@@ -7,6 +7,7 @@ import mock
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
+from django.test import TestCase
 
 from openedx.features.enterprise_support.api import (
     data_sharing_consent_required,
@@ -17,17 +18,20 @@ from openedx.features.enterprise_support.api import (
     insert_enterprise_pipeline_elements
 )
 
-
+# Enterprise integration is disabled by default.
+FEATURES_WITH_ENTERPRISE_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestEnterpriseApi(unittest.TestCase):
+@override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
+class TestEnterpriseApi(TestCase):
     """
     Test enterprise support APIs.
     """
 
+    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_DISABLED)
     def test_utils_with_enterprise_disabled(self):
         """
         Test that disabling the enterprise integration flag causes
@@ -36,7 +40,6 @@ class TestEnterpriseApi(unittest.TestCase):
         self.assertFalse(enterprise_enabled())
         self.assertEqual(insert_enterprise_pipeline_elements(None), None)
 
-    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     def test_utils_with_enterprise_enabled(self):
         """
         Test that enabling enterprise integration (which is currently on by default) causes the
@@ -50,7 +53,6 @@ class TestEnterpriseApi(unittest.TestCase):
                                     'social_core.pipeline.social_auth.load_extra_data',
                                     'def'])
 
-    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
     def test_enterprise_customer_for_request(self, ec_class_mock, get_ec_pipeline_mock):
@@ -173,7 +175,6 @@ class TestEnterpriseApi(unittest.TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
 
-    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_get_enterprise_consent_url(self, needed_for_course_mock):
         """
@@ -198,7 +199,6 @@ class TestEnterpriseApi(unittest.TestCase):
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
         self.assertEqual(actual_url, expected_url)
 
-    @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_get_enterprise_consent_url_next_provided_not_course_specific(self, needed_for_course_mock):
         """

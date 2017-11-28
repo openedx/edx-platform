@@ -206,7 +206,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # User visits the track selection page directly without ever enrolling
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-        print(response)
         self.assertContains(
             response,
             'Welcome, {username}! You are about to enroll in {course_name}, from test organization 0 and '
