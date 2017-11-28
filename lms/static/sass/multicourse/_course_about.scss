@@ -2,9 +2,9 @@
   .container {
     padding-bottom: 120px;
 
-    @media screen and (max-width: $bp-screen-md) {
+    @include media-breakpoint-down(md) {
       min-width: auto;
-      padding: 20px;
+      padding: $baseline;
     }
   }
 
@@ -32,8 +32,8 @@
       margin: 0 auto;
       max-width: map-get($container-max-widths, xl);
 
-      @media screen and (min-width: $bp-screen-md) {
-        min-width: $bp-screen-md;
+      @include media-breakpoint-up(md) {
+          min-width: map-get($container-max-widths, md);
       }
 
       position: relative;
@@ -300,7 +300,7 @@
   }
 
   .details {
-    @media screen and (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       @include float(left);
       @include margin-right(flex-gutter());
 
@@ -395,7 +395,7 @@
   }
 
   .course-sidebar {
-    @media screen and (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(dm) {
       @include box-sizing(border-box);
       @include float(left);
 
