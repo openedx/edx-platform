@@ -8,19 +8,20 @@ from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, U
 
 
 def fetch_survey(request):
-    survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
-    uos = get_user_survey(request.user, survey)
+    latest_survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
+    uos = get_user_survey(request.user, latest_survey)
+    survey = uos.oef_survey
     topics = get_survey_topics(uos, survey.id)
 
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id, "topics": topics})
 
 
-def get_user_survey(user, survey):
+def get_user_survey(user, latest_survey):
     try:
-        uos = UserOefSurvey.objects.get(oef_survey_id=survey.id, user_id=user.id)
+        uos = UserOefSurvey.objects.get(user_id=user.id, status='in-progress')
     except UserOefSurvey.DoesNotExist:
         uos = UserOefSurvey()
-        uos.oef_survey = survey
+        uos.oef_survey = latest_survey
         uos.user = user
         uos.survey_date = datetime.date.today()
         uos.start_date = datetime.date.today()

@@ -39,14 +39,19 @@ class Option(TimeStampedModel):
 
 
 class UserOefSurvey(TimeStampedModel):
+    STATUS_CHOICES = (
+        ('in-progress', 'In Progress'),
+        ('completed', 'Completed'),
+    )
     user = models.ForeignKey(User)
     oef_survey = models.ForeignKey(OefSurvey)
     start_date = models.DateField()
     completed_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in-progress')
 
     def __str__(self):
         return '-'.join([self.user.username, self.oef_survey.title])
+
 
 class UserAnswers(TimeStampedModel):
     user_survey = models.ForeignKey(UserOefSurvey, related_name='answers')
