@@ -1,6 +1,6 @@
-<ul aria-labelledby="notif_dropdown">
+<ul aria-labelledby="notif_dropdown" class="xns-container">
 
-    <li class="notification-header action-btns"> Notifications
+    <li class="notification-header xns-list-header action-btns">
         <div class="xns-actions">
             <ul class="xns-tab-list">
                 <li class="xns-unread-action"><a href="#">View unread</a></li>
@@ -14,10 +14,10 @@
         <li class="no-notifs"><span>No notifications</span></li>
     <% } %>
     <li>
-        <ul class="notification-menu" id="notification-dropdown">
+        <ul class="notification-menu xns-items" id="notification-dropdown">
             <% _.each(notifications, function(notification){ %>
 
-                <li <% if (!notification.read_at) { %> class="unread xns-mark-read-action"  <% } %> id="<%-notification.id%>" data-path="<%-notification.msg.payload.path%>"
+                <li <% if (!notification.read_at) { %> class="unread xns-item"  <% } else { %> class="xns-item" <% } %> id="<%-notification.id%>" data-path="<%-notification.msg.payload.path%>"
                     data-pid="<%-notification.msg.payload.pid%>" data-tid="<%-notification.msg.payload.tid%>">
                         <%  if (notification.image) { %>
                          <span class="img-box"><img src="<%-notification.image%>"/></span>
@@ -27,8 +27,8 @@
                         <span class="notification-text mark-me-read " data-msg-id="<%-notification.msg.id%>" data-path="<%-notification.msg.payload.path%>">
                             <span class="text"><%-notification.msg.payload.bodyLong%></span>
                         </span>
-                        <% if (!notification.read_at) { %>
-                            <span class="mark-read mark-me-read xns-mark-read-action" data-msg-id="<%-notification.msg.id%>" data-redirect="false" aria-label="Mark Read">&#9673</span>
+                        <% if (!notification.read_at && selected_pane == "unread") { %>
+                            <span class="mark-read mark-me-read xns-close-item" data-msg-id="<%-notification.msg.id%>" data-redirect="false" aria-label="Mark Read">&#9673</span>
                         <% } %>
 
                         <span class="relTime"><time class="timeago" datetime="<%-notification.created%>"></time></span>
