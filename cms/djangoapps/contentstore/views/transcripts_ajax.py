@@ -11,15 +11,16 @@ import logging
 import os
 
 import requests
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
+from edxval import api as edxval_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
@@ -28,20 +29,19 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
+    GetTranscriptsFromYouTubeException,
+    Transcript,
+    TranscriptsRequestValidationException,
     copy_or_rename_transcript,
     download_youtube_subs,
-    GetTranscriptsFromYouTubeException,
-    get_video_transcript_content,
     generate_subs_from_source,
     get_transcripts_from_youtube,
+    get_video_transcript_content,
     is_val_transcript_feature_enabled_for_course,
     manage_video_subtitles_save,
     remove_subs_from_store,
-    Transcript,
-    TranscriptsRequestValidationException,
-    youtube_video_transcript_name,
+    youtube_video_transcript_name
 )
-from edxval import api as edxval_api
 
 __all__ = [
     'upload_transcripts',
@@ -125,20 +125,20 @@ def upload_transcripts(request):
             sjson_subs = generate_subs_from_source({}, source_subs_ext, source_subs_filedata, item)
 
             for video_dict in video_list:
-                video_name = video_dict['video']
+                video_id = video_dict['video']
                 # We are creating transcripts for every video source in case a video source is deleted in future.
                 edxval_api.create_or_update_video_transcript(
-                    video_id=video_name,
+                    video_id=video_id,
                     language_code='en',
-                    file_name='subs.sjson',  # S3 filename will be `uuid.sjson` like 5d30d3e44cebacf6163976388cae.sjson
+                    file_name='subs.sjson',  # S3 filename will be `{uuid}.sjson` like 5d30d3ehebacf6163976388cae.sjson
                     file_format='sjson',
                     provider='Custom',
                     file_data=ContentFile(json.dumps(sjson_subs)),
                 )
 
-            item.sub = video_name
+            item.sub = video_id
             item.save_with_metadata(request.user)
-            response['subs'] = video_name
+            response['subs'] = video_id
             response['status'] = 'Success'
         except Exception as ex:
             return error_response(response, ex.message)

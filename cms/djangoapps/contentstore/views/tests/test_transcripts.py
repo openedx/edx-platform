@@ -135,17 +135,21 @@ class TestUploadTranscripts(BaseTranscripts):
 
         self.ufeff_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
 
-    def assert_transcript_upload(self, filename, expected_transcript_content):
+    def assert_transcript_upload(self, subs_id, expected_transcript_content):
         """
-        Verify that transcript is uploaded as expected
+        Verify that transcript is uploaded as expected.
+
+        Arguments:
+            subs_id (str): subtitle id
+            expected_transcript_content (str): transcript content be checked
         """
         # verify that transcript should not be in contentstore
-        content_location = StaticContent.compute_location(self.course.id, 'subs_{0}.srt.sjson'.format(filename))
+        content_location = StaticContent.compute_location(self.course.id, 'subs_{0}.srt.sjson'.format(subs_id))
         with self.assertRaises(NotFoundError):
             contentstore().find(content_location)
 
         # verify uploaded transcript content
-        transcript_data = edxval_api.get_video_transcript_data([filename], 'en')
+        transcript_data = edxval_api.get_video_transcript_data([subs_id], 'en')
         sjson_transcript = transcript_data['content']
         uploaded_transcript_content = transcripts_utils.Transcript.convert(
             sjson_transcript,
