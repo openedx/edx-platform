@@ -2,10 +2,12 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-from django.utils.translation import override as override_language, ugettext as _
-from django.db import transaction, IntegrityError
+import re
 import datetime
 from pytz import UTC
+
+from django.utils.translation import override as override_language, ugettext as _
+from django.db import transaction, IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, ValidationError
@@ -133,8 +135,10 @@ def update_account_settings(requesting_user, update, username=None):
 
     # If user has requested to change name, store old name because we must update associated metadata
     # after the save process is complete.
+    changing_full_name = False
     old_name = None
     if "name" in update:
+        changing_full_name = True
         old_name = existing_user_profile.name
 
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
@@ -168,6 +172,12 @@ def update_account_settings(requesting_user, update, username=None):
                 "developer_message": u"Error thrown from validate_new_email: '{}'".format(err.message),
                 "user_message": err.message
             }
+
+    if changing_full_name and contains_html(update['name']):
+        field_errors["name"] = {
+            "developer_message": u"Error thrown from validate_full_name: '{}'".format('Full Name is in-valid'),
+            "user_message": _(u"Full Name cannot contain the following characters: < >")
+        }
 
     # If we have encountered any validation errors, return them to the user.
     if field_errors:
@@ -512,6 +522,14 @@ def _get_user_and_profile(username):
     existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
     return existing_user, existing_user_profile
+
+
+def contains_html(value):
+    """
+    Validator method to check whether name contains html tags
+    """
+    regex = re.compile('(<|>)', re.UNICODE)
+    return bool(regex.search(value))
 
 
 def _validate(validation_func, err, *args):
