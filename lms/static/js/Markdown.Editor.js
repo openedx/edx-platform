@@ -1442,9 +1442,9 @@
             buttonRow.className = 'wmd-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
-            var makeButton = function(id, title, XShift, textOp) {
+            var makeButton = function(id, title, XShift, textOp, tabIndex) {
                 var button = document.createElement('button');
-                button.tabIndex = 0;
+                button.tabIndex = tabIndex;
                 button.className = 'wmd-button';
                 button.style.left = xPosition + 'px';
                 xPosition += 25;
@@ -1468,35 +1468,35 @@
                 xPosition += 25;
             };
 
-            buttons.bold = makeButton('wmd-bold-button', gettext('Bold (Ctrl+B)'), '0px', bindCommand('doBold'));
-            buttons.italic = makeButton('wmd-italic-button', gettext('Italic (Ctrl+I)'), '-20px', bindCommand('doItalic'));
+            buttons.bold = makeButton('wmd-bold-button', gettext('Bold (Ctrl+B)'), '0px', bindCommand('doBold'), 0);
+            buttons.italic = makeButton('wmd-italic-button', gettext('Italic (Ctrl+I)'), '-20px', bindCommand('doItalic'), -1);
             makeSpacer(1);
             buttons.link = makeButton('wmd-link-button', gettext('Hyperlink (Ctrl+L)'), '-40px', bindCommand(function(chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
-            }));
-            buttons.quote = makeButton('wmd-quote-button', gettext('Blockquote (Ctrl+Q)'), '-60px', bindCommand('doBlockquote'));
-            buttons.code = makeButton('wmd-code-button', gettext('Code Sample (Ctrl+K)'), '-80px', bindCommand('doCode'));
+            }), -1);
+            buttons.quote = makeButton('wmd-quote-button', gettext('Blockquote (Ctrl+Q)'), '-60px', bindCommand('doBlockquote'), -1);
+            buttons.code = makeButton('wmd-code-button', gettext('Code Sample (Ctrl+K)'), '-80px', bindCommand('doCode'), -1);
             buttons.image = makeButton('wmd-image-button', gettext('Image (Ctrl+G)'), '-100px', bindCommand(function(chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, true, imageUploadHandler);
-            }));
+            }), -1);
             makeSpacer(2);
             buttons.olist = makeButton('wmd-olist-button', gettext('Numbered List (Ctrl+O)'), '-120px', bindCommand(function(chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
-            }));
+            }), -1);
             buttons.ulist = makeButton('wmd-ulist-button', gettext('Bulleted List (Ctrl+U)'), '-140px', bindCommand(function(chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
-            }));
-            buttons.heading = makeButton('wmd-heading-button', gettext('Heading (Ctrl+H)'), '-160px', bindCommand('doHeading'));
-            buttons.hr = makeButton('wmd-hr-button', gettext('Horizontal Rule (Ctrl+R)'), '-180px', bindCommand('doHorizontalRule'));
+            }), -1);
+            buttons.heading = makeButton('wmd-heading-button', gettext('Heading (Ctrl+H)'), '-160px', bindCommand('doHeading'), -1);
+            buttons.hr = makeButton('wmd-hr-button', gettext('Horizontal Rule (Ctrl+R)'), '-180px', bindCommand('doHorizontalRule'), -1);
             makeSpacer(3);
-            buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null);
+            buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null, -1);
             buttons.undo.execute = function(manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 gettext('Redo (Ctrl+Y)') :
                 gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null);
+            buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null, -1);
             buttons.redo.execute = function(manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {

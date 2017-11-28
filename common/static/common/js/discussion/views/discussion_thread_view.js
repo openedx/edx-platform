@@ -62,7 +62,10 @@
 
             DiscussionThreadView.prototype.events = {
                 'click .discussion-submit-post': 'submitComment',
-                'click .add-response-btn': 'scrollToAddResponse'
+                'click .add-response-btn': 'scrollToAddResponse',
+                'keydown .wmd-button': function(event) {
+                    return DiscussionUtil.handleKeypressInToolbar(event);
+                }
             };
 
             DiscussionThreadView.prototype.$ = function(selector) {
