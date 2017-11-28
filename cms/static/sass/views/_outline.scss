@@ -191,6 +191,8 @@
       display: inline-block;
       color: $color-copy-base;
       margin-right: $baseline;
+      vertical-align: top;
+      margin-bottom: 0;
 
       // STATE: hover
       &:hover {
@@ -204,17 +206,23 @@
       margin-left: $baseline * 1.6;
     }
 
-    .status-release-label,
     .status-release-value,
-    .status-pacing-label,
     .status-pacing-value,
-    .status-highlights-enabled-label,
     .status-highlights-enabled-value,
     .status-highlights-enabled-info,
     .status-actions {
       display: inline-block;
       vertical-align: middle;
       margin-bottom: 0;
+    }
+
+    .status-release-label,
+    .status-release-row,
+    .status-pacing-label,
+    .status-pacing-row,
+    .status-highlights-enabled-label,
+    .status-highlights-enabled-row {
+      display: block;
     }
 
     .status-release-label,
