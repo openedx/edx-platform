@@ -9,7 +9,6 @@ import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from branding import api as branding_api

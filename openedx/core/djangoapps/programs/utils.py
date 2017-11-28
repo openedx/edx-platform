@@ -22,7 +22,6 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -605,8 +604,8 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
     def __init__(self, program_data, user):
         super(ProgramMarketingDataExtender, self).__init__(program_data, user)
 
-        # Aggregate dict of instructors for the program keyed by name
-        self.instructors = {}
+        # Aggregate list of instructors for the program
+        self.instructors = []
 
         # Values for programs' price calculation.
         self.data['avg_price_per_course'] = 0.0
@@ -628,7 +627,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
-            program_instructors = self.instructors.values()
+            program_instructors = self.instructors
             cache.set(cache_key, program_instructors, 3600)
 
         self.data['instructors'] = program_instructors
@@ -688,6 +687,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             course_instructors = getattr(course_descriptor, 'instructor_info', {})
 
             # Deduplicate program instructors using instructor name
-            self.instructors.update(
-                {instructor.get('name', '').strip(): instructor for instructor in course_instructors.get('instructors', [])}
-            )
+            curr_instructors_names = [instructor.get('name', '').strip() for instructor in self.instructors]
+            for instructor in course_instructors.get('instructors', []):
+                if instructor.get('name', '').strip() not in curr_instructors_names:
+                    self.instructors.append(instructor)

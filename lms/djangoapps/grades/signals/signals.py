@@ -5,7 +5,6 @@ from django.dispatch import Signal
 
 # Signal that indicates that a user's grade for a course has been updated.
 # This is a downstream signal of SUBSECTION_SCORE_CHANGED.
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 # Signal that indicates that a user's raw score for a problem has been updated.
 # This signal is generated when a scoring event occurs within the core

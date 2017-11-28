@@ -20,7 +20,7 @@ from instructor_analytics.csvs import format_dictlist
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from survey.models import SurveyAnswer
-from util.file import UniversalNewlineIterator, course_filename_prefix_generator
+from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store

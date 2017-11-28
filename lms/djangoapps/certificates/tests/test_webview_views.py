@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 """Tests for certificates views. """
 
+import datetime
 import json
 from collections import OrderedDict
 from urllib import urlencode
 from uuid import uuid4
 
-import ddt
-import datetime
+import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-
-from util.date_utils import strftime_localized
 from mock import patch
-from nose.plugins.attrib import attr
 
+import ddt
 from certificates.api import get_certificate_url
 from certificates.models import (
     CertificateGenerationCourseSetting,
@@ -40,6 +38,7 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
@@ -47,6 +46,7 @@ from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
 from util import organizations_helpers as organizations_api
+from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -243,6 +243,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
 
 @attr(shard=1)
 @ddt.ddt
+@pytest.mark.django111_expected_failure
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
     Tests for the certificates web/html views
@@ -657,6 +658,35 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_html_view_for_non_viewable_certificate(self):
+        """
+        Tests that Certificate HTML Web View returns "Cannot Find Certificate" if certificate is not viewable yet.
+        """
+        test_certificates = [
+            {
+                'id': 0,
+                'name': 'Certificate Name 0',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': test_certificates}
+        self.course.cert_html_view_enabled = True
+        self.course.certificate_available_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn("Invalid Certificate", response.content)
+        self.assertIn("Cannot Find Certificate", response.content)
+        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_valid_signatories(self):
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
@@ -871,8 +901,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @ddt.data(
         (-2, True),
-        (-2, False),
-        (10, False)
+        (-2, False)
     )
     @ddt.unpack
     def test_html_view_certificate_available_date_for_instructor_paced_courses(self, cert_avail_delta, self_paced):

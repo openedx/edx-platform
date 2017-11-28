@@ -1,6 +1,7 @@
 """
 Tests for the Badges app models.
 """
+import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
@@ -37,6 +38,7 @@ class BadgeImageConfigurationTest(TestCase):
     Test the validation features of BadgeImageConfiguration.
     """
 
+    @pytest.mark.django111_expected_failure
     def test_no_double_default(self):
         """
         Verify that creating two configurations as default is not permitted.

@@ -7,7 +7,6 @@ import json
 import unittest
 
 import ddt
-import mock
 import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse

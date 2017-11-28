@@ -43,7 +43,8 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
             settings=course_settings
         )
         self.course_fixture.add_advanced_settings({
-            "cert_html_view_enabled": {"value": "true"}
+            "cert_html_view_enabled": {"value": "true"},
+            "certificates_display_behavior": {"value": "early_with_info"},
         })
         self.course_fixture.install()
         self.user_id = "99"  # we have created a user with this id in fixture

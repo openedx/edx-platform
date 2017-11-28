@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-16 11:00+0000\n"
-"PO-Revision-Date: 2017-11-16 11:00:28.867741\n"
+"POT-Creation-Date: 2017-11-23 10:57+0000\n"
+"PO-Revision-Date: 2017-11-23 10:57:57.263712\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3134,6 +3134,16 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Highlights Enabled for Messaging"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, any highlights associated with content in the "
+"course will be messaged to learners at their scheduled time."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr ""
 
@@ -5819,31 +5829,19 @@ msgid "full_name"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid "%(comment_username)s replied to your thread."
-msgstr ""
-
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid ""
-"<p> Hi %(thread_username)s, </p> <p> %(comment_username)s made the following"
-" reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
-"%(comment_body)s </p>"
-msgstr ""
-
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-msgid "View the discussion"
-msgstr ""
-
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
-msgid "This is the reply to your thread:"
+#, python-format
+msgid "%(comment_username)s replied to your <b>%(thread_title)s</b> post"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+msgid "View discussion"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
-msgid ""
-"\n"
-"Someone replied to your thread on %(platform_name)s\n"
+msgid "Response to your %(thread_title)s post"
 msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
@@ -9442,6 +9440,18 @@ msgstr ""
 msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr ""
 
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "KnownErrorCases"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Schedule start < course start"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Experience"
+msgstr ""
+
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedules"
@@ -9587,6 +9597,7 @@ msgid "Welcome to week %(week_num)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 #, python-format
 msgid ""
 "Many %(platform_name)s learners are completing more problems every week, and"
@@ -9595,6 +9606,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 #, python-format
 msgid ""
 "Many %(platform_name)s learners in %(course_name)s are completing more "
@@ -9608,18 +9620,11 @@ msgid "Keep up the momentum!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
-msgid ""
-"Many edX learners are completing more problems every week, and participating"
-" in the discussion forums. What do you want to do to keep learning?"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #, python-format
 msgid ""
-"Many edX learners in <strong>%(course_name)s</strong> are completing more "
-"problems every week, and participating in the discussion forums. What do you"
-" want to do to keep learning?"
+"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
+"completing more problems every week, and participating in the discussion "
+"forums. What do you want to do to keep learning?"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -9627,30 +9632,21 @@ msgstr ""
 msgid "Keep learning"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Many edX learners in %(course_name)s are completing more problems every "
-"week, and participating in the discussion forums. What do you want to do to "
-"keep learning?"
+"Remember when you enrolled in %(course_name)s, and other courses on "
+"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
+" is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in %(course_name)s on %(platform_name)s? We do, "
+"and we’re glad to have you! Come see what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
@@ -9661,15 +9657,16 @@ msgstr ""
 #, python-format
 msgid ""
 "Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on edX.org? We do, and we’re glad to have you! Come see what "
-"everyone is learning."
+"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
+"what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #, python-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on edX.org? "
-"We do, and we’re glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
+" is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
@@ -10311,6 +10308,20 @@ msgid ""
 "Welcome to the new learner profile page. Your full profile now displays more"
 " information to other learners. You can instead choose to display a limited "
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
+msgstr ""
+
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
+" We do, and we’re glad to have you! Come see what everyone is learning."
+msgstr ""
+
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
+"glad to have you! Come see what everyone is learning."
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -14382,16 +14393,16 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive course credit from {providers} "
-"for successfully completing your {platform_name} course! {link_start}Get "
-"your credit now.{link_end}"
+"Congratulations! You are now eligible to receive course credit from "
+"{providers} for successfully completing your {platform_name} course! "
+"{link_start}Purchase credit now.{link_end}"
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive course credit for successfully "
-"completing your {platform_name} course! {link_start}Get your credit "
-"now.{link_end}"
+"Congratulations! You are now eligible to receive course credit for "
+"successfully completing your {platform_name} course! {link_start}Purchase "
+"credit now.{link_end}"
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -14402,11 +14413,22 @@ msgid ""
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid "There are 2 steps to getting course credit."
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"To get course credit, simply go to your {link_start}{platform_name} "
-"dashboard{link_end} and click the <b>Get Credit</b> button. After you "
-"receive your credit, you will also have an official academic transcript at "
-"the institution that granted the credit."
+"Purchase credit by going to your {link_start}{platform_name} "
+"dashboard{link_end} and clicking the {bold_start}Get Credit{bold_end} button"
+" below the course title."
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"When your payment is complete, return to the dashboard and click the "
+"{bold_start}Request Credit{bold_end} button under the course title to "
+"request an official academic transcript at the institution that granted the "
+"credit."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -14523,10 +14545,6 @@ msgid ""
 "Since we did not have a valid set of verification photos from you when your "
 "{cert_name_long} was generated, we could not grant you a verified "
 "{cert_name_short}. An honor code {cert_name_short} has been granted instead."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course details"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html

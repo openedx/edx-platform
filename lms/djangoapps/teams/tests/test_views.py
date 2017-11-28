@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime
 
 import ddt
+import pytest
 import pytz
 from dateutil import parser
 from django.conf import settings
@@ -79,6 +80,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = self.client.get(self.teams_url)
         self.assertEqual(404, response.status_code)
 
+    @pytest.mark.django111_expected_failure
     def test_not_enrolled_staff(self):
         """
         Verifies that a user with global access who is not enrolled in the course can access the team dashboard.
@@ -89,6 +91,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = staff_client.get(self.teams_url)
         self.assertContains(response, "TeamsTabFactory", status_code=200)
 
+    @pytest.mark.django111_expected_failure
     def test_enrolled_not_staff(self):
         """
         Verifies that a user without global access who is enrolled in the course can access the team dashboard.

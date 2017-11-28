@@ -5,7 +5,6 @@ Certificate HTML webview.
 import logging
 import urllib
 from datetime import datetime
-from dateutil import parser
 from uuid import uuid4
 
 import pytz
@@ -44,7 +43,7 @@ from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from openedx.core.djangoapps.certificates.api import display_date_for_certificate
+from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
@@ -515,6 +514,13 @@ def render_html_view(request, user_id, course_id):
             "%d. Specific error: %s"
         )
         log.info(error_str, course_id, user_id, str(exception))
+        return _render_invalid_certificate(course_id, platform_name, configuration)
+
+    if not certificates_viewable_for_course(course):
+        log.info(
+            "Invalid cert: Certificate for %s is not viewable yet.",
+            course_id,
+        )
         return _render_invalid_certificate(course_id, platform_name, configuration)
 
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course

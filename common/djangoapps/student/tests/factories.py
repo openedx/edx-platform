@@ -1,17 +1,15 @@
 """Provides factories for student models."""
-import random
+
 from datetime import datetime
 from uuid import uuid4
 
 import factory
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from factory import lazy_attribute
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import (

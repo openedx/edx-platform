@@ -2,6 +2,7 @@
 Tests for wiki middleware.
 """
 
+import pytest
 from django.test.client import Client
 from nose.plugins.attrib import attr
 from wiki.models import URLPath
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
+@pytest.mark.django111_expected_failure
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
 

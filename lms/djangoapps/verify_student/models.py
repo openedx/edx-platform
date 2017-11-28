@@ -608,7 +608,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
        both Software Secure and edx-platform.
 
     2. The snapshot of a user's photo ID is also encrypted using AES-256, but
-       the key is randomly generated using pycrypto's Random. Every verification
+       the key is randomly generated using os.urandom. Every verification
        attempt has a new key. The AES key is then encrypted using a public key
        provided by Software Secure. We store only the RSA-encryped AES key.
        Since edx-platform does not have Software Secure's private RSA key, it

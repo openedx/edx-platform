@@ -17,14 +17,11 @@ import inspect
 import json
 import logging
 import numbers
-import os
 import random
 import re
-import subprocess
 import sys
 import textwrap
 import traceback
-import xml.sax.saxutils as saxutils
 from collections import namedtuple
 from datetime import datetime
 from sys import float_info

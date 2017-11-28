@@ -12,7 +12,6 @@ from pytz import UTC
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import i4xEncoder
 
-import pystache_custom as pystache
 from courseware import courses
 from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
@@ -20,7 +19,6 @@ from django_comment_client.permissions import check_permissions_by_view, get_tea
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
 from django_comment_common.utils import get_course_discussion_settings
-from edxmako import lookup_template
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from request_cache.middleware import request_cached

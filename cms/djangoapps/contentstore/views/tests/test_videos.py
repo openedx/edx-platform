@@ -24,7 +24,6 @@ from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
     _get_default_video_image_url,
     validate_video_image,
-    validate_transcript_preferences,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
     TranscriptProvider
@@ -994,7 +993,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'video_source_language': 'zh',
             },
             True,
@@ -1004,7 +1003,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'video_source_language': 'es',
                 'preferred_languages': ['es', 'ur']
             },
@@ -1015,7 +1014,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'video_source_language': 'en',
                 'preferred_languages': ['es', 'ur']
             },
@@ -1039,7 +1038,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA,
-                'three_play_turnaround': 'default',
+                'three_play_turnaround': 'standard',
                 'preferred_languages': ['en'],
                 'video_source_language': 'en',
             },

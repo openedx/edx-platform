@@ -20,7 +20,8 @@ CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
 LMS_ROOT_URL = 'http://localhost:8000'
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 
 ################################ LOGGERS ######################################
 
@@ -267,6 +268,22 @@ JWT_AUTH.update({
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',
 })
+
+
+############## Settings for ACE ####################################
+ACE_ENABLED_CHANNELS = [
+    'file_email'
+]
+ACE_ENABLED_POLICIES = [
+    'bulk_email_optout'
+]
+ACE_CHANNEL_SAILTHRU_DEBUG = True
+ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = 'Automated Communication Engine Email'
+ACE_CHANNEL_SAILTHRU_API_KEY = None
+ACE_CHANNEL_SAILTHRU_API_SECRET = None
+
+ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
+
 
 #####################################################################
 # See if the developer has any local overrides.
