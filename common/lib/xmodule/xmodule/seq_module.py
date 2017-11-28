@@ -159,6 +159,7 @@ class ProctoringFields(object):
 @XBlock.wants('proctoring')
 @XBlock.wants('verification')
 @XBlock.wants('milestones')
+@XBlock.wants('gating')
 @XBlock.wants('credit')
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
@@ -267,16 +268,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             return banner_text, hidden_content_html
 
-    def _is_content_gated(self):
+    def _get_gating_milestone(self):
         """
         Checks whether the content is gated for learners.
         """
-        milestones_service = self.runtime.service(self, 'milestones')
-        if milestones_service:
-            content_milestones = milestones_service.get_course_content_milestones(
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            milestone = gating_service.get_gating_milestone(
                 self.course_id, self.location, 'requires'
             )
-            return content_milestones
+            return milestone
 
         return False
 
@@ -284,13 +285,22 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         Evaluate if the user has completed the prerequiste
         """
-        prereq_met = False
-        milestones_service = self.runtime.service(self, 'milestones')
-        if milestones_service:
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
             # if it's complete then a user milestone record will exist
-            prereq_met = milestones_service.user_has_milestone({'id': self.runtime.user_id}, milestone)
+            return gating_service.is_prereq_met(self.runtime.user_id, milestone)
+
+        return False
+
+    def _get_milestone_meta_info(self, milestone):
+        """
+        Return information to display about the gating milstone
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            return gating_service.get_gating_milestone_meta_info(self.course_id, milestone)
         
-        return prereq_met
+        return {}
 
     def _can_user_view_content(self, course):
         """
@@ -317,19 +327,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._update_position(context, len(display_items))
 
         gate_content = False
-        milestones = self._is_content_gated()
-        if milestones:
+        milestone = self._get_gating_milestone()
+        if milestone:
             if self.runtime.user_is_staff:
                 banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
-            elif not self._is_prereq_met(milestones[0]):
+            elif not self._is_prereq_met(milestone):
                 gate_content = True
-                required_grade = milestones[0]['requirements']['min_score']
-                # figure out correct way to formulate this url
-                preqreq_url = '../../../jump_to/' + milestones[0]['namespace'].replace('.gating', '')
-                # figure out how to get the display name of the gating section
-                preqreq_section_name = 'Test Section'
-            else:
-                print('\nBF!! Hurray the prequesite has been met!!')
+                milestone_meta_info = self._get_milestone_meta_info(milestone)
 
         fragment = Fragment()
         params = {
@@ -344,9 +348,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'banner_text': banner_text,
             'disable_navigation': not self.is_user_authenticated(context),
             'gate_content': gate_content,
-            'required_grade': required_grade if gate_content else None,
-            'prereq_url': preqreq_url if gate_content else None,
-            'prereq_section_name' : preqreq_section_name if gate_content else None
+            'required_grade': milestone['requirements']['min_score'] if gate_content else None,
+            'prereq_url': milestone_meta_info['url'] if gate_content else None,
+            'prereq_section_name': milestone_meta_info['display_name'] if gate_content else None
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
 

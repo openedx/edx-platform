@@ -3,6 +3,7 @@ API for the gating djangoapp
 """
 import logging
 
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
@@ -299,3 +300,32 @@ def get_gated_content(course, user):
                 {'id': user.id}
             )
         ]
+
+def is_prereq_met(user_id, milestone):
+    """
+    Returns true if the prequiste has been met for a given milestone
+
+    Arguments:
+        user_id: The id of the user
+        milestone (Milestone) : The milestone to check
+    """
+    return milestones_api.user_has_milestone({'id': user_id}, milestone)
+
+def get_gating_milestone_meta_info(course_id, milestone):
+    """
+    Returns dict containing meta information about given milestone
+
+    Arguments:
+        course_id: The id of the course
+        milestone (Milestone): The gating milestone
+
+    Returns:
+        dict of {'url': gating_milestone_url, 'display_name': gating_milestone_display_name}
+    """
+    prereq_content_key = milestone['namespace'].replace(GATING_NAMESPACE_QUALIFIER, '')
+    gating_milestone_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': prereq_content_key})
+    block_id = UsageKey.from_string(prereq_content_key).block_id
+    blocks = modulestore().get_items(course_id, qualifiers={'name': [block_id]})
+    if blocks:
+        gating_milestone_display_name = blocks[0].display_name
+    return {'url': gating_milestone_url, 'display_name': gating_milestone_display_name}
