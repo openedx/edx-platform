@@ -929,11 +929,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         with self.assertRaises(pipeline.AuthEntryError):
             strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
-    def test_pipeline_raises_auth_entry_error_if_auth_entry_missing(self):
+    def test_pipeline_assumes_login_if_auth_entry_missing(self):
         _, strategy = self.get_request_and_strategy(auth_entry=None, redirect_uri='social:complete')
-
-        with self.assertRaises(pipeline.AuthEntryError):
-            strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        response = self.fake_auth_complete(strategy)
+        self.assertEqual(response.url, reverse('signin_user'))
 
 
 # pylint: disable=test-inherits-tests, abstract-method

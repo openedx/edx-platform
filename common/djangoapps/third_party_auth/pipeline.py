@@ -150,7 +150,7 @@ logger = getLogger(__name__)
 
 
 class AuthEntryError(AuthException):
-    """Raised when auth_entry is missing or invalid on URLs.
+    """Raised when auth_entry is invalid on URLs.
 
     auth_entry tells us whether the auth flow was initiated to register a new
     user (in which case it has the value of AUTH_ENTRY_REGISTER) or log in an
@@ -459,10 +459,11 @@ def running(request):
 
 def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
-    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY)
-    if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
-        raise AuthEntryError(strategy.request.backend, 'auth_entry missing or invalid')
-
+    # If auth_entry is not in the session, we got here by a non-standard workflow.
+    # We simply assume 'login' in that case.
+    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
+    if auth_entry not in _AUTH_ENTRY_CHOICES:
+        raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
     return {'auth_entry': auth_entry}
 
 
