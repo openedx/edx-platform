@@ -242,6 +242,8 @@ class PaginationTestCase(AssetsTestCase):
             url + '?sort=' + sort + '&direction=' + direction, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets_response = json_response['assets']
+        self.assertEquals(sort, json_response['sort'])
+        self.assertEquals(direction, json_response['direction'])
         name1 = assets_response[0][sort]
         name2 = assets_response[1][sort]
         name3 = assets_response[2][sort]
@@ -257,7 +259,7 @@ class PaginationTestCase(AssetsTestCase):
         Get from the url w/ a filter option and ensure items honor that filter
         """
 
-        filter_value_split = filter_value.split(',')
+        filter_value_split = filter_value.split(',') if filter_value else []
 
         requested_file_extensions = []
         all_file_extensions = []
@@ -276,6 +278,7 @@ class PaginationTestCase(AssetsTestCase):
             url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets_response = json_response['assets']
+        self.assertEquals(filter_value_split, json_response['assetTypes'])
 
         if filter_value is not '':
             content_types = [asset['content_type'].lower()
