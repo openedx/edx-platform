@@ -2577,8 +2577,10 @@ class TestXBlockInfo(ItemTest):
         self.store.update_item(self.course, None)
         chapter = self.store.get_item(self.chapter.location)
         with highlights_setting.override():
-            xblock_info = create_xblock_info(chapter)
-            self.assertTrue(xblock_info['highlights_enabled'])
+            chapter_xblock_info = create_xblock_info(chapter)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertTrue(chapter_xblock_info['highlights_enabled'])
+            self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
@@ -2588,6 +2590,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], unicode(self.course.location))
         self.assertEqual(xblock_info['display_name'], self.course.display_name)
         self.assertTrue(xblock_info['published'])
+        self.assertFalse(xblock_info['highlights_enabled_for_messaging'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info, course_outline=course_outline)
@@ -2608,7 +2611,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['format'], None)
         self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
         self.assertFalse(xblock_info['highlights_enabled'])
-        self.assertFalse(xblock_info['highlights_enabled_for_messaging'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)

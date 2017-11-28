@@ -21,7 +21,9 @@ class TestContentHighlights(ModuleStoreTestCase):
         self._setup_user()
 
     def _setup_course(self):
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            highlights_enabled_for_messaging=True
+        )
         self.course_key = self.course.id
 
     def _setup_user(self):
@@ -65,6 +67,23 @@ class TestContentHighlights(ModuleStoreTestCase):
             get_week_highlights(self.user, self.course_key, week_num=1),
             highlights,
         )
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_highlights_disabled_for_messaging(self):
+        highlights = [u'A test highlight.']
+        with self.store.bulk_operations(self.course_key):
+            self._create_chapter(highlights=highlights)
+            self.course.highlights_enabled_for_messaging = False
+            self.store.update_item(self.course, self.user.id)
+
+        self.assertFalse(course_has_highlights(self.course_key))
+
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_week_highlights(
+                self.user,
+                self.course_key,
+                week_num=1,
+            )
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_course_with_no_highlights(self):

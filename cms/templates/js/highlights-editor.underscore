@@ -19,7 +19,10 @@
         'read our {linkStart}documentation{linkEnd}.'
     ),
     {
-        linkStart: edx.HtmlUtils.HTML('<a href="' + highlights_doc_url + '">'),
+        linkStart: edx.HtmlUtils.interpolateHtml(
+            edx.HtmlUtils.HTML('<a href={highlightsDocUrl}">'),
+            {highlightsDocUrl: highlights_doc_url}
+        ),
         linkEnd: edx.HtmlUtils.HTML('</a>')
     }
 ) %>
