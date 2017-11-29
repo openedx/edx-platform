@@ -6,6 +6,9 @@ from paver.easy import call_task
 from ..utils.envs import Env
 from .utils import PaverTestCase
 
+import pytest
+pytestmark = pytest.mark.skip()
+
 EXPECTED_COFFEE_COMMAND = (
     u"node_modules/.bin/coffee --compile `find {platform_root}/lms "
     u"{platform_root}/cms {platform_root}/common -type f -name \"*.coffee\"`"

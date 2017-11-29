@@ -9,6 +9,9 @@ from pavelib.utils.envs import Env
 
 from .utils import PaverTestCase
 
+import pytest
+pytestmark = pytest.mark.skip()
+
 
 @ddt.ddt
 class TestPaverJavaScriptTestTasks(PaverTestCase):

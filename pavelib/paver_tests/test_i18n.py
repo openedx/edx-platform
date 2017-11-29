@@ -6,6 +6,9 @@ import os
 import textwrap
 import unittest
 
+import pytest
+pytestmark = pytest.mark.skip()
+
 from mock import mock_open, patch
 from paver.easy import call_task, task
 
