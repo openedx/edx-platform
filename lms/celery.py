@@ -11,6 +11,8 @@ import os
 from celery import Celery
 from django.conf import settings
 
+import openedx
+openedx
 from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
 
 # set the default Django settings module for the 'celery' program.
