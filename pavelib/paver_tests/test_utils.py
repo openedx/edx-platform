@@ -4,9 +4,6 @@ Tests for pavelib/utils/test/utils
 
 import unittest
 
-import pytest
-pytestmark = pytest.mark.skip()
-
 from mock import patch
 
 from pavelib.utils.envs import Env

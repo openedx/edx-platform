@@ -3,9 +3,6 @@
 import os
 from unittest import TestCase
 
-import pytest
-pytestmark = pytest.mark.skip()
-
 import ddt
 from mock import patch
 from paver.easy import call_task, path

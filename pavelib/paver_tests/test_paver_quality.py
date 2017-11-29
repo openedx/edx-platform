@@ -6,9 +6,6 @@ import tempfile
 import textwrap
 import unittest
 
-import pytest
-pytestmark = pytest.mark.skip()
-
 import paver.easy
 import paver.tasks
 from ddt import ddt, file_data, data, unpack

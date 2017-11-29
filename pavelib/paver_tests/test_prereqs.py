@@ -5,9 +5,6 @@ Tests covering the Open edX Paver prequisites installation workflow
 import os
 import unittest
 
-import pytest
-pytestmark = pytest.mark.skip()
-
 from mock import call, patch
 from paver.easy import BuildFailure
 

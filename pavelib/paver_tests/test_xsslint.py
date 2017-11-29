@@ -8,9 +8,6 @@ import pavelib.quality
 
 from .utils import PaverTestCase
 
-import pytest
-pytestmark = pytest.mark.skip()
-
 
 class PaverXSSLintTest(PaverTestCase):
     """

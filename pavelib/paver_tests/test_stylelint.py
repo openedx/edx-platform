@@ -7,9 +7,6 @@ from paver.easy import call_task
 
 from .utils import PaverTestCase
 
-import pytest
-pytestmark = pytest.mark.skip()
-
 
 @ddt.ddt
 class TestPaverStylelint(PaverTestCase):
