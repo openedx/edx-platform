@@ -101,13 +101,15 @@ Glossary
    the number of emails each task must send.
 
 -  **Email Backend**: An external service that ACE will use to deliver emails.
-   Right now, ACE only supports `Sailthru <http://www.sailthru.com/>`__ as an
+   For now, ACE only supports `Sailthru <http://www.sailthru.com/>`__ as an
    email backend.
 
 
-A System Diagram
-----------------
-Here is how edX runs this:
+edX's Production Configuration for the Schedules App
+----------------------------------------------------
+
+edX's uses several tools to drive the dynamic pacing experience. The following
+flowchart demonstrates how edX deploys Schedules in production.
 
 .. image:: img/system_diagram.png
 
