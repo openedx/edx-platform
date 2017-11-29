@@ -43,15 +43,16 @@ def get_survey_topics(uos, survey_id):
     topics = TopicQuestion.objects.filter(survey_id=survey_id)
     parsed_topics = []
     for index, topic in enumerate(topics):
-        options = topic.options.all()
-        options = {str(option.priority.value).replace('.', ''): get_option_data(option) for option in options}
+        options = list(topic.options.all())
+        options.sort(key=lambda x: x.priority.value, reverse=False)
+        answer = get_answer(uos, topic.id)
         parsed_topics.append({
             'title': topic.title,
             'description': topic.description,
             'index': index + 1,
             'id': topic.id,
             'options': options,
-            'answer': get_answer(uos, topic.id)
+            'answer': answer.selected_option.value  if answer else None
         })
     return parsed_topics
 
@@ -72,7 +73,7 @@ def get_option_data(option):
 
 def get_answer(uos, question_id):
     try:
-        return UserAnswers.objects.get(user_survey_id=uos.id, question_id=question_id).selected_option.value
+        return UserAnswers.objects.get(user_survey_id=uos.id, question_id=question_id)
     except UserAnswers.DoesNotExist:
         return None
 
