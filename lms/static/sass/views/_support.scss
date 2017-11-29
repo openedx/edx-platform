@@ -248,12 +248,18 @@
   .btn-signin {
     width: $baseline * 8;
     color: $white;
-    margin-bottom: ($baseline * 2) + 10;
+    margin-bottom: $baseline;
 
     &:hover,
     &:focus {
       color: $white;
     }
+  }
+
+  a.create-account {
+    color: $m-blue-d6;
+    text-decoration: underline !important;
+    font-size: $support-form-base-font-size + 4;
   }
 
   input[type='text'] {

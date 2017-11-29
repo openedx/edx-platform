@@ -13,7 +13,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_j
 
 <%block name="title">
     <title>
-        ${_("{platform_name} Support: Contact Us").format(platform_name=platform_name)}
+        ${_("Contact {platform_name} Support").format(platform_name=platform_name)}
     </title>
 </%block>
 
@@ -30,7 +30,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_j
         var context = {
             'platformName': "${platform_name | n, js_escaped_string}",
             'marketingUrl': "${marketing_link('FAQ') | n, js_escaped_string}",
-            'loginQuery': "/login${login_query() | n, js_escaped_string}",
+            'loginQuery': "${login_query() | n, js_escaped_string}",
             'dashboardUrl': "${reverse('dashboard') | n, js_escaped_string}",
             'homepageUrl': "${marketing_link('ROOT') | n, js_escaped_string}",
             'zendeskApiHost': "${zendesk_api_host | n, js_escaped_string}",
