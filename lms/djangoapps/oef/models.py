@@ -15,6 +15,7 @@ class OefSurvey(TimeStampedModel):
 class OptionPriority(TimeStampedModel):
     label = models.CharField(max_length=50)
     value = models.FloatField()
+    caption = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
         return self.label

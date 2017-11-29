@@ -1,10 +1,11 @@
 import datetime
+import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import status
 
-from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, UserAnswers
+from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, UserAnswers, OptionPriority
 
 
 def fetch_survey(request):
@@ -12,8 +13,11 @@ def fetch_survey(request):
     uos = get_user_survey(request.user, latest_survey)
     survey = uos.oef_survey
     topics = get_survey_topics(uos, survey.id)
-
-    return render(request, 'oef/oef_survey.html', {"survey_id": survey.id, "topics": topics})
+    priorities = get_option_priorities()
+    return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "topics": topics,
+                                                   "priorities": priorities
+                                                   })
 
 
 def get_user_survey(user, latest_survey):
@@ -39,13 +43,23 @@ def get_survey_topics(uos, survey_id):
     topics = TopicQuestion.objects.filter(survey_id=survey_id)
     parsed_topics = []
     for index, topic in enumerate(topics):
+        options = topic.options.all()
+        options = {str(option.priority.value).replace('.', ''): get_option_data(option) for option in options}
         parsed_topics.append({
             'title': topic.title,
+            'description': topic.description,
             'index': index + 1,
             'id': topic.id,
-            'is_answered': is_answered(uos, topic.id)
+            'options': options,
+            'answer': get_answer(uos, topic.id)
         })
     return parsed_topics
+
+
+def get_option_priorities():
+    priorities = list(OptionPriority.objects.all())
+    priorities.sort(key=lambda x: x.value, reverse=False)
+    return priorities
 
 
 def get_option_data(option):
@@ -56,26 +70,9 @@ def get_option_data(option):
     }
 
 
-def get_survey_topic(request, survey_id, topic_id):
-    topic_question = TopicQuestion.objects.get(id=topic_id)
-    options = topic_question.options.all()
-    options = [get_option_data(option) for option in options]
-    uos = UserOefSurvey.objects.get(oef_survey_id=survey_id, user_id=request.user.id)
-    answer = get_answer(uos, topic_id)
-    answer = str(answer.selected_option.value) if answer else ''
-
-    return JsonResponse({
-        'title': topic_question.title,
-        'description': topic_question.description,
-        'id': topic_question.id,
-        'options': options,
-        'answer': answer.replace('.0', '')
-    }, status=status.HTTP_200_OK)
-
-
 def get_answer(uos, question_id):
     try:
-        return UserAnswers.objects.get(user_survey_id=uos.id, question_id=question_id)
+        return UserAnswers.objects.get(user_survey_id=uos.id, question_id=question_id).selected_option.value
     except UserAnswers.DoesNotExist:
         return None
 
@@ -87,14 +84,21 @@ def create_answer(uos, data):
     return answer
 
 
+def get_option(option_value):
+    return OptionPriority.objects.get(value=option_value)
+
+
 def save_answer(request):
-    data = request.POST
+    data = json.loads(request.body)
     survey_id = int(data['survey_id'])
-    question_id = int(data['topic_id'])
     uos = UserOefSurvey.objects.get(oef_survey_id=survey_id, user_id=request.user.id)
-    answer = get_answer(uos, question_id) or create_answer(uos, data)
-    answer.selected_option_id = int(data['answer'])
-    answer.save()
+
+    for answer_data in data['answers']:
+        question_id = int(answer_data['topic_id'])
+
+        answer = get_answer(uos, question_id) or create_answer(uos, answer_data)
+        answer.selected_option = get_option(float(answer_data['answer_id']))
+        answer.save()
     return JsonResponse({
         'status': 'success'
     }, status=status.HTTP_201_CREATED)
