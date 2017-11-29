@@ -7,6 +7,9 @@ from django.core.urlresolvers import reverse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from entitlements.tests.factories import CourseEntitlementFactory
+from entitlements.models import CourseEntitlement
+from entitlements.api.v1.serializers import CourseEntitlementSerializer
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -151,6 +154,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement = CourseEntitlementFactory()
         CourseEntitlementFactory.create_batch(2)
 
+        CourseEntitlementFactory()
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(entitlement.uuid)])
 
         response = self.client.get(
@@ -195,3 +199,124 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert course_entitlement.expired_at is not None
         assert course_entitlement.enrollment_course_run is None
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@patch("openedx.core.djangoapps.catalog.utils.get_course_runs_for_course")
+class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
+    ENTITLEMENTS_ENROLLMENT_NAMESPACE = 'entitlements_api:v1:enrollments'
+
+    def setUp(self):
+        super(EntitlementEnrollmentViewSetTest, self).setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
+        self.course2 = CourseFactory.create(org='edX', number='DemoX2', display_name='Demo_Course 2')
+
+    def test_user_can_enroll(self, mock_get_course_runs):
+        course_entitlement = CourseEntitlementFactory(
+            user=self.user
+        )
+        url = reverse(
+            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
+            args=[str(course_entitlement.uuid)]
+        )
+        assert course_entitlement.enrollment_course_run is None
+
+        mock_get_course_runs.method.return_value = [
+            {'key': str(self.course.id)}
+        ]
+
+        data = {
+            'course_run_id': str(self.course.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        course_entitlement.refresh_from_db()
+
+        assert response.status_code == 201
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+        assert course_entitlement.enrollment_course_run is not None
+
+    def test_user_can_unenroll(self, mock_get_course_runs):
+        course_entitlement = CourseEntitlementFactory(
+            user=self.user
+        )
+        url = reverse(
+            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
+            args=[str(course_entitlement.uuid)]
+        )
+        assert course_entitlement.enrollment_course_run is None
+
+        mock_get_course_runs.return_value = [
+            {'key': str(self.course.id)}
+        ]
+
+        data = {
+            'course_run_id': str(self.course.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        course_entitlement.refresh_from_db()
+
+        assert response.status_code == 201
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+
+        response = self.client.delete(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 204
+
+        course_entitlement.refresh_from_db()
+        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
+        assert course_entitlement.enrollment_course_run is None
+
+    def test_user_can_switch(self, mock_get_course_runs):
+        course_entitlement = CourseEntitlementFactory(
+            user=self.user
+        )
+        url = reverse(
+            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
+            args=[str(course_entitlement.uuid)]
+        )
+        assert course_entitlement.enrollment_course_run is None
+
+        mock_get_course_runs.return_value = [
+            {'key': str(self.course.id)},
+            {'key': str(self.course2.id)}
+        ]
+
+        data = {
+            'course_run_id': str(self.course.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        course_entitlement.refresh_from_db()
+
+        assert response.status_code == 201
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+
+        data = {
+            'course_run_id': str(self.course2.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+
+        course_entitlement.refresh_from_db()
+        assert CourseEnrollment.is_enrolled(self.user, self.course2.id)
+        assert course_entitlement.enrollment_course_run is not None
+        print course_entitlement.enrollment_course_run.course_id
