@@ -8,6 +8,33 @@ from rest_framework import status
 from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, UserAnswers, OptionPriority
 
 
+def oef_dashboard(request):
+    user_surveys = UserOefSurvey.objects.filter(user_id=request.user.id)
+    surveys = []
+    for survey in user_surveys:
+        surveys.append({
+            'id': survey.id,
+            'start_date': survey.start_date.strftime('%m/%d/%Y'),
+            'completed_date': survey.completed_date.strftime('%m/%d/%Y') if survey.completed_date else '',
+            'is_complete': bool(survey.completed_date),
+            'status': survey.status
+        })
+
+    return render(request, 'oef/oef-org.html', {'surveys': surveys})
+
+
+def get_survey_by_id(request, user_survey_id):
+    uos = UserOefSurvey.objects.get(id=int(user_survey_id), user_id=request.user.id)
+    survey = uos.oef_survey
+    topics = get_survey_topics(uos, survey.id)
+    priorities = get_option_priorities()
+    return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "topics": topics,
+                                                   "priorities": priorities
+                                                   })
+
+
+
 def fetch_survey(request):
     latest_survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
     uos = get_user_survey(request.user, latest_survey)
@@ -52,7 +79,7 @@ def get_survey_topics(uos, survey_id):
             'index': index + 1,
             'id': topic.id,
             'options': options,
-            'answer': answer.selected_option.value  if answer else None
+            'answer': answer.selected_option.value if answer else None
         })
     return parsed_topics
 
