@@ -43,7 +43,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
 )
-from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -535,11 +535,9 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
-# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
-MAKO_TEMPLATES = {}
-MAIN_MAKO_TEMPLATES_BASE = [
+MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
@@ -550,24 +548,55 @@ MAIN_MAKO_TEMPLATES_BASE = [
 ]
 
 
-def _make_main_mako_templates(settings):
+def _make_mako_template_dirs(settings):
     """
-    Derives the final MAKO_TEMPLATES['main'] setting from other settings.
+    Derives the final Mako template directories list from other settings.
     """
     if settings.ENABLE_COMPREHENSIVE_THEMING:
         themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
-        for theme in get_themes_unchecked(themes_dirs, PROJECT_ROOT):
-            if theme.themes_base_dir not in settings.MAIN_MAKO_TEMPLATES_BASE:
-                settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, theme.themes_base_dir)
+        for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
+            if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
+                settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
     if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
-        settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
-    return settings.MAIN_MAKO_TEMPLATES_BASE
-MAKO_TEMPLATES['main'] = _make_main_mako_templates
-derived_dict_entry('MAKO_TEMPLATES', 'main')
+        settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
+    return settings.MAKO_TEMPLATE_DIRS_BASE
+
+
+CONTEXT_PROCESSORS = [
+    'django.template.context_processors.request',
+    'django.template.context_processors.static',
+    'django.contrib.messages.context_processors.messages',
+    'django.template.context_processors.i18n',
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.template.context_processors.csrf',
+
+    # Added for django-wiki
+    'django.template.context_processors.media',
+    'django.template.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'sekizai.context_processors.sekizai',
+
+    # Hack to get required link URLs to password reset templates
+    'edxmako.shortcuts.marketing_link_context_processor',
+
+    # Shoppingcart processor (detects if request.user has a cart)
+    'shoppingcart.context_processor.user_has_cart_context_processor',
+
+    # Timezone processor (sends language and time_zone preference)
+    'courseware.context_processor.user_timezone_locale_prefs',
+
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.footer_context_processor',
+
+    # Online contextual help
+    'help_tokens.context_processor',
+    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
+]
 
 # Django templating
 TEMPLATES = [
     {
+        'NAME': 'django',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
@@ -588,41 +617,27 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.template.context_processors.static',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',
-                'django.contrib.auth.context_processors.auth',  # this is required for admin
-                'django.template.context_processors.csrf',
-
-                # Added for django-wiki
-                'django.template.context_processors.media',
-                'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages',
-                'sekizai.context_processors.sekizai',
-
-                # Hack to get required link URLs to password reset templates
-                'edxmako.shortcuts.marketing_link_context_processor',
-
-                # Shoppingcart processor (detects if request.user has a cart)
-                'shoppingcart.context_processor.user_has_cart_context_processor',
-
-                # Timezone processor (sends language and time_zone preference)
-                'courseware.context_processor.user_timezone_locale_prefs',
-
-                # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.footer_context_processor',
-
-                # Online contextual help
-                'help_tokens.context_processor',
-                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
-            ],
+            'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
             'debug': False
         }
-    }
+    },
+    {
+        'NAME': 'mako',
+        'BACKEND': 'edxmako.backend.Mako',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': _make_mako_template_dirs,
+        # Options specific to this backend.
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            # Change 'debug' in your environment settings files - not here.
+            'debug': False,
+        }
+    },
 ]
+derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
 
@@ -634,8 +649,10 @@ def _add_microsite_dirs_to_default_template_engine(settings):
     if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
         DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
     return DEFAULT_TEMPLATE_ENGINE_DIRS
+
+
 DEFAULT_TEMPLATE_ENGINE['DIRS'] = _add_microsite_dirs_to_default_template_engine
-derived_dict_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
+derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 

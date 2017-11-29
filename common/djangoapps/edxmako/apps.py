@@ -20,8 +20,11 @@ class EdxMakoConfig(AppConfig):
         IMPORTANT: This method can be called multiple times during application startup. Any changes to this method
         must be safe for multiple callers during startup phase.
         """
-        template_locations = settings.MAKO_TEMPLATES
-        for namespace, directories in template_locations.items():
+        for backend in settings.TEMPLATES:
+            if 'edxmako' not in backend['BACKEND']:
+                continue
+            namespace = backend['OPTIONS'].get('namespace', 'main')
+            directories = backend['DIRS']
             clear_lookups(namespace)
             for directory in directories:
                 add_lookup(namespace, directory)

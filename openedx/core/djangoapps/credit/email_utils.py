@@ -113,7 +113,7 @@ def send_credit_notifications(username, course_key):
         else:
             email_body_content = ''
 
-    email_body = Template(email_body_content).render([context])
+    email_body = Template(email_body_content).render(context)
     msg_alternative.attach(SafeMIMEText(email_body, _subtype='html', _charset='utf-8'))
 
     # attach logo image

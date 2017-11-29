@@ -4,7 +4,7 @@ Tests for derived.py
 
 import sys
 from unittest import TestCase
-from openedx.core.lib.derived import derived, derive_settings, clear_for_tests
+from openedx.core.lib.derived import derived, derived_collection_entry, derive_settings, clear_for_tests
 
 
 class TestDerivedSettings(TestCase):
@@ -22,7 +22,9 @@ class TestDerivedSettings(TestCase):
         derived('DERIVED_VALUE', 'ANOTHER_DERIVED_VALUE')
         self.module.DICT_VALUE = {}
         self.module.DICT_VALUE['test_key'] = lambda settings: settings.DERIVED_VALUE * 3
-        derived(('DICT_VALUE', 'test_key'))
+        derived_collection_entry('DICT_VALUE', 'test_key')
+        self.module.DICT_VALUE['list_key'] = ['not derived', lambda settings: settings.DERIVED_VALUE]
+        derived_collection_entry('DICT_VALUE', 'list_key', 1)
 
     def test_derived_settings_are_derived(self):
         derive_settings(__name__)
@@ -42,3 +44,7 @@ class TestDerivedSettings(TestCase):
     def test_derived_dict_settings(self):
         derive_settings(__name__)
         self.assertEqual(self.module.DICT_VALUE['test_key'], 'mutter paneermutter paneermutter paneer')
+
+    def test_derived_nested_settings(self):
+        derive_settings(__name__)
+        self.assertEqual(self.module.DICT_VALUE['list_key'][1], 'mutter paneer')

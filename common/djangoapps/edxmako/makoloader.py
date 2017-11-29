@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Engine
+from django.template import Engine, engines
 from django.template.base import TemplateDoesNotExist
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 from django.template.loaders.filesystem import Loader as FilesystemLoader
@@ -16,8 +16,8 @@ log = logging.getLogger(__name__)
 class MakoLoader(object):
     """
     This is a Django loader object which will load the template as a
-    Mako template if the first line is "## mako". It is based off BaseLoader
-    in django.template.loader.
+    Mako template if the first line is "## mako". It is based off Loader
+    in django.template.loaders.base.
     We need this in order to be able to include mako templates inside main_django.html.
     """
 
@@ -53,7 +53,8 @@ class MakoLoader(object):
                                 output_encoding='utf-8',
                                 default_filters=['decode.utf8'],
                                 encoding_errors='replace',
-                                uri=template_name)
+                                uri=template_name,
+                                engine=engines['mako'])
             return template, None
         else:
             # This is a regular template
