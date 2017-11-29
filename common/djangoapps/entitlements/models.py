@@ -26,21 +26,6 @@ class CourseEntitlement(TimeStampedModel):
     order_number = models.CharField(max_length=128, null=True)
 
     @classmethod
-    def get_active_user_course_entitlements(cls, user, course_uuid):
-        """
-        Returns all the available sessions for a given course.
-        """
-
-        try:
-            entitlement = cls.objects.get(
-                user=user,
-                course_uuid=course_uuid,
-            )
-            return entitlement
-        except cls.DoesNotExist:
-            return None
-
-    @classmethod
     def set_enrollment(cls, entitlement, enrollment):
         """
         Fulfills an entitlement by specifying a session.

@@ -319,7 +319,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         If we remove the prerequisite and access the dashboard again, the prerequisite
         should not appear.
         """
-        self.pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')
+        self.pre_requisite_course =CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')
         self.course = CourseFactory.create(
             org='edx',
             number='998',
