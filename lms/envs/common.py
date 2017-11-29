@@ -540,6 +540,7 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
             'context_processors': [
+                'lms.djangoapps.homepage.custom_context_processors.notifications_configs',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
@@ -881,6 +882,7 @@ DEFAULT_COURSE_ABOUT_IMAGE_URL = 'images/pencils.jpg'
 
 # User-uploaded content
 MEDIA_ROOT = '/edx/var/edxapp/media/'
+
 MEDIA_URL = '/media/'
 
 # Locale/Internationalization
