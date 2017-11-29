@@ -11,8 +11,12 @@ import os
 from celery import Celery
 from django.conf import settings
 
+import logging
+log = logging.getLogger(__name__)
+
 import openedx
-raise Exception('OPENEDX MODULE: {}'.format(str(openedx)))
+log.debug('OPENEDX MODULE: {}'.format(str(openedx)))
+log.error('OPENEDX MODULE: {}'.format(str(openedx)))
 
 from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
 
