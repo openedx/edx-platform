@@ -21,6 +21,9 @@ def oef_dashboard(request):
 
     return render(request, 'oef/oef-org.html', {'surveys': surveys})
 
+def oef_instructions(request):
+    return render(request, 'oef/oef-instructional.html', {})
+
 
 def get_survey_by_id(request, user_survey_id):
     uos = UserOefSurvey.objects.get(id=int(user_survey_id), user_id=request.user.id)
@@ -82,6 +85,7 @@ def get_survey_topics(uos, survey_id):
             'answer': answer.selected_option.value if answer else None
         })
     return parsed_topics
+
 
 
 def get_option_priorities():
