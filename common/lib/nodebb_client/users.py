@@ -20,11 +20,11 @@ class ForumUser(User):
         kwargs.update({'username': username})
         return self.client.post('/api/v2/users/create', **kwargs['kwargs'])
 
-    def activate(self, username, **kwargs):
+    def activate(self, username, active, **kwargs):
         """
         Activate a given user
         """
-        payload = {'username': username}
+        payload = {'username': username, 'active': active}
         return self.client.post('/api/v2/users/activate', **payload)
 
     def update_profile(self, username, **kwargs):
