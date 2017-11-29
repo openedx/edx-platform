@@ -158,7 +158,6 @@ class ProctoringFields(object):
 
 @XBlock.wants('proctoring')
 @XBlock.wants('verification')
-@XBlock.wants('milestones')
 @XBlock.wants('gating')
 @XBlock.wants('credit')
 @XBlock.needs('user')
@@ -268,40 +267,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             return banner_text, hidden_content_html
 
-    def _get_gating_milestone(self):
-        """
-        Checks whether the content is gated for learners.
-        """
-        gating_service = self.runtime.service(self, 'gating')
-        if gating_service:
-            milestone = gating_service.get_gating_milestone(
-                self.course_id, self.location, 'requires'
-            )
-            return milestone
-
-        return False
-
-    def _is_prereq_met(self, milestone):
-        """
-        Evaluate if the user has completed the prerequiste
-        """
-        gating_service = self.runtime.service(self, 'gating')
-        if gating_service:
-            # if it's complete then a user milestone record will exist
-            return gating_service.is_prereq_met(self.runtime.user_id, milestone)
-
-        return False
-
-    def _get_milestone_meta_info(self, milestone):
-        """
-        Return information to display about the gating milstone
-        """
-        gating_service = self.runtime.service(self, 'gating')
-        if gating_service:
-            return gating_service.get_gating_milestone_meta_info(self.course_id, milestone)
-        
-        return {}
-
     def _can_user_view_content(self, course):
         """
         Returns whether the runtime user can view the content
@@ -358,6 +323,40 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._capture_current_unit_metrics(display_items)
 
         return fragment
+
+    def _get_gating_milestone(self):
+            """
+        Checks whether the content is gated for learners.
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            milestone = gating_service.get_gating_milestone(
+                self.course_id, self.location, 'requires'
+            )
+            return milestone
+
+        return False
+
+    def _is_prereq_met(self, milestone):
+        """
+        Evaluate if the user has completed the prerequiste
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            # if it's complete then a user milestone record will exist
+            return gating_service.is_prereq_met(self.runtime.user_id, milestone)
+
+        return False
+
+    def _get_milestone_meta_info(self, milestone):
+        """
+        Return information to display about the gating milstone
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            return gating_service.get_gating_milestone_meta_info(self.course_id, milestone)
+        
+        return {}
 
     def _update_position(self, context, number_of_display_items):
         """
