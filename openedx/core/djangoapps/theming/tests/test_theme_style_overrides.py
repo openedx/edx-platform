@@ -64,6 +64,30 @@ class TestComprehensiveThemeLMS(TestCase):
         result = staticfiles.finders.find('test-theme/images/logo.png')
         self.assertEqual(result, settings.TEST_THEME / 'lms/static/images/logo.png')
 
+    @with_comprehensive_theme("test-theme")
+    def test_override_block_in_parent(self):
+        """
+        Test that theme title is used instead of parent title.
+        """
+        self._login()
+        dashboard_url = reverse('dashboard')
+        resp = self.client.get(dashboard_url)
+        self.assertEqual(resp.status_code, 200)
+        # This string comes from the 'pagetitle' block of the overriding theme.
+        self.assertContains(resp, "Overridden Title!")
+
+    @with_comprehensive_theme("test-theme")
+    def test_override_block_in_grandparent(self):
+        """
+        Test that theme title is used instead of parent's parent's title.
+        """
+        self._login()
+        dashboard_url = reverse('dashboard')
+        resp = self.client.get(dashboard_url)
+        self.assertEqual(resp.status_code, 200)
+        # This string comes from the 'bodyextra' block of the overriding theme.
+        self.assertContains(resp, "Overriden Body Extra!")
+
 
 @skip_unless_cms
 class TestComprehensiveThemeCMS(TestCase):

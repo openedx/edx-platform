@@ -70,6 +70,11 @@ class DynamicTemplateLookup(TemplateLookup):
             try:
                 # Try to find themed template, i.e. see if current theme overrides the template
                 template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
+                # For an overriding template, the uri is the path to the same template, so the lookup always
+                # finds the same overriding template. If that's the case, route to exception so that the
+                # uri can be stripped of the path and the parent template can be found.
+                if template == super(DynamicTemplateLookup, self).get_template(uri):
+                    raise TopLevelLookupException()
             except TopLevelLookupException:
                 # strip off the prefix path to theme and look in default template dirs
                 template = super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))
