@@ -7,9 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
-from student.models import CourseEnrollmentException
-# from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
-# from openedx.core.lib.exceptions import CourseNotFoundError
+from student.models import CourseEnrollmentException, AlreadyEnrolledError
 
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from entitlements.api.v1.filters import CourseEntitlementFilter
@@ -26,8 +24,8 @@ log = logging.getLogger(__name__)
 
 
 class EntitlementViewSet(viewsets.ModelViewSet):
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser,)
+    authentication_classes = (JwtAuthentication, SessionAuthenticationCrossDomainCsrf,)
+    permission_classes = (permissions.IsAuthenticated, IsAdminOrAuthenticatedReadOnly,)
     queryset = CourseEntitlement.objects.all().select_related('user')
     lookup_value_regex = '[0-9a-f-]+'
     lookup_field = 'uuid'
