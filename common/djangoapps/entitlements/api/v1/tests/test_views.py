@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -42,11 +43,11 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         response = self.client.get(self.entitlements_list_url)
         assert response.status_code == 401
 
-    def test_staff_user_required(self):
+    def test_staff_user_not_required_for_get(self):
         not_staff_user = UserFactory()
-        self.client.login(username=not_staff_user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
         response = self.client.get(self.entitlements_list_url)
-        assert response.status_code == 403
+        assert response.status_code == 200
 
     def test_add_entitlement_with_missing_data(self):
         entitlement_data_missing_parts = self._get_data_set(self.user, str(uuid.uuid4()))
@@ -59,6 +60,33 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             content_type='application/json',
         )
         assert response.status_code == 400
+
+    def test_staff_user_required_for_post(self):
+        not_staff_user = UserFactory()
+        self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
+
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 403
+
+    def test_staff_user_required_for_delete(self):
+        not_staff_user = UserFactory()
+        self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
+
+        course_entitlement = CourseEntitlementFactory()
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(course_entitlement.uuid)])
+
+        response = self.client.delete(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 403
 
     def test_add_entitlement(self):
         course_uuid = uuid.uuid4()
@@ -78,7 +106,21 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         assert results == CourseEntitlementSerializer(course_entitlement).data
 
-    def test_get_entitlements(self):
+    def test_non_staff_get_select_entitlements(self):
+        not_staff_user = UserFactory()
+        self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
+        CourseEntitlementFactory.create_batch(2)
+        entitlement = CourseEntitlementFactory.create(user=not_staff_user)
+        response = self.client.get(
+            self.entitlements_list_url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+
+        results = response.data.get('results', [])  # pylint: disable=no-member
+        assert results == CourseEntitlementSerializer([entitlement], many=True).data
+
+    def test_staff_get_all_entitlements(self):
         entitlements = CourseEntitlementFactory.create_batch(2)
 
         response = self.client.get(
@@ -109,7 +151,6 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement = CourseEntitlementFactory()
         CourseEntitlementFactory.create_batch(2)
 
-        CourseEntitlementFactory()
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(entitlement.uuid)])
 
         response = self.client.get(

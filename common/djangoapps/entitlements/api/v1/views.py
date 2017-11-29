@@ -4,25 +4,31 @@ from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets
-from rest_framework.authentication import SessionAuthentication
 
 from entitlements.api.v1.filters import CourseEntitlementFilter
-from entitlements.models import CourseEntitlement
+from entitlements.api.v1.permissions import IsAdminOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import CourseEntitlementSerializer
+from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
 
 class EntitlementViewSet(viewsets.ModelViewSet):
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser,)
-    queryset = CourseEntitlement.objects.all().select_related('user')
+    authentication_classes = (JwtAuthentication, SessionAuthenticationCrossDomainCsrf,)
+    permission_classes = (permissions.IsAuthenticated, IsAdminOrAuthenticatedReadOnly,)
     lookup_value_regex = '[0-9a-f-]+'
     lookup_field = 'uuid'
     serializer_class = CourseEntitlementSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = CourseEntitlementFilter
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return CourseEntitlement.objects.all().select_related('user')
+        return CourseEntitlement.objects.filter(user=user).select_related('user')
 
     def perform_destroy(self, instance):
         """
