@@ -84,7 +84,7 @@
                             data[i].errorMessages = this.escapeStrings(data[i].errorMessages);
                         }
 
-                        html.push(_.template(fieldTpl)($.extend(data[i], {
+                        html.push(HtmlUtils.template(fieldTpl)($.extend(data[i], {
                             form: this.formType,
                             requiredStr: this.requiredStr,
                             optionalStr: this.optionalStr,
