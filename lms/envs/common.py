@@ -3103,3 +3103,7 @@ NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
 
 # Google Place API key
 GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
+
+# OEF renewal
+
+OEF_RENEWAL_DAYS = 180

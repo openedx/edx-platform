@@ -1,8 +1,10 @@
 import datetime
 import json
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import status
 
 from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, UserAnswers, OptionPriority
@@ -21,7 +23,11 @@ def oef_dashboard(request):
 
     return render(request, 'oef/oef-org.html', {'surveys': surveys})
 
+
 def oef_instructions(request):
+    survey_info = get_user_survey_status(request.user, create_new_survey=False)
+    if survey_info['error']:
+        return redirect(reverse('courses'))
     return render(request, 'oef/oef-instructional.html', {})
 
 
@@ -38,16 +44,54 @@ def get_survey_by_id(request, user_survey_id):
 
 
 def fetch_survey(request):
-    latest_survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
-    uos = get_user_survey(request.user, latest_survey)
+    survey_info = get_user_survey_status(request.user)
+    if not survey_info['survey']:
+        return redirect(reverse('recommendations'))
+
+    uos = get_user_survey(request.user, survey_info['survey'])
     survey = uos.oef_survey
     topics = get_survey_topics(uos, survey.id)
     priorities = get_option_priorities()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
                                                    "topics": topics,
                                                    "priorities": priorities,
-                                                   'is_completed': bool(uos.completed_date),
+                                                   'is_completed': uos.status == 'completed',
                                                    })
+
+
+def get_user_survey_status(user, create_new_survey=True):
+    error = ''
+    is_eligible = True
+    survey = None
+    try:
+        uos = UserOefSurvey.objects.filter(user=user).latest('start_date')
+    except UserOefSurvey.DoesNotExist:
+        if create_new_survey:
+            survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
+
+        return {
+            'error': error,
+            'is_eligible': is_eligible,
+            'survey': survey
+        }
+
+    if uos.status == 'in-progress':
+        error = 'You have a pending survey'
+        is_eligible = False
+        survey = uos.oef_survey
+    else:
+        limit = settings.OEF_RENEWAL_DAYS
+        if (datetime.date.today() - uos.start_date).days < limit:
+            is_eligible = False
+            error = 'You can request a new OEF survey only after %s days of last survey' % limit
+        elif create_new_survey:
+            survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
+
+    return {
+        'error': error,
+        'is_eligible': is_eligible,
+        'survey': survey
+    }
 
 
 def get_user_survey(user, latest_survey):
@@ -86,19 +130,10 @@ def get_survey_topics(uos, survey_id):
     return parsed_topics
 
 
-
 def get_option_priorities():
     priorities = list(OptionPriority.objects.all())
     priorities.sort(key=lambda x: x.value, reverse=False)
     return priorities
-
-
-def get_option_data(option):
-    return {
-        'text': option.text,
-        'priority': option.priority.label,
-        'id': option.id
-    }
 
 
 def get_answer(uos, question_id):

@@ -342,7 +342,7 @@ def org_detail_survey(request):
             update_user_history(request.user)
             if not are_forms_complete:
                 set_survey_complete(request.user.extended_profile)
-                return redirect(reverse('recommendations'))
+                return redirect(reverse('oef_instructions'))
 
             return redirect(reverse('org_detail_survey'))
 
