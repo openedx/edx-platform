@@ -59,7 +59,6 @@ def get_user_survey(user, latest_survey):
         uos.user = user
         uos.survey_date = datetime.date.today()
         uos.start_date = datetime.date.today()
-        uos.completed_date = datetime.date.today()
         uos.save()
 
     return uos
