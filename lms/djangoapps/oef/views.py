@@ -16,7 +16,6 @@ def oef_dashboard(request):
             'id': survey.id,
             'start_date': survey.start_date.strftime('%m/%d/%Y'),
             'completed_date': survey.completed_date.strftime('%m/%d/%Y') if survey.completed_date else '',
-            'is_complete': bool(survey.completed_date),
             'status': survey.status
         })
 
@@ -29,10 +28,10 @@ def get_survey_by_id(request, user_survey_id):
     topics = get_survey_topics(uos, survey.id)
     priorities = get_option_priorities()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "is_completed": uos.status == 'completed',
                                                    "topics": topics,
                                                    "priorities": priorities
                                                    })
-
 
 
 def fetch_survey(request):
@@ -43,7 +42,8 @@ def fetch_survey(request):
     priorities = get_option_priorities()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
                                                    "topics": topics,
-                                                   "priorities": priorities
+                                                   "priorities": priorities,
+                                                   'is_completed': bool(uos.completed_date),
                                                    })
 
 
@@ -116,6 +116,13 @@ def get_option(option_value):
     return OptionPriority.objects.get(value=option_value)
 
 
+def check_if_complete(uos, answers_count):
+    if uos.oef_survey.topics.count() == answers_count:
+        uos.status = 'completed'
+        uos.completed_date = datetime.date.today()
+        uos.save()
+
+
 def save_answer(request):
     data = json.loads(request.body)
     survey_id = int(data['survey_id'])
@@ -127,6 +134,8 @@ def save_answer(request):
         answer = get_answer(uos, question_id) or create_answer(uos, answer_data)
         answer.selected_option = get_option(float(answer_data['answer_id']))
         answer.save()
+
+    check_if_complete(uos, len(data['answers']))
     return JsonResponse({
         'status': 'success'
     }, status=status.HTTP_201_CREATED)
