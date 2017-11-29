@@ -12,6 +12,7 @@ from django.conf import settings
 import requests
 from lazy import lazy
 from lxml import etree
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
@@ -1337,7 +1338,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         Returns whether the video pipeline advanced setting is configured for this course.
         """
-        return (
+        return VideoUploadsEnabledByDefault.feature_enabled(course_id=self.id) or (
             self.video_upload_pipeline is not None and
             'course_video_upload_token' in self.video_upload_pipeline
         )
