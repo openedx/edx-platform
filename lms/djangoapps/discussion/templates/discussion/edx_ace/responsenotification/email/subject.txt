@@ -1,5 +1,3 @@
 {% load i18n %}
 
-{% blocktrans trimmed %}
-    Response to your {{ thread_title }} post
-{% endblocktrans %}
+{% blocktrans %}Response to {{ thread_title }}{% endblocktrans %}
