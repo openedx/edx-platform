@@ -153,7 +153,6 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement = CourseEntitlementFactory()
         CourseEntitlementFactory.create_batch(2)
 
-        CourseEntitlementFactory()
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(entitlement.uuid)])
 
         response = self.client.get(
@@ -201,7 +200,6 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-# @patch("openedx.core.djangoapps.catalog.utils.get_course_runs_for_course")
 class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     ENTITLEMENTS_ENROLLMENT_NAMESPACE = 'entitlements_api:v1:enrollments'
 
