@@ -105,11 +105,8 @@ Glossary
    email backend.
 
 
-edX's Production Configuration for the Schedules App
-----------------------------------------------------
-
-edX's uses several tools to drive the dynamic pacing experience. The following
-flowchart demonstrates how edX deploys Schedules in production.
+An Overview of edX's Dynamic Pacing System
+------------------------------------------
 
 .. image:: img/system_diagram.png
 
