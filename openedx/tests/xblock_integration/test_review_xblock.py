@@ -364,7 +364,7 @@ class TestReviewFunctions(TestReviewXBlock):
             }
         ))
 
-        expected_header_text = 'Review Component'
+        expected_header_text = 'Review Problems'
         # The problems are defaulted to correct upon load
         # This happens because the problems "raw_possible" field is 0 and the
         # "raw_earned" field is also 0.
