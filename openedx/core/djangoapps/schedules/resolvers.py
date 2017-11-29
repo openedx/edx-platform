@@ -195,7 +195,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             except InvalidContextError:
                 continue
 
-            yield (user, first_schedule.enrollment.course.language, template_context)
+            yield (user, first_schedule.enrollment.course.closest_released_language, template_context)
 
     def get_template_context(self, user, user_schedules):
         """
@@ -317,7 +317,7 @@ def _get_upsell_information_for_schedule(user, schedule):
             enrollment.dynamic_upgrade_deadline,
             get_format(
                 'DATE_FORMAT',
-                lang=course.language,
+                lang=course.closest_released_language,
                 use_l10n=True
             )
         )
@@ -370,7 +370,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             })
             template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-            yield (user, schedule.enrollment.course.language, template_context)
+            yield (user, schedule.enrollment.course.closest_released_language, template_context)
 
 
 def _get_trackable_course_home_url(course_id):

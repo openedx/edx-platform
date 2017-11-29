@@ -18,6 +18,7 @@ from PIL import Image
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
@@ -37,6 +38,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
+from .factories import CourseOverviewFactory
 
 
 @attr(shard=3)
@@ -288,6 +290,21 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
             self.assertNotEqual(course_overview.language, course.language)
         else:
             self.assertEqual(course_overview.language, course.language)
+
+    @ddt.data(
+        ('fa', 'fa-ir', 'fa'),
+        ('fa', 'fa', 'fa'),
+        ('es-419', 'es-419', 'es-419'),
+        ('es-419', 'es-es', 'es-419'),
+        ('es-419', 'es', 'es-419'),
+        ('es-419', None, None),
+        ('es-419', 'fr', None),
+    )
+    @ddt.unpack
+    def test_closest_released_language(self, released_languages, course_language, expected_language):
+        DarkLangConfig(released_languages=released_languages, enabled=True, changed_by=self.user).save()
+        course_overview = CourseOverviewFactory.create(language=course_language)
+        self.assertEqual(course_overview.closest_released_language, expected_language)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_get_non_existent_course(self, modulestore_type):
