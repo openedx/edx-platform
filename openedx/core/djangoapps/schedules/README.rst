@@ -101,8 +101,15 @@ Glossary
    the number of emails each task must send.
 
 -  **Email Backend**: An external service that ACE will use to deliver emails.
-	 Right now, ACE only supports `Sailthru <http://www.sailthru.com/>` as an
+   For now, ACE only supports `Sailthru <http://www.sailthru.com/>`__ as an
    email backend.
+
+
+An Overview of edX's Dynamic Pacing System
+------------------------------------------
+
+.. image:: img/system_diagram.png
+
 
 Running the Management Commands
 -------------------------------
