@@ -68,7 +68,7 @@ var commonFiles = {
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'common/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/src/**/*.js'}
+        {pattern: '../../common/lib/xmodule/xmodule/js/src/**/*.js'}
     ],
 
     sourceFiles: [
