@@ -10,6 +10,14 @@ define(['underscore'], function(_) {
     var PASSWORD_RESET_SUPPORT_LINK = 'https://support.edx.org/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message-'; // eslint-disable-line max-len
     var PLATFORM_NAME = 'edX';
     var CONTACT_EMAIL = 'info@example.com';
+
+    var SYNC_LEARNER_PROFILE_DATA = true;
+    var ENTERPRISE_NAME = 'Test Enterprise';
+    var ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS = {
+        fields: ['username', 'name', 'email', 'country']
+    };
+    var EDX_SUPPORT_URL = 'https://support.edx.org/';
+
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
         has_image: true
@@ -167,6 +175,36 @@ define(['underscore'], function(_) {
         });
     };
 
+    var expectSettingsSectionsAndFieldsToBeRenderedWithMessage = function(accountSettingsView, fieldsAreRendered) {
+        var sectionFieldElements;
+        var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
+
+        var sectionElements = accountSettingsView.$('#aboutTabSections-tabpanel .section');
+        expect(sectionElements.length).toBe(sectionsData.length);
+
+        _.each(sectionElements, function(sectionElement, sectionIndex) {
+            expect($(sectionElement).find('.section-header').text()
+                .trim()).toBe(sectionsData[sectionIndex].title);
+
+            if (!_.isUndefined(sectionsData[sectionIndex].message)) {
+                expect($(sectionElement).find('.account-settings-section-message span').html()
+                    .trim()).toBe(String(sectionsData[sectionIndex].message));
+            }
+
+            sectionFieldElements = $(sectionElement).find('.u-field');
+
+            if (fieldsAreRendered === false) {
+                expect(sectionFieldElements.length).toBe(0);
+            } else {
+                expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
+
+                _.each(sectionFieldElements, function(sectionFieldElement, fieldIndex) {
+                    expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
+                });
+            }
+        });
+    };
+
     var expectSettingsSectionsButNotFieldsToBeRendered = function(accountSettingsView) {
         expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false);
     };
@@ -181,6 +219,12 @@ define(['underscore'], function(_) {
         PASSWORD_RESET_SUPPORT_LINK: PASSWORD_RESET_SUPPORT_LINK,
         PLATFORM_NAME: PLATFORM_NAME,
         CONTACT_EMAIL: CONTACT_EMAIL,
+
+        SYNC_LEARNER_PROFILE_DATA: SYNC_LEARNER_PROFILE_DATA,
+        ENTERPRISE_NAME: ENTERPRISE_NAME,
+        ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS: ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS,
+        EDX_SUPPORT_URL: EDX_SUPPORT_URL,
+
         PROFILE_IMAGE: PROFILE_IMAGE,
         FIELD_OPTIONS: FIELD_OPTIONS,
         TIME_ZONE_RESPONSE: TIME_ZONE_RESPONSE,
@@ -195,6 +239,7 @@ define(['underscore'], function(_) {
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,
         expectElementContainsField: expectElementContainsField,
         expectSettingsSectionsButNotFieldsToBeRendered: expectSettingsSectionsButNotFieldsToBeRendered,
-        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered
+        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered,
+        expectSettingsSectionsAndFieldsToBeRenderedWithMessage: expectSettingsSectionsAndFieldsToBeRenderedWithMessage
     };
 });

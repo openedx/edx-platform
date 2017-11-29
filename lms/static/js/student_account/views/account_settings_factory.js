@@ -21,12 +21,19 @@
             platformName,
             contactEmail,
             allowEmailChange,
-            socialPlatforms
+            socialPlatforms,
+
+            syncLearnerProfileData,
+            enterpriseName,
+            enterpriseReadonlyAccountFields,
+            edxSupportUrl
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
                 showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField,
-                emailFieldView, socialFields, platformData;
+                emailFieldView, socialFields, platformData,
+                aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
+                fullNameFieldData, emailFieldData, countryFieldData;
 
             $accountSettingsElement = $('.wrapper-account-settings');
 
@@ -36,30 +43,80 @@
             userPreferencesModel = new UserPreferencesModel();
             userPreferencesModel.url = userPreferencesApiUrl;
 
-            if (allowEmailChange) {
-                emailFieldView = {
-                    view: new AccountSettingsFieldViews.EmailFieldView({
-                        model: userAccountModel,
-                        title: gettext('Email Address'),
-                        valueAttribute: 'email',
-                        helpMessage: StringUtils.interpolate(
-                            gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'),  // eslint-disable-line max-len
-                            {platform_name: platformName}
+            if (syncLearnerProfileData && enterpriseName) {
+                aboutSectionMessageType = 'info';
+                aboutSectionMessage = HtmlUtils.interpolateHtml(
+                    gettext('Your profile settings are managed by {enterprise_name}. Contact your administrator or {link_start}edX Support{link_end} for help.'),  // eslint-disable-line max-len
+                    {
+                        enterprise_name: enterpriseName,
+                        link_start: HtmlUtils.HTML(
+                            StringUtils.interpolate(
+                                '<a href="{edx_support_url}">', {
+                                    edx_support_url: edxSupportUrl
+                                }
+                            )
                         ),
-                        persistChanges: true
-                    })
+                        link_end: HtmlUtils.HTML('</a>')
+                    }
+                );
+            }
+
+            emailFieldData = {
+                model: userAccountModel,
+                title: gettext('Email Address (Sign In)'),
+                valueAttribute: 'email',
+                helpMessage: StringUtils.interpolate(
+                    gettext('You receive messages from {platform_name} and course teams at this address.'),  // eslint-disable-line max-len
+                    {platform_name: platformName}
+                ),
+                persistChanges: true
+            };
+            if (!allowEmailChange || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) {  // eslint-disable-line max-len
+                emailFieldView = {
+                    view: new AccountSettingsFieldViews.ReadonlyFieldView(emailFieldData)
                 };
             } else {
                 emailFieldView = {
-                    view: new AccountSettingsFieldViews.ReadonlyFieldView({
-                        model: userAccountModel,
-                        title: gettext('Email Address'),
-                        valueAttribute: 'email',
-                        helpMessage: StringUtils.interpolate(
-                            gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.  To change the email address, please contact {contact_email}.'),  // eslint-disable-line max-len
-                            {platform_name: platformName, contact_email: contactEmail}
-                        )
-                    })
+                    view: new AccountSettingsFieldViews.EmailFieldView(emailFieldData)
+                };
+            }
+
+            fullNameFieldData = {
+                model: userAccountModel,
+                title: gettext('Full Name'),
+                valueAttribute: 'name',
+                helpMessage: gettext('The name that is used for ID verification and that appears on your certificates.'),  // eslint-disable-line max-len,
+                persistChanges: true
+            };
+            if (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('name') !== -1) {
+                fullnameFieldView = {
+                    view: new AccountSettingsFieldViews.ReadonlyFieldView(fullNameFieldData)
+                };
+            } else {
+                fullnameFieldView = {
+                    view: new AccountSettingsFieldViews.TextFieldView(fullNameFieldData)
+                };
+            }
+
+            countryFieldData = {
+                model: userAccountModel,
+                required: true,
+                title: gettext('Country or Region of Residence'),
+                valueAttribute: 'country',
+                options: fieldsData.country.options,
+                persistChanges: true,
+                helpMessage: gettext('The country or region where you live.')
+            };
+            if (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('country') !== -1) {
+                countryFieldData.editable = 'never';
+                countryFieldView = {
+                    view: new AccountSettingsFieldViews.DropdownFieldView(
+                        countryFieldData
+                    )
+                };
+            } else {
+                countryFieldView = {
+                    view: new AccountSettingsFieldViews.DropdownFieldView(countryFieldData)
                 };
             }
 
@@ -67,6 +124,10 @@
                 {
                     title: gettext('Basic Account Information'),
                     subtitle: gettext('These settings include basic information about your account.'),
+
+                    messageType: aboutSectionMessageType,
+                    message: aboutSectionMessage,
+
                     fields: [
                         {
                             view: new AccountSettingsFieldViews.ReadonlyFieldView({
@@ -74,26 +135,12 @@
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
                                 helpMessage: StringUtils.interpolate(
-                                    gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'),  // eslint-disable-line max-len
+                                    gettext('The name that identifies you on {platform_name}. You cannot change your username.'),  // eslint-disable-line max-len
                                     {platform_name: platformName}
                                 )
                             })
                         },
-                        {
-                            view: new AccountSettingsFieldViews.TextFieldView({
-                                model: userAccountModel,
-                                title: gettext('Full Name'),
-                                valueAttribute: 'name',
-                                helpMessage: HtmlUtils.interpolateHtml(
-                                    gettext('The name that is used for ID verification and that appears on your certificates. Other learners see your full name if you have selected {bold_start}Full Profile{bold_end} for profile visibility. Make sure to enter your name exactly as it appears on your photo ID, including any non-Roman characters.'),  // eslint-disable-line max-len
-                                    {
-                                        bold_start: HtmlUtils.HTML('<b>'),
-                                        bold_end: HtmlUtils.HTML('</b>')
-                                    }
-                                ),
-                                persistChanges: true
-                            })
-                        },
+                        fullnameFieldView,
                         emailFieldView,
                         {
                             view: new AccountSettingsFieldViews.PasswordFieldView({
@@ -105,10 +152,7 @@
                                 passwordResetSupportUrl: passwordResetSupportUrl,
                                 linkTitle: gettext('Reset Your Password'),
                                 linkHref: fieldsData.password.url,
-                                helpMessage: StringUtils.interpolate(
-                                    gettext('When you select "Reset Your Password", a message will be sent to the email address for your {platform_name} account. Click the link in the message to reset your password.'),  // eslint-disable-line max-len
-                                    {platform_name: platformName}
-                                )
+                                helpMessage: gettext('Check your email account for instructions to reset your password.')  // eslint-disable-line max-len
                             })
                         },
                         {
@@ -126,17 +170,7 @@
                                 persistChanges: true
                             })
                         },
-                        {
-                            view: new AccountSettingsFieldViews.DropdownFieldView({
-                                model: userAccountModel,
-                                required: true,
-                                title: gettext('Country or Region of Residence'),
-                                valueAttribute: 'country',
-                                options: fieldsData.country.options,
-                                persistChanges: true,
-                                helpMessage: gettext('The country or region where you live.')
-                            })
-                        },
+                        countryFieldView,
                         {
                             view: new AccountSettingsFieldViews.TimeZoneFieldView({
                                 model: userPreferencesModel,
