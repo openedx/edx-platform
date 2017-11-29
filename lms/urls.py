@@ -30,7 +30,6 @@ urlpatterns = (
 
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
-    url(r'', include('philu_notifications.urls', namespace='notifications')),
 
     url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
     url(r'', include('edx_notifications.server.urls')),
