@@ -8,3 +8,11 @@ from __future__ import absolute_import, unicode_literals
 # avoid duplicating the implementation
 
 from cms.conftest import _django_clear_site_cache, pytest_configure  # pylint: disable=unused-import
+
+# skip everything except pavelib
+collect_ignore = [
+    'lms',
+    'cms',
+    'common',
+    'openedx',
+]
