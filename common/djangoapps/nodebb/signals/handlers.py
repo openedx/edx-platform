@@ -20,7 +20,10 @@ log = getLogger(__name__)
 @receiver(post_save, sender=OrganizationSurvey)
 @receiver(save_interests, sender=InterestsSurvey)
 def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """ Sync user information with  """
+    """
+    Sync information b/w NodeBB User Profile and Edx User Profile, Surveys
+
+    """
     user = instance.user
 
     if user:
@@ -66,6 +69,9 @@ def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=u
 
 @receiver(post_save, sender=ExtendedProfile, dispatch_uid='create_user_on_nodebb')
 def create_user_on_nodebb(sender, instance, created, **kwargs):
+    """
+    Create a new user on nodebb whenver a new user is created on edx platform
+    """
     if created:
         user_info = {
             'email': instance.user.email,
@@ -88,6 +94,9 @@ def create_user_on_nodebb(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_user_on_nodebb')
 def activate_user_on_nodebb(sender, instance, **kwargs):
+    """
+    Activate a user on nodebb whenever user become active on edx platform
+    """
     if instance.is_active and User.objects.filter(pk=instance.pk, is_active=False).exists():
 
         status_code, response_body = NodeBBClient().users.activate(username=instance.username)
@@ -100,6 +109,9 @@ def activate_user_on_nodebb(sender, instance, **kwargs):
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
 def create_category_on_nodebb(sender, instance, created, **kwargs):
+    """
+    Create a community on NodeBB whenever a new course is created
+    """
     if created:
         community_name = '%s-%s-%s-%s' % (instance.display_name, instance.id.org, instance.id.course, instance.id.run)
         status_code, response_body = NodeBBClient().categories.create(name=community_name)
@@ -120,6 +132,9 @@ def create_category_on_nodebb(sender, instance, created, **kwargs):
 
 @receiver(ENROLL_STATUS_CHANGE)
 def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: disable=unused-argument
+    """
+    Automatically join a group on NodeBB [related to that course] on student enrollment
+    """
     if event == EnrollStatusChange.enroll:
         user_name = user.username
         course = modulestore().get_course(kwargs.get('course_id'))
