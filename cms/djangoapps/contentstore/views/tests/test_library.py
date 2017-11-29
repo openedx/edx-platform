@@ -72,8 +72,14 @@ class UnitTestLibraries(CourseTestCase):
         """
         nostaff_client, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertFalse(get_library_creator_status(nostaff_user))
-        response = nostaff_client.get_json(LIBRARY_REST_URL)
-        self.assertEqual(response.status_code, 200)
+
+        # To be explicit, this user can GET, but not POST
+        get_response = nostaff_client.get_json(LIBRARY_REST_URL)
+        post_response = nostaff_client.ajax_post(LIBRARY_REST_URL, {
+            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+        })
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(post_response.status_code, 403)
 
     @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
