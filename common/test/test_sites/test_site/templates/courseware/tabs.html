@@ -1,11 +1,10 @@
 ## mako
-<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
 <%!
  from django.utils.translation import ugettext as _
  from django.core.urlresolvers import reverse
  %>
-<%page args="tab_list, active_page, default_tab, tab_image" />
+<%page args="tab_list, active_page, default_tab, tab_image" expression_filter="h" />
 
 <%
 def url_class(is_active):
