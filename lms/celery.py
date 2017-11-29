@@ -11,14 +11,24 @@ import os
 from celery import Celery
 from django.conf import settings
 
-import logging
-log = logging.getLogger(__name__)
 
-import openedx
-log.debug('OPENEDX MODULE: {}'.format(str(openedx)))
-log.error('OPENEDX MODULE: {}'.format(str(openedx)))
+try:
+    from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
+except ImportError as e:
+    import logging
+    import subprocess
 
-from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
+    log = logging.getLogger(__name__)
+
+    log.debug('OPENEDX MODULE: {}'.format(str(openedx)))
+    log.error('OPENEDX MODULE: {}'.format(str(openedx)))
+
+    import openedx
+    contents = subprocess.check_output('ls -l {}'.format(openedx.__path__))
+    log.debug('OPENEDX MODULE PATH: {}'.format(contents))
+    log.error('OPENEDX MODULE PATH: {}'.format(contents))
+
+    raise
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
