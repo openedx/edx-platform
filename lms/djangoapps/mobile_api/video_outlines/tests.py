@@ -889,7 +889,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
     @ddt.unpack
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_transcript_languages(self, transcripts, english_sub, val_transcripts,
-                                                  expected_transcripts, mock_get_transcript_languages):
+                                      expected_transcripts, mock_get_transcript_languages):
         """
         Tests that serialized course outline includes the VAL transcripts/translations languages as well.
         """

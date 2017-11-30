@@ -977,7 +977,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         '''
 
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
-        translations = descriptor.available_translations(descriptor.get_transcripts_info())
+        translations = descriptor.available_translations(descriptor.get_transcripts_info(include_val_transcripts=False))
         self.assertEqual(translations, ['hr', 'ge'])
 
     def test_video_with_no_transcripts_translation_retrieval(self):
@@ -987,13 +987,17 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         does not throw an exception.
         """
         descriptor = instantiate_descriptor(data=None)
-        translations_with_fallback = descriptor.available_translations(descriptor.get_transcripts_info())
+        translations_with_fallback = descriptor.available_translations(
+            descriptor.get_transcripts_info(include_val_transcripts=False)
+        )
         self.assertEqual(translations_with_fallback, ['en'])
 
         with patch.dict(settings.FEATURES, FALLBACK_TO_ENGLISH_TRANSCRIPTS=False):
             # Some organizations don't have English transcripts for all videos
             # This feature makes it configurable
-            translations_no_fallback = descriptor.available_translations(descriptor.get_transcripts_info())
+            translations_no_fallback = descriptor.available_translations(
+                descriptor.get_transcripts_info(include_val_transcripts=False)
+            )
             self.assertEqual(translations_no_fallback, [])
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
@@ -1017,7 +1021,11 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             </video>
         '''
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
-        translations = descriptor.available_translations(descriptor.get_transcripts_info(), verify_assets=False)
+        translations = descriptor.available_translations(
+            descriptor.get_transcripts_info(include_val_transcripts=False),
+            include_val_transcripts=False,
+            verify_assets=False
+        )
         self.assertNotEqual(translations, ['ur'])
 
     def assert_validation_message(self, validation, expected_msg):
@@ -1073,6 +1081,6 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         """
         descriptor = instantiate_descriptor(data=None)
         descriptor.transcripts = None
-        response = descriptor.get_transcripts_info()
+        response = descriptor.get_transcripts_info(include_val_transcripts=False)
         expected = {'transcripts': {}, 'sub': ''}
         self.assertEquals(expected, response)

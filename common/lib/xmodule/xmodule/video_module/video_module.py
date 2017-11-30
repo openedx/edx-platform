@@ -922,7 +922,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
             try:
-                transcripts = self.get_transcripts_info()
+                # This is to index contentstore transcripts so, do not include VAL transcripts.
+                transcripts = self.get_transcripts_info(include_val_transcripts=False)
                 transcript = self.get_transcript(
                     transcripts, transcript_format='txt', lang=language
                 )[0].replace("\n", " ")

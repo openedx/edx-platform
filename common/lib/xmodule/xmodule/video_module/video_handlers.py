@@ -226,7 +226,7 @@ class VideoStudentViewHandlers(object):
         is_bumper = request.GET.get('is_bumper', False)
         # Currently, we don't handle video pre-load/bumper transcripts in edx-val.
         include_val_transcripts = not is_bumper
-        transcripts = self.get_transcripts_info(is_bumper)
+        transcripts = self.get_transcripts_info(is_bumper, include_val_transcripts=include_val_transcripts)
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 

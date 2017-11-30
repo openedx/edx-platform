@@ -770,12 +770,16 @@ class VideoTranscriptsMixin(object):
             transcript_language = u'en'
         return transcript_language
 
-    def get_transcripts_info(self, is_bumper=False):
+    def get_transcripts_info(self, is_bumper=False, include_val_transcripts=True):
         """
         Returns a transcript dictionary for the video.
 
         Arguments:
             is_bumper(bool): If True, the request is for the bumper transcripts
+            include_val_transcripts(bool): If True, val transcripts will also get included
+
+        Note: Do not include VAL transcripts into the transcripts metadata if the request is for bumper transcripts.
+        Currently, we don't handle video pre-load/bumper transcripts in edx-val.
         """
         if is_bumper:
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
@@ -790,10 +794,7 @@ class VideoTranscriptsMixin(object):
             for language_code, transcript_file in transcripts.items() if transcript_file != ''
         }
 
-        # Do not include VAL transcripts into the transcripts metadata
-        # if the request is for bumper transcripts. Currently, we don't
-        # handle video pre-load/bumper transcripts in edx-val.
-        if not is_bumper:
+        if include_val_transcripts:
             transcript_languages = get_available_transcript_languages(
                 edx_video_id=self.edx_video_id,
                 youtube_id_1_0=self.youtube_id_1_0,
