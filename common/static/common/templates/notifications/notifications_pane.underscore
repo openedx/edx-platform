@@ -17,7 +17,7 @@
         <ul class="notification-menu xns-items" id="notification-dropdown">
             <% _.each(notifications, function(notification){ %>
 
-                <li <% if (!notification.read_at) { %> class="unread xns-item"  <% } else { %> class="xns-item" <% } %> id="<%-notification.id%>" data-path="<%-notification.msg.payload.path%>"
+                <li <% if (!notification.read_at) { %> class="unread xns-item"  <% } else { %> class="xns-item" <% } %> id="<%-notification.msg.id%>" data-path="<%-notification.msg.payload.path%>"
                     data-pid="<%-notification.msg.payload.pid%>" data-tid="<%-notification.msg.payload.tid%>">
                         <%  if (notification.image) { %>
                          <span class="img-box"><img src="<%-notification.image%>"/></span>

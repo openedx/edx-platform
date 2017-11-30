@@ -8,6 +8,9 @@ from xmodule.modulestore.django import modulestore
 
 
 def home_page(request, user=AnonymousUser()):
+    """
+    Override the default homepage for students
+    """
     featured_courses = get_featured_courses(user)
     status_code, featured_categories = NodeBBClient().categories.featured()
 

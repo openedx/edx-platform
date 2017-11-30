@@ -12,6 +12,9 @@ from xmodule.modulestore.django import modulestore
 
 
 def get_recommended_courses(user):
+    """
+    Helper function to get recommended courses for a user based on his interests
+    """
     recommended_courses = []
     all_courses = get_courses(user)
     try:
@@ -31,6 +34,9 @@ def get_recommended_courses(user):
 
 
 def get_enrolled_past_courses(course_enrollments):
+    """
+    Helper function to separate past courses from all enrolled courses
+    """
     enrolled, past = [], []
 
     for course in course_enrollments:
@@ -43,6 +49,10 @@ def get_enrolled_past_courses(course_enrollments):
 
 
 def get_recommended_xmodule_courses(user):
+    """
+    Helper function to get recommended courses based on the user interests and add details from xmodule to
+    the recommended courses
+    """
     recommended_courses = []
     all_courses = get_courses(user)
     user_interests = InterestsSurvey.objects.get(user=user)
@@ -72,5 +82,8 @@ def get_recommended_xmodule_courses(user):
 
 
 def get_recommended_communities(user):
+    """
+    Helper function to get recommended communities from NodeBB API
+    """
     status, categories = NodeBBClient().categories.recommended(user)
     return categories if status == 200 else []

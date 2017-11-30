@@ -101,6 +101,7 @@ class ChooseModeView(View):
                     redirect_url = ecommerce_service.checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
+        # TODO: Move out this piece of code as we are making changes in edx code.
         course = modulestore().get_course(course_key)
         today_date = timezone.now()
         course_start_date = course.start
@@ -213,6 +214,7 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
+        # TODO: Move out this piece of code as we are making changes in edx code.
         course = modulestore().get_course(course_key)
         today_date = timezone.now()
         course_start_date = course.start

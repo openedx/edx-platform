@@ -4,6 +4,9 @@ from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class CustomSettings(models.Model):
+    """
+    Extra Custom Settings for each course
+    """
     id = CourseKeyField(max_length=255, db_index=True, primary_key=True)
     is_featured = models.BooleanField(default=False)
     tags = models.CharField(max_length=255, null=True, blank=True)

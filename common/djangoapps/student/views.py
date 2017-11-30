@@ -660,6 +660,7 @@ def dashboard(request):
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
+    # Show different dashboard messages in case of admin OR regular user
     message = ""
     first_name = user.extended_profile.first_name
     if not user.is_active:
@@ -1175,6 +1176,7 @@ def change_enrollment(request, check_access=True):
 
         # Otherwise, there is only one mode available (the default)
 
+        # TODO: Move this section out because we are making changes in the built in code
         current_course = modulestore().get_course(course_id)
         today_date = timezone.now()
         course_start_date = current_course.start

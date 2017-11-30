@@ -4,6 +4,9 @@ from django.utils import timezone
 
 
 class Faq(models.Model):
+    """
+    Model to save the data of FAQ page dynamically
+    """
     title = models.CharField(max_length=128, default="FAQ")
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)

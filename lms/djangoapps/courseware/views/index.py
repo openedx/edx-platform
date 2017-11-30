@@ -401,6 +401,7 @@ class CoursewareIndex(View):
             self.field_data_cache,
         )
 
+        # TODO: Move this section out as we are changing built in edx code
         default_chapter = ''
         if self.chapter:
             default_chapter = self.chapter.display_name
