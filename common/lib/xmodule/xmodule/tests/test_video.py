@@ -977,7 +977,10 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         '''
 
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
-        translations = descriptor.available_translations(descriptor.get_transcripts_info(include_val_transcripts=False))
+        translations = descriptor.available_translations(
+            descriptor.get_transcripts_info(include_val_transcripts=False),
+            include_val_transcripts=False
+        )
         self.assertEqual(translations, ['hr', 'ge'])
 
     def test_video_with_no_transcripts_translation_retrieval(self):
@@ -988,7 +991,8 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         """
         descriptor = instantiate_descriptor(data=None)
         translations_with_fallback = descriptor.available_translations(
-            descriptor.get_transcripts_info(include_val_transcripts=False)
+            descriptor.get_transcripts_info(include_val_transcripts=False),
+            include_val_transcripts=False,
         )
         self.assertEqual(translations_with_fallback, ['en'])
 
@@ -996,7 +1000,8 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             # Some organizations don't have English transcripts for all videos
             # This feature makes it configurable
             translations_no_fallback = descriptor.available_translations(
-                descriptor.get_transcripts_info(include_val_transcripts=False)
+                descriptor.get_transcripts_info(include_val_transcripts=False),
+                include_val_transcripts=False,
             )
             self.assertEqual(translations_no_fallback, [])
 
