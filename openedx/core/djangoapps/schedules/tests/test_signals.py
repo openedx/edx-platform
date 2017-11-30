@@ -7,7 +7,6 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -44,40 +43,28 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_create_schedule(self, mock_get_current_site):
         site = SiteFactory.create()
         mock_get_current_site.return_value = site
         ScheduleConfigFactory.create(site=site)
         self.assert_schedule_created()
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_no_current_site(self, mock_get_current_site):
         mock_get_current_site.return_value = None
         self.assert_schedule_not_created()
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
-    def test_schedule_config_disabled_waffle_enabled(self, mock_get_current_site):
-        site = SiteFactory.create()
-        mock_get_current_site.return_value = site
-        ScheduleConfigFactory.create(site=site, create_schedules=False)
-        self.assert_schedule_created()
-
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, False)
-    def test_schedule_config_enabled_waffle_disabled(self, mock_get_current_site):
+    def test_schedule_config_enabled(self, mock_get_current_site):
         site = SiteFactory.create()
         mock_get_current_site.return_value = site
         ScheduleConfigFactory.create(site=site, create_schedules=True)
         self.assert_schedule_created()
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, False)
-    def test_schedule_config_disabled_waffle_disabled(self, mock_get_current_site):
+    def test_schedule_config_disabled(self, mock_get_current_site):
         site = SiteFactory.create()
         mock_get_current_site.return_value = site
         ScheduleConfigFactory.create(site=site, create_schedules=False)
         self.assert_schedule_not_created()
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_schedule_config_creation_enabled_instructor_paced(self, mock_get_current_site):
         site = SiteFactory.create()
         mock_get_current_site.return_value = site
@@ -87,15 +74,14 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         with self.assertRaises(Schedule.DoesNotExist):
             enrollment.schedule
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     @patch('openedx.core.djangoapps.schedules.signals.course_has_highlights')
     def test_create_schedule_course_updates_experience(self, mock_course_has_highlights, mock_get_current_site):
         site = SiteFactory.create()
+        ScheduleConfigFactory.create(site=site, enabled=True, create_schedules=True)
         mock_course_has_highlights.return_value = True
         mock_get_current_site.return_value = site
         self.assert_schedule_created(experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
-    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     @patch('analytics.track')
     @patch('random.random')
     @ddt.data(
