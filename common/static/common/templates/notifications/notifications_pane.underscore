@@ -25,7 +25,7 @@
                             <span class="img-box"><img data-name="<%-notification.msg.payload.from_user%>" class="profile"/></span>
                         <% } %>
                         <span class="notification-text mark-me-read " data-msg-id="<%-notification.msg.id%>" data-path="<%-notification.msg.payload.path%>">
-                            <span class="text"><%-notification.msg.payload.bodyLong%></span>
+                            <span class="text"><%= notification.msg.payload.bodyShort%></span>
                         </span>
                         <% if (!notification.read_at && selected_pane == "unread") { %>
                             <span class="mark-read mark-me-read xns-close-item" data-msg-id="<%-notification.msg.id%>" data-redirect="false" aria-label="Mark Read">&#9673</span>
