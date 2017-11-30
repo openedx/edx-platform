@@ -974,7 +974,7 @@ function(VideoPlayer, HLS) {
             });
 
             it('can extract hls video sources correctly', function() {
-                expect(state.HLSVideoSources).toEqual(['/base/fixtures/hls/hls.m3u8']);
+                expect(state.HLSVideoSources).toEqual(['/base/common/lib/xmodule/xmodule/js/fixtures/hls/hls.m3u8']);
                 expect(state.videoPlayer.player.hls).toBeDefined();
             });
 
@@ -995,7 +995,7 @@ function(VideoPlayer, HLS) {
         describe('HLS Video Errors', function() {
             beforeEach(function() {
                 spyOn(HLS, 'isSupported').and.returnValue(false);
-                state = jasmine.initializeHLSPlayer({sources: ['/base/fixtures/hls/hls.m3u8']});
+                state = jasmine.initializeHLSPlayer({sources: ['/base/common/lib/xmodule/xmodule/js/fixtures/hls/hls.m3u8']});
             });
 
             it('shows error message if hls is not supported', function() {
