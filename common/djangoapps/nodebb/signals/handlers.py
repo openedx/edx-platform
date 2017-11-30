@@ -74,6 +74,7 @@ def create_user_on_nodebb(sender, instance, created, **kwargs):
     """
     if created:
         user_info = {
+            'edx_user_id': instance.user.id,
             'email': instance.user.email,
             'first_name': instance.first_name,
             'last_name': instance.last_name,

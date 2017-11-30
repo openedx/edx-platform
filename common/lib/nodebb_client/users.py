@@ -24,7 +24,7 @@ class ForumUser(User):
         """
         Activate a given user
         """
-        payload = {'username': username, 'active': active}
+        payload = {'username': username, 'active': active, "_uid": 1}
         return self.client.post('/api/v2/users/activate', **payload)
 
     def update_profile(self, username, **kwargs):
