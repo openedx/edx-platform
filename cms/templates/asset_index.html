@@ -56,15 +56,17 @@
     <div class="content">
         <div class="content-primary">
             % if waffle_flag_enabled:
-                <%static:studiofrontend page="AssetsPage" lang="fr">
-                    {
-                        "id": "${context_course.id | n, js_escaped_string}",
-                        "name": "${context_course.display_name_with_default | n, js_escaped_string}",
-                        "url_name": "${context_course.location.name | n, js_escaped_string}",
-                        "org": "${context_course.location.org | n, js_escaped_string}",
-                        "num": "${context_course.location.course | n, js_escaped_string}",
-                        "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
-                        "revision": "${context_course.location.revision | n, js_escaped_string}"
+                <%static:studiofrontend page="AssetsPage" lang="en">
+                    {   
+                        "course": {
+                            "id": "${context_course.id | n, js_escaped_string}",
+                            "name": "${context_course.display_name_with_default | n, js_escaped_string}",
+                            "url_name": "${context_course.location.name | n, js_escaped_string}",
+                            "org": "${context_course.location.org | n, js_escaped_string}",
+                            "num": "${context_course.location.course | n, js_escaped_string}",
+                            "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
+                            "revision": "${context_course.location.revision | n, js_escaped_string}"
+                        }
                     }
                 </%static:studiofrontend>
             % else:
