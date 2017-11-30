@@ -59,7 +59,8 @@ def _log_start_date_change(previous_course_overview, updated_course_overview):
     new_start_str = 'None'
     if updated_course_overview.start is not None:
         new_start_str = updated_course_overview.start.isoformat()
-    LOG.info('Course start date changed: previous={0} new={1}'.format(
+    LOG.info('Course start date changed: course={0} previous={1} new={2}'.format(
+        updated_course_overview.id,
         previous_start_str,
         new_start_str,
     ))
