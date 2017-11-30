@@ -143,7 +143,7 @@ def run_pylint(options):
     # If pylint *did* run successfully, then great! Modify the lower limit.
     if num_violations < lower_violations_limit > -1:
         raise BuildFailure(
-            "Failed. Too few pylint violations. "
+            "FAILURE: Too few pylint violations. "
             "Expected to see at least {lower_limit} pylint violations. "
             "Either pylint is not running correctly -or- "
             "the limits should be lowered and/or the lower limit should be removed.".format(
@@ -154,7 +154,7 @@ def run_pylint(options):
     # Fail when number of violations is greater than the upper limit.
     if num_violations > upper_violations_limit > -1:
         raise BuildFailure(
-            "Failed. Too many pylint violations. "
+            "FAILURE: Too many pylint violations. "
             "The limit is {upper_limit}.".format(upper_limit=upper_violations_limit)
         )
 
@@ -257,7 +257,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
     # Fail if any violations are found
     if count:
-        failure_string = "Too many pep8 violations. " + violations_count_str
+        failure_string = "FAILURE: Too many pep8 violations. " + violations_count_str
         failure_string += "\n\nViolations:\n{violations_list}".format(violations_list=violations_list)
         raise BuildFailure(failure_string)
 
@@ -295,7 +295,7 @@ def run_complexity():
         print "radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric))
 
     except BuildFailure:
-        print "ERROR: Unable to calculate python-only code-complexity."
+        print "FAILURE: Unable to calculate python-only code-complexity."
 
 
 @task
@@ -326,7 +326,7 @@ def run_eslint(options):
         num_violations = int(_get_count_from_last_line(eslint_report, "eslint"))
     except TypeError:
         raise BuildFailure(
-            "Error. Number of eslint violations could not be found in {eslint_report}".format(
+            "FAILURE: Number of eslint violations could not be found in {eslint_report}".format(
                 eslint_report=eslint_report
             )
         )
@@ -337,7 +337,7 @@ def run_eslint(options):
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         raise BuildFailure(
-            "ESLint Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
+            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(
                 count=num_violations, violations_limit=violations_limit
             )
         )
@@ -364,7 +364,7 @@ def _get_stylelint_violations():
         return int(_get_count_from_last_line(stylelint_report, "stylelint"))
     except TypeError:
         raise BuildFailure(
-            "Error. Number of stylelint violations could not be found in {stylelint_report}".format(
+            "FAILURE: Number of stylelint violations could not be found in {stylelint_report}".format(
                 stylelint_report=stylelint_report
             )
         )
@@ -390,7 +390,7 @@ def run_stylelint(options):
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         raise BuildFailure(
-            "Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
+            "FAILURE: Stylelint failed with too many violations: ({count}).\nThe limit is {violations_limit}.".format(
                 count=num_violations,
                 violations_limit=violations_limit,
             )
@@ -417,7 +417,7 @@ def run_xsslint(options):
             any(key not in ("total", "rules") for key in violation_thresholds.keys()):
 
         raise BuildFailure(
-            """Error. Thresholds option "{thresholds_option}" was not supplied using proper format.\n"""
+            """FAILURE: Thresholds option "{thresholds_option}" was not supplied using proper format.\n"""
             """Here is a properly formatted example, '{{"total":100,"rules":{{"javascript-escape":0}}}}' """
             """with property names in double-quotes.""".format(
                 thresholds_option=thresholds_option
@@ -454,7 +454,7 @@ def run_xsslint(options):
                 )
     except TypeError:
         raise BuildFailure(
-            "Error. Number of {xsslint_script} violations could not be found in {xsslint_report}".format(
+            "FAILURE: Number of {xsslint_script} violations could not be found in {xsslint_report}".format(
                 xsslint_script=xsslint_script, xsslint_report=xsslint_report
             )
         )
@@ -494,7 +494,7 @@ def run_xsslint(options):
 
     if error_message is not "":
         raise BuildFailure(
-            "XSSLinter Failed.\n{error_message}\n"
+            "FAILURE: XSSLinter Failed.\n{error_message}\n"
             "See {xsslint_report} or run the following command to hone in on the problem:\n"
             "  ./scripts/xss-commit-linter.sh -h".format(
                 error_message=error_message, xsslint_report=xsslint_report
@@ -529,7 +529,7 @@ def run_xsscommitlint():
         num_violations = int(xsscommitlint_count)
     except TypeError:
         raise BuildFailure(
-            "Error. Number of {xsscommitlint_script} violations could not be found in {xsscommitlint_report}".format(
+            "FAILURE: Number of {xsscommitlint_script} violations could not be found in {xsscommitlint_report}".format(
                 xsscommitlint_script=xsscommitlint_script, xsscommitlint_report=xsscommitlint_report
             )
         )
@@ -580,7 +580,6 @@ def _get_report_contents(filename, last_line_only=False):
         String containing full contents of the report, or the last line.
 
     """
-    file_not_found_message = "The following log file could not be found: {file}".format(file=filename)
     if os.path.isfile(filename):
         with open(filename, 'r') as report_file:
             if last_line_only:
@@ -591,7 +590,7 @@ def _get_report_contents(filename, last_line_only=False):
             else:
                 return report_file.read()
     else:
-        # Raise a build error if the file is not found
+        file_not_found_message = "FAILURE: The following log file could not be found: {file}".format(file=filename)
         raise BuildFailure(file_not_found_message)
 
 
@@ -799,7 +798,8 @@ def run_quality(options):
 
     # If one of the quality runs fails, then paver exits with an error when it is finished
     if not diff_quality_percentage_pass:
-        raise BuildFailure("Diff-quality failure(s).")
+        msg = "FAILURE: Diff-quality failure(s). This means that violations were found in the current changeset."
+        raise BuildFailure(msg)
 
 
 def run_diff_quality(
@@ -828,7 +828,7 @@ def run_diff_quality(
         if is_percentage_failure(error_message):
             return False
         else:
-            raise BuildFailure(error_message)
+            raise BuildFailure('FAILURE: {}'.format(error_message))
 
 
 def is_percentage_failure(error_message):
