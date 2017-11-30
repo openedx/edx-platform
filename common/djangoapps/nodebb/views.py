@@ -3,6 +3,7 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 """
 
 import logging
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
@@ -34,6 +35,7 @@ def nodebb_forum_discussion(request, course_id):
 
     context = {
         "provider": current_course.org,
+        "nodebb_endpoint": settings.NODEBB_ENDPOINT,
         "course_link": course_link,
         "progress": progress,
         "course_display_name": current_course.display_name,
