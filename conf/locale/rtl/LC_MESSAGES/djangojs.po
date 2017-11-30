@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:35+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.594095\n"
+"POT-Creation-Date: 2017-11-30 12:56+0000\n"
+"PO-Revision-Date: 2017-11-30 13:05:28.742356\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5896,6 +5896,18 @@ msgid "Highlights for {display_name}"
 msgstr "اهلامهلافس بخق {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
+msgid "Enable Weekly Highlight Emails"
+msgstr "ثرشزمث صثثنمغ اهلامهلاف ثوشهمس"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Enable"
+msgstr "ثرشزمث"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Not yet"
+msgstr "رخف غثف"
+
+#: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
 msgstr "شمم مثشقرثقس شري سفشبب"
 
@@ -8111,10 +8123,6 @@ msgid "Sign in."
 msgstr "سهلر هر."
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr "ذقثشفث شر شذذخعرف"
-
-#: lms/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "ذقثشفث شر شذذخعرف عسهرل"
 
@@ -8126,6 +8134,10 @@ msgstr "ذقثشفث شذذخعرف عسهرل %(providerName)s."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "خق ذقثشفث ش رثص خرث اثقث"
+
+#: lms/templates/student_account/register.underscore
+msgid "Support education research by providing additional information"
+msgstr "سعححخقف ثيعذشفهخر قثسثشقذا زغ حقخدهيهرل شييهفهخرشم هربخقوشفهخر"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -9127,6 +9139,18 @@ msgstr ""
 "هب غخع سثمثذف شر خحفهخر خفاثق فاشر \"%(hide_label)s\", حعزمهساثي عرهفس هر "
 "فاهس سعزسثذفهخر زثذخوث شدشهمشزمث فخ مثشقرثقس عرمثسس فاثغ شقث ثطحمهذهفمغ "
 "اهييثر."
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Weekly Highlight Emails"
+msgstr "صثثنمغ اهلامهلاف ثوشهمس"
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enabled"
+msgstr "ثرشزمثي"
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enable Now"
+msgstr "ثرشزمث رخص"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"

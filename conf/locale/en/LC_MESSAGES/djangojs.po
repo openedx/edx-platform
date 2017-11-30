@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:35+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.594095\n"
+"POT-Creation-Date: 2017-11-30 12:56+0000\n"
+"PO-Revision-Date: 2017-11-30 13:05:28.742356\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5560,6 +5560,18 @@ msgid "Highlights for {display_name}"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
+msgid "Enable Weekly Highlight Emails"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Enable"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Not yet"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
 msgstr ""
 
@@ -7668,10 +7680,6 @@ msgid "Sign in."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr ""
 
@@ -7682,6 +7690,10 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Support education research by providing additional information"
 msgstr ""
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8587,6 +8599,18 @@ msgid ""
 "If you select an option other than \"%(hide_label)s\", published units in "
 "this subsection become available to learners unless they are explicitly "
 "hidden."
+msgstr ""
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Weekly Highlight Emails"
+msgstr ""
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enabled"
+msgstr ""
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enable Now"
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore

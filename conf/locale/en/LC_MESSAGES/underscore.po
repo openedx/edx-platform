@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:35+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.781212\n"
+"POT-Creation-Date: 2017-11-30 12:56+0000\n"
+"PO-Revision-Date: 2017-11-30 13:05:28.858179\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -530,7 +530,6 @@ msgstr ""
 msgid "This post is visible to everyone."
 msgstr ""
 
-#: common/static/common/templates/discussion/thread-type.underscore
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
 msgstr ""
@@ -1808,10 +1807,6 @@ msgid "Sign in."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr ""
 
@@ -1822,6 +1817,10 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Support education research by providing additional information"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
