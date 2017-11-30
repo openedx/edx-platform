@@ -13,6 +13,7 @@ from datetime import datetime
 from webob import Response
 
 from xblock.core import XBlock
+from django.core.files.base import ContentFile
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
@@ -29,7 +30,10 @@ from .transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
     youtube_speed_dict,
+    generate_subs_from_source,
+    get_video_ids_info
 )
+from edxval import api as edxval_api
 
 
 log = logging.getLogger(__name__)
@@ -400,19 +404,51 @@ class VideoStudioViewHandlers(object):
                     log.info("Invalid encoding type for transcript file: {}".format(subtitles.filename))
                     msg = _("Invalid encoding type, transcripts should be UTF-8 encoded.")
                     return Response(msg, status=400)
-                save_to_store(file_data, unicode(subtitles.filename), 'application/x-subrip', self.location)
-                generate_sjson_for_all_speeds(self, unicode(subtitles.filename), {}, language)
+
+                # Generate sjson subtitles from srt substitles
+                sjson_subs = generate_subs_from_source(
+                    {},
+                    os.path.splitext(subtitles.filename)[1][1:],
+                    file_data.decode('utf-8-sig'),
+                    self,
+                    language
+                )
+                __, video_ids = get_video_ids_info(self.edx_video_id, self.youtube_id_1_0, self.html5_sources)
+                for video_id in video_ids:
+                    edxval_api.create_or_update_video_transcript(
+                        video_id=video_id,
+                        language_code=language,
+                        file_name='subs.sjson',  # S3 filename will be `uuid.sjson` like 5d30d3e44ceb163976388cae.sjson
+                        file_format='sjson',
+                        provider='Custom',
+                        file_data=ContentFile(json.dumps(sjson_subs)),
+                    )
+
                 response = {'filename': unicode(subtitles.filename), 'status': 'Success'}
                 return Response(json.dumps(response), status=201)
 
             elif request.method == 'GET':
-
                 filename = request.GET.get('filename')
                 if not filename:
                     log.info("Invalid /translation request: no filename in request.GET")
                     return Response(status=400)
 
-                content = Transcript.get_asset(self.location, filename).data
+                transcript = get_video_transcript_content(
+                    language_code=language,
+                    edx_video_id=self.edx_video_id,
+                    youtube_id_1_0=self.youtube_id_1_0,
+                    html5_sources=self.html5_sources,
+                )
+                if transcript:
+                    # convert sjson content into srt.
+                    content = Transcript.convert(
+                        transcript['content'],
+                        input_format='sjson',
+                        output_format='srt'
+                    )
+                else:
+                    content = Transcript.get_asset(self.location, filename).data
+
                 response = Response(content, headerlist=[
                     ('Content-Disposition', 'attachment; filename="{}"'.format(filename.encode('utf8'))),
                     ('Content-Language', language),
