@@ -12,7 +12,7 @@ class OefSurvey(TimeStampedModel):
         return self.title
 
 
-class OptionPriority(TimeStampedModel):
+class OptionLevel(TimeStampedModel):
     label = models.CharField(max_length=50)
     value = models.FloatField()
     caption = models.CharField(max_length=10, null=True, blank=True)
@@ -32,7 +32,7 @@ class TopicQuestion(TimeStampedModel):
 
 class Option(TimeStampedModel):
     topic = models.ForeignKey(TopicQuestion, related_name='options')
-    priority = models.ForeignKey(OptionPriority)
+    level = models.ForeignKey(OptionLevel)
     text = models.TextField()
 
     def __str__(self):
@@ -41,20 +41,20 @@ class Option(TimeStampedModel):
 
 class UserOefSurvey(TimeStampedModel):
     STATUS_CHOICES = (
-        ('in-progress', 'In Progress'),
+        ('pending', 'Pending'),
         ('completed', 'Completed'),
     )
     user = models.ForeignKey(User)
-    oef_survey = models.ForeignKey(OefSurvey)
-    start_date = models.DateField()
-    completed_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in-progress')
+    survey = models.ForeignKey(OefSurvey)
+    started_on = models.DateField()
+    completed_on = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
-        return '-'.join([self.user.username, self.oef_survey.title])
+        return '-'.join([self.user.username, self.survey.title])
 
 
 class UserAnswers(TimeStampedModel):
     user_survey = models.ForeignKey(UserOefSurvey, related_name='answers')
     question = models.ForeignKey(TopicQuestion)
-    selected_option = models.ForeignKey(OptionPriority)
+    selected_option = models.ForeignKey(OptionLevel)
