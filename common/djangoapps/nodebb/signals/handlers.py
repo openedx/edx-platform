@@ -74,6 +74,7 @@ def create_user_on_nodebb(sender, instance, created, **kwargs):
     """
     if created:
         user_info = {
+            'edx_user_id': instance.user.id,
             'email': instance.user.email,
             'first_name': instance.first_name,
             'last_name': instance.last_name,
@@ -92,19 +93,23 @@ def create_user_on_nodebb(sender, instance, created, **kwargs):
         return status_code
 
 
-@receiver(pre_save, sender=User, dispatch_uid='activate_user_on_nodebb')
-def activate_user_on_nodebb(sender, instance, **kwargs):
+@receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
+def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
     """
-    Activate a user on nodebb whenever user become active on edx platform
+    Activate or Deactivate a user on nodebb whenever user's active state changes on edx platform
     """
-    if instance.is_active and User.objects.filter(pk=instance.pk, is_active=False).exists():
+    current_user_obj = User.objects.filter(pk=instance.pk)
 
-        status_code, response_body = NodeBBClient().users.activate(username=instance.username)
+    if current_user_obj.first() and current_user_obj[0].is_active != instance.is_active:
+        status_code, response_body = NodeBBClient().users.activate(username=instance.username,
+                                                                   active=instance.is_active)
 
         if status_code != 200:
-            log.error("Error: Can not activate user(%s) on nodebb due to %s" % (instance.username, response_body))
+            log.error("Error: Can not change active status of a user(%s) on nodebb due to %s"
+                      % (instance.username, response_body))
         else:
-            log.info('Success: User(%s) has been activated on nodebb' % instance.username)
+            log.info("Success: User(%s)'s active status('is_active:%s') has been changed on nodebb"
+                     % (instance.username, instance.is_active))
 
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
