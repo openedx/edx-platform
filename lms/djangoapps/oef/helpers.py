@@ -21,7 +21,7 @@ def get_user_survey_status(user, create_new_survey=True):
             'survey': survey
         }
 
-    if uos.status == 'in-progress':
+    if uos.status == 'pending':
         error = 'You have a pending survey'
         is_eligible = False
         survey = uos.survey
