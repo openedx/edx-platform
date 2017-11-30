@@ -73,7 +73,7 @@
     // Time waitsFor() should wait for before failing a test.
     window.WAIT_TIMEOUT = 5000;
 
-    jasmine.getFixtures().fixturesPath += 'fixtures';
+    jasmine.getFixtures().fixturesPath += 'common/lib/xmodule/xmodule/js/fixtures';
 
     jasmine.stubbedMetadata = {
         '7tqY6eQzVhE': {
