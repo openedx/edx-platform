@@ -189,6 +189,7 @@ class ProgramFactory(DictFactoryBase):
     expected_learning_items = factory.LazyFunction(partial(generate_instances, CourseFactory))
     faq = factory.LazyFunction(partial(generate_instances, FAQFactory))
     hidden = False
+    instructor_ordering = factory.LazyFunction(partial(generate_instances, PersonFactory))
     is_program_eligible_for_one_click_purchase = True
     job_outlook_items = factory.LazyFunction(partial(generate_instances, JobOutlookItemFactory))
     marketing_slug = factory.Faker('slug')
