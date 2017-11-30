@@ -6,12 +6,23 @@ from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, U
 
 
 def get_user_survey_status(user, create_new_survey=True):
+    """
+    This function determines, whether a user is
+    eligible to take a new oef survey. If a user
+    has a pending survey, return that to user
+    if user took a survey less that days limit
+    specified in setting, return none
+    """
     error = ''
     is_eligible = True
     survey = None
+    uos = None
     try:
         uos = UserOefSurvey.objects.filter(user=user).latest('started_on')
     except UserOefSurvey.DoesNotExist:
+        pass
+
+    if not uos:
         if create_new_survey:
             survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
 
@@ -41,9 +52,17 @@ def get_user_survey_status(user, create_new_survey=True):
 
 
 def get_user_survey(user, latest_survey):
+    """
+    Create/Get a user-survey object, if one
+    in pending already exists, return that
+    """
+    uos = None
     try:
-        uos = UserOefSurvey.objects.get(user_id=user.id, status='in-progress')
+        uos = UserOefSurvey.objects.get(user_id=user.id, status='pending')
     except UserOefSurvey.DoesNotExist:
+        pass
+
+    if not uos:
         uos = UserOefSurvey()
         uos.survey = latest_survey
         uos.user = user
@@ -62,8 +81,8 @@ def get_survey_topics(uos, survey_id):
     topics = TopicQuestion.objects.filter(survey_id=survey_id)
     parsed_topics = []
     for index, topic in enumerate(topics):
-        options = list(topic.options.all())
-        options.sort(key=lambda x: x.level.value, reverse=False)
+        options = topic.options.order_by('level__value')
+        # options.sort(key=lambda x: x.level.value, reverse=False)
         answer = get_answer(uos, topic.id)
         parsed_topics.append({
             'title': topic.title,
@@ -77,9 +96,7 @@ def get_survey_topics(uos, survey_id):
 
 
 def get_option_levels():
-    levels = list(OptionLevel.objects.all())
-    levels.sort(key=lambda x: x.value, reverse=False)
-    return levels
+    return OptionLevel.objects.order_by('value')
 
 
 def get_answer(uos, question_id):
@@ -90,10 +107,7 @@ def get_answer(uos, question_id):
 
 
 def create_answer(uos, data):
-    answer = UserAnswers()
-    answer.user_survey = uos
-    answer.question_id = int(data['topic_id'])
-    return answer
+    return UserAnswers(user_survey=uos, question_id=int(data['topic_id']))
 
 
 def get_option(option_value):
@@ -101,6 +115,10 @@ def get_option(option_value):
 
 
 def check_if_complete(uos, answers_count):
+    """
+    Check if the survey has been completed
+    if yes, mark it complete
+    """
     if uos.survey.topics.count() == answers_count:
         uos.status = 'completed'
         uos.completed_on = datetime.date.today()

@@ -11,8 +11,13 @@ from lms.djangoapps.oef.helpers import *
 
 @login_required
 def oef_dashboard(request):
+    """
+    View for OEF dashboard
+
+    """
     user_surveys = UserOefSurvey.objects.filter(user_id=request.user.id)
     surveys = []
+    user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
     for survey in user_surveys:
         surveys.append({
             'id': survey.id,
@@ -21,19 +26,25 @@ def oef_dashboard(request):
             'status': survey.status
         })
 
-    return render(request, 'oef/oef-org.html', {'surveys': surveys})
+    return render(request, 'oef/oef-org.html', {'surveys': surveys, 'error': user_survey_status['error']})
 
 
 @login_required
 def oef_instructions(request):
+    """
+    View for instructions page of OEF
+    """
     survey_info = get_user_survey_status(request.user, create_new_survey=False)
     if survey_info['error']:
-        return redirect(reverse('courses'))
+        return redirect(reverse('oef_dashboard'))
     return render(request, 'oef/oef-instructional.html', {})
 
 
 @login_required
 def get_survey_by_id(request, user_survey_id):
+    """
+    Get a particular survey by its id
+    """
     uos = UserOefSurvey.objects.get(id=int(user_survey_id), user_id=request.user.id)
     survey = uos.survey
     topics = get_survey_topics(uos, survey.id)
@@ -47,23 +58,30 @@ def get_survey_by_id(request, user_survey_id):
 
 @login_required
 def fetch_survey(request):
+    """
+    Fetch appropriate survey for the user
+
+    """
     survey_info = get_user_survey_status(request.user)
     if not survey_info['survey']:
-        return redirect(reverse('recommendations'))
+        return redirect(reverse('oef_dashboard'))
 
     uos = get_user_survey(request.user, survey_info['survey'])
     survey = uos.survey
     topics = get_survey_topics(uos, survey.id)
-    levles = get_option_levels()
+    levels = get_option_levels()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
                                                    "topics": topics,
-                                                   "levels": levles,
+                                                   "levels": levels,
                                                    'is_completed': uos.status == 'completed',
                                                    })
 
 
 @login_required
 def save_answer(request):
+    """
+    Save answers submitted by user
+    """
     data = json.loads(request.body)
     survey_id = int(data['survey_id'])
     uos = UserOefSurvey.objects.get(survey_id=survey_id, user_id=request.user.id)
