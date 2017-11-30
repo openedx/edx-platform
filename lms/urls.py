@@ -32,6 +32,7 @@ urlpatterns = (
     url(r'', include('homepage.urls', namespace='homepage')),
 
     url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
+    url(r'^oef/', include('lms.djangoapps.oef.urls')),
     url(r'', include('edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
