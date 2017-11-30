@@ -9,6 +9,7 @@ import re
 from datetime import datetime, timedelta
 
 import ddt
+import pytest
 from django.core.urlresolvers import reverse
 from django.db.models import signals
 from nose.plugins.attrib import attr
@@ -66,6 +67,7 @@ class SupportViewAccessTests(SupportViewTestCase):
         ))
     ))
     @ddt.unpack
+    @pytest.mark.django111_expected_failure
     def test_access(self, url_name, role, has_access):
         if role is not None:
             role().add_users(self.user)

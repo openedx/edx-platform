@@ -8,6 +8,7 @@ from decimal import Decimal
 from urlparse import urlparse
 
 import ddt
+import pytest
 import pytz
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
@@ -198,7 +199,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.client.login(username=self.user.username, password="password")
 
     def test_add_course_to_cart_anon(self):
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
@@ -260,7 +261,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         # add first course to user cart
         resp = self.client.post(
-            reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()])
+            reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()])
         )
         self.assertEqual(resp.status_code, 200)
         # add and apply the coupon code to course in the cart
@@ -273,7 +274,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         #now add the second course to cart, the coupon code should be
         # applied when adding the second course to the cart
         resp = self.client.post(
-            reverse('shoppingcart.views.add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()])
+            reverse('add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()])
         )
         self.assertEqual(resp.status_code, 200)
         #now check the user cart and see that the discount has been applied on both the courses
@@ -286,7 +287,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 400)
         self.assertIn('The course {0} is already in your cart.'.format(self.course_key.to_deprecated_string()), resp.content)
 
@@ -475,6 +476,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn("Cart item quantity should not be greater than 1 when applying activation code", resp.content)
 
     @ddt.data(True, False)
+    @pytest.mark.django111_expected_failure
     def test_reg_code_uses_associated_mode(self, expired_mode):
         """Tests the use of reg codes on verified courses, expired or active. """
         course_key = self.course_key.to_deprecated_string()
@@ -487,6 +489,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
 
     @ddt.data(True, False)
+    @pytest.mark.django111_expected_failure
     def test_reg_code_uses_unknown_mode(self, expired_mode):
         """Tests the use of reg codes on verified courses, expired or active. """
         course_key = self.course_key.to_deprecated_string()
@@ -769,20 +772,20 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 400)
         self.assertIn('You are already registered in course {0}.'.format(self.course_key.to_deprecated_string()), resp.content)
 
     def test_add_nonexistent_course_to_cart(self):
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=['non/existent/course']))
+        resp = self.client.post(reverse('add_course_to_cart', args=['non/existent/course']))
         self.assertEqual(resp.status_code, 404)
         self.assertIn("The course you requested does not exist.", resp.content)
 
     def test_add_course_to_cart_success(self):
         self.login_user()
-        reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()])
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()])
+        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
@@ -1379,7 +1382,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self._assert_404(reverse('shoppingcart.views.show_cart', args=[]))
         self._assert_404(reverse('shoppingcart.views.clear_cart', args=[]))
         self._assert_404(reverse('shoppingcart.views.remove_item', args=[]), use_post=True)
-        self._assert_404(reverse('shoppingcart.views.register_code_redemption', args=["testing"]))
+        self._assert_404(reverse('register_code_redemption', args=["testing"]))
         self._assert_404(reverse('shoppingcart.views.use_code', args=[]), use_post=True)
         self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
@@ -1440,6 +1443,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             }
         )
 
+    @pytest.mark.django111_expected_failure
     def test_shopping_cart_navigation_link_not_in_microsite(self):
         """
         Tests shopping cart link is available in navigation header if request is not from a microsite.
@@ -1474,6 +1478,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<a class="shopping-cart"', resp.content)
 
+    @pytest.mark.django111_expected_failure
     def test_shopping_cart_navigation_link_in_microsite_courseware_page(self):
         """
         Tests shopping cart link is not available in navigation header if request is from a microsite
