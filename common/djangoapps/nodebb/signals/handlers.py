@@ -98,9 +98,9 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
     """
     Activate or Deactivate a user on nodebb whenever user's active state changes on edx platform
     """
-    current_user_obj = User.objects.filter(pk=instance.pk).first()
+    current_user_obj = User.objects.filter(pk=instance.pk)
 
-    if current_user_obj and current_user_obj.is_active != instance.is_active:
+    if current_user_obj.first() and current_user_obj[0].is_active != instance.is_active:
         status_code, response_body = NodeBBClient().users.activate(username=instance.username,
                                                                    active=instance.is_active)
 
