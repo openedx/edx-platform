@@ -104,7 +104,11 @@ source, template_path = Loader(engine).load_template_source(path)
         def _convert_dict_to_json(input_dict):
             output_json = "{"
             for key in input_dict:
-                output_json = "{}{}:\"{}\",".format(output_json, key, input_dict[key])
+                if input_dict[key] is dict:
+                    sub_dict = _convert_dict_to_json(input_dict[key])
+                    output_json = "{}{}:\"{}\",".format(output_json, key, sub_dict)
+                else:
+                    output_json = "{}{}:\"{}\",".format(output_json, key, input_dict[key])
             output_json += "}"
             return output_json
 
