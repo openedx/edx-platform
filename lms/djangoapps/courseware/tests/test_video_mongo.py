@@ -1467,33 +1467,17 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
-    def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
-                                                       expected_transcripts, mock_get_transcript_languages):
+    def test_student_view_with_val_transcripts(self, transcripts, english_sub, val_transcripts,
+                                               expected_transcripts, mock_get_transcript_languages):
         """
-        Test `student_view_data` with edx-val transcripts enabled.
+        Test that `student_view_data` works as expected with edx-val transcripts.
         """
         mock_get_transcript_languages.return_value = val_transcripts
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
-
-    @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    @patch(
-        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
-        Mock(return_value=['ro', 'es']),
-    )
-    def test_student_view_with_val_transcripts_disabled(self):
-        """
-        Test `student_view_data` with edx-val transcripts disabled.
-        """
-        student_view_response = self.get_result()
-        self.assertDictEqual(student_view_response['transcripts'], {self.TEST_LANGUAGE: self.transcript_url})
 
 
 @attr(shard=1)

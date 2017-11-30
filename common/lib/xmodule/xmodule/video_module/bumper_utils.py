@@ -121,7 +121,7 @@ def bumper_metadata(video, sources):
     """
     Generate bumper metadata.
     """
-    transcripts = video.get_transcripts_info(is_bumper=True)
+    transcripts = video.get_transcripts_info(is_bumper=True, include_val_transcripts=False)
     unused_track_url, bumper_transcript_language, bumper_languages = video.get_transcripts_for_student(transcripts)
 
     metadata = OrderedDict({

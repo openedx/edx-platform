@@ -44,7 +44,6 @@ from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
     get_video_ids_info,
-    is_val_transcript_feature_enabled_for_course,
     Transcript,
     VideoTranscriptsMixin,
 )
@@ -289,8 +288,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if download_video_link and download_video_link.endswith('.m3u8'):
                 download_video_link = None
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
-        transcripts = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        transcripts = self.get_transcripts_info()
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
@@ -924,7 +922,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
             try:
-                transcripts = self.get_transcripts_info()
+                # This is to index contentstore transcripts so, do not include VAL transcripts.
+                transcripts = self.get_transcripts_info(include_val_transcripts=False)
                 transcript = self.get_transcript(
                     transcripts, transcript_format='txt', lang=language
                 )[0].replace("\n", " ")
@@ -1023,9 +1022,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
-        transcripts_info = self.get_transcripts_info(include_val_transcripts=feature_enabled)
-        available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
+        transcripts_info = self.get_transcripts_info()
+        available_translations = self.available_translations(transcripts_info)
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations
