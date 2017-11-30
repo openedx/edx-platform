@@ -73,3 +73,22 @@ def all_languages():
     """
     languages = [(lang[0], _(lang[1])) for lang in settings.ALL_LANGUAGES]  # pylint: disable=translation-of-non-string
     return sorted(languages, key=lambda lang: lang[1])
+
+
+def get_closest_released_language(target_language_code):
+    """
+    Return the language code that most closely matches the target and is fully
+    supported by the LMS, or None if there are no fully supported languages that
+    match the target.
+    """
+    match = None
+    languages = released_languages()
+
+    for language in languages:
+        if language.code == target_language_code:
+            match = language.code
+            break
+        elif (match is None) and (language.code[:2] == target_language_code[:2]):
+            match = language.code
+
+    return match
