@@ -417,7 +417,7 @@ class VideoStudioViewHandlers(object):
                 for video_id in video_ids:
                     edxval_api.create_or_update_video_transcript(
                         video_id=video_id,
-                        language_code='en',
+                        language_code=language,
                         file_name='subs.sjson',  # S3 filename will be `uuid.sjson` like 5d30d3e44ceb163976388cae.sjson
                         file_format='sjson',
                         provider='Custom',

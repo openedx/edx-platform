@@ -9,18 +9,22 @@ from datetime import datetime, timedelta
 
 import ddt
 import freezegun
+from common.test.utils import normalize_repr
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
-from webob import Request, Response
-
-from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
+from webob import Request, Response
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import TranscriptException, TranscriptsGenerationException
+from xmodule.video_module.transcripts_utils import (
+    Transcript,
+    TranscriptException,
+    TranscriptsGenerationException,
+    get_video_transcript_content
+)
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
@@ -30,7 +34,7 @@ TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
 SRT_content = textwrap.dedent("""
         0
-        00:00:00,12 --> 00:00:00,100
+        00:00:00,012 --> 00:00:00,100
         Привіт, edX вітає вас.
     """)
 
@@ -897,16 +901,43 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
 
     METADATA = {}
 
+    def assert_transcript_upload(self, item, subs_id, language, expected_transcript_content):
+        """
+        Verify that transcript is uploaded as expected.
+
+        Arguments:
+            item (descriptor): Video descriptor
+            subs_id (str): subtitle id
+            language (str): transcript language
+            expected_transcript_content (str): transcript content be checked
+        """
+        # verify that transcript should not be in contentstore
+        content_location = StaticContent.compute_location(self.course.id, subs_id)
+        with self.assertRaises(NotFoundError):
+            contentstore().find(content_location)
+
+        # verify uploaded transcript content
+        transcript_data = get_video_transcript_content(
+            language_code=language,
+            edx_video_id=item.edx_video_id,
+            youtube_id_1_0=item.youtube_id_1_0,
+            html5_sources=item.html5_sources,
+        )
+        uploaded_transcript_content = Transcript.convert(
+            transcript_data['content'],
+            input_format='sjson',
+            output_format='srt'
+        )
+        self.assertIn(expected_transcript_content.decode('utf-8').strip(), uploaded_transcript_content.strip())
+
+
     def test_studio_transcript_post(self):
         # Check for exceptons:
 
         # Language is passed, bad content or filename:
 
         # should be first, as other tests save transcrips to store.
-        request = Request.blank('/translation/uk', POST={'file': ('filename.srt', SRT_content)})
-        with patch('xmodule.video_module.video_handlers.save_to_store'):
-            with self.assertRaises(TranscriptException):  # transcripts were not saved to store for some reason.
-                response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
+
         request = Request.blank('/translation/uk', POST={'file': ('filename', 'content')})
         with self.assertRaises(TranscriptsGenerationException):  # Not an srt filename
             self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
@@ -932,7 +963,13 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         self.assertEqual(response.status, '201 Created')
         self.assertDictEqual(json.loads(response.body), {'filename': u'filename.srt', 'status': 'Success'})
         self.assertDictEqual(self.item_descriptor.transcripts, {})
-        self.assertTrue(_check_asset(self.item_descriptor.location, u'filename.srt'))
+
+        self.assert_transcript_upload(
+            self.item_descriptor,
+            'filename.srt',
+            'uk',
+            SRT_content,
+        )
 
 
 @attr(shard=1)
@@ -1091,7 +1128,7 @@ class TestGetTranscript(TestVideo):
         text, filename, mime_type = self.item.get_transcript(transcripts)
         expected_text = textwrap.dedent("""
         0
-        00:00:00,12 --> 00:00:00,100
+        00:00:00,012 --> 00:00:00,100
         Привіт, edX вітає вас.
         """)
         self.assertEqual(text, expected_text)
