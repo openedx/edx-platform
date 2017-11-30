@@ -21,7 +21,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import (
     Transcript,
-    TranscriptException,
     TranscriptsGenerationException,
     get_video_transcript_content
 )
@@ -929,7 +928,6 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
             output_format='srt'
         )
         self.assertIn(expected_transcript_content.decode('utf-8').strip(), uploaded_transcript_content.strip())
-
 
     def test_studio_transcript_post(self):
         # Check for exceptons:
