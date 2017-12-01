@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+export NUMBER_OF_BOKCHOY_THREADS=10
 
 echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
