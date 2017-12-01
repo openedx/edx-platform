@@ -222,12 +222,8 @@ class TaskTestCase(ModuleStoreTestCase):
 
     def _assert_rendered_email(self, message):
         # check that we can actually render the message
-        middleware_classes = [
-            CurrentRequestUserMiddleware,
-            CurrentSiteThemeMiddleware,
-        ]
         with emulate_http_request(
-            site=message.context['site'], user=self.thread_author, middleware_classes=middleware_classes
+            site=message.context['site'], user=self.thread_author
         ):
             rendered_email = EmailRenderer().render(message)
             self.assertTrue(self.comment['body'] in rendered_email.body_html)

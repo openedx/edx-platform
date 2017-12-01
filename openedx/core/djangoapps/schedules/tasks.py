@@ -3,7 +3,6 @@ import logging
 
 import analytics
 from celery.task import task, Task
-from crum import CurrentRequestUserMiddleware
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -20,7 +19,6 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
-from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 LOG = logging.getLogger(__name__)
@@ -103,11 +101,7 @@ class ScheduleMessageBaseTask(Task):
     ):
         msg_type = self.make_message_type(day_offset)
         site = Site.objects.select_related('configuration').get(id=site_id)
-        middleware_classes = [
-            CurrentRequestUserMiddleware,
-            CurrentSiteThemeMiddleware,
-        ]
-        with emulate_http_request(site=site, middleware_classes=middleware_classes):
+        with emulate_http_request(site=site):
             _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
             return self.resolver(
                 self.async_send_task,
@@ -191,11 +185,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
 
         user = User.objects.get(username=msg.recipient.username)
-        middleware_classes = [
-            CurrentRequestUserMiddleware,
-            CurrentSiteThemeMiddleware,
-        ]
-        with emulate_http_request(site=site, user=user, middleware_classes=middleware_classes):
+        with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
             LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
             ace.send(msg)

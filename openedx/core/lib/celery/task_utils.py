@@ -1,6 +1,8 @@
 from contextlib import contextmanager
 
+from crum import CurrentRequestUserMiddleware
 from django.http import HttpRequest, HttpResponse
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 
 
 @contextmanager
@@ -20,12 +22,17 @@ def emulate_http_request(site=None, user=None, middleware_classes=None):
         site (Site): The site that this request should emulate. Defaults to None.
         user (User): The user that initiated this fake request. Defaults to None
         middleware_classes (list): A list of classes that implement Django's middleware interface.
+            Defaults to [CurrentRequestUserMiddleware, CurrentSiteThemeMiddleware] if None.
     """
     request = HttpRequest()
     request.user = user
     request.site = site
 
-    middleware_classes = middleware_classes or []
+    # TODO: define the default middleware_classes in settings.py
+    middleware_classes = middleware_classes or [
+        CurrentRequestUserMiddleware,
+        CurrentSiteThemeMiddleware,
+    ]
     middleware_instances = [klass() for klass in middleware_classes]
     response = HttpResponse()
 
