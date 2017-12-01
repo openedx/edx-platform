@@ -6,7 +6,7 @@ from unittest import TestCase
 import ddt
 from mock import patch
 from paver.easy import call_task, path
-from watchdog.observers.polling import PollingObserver
+from watchdog.observers import Observer
 
 from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
 
@@ -221,7 +221,7 @@ class TestPaverWatchAssetTasks(TestCase):
         Test the "compile_sass" task.
         """
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
-            with patch('pavelib.assets.PollingObserver.start'):
+            with patch('pavelib.assets.Observer.start'):
                 with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
                     call_task(
                         'pavelib.assets.watch_assets',
@@ -232,7 +232,7 @@ class TestPaverWatchAssetTasks(TestCase):
 
                     sass_watcher_args = mock_register.call_args_list[0][0]
 
-                    self.assertIsInstance(sass_watcher_args[0], PollingObserver)
+                    self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
                     self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
 
@@ -248,7 +248,7 @@ class TestPaverWatchAssetTasks(TestCase):
         ])
 
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
-            with patch('pavelib.assets.PollingObserver.start'):
+            with patch('pavelib.assets.Observer.start'):
                 with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
                     call_task(
                         'pavelib.assets.watch_assets',
@@ -262,7 +262,7 @@ class TestPaverWatchAssetTasks(TestCase):
                     self.assertEqual(mock_webpack.call_count, 1)
 
                     sass_watcher_args = mock_register.call_args_list[0][0]
-                    self.assertIsInstance(sass_watcher_args[0], PollingObserver)
+                    self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
                     self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
 
