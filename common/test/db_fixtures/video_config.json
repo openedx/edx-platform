@@ -1,0 +1,11 @@
+[
+  {
+    "pk": 2,
+    "model": "video_config.videotranscriptenabledflag",
+    "fields": {
+      "enabled": 1,
+      "enabled_for_all_courses": 1,
+      "change_date": "2016-04-21 10:19:32.034856"
+    }
+  }
+]
