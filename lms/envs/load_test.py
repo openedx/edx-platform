@@ -10,7 +10,7 @@ from .aws import *
 
 # Disable CSRF for load testing
 EXCLUDE_CSRF = lambda elem: elem not in [
-    'django.core.context_processors.csrf',
+    'django.template.context_processors.csrf',
     'django.middleware.csrf.CsrfViewMiddleware'
 ]
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] = filter(
