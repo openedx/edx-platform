@@ -62,6 +62,8 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
     faqs = program['faq']
     courses = program['courses']
     instructors = program['instructors']
+    full_program_price_format = '{0:.0f}' if program['full_program_price'].is_integer() else '{0:.2f}'
+    full_program_price = full_program_price_format.format(program['full_program_price'])
   %>
   <div id="program-details-hero">
     <div class="main-banner" 
@@ -83,9 +85,30 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
               <h2>${program['subtitle']}</h2>
             </div>
             <div>
+              ## Note: Weird formatting to fix the inline spacing issue.
               % if program.get('is_learner_eligible_for_one_click_purchase'):
                 <a href="${buy_button_href}" class="btn btn-success">
-                  ${_('Purchase the Program')}
+                <span>${_('Purchase the Program (')}</span
+                % if program.get('discount_data') and program['discount_data']['is_discounted']:
+                  ><span aria-label="${_('Original Price')}" class="original-price"
+                  >${Text(_('${oldPrice}')).format(
+                      oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
+                    )}</span
+                  ><span aria-label="${_('Discounted Price')}" class="discount">
+                      ${Text(_('${newPrice}')).format(
+                        newPrice=full_program_price,
+                      )}
+                  </span
+                  ><span class="savings">
+                    ${Text(_('{currency})')).format(
+                      discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
+                      currency=program['discount_data']['currency']
+                    )}
+                  </span>
+                % else:
+                ><span>${"${price})".format(price=full_program_price)}
+                  </span>
+                % endif
                 </a>
               % else:
                 <a href="#courses" class="btn btn-success">

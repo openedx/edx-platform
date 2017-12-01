@@ -8,16 +8,16 @@
         "javascript-jquery-insert-into-target": 23,
         "javascript-jquery-insertion": 19,
         "javascript-jquery-prepend": 7,
-        "mako-html-entities": 0,
+        "mako-html-entities": 1,
         "mako-invalid-html-filter": 11,
         "mako-invalid-js-filter": 192,
         "mako-js-html-string": 0,
         "mako-js-missing-quotes": 0,
-        "mako-missing-default": 181,
+        "mako-missing-default": 162,
         "mako-multiple-page-tags": 0,
         "mako-unknown-context": 0,
         "mako-unparseable-expression": 0,
-        "mako-unwanted-html-filter": 0,
+        "mako-unwanted-html-filter": 2,
         "python-close-before-format": 0,
         "python-concat-html": 24,
         "python-custom-escape": 13,
@@ -28,5 +28,5 @@
         "python-wrap-html": 226,
         "underscore-not-escaped": 507
     },
-    "total": 1770
+    "total": 1754
 }

@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from openedx.core.djangolib.markup import HTML
 
 from . import models
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from opaque_keys.edx.keys import CourseKey
 
 
 class ScheduleExperienceAdminInline(admin.StackedInline):
@@ -45,7 +47,10 @@ for (db_name, human_name) in models.ScheduleExperience.EXPERIENCES:
 
 
 class KnownErrorCases(admin.SimpleListFilter):
-    title = _('KnownErrorCases')
+    """
+    Filter schedules by a list of known error cases.
+    """
+    title = _('Known Error Case')
 
     parameter_name = 'error'
 
@@ -59,14 +64,65 @@ class KnownErrorCases(admin.SimpleListFilter):
             return queryset.filter(start__lt=F('enrollment__course__start'))
 
 
+class CourseIdFilter(admin.SimpleListFilter):
+    """
+    Filter schedules to by course id using a dropdown list.
+    """
+    template = "dropdown_filter.html"
+    title = _("Course Id")
+    parameter_name = "course_id"
+
+    def __init__(self, request, params, model, model_admin):
+        super(CourseIdFilter, self).__init__(request, params, model, model_admin)
+        self.unused_parameters = params.copy()
+        self.unused_parameters.pop(self.parameter_name, None)
+
+    def value(self):
+        value = super(CourseIdFilter, self).value()
+        if value == "None" or value is None:
+            return None
+        else:
+            return CourseKey.from_string(value)
+
+    def lookups(self, request, model_admin):
+        return (
+            (overview.id, unicode(overview.id)) for overview in CourseOverview.objects.all().order_by('id')
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value is None:
+            return queryset
+        else:
+            return queryset.filter(enrollment__course_id=value)
+
+    def choices(self, changelist):  # pylint: disable=unused-argument
+        yield {
+            'selected': self.value() is None,
+            'value': None,
+            'display': _('All'),
+        }
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup,
+                'value': unicode(lookup),
+                'display': title,
+            }
+
+
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline', 'experience_display')
     list_display_links = ('start', 'upgrade_deadline', 'experience_display')
-    list_filter = ('experience__experience_type', 'active', KnownErrorCases)
+    list_filter = (
+        CourseIdFilter,
+        'experience__experience_type',
+        'active',
+        KnownErrorCases
+    )
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
-    search_fields = ('enrollment__user__username', 'enrollment__course__id',)
+    search_fields = ('enrollment__user__username',)
     inlines = (ScheduleExperienceAdminInline,)
     actions = ['deactivate_schedules', 'activate_schedules'] + experience_actions
 

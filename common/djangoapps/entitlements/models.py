@@ -24,3 +24,10 @@ class CourseEntitlement(TimeStampedModel):
         help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.'
     )
     order_number = models.CharField(max_length=128, null=True)
+
+    @property
+    def expired_at_datetime(self):
+        """
+        Getter to be used instead of expired_at because of the conditional check and update
+        """
+        return self.expired_at

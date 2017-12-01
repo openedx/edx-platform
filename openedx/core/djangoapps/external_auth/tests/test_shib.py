@@ -5,7 +5,10 @@ Tests for Shibboleth Authentication
 @jbau
 """
 import unittest
+from importlib import import_module
+from urllib import urlencode
 
+import pytest
 from ddt import ddt, data
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -14,14 +17,12 @@ from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
-from importlib import import_module
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
 from mock import patch
 from nose.plugins.attrib import attr
-from urllib import urlencode
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import change_enrollment
@@ -297,6 +298,7 @@ class ShibSPTest(CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @data(*gen_all_identities())
+    @pytest.mark.django111_expected_failure
     def test_registration_form_submit(self, identity):
         """
         Tests user creation after the registration form that pops is submitted.  If there is no shib

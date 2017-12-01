@@ -101,8 +101,15 @@ Glossary
    the number of emails each task must send.
 
 -  **Email Backend**: An external service that ACE will use to deliver emails.
-	 Right now, ACE only supports `Sailthru <http://www.sailthru.com/>` as an
+   For now, ACE only supports `Sailthru <http://www.sailthru.com/>`__ as an
    email backend.
+
+
+An Overview of edX's Dynamic Pacing System
+------------------------------------------
+
+.. image:: img/system_diagram.png
+
 
 Running the Management Commands
 -------------------------------
@@ -365,6 +372,78 @@ Course Update
 -  Learners must have the ScheduleExperience type of “Course Updates”.
 -  Their Schedule ``start_date`` must be 7, 14, or any increment of 7
    days up to 77 days before the current date.
+
+Analytics
+~~~~~~~~~
+
+To track the performance of these communications, there is an integration setup
+with Google Analytics and Segment. When a message is sent a Segment event is
+emitted that contains the unique message identifier and a bunch of other data
+about the message that was sent. When a user opens an email, an invisible
+tracking pixel is rendered that records an event in Google Analytics. When a
+user clicks a link in the email,
+`UTM parameters <https://en.wikipedia.org/wiki/UTM_parameters>`__ are included
+in the query string which allow Google Analytics to know that the traffic was
+driven to the LMS by that email.
+
+Using these three pieces of information you can track many key metrics.
+Specifically: you can monitor the number of messages sent, the ratio of messages
+opened to messages sent, and the ratio of links clicked in messages to the
+messages opened. These help you answer a few key questions: How many people
+am I reaching? How many people are opening my messages? How many people are
+persuaded to actually come back to my site after reading my message?
+
+You can also filter Google Analytics to compare the behavior of the users
+coming to your platform from these emails relative to other sources of traffic.
+
+Enabling Tracking
+^^^^^^^^^^^^^^^^^
+
+-  In either your site configuration or django settings set
+   ``GOOGLE_ANALYTICS_TRACKING_ID`` to your Google Analytics tracking ID. This
+   will look something like UA-XXXXXXX-X
+-  In your django settings set ``LMS_SEGMENT_KEY`` to your Segment project
+   write key.
+
+Emitted Events
+^^^^^^^^^^^^^^
+
+The segment event that is emitted when a message is sent is named
+"edx.bi.email.sent" and contains the following information:
+
+-  ``send_uuid`` uniquely identifies this batch of emails that are being sent to
+   many learners.
+-  ``uuid`` uniquely identifies this particular message being sent to exactly
+   one learner.
+-  ``site`` is the site that the email was sent for.
+-  ``app_label`` will always be "schedules" for the emails sent from here.
+-  ``name`` will be the name of the message that was sent: recurringnudge_day3,
+   recurringnudge_day10, upgradereminder, or courseupdate.
+- ``primary_course_id`` identifies the primary course discussed in the email if
+  the email was sent on behalf of several courses.
+- ``language`` is the language the email was translated into.
+- ``course_ids`` is a list of all courses that this email was sent on behalf of.
+  This can be truncated if the list of courses is long.
+- ``num_courses`` is the actual number of courses covered by this message. This
+  may differ from the course_ids list if the list was truncated.
+
+The Google Analytics event that is emitted when a learner opens an email has
+the following properties:
+
+-  ``action`` is "edx.bi.email.opened"
+-  ``category`` is "email"
+-  ``label`` is the primary_course_id described above
+-  ``campaign source`` is "schedules"
+-  ``campaign medium`` is "email"
+-  ``campaign content`` is the unique identifier for the message
+
+When the user clicks a link in the email the following UTM parameters are
+included in the URL:
+
+-  ``campaign source`` is "schedules"
+-  ``campaign medium`` is "email"
+-  ``campaign content`` is the unique identifier for the message
+-  ``campaign term`` is the primary_course_id described above
 
 Litmus
 ------
