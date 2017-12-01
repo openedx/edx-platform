@@ -29,7 +29,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
         with patch.multiple(
             self.basetask,
             is_enqueue_enabled=Mock(return_value=False),
-            log_debug=DEFAULT,
+            log_info=DEFAULT,
             run=send,
         ) as patches:
             self.basetask.enqueue(
@@ -37,7 +37,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
                 current_date=datetime.datetime.now(),
                 day_offset=2
             )
-            patches['log_debug'].assert_called_once_with(
+            patches['log_info'].assert_called_once_with(
                 'Message queuing disabled for site %s', self.site.domain)
             send.apply_async.assert_not_called()
 
@@ -48,7 +48,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
         with patch.multiple(
             self.basetask,
             is_enqueue_enabled=Mock(return_value=True),
-            log_debug=DEFAULT,
+            log_info=DEFAULT,
             run=send,
         ) as patches:
             self.basetask.enqueue(
@@ -58,8 +58,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
             )
             target_date = current_date.replace(hour=0, minute=0, second=0, microsecond=0) + \
                 datetime.timedelta(day_offset)
-            print(patches['log_debug'].mock_calls)
-            patches['log_debug'].assert_any_call(
+            patches['log_info'].assert_any_call(
                 'Target date = %s', target_date.isoformat())
             assert send.call_count == DEFAULT_NUM_BINS
 

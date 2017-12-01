@@ -14,4 +14,13 @@ class PrefixedDebugLoggerMixin(object):
             self.log_prefix = self.__class__.__name__
 
     def log_debug(self, message, *args, **kwargs):
+        """
+        Wrapper around LOG.debug that prefixes the message.
+        """
         LOG.debug(self.log_prefix + ': ' + message, *args, **kwargs)
+
+    def log_info(self, message, *args, **kwargs):
+        """
+        Wrapper around LOG.info that prefixes the message.
+        """
+        LOG.info(self.log_prefix + ': ' + message, *args, **kwargs)
