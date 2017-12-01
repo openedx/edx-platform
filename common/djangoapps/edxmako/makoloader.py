@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import Engine
-from django.template.base import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
