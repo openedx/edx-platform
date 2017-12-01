@@ -66,18 +66,24 @@ class ScheduleMessageBaseTask(Task):
 
     @classmethod
     def log_debug(cls, message, *args, **kwargs):
+        """Wrapper around LOG.debug that prefixes the message"""
         LOG.debug(cls.log_prefix + ': ' + message, *args, **kwargs)
+
+    @classmethod
+    def log_info(cls, message, *args, **kwargs):
+        """Wrapper around LOG.inf that prefixes the message"""
+        LOG.info(cls.log_prefix + ': ' + message, *args, **kwargs)
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_debug('Message queuing disabled for site %s', site.domain)
+            cls.log_info('Message queuing disabled for site %s', site.domain)
             return
 
         target_date = current_date + datetime.timedelta(days=day_offset)
-        cls.log_debug('Target date = %s', target_date.isoformat())
+        cls.log_info('Target date = %s', target_date.isoformat())
         for bin in range(cls.num_bins):
             task_args = (
                 site.id,
@@ -86,7 +92,7 @@ class ScheduleMessageBaseTask(Task):
                 bin,
                 override_recipient_email,
             )
-            cls.log_debug('Launching task with args = %r', task_args)
+            cls.log_info('Launching task with args = %r', task_args)
             cls.apply_async(
                 task_args,
                 retry=False,
@@ -228,7 +234,7 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:
-        LOG.debug('%s: Message delivery disabled for site %s', log_prefix, site.domain)
+        LOG.info('%s: Message delivery disabled for site %s', log_prefix, site.domain)
 
 
 def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):
