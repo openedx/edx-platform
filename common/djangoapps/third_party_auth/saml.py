@@ -144,7 +144,6 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         'defaultFullName': 'fullname',
         'email': 'email',
         'country': 'country',
-        'city': 'city',
     }
 
     # Define a simple mapping to relate SAPSF values to Open edX-compatible values for
