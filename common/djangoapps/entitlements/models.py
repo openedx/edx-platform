@@ -41,9 +41,13 @@ class CourseEntitlementPolicy(models.Model):
         """
         Returns an integer of number of days until the entitlement expires
         """
-        expiry_date = entitlement.created + timedelta(self.expiration_period_days)
         now = datetime.now(tz=pytz.UTC)
-        return (expiry_date - now).days
+        if not entitlement.enrollment_course_run:
+            expiry_date = entitlement.created + timedelta(self.expiration_period_days)
+            return (expiry_date - now).days
+        else:
+            expiry_date = entitlement.created + timedelta(self.regain_period_days)
+            return (expiry_date - now).days
 
     def is_entitlement_regainable(self, entitlement):
         """
@@ -59,8 +63,8 @@ class CourseEntitlementPolicy(models.Model):
 
                     # This is < because now - some duration being equal to regain_period_days means that
                     # many days have passed, which should then make the entitlement no longer regainable
-                    (now - course_overview.start).days < self.regain_period_days or
-                    (now - entitlement.enrollment_course_run.created).days < self.regain_period_days) and
+                    ((now - course_overview.start).days < self.regain_period_days or
+                     (now - entitlement.enrollment_course_run.created).days < self.regain_period_days)) and
                 # This is <= because a days_until_expiration 0 means that the expiration day has not fully passed yet
                 # and that the entitlement should not be expired as there is still time
                 self.get_days_until_expiration(entitlement) >= 0
@@ -167,7 +171,7 @@ class CourseEntitlement(TimeStampedModel):
         OR if the policy can no longer be regained AND the policy has been redeemed
         """
         if (not self.expired_at and self.policy.get_days_until_expiration(self) < 0
-                or (self.enrollment_course_run and self.is_entitlement_regainable())):
+                or (self.enrollment_course_run and not self.is_entitlement_regainable())):
             self.expired_at = datetime.utcnow()
             self.save()
 
