@@ -192,16 +192,29 @@ class ReportStore(object):
         config = getattr(settings, config_name, {})
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
-            return DjangoStorageReportStore(
-                storage_class='openedx.core.storage.S3ReportStorage',
-                storage_kwargs={
-                    'bucket': config['BUCKET'],
-                    'location': config['ROOT_PATH'],
-                    'custom_domain': config.get("CUSTOM_DOMAIN", None),
-                    'querystring_expire': 300,
-                    'gzip': True,
-                },
-            )
+            if settings.S3_HOST and settings.S3_USE_SIGV4:
+                return DjangoStorageReportStore(
+                    storage_class='openedx.core.storage.S3ReportStorage',
+                    storage_kwargs={
+                        'bucket': config['BUCKET'],
+                        'location': config['ROOT_PATH'],
+                        'custom_domain': config.get("CUSTOM_DOMAIN", '%s/%s' % (settings.S3_HOST, config['BUCKET'])),
+                        'querystring_expire': 300,
+                        'gzip': True,
+                        'host': settings.S3_HOST
+                    },
+                )
+            else:
+                return DjangoStorageReportStore(
+                    storage_class='openedx.core.storage.S3ReportStorage',
+                    storage_kwargs={
+                        'bucket': config['BUCKET'],
+                        'location': config['ROOT_PATH'],
+                        'custom_domain': config.get("CUSTOM_DOMAIN", None),
+                        'querystring_expire': 300,
+                        'gzip': True,
+                    },
+                )
         if storage_type == 'azure':
             return DjangoStorageReportStore(
                 storage_class='openedx.core.storage.AzureStorageExtended',
