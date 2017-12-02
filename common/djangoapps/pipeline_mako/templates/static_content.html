@@ -101,25 +101,18 @@ source, template_path = Loader(engine).load_template_source(path)
         from webpack_loader.exceptions import WebpackLoaderBadStatsError
         import json
 
-        def _convert_dict_to_json(input_dict):
-            output_json = "{"
-            for key in input_dict:
-                output_json = "{}{}:\"{}\",".format(output_json, key, input_dict[key])
-            output_json += "}"
-            return output_json
-
         body = capture(caller.body)
         body_dict = json.loads(body)
         body_dict['lang'] = lang
         return Template("""
-            <script type="text/javascript" id='courseContext'>
-                var courseContext = {% autoescape off %}{{ body }}{% endautoescape %};
+            <script type="text/javascript" id='studioContext'>
+                var studioContext = {% autoescape off %}{{ body }}{% endautoescape %};
             </script>
             <div id="root"></div>
             {% load render_bundle from webpack_loader %}
             {% render_bundle page %}
         """).render(Context({
-            'body': _convert_dict_to_json(body_dict),
+            'body': json.dumps(body_dict),
             'page': page
         }))
     %>
