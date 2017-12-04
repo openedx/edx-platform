@@ -5,10 +5,10 @@ echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
 
 echo "Running explicit accessibility tests..."
-SELENIUM_BROWSER=phantomjs paver test_a11y -n=10
+SELENIUM_BROWSER=phantomjs paver test_a11y -n 10
 
 # The settings that we use are installed with the pa11ycrawler module
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
 echo "Running pa11ycrawler against test course..."
-paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html -n=10
+paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html -n 10
