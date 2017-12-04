@@ -278,7 +278,7 @@ class BokChoyTestSuite(TestSuite):
         if self.num_processes != 1:
             # Construct "multiprocess" pytest command
             command += [
-                "-n {}".format(self.num_processes),
+                "--dist=loadscope --tx={}*popen".format(self.num_processes),
                 "--color=no",
             ]
         if self.verbosity < 1:
