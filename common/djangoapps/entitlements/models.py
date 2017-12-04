@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 
+from certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -66,7 +67,11 @@ class CourseEntitlementPolicy(models.Model):
         the course or their redemption, whichever comes later, and the expiration period hasn't passed yet
         """
         if entitlement.enrollment_course_run:
-            # This is <= because a days_until_expiration 0 means that the expiration day has not fully passed yet
+            if GeneratedCertificate.certificate_for_student(
+                    entitlement.user_id, entitlement.enrollment_course_run.course_id) is not None:
+                return False
+
+            # This is >= because a days_until_expiration 0 means that the expiration day has not fully passed yet
             # and that the entitlement should not be expired as there is still time
             return self.get_days_until_expiration(entitlement) >= 0
         return False
@@ -77,6 +82,10 @@ class CourseEntitlementPolicy(models.Model):
         yet been redeemed (enrollment_course_run is NULL) and policy.refund_period_days has not yet passed, or if
         the entitlement has been redeemed, but the regain period hasn't passed yet.
         """
+        # If there's no order number, it cannot be refunded
+        if entitlement.order_number is None:
+            return False
+
         # This is > because a get_days_since_created of refund_period_days means that that many days have passed,
         # which should then make the entitlement no longer refundable
         if entitlement.get_days_since_created() > self.refund_period_days:
