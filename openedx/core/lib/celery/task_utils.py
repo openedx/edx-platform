@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 
 from crum import CurrentRequestUserMiddleware
-from django.http import HttpRequest, HttpResponse
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
+from django.http import HttpResponse
+from request_cache import get_request_or_stub
 
 
 @contextmanager
@@ -24,9 +25,9 @@ def emulate_http_request(site=None, user=None, middleware_classes=None):
         middleware_classes (list): A list of classes that implement Django's middleware interface.
             Defaults to [CurrentRequestUserMiddleware, CurrentSiteThemeMiddleware] if None.
     """
-    request = HttpRequest()
-    request.user = user
+    request = get_request_or_stub()
     request.site = site
+    request.user = user
 
     # TODO: define the default middleware_classes in settings.py
     middleware_classes = middleware_classes or [

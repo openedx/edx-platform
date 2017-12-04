@@ -99,9 +99,9 @@ class ScheduleMessageBaseTask(Task):
     def run(
         self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
     ):
-        msg_type = self.make_message_type(day_offset)
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
+            msg_type = self.make_message_type(day_offset)
             _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
             return self.resolver(
                 self.async_send_task,
