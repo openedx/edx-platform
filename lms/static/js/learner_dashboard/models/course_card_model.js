@@ -42,6 +42,11 @@
                     return desiredCourseRun;
                 },
 
+                isEnrolledInSession: function() {
+                    // Returns true if the user is currently enrolled in a session of the course
+                    return _.findWhere(this.context.course_runs, {is_enrolled: true}) !== undefined;
+                },
+
                 getUnselectedCourseRun: function(courseRuns) {
                     var unselectedRun = {},
                         courseRun;
@@ -178,26 +183,27 @@
                 },
 
                 setActiveCourseRun: function(courseRun, userPreferences) {
-                    var startDateString;
-
+                    var startDateString,
+                        isEnrolled = this.isEnrolledInSession() && courseRun.key;
                     if (courseRun) {
                         if (this.valueIsDefined(courseRun.advertised_start)) {
                             startDateString = courseRun.advertised_start;
                         } else {
                             startDateString = this.formatDate(courseRun.start, userPreferences);
                         }
-
                         this.set({
                             certificate_url: courseRun.certificate_url,
-                            course_run_key: courseRun.key,
-                            course_url: courseRun.course_url || '',
+                            course_run_key: isEnrolled ? courseRun.key : '',
+                            course_url: isEnrolled ? courseRun.course_url : '',
                             title: this.context.title,
                             end_date: this.formatDate(courseRun.end, userPreferences),
                             enrollable_course_runs: this.getEnrollableCourseRuns(),
                             is_course_ended: courseRun.is_course_ended,
-                            is_enrolled: courseRun.is_enrolled,
+                            is_enrolled: isEnrolled,
                             is_enrollment_open: courseRun.is_enrollment_open,
                             course_key: this.context.key,
+                            user_entitlement: this.context.user_entitlement,
+                            is_unfulfilled_entitlement: this.context.user_entitlement && !isEnrolled,
                             marketing_url: courseRun.marketing_url,
                             mode_slug: courseRun.type,
                             start_date: startDateString,
@@ -220,6 +226,10 @@
                 updateCourseRun: function(courseRunKey) {
                     var selectedCourseRun = _.findWhere(this.get('course_runs'), {key: courseRunKey});
                     if (selectedCourseRun) {
+                        // Set the course run to the enrolled state
+                        _.each(this.context.course_runs, function(run) {
+                            if (run.key === selectedCourseRun.key) run.is_enrolled = true; // eslint-disable-line no-param-reassign, max-len
+                        });
                         this.setActiveCourseRun(selectedCourseRun);
                     }
                 }

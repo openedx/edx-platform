@@ -11,6 +11,7 @@
         'js/learner_dashboard/views/certificate_status_view',
         'js/learner_dashboard/views/expired_notification_view',
         'js/learner_dashboard/views/course_enroll_view',
+        'js/learner_dashboard/views/course_entitlement_view',
         'text!../../../templates/learner_dashboard/course_card.underscore'
     ],
          function(
@@ -24,6 +25,7 @@
              CertificateStatusView,
              ExpiredNotificationView,
              CourseEnrollView,
+             EntitlementView,
              pageTpl
          ) {
              return Backbone.View.extend({
@@ -41,6 +43,8 @@
                      this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
                      this.grade = this.grade * 100;
                      this.collectionCourseStatus = this.context.collectionCourseStatus || '';
+                     this.entitlement = this.model.get('user_entitlement');
+
                      this.render();
                      this.listenTo(this.model, 'change', this.render);
                  },
@@ -57,7 +61,9 @@
                      var $upgradeMessage = this.$('.upgrade-message'),
                          $certStatus = this.$('.certificate-status'),
                          $expiredNotification = this.$('.expired-notification'),
-                         expired = this.model.get('expired');
+                         expired = this.model.get('expired'),
+                         courseUUID = this.model.get('uuid'),
+                         containerSelector = '#course-' + courseUUID;
 
                      this.enrollView = new CourseEnrollView({
                          $parentEl: this.$('.course-actions'),
@@ -67,6 +73,26 @@
                          urlModel: this.urlModel,
                          enrollModel: this.enrollModel
                      });
+
+                     if (this.entitlement) {
+                         this.sessionSelectionView = new EntitlementView({
+                             el: this.$(containerSelector + ' .course-entitlement-selection-container'),
+                             $parentEl: this.$el,
+                             courseCardModel: this.model,
+                             enrollModel: this.enrollModel,
+                             triggerOpenBtn: '.course-details .change-session',
+                             courseCardMessages: '',
+                             courseImageLink: '',
+                             courseTitleLink: containerSelector + ' .course-details .course-title',
+                             dateDisplayField: containerSelector + ' .course-details .course-text',
+                             enterCourseBtn: containerSelector + ' .view-course-button',
+                             availableSessions: JSON.stringify(this.model.get('course_runs')),
+                             entitlementUUID: this.entitlement.uuid,
+                             currentSessionId: this.model.get('course_run_key'),
+                             enrollUrl: this.model.get('enroll_url'),
+                             courseHomeUrl: this.model.get('course_url')
+                         });
+                     }
 
                      if (this.model.get('upgrade_url') && !(expired === true)) {
                          this.upgradeMessage = new UpgradeMessageView({

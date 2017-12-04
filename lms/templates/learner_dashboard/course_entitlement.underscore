@@ -9,8 +9,8 @@
     <div class="action-controls">
         <select class="session-select" aria-label="<%- StringUtils.interpolate( gettext('Session Selection Dropdown for {courseName}'), { courseName: courseName }) %>">
             <% _.each(availableSessions, function(session) { %>
-                <option data-session_id="<%- session.session_id %>">
-                    <% if (session.session_id === currentSessionId) { %>
+                <option data-session_id="<%- session.session_id || session.key %>">
+                    <% if ((session.session_id || session.key) === currentSessionId) { %>
                         <%- StringUtils.interpolate( gettext('{sessionDates} - Currently Selected'), {sessionDates: session.session_dates}) %>
                     <% } else if (session.enrollment_end){ %>
                         <%- StringUtils.interpolate( gettext('{sessionDates} (Open until {enrollmentEnd})'), {sessionDates: session.session_dates, enrollmentEnd: session.enrollment_end}) %>

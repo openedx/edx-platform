@@ -437,7 +437,6 @@
   .program-course-card {
     width: 100%;
     padding: 15px;
-    margin-bottom: 10px;
 
     @media (min-width: $bp-screen-md) {
       height: auto;
@@ -452,6 +451,10 @@
       }
     }
 
+    .section:not(:last-child) {
+      margin-bottom: $baseline/2;
+    }
+
     .section:not(:first-child) {
       margin-top: 0;
     }
@@ -461,10 +464,14 @@
 
       .course-title {
         font-size: 1em;
-        color: palette(primary, base);
         font-weight: 600;
-        text-decoration: underline;
         margin: 0;
+
+        .course-title-link,
+        .course-title-link:visited{
+          color: palette(primary, base);
+          text-decoration: underline;
+        }
       }
 
       .run-period {

@@ -51,7 +51,8 @@
 @import 'multicourse/survey-page';
 
 // base - specific views
-@import "views/account-settings";
+@import 'views/account-settings';
+@import 'views/course-entitlements';
 @import 'views/login-register';
 @import 'views/verification';
 @import 'views/decoupled-verification';
@@ -59,7 +60,7 @@
 @import 'views/homepage';
 @import 'views/support';
 @import 'views/oauth2';
-@import "views/financial-assistance";
+@import 'views/financial-assistance';
 @import 'course/auto-cert';
 @import 'views/api-access';
 

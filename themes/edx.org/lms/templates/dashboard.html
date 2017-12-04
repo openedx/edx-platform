@@ -132,9 +132,9 @@ from student.models import CourseEnrollment
                 'session_id': course['key'],
                 'enrollment_end': course['enrollment_end'],
                 'pacing_type': course['pacing_type'],
-                'session_start_advertised': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).advertised_start,
-                'session_start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).start,
-                'session_end': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).end,
+                'advertised_start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).advertised_start,
+                'start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).start,
+                'end': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).end,
                 } for course in course_entitlement_available_sessions[str(entitlement.uuid)]]
               if is_fulfilled_entitlement:
                 # If the user has a fulfilled entitlement, pass through the entitlements CourseEnrollment object

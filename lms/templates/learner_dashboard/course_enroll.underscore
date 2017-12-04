@@ -11,7 +11,7 @@
             <%- gettext('View Course') %>
         <% } %>
     </a>
-<% } else { %>
+<% } else if (!user_entitlement) { %>
     <% if (enrollable_course_runs.length > 0) { %>
         <% if (enrollable_course_runs.length > 1) { %>
             <div class="run-select-container">
