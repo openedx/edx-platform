@@ -11,13 +11,13 @@ install edX:
    to contribute or make changes to the edX source code.
 -  `edX Full Stack`_: Using Vagrant/Virtualbox this will setup all edX
    services on a single server in a production like configuration.
--  `edX Ubuntu 12.04 64-bit Installation`_: This will install edX on an
-   existing Ubuntu 12.04 server.
+-  `edX Ubuntu 16.04 64-bit Installation`_: This will install edX on an
+   existing Ubuntu 16.04 server.
 
 .. _configuration repo: https://github.com/edx/configuration
 .. _edX Developer Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Devstack
 .. _edX Full Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Fullstack
-.. _edX Ubuntu 12.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+12.04+64+bit+Installation
+.. _edX Ubuntu 16.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+16.04+64+bit+Installation
 
 
 License
