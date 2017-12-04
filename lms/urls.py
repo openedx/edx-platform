@@ -72,7 +72,7 @@ urlpatterns = [
     # Static template view endpoints like blog, faq, etc.
     url(r'', include('static_template_view.urls')),
 
-    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
+    url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
 
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
@@ -634,7 +634,7 @@ urlpatterns += [
 
     # Student Notes
     url(
-        r'^courses/{}/edxnotes'.format(
+        r'^courses/{}/edxnotes/'.format(
             settings.COURSE_ID_PATTERN,
         ),
         include('edxnotes.urls'),
@@ -686,7 +686,7 @@ if settings.FEATURES['ENABLE_TEAMS']:
             include('lms.djangoapps.teams.api_urls')
         ),
         url(
-            r'^courses/{}/teams'.format(
+            r'^courses/{}/teams/'.format(
                 settings.COURSE_ID_PATTERN,
             ),
             include('lms.djangoapps.teams.urls'),
