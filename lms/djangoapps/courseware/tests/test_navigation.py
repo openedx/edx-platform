@@ -3,7 +3,6 @@ This test file will run through some LMS test scenarios regarding access and nav
 """
 import time
 
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -21,7 +20,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.

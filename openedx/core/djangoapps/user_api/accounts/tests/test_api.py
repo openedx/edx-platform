@@ -409,7 +409,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         activate_account(u'invalid')
 
     @skip_unless_lms
-    @pytest.mark.django111_expected_failure
     def test_request_password_change(self):
         # Create and activate an account
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -428,7 +427,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertIsNot(result, None)
 
     @skip_unless_lms
-    @pytest.mark.django111_expected_failure
     def test_request_password_change_invalid_user(self):
         with self.assertRaises(UserNotFound):
             request_password_change(self.EMAIL, self.IS_SECURE)

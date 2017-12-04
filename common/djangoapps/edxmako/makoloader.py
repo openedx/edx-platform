@@ -2,8 +2,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Engine, engines
-from django.template.base import TemplateDoesNotExist
+from django.template import Engine, engines, TemplateDoesNotExist
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
@@ -22,6 +21,7 @@ class MakoLoader(object):
     """
 
     is_usable = False
+    supports_recursion = False
 
     def __init__(self, base_loader):
         # base_loader is an instance of a BaseLoader subclass

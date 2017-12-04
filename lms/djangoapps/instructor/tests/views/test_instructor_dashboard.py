@@ -4,7 +4,6 @@ Unit tests for instructor_dashboard.py.
 import datetime
 
 import ddt
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
@@ -321,7 +320,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
 
-    @pytest.mark.django111_expected_failure
     def test_open_response_assessment_page(self):
         """
         Test that Open Responses is available only if course contains at least one ORA block
@@ -341,7 +339,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertIn(ora_section, response.content)
 
-    @pytest.mark.django111_expected_failure
     def test_open_response_assessment_page_orphan(self):
         """
         Tests that the open responses tab loads if the course contains an
