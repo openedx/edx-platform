@@ -1,4 +1,4 @@
-{% extends 'schedules/edx_ace/common/base_body.html' %}
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
 {% load i18n %}
 
 {% block preview_text %}
@@ -31,9 +31,9 @@
             </p>
 
             {% trans "Resume your course now" as course_cta_text %}
-            {% include "schedules/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
 
-            {% include "schedules/edx_ace/common/upsell_cta.html"%}
+            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
         </td>
     </tr>
 </table>

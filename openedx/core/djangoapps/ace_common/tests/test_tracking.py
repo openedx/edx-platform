@@ -2,8 +2,8 @@ from unittest import TestCase
 
 from django.test import override_settings
 
-from openedx.core.djangoapps.schedules.tests.mixins import QueryStringAssertionMixin
-from openedx.core.djangoapps.schedules.tracking import (
+from openedx.core.djangoapps.ace_common.tests.mixins import QueryStringAssertionMixin
+from openedx.core.djangoapps.ace_common.tracking import (
     CampaignTrackingInfo,
     DEFAULT_CAMPAIGN_SOURCE,
     DEFAULT_CAMPAIGN_MEDIUM,

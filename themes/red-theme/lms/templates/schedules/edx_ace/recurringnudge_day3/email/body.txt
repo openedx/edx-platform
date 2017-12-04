@@ -17,4 +17,4 @@ This is the RED theme!
 
 {% trans "Start learning now" %} <{% with_link_tracking course_url %}>
 {% endif %}
-{% include "schedules/edx_ace/common/upsell_cta.txt"%}
+{% include "ace_common/edx_ace/common/upsell_cta.txt"%}

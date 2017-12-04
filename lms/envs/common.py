@@ -2331,6 +2331,7 @@ INSTALLED_APPS = [
     'database_fixups',
 
     'openedx.core.djangoapps.waffle_utils',
+    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # Course Goals

@@ -1118,6 +1118,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.waffle_utils',
 
     # Dynamic schedules
+    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # DRF filters

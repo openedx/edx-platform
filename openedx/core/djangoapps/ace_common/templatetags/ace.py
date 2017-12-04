@@ -1,10 +1,10 @@
-from urlparse import urlparse, parse_qs
+from urlparse import urlparse
 
 from crum import get_current_request
 from django import template
 from django.utils.safestring import mark_safe
 
-from openedx.core.djangoapps.schedules.tracking import CampaignTrackingInfo, GoogleAnalyticsTrackingPixel
+from openedx.core.djangoapps.ace_common.tracking import CampaignTrackingInfo, GoogleAnalyticsTrackingPixel
 from openedx.core.djangolib.markup import HTML
 
 register = template.Library()
