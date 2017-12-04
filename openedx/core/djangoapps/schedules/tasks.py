@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import analytics
-from celery.task import task, Task
+from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 
 from django.db.utils import DatabaseError
 
+from celery_utils.logged_task import LoggedTask
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
@@ -36,7 +38,7 @@ UPGRADE_REMINDER_LOG_PREFIX = 'Upgrade Reminder'
 COURSE_UPDATE_LOG_PREFIX = 'Course Update'
 
 
-@task(bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
 def update_course_schedules(self, **kwargs):
     course_key = CourseKey.from_string(kwargs['course_id'])
     new_start_date = deserialize(kwargs['new_start_date_str'])
@@ -53,7 +55,11 @@ def update_course_schedules(self, **kwargs):
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
-class ScheduleMessageBaseTask(Task):
+class ScheduleMessageBaseTask(LoggedTask):
+    """
+    Base class for top-level Schedule tasks that create subtasks
+    for each Bin.
+    """
     ignore_result = True
     routing_key = ROUTING_KEY
     num_bins = resolvers.DEFAULT_NUM_BINS
@@ -95,7 +101,7 @@ class ScheduleMessageBaseTask(Task):
                 override_recipient_email,
             )
             cls.log_info('Launching task with args = %r', task_args)
-            cls.apply_async(
+            cls().apply_async(
                 task_args,
                 retry=False,
             )
@@ -126,7 +132,7 @@ class ScheduleMessageBaseTask(Task):
         raise NotImplementedError
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
 def _recurring_nudge_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -136,7 +142,7 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
     )
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
 def _upgrade_reminder_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -146,7 +152,7 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     )
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
 def _course_update_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
