@@ -28,6 +28,7 @@ def make_url_for_lib(key):
 
 
 @ddt.ddt
+@mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': False})
 class UnitTestLibraries(CourseTestCase):
     """
     Unit tests for library views
@@ -62,6 +63,23 @@ class UnitTestLibraries(CourseTestCase):
     def test_library_creator_status_with_no_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), True)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
+        """
+        Ensure that `DISABLE_COURSE_CREATION` feature works with libraries as well.
+        """
+        nostaff_client, nostaff_user = self.create_non_staff_authed_user_client()
+        self.assertFalse(get_library_creator_status(nostaff_user))
+
+        # To be explicit, this user can GET, but not POST
+        get_response = nostaff_client.get_json(LIBRARY_REST_URL)
+        post_response = nostaff_client.ajax_post(LIBRARY_REST_URL, {
+            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+        })
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(post_response.status_code, 403)
 
     @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
