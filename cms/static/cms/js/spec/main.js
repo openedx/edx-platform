@@ -197,13 +197,13 @@
                 exports: 'sinon'
             },
             'jasmine-imagediff': {},
-            'common/js/spec_helpers/jasmine-extensions': {
+            'cms/static/common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
-            'common/js/spec_helpers/jasmine-stealth': {
+            'cms/static/common/js/spec_helpers/jasmine-stealth': {
                 deps: ['underscore', 'underscore.string']
             },
-            'common/js/spec_helpers/jasmine-waituntil': {
+            'cms/static/common/js/spec_helpers/jasmine-waituntil': {
                 deps: ['jquery']
             },
             'xblock/core': {

@@ -185,10 +185,10 @@
     jasmine.getFixtures().fixturesPath += 'coffee/fixtures';
 
     testFiles = [
-        'coffee/spec/views/assets_spec',
-        'js/spec/video/translations_editor_spec',
-        'js/spec/video/file_uploader_editor_spec',
-        'js/spec/models/group_configuration_spec'
+        'cms/static/coffee/spec/views/assets_spec',
+        'cms/static/js/spec/video/translations_editor_spec',
+        'cms/static/js/spec/video/file_uploader_editor_spec',
+        'cms/static/js/spec/models/group_configuration_spec'
     ];
 
     i = 0;
@@ -199,9 +199,9 @@
     }
 
     specHelpers = [
-        'common/js/spec_helpers/jasmine-extensions',
-        'common/js/spec_helpers/jasmine-stealth',
-        'common/js/spec_helpers/jasmine-waituntil'
+        'cms/static/common/js/spec_helpers/jasmine-extensions',
+        'cms/static/common/js/spec_helpers/jasmine-stealth',
+        'cms/static/common/js/spec_helpers/jasmine-waituntil'
     ];
 
     requireSerial(specHelpers.concat(testFiles), function() {
