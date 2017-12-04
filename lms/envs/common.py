@@ -545,6 +545,7 @@ MAKO_TEMPLATE_DIRS_BASE = [
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
+    OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
 ]
 
 
@@ -1673,6 +1674,18 @@ PIPELINE_CSS = {
             'css/lms-learner-dashboard-rtl.css',
         ],
         'output_filename': 'css/lms-learner-dashboard-rtl.css',
+    },
+    'style-mobile': {
+        'source_filenames': [
+            'css/lms-mobile.css',
+        ],
+        'output_filename': 'css/lms-mobile.css',
+    },
+    'style-mobile-rtl': {
+        'source_filenames': [
+            'css/lms-mobile-rtl.css',
+        ],
+        'output_filename': 'css/lms-mobile-rtl.css',
     },
 }
 
