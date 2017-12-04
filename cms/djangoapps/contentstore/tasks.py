@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 import base64
 import json
+import logging
 import os
 import shutil
 import tarfile
@@ -12,7 +13,7 @@ from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
 from celery.task import task
-from celery.utils.log import get_task_logger
+from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
@@ -48,7 +49,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
-LOGGER = get_task_logger(__name__)
+LOGGER = logging.getLogger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
 
@@ -75,7 +76,7 @@ def clone_instance(instance, field_values):
     return instance
 
 
-@task()
+@task(base=LoggedTask)
 def rerun_course(source_course_key_string, destination_course_key_string, user_id, fields=None):
     """
     Reruns a course in a new celery task.
@@ -159,7 +160,7 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@task()
+@task(base=LoggedTask)
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
@@ -172,7 +173,7 @@ def update_search_index(course_id, triggered_time_isoformat):
         LOGGER.debug(u'Search indexing successful for complete course %s', course_id)
 
 
-@task()
+@task(base=LoggedTask)
 def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
@@ -185,7 +186,7 @@ def update_library_index(library_id, triggered_time_isoformat):
         LOGGER.debug(u'Search indexing successful for library %s', library_id)
 
 
-@task()
+@task(base=LoggedTask)
 def push_course_update_task(course_key_string, course_subscription_id, course_display_name):
     """
     Sends a push notification for a course update.
@@ -195,7 +196,7 @@ def push_course_update_task(course_key_string, course_subscription_id, course_di
     send_push_course_update(course_key_string, course_subscription_id, course_display_name)
 
 
-class CourseExportTask(UserTask):  # pylint: disable=abstract-method
+class CourseExportTask(UserTask, LoggedTask):  # pylint: disable=abstract-method
     """
     Base class for course and library export tasks.
     """
@@ -261,7 +262,7 @@ def export_olx(self, user_id, course_key_string, language):
         LOGGER.exception(u'Error exporting course %s', courselike_key, exc_info=True)
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': text_type(exception)})
-        return
+        raise
 
 
 def create_export_tarball(course_module, course_key, context, status=None):
@@ -325,7 +326,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
     return export_file
 
 
-class CourseImportTask(UserTask):  # pylint: disable=abstract-method
+class CourseImportTask(UserTask, LoggedTask):  # pylint: disable=abstract-method
     """
     Base class for course and library import tasks.
     """
