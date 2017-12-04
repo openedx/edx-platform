@@ -27,32 +27,21 @@ ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
 MAX_RETRIES = 11
 
 
-def get_api_client(api_config, student):
+def get_api_client(api_config, user):
     """
     Create and configure an API client for authenticated HTTP requests.
 
     Args:
         api_config: CredentialsApiConfig object
-        student: User object as whom to authenticate to the API
+        user: User object as whom to authenticate to the API
 
     Returns:
         EdxRestApiClient
 
     """
-    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
-    client_name = api_config.OAUTH2_CLIENT_NAME
-
-    try:
-        client = Client.objects.get(name=client_name)
-    except Client.DoesNotExist:
-        raise ImproperlyConfigured(
-            'OAuth2 Client with name [{}] does not exist.'.format(client_name)
-        )
-
     scopes = ['email', 'profile']
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(student, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
-
+    jwt = JwtBuilder(user).build_token(scopes, expires_in)
     return EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
 
 
