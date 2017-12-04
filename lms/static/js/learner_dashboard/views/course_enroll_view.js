@@ -57,7 +57,7 @@
                      // Enrollment click event handled here
                      var courseRunKey = $('.run-select').val() || this.model.get('course_run_key');
                      this.model.updateCourseRun(courseRunKey);
-                     if (!this.model.get('is_enrolled')) {
+                     if (this.model.get('is_enrolled')) {
                          // Create the enrollment.
                          this.enrollModel.save({
                              course_id: courseRunKey

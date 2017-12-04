@@ -37,12 +37,12 @@
 
                  initialize: function(options) {
                      // Set up models and reload view on change
-                     this.courseCardModel = new CourseCardModel();
+                     this.courseCardModel = options.courseCardModel || new CourseCardModel();
+                     this.enrollModel = options.enrollModel;
                      this.entitlementModel = new EntitlementModel({
                          availableSessions: this.formatDates(JSON.parse(options.availableSessions)),
                          entitlementUUID: options.entitlementUUID,
                          currentSessionId: options.currentSessionId,
-                         userId: options.userId,
                          courseName: options.courseName
                      });
                      this.listenTo(this.entitlementModel, 'change', this.render);
@@ -51,13 +51,18 @@
                      this.enrollUrl = options.enrollUrl;
                      this.courseHomeUrl = options.courseHomeUrl;
 
-                     // Grab elements from the parent card that work with this view and bind associated events
-                     this.$triggerOpenBtn = $(options.triggerOpenBtn); // Opens/closes session selection view
-                     this.$dateDisplayField = $(options.dateDisplayField); // Displays current session dates
+                     // Grab elements from the parent card that work with this view
+                     this.$parentEl = options.$parentEl; // Containing course card (must be a backbone view root el)
                      this.$enterCourseBtn = $(options.enterCourseBtn); // Button link to course home page
                      this.$courseCardMessages = $(options.courseCardMessages); // Additional session messages
                      this.$courseTitleLink = $(options.courseTitleLink); // Title link to course home page
                      this.$courseImageLink = $(options.courseImageLink); // Image link to course home page
+
+                     // Bind action elements with associated events to objects outside this view
+                     this.$dateDisplayField = this.$parentEl ? this.$parentEl.find(options.dateDisplayField) :
+                         $(options.dateDisplayField); // Displays current session dates
+                     this.$triggerOpenBtn = this.$parentEl ? this.$parentEl.find(options.triggerOpenBtn) :
+                         $(options.triggerOpenBtn); // Opens/closes session selection view
                      this.$triggerOpenBtn.on('click', this.toggleSessionSelectionPanel.bind(this));
 
                      this.render(options);
@@ -72,15 +77,17 @@
                  },
 
                  postRender: function() {
-                     // Close popover on click-away
+                     // Close any visible popovers on click-away
                      $(document).on('click', function(e) {
-                         if (!($(e.target).closest('.enroll-btn-initial, .popover').length)) {
+                         if (this.$('.popover:visible').length &&
+                             !($(e.target).closest('.enroll-btn-initial, .popover').length)) {
                              this.hideDialog(this.$('.enroll-btn-initial'));
                          }
                      }.bind(this));
 
-                     this.$('.enroll-btn-initial').click(function(e) {
-                         this.showDialog($(e.target));
+                     // Initialize focus to cancel button on popover load
+                     $(document).on('shown.bs.popover', function() {
+                         this.$('.final-confirmation-btn:first').focus();
                      }.bind(this));
                  },
 
@@ -130,7 +137,13 @@
                      */
                      var successIconEl = '<span class="fa fa-check" aria-hidden="true"></span>';
 
-                     // Update the model with the new session Id;
+                     // With a containing backbone view, we can simply re-render the parent card
+                     if (this.$parentEl) {
+                         this.courseCardModel.updateCourseRun(this.currentSessionSelection);
+                         return;
+                     }
+
+                     // Update the model with the new session Id
                      this.entitlementModel.set({currentSessionId: this.currentSessionSelection});
 
                      // Allow user to change session
@@ -161,6 +174,11 @@
                      3) Remove the messages associated with the enrolled state.
                      4) Remove the link from the course card image and title.
                      */
+                     // With a containing backbone view, we can simply re-render the parent card
+                     if (this.$parentEl) {
+                         this.courseCardModel.setUnselected();
+                         return;
+                     }
 
                      // Update the model with the new session Id;
                      this.entitlementModel.set({currentSessionId: this.currentSessionSelection});
@@ -198,13 +216,18 @@
                  },
 
                  enrollError: function() {
-                     var errorMsgEl = HtmlUtils.HTML(
-                         gettext('There was an error. Please reload the page and try again.')
+                     // Display a success indicator
+                     var errorMsgEl = HtmlUtils.joinHtml(
+                         HtmlUtils.HTML('<span class="enroll-error">'),
+                         gettext('There was an error. Please reload the page and try again.'),
+                         HtmlUtils.HTML('</spandiv>')
                      ).text;
+
                      this.$dateDisplayField
                          .find('.fa.fa-spin')
                          .removeClass('fa-spin fa-spinner')
                          .addClass('fa-close');
+
                      this.$dateDisplayField.append(errorMsgEl);
                      this.hideDialog(this.$('.enroll-btn-initial'));
                  },
@@ -237,7 +260,6 @@
                          enrollText = gettext('Leave Current Session');
                      }
                      enrollBtnInitial.text(enrollText);
-                     this.removeDialog(enrollBtnInitial);
                      this.initializeVerificationDialog(enrollBtnInitial);
                  },
 
@@ -263,7 +285,6 @@
                       */
                      var confirmationMsgTitle,
                          confirmationMsgBody,
-                         popoverDialogHtml,
                          currentSessionId = this.entitlementModel.get('currentSessionId'),
                          newSessionId = this.$('.session-select').find('option:selected').data('session_id');
 
@@ -279,38 +300,35 @@
                          confirmationMsgBody = gettext('Any course progress or grades from your current session will be lost.'); // eslint-disable-line max-len
                      }
 
-                     // Remove existing popover and re-initialize
-                     popoverDialogHtml = this.verificationTpl({
-                         confirmationMsgTitle: confirmationMsgTitle,
-                         confirmationMsgBody: confirmationMsgBody
-                     });
-
+                     // Re-initialize the popover
                      invokingElement.popover({
                          placement: 'bottom',
                          container: this.$el,
                          html: true,
                          trigger: 'click',
-                         content: popoverDialogHtml.text
+                         content: this.verificationTpl({
+                             confirmationMsgTitle: confirmationMsgTitle,
+                             confirmationMsgBody: confirmationMsgBody
+                         }).text
                      });
                  },
 
-                 removeDialog: function(invokingElement) {
+                 removeDialog: function(el) {
                      /* Removes the Bootstrap v4 dialog modal from the update session enrollment button. */
-                     invokingElement.popover('dispose');
-                 },
-
-                 showDialog: function(invokingElement) {
-                     /* Given an element with an associated dialog modal, shows the modal. */
-                     invokingElement.popover('show');
-                     this.$('.final-confirmation-btn:first').focus();
+                     var $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
+                     if (this.$('popover').length) {
+                         $el.popover('dispose');
+                     }
                  },
 
                  hideDialog: function(el, returnFocus) {
-                     /* Hides the  modal without removing it from the DOM. */
+                     /* Hides the modal if it is visible without removing it from the DOM. */
                      var $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
-                     $el.popover('hide');
-                     if (returnFocus) {
-                         $el.focus();
+                     if (this.$('.popover:visible').length) {
+                         $el.popover('hide');
+                         if (returnFocus) {
+                             $el.focus();
+                         }
                      }
                  },
 
@@ -363,12 +381,13 @@
 
                      return _.map(formattedSessionData, function(session) {
                          var formattedSession = session;
-                         startDate = this.formatDate(formattedSession.session_start, dateFormat);
-                         endDate = this.formatDate(formattedSession.session_end, dateFormat);
+                         startDate = this.formatDate(formattedSession.start, dateFormat);
+                         endDate = this.formatDate(formattedSession.end, dateFormat);
                          formattedSession.enrollment_end = this.formatDate(formattedSession.enrollment_end, dateFormat);
                          formattedSession.session_dates = this.courseCardModel.formatDateString({
-                             start_date: session.session_start_advertised || startDate,
-                             end_date: session.session_start_advertised ? null : endDate,
+                             start_date: startDate,
+                             advertised_start: session.advertised_start,
+                             end_date: endDate,
                              pacing_type: formattedSession.pacing_type
                          });
                          return formattedSession;
@@ -376,7 +395,7 @@
                  },
 
                  formatDate: function(date, dateFormat) {
-                     return date ? moment((new Date(date))).format(dateFormat) : null;
+                     return date ? moment((new Date(date))).format(dateFormat) : '';
                  },
 
                  getAvailableSessionWithId: function(sessionId) {
