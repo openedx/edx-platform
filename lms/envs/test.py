@@ -491,7 +491,7 @@ MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # add extra template directory for test-only templates
-MAIN_MAKO_TEMPLATES_BASE.extend([
+MAKO_TEMPLATE_DIRS_BASE.extend([
     COMMON_ROOT / 'test' / 'templates',
     COMMON_ROOT / 'test' / 'test_sites',
     REPO_ROOT / 'openedx' / 'core' / 'djangolib' / 'tests' / 'templates',

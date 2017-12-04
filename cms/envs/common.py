@@ -119,7 +119,7 @@ from lms.envs.common import (
     VIDEO_TRANSCRIPTS_SETTINGS,
 
     # Methods to derive settings
-    _make_main_mako_templates,
+    _make_mako_template_dirs,
     _make_locale_paths,
 )
 from path import Path as path
@@ -134,7 +134,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_base_dirs_from_settings
 )
 from openedx.core.lib.license import LicenseMixin
-from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 
 ############################ FEATURE CONFIGURATION #############################
@@ -310,11 +310,9 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
-# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
-MAKO_TEMPLATES = {}
-MAIN_MAKO_TEMPLATES_BASE = [
+MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
@@ -324,19 +322,27 @@ MAIN_MAKO_TEMPLATES_BASE = [
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
-MAKO_TEMPLATES['lms.main'] = lms.envs.common.MAIN_MAKO_TEMPLATES_BASE
 
-MAKO_TEMPLATES['main'] = _make_main_mako_templates
-derived_dict_entry('MAKO_TEMPLATES', 'main')
+CONTEXT_PROCESSORS = (
+    'django.template.context_processors.request',
+    'django.template.context_processors.static',
+    'django.contrib.messages.context_processors.messages',
+    'django.template.context_processors.i18n',
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.template.context_processors.csrf',
+    'dealer.contrib.django.staff.context_processor',  # access git revision
+    'help_tokens.context_processor',
+)
 
 # Django templating
 TEMPLATES = [
     {
+        'NAME': 'django',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': MAIN_MAKO_TEMPLATES_BASE,
+        'DIRS': _make_mako_template_dirs,
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
@@ -346,21 +352,36 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ),
-            'context_processors': (
-                'django.template.context_processors.request',
-                'django.template.context_processors.static',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',
-                'django.contrib.auth.context_processors.auth',  # this is required for admin
-                'django.template.context_processors.csrf',
-                'dealer.contrib.django.staff.context_processor',  # access git revision
-                'help_tokens.context_processor',
-            ),
+            'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
             'debug': False
         }
-    }
+    },
+    {
+        'NAME': 'mako',
+        'BACKEND': 'edxmako.backend.Mako',
+        'APP_DIRS': False,
+        'DIRS': _make_mako_template_dirs,
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            'debug': False,
+        }
+    },
+    {
+        # This separate copy of the Mako backend is used to render previews using the LMS templates
+        'NAME': 'preview',
+        'BACKEND': 'edxmako.backend.Mako',
+        'APP_DIRS': False,
+        'DIRS': lms.envs.common.MAKO_TEMPLATE_DIRS_BASE,
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            'debug': False,
+            'namespace': 'lms.main',
+        }
+    },
 ]
+derived_collection_entry('TEMPLATES', 0, 'DIRS')
+derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 ##############################################################################
