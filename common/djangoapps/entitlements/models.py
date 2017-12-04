@@ -39,15 +39,25 @@ class CourseEntitlementPolicy(models.Model):
 
     def get_days_until_expiration(self, entitlement):
         """
-        Returns an integer of number of days until the entitlement expires
+        Returns an integer of number of days until the entitlement expires. Includes if the
         """
         now = datetime.now(tz=pytz.UTC)
+        expiry_date = entitlement.created + timedelta(self.expiration_period_days)
+        days_until_expiry = (expiry_date - now).days
         if not entitlement.enrollment_course_run:
-            expiry_date = entitlement.created + timedelta(self.expiration_period_days)
-            return (expiry_date - now).days
+            return days_until_expiry
         else:
-            expiry_date = entitlement.created + timedelta(self.regain_period_days)
-            return (expiry_date - now).days
+            course_overview = CourseOverview.get_from_id(entitlement.enrollment_course_run.course_id)
+            # Compute the days left for the regain
+            days_since_course_start = (now - course_overview.start).days
+            days_since_enrollment = (now - entitlement.enrollment_course_run.created).days
+
+            if days_until_expiry < days_since_course_start and days_until_expiry < days_since_enrollment:
+                return days_until_expiry
+            if days_since_course_start > days_since_enrollment:
+                return self.regain_period_days - days_since_course_start
+            else:
+                return self.regain_period_days - days_since_enrollment
 
     def is_entitlement_regainable(self, entitlement):
         """
@@ -56,19 +66,9 @@ class CourseEntitlementPolicy(models.Model):
         the course or their redemption, whichever comes later, and the expiration period hasn't passed yet
         """
         if entitlement.enrollment_course_run:
-            now = datetime.now(tz=pytz.UTC)
-            course_overview = CourseOverview.get_from_id(entitlement.enrollment_course_run.course_id)
-            return (
-                (
-
-                    # This is < because now - some duration being equal to regain_period_days means that
-                    # many days have passed, which should then make the entitlement no longer regainable
-                    ((now - course_overview.start).days < self.regain_period_days or
-                     (now - entitlement.enrollment_course_run.created).days < self.regain_period_days)) and
-                # This is <= because a days_until_expiration 0 means that the expiration day has not fully passed yet
-                # and that the entitlement should not be expired as there is still time
-                self.get_days_until_expiration(entitlement) >= 0
-            )
+            # This is <= because a days_until_expiration 0 means that the expiration day has not fully passed yet
+            # and that the entitlement should not be expired as there is still time
+            return self.get_days_until_expiration(entitlement) >= 0
         return False
 
     def is_entitlement_refundable(self, entitlement):

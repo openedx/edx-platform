@@ -28,7 +28,7 @@ class TestModels(TestCase):
 
     def test_is_entitlement_redeemable(self):
         """
-        Test that the entitlement is not expired when created now, and is expired when created two years
+        Test that the entitlement is not expired when created now, and is expired when created 2 years
         ago with a policy that sets the expiration period to 450 days
         """
 
@@ -45,7 +45,7 @@ class TestModels(TestCase):
 
     def test_is_entitlement_refundable(self):
         """
-        Test that the entitlement is refundable when created now, and is not refundable when created two years
+        Test that the entitlement is refundable when created now, and is not refundable when created 70 days
         ago with a policy that sets the expiration period to 60 days. Also test that if the entitlement is spent
         and greater than 14 days it is no longer refundable.
         """
@@ -60,10 +60,14 @@ class TestModels(TestCase):
 
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
         # Create a date 50 days in the past (less than the policy refund expire period of 60 days)
-        # but more than the policy regain period of 14 days
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=50)
+        # but more than the policy regain period of 14 days and also the course start
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
         entitlement.created = past_datetime
+        self.enrollment.created = past_datetime
+        self.course.start = past_datetime
         entitlement.save()
+        self.course.save()
+        self.enrollment.save()
 
         assert entitlement.is_entitlement_refundable() is False
 
@@ -74,15 +78,15 @@ class TestModels(TestCase):
 
     def test_is_entitlement_regainable(self):
         """
-        Test that the entitlement is not expired when created now, and is expired when created two years
-        ago with a policy that sets the expiration period to 15 days
+        Test that the entitlement is not expired when created now, and is expired when created20 days
+        ago with a policy that sets the expiration period to 14 days
         """
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
         assert entitlement.is_entitlement_regainable() is True
 
-        # Create a date 15 days in the past (greater than the policy expire period of 14 days)
+        # Create a date 20 days in the past (greater than the policy expire period of 14 days)
         # and apply it to both the entitlement and the course
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=15)
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
         entitlement.created = past_datetime
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
@@ -105,27 +109,40 @@ class TestModels(TestCase):
 
     def test_expired_at_datetime(self):
         """
-        Tests the using the getter method properly updates the expired_at field for an entitlement
+        Tests that using the getter method properly updates the expired_at field for an entitlement
         """
 
-        # Verify a brand new entitlement isn't expired
+        # Verify a brand new entitlement isn't expired and the db row isn't updated
         entitlement = CourseEntitlementFactory.create()
-        assert entitlement.expired_at_datetime is None
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime is None
+        assert entitlement.expired_at is None
 
-        # Verify an entitlement from two years ago is expired
+        # Verify an entitlement from two years ago is expired and the db row is updated
         past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
         entitlement.created = past_datetime
         entitlement.save()
-        assert entitlement.expired_at_datetime
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime
+        assert entitlement.expired_at
 
         # Verify that a brand new entitlement that has been redeemed is not expired
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
         assert entitlement.enrollment_course_run
-        assert entitlement.expired_at_datetime is None
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime is None
+        assert entitlement.expired_at is None
 
-        # Verify that an entitlement that has been redeemed but not within 14 days is expired
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=15)
+        # Verify that an entitlement that has been redeemed but not within 14 days
+        # and the course started more than two weeks ago is expired
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
         entitlement.created = past_datetime
+        self.enrollment.created = past_datetime
+        self.course.start = past_datetime
         entitlement.save()
+        self.course.save()
+        self.enrollment.save()
         assert entitlement.enrollment_course_run
-        assert entitlement.expired_at_datetime
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime
+        assert entitlement.expired_at
