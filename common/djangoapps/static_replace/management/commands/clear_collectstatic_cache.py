@@ -1,14 +1,21 @@
-###
-### Script for importing courseware from XML format
-###
+"""
+Django management command to clear the 'staticfiles' Django cache
+"""
 
-from django.core.management.base import NoArgsCommand
+from __future__ import print_function
+
+from django.core.management.base import BaseCommand
 from django.core.cache import caches
 
 
-class Command(NoArgsCommand):
-    help = 'Import the specified data directory into the default ModuleStore'
+class Command(BaseCommand):
+    """
+    Implementation of the management command
+    """
 
-    def handle_noargs(self, **options):
+    help = 'Empties the Django caches["staticfiles"] cache.'
+
+    def handle(self, *args, **_):
         staticfiles_cache = caches['staticfiles']
         staticfiles_cache.clear()
+        print("Cache cleared.")
