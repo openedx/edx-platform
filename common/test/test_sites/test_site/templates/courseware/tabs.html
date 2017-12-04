@@ -18,8 +18,8 @@ def url_class(is_active):
     tab_class = url_class(tab_is_active)
   %>
   <li>
-  <a href="${tab.link_func(course, reverse) | h}" class="${tab_class}">
-  Test Site Tab: ${_(tab.name) | h}
+  <a href="${tab.link_func(course, reverse)}" class="${tab_class}">
+  Test Site Tab: ${_(tab.name)}
   % if tab_is_active:
       <span class="sr">, current location</span>
   %endif
