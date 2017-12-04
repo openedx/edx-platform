@@ -7,6 +7,9 @@ import pytz
 from django.conf import settings
 from django.test import TestCase
 
+from certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.api import MODES
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import CourseEnrollmentFactory
 
@@ -52,14 +55,18 @@ class TestModels(TestCase):
         entitlement = CourseEntitlementFactory.create()
         assert entitlement.is_entitlement_refundable() is True
 
+        # If there is no order_number make sure the entitlement is not refundable
+        entitlement.order_number = None
+        assert entitlement.is_entitlement_refundable() is False
+
         # Create a date 70 days in the past (greater than the policy refund expire period of 60 days)
         past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=70)
-        entitlement.created = past_datetime
+        entitlement = CourseEntitlementFactory.create(created=past_datetime)
 
         assert entitlement.is_entitlement_refundable() is False
 
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
-        # Create a date 50 days in the past (less than the policy refund expire period of 60 days)
+        # Create a date 20 days in the past (less than the policy refund expire period of 60 days)
         # but more than the policy regain period of 14 days and also the course start
         past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
         entitlement.created = past_datetime
@@ -84,14 +91,23 @@ class TestModels(TestCase):
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
         assert entitlement.is_entitlement_regainable() is True
 
+        # Create and associate a GeneratedCertificate for a user and course and make sure it isn't regainable
+        GeneratedCertificateFactory(
+            user=entitlement.user,
+            course_id=entitlement.enrollment_course_run.course_id,
+            mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
+        )
+
+        assert entitlement.is_entitlement_regainable() is False
+
         # Create a date 20 days in the past (greater than the policy expire period of 14 days)
         # and apply it to both the entitlement and the course
         past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
-        entitlement.created = past_datetime
+        entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment, created=past_datetime)
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
 
-        entitlement.save()
         self.course.save()
         self.enrollment.save()
 
