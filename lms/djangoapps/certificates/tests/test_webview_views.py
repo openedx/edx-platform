@@ -658,7 +658,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_view_for_non_viewable_certificate(self):
+    def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
         """
         Tests that Certificate HTML Web View returns "Cannot Find Certificate" if certificate is not viewable yet.
         """

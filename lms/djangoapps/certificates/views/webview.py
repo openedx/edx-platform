@@ -350,7 +350,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
                 verify_uuid=unicode(uuid4().hex),
                 modified_date=modified_date
             )
-    else:
+    elif certificates_viewable_for_course(course):
         # certificate is being viewed by learner or public
         try:
             user_certificate = GeneratedCertificate.eligible_certificates.get(
@@ -514,13 +514,6 @@ def render_html_view(request, user_id, course_id):
             "%d. Specific error: %s"
         )
         log.info(error_str, course_id, user_id, str(exception))
-        return _render_invalid_certificate(course_id, platform_name, configuration)
-
-    if not certificates_viewable_for_course(course):
-        log.info(
-            "Invalid cert: Certificate for %s is not viewable yet.",
-            course_id,
-        )
         return _render_invalid_certificate(course_id, platform_name, configuration)
 
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course
