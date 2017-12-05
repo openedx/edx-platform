@@ -121,6 +121,18 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         else:
             self.assert_schedule_not_created()
             mock_track.assert_called_once()
+            self.assertEquals(mock_track.call_args[1].get('event'), 'edx.bi.schedule.suppressed')
+
+    @patch('openedx.core.djangoapps.schedules.signals.log.exception')
+    @patch('openedx.core.djangoapps.schedules.signals.Schedule.objects.create')
+    def test_create_schedule_error(self, mock_create_schedule, mock_log, mock_get_current_site):
+        site = SiteFactory.create()
+        mock_get_current_site.return_value = site
+        ScheduleConfigFactory.create(site=site)
+        mock_create_schedule.side_effect = ValueError('Fake error')
+        self.assert_schedule_not_created()
+        mock_log.assert_called_once()
+        assert 'Encountered error in creating a Schedule for CourseEnrollment' in mock_log.call_args[0][0]
 
 
 @ddt.ddt
