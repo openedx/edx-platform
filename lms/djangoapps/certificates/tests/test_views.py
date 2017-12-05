@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import ddt
 import datetime
-import pytest
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
@@ -261,7 +260,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.store.update_item(self.course, self.user.id)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @pytest.mark.django111_expected_failure
     def test_html_view_for_microsite(self):
         test_configuration_string = """{
             "default": {
@@ -311,7 +309,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.assertIn('Microsite title', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @pytest.mark.django111_expected_failure
     def test_html_view_microsite_configuration_missing(self):
         test_configuration_string = """{
             "default": {

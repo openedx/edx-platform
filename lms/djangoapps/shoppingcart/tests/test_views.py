@@ -8,7 +8,6 @@ from decimal import Decimal
 from urlparse import urlparse
 
 import ddt
-import pytest
 import pytz
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
@@ -476,7 +475,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn("Cart item quantity should not be greater than 1 when applying activation code", resp.content)
 
     @ddt.data(True, False)
-    @pytest.mark.django111_expected_failure
     def test_reg_code_uses_associated_mode(self, expired_mode):
         """Tests the use of reg codes on verified courses, expired or active. """
         course_key = self.course_key.to_deprecated_string()
@@ -489,7 +487,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
 
     @ddt.data(True, False)
-    @pytest.mark.django111_expected_failure
     def test_reg_code_uses_unknown_mode(self, expired_mode):
         """Tests the use of reg codes on verified courses, expired or active. """
         course_key = self.course_key.to_deprecated_string()
@@ -1443,7 +1440,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             }
         )
 
-    @pytest.mark.django111_expected_failure
     def test_shopping_cart_navigation_link_not_in_microsite(self):
         """
         Tests shopping cart link is available in navigation header if request is not from a microsite.
@@ -1478,7 +1474,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<a class="shopping-cart"', resp.content)
 
-    @pytest.mark.django111_expected_failure
     def test_shopping_cart_navigation_link_in_microsite_courseware_page(self):
         """
         Tests shopping cart link is not available in navigation header if request is from a microsite

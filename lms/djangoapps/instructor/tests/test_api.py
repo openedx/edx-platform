@@ -11,7 +11,6 @@ import shutil
 import tempfile
 
 import ddt
-import pytest
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -3641,7 +3640,6 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@pytest.mark.django111_expected_failure
 class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -4527,7 +4525,6 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
 
 @attr(shard=1)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
-@pytest.mark.django111_expected_failure
 class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
     """
     Test data dumps for E-commerce Course Registration Codes.

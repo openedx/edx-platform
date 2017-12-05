@@ -40,6 +40,15 @@ from lms.envs.test import (
     REGISTRATION_EXTRA_FIELDS,
 )
 
+# Add some host names used in assorted tests
+ALLOWED_HOSTS = [
+    'localhost',
+    'logistration.testserver',
+    '.testserver.fake',
+    'test-site.testserver',
+    'testserver.fakeother',
+]
+
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')

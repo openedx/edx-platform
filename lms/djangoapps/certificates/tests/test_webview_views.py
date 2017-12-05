@@ -7,7 +7,6 @@ from collections import OrderedDict
 from urllib import urlencode
 from uuid import uuid4
 
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
@@ -243,7 +242,6 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
     Tests for the certificates web/html views
