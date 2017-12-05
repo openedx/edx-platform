@@ -1,3 +1,4 @@
+{% autoescape off %}
 {% load i18n %}
 
 {% blocktrans trimmed %}
@@ -14,3 +15,4 @@ With self-paced courses, you learn on your own schedule. We encourage you to spe
 Your focused attention will pay off in the end!
 {% endblocktrans %}
 {% include "schedules/edx_ace/common/upsell_cta.txt"%}
+{% endautoescape %}

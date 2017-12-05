@@ -1,3 +1,4 @@
+{% autoescape off %}
 {% load i18n %}
 {% load ace %}
 {% if course_ids|length > 1 %}
@@ -27,3 +28,4 @@ Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 
 {% trans "Upgrade now at" %} <{% with_link_tracking upsell_link %}>
 {% endif %}
+{% endautoescape %}

@@ -1,3 +1,4 @@
+{% autoescape off %}
 {% load i18n %}
 
 {% if course_ids|length > 1 %}
@@ -5,3 +6,4 @@
 {% else %}
 {% blocktrans %}Upgrade to earn a verified certificate in {{ first_course_name }}{% endblocktrans %}
 {% endif %}
+{% endautoescape %}
