@@ -19,7 +19,7 @@ class ContactUsView(View):
         context = {
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'zendesk_api_host': settings.ZENDESK_URL,
-            'access_token': settings.ZENDESK_OAUTH_ACCESS_TOKEN,
+            'access_token': 'DUMMY_ACCESS_TOKEN',  # LEARNER-3450
             'custom_fields': settings.ZENDESK_CUSTOM_FIELDS
         }
 
