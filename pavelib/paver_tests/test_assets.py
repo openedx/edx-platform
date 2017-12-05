@@ -75,7 +75,7 @@ class TestPaverAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertEquals(self.task_messages, expected_messages)
+        self.assertEquals(sorted(self.task_messages), sorted(expected_messages))
 
 
 @ddt.ddt
@@ -190,7 +190,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertEquals(self.task_messages, expected_messages)
+        self.assertEquals(sorted(self.task_messages), sorted(expected_messages))
 
 
 class TestPaverWatchAssetTasks(TestCase):
