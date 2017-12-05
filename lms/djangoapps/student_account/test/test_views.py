@@ -588,7 +588,6 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertEqual(enterprise_cookie.value, '')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    @pytest.mark.django111_expected_failure
     def test_microsite_uses_old_login_page(self):
         # Retrieve the login page from a microsite domain
         # and verify that we're served the old page.
@@ -599,7 +598,6 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertContains(resp, "Log into your Test Site Account")
         self.assertContains(resp, "login-form")
 
-    @pytest.mark.django111_expected_failure
     def test_microsite_uses_old_register_page(self):
         # Retrieve the register page from a microsite domain
         # and verify that we're served the old page.

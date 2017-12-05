@@ -4,7 +4,6 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 
 import datetime
 
-import pytest
 import pytz
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
@@ -19,7 +18,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard

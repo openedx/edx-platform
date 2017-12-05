@@ -34,6 +34,15 @@ from util.testing import patch_testcase, patch_sessions
 patch_testcase()
 patch_sessions()
 
+# Add some host names used in assorted tests
+ALLOWED_HOSTS = [
+    'localhost',
+    'logistration.testserver',
+    '.testserver.fake',
+    'test-site.testserver',
+    'testserver.fakeother',
+]
+
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
 LOG_OVERRIDES = [
