@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:34+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.682203\n"
+"POT-Creation-Date: 2017-11-30 12:56+0000\n"
+"PO-Revision-Date: 2017-11-30 13:05:28.791998\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -667,8 +667,8 @@ msgstr ""
 msgid "Edit Start Date"
 msgstr ""
 
-#: cms/templates/course_outline.html
-msgid "Course Pacing:"
+#: cms/templates/course_outline.html cms/templates/settings.html
+msgid "Course Pacing"
 msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/settings.html
@@ -2712,10 +2712,6 @@ msgstr ""
 msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
-msgstr ""
-
-#: cms/templates/settings.html
-msgid "Course Pacing"
 msgstr ""
 
 #: cms/templates/settings.html

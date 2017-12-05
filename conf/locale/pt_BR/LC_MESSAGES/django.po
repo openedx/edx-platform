@@ -18,6 +18,7 @@
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Eduardo Barasal Morales <emorales@nic.br>, 2017
 # Erik Henrique <contato@erikhenrique.com.br>, 2015
+# Evaldo klock <neto.nemesis@gmail.com>, 2017
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # G.Ribas <gabriel.ribas1@hotmail.com>, 2014
