@@ -1,4 +1,4 @@
-{% extends 'schedules/edx_ace/common/base_body.html' %}
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
 
 {% load i18n %}
 {% load static %}
@@ -19,7 +19,7 @@
             </div>
 
             {% trans "View discussion" as course_cta_text %}
-            {% include "schedules/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
 
             {% block google_analytics_pixel %}
                 <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>

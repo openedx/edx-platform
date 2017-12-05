@@ -19,7 +19,7 @@ from openedx.core.djangoapps.schedules.content_highlights import get_week_highli
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
-from openedx.core.djangoapps.schedules.template_context import get_base_template_context
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.course_experience import course_home_url_name
 

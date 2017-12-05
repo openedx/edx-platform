@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,no-member
 import uuid
 
 from django.http import HttpRequest
@@ -6,13 +7,13 @@ from django.test import override_settings
 from mock import patch
 
 from edx_ace import Message, Recipient
-from openedx.core.djangoapps.schedules.templatetags.ace import (
+from openedx.core.djangoapps.ace_common.templatetags.ace import (
     ensure_url_is_absolute,
     with_link_tracking,
     google_analytics_tracking_pixel,
     _get_google_analytics_tracking_url
 )
-from openedx.core.djangoapps.schedules.tests.mixins import QueryStringAssertionMixin
+from openedx.core.djangoapps.ace_common.tests.mixins import QueryStringAssertionMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
@@ -23,6 +24,7 @@ class TestAbsoluteUrl(CacheIsolationTestCase):
     def setUp(self):
         self.site = SiteFactory.create()
         self.site.domain = 'example.com'
+        super(TestAbsoluteUrl, self).setUp()
 
     def test_absolute_url(self):
         absolute = ensure_url_is_absolute(self.site, '/foo/bar')
@@ -41,7 +43,7 @@ class TestAbsoluteUrl(CacheIsolationTestCase):
 class EmailTemplateTagMixin(object):
 
     def setUp(self):
-        patcher = patch('openedx.core.djangoapps.schedules.templatetags.ace.get_current_request')
+        patcher = patch('openedx.core.djangoapps.ace_common.templatetags.ace.get_current_request')
         self.mock_get_current_request = patcher.start()
         self.addCleanup(patcher.stop)
 

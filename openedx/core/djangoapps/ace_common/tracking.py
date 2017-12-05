@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 from urlparse import parse_qs
 
 import attr
@@ -92,7 +93,10 @@ class GoogleAnalyticsTrackingPixel(object):
 
         parameters['tid'] = tracking_id
 
-        user_id_dimension = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_USER_ID_CUSTOM_DIMENSION", site=self.site)
+        user_id_dimension = get_config_value_from_site_or_settings(
+            "GOOGLE_ANALYTICS_USER_ID_CUSTOM_DIMENSION",
+            site=self.site,
+        )
         if user_id_dimension is not None and self.user_id is not None:
             parameter_name = 'cd{0}'.format(user_id_dimension)
             parameters[parameter_name] = self.user_id

@@ -20,7 +20,7 @@ from lms.djangoapps.django_comment_client.utils import permalink
 import lms.lib.comment_client as cc
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.schedules.template_context import get_base_template_context
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 

@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 from urlparse import parse_qs, urlparse
 
 
