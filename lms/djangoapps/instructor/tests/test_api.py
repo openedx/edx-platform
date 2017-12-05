@@ -250,6 +250,10 @@ def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
     "A dummy view that raises an AlreadyRunningError exception"
     raise AlreadyRunningError()
 
+@common_exceptions_400
+def view_alreadyrunningerror_unicode(request):  # pylint: disable=unused-argument
+    "A dummy view that raises an AlreadyRunningError exception"
+    raise AlreadyRunningError(u'Dummy unicode text ☺')
 
 @common_exceptions_400
 def view_queue_connection_error(request):  # pylint: disable=unused-argument
@@ -292,12 +296,18 @@ class TestCommonExceptions400(TestCase):
         resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Requested task is already running", resp.content)
+        resp_unicode = view_alreadyrunningerror_unicode(self.request)  # pylint: disable=assignment-from-no-return
+        self.assertEqual(resp_unicode.status_code, 400)
+        self.assertIn("Dummy unicode text ☺", resp_unicode.content)
 
     def test_alreadyrunningerror_ajax(self):
         self.request.is_ajax.return_value = True
         resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Requested task is already running", resp.content)
+        resp_unicode = view_alreadyrunningerror_unicode(self.request)  # pylint: disable=assignment-from-no-return
+        self.assertEqual(resp_unicode.status_code, 400)
+        self.assertIn("Dummy unicode text ☺", resp_unicode.content)
 
     @ddt.data(True, False)
     def test_queue_connection_error(self, is_ajax):
