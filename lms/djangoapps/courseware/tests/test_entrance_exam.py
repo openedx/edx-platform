@@ -1,7 +1,6 @@
 """
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
-import pytest
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from mock import Mock, patch
@@ -39,7 +38,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 @attr(shard=2)
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
-@pytest.mark.django111_expected_failure
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Check that content is properly gated.

@@ -6,7 +6,6 @@ import datetime
 import itertools
 
 import ddt
-import pytest
 import pytz
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
@@ -159,7 +158,6 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the various access controls on the student dashboard
@@ -633,7 +631,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertEqual(bool(access._has_access_course(self.staff, 'load_mobile', descriptor)), staff_expected)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    @pytest.mark.django111_expected_failure
     def test_courseware_page_unfulfilled_prereqs(self):
         """
         Test courseware access when a course has pre-requisite course yet to be completed

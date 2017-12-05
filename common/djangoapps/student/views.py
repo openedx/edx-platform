@@ -10,11 +10,12 @@ import warnings
 from collections import defaultdict, namedtuple
 from urlparse import parse_qs, urlsplit, urlunsplit
 
+import django
 import analytics
 import edx_oauth2_provider
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, load_backend, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
@@ -146,6 +147,14 @@ REGISTRATION_UTM_PARAMETERS = {
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "registration"])
+
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Compensate for behavior change of default authentication backend in 1.10
+if django.VERSION[0] == 1 and django.VERSION[1] < 10:
+    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.ModelBackend'
+else:
+    # We want to allow inactive users to log in only when their account is first created
+    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -2068,7 +2077,9 @@ def create_account_with_params(request, params):
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
-    new_user = authenticate(username=user.username, password=params['password'])
+    backend = load_backend(NEW_USER_AUTH_BACKEND)
+    new_user = backend.authenticate(request=request, username=user.username, password=params['password'])
+    new_user.backend = NEW_USER_AUTH_BACKEND
     login(request, new_user)
     request.session.set_expiry(0)
 

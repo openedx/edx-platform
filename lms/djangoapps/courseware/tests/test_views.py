@@ -210,7 +210,6 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
     Tests for query count.
@@ -253,7 +252,6 @@ class IndexQueryTestCase(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
@@ -1117,7 +1115,6 @@ class TestProgressDueDate(BaseDueDateTests):
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-@pytest.mark.django111_expected_failure
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
@@ -1190,7 +1187,6 @@ class StartDateTests(ModuleStoreTestCase):
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
-    @pytest.mark.django111_expected_failure
     def test_format_localized_in_studio_course(self):
         course = self.set_up_course()
         response = self.get_about_response(course.id)
@@ -2198,7 +2194,6 @@ class ViewCheckerBlock(XBlock):
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
@@ -2536,7 +2531,6 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.

@@ -9,7 +9,6 @@ import StringIO
 import unittest
 from copy import deepcopy
 
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -197,7 +196,6 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestRecommenderCreateFromEmpty(TestRecommender):
     """
     Check whether we can add resources to an empty database correctly
@@ -258,7 +256,6 @@ class TestRecommenderResourceBase(TestRecommender):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestRecommenderWithResources(TestRecommenderResourceBase):
     """
     Check whether we can add/edit/flag/export resources correctly
@@ -425,7 +422,6 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
 
 @attr(shard=1)
 @ddt
-@pytest.mark.django111_expected_failure
 class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
     """
     Check whether we can vote resources correctly
@@ -540,7 +536,6 @@ class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
 
 @attr(shard=1)
 @ddt
-@pytest.mark.django111_expected_failure
 class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
     """
     Check whether we can remove/endorse resources correctly
@@ -636,7 +631,6 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
 
 @attr(shard=1)
 @ddt
-@pytest.mark.django111_expected_failure
 class TestRecommenderFileUploading(TestRecommender):
     """
     Check whether we can handle file uploading correctly

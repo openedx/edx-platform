@@ -5,7 +5,6 @@ import json
 import pickle
 from datetime import datetime
 
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -174,7 +173,6 @@ class NormalStudentVisibilityTest(MasqueradeTestCase):
         return UserFactory()
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @pytest.mark.django111_expected_failure
     def test_staff_debug_not_visible(self):
         """
         Tests that staff debug control is not present for a student.
@@ -224,7 +222,6 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as student.
     """
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @pytest.mark.django111_expected_failure
     def test_staff_debug_with_masquerade(self):
         """
         Tests that staff debug control is not visible when masquerading as a student.
@@ -314,7 +311,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         )
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @pytest.mark.django111_expected_failure
     def test_masquerade_as_specific_user_on_self_paced(self):
         """
         Test masquerading as a specific user for course info page when self paced configuration
@@ -339,7 +335,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("OOGIE BLOOGIE", content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @pytest.mark.django111_expected_failure
     def test_masquerade_as_specific_student(self):
         """
         Test masquerading as a specific user.

@@ -5,7 +5,6 @@ from textwrap import dedent
 from unittest import TestCase
 
 import mock
-import pytest
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
@@ -19,7 +18,6 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class ActivateLoginTest(LoginEnrollmentTestCase):
     """
     Test logging in and logging out.
@@ -124,7 +122,6 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.

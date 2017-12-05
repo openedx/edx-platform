@@ -640,7 +640,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual(1, len(pending_change))
         activation_key = pending_change[0].activation_key
         confirm_change_url = reverse(
-            "student.views.confirm_email_change", kwargs={'key': activation_key}
+            "confirm_email_change", kwargs={'key': activation_key}
         )
         response = self.client.post(confirm_change_url)
         self.assertEqual(200, response.status_code)
