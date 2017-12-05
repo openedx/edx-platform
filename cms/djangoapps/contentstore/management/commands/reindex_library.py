@@ -22,7 +22,6 @@ class Command(BaseCommand):
         ./manage.py reindex_library --all - reindexes all available libraries
     """
     help = dedent(__doc__)
-    can_import_settings = True
     CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
