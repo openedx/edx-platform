@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,no-member
 import uuid
 
 from django.http import HttpRequest
@@ -23,6 +24,7 @@ class TestAbsoluteUrl(CacheIsolationTestCase):
     def setUp(self):
         self.site = SiteFactory.create()
         self.site.domain = 'example.com'
+        super(TestAbsoluteUrl, self).setUp()
 
     def test_absolute_url(self):
         absolute = ensure_url_is_absolute(self.site, '/foo/bar')

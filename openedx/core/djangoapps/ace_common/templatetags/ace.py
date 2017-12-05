@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 from urlparse import urlparse
 
 from crum import get_current_request
@@ -7,7 +8,7 @@ from django.utils.safestring import mark_safe
 from openedx.core.djangoapps.ace_common.tracking import CampaignTrackingInfo, GoogleAnalyticsTrackingPixel
 from openedx.core.djangolib.markup import HTML
 
-register = template.Library()
+register = template.Library()  # pylint: disable=invalid-name
 
 
 @register.simple_tag(takes_context=True)
@@ -133,7 +134,7 @@ def modify_url_to_track_clicks(url, campaign=None):
     if campaign is None:
         campaign = CampaignTrackingInfo()
     modified_url = parsed_url._replace(query=campaign.to_query_string(parsed_url.query))
-    return modified_url.geturl()
+    return modified_url.geturl()  # pylint: disable=no-member
 
 
 def ensure_url_is_absolute(site, relative_path):
