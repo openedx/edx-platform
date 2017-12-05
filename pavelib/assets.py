@@ -962,6 +962,6 @@ def update_assets(args):
                 'background': not args.debug,
                 'theme_dirs': args.theme_dirs,
                 'themes': args.themes,
-                'wait': float(args.wait)
+                'wait': [float(args.wait)]
             },
         )
