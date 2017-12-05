@@ -2504,9 +2504,8 @@ Annotator.Plugin.Store = (function(_super) {
   };
 
   Store.prototype._onError = function(xhr) {
-    var action, message;
-    action = xhr._action;
-    Annotator._t("Note: Your annotations will NOT be saved once you leave this page and will not be visible to anyone.");
+    var message;
+    message = Annotator._t("Note: Your annotations will NOT be saved once you leave this page and will not be visible to anyone.");
     Annotator.showNotification(message, Annotator.Notification.ERROR);
     return console.error(Annotator._t("API request failed:") + (" '" + xhr.status + "'"));
   };
