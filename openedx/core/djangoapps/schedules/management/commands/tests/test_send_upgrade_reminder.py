@@ -52,7 +52,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
             enrollment__mode=CourseMode.VERIFIED if is_verified else CourseMode.AUDIT,
         )
 
-        self.task.apply(kwargs=dict(
+        self.task().apply(kwargs=dict(
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
             bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
         ))
@@ -76,7 +76,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             mock_schedule_send.apply_async = lambda args, *_a, **_kw: sent_messages.append(args[1])
 
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(user),
             ))
@@ -95,7 +95,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
         schedule = self._schedule_factory()
         schedule.enrollment.course.modes.filter(mode_slug=CourseMode.VERIFIED).delete()
 
-        self.task.apply(kwargs=dict(
+        self.task().apply(kwargs=dict(
             site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
             bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
         ))

@@ -200,7 +200,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                         is_first_match = False
 
                 with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.task.apply(kwargs=dict(
+                    self.task().apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=target_day_str, day_offset=offset, bin_num=b,
                     ))
 
@@ -220,15 +220,15 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             course_id=CourseKey.from_string('edX/toy/Not_2012_Fall'),
             user=UserFactory.create(),
         )
-        schedule = self._schedule_factory(enrollment=enrollment)
+        self._schedule_factory(enrollment=enrollment)
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            for b in range(self.task.num_bins):
-                self.task.apply(kwargs=dict(
+            for bin_num in range(self.task().num_bins):
+                self.task().apply(kwargs=dict(
                     site_id=self.site_config.site.id,
                     target_day_str=serialize(target_day),
                     day_offset=offset,
-                    bin_num=b,
+                    bin_num=bin_num,
                 ))
 
         # There is no database constraint that enforces that enrollment.course_id points
@@ -308,7 +308,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         )
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
             ))
 
@@ -328,7 +328,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         )
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0,
             ))
 
@@ -354,7 +354,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         expected_query_count = NUM_QUERIES_FIRST_MATCH + additional_course_queries
         with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
             with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-                self.task.apply(kwargs=dict(
+                self.task().apply(kwargs=dict(
                     site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                     bin_num=self._calculate_bin_for_user(user),
                 ))
@@ -402,7 +402,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                     num_expected_queries += 1
 
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.task.apply(kwargs=dict(
+                    self.task().apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                         bin_num=self._calculate_bin_for_user(user),
                     ))
@@ -436,7 +436,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         schedule = self._schedule_factory(**kwargs)
 
         with patch.object(tasks, 'ace') as mock_ace:
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))

@@ -87,7 +87,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         enrollment.schedule.save()
 
         with patch.object(tasks, 'ace') as mock_ace:
-            self.task.apply(kwargs=dict(  # pylint: disable=no-value-for-parameter
+            self.task().apply(kwargs=dict(  # pylint: disable=no-value-for-parameter
                 site_id=self.site_config.site.id,
                 target_day_str=serialize(target_day),
                 day_offset=offset,
