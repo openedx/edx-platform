@@ -161,6 +161,7 @@
 
                 postRender: function() {
                     var inputs = this.$('.form-field'),
+                        inputSelectors = 'input, select, textarea',
                         inputTipSelectors = ['tip error', 'tip tip-input'],
                         inputTipSelectorsHidden = ['tip error hidden', 'tip tip-input hidden'],
                         onInputFocus = function() {
@@ -177,7 +178,7 @@
                         },
                         onInputFocusOut = function() {
                             // If input has no text apply focus out styles
-                            if ($(this).val().length === 0) {
+                            if ($(this).find(inputSelectors).val().length === 0) {
                                 $(this).find('label').addClass('focus-out')
                                     .removeClass('focus-in');
                             }
@@ -191,7 +192,7 @@
                         },
                         handleInputBehavior = function(input) {
                             // Initially put label in input
-                            if (input.val().length === 0) {
+                            if (input.find(inputSelectors).val().length === 0) {
                                 input.find('label').addClass('focus-out')
                                     .removeClass('focus-in');
                             }
