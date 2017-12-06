@@ -32,12 +32,12 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -578,8 +578,8 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         self.addCleanup(patcher.stop)
 
         mock_get_current_site.return_value = SiteFactory.create()
-        self.site = mock_get_current_site.return_value
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_before_course_start(self):
         """ Enrolling before a course begins should result in the upgrade deadline being set relative to the
         course start date. """
@@ -587,7 +587,6 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         course = create_self_paced_course_run(days_till_start=3)
         overview = CourseOverview.get_from_id(course.id)
         expected = overview.start + timedelta(days=global_config.deadline_days)
-        ScheduleConfigFactory.create(site=self.site, enabled=True, create_schedules=True)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
@@ -602,6 +601,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         )
         self.assertEqual(upgrade_date_summary.relative_datestring, 'by {date}')
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_after_course_start(self):
         """ Enrolling after a course begins should result in the upgrade deadline being set relative to the
         enrollment date.
@@ -611,7 +611,6 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         """
         global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
-        ScheduleConfigFactory.create(site=self.site, enabled=True, create_schedules=True)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=global_config.deadline_days)
@@ -635,6 +634,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         expected = enrollment.created + timedelta(days=course_config.deadline_days)
         self.assertEqual(block.date, expected)
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_without_dynamic_upgrade_deadline(self):
         """ Disabling the dynamic upgrade deadline functionality should result in the verified mode's
         expiration date being returned. """
@@ -645,13 +645,13 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_existing_schedule(self):
         """ If a schedule is created while deadlines are disabled, they shouldn't magically appear once the feature is
         turned on. """
         course = create_self_paced_course_run(days_till_start=-1)
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=False)
         course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(enabled=False, course_id=course.id)
-        ScheduleConfigFactory.create(site=self.site, enabled=True, create_schedules=True)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
 
         # The enrollment has a schedule, but the upgrade deadline should be None
@@ -705,6 +705,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         (True, True, True, True, True, False),
     )
     @ddt.unpack
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_org_and_course_config_overrides(self, enroll_first, org_config_enabled, org_config_opt_out,
                                                        course_config_enabled, course_config_opt_out,
                                                        expected_dynamic_deadline):
@@ -712,7 +713,6 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         and opt-out states to verify that course-level overrides the org-level config. """
         course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        ScheduleConfigFactory.create(site=self.site, enabled=True, create_schedules=True)
         if enroll_first:
             enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
         OrgDynamicUpgradeDeadlineConfiguration.objects.create(

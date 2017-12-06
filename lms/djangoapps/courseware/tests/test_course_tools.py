@@ -15,12 +15,12 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.course_tools import VerifiedUpgradeTool
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.schedules.config import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 
 
 @attr(shard=3)
@@ -40,6 +40,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
         )
         cls.course_overview = CourseOverview.get_from_id(cls.course.id)
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def setUp(self):
         super(VerifiedUpgradeToolTest, self).setUp()
 
@@ -55,11 +56,6 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
         mock_get_current_site.return_value = SiteFactory.create()
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-
-        ScheduleConfigFactory.create(
-            site=mock_get_current_site.return_value,
-            create_schedules=True
-        )
 
         self.enrollment = CourseEnrollmentFactory(
             course_id=self.course.id,

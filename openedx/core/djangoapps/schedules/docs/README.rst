@@ -250,6 +250,14 @@ and link it to the Site. Make sure to enable all of the settings:
 -  ``hold_back_ratio``: ratio of all new Course Enrollments that should
    NOT have a Schedule created.
 
+Roll-out Waffle Flag
+^^^^^^^^^^^^^^^^^^^^
+
+There is one roll-out related course waffle flag that we plan to delete
+called ``schedules.create_schedules_for_course``, which, if the
+``ScheduleConfig.create_schedules`` is disabled, will enable schedule
+creation on a per-course basis.
+
 Self-paced Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

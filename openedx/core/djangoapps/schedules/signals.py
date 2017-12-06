@@ -18,6 +18,7 @@ from openedx.core.djangoapps.schedules.content_highlights import course_has_high
 from openedx.core.djangoapps.signals.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
+from .config import CREATE_SCHEDULE_WAFFLE_FLAG
 from .models import Schedule, ScheduleConfig
 from .tasks import update_course_schedules
 
@@ -38,7 +39,10 @@ def create_schedule(sender, **kwargs):
 
     enrollment = kwargs['instance']
     schedule_config = ScheduleConfig.current(current_site)
-    if not schedule_config.create_schedules:
+    if (
+        not schedule_config.create_schedules
+        and not CREATE_SCHEDULE_WAFFLE_FLAG.is_enabled(enrollment.course_id)
+    ):
         log.debug('Schedules: Creation not enabled for this course or for this site')
         return
 
