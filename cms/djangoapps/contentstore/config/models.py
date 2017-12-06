@@ -4,6 +4,7 @@ controlling the new assets page.
 """
 from config_models.models import ConfigurationModel
 from django.db.models import BooleanField
+
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 

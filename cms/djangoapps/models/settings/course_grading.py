@@ -1,10 +1,11 @@
+import json
 from base64 import b64encode
 from datetime import timedelta
 from hashlib import sha1
-import json
+
+from eventtracking import tracker
 
 from contentstore.signals.signals import GRADING_POLICY_CHANGED
-from eventtracking import tracker
 from track.event_transaction_utils import create_new_event_transaction_id
 from xmodule.modulestore.django import modulestore
 

@@ -1,11 +1,11 @@
 """Tests running the delete_orphan command"""
 
 import ddt
-from django.core.management import call_command, CommandError
-from contentstore.tests.test_orphan import TestOrphanBase
+from django.core.management import CommandError, call_command
 
-from xmodule.modulestore.tests.factories import CourseFactory
+from contentstore.tests.test_orphan import TestOrphanBase
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt

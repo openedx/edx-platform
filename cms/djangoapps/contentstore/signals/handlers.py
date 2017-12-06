@@ -1,8 +1,8 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 
+import logging
 from datetime import datetime
 from functools import wraps
-import logging
 
 from django.core.cache import cache
 from django.dispatch import receiver
@@ -15,9 +15,9 @@ from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.module_utils import yield_dynamic_descriptor_descendants
-from .signals import GRADING_POLICY_CHANGED
 from xmodule.modulestore.django import SignalHandler, modulestore
 
+from .signals import GRADING_POLICY_CHANGED
 
 log = logging.getLogger(__name__)
 

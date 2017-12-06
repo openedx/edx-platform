@@ -10,13 +10,13 @@ import ddt
 import mock
 from django.conf import settings
 from django.test.utils import override_settings
-from pytz import UTC
+from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
+from pytz import UTC
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from milestones.models import MilestoneRelationshipType
-from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
+from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails

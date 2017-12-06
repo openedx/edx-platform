@@ -3,24 +3,21 @@ import base64
 import logging
 import os
 
-from path import Path as path
-from six import text_type
-
 from django.conf import settings
-
 from django.core.files import File
 from opaque_keys.edx.keys import CourseKey
+from path import Path as path
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from six import text_type
 from user_tasks.models import UserTaskStatus
-
-from student.auth import has_course_author_access
 
 from contentstore.storage import course_import_export_storage
 from contentstore.tasks import CourseImportTask, import_olx
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from student.auth import has_course_author_access
 
 log = logging.getLogger(__name__)
 

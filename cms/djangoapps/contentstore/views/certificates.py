@@ -31,6 +31,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 
@@ -39,7 +40,6 @@ from contentstore.views.assets import delete_asset
 from contentstore.views.exception import AssetNotFoundException
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
-from eventtracking import tracker
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
 from util.db import MYSQL_MAX_INT, generate_int_id

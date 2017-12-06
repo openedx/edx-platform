@@ -8,6 +8,7 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
 from contentstore.views.course import _accessible_courses_iter, get_course_and_check_access
+
 from ..serializers.course_runs import (
     CourseRunCreateSerializer,
     CourseRunImageSerializer,

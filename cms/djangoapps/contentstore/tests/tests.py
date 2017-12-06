@@ -2,6 +2,7 @@
 This test file will test registration, login, activation, and session activity timeouts
 """
 from __future__ import print_function
+
 import datetime
 import time
 
@@ -16,11 +17,11 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from pytz import UTC
-from six.moves import xrange
 
 from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
+from six.moves import xrange
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

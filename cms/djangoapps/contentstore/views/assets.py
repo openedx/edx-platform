@@ -9,14 +9,9 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from contentstore.config.models import NewAssetsPageFlag
 from contentstore.utils import reverse_course_url
@@ -26,6 +21,11 @@ from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from student.auth import has_course_author_access
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 __all__ = ['assets_handler']
 

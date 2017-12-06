@@ -1,5 +1,6 @@
 """ Management command to update libraries' search index """
 from __future__ import print_function
+
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError

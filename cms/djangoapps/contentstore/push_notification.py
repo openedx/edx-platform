@@ -6,12 +6,12 @@ from logging import exception as log_exception
 from uuid import uuid4
 
 from django.conf import settings
-
-from contentstore.models import PushNotificationConfig
-from contentstore.tasks import push_course_update_task
 from parse_rest.connection import register
 from parse_rest.core import ParseError
 from parse_rest.installation import Push
+
+from contentstore.models import PushNotificationConfig
+from contentstore.tasks import push_course_update_task
 from xmodule.modulestore.django import modulestore
 
 

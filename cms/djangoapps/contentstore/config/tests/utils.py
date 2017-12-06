@@ -4,7 +4,7 @@ to configure flags related to persistent grading.
 """
 from contextlib import contextmanager
 
-from contentstore.config.models import NewAssetsPageFlag, CourseNewAssetsPageFlag
+from contentstore.config.models import CourseNewAssetsPageFlag, NewAssetsPageFlag
 from request_cache.middleware import RequestCache
 
 

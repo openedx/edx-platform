@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import shutil
+from wsgiref.util import FileWrapper
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -24,7 +25,6 @@ from path import Path as path
 from six import text_type
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
-from wsgiref.util import FileWrapper
 
 from contentstore.storage import course_import_export_storage
 from contentstore.tasks import CourseExportTask, CourseImportTask, export_olx, import_olx

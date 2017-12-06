@@ -18,12 +18,12 @@ from search.api import perform_search
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
+from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.course import (
     _deprecated_blocks_info,
     course_outline_initial_state,
     reindex_course_and_check_access
 )
-from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
