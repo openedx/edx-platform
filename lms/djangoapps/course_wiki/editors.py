@@ -1,3 +1,8 @@
+"""
+Support for using the CodeMirror code editor as a wiki content editor.
+"""
+
+import django
 from django import forms
 from django.forms.utils import flatatt
 from django.template.loader import render_to_string
@@ -9,6 +14,9 @@ from wiki.editors.markitup import MarkItUpAdminWidget
 
 
 class CodeMirrorWidget(forms.Widget):
+    """
+    Use CodeMirror as a Django form widget (like a textarea).
+    """
     def __init__(self, attrs=None):
         # The 'rows' and 'cols' attributes are required for HTML correctness.
         default_attrs = {
@@ -25,7 +33,14 @@ class CodeMirrorWidget(forms.Widget):
         if value is None:
             value = ''
 
-        final_attrs = self.build_attrs(attrs, name=name)
+        # TODO: Remove Django 1.11 upgrade shim
+        # SHIM: Compensate for build_attrs() implementation change in 1.11
+        if django.VERSION < (1, 11):
+            final_attrs = self.build_attrs(attrs, name=name)
+        else:
+            extra_attrs = attrs.copy()
+            extra_attrs['name'] = name
+            final_attrs = self.build_attrs(self.attrs, extra_attrs=extra_attrs)  # pylint: disable=redundant-keyword-arg
 
         # TODO use the help_text field of edit form instead of rendering a template
 
@@ -36,6 +51,9 @@ class CodeMirrorWidget(forms.Widget):
 
 
 class CodeMirror(BaseEditor):
+    """
+    Wiki content editor using CodeMirror.
+    """
     editor_id = 'codemirror'
 
     def get_admin_widget(self, instance=None):
