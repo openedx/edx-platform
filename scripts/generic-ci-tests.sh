@@ -76,31 +76,47 @@ else
 fi
 PARALLEL="--processes=-1"
 export SUBSET_JOB=$JOB_NAME
+
+function run_paver_quality {
+    QUALITY_TASK=$1
+    shift
+    mkdir -p test_root/log/
+    LOG_PREFIX=test_root/log/$QUALITY_TASK
+    paver $QUALITY_TASK $* 2> $LOG_PREFIX.err.log > $LOG_PREFIX.out.log || {
+        echo "STDOUT (last 100 lines of $LOG_PREFIX.out.log):";
+        tail -n 100 $LOG_PREFIX.out.log;
+        echo "STDERR (last 100 lines of $LOG_PREFIX.err.log):";
+        tail -n 100 $LOG_PREFIX.err.log;
+        return 1;
+    }
+    return 0;
+}
+
 case "$TEST_SUITE" in
 
     "quality")
         echo "Finding fixme's and storing report..."
-        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+        run_paver_quality find_fixme || EXIT=1
         echo "Finding pep8 violations and storing report..."
-        paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+        run_paver_quality run_pep8 || EXIT=1
         echo "Finding pylint violations and storing in report..."
-        paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD > pylint.log || { echo 'Too many pylint violations. You can view them in pylint.log'; EXIT=1; }
+        run_paver_quality run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
 
         mkdir -p reports
 
         echo "Finding ESLint violations and storing report..."
-        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { echo 'Too many eslint violations. You can view them in eslint.log'; EXIT=1; }
+        run_paver_quality run_eslint -l $ESLINT_THRESHOLD || EXIT=1
         echo "Finding Stylelint violations and storing report..."
-        paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { echo 'Too many stylelint violations. You can view them in stylelint.log'; EXIT=1; }
+        run_paver_quality run_stylelint -l $STYLELINT_THRESHOLD || EXIT=1
         echo "Running code complexity report (python)."
-        paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
+        run_paver_quality run_complexity || echo "Unable to calculate code complexity. Ignoring error."
         echo "Running xss linter report."
-        paver run_xsslint -t $XSSLINT_THRESHOLDS > xsslint.log || { echo 'Too many xsslint violations. You can view them in xsslint.log'; EXIT=1; }
-        echo "Running xss commit linter report."
-        paver run_xsscommitlint > xsscommitlint.log || { cat xsscommitlint.log; EXIT=1; }
+        run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || EXIT=1
+        echo "Running safe commit linter report."
+        run_paver_quality run_xsscommitlint || EXIT=1
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         echo "Running diff quality."
-        paver run_quality -p 100 || EXIT=1
+        run_paver_quality run_quality -p 100 -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.

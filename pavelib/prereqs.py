@@ -305,6 +305,8 @@ def install_python_prereqs():
 
     prereq_cache("Python prereqs", files_to_fingerprint, python_prereqs_installation)
 
+    sh("pip freeze")
+
 
 @task
 @timed

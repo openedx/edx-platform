@@ -1,3 +1,8 @@
 # Requirements to run and test Paver
 Paver==1.2.4
 libsass==0.10.0
+wrapt==1.10.5
+markupsafe
+edx-opaque-keys
+requests
+mock
