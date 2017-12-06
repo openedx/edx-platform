@@ -1467,7 +1467,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
@@ -1481,7 +1481,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
         Mock(return_value=False),
     )
     @patch(

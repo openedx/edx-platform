@@ -22,7 +22,6 @@ from .transcripts_utils import (
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
     get_video_transcript_content,
-    is_val_transcript_feature_enabled_for_course,
     save_to_store,
     subs_filename,
     Transcript,
@@ -30,7 +29,9 @@ from .transcripts_utils import (
     TranscriptsGenerationException,
     youtube_speed_dict,
 )
-
+from .transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
+)
 
 log = logging.getLogger(__name__)
 

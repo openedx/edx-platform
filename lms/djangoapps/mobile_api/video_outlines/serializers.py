@@ -11,7 +11,7 @@ from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
-from xmodule.video_module.transcripts_utils import is_val_transcript_feature_enabled_for_course
+from xmodule.video_module.transcripts_model_utils import is_val_transcript_feature_enabled_for_course
 
 
 class BlockOutline(object):
