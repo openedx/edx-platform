@@ -172,7 +172,6 @@ class EmailMarketingTests(TestCase):
         add_email_marketing_cookies(None, response=response, user=self.user)
         self.assertFalse('sailthru_hid' in response.cookies)
 
-
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.SailthruClient.api_get')
