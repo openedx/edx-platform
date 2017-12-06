@@ -82,7 +82,11 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             post_parms['cookies'] = {'anonymous_interest': sailthru_content}
 
     time_before_call = datetime.datetime.now()
-    sailthru_response = get_email_cookies_via_sailthru.delay(user.email, post_parms)
+    try:
+        sailthru_response = get_email_cookies_via_sailthru.delay(user.email, post_parms)
+    except Exception as exc:  # pylint: disable=broad-except
+        log.error("Exception Connecting to celery task: %s", unicode(exc))
+        return response
 
     try:
         # synchronous call to get result of an asynchronous celery task, with timeout
