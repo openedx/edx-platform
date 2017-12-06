@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
 from django.http import HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware
+from birdcage.v1_11.csrf import CsrfViewMiddleware
 
 from ..middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
 
