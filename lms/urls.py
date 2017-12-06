@@ -141,6 +141,9 @@ urlpatterns = [
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
+
+    # Zendesk API proxy endpoint
+    url(r'^zendesk_proxy/', include('openedx.core.djangoapps.zendesk_proxy.urls')),
 ]
 
 # TODO: This needs to move to a separate urls.py once the student_account and
