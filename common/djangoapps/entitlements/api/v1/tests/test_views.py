@@ -1,13 +1,15 @@
 import json
 import unittest
 import uuid
+from datetime import datetime, timedelta
 
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
+
+from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, TEST_PASSWORD
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -133,6 +135,44 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         results = response.data.get('results', [])
         assert results == CourseEntitlementSerializer([entitlement], many=True).data
 
+    def test_staff_get_expired_entitlements(self):
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        entitlements = CourseEntitlementFactory.create_batch(2, created=past_datetime, user=self.user)
+
+        # Set the first entitlement to be at a time that it isn't expired
+        entitlements[0].created = datetime.utcnow()
+        entitlements[0].save()
+
+        response = self.client.get(
+            self.entitlements_list_url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+        results = response.data.get('results', [])  # pylint: disable=no-member
+        # Make sure that the first result isn't expired, and the second one is also not for staff users
+        assert results[0].get('expired_at') is None and results[1].get('expired_at') is None
+
+    def test_get_user_expired_entitlements(self):
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        not_staff_user = UserFactory()
+        self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
+        entitlement_user2 = CourseEntitlementFactory.create_batch(2, user=not_staff_user, created=past_datetime)
+        url = reverse('entitlements_api:v1:entitlements-list')
+        url += '?user={username}'.format(username=not_staff_user.username)
+
+        # Set the first entitlement to be at a time that it isn't expired
+        entitlement_user2[0].created = datetime.utcnow()
+        entitlement_user2[0].save()
+
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+
+        results = response.data.get('results', [])  # pylint: disable=no-member
+        assert results[0].get('expired_at') is None and results[1].get('expired_at')
+
     def test_get_user_entitlements(self):
         user2 = UserFactory()
         CourseEntitlementFactory.create()
@@ -161,10 +201,27 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 200
 
         results = response.data
-        assert results == CourseEntitlementSerializer(entitlement).data
+        assert results == CourseEntitlementSerializer(entitlement).data and results.get('expired_at') is None
+
+    def test_get_expired_entitlement_by_uuid(self):
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        entitlement = CourseEntitlementFactory(created=past_datetime)
+        CourseEntitlementFactory.create_batch(2)
+
+        CourseEntitlementFactory()
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(entitlement.uuid)])
+
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+
+        results = response.data  # pylint: disable=no-member
+        assert results.get('expired_at')
 
     def test_delete_and_revoke_entitlement(self):
-        course_entitlement = CourseEntitlementFactory()
+        course_entitlement = CourseEntitlementFactory.create()
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(course_entitlement.uuid)])
 
         response = self.client.delete(
@@ -176,7 +233,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.expired_at is not None
 
     def test_revoke_unenroll_entitlement(self):
-        course_entitlement = CourseEntitlementFactory()
+        course_entitlement = CourseEntitlementFactory.create()
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(course_entitlement.uuid)])
 
         enrollment = CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
