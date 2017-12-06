@@ -341,7 +341,8 @@ class BokChoyTestSuite(TestSuite):
             cmd.append("--rcfile={}".format(self.coveragerc))
         else:
             cmd += [
-                "python"
+                "python",
+                "-Wd",
             ]
         cmd += [
             "-m",
