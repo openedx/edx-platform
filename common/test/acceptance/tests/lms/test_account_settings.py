@@ -9,7 +9,7 @@ from bok_choy.page_object import XSS_INJECTION
 from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
-from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAME
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
@@ -123,7 +123,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Initialize account and pages.
         """
         super(AccountSettingsPageTest, self).setUp()
-        self.full_name = XSS_INJECTION
+        self.full_name = FULL_NAME
         self.social_link = ''
         self.username, self.user_id = self.log_in_as_unique_user(full_name=self.full_name)
         self.visit_account_settings_page()
@@ -275,8 +275,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'Full Name',
             self.full_name,
             u'@',
-            [u'<h1>another name<h1>', self.full_name],
-            u'Full Name cannot contain the following characters: < >',
+            [u'<h1>another name<h1>', u'<script>'],
+            'Full Name cannot contain the following characters: < >',
             False
         )
 

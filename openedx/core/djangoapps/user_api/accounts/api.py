@@ -173,11 +173,15 @@ def update_account_settings(requesting_user, update, username=None):
                 "user_message": err.message
             }
 
-    if changing_full_name and contains_html(update['name']):
-        field_errors["name"] = {
-            "developer_message": u"Error thrown from validate_full_name: '{}'".format('Full Name is in-valid'),
-            "user_message": _(u"Full Name cannot contain the following characters: < >")
-        }
+    # If the user asked to change full name, validate it
+    if changing_full_name:
+        try:
+            student_forms.validate_name(update['name'])
+        except ValidationError as err:
+            field_errors["name"] = {
+                "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
+                "user_message": err.message
+            }
 
     # If we have encountered any validation errors, return them to the user.
     if field_errors:
