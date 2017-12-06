@@ -1,0 +1,36 @@
+<%page args="items, gate_content, disable_navigation" expression_filter="h"/>
+
+<%! 
+from django.utils.translation import ugettext as _ 
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+    <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
+        <ol id="sequence-list" role="tablist">
+            % if gate_content:
+                <li>Locked</li>
+            % else:
+            % for idx, item in enumerate(items):
+            <li>
+            <button class="seq_${item['type']} inactive nav-item tab"
+                role="tab"
+                tabindex="-1"
+                aria-selected="false"
+                aria-expanded="false"
+                aria-controls="seq_content"
+                data-index="${idx}"
+                data-id="${item['id']}"
+                data-element="${idx+1}"
+                data-page-title="${item['page_title']}"
+                data-path="${item['path']}"
+                id="tab_${idx}"
+                ${"disabled=disabled" if disable_navigation else ""}>
+                <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
+                <span class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></span>
+                <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
+                </button>
+            </li>
+            % endfor
+            % endif
+        </ol>
+    </nav>

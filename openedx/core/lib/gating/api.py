@@ -3,12 +3,15 @@ API for the gating djangoapp
 """
 import logging
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from lms.djangoapps.courseware.access import _has_access_to_course
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
-
-from lms.djangoapps.courseware.access import _has_access_to_course
+from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from xmodule.modulestore.django import modulestore
 
@@ -301,15 +304,42 @@ def get_gated_content(course, user):
             )
         ]
 
-def is_prereq_met(user_id, milestone):
+def _get_block_id(milestone):
     """
-    Returns true if the prequiste has been met for a given milestone
+    Get the block id for the given milestone
+    """
+    prereq_content_key = milestone['namespace'].replace(GATING_NAMESPACE_QUALIFIER, '')
+    block_id = UsageKey.from_string(prereq_content_key).block_id
+    return block_id
 
-    Arguments:
-        user_id: The id of the user
-        milestone (Milestone) : The milestone to check
+def _get_minimum_required_percentage(milestone):
     """
-    return milestones_api.user_has_milestone({'id': user_id}, milestone)
+    Returns the minimum percentage requirement for the given milestone.
+    """
+    # Default minimum score to 100
+    min_score = 100
+    requirements = milestone.get('requirements')
+    if requirements:
+        try:
+            min_score = int(requirements.get('min_score'))
+        except (ValueError, TypeError):
+            log.warning(
+                u'Gating: Failed to find minimum score for gating milestone %s, defaulting to 100',
+            )
+    return min_score
+
+
+def _get_subsection_percentage(subsection_grade):
+    """
+    Returns the percentage value of the given subsection_grade.
+    """
+    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
+
+def _calculate_ratio(earned, possible):
+    """
+    Returns the percentage of the given earned and possible values.
+    """
+    return float(earned) / float(possible) if possible else 0.0
 
 def get_gating_milestone_meta_info(course_id, milestone):
     """
@@ -329,3 +359,46 @@ def get_gating_milestone_meta_info(course_id, milestone):
     if blocks:
         gating_milestone_display_name = blocks[0].display_name
     return {'url': gating_milestone_url, 'display_name': gating_milestone_display_name}
+
+
+def is_prereq_met(course_id, content_id, user_id, recalc_on_unmet=False):
+    """
+    Returns true if the prequiste has been met for a given milestone
+
+    Arguments:
+        course_id (CourseLocator): CourseLocator object for the course
+        content_id (BlockUsageLocator): BlockUsageLocator for the content
+        user_id: The id of the user
+        recalc_on_unmet: Recalculate the grade if prereq has not yet been met
+    """
+    # first check source of truth.. the database
+    #prereq_met = milestones_api.user_has_milestone({'id': user_id}, milestone)
+    unfulfilled_milestones = milestones_api.get_course_content_milestones(course_id, content_id, 'requires', {'id': user_id})
+    prereq_met = not unfulfilled_milestones
+
+
+    if prereq_met or not recalc_on_unmet:
+        return prereq_met
+
+    student = User.objects.get(id=user_id)
+    store = modulestore()
+
+    with store.bulk_operations(course_id):
+        course_structure = get_course_blocks(student, store.make_course_usage_key(course_id))
+        course = store.get_course(course_id, depth=0)
+        subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
+        subsection_usage_key = BlockUsageLocator(course_id, 'sequential', _get_block_id(unfulfilled_milestones[0]))
+        if subsection_usage_key in course_structure:
+            subsection_grade = subsection_grade_factory.update(
+                course_structure[subsection_usage_key]
+            )
+            min_percentage = _get_minimum_required_percentage(unfulfilled_milestones[0])
+            subsection_percentage = _get_subsection_percentage(subsection_grade)
+            if subsection_percentage >= min_percentage:
+                prereq_met = True
+                #milestones_helpers.add_user_milestone({'id': user.id}, prereq_milestone)
+            else:
+                prereq_met = False
+                #milestones_helpers.remove_user_milestone({'id': user.id}, prereq_milestone)
+
+    return prereq_met

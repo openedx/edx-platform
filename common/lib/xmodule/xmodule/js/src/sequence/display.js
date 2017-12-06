@@ -38,6 +38,12 @@
             this.displayTabTooltip = function(event) {
                 return Sequence.prototype.displayTabTooltip.apply(self, [event]);
             };
+            this.loadSeqContents = function(event) {
+                return Sequence.prototype.loadSeqContents.apply(self, [event]);
+            }
+            this.recalcGrade = function(event) {
+                return Sequence.prototype.recalcGrade.apply(self, [event]);
+            }
             this.arrowKeys = {
                 LEFT: 37,
                 UP: 38,
@@ -57,6 +63,12 @@
             this.ajaxUrl = this.el.data('ajax-url');
             this.nextUrl = this.el.data('next-url');
             this.prevUrl = this.el.data('prev-url');
+            this.gateContent = this.el.data('gate-content');
+            this.prereqUrl = this.el.data('prereq-url');
+            this.prereqSectionName = this.el.data('prereq-section-name');
+            this.unitName  = this.el.data('unit-name');
+            this.scoreReached = this.el.data('score-reached');
+            this.calculateScore = this.el.data('calculate-score');
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
             this.bind();
@@ -74,6 +86,52 @@
             this.el.on('bookmark:remove', this.removeBookmarkIconFromActiveNavItem);
             this.$('#sequence-list .nav-item').on('focus mouseenter', this.displayTabTooltip);
             this.$('#sequence-list .nav-item').on('blur mouseleave', this.hideTabTooltip);
+            this.$('.recalc-grade').click(this.recalcGrade);
+        };
+
+        Sequence.prototype.loadSeqContents = function(event) {
+            var modxFullUrl, currentText, self;
+            modxFullUrl = '' + this.ajaxUrl + '/load_seq_contents';
+            self = this;
+
+            $.postWithPrefix(modxFullUrl, {},
+                function(response) {
+                    console.log('load_seq_contents response = ');
+                    console.log(response);
+                    self.position = -1;
+                    $('.sequence-list-wrapper').contents(response.seq_list_html);
+                    $('#main-content').html(response.seq_contents_html);
+                    self.contents = self.$('.seq_contents');
+                    self.content_container = self.$('#seq_content');
+                    self.sr_container = self.$('.sr-is-focusable');
+                    self.render(1);
+                }
+            );
+        };
+
+        Sequence.prototype.recalcGrade = function(event) {
+            var modxFullUrl, currentText, self;
+            modxFullUrl = '' + this.ajaxUrl + '/recalc_grade';
+            self = this;
+            $.postWithPrefix(modxFullUrl, {
+                    "gate_conent": this.gateContent,
+                    "prereq_url": this.prereqUrl,
+                    "prereq_section_name": this.prereqSectionName,
+                    "unit_name": this.unitName,
+                    "score_reached": this.scoreReached,
+                    "calculate_score": this.calculateScore
+                }, function(response) {
+                    console.log('Got response = ');
+                    console.log(response);
+                    self.gateContent = response.gate_content;
+                    self.scoreReached = response.score_reached;
+                    self.calculateScore = response.calculate_score;
+                    $('#main-content').html(response.html);
+                    if (self.scoreReached) {
+                        setTimeout(self.loadSeqContents(event), 3000);
+                    }
+                }
+            );
         };
 
         Sequence.prototype.previousNav = function(focused, index) {
@@ -240,7 +298,9 @@
                 // Added for aborting video bufferization, see ../video/10_main.js
                 this.el.trigger('sequence:change');
                 this.mark_active(newPosition);
+                console.log("this.contents=" + this.contents);
                 currentTab = this.contents.eq(newPosition - 1);
+                console.log("current tab text=" + currentTab.text());
                 bookmarked = this.el.find('.active .bookmark-icon').hasClass('bookmarked');
 
                 // update the data-attributes with latest contents only for updated problems.
@@ -263,6 +323,7 @@
                             .data('attempts-used', latestResponse.attempts_used);
                     });
                 }
+                console.log("calling XBlock.initialize");
                 XBlock.initializeBlocks(this.content_container, this.requestToken);
 
                 // For embedded circuit simulator exercises in 6.002x

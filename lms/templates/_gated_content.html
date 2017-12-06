@@ -1,0 +1,45 @@
+<%page args="gate_content, prereq_url, prereq_section_name, unit_name, score_reached, calculate_score" expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="hidden-content proctored-exam completed">
+    <h3>
+        ${unit_name}
+    </h3>
+    <hr>
+    <h3>
+        % if calculate_score:
+            <span class="recalc-grade">
+                ${Text(_(
+                    "Calculating your score for {section_name}..."
+                )).format(
+                    section_name=prereq_section_name
+                )}
+            </span>
+        % elif score_reached:
+            ${_("Score achieved!")}
+        % else:
+            ${_("Content Locked")}
+        % endif
+    </h3>
+    <p>
+        % if calculate_score:
+            ${_("Processing...")}
+        % elif score_reached:
+            ${_("Congratulations you have unlocked this section!")}
+        % else:
+            ${Text(_(
+                "You must complete the section '{section_name}' with the required score before you are able to view this content."
+            )).format(section_name=prereq_section_name)}
+            <p>
+                <button><a href="${prereq_url}">${_("Go to Prerequiste Section")}</a></button>
+            </p>
+            <p>
+                <button><span class="recalc-grade">Recalculate Grade</span></button>
+            </p>
+        % endif
+    </p>
+</div>
