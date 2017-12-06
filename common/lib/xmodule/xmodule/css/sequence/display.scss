@@ -117,6 +117,7 @@ $seq-nav-height: 50px;
         border-width: 1px;
         border-bottom-style: solid;
         box-sizing: border-box;
+        overflow: visible; // for tooltip - IE11 uses 'hidden' by default if width/height is specified
 
         .icon {
           display: block;
