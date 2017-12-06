@@ -24,8 +24,8 @@
     <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
       <ol id="sequence-list" role="tablist">
         % for idx, item in enumerate(items):
-        <li>
-        <button class="seq_${item['type']} inactive nav-item tab"
+        <li role="presentation">
+          <button class="seq_${item['type']} inactive nav-item tab"
             role="tab"
             tabindex="-1"
             aria-selected="false"
