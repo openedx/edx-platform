@@ -41,6 +41,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "SELENIUM_DRIVER_LOG_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "VERIFY_XSS='{}'".format(verify_xss),
             "python",
+            "-Wd",
             "-m",
             "pytest",
             "{}/common/test/acceptance/{}".format(REPO_DIR, name),

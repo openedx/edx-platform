@@ -134,7 +134,7 @@ class SystemTestSuite(PytestSuite):
         if self.django_toxenv:
             cmd = ['tox', '-e', self.django_toxenv, '--']
         else:
-            cmd = ['pytest']
+            cmd = ['python', '-Wd', '-m', 'pytest']
         cmd.extend([
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
             "--junitxml={}".format(self.xunit_report),
@@ -223,7 +223,7 @@ class LibTestSuite(PytestSuite):
         if self.django_toxenv:
             cmd = ['tox', '-e', self.django_toxenv, '--']
         else:
-            cmd = ['pytest']
+            cmd = ['python', '-Wd', '-m', 'pytest']
         cmd.extend([
             "-p",
             "no:randomly",
