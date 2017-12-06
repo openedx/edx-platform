@@ -25,6 +25,16 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
         log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
         return
 
+    try:
+        if not current_site.configuration.get_value(ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY, False):
+            log_message = 'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
+            log.info(log_message, current_site, post.id)
+            return
+    except SiteConfiguration.DoesNotExist:
+        log_message = 'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
+        log.info(log_message, current_site, post.id)
+        return
+
     send_message(post, current_site)
 
 
