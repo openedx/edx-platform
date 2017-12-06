@@ -27,18 +27,6 @@ class SendMessageHandlerTestCase(TestCase):
 
         mock_send_message.assert_called_once_with(self.post, mock_get_current_site.return_value)
 
-    @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
-    def test_comment_created_signal_message_not_sent_without_waffle_switch(self, mock_send_message):
-        signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
-
-        self.assertFalse(mock_send_message.called)
-
-    @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
-    def test_comment_created_signal_message_not_sent_without_course_waffle_flag(self, mock_send_message):
-        signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
-
-        self.assertFalse(mock_send_message.called)
-
     @mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=None)
     @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
     def test_comment_created_signal_message_not_sent_without_site(self, mock_send_message, mock_get_current_site):
