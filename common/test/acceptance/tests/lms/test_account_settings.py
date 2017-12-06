@@ -275,16 +275,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'Full Name',
             self.full_name,
             u'@',
-            [u'another name', self.full_name],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('name', self.full_name, 'another name'),
-                self.expected_settings_changed_event('name', 'another name', self.full_name),
-            ],
-            actual_events
+            [u'<h1>another name<h1>', self.full_name],
+            u'Full Name cannot contain the following characters: < >',
+            False
         )
 
     def test_email_field(self):
