@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from student.models import User
 
-from lms.djangoapps.onboarding_survey.models import Organization, ExtendedProfile
+from lms.djangoapps.onboarding.models import Organization, ExtendedProfile
 from lms.djangoapps.philu_api.helpers import get_encoded_token
 
 log = logging.getLogger("edx.philu_api")

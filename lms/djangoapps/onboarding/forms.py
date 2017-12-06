@@ -11,7 +11,7 @@ from django import forms
 from django.utils.encoding import force_unicode
 from django.contrib.auth.models import User
 from django.conf import settings
-from lms.djangoapps.onboarding_survey.models import (
+from lms.djangoapps.onboarding.models import (
     OrganizationSurvey,
     InterestsSurvey,
     UserInfoSurvey,
@@ -19,7 +19,7 @@ from lms.djangoapps.onboarding_survey.models import (
     Organization,
     OrganizationDetailSurvey,
     Currency)
-from lms.djangoapps.onboarding_survey.email_utils import send_admin_activation_email
+from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

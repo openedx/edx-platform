@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from lms.djangoapps.onboarding_survey.models import (
+from lms.djangoapps.onboarding.models import (
 RoleInsideOrg,
 OrgSector,
 OperationLevel,

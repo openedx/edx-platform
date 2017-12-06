@@ -1,6 +1,7 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
 
+from lms.djangoapps.onboarding.models import Organization
 from student.models import User
 
 
@@ -59,3 +60,21 @@ class UserAnswers(TimeStampedModel):
     user_survey = models.ForeignKey(UserOefSurvey, related_name='answers')
     question = models.ForeignKey(TopicQuestion)
     selected_option = models.ForeignKey(OptionLevel)
+
+
+class OrganizationOefScore(TimeStampedModel):
+    org = models.ForeignKey(Organization, related_name="organization_oef_scores")
+    user = models.ForeignKey(User, related_name="organization_oef_scores")
+    start_date = models.DateField()
+    finish_date = models.DateField()
+    version = models.CharField(max_length=10, default="v1.0")
+    human_resource_score = models.PositiveIntegerField()
+    leadership_score = models.PositiveIntegerField()
+    financial_management_score = models.PositiveIntegerField()
+    fundraising_score = models.PositiveIntegerField()
+    measurement_score = models.PositiveIntegerField()
+    marketing_score = models.PositiveIntegerField()
+    strategy_score = models.PositiveIntegerField()
+    program_design_score = models.PositiveIntegerField()
+    external_relations_score = models.PositiveIntegerField()
+    systems_score = models.PositiveIntegerField()

@@ -19,21 +19,21 @@ from django.views.decorators.csrf import csrf_exempt
 from path import Path as path
 
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
-from lms.djangoapps.onboarding_survey.models import (
+from lms.djangoapps.onboarding.helpers import is_first_signup_in_org
+from lms.djangoapps.onboarding.models import (
     UserInfoSurvey,
     InterestsSurvey,
     OrganizationSurvey,
     Organization,
     OrganizationDetailSurvey,
     Currency)
-from lms.djangoapps.onboarding_survey.signals import save_interests
+from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
-from onboarding_survey import forms
-from lms.djangoapps.onboarding_survey.history import update_history
-from lms.djangoapps.onboarding_survey.models import ExtendedProfile
+from onboarding import forms
+from lms.djangoapps.onboarding.history import update_history
+from lms.djangoapps.onboarding.models import ExtendedProfile
 
-log = logging.getLogger("edx.onboarding_survey")
+log = logging.getLogger("edx.onboarding")
 
 
 def update_user_history(user):
@@ -149,7 +149,7 @@ def user_info(request):
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
     context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
-    return render(request, 'onboarding_survey/tell_us_more_survey.html', context)
+    return render(request, 'onboarding/tell_us_more_survey.html', context)
 
 
 @login_required
@@ -210,7 +210,7 @@ def interests(request):
     context.update(get_un_submitted_surveys(user))
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
-    return render(request, 'onboarding_survey/interests_survey.html', context)
+    return render(request, 'onboarding/interests_survey.html', context)
 
 
 def mark_partner_network(organization_survey):
@@ -286,7 +286,7 @@ def organization(request):
     context['organization_name'] = extended_profile.organization.name
     context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
 
-    return render(request, 'onboarding_survey/organization_survey.html', context)
+    return render(request, 'onboarding/organization_survey.html', context)
 
 
 @csrf_exempt
@@ -296,7 +296,7 @@ def get_country_names(request):
     """
     if request.is_ajax():
         file_path = path(os.path.join(
-            'lms', 'djangoapps', 'onboarding_survey', 'data', 'world_countries.json'
+            'lms', 'djangoapps', 'onboarding', 'data', 'world_countries.json'
         )).abspath()
         with open(file_path) as json_data:
             q = request.GET.get('term', '')
@@ -364,7 +364,7 @@ def org_detail_survey(request):
     context['is_poc'] = extended_profile.is_poc
     context['is_first_user'] = is_first_signup_in_org(extended_profile.organization)
     context['organization_name'] = extended_profile.organization.name
-    return render(request, 'onboarding_survey/organization_detail_survey.html', context)
+    return render(request, 'onboarding/organization_detail_survey.html', context)
 
 
 @csrf_exempt
@@ -374,7 +374,7 @@ def get_languages(request):
     """
     if request.is_ajax():
         file_path = path(os.path.join(
-            'lms', 'djangoapps', 'onboarding_survey', 'data', 'world_languages.json'
+            'lms', 'djangoapps', 'onboarding', 'data', 'world_languages.json'
         )).abspath()
         with open(file_path) as json_data:
             q = request.GET.get('term', '')
@@ -417,7 +417,7 @@ def update_account_settings(request):
         )
 
     return render(
-        request, 'onboarding_survey/registration_update.html',
+        request, 'onboarding/registration_update.html',
         {'form': form, 'org_url': reverse('get_user_organizations')}
     )
 
@@ -469,7 +469,7 @@ def recommendations(request):
         'recommended_communities': recommended_communities,
     }
 
-    return render_to_response('onboarding_survey/recommendations.html', context)
+    return render_to_response('onboarding/recommendations.html', context)
 
 @csrf_exempt
 def admin_activation(request, org_id, activation_key):
@@ -512,4 +512,4 @@ def admin_activation(request, org_id, activation_key):
                 activation_status = 3
 
     context['activation_status'] = activation_status
-    return render_to_response('onboarding_survey/admin_activation.html', context)
+    return render_to_response('onboarding/admin_activation.html', context)

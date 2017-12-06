@@ -1,7 +1,7 @@
 $(document).ready(function() {
     var orgs;
     $.ajax({
-            url: "onboarding_survey/get_user_organizations", success: function (result) {
+            url: "onboarding/get_user_organizations", success: function (result) {
                 full_result = result
                 orgs = Object.keys(result)
             }

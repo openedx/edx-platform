@@ -1219,7 +1219,7 @@ MIDDLEWARE_CLASSES = (
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
-    'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
+    'lms.djangoapps.onboarding.middleware.RedirectMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -2200,7 +2200,7 @@ INSTALLED_APPS = (
     # Unusual migrations
     'database_fixups',
 
-    'lms.djangoapps.onboarding_survey',
+    'lms.djangoapps.onboarding',
 
 
     # OEF survey
@@ -3028,7 +3028,7 @@ MAX_BOOKMARKS_PER_COURSE = 100
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = 'onboarding_survey.forms.RegModelForm'
+REGISTRATION_EXTENSION_FORM = 'onboarding.forms.RegModelForm'
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [

@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
-from lms.djangoapps.onboarding_survey.models import InterestsSurvey
+from lms.djangoapps.onboarding.models import InterestsSurvey
 from xmodule.modulestore.django import modulestore
 
 

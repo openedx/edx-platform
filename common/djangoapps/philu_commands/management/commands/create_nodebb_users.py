@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 
 from common.lib.nodebb_client.client import NodeBBClient
 from nodebb.signals.handlers import create_user_on_nodebb
-from lms.djangoapps.onboarding_survey.models import ExtendedProfile
+from lms.djangoapps.onboarding.models import ExtendedProfile
 from philu_commands.models import CreationFailedUsers
 
 log = getLogger(__name__)

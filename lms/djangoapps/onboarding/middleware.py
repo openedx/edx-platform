@@ -4,10 +4,10 @@ The middleware for on-boarding survey app.
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
-from lms.djangoapps.onboarding_survey.models import (
+from lms.djangoapps.onboarding.models import (
     UserInfoSurvey, InterestsSurvey, OrganizationSurvey, OrganizationDetailSurvey
 )
-from lms.djangoapps.onboarding_survey.helpers import is_first_signup_in_org
+from lms.djangoapps.onboarding.helpers import is_first_signup_in_org
 
 
 class RedirectMiddleware(object):

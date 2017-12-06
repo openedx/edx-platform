@@ -8,9 +8,9 @@ ${_("We have received a suggestion from {referring_user} that you are"
     ).format(referring_user=referring_user, org_name=org_name)}
 
 % if is_secure:
-  https://${ site }/onboarding_survey/admin_activate/${ org_id }/${ key }
+  https://${ site }/onboarding/admin_activate/${ org_id }/${ key }
 % else:
-  http://${ site }/onboarding_survey/admin_activate/${ org_id }/${ key }
+  http://${ site }/onboarding/admin_activate/${ org_id }/${ key }
 % endif
 ${_("If you are not admin of the organization, you don't need to do anything; you "
       "won't receive any more email from us. If you need assistance, please "
