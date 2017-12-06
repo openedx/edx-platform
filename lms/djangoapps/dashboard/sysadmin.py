@@ -28,6 +28,7 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
+from opaque_keys.edx.locator import CourseLocator
 
 import dashboard.git_import as git_import
 import track.views
@@ -621,6 +622,11 @@ class GitLogs(TemplateView):
                 raise Http404
             cilset = CourseImportLog.objects.order_by('-created')
         else:
+            course_id = CourseLocator(
+                org=course_id.org,
+                course=course_id.course,
+                run=course_id.run
+            )
             try:
                 course = get_course_by_id(course_id)
             except Exception:

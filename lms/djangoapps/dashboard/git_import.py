@@ -15,6 +15,7 @@ from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import CourseKey
 
 from dashboard.models import CourseImportLog
@@ -294,6 +295,11 @@ def add_repo(repo, rdir_in, branch=None):
     if match:
         course_id = match.group(1)
         course_key = CourseKey.from_string(course_id)
+        course_key = CourseLocator(
+            org=course_key.org,
+            course=course_key.course,
+            run=course_key.run
+        )
         cdir = '{0}/{1}'.format(git_repo_dir, course_key.course)
         log.debug('Studio course dir = %s', cdir)
 
