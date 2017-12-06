@@ -7,7 +7,6 @@ from django.dispatch import receiver
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common import signals
-from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS
 from lms.djangoapps.discussion import tasks
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -24,16 +23,6 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
     current_site = get_current_site()
     if current_site is None:
         log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
-        return
-
-    try:
-        if not current_site.configuration.get_value(ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY, False):
-            log_message = 'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
-            log.info(log_message, current_site, post.id)
-            return
-    except SiteConfiguration.DoesNotExist:
-        log_message = 'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
-        log.info(log_message, current_site, post.id)
         return
 
     send_message(post, current_site)

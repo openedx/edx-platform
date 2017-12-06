@@ -17,7 +17,6 @@ from django_comment_common.signals import comment_created
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
-from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -183,9 +182,6 @@ class TaskTestCase(ModuleStoreTestCase):
         user = mock.Mock()
         comment = cc.Comment.find(id=self.comment['id']).retrieve()
         site = Site.objects.get_current()
-        site_config = SiteConfigurationFactory.create(site=site)
-        site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
-        site_config.save()
         with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
             comment_created.send(sender=None, user=user, post=comment)
 
