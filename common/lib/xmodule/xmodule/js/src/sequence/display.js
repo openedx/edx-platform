@@ -7,7 +7,7 @@
     this.Sequence = (function() {
         function Sequence(element) {
             var self = this;
-
+            //alert("in Sequence for element" + element);
             this.removeBookmarkIconFromActiveNavItem = function(event) {
                 return Sequence.prototype.removeBookmarkIconFromActiveNavItem.apply(self, [event]);
             };
@@ -38,11 +38,11 @@
             this.displayTabTooltip = function(event) {
                 return Sequence.prototype.displayTabTooltip.apply(self, [event]);
             };
-            this.loadSeqContents = function(event) {
-                return Sequence.prototype.loadSeqContents.apply(self, [event]);
+            this.loadSeqContents = function() {
+                return Sequence.prototype.loadSeqContents.apply(self);
             }
-            this.recalcGrade = function(event) {
-                return Sequence.prototype.recalcGrade.apply(self, [event]);
+            this.recalcGrade = function() {
+                return Sequence.prototype.recalcGrade.apply(self);
             }
             this.arrowKeys = {
                 LEFT: 37,
@@ -73,6 +73,9 @@
             this.base_page_title = ($('title').data('base-title') || '').trim();
             this.bind();
             this.render(parseInt(this.el.data('position'), 10));
+            if (this.calculateScore) {
+                this.recalcGrade();
+            }
         }
 
         Sequence.prototype.$ = function(selector) {
@@ -89,30 +92,35 @@
             this.$('.recalc-grade').click(this.recalcGrade);
         };
 
-        Sequence.prototype.loadSeqContents = function(event) {
+        Sequence.prototype.loadSeqContents = function() {
             var modxFullUrl, currentText, self;
             modxFullUrl = '' + this.ajaxUrl + '/load_seq_contents';
             self = this;
 
             $.postWithPrefix(modxFullUrl, {},
                 function(response) {
+                    $('#loading-content').hide();
                     console.log('load_seq_contents response = ');
                     console.log(response);
                     self.position = -1;
-                    $('.sequence-list-wrapper').contents(response.seq_list_html);
+                    $('#seq-list-wrapper').html(response.seq_list_html);
                     $('#main-content').html(response.seq_contents_html);
+
                     self.contents = self.$('.seq_contents');
                     self.content_container = self.$('#seq_content');
                     self.sr_container = self.$('.sr-is-focusable');
+                    self.num_contents = self.contents.length;
+                    self.bind();
                     self.render(1);
                 }
             );
         };
 
-        Sequence.prototype.recalcGrade = function(event) {
+        Sequence.prototype.recalcGrade = function() {
             var modxFullUrl, currentText, self;
             modxFullUrl = '' + this.ajaxUrl + '/recalc_grade';
             self = this;
+            $('.ui-loading').show();
             $.postWithPrefix(modxFullUrl, {
                     "gate_conent": this.gateContent,
                     "prereq_url": this.prereqUrl,
@@ -126,9 +134,14 @@
                     self.gateContent = response.gate_content;
                     self.scoreReached = response.score_reached;
                     self.calculateScore = response.calculate_score;
+                    $('.ui-loading').hide();
                     $('#main-content').html(response.html);
                     if (self.scoreReached) {
-                        setTimeout(self.loadSeqContents(event), 3000);
+                        // if we reached the score, load the contents
+                        // after a short delay
+                        self.el.find('.icon .fa .fa-lock').removeClass('fa-lock').addClass('fa-unlock');
+                        $('#loading-content').show();
+                        setTimeout(self.loadSeqContents, 6000);
                     }
                 }
             );
@@ -227,7 +240,7 @@
             *   'new_content_state' is the updated content of the problem.
             *   'new_state' is the updated state of the problem.
             */
-
+            alert("in addToUpdatedProblems for problemId=" + problemId);
             // initialize for the current sequence if there isn't any updated problem for this position.
             if (!this.anyUpdatedProblems(this.position)) {
                 this.updatedProblems[this.position] = {};
@@ -283,9 +296,11 @@
         };
 
         Sequence.prototype.render = function(newPosition) {
+
             var bookmarked, currentTab, modxFullUrl, sequenceLinks,
                 self = this;
             if (this.position !== newPosition) {
+                //alert("in render for position" + newPosition);
                 if (this.position) {
                     this.mark_visited(this.position);
                     modxFullUrl = '' + this.ajaxUrl + '/goto_position';
@@ -298,9 +313,7 @@
                 // Added for aborting video bufferization, see ../video/10_main.js
                 this.el.trigger('sequence:change');
                 this.mark_active(newPosition);
-                console.log("this.contents=" + this.contents);
                 currentTab = this.contents.eq(newPosition - 1);
-                console.log("current tab text=" + currentTab.text());
                 bookmarked = this.el.find('.active .bookmark-icon').hasClass('bookmarked');
 
                 // update the data-attributes with latest contents only for updated problems.
@@ -312,6 +325,7 @@
 
                 if (this.anyUpdatedProblems(newPosition)) {
                     $.each(this.updatedProblems[newPosition], function(problemId, latestData) {
+                        alert("updating problem index=" + newPosition + " problemId=" + problemId);
                         var latestContent, latestResponse;
                         latestContent = latestData[0];
                         latestResponse = latestData[1];
@@ -323,8 +337,9 @@
                             .data('attempts-used', latestResponse.attempts_used);
                     });
                 }
-                console.log("calling XBlock.initialize");
+                //alert("calling XBlock.initialize for content_container=" + this.content_container + " requestToken=" + this.requestToken);
                 XBlock.initializeBlocks(this.content_container, this.requestToken);
+                //alert("XBlocks init is done");
 
                 // For embedded circuit simulator exercises in 6.002x
                 window.update_schematics();

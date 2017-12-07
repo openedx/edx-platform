@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
+<div class="sequence-nav" id="seq-list-wrapper">
     <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
         <ol id="sequence-list" role="tablist">
             % if gate_content:
@@ -34,3 +35,4 @@ from openedx.core.djangolib.markup import HTML, Text
             % endif
         </ol>
     </nav>
+</div>
