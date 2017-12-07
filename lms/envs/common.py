@@ -810,6 +810,9 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 
+######################## BRANCH.IO ###########################
+BRANCH_IO_KEY = None
+
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
 
