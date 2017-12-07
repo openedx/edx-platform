@@ -119,7 +119,7 @@ def create_category_on_nodebb(sender, instance, created, **kwargs):
     """
     if created:
         community_name = '%s-%s-%s-%s' % (instance.display_name, instance.id.org, instance.id.course, instance.id.run)
-        status_code, response_body = NodeBBClient().categories.create(name=community_name)
+        status_code, response_body = NodeBBClient().categories.create(name=community_name, label=instance.display_name)
 
         if status_code != 200:
             log.error(
