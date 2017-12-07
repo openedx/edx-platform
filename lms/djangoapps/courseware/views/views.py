@@ -809,6 +809,8 @@ def course_about(request, course_id):
         # Embed the course reviews tool
         reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
 
+        all_modes = CourseMode.modes_for_course_dict(course_key, include_expired=True)
+
         context = {
             'course': course,
             'course_details': course_details,
@@ -838,6 +840,7 @@ def course_about(request, course_id):
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
+            'all_modes': all_modes,
         }
 
         return render_to_response('courseware/course_about.html', context)
