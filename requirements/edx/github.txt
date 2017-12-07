@@ -47,7 +47,7 @@
 
 # Third-party:
 git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline==1.5.3
-git+https://github.com/edx/django-wiki.git@v0.0.10#egg=django-wiki==0.0.10
+git+https://github.com/open-craft/django-wiki.git@opencraft-release/ginkgo.1#egg=django-wiki==0.0.10
 git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
