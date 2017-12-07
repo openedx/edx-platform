@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 
-ZENDESK_REQUESTS_PER_HOUR = 15
+ZENDESK_REQUESTS_PER_HOUR = 50
 
 
 class ZendeskProxyThrottle(SimpleRateThrottle):
