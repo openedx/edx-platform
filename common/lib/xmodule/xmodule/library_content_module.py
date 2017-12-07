@@ -3,9 +3,11 @@
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
 import json
+import logging
 import random
 from copy import copy
 from gettext import ngettext
+from django.utils.translation import ugettext as _
 
 from lazy import lazy
 from lxml import etree
@@ -18,6 +20,7 @@ from xblock.fragment import Fragment
 
 from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.util.adaptive_learning import AdaptiveLearningAPIClient
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import STUDENT_VIEW, XModule
 
@@ -29,6 +32,9 @@ from .xml_module import XmlDescriptor
 _ = lambda text: text
 
 ANY_CAPA_TYPE_VALUE = 'any'
+
+
+log = logging.getLogger(__name__)
 
 
 def _get_human_name(problem_class):
@@ -117,6 +123,18 @@ class LibraryContentFields(object):
         return LibraryLocator.from_string(self.source_library_id)
 
 
+class AdaptiveLibraryContentFields(LibraryContentFields):
+    """
+    Custom field definitions for adaptive library content blocks.
+    """
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
+        default="Adaptive Content Block",
+        scope=Scope.settings,
+    )
+
+
 #pylint: disable=abstract-method
 @XBlock.wants('library_tools')  # Only needed in studio
 class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
@@ -130,7 +148,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     """
 
     @classmethod
-    def make_selection(cls, selected, children, max_count, mode):
+    def make_selection(cls, selected, children, max_count, mode, **kwargs):  # pylint: disable=unused-argument
         """
         Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
 
@@ -253,24 +271,12 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 added=format_block_keys(block_keys['added'])
             )
 
-    def selected_children(self):
+    def publish_events(self, block_keys):
         """
-        Returns a set() of block_ids indicating which of the possible children
-        have been selected to display to the current user.
+        Publish events containing information about child block selection.
 
-        This reads and updates the "selected" field, which has user_state scope.
-
-        Note: self.selected and the return value contain block_ids. To get
-        actual BlockUsageLocators, it is necessary to use self.children,
-        because the block_ids alone do not specify the block type.
+        Thin wrapper around `publish_selected_children_events`.
         """
-        if hasattr(self, "_selected_set"):
-            # Already done:
-            return self._selected_set  # pylint: disable=access-member-before-definition
-
-        block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
-
-        # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
         format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
         self.publish_selected_children_events(
@@ -279,11 +285,36 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             self._publish_event,
         )
 
-        # Save our selections to the user state, to ensure consistency:
-        selected = block_keys['selected']
+    def store_selected(self, selected):
+        """
+        Save `selected` children to user state to ensure consistency, and cache them for further use.
+
+        This reads and updates the "selected" field, which has user_state scope.
+
+        Note: self.selected and the return value contain block_ids. To get
+        actual BlockUsageLocators, it is necessary to use self.children,
+        because the block_ids alone do not specify the block type.
+        """
         self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
-        # Cache the results
         self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
+
+    def selected_children(self):
+        """
+        Returns a set() of block_ids indicating which of the possible children
+        have been selected to display to the current user.
+        """
+        if hasattr(self, "_selected_set"):
+            # Already done:
+            return self._selected_set  # pylint: disable=access-member-before-definition
+
+        block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
+
+        # Publish events for analytics purposes:
+        self.publish_events(block_keys)
+
+        # Store selected children
+        selected = block_keys['selected']
+        self.store_selected(selected)
 
         return selected
 
@@ -360,6 +391,241 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
 @XBlock.wants('user')
 @XBlock.wants('library_tools')  # Only needed in studio
+class AdaptiveLibraryContentModule(AdaptiveLibraryContentFields, LibraryContentModule):
+    """
+    A specialized version of Randomized Content Block that communicates
+    with an external service to determine when to show its children, and which ones.
+    """
+
+    @lazy
+    def api_client(self):
+        """
+        Return instance of `AdaptiveLearningAPIClient` for parent course of this block.
+        """
+        return AdaptiveLearningAPIClient(self.parent_course)
+
+    @lazy
+    def parent_course(self):
+        """
+        Return parent course.
+        """
+        return self.runtime.modulestore.get_course(self.course_id, depth=1)
+
+    @lazy
+    def parent_unit_id(self):
+        """
+        Return block ID of parent unit.
+        """
+        parent_unit = self.get_parent()
+        return parent_unit.scope_ids.usage_id.block_id
+
+    @lazy
+    def current_user_id(self):
+        """
+        Return ID of current user.
+        """
+        return self.descriptor.get_user_id()
+
+    @lazy
+    def child_block_ids(self):
+        """
+        Return list of `block_id`s identifying children of this block.
+        """
+        return [child.block_id for child in self.children]  # pylint: disable=no-member
+
+    @classmethod
+    def make_selection(cls, selected, children, max_count, mode, **kwargs):
+        """
+        Dynamically selects block_ids indicating which of the possible children are displayed to the current user.
+
+        Arguments:
+            selected - list of (block_type, block_id) tuples assigned to this student
+            children - children of this block
+            max_count - number of components to display to each student
+            mode - how content is drawn from the library
+
+        Returns:
+            A dict containing the following keys:
+
+            'selected' (set) of (block_type, block_id) tuples assigned to this student
+            'invalid' (set) of dropped (block_type, block_id) tuples that are no longer valid
+            'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
+            'added' (set) of newly added (block_type, block_id) tuples
+
+        Note that this implementation ignores the `max_count` argument:
+        The list of `selected` (block_type, block_id) tuples assigned to this student
+        has been determined based on information from external service providing adaptive learning features,
+        so we only remove blocks that are no longer valid here.
+        We don't add or remove blocks to make the number of `selected` blocks match the value of `max_count`.
+        """
+        # Set of (block_type, block_id) tuples assigned to this student
+        selected = set(tuple(k) for k in selected)
+        # Set of (block_type, block_id) tuples previously assigned to this student
+        previously_selected = kwargs.get('previously_selected')
+        if previously_selected is not None:
+            previously_selected = set(tuple(k) for k in previously_selected)
+
+        # Determine which of our children we will show:
+        valid_block_keys = set([(c.block_type, c.block_id) for c in children])
+
+        # Remove any selected blocks that are no longer valid.
+        # The set of invalid blocks includes:
+        # - Any block that became invalid since the set of `selected` blocks was computed
+        # - Any block that is part of the set of `previously_selected` blocks,
+        #   and is *not* listed in `valid_block_keys`
+        invalid_block_keys = (selected - valid_block_keys)
+        if previously_selected is not None:
+            invalid_block_keys |= (previously_selected - valid_block_keys)
+
+        # Make sure that the set of `selected` blocks does not contain any invalid blocks:
+        if invalid_block_keys:
+            selected -= invalid_block_keys
+
+        # If information about `previously_selected` blocks is available,
+        # compute `added_block_keys` as the set of blocks that are
+        # - part of the set of `selected` blocks
+        # - *not* part of the set of `previously_selected` blocks
+        # - *not* listed in `invalid_block_keys`.
+        # Note that we don't need to subtract the set of `invalid_block_keys`
+        # from the set of `selected` blocks again; we already took care of this above:
+        if previously_selected is not None:
+            added_block_keys = (selected - previously_selected)
+        else:
+            added_block_keys = set()
+
+        return {
+            'selected': selected,
+            'invalid': invalid_block_keys,
+            # External service determines number of children to show,
+            # so `max_count` setting has no effect:
+            # We never *drop* previously selected children because of it,
+            # so the set of dropped children is empty by definition:
+            'overlimit': set(),
+            'added': added_block_keys,
+        }
+
+    def selected_children(self):
+        """
+        Returns a set() of block_ids indicating which of the possible children
+        have been selected to display to the current user.
+        """
+        if hasattr(self, "_selected_set"):
+            # Already done:
+            return self._selected_set  # pylint: disable=access-member-before-definition
+
+        # Determine children to display based on information about pending reviews from external service.
+        # This needs to happen here (at instance level) because we need access to course and block-specific data,
+        # which is not available at the class level.
+        selected = self.get_selections_current_user(self.children)  # pylint: disable=no-member
+        block_keys = self.make_selection(
+            selected, self.children, self.max_count, "adaptive", previously_selected=self.selected  # pylint: disable=no-member
+        )
+
+        # Publish events for analytics purposes:
+        self.publish_events(block_keys)
+
+        # Store selected children
+        selected = block_keys['selected']
+        self.store_selected(selected)
+
+        return selected
+
+    def get_selections_current_user(self, children):
+        """
+        Check with external service whether any children of this block
+        are scheduled for review by the current user, and return them.
+        """
+        pending_reviews = self.api_client.get_pending_reviews(self.current_user_id)
+        valid_block_keys = {
+            c.block_id: (c.block_type, c.block_id) for c in children
+        }
+        selections = []
+        for pending_review in pending_reviews:
+            question_id = pending_review.get('review_question_uid')
+            if question_id in valid_block_keys:
+                selections.append(valid_block_keys[question_id])
+        return selections
+
+    def student_view(self, context):
+        """
+        Render selected child blocks.
+        """
+        # Notify external service that parent unit has been viewed by learner
+        self.send_unit_viewed_event()
+        # Link current user to children of this block
+        self.link_current_user_to_children()
+
+        # Renders children that are scheduled for review, or returns a message.
+        fragment = Fragment()
+        contents = []
+        child_context = {} if not context else copy(context)
+
+        for child in self._get_selected_child_blocks():
+            for displayable in child.displayable_items():
+                rendered_child = displayable.render(STUDENT_VIEW, child_context)
+                fragment.add_frag_resources(rendered_child)
+                contents.append({
+                    'id': displayable.location.to_deprecated_string(),
+                    'content': rendered_child.content,
+                })
+
+        if not contents:
+            contents.append({
+                'id': 'adaptive-learning-no-reviews-message',
+                'content': _('No questions are currently scheduled for review. Please check back later.'),
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents,
+            'xblock_context': context,
+            'show_bookmark_button': False,
+        }))
+        return fragment
+
+    def send_unit_viewed_event(self):
+        """
+        Notify external service that parent unit has been viewed by learner.
+        """
+        # Get block ID of parent unit
+        block_id = self.parent_unit_id
+        # Get ID of current user
+        user_id = self.current_user_id
+        # Send "Unit viewed" event
+        self.api_client.create_read_event(block_id, user_id)
+
+    def link_current_user_to_children(self):
+        """
+        On external service, establish links between current user and children of this block
+        if they don't exist.
+        """
+        # Get IDs of children
+        block_ids = self.child_block_ids
+        # Get ID of current user
+        user_id = self.current_user_id
+        # Establish links
+        self.api_client.create_knowledge_node_students(block_ids, user_id)
+
+    @classmethod
+    def send_result_event(cls, course, block_id, user_id, result):
+        """
+        Create result event for unit identified by `block_id` and student identified by `user_id`
+        using adaptive learning configuration from `course`.
+        """
+        api_client = AdaptiveLearningAPIClient(course)
+        api_client.create_result_event(block_id, user_id, result)
+
+    @classmethod
+    def fetch_pending_reviews(cls, course, user_id):
+        """
+        Return pending reviews for user identified by `user_id`
+        using adaptive learning configuration from `course`.
+        """
+        api_client = AdaptiveLearningAPIClient(course)
+        return api_client.get_pending_reviews(user_id)
+
+
+@XBlock.wants('user')
+@XBlock.wants('library_tools')  # Only needed in studio
 @XBlock.wants('studio_user_permissions')  # Only available in studio
 class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDescriptor, StudioEditableDescriptor):
     """
@@ -369,6 +635,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     resources_dir = 'assets/library_content'
 
     module_class = LibraryContentModule
+    category = 'library_content'
     mako_template = 'widgets/metadata-edit.html'
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
     js_module_name = "VerticalDescriptor"
@@ -631,7 +898,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     def definition_to_xml(self, resource_fs):
         """ Exports Library Content Module to XML """
-        xml_object = etree.Element('library_content')
+        xml_object = etree.Element(self.category)
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
@@ -641,6 +908,17 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             if field.is_set_on(self):
                 xml_object.set(field_name, unicode(field.read_from(self)))
         return xml_object
+
+
+@XBlock.wants('user')
+@XBlock.wants('library_tools')  # Only needed in studio
+@XBlock.wants('studio_user_permissions')  # Only available in studio
+class AdaptiveLibraryContentDescriptor(AdaptiveLibraryContentFields, LibraryContentDescriptor):
+    """
+    Descriptor class for LibraryContentModule XBlock.
+    """
+    module_class = AdaptiveLibraryContentModule
+    category = 'adaptive_library_content'
 
 
 class LibrarySummary(object):

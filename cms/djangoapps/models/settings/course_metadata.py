@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from xblock.fields import Scope
 
+from adaptive_learning.config.models import AdaptiveLearningEnabledFlag
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
@@ -61,6 +62,15 @@ class CourseMetadata(object):
         'highlights_enabled_for_messaging',
     ]
 
+    # A list of tuples (field_name, enabled_function) defining fields
+    # that should or shouldn't be shown in Advanced Settings based on course-specific settings.
+    # If `enabled_function(course_id)` returns False for a field identified by `field_name`,
+    # the field won't be shown in Advanced Settings for the course identfied by `course_id`.
+    COURSE_SPECIFIC_FILTERED_LIST = [
+        ('adaptive_learning_configuration',
+         AdaptiveLearningEnabledFlag.feature_enabled),
+    ]
+
     @classmethod
     def filtered_list(cls):
         """
@@ -111,6 +121,20 @@ class CourseMetadata(object):
         return filtered_list
 
     @classmethod
+    def course_specific_filtered_list(cls, course_descriptor):
+        """
+        Return list of fields that shouldn't be shown in the Advanced Settings
+        of a given course.
+        """
+        course_key = course_descriptor.location.course_key
+        filtered_list = [
+            field_name for field_name, enabled_function in cls.COURSE_SPECIFIC_FILTERED_LIST
+            if not enabled_function(course_key)
+        ]
+
+        return filtered_list
+
+    @classmethod
     def fetch(cls, descriptor):
         """
         Fetch the key:value editable course details for the given course from
@@ -119,7 +143,7 @@ class CourseMetadata(object):
         result = {}
         metadata = cls.fetch_all(descriptor)
         for key, value in metadata.iteritems():
-            if key in cls.filtered_list():
+            if key in cls.filtered_list() + cls.course_specific_filtered_list(descriptor):
                 continue
             result[key] = value
         return result

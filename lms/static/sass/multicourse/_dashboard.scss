@@ -1067,6 +1067,19 @@
       }
     }
 
+    .profile-sidebar {
+      .dashboard-revisions {
+        margin: ($baseline*2) 0;
+        border-top: 3px solid #0078b0;
+        padding: $baseline 0;
+        color: $link-color;
+        li {
+          list-style-type: disc;
+          color: $link-color;
+        }
+      }
+    }
+
     @include media-breakpoint-down(md) {
       @include padding($baseline/2, $baseline, $baseline/2, $baseline/2);
     }

@@ -12,6 +12,7 @@ from .usage_info import CourseUsageInfo
 # based on the user's access to the course blocks.
 COURSE_BLOCK_ACCESS_TRANSFORMERS = [
     library_content.ContentLibraryTransformer(),
+    library_content.AdaptiveContentLibraryTransformer(),
     start_date.StartDateTransformer(),
     user_partitions.UserPartitionTransformer(),
     visibility.VisibilityTransformer(),

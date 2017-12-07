@@ -1125,6 +1125,9 @@ INSTALLED_APPS = [
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # Adaptive Learning
+    'adaptive_learning'
 ]
 
 

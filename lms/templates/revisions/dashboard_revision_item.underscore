@@ -1,0 +1,16 @@
+<li>
+    <a href="<%- url %>">
+        <%- name %>
+        <% if (due_date) { %>
+            (<%= gettext("since") %> <%
+                var d = new Date(due_date*1000),
+                    fragments = [
+                        d.getDate(),
+                        d.getMonth() + 1,
+                        d.getFullYear()
+                    ];
+                print(fragments.join('/'));
+                %>)
+        <% } %>
+    </a>
+</li>

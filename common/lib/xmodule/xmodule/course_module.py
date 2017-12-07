@@ -173,6 +173,20 @@ class TextbookList(List):
 
 
 class CourseFields(object):
+    adaptive_learning_configuration = Dict(
+        display_name=_("Adaptive Learning Configuration"),
+        help=_(
+            "Enter configuration for accessing external service that provides adaptive learning features."
+        ),
+        default={
+            'url': '',
+            'api_version': '',
+            'instance_id': -1,
+            'access_token': '',
+        },
+        scope=Scope.settings
+    )
+
     lti_passports = List(
         display_name=_("LTI Passports"),
         help=_('Enter the passports for course LTI tools in the following format: "id:client_key:client_secret".'),

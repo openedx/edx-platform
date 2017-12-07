@@ -1,0 +1,14 @@
+<span class="title edit-name">
+    <% if (totalCount > 0 ) { %>
+        <%= interpolate(
+            ngettext(
+                "You have (%(num_items)s) pending revision:",
+                "You have (%(num_items)s) pending revisions:",
+                totalCount
+            ),
+            { num_items: totalCount },
+            true
+        ) %>
+    <% } %>
+</span>
+<ul class="revision-list"></ul>

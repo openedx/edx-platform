@@ -11,11 +11,13 @@ from third_party_auth import pipeline
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
+from adaptive_learning.config.models import AdaptiveLearningEnabledFlag
 %>
 
 <%
   cert_name_short = settings.CERT_NAME_SHORT
   cert_name_long = settings.CERT_NAME_LONG
+  adaptive_learning_enabled = AdaptiveLearningEnabledFlag.current().feature_enabled()
 %>
 
 
@@ -28,6 +30,14 @@ from openedx.core.djangolib.markup import HTML, Text
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
+
+% if adaptive_learning_enabled:
+  % for template_name in ["dashboard_revision_item", "dashboard_revision_list", "dashboard_revision_loading", "dashboard_revision_error"]:
+    <script type="text/template" id="${template_name}-tpl">
+      <%static:include path="revisions/${template_name}.underscore" />
+    </script>
+  % endfor
+% endif
 </%block>
 
 <%block name="js_extra">
@@ -63,6 +73,12 @@ from openedx.core.djangolib.markup import HTML, Text
         var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
         $('#content').prepend(banner.$el);
         banner.showMessage(${redirect_message | n, dump_js_escaped_json})
+    </%static:require_module>
+  % endif
+
+  % if adaptive_learning_enabled:
+    <%static:require_module module_name="js/revisions/dashboard_revision_factory" class_name="DashboardRevisionFactory">
+      DashboardRevisionFactory();
     </%static:require_module>
   % endif
 </%block>
@@ -210,6 +226,12 @@ from openedx.core.djangolib.markup import HTML, Text
 
               </ul>
             </div>
+
+            % if adaptive_learning_enabled:
+              <div id="dashboard-revisions" class="dashboard-revisions" aria-live="polite" aria-atomic="true">
+              </div>
+            % endif
+
           </div>
         % endif
       </div>
