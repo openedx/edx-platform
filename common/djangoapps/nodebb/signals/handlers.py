@@ -5,92 +5,87 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.onboarding.models import ExtendedProfile, UserInfoSurvey, InterestsSurvey, OrganizationSurvey
-from lms.djangoapps.onboarding.signals import save_interests
+from lms.djangoapps.onboarding.helpers import COUNTRIES
+from nodebb.helpers import get_fields_to_sync_with_nodebb
+from lms.djangoapps.onboarding.models import UserExtendedProfile, Organization
 from nodebb.models import DiscussionCommunity
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
+from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile
 from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
 
 
-@receiver(post_save, sender=UserInfoSurvey)
-@receiver(post_save, sender=ExtendedProfile)
-@receiver(post_save, sender=OrganizationSurvey)
-@receiver(save_interests, sender=InterestsSurvey)
-def sync_user_info_with_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """
-    Sync information b/w NodeBB User Profile and Edx User Profile, Surveys
+def log_action_response(user, status_code, response_body):
+    if status_code != 200:
+        log.error("Error: Can not update user(%s) on nodebb due to %s" % (user.username, response_body))
+    else:
+        log.info('Success: User(%s) has been updated on nodebb' % user.username)
 
+
+@receiver(post_save, sender=UserProfile)
+@receiver(post_save, sender=UserExtendedProfile)
+def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
+    Sync information b/w NodeBB User Profile and Edx User Profile
+    """
+
+    fields_to_sync_with_nodebb = get_fields_to_sync_with_nodebb()
+    #
+    # if not kwargs.get('update_fields') or (not kwargs['update_fields'] & set(fields_to_sync_with_nodebb)) \
+    #         and not created:
+    #     return
+
     user = instance.user
-
-    if user:
-        if sender == ExtendedProfile:
-            data_to_sync = {
-                "first_name": instance.first_name,
-                "last_name": instance.last_name
-            }
-
-            if instance.organization:
-                data_to_sync["organization"] = instance.organization.name
-
-        elif sender == UserInfoSurvey:
-            data_to_sync = {
-                "city_of_residence": instance.city_of_residence,
-                "country_of_residence": instance.country_of_residence,
-                # "birthday": instance.dob,
-                "country_of_employment": instance.country_of_employment,
-                "city_of_employment": instance.city_of_employment,
-                "birthday": "01/01/%s" % instance.year_of_birth,
-                "language": instance.language,
-            }
-        elif sender == OrganizationSurvey:
-            data_to_sync = {
-                "focus_area": instance.focus_area
-            }
-        elif sender == InterestsSurvey:
-            data_to_sync = {
-                'interests': [interest.label for interest in instance.capacity_areas.all()]
-            }
-        else:
-            return
-
-        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
-
-        if status_code != 200:
-            log.error(
-                "Error: Can not update user(%s) on nodebb due to %s" % (user.username, response_body)
-            )
-        else:
-            log.info('Success: User(%s) has been updated on nodebb' % user.username)
-
-
-@receiver(post_save, sender=ExtendedProfile, dispatch_uid='create_user_on_nodebb')
-def create_user_on_nodebb(sender, instance, created, **kwargs):
-    """
-    Create a new user on nodebb whenver a new user is created on edx platform
-    """
-    if created:
-        user_info = {
-            'edx_user_id': instance.user.id,
-            'email': instance.user.email,
-            'first_name': instance.first_name,
-            'last_name': instance.last_name,
-            'username': instance.user.username,
-            'organization': instance.organization.name,
-            'date_joined': instance.user.date_joined.strftime('%d/%m/%Y'),
+    if sender == UserProfile:
+        data_to_sync = {
+            "city_of_residence": instance.city,
+            "country_of_residence": COUNTRIES.get(instance.country.code, ''),
+            "birthday": "01/01/%s" % instance.year_of_birth,
+            "language": instance.language,
+        }
+    elif sender == UserExtendedProfile:
+        data_to_sync = {
+            "country_of_employment": COUNTRIES.get(instance.country_of_employment, ''),
+            "city_of_employment": instance.city_of_employment,
+            "interests": instance.get_user_selected_interests(),
+            "focus_area": instance.get_user_selected_functions()
         }
 
-        status_code, response_body = NodeBBClient().users.create(username=instance.user.username, kwargs=user_info)
+        if instance.organization:
+            data_to_sync["organization"] = instance.organization.label
 
-        if status_code != 200:
-            log.error("Error: Can not create user(%s) on nodebb due to %s" % (instance.user.username, response_body))
-        else:
-            log.info('Success: User(%s) has been created on nodebb' % instance.user.username)
+    status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
+    log_action_response(user, status_code, response_body)
+
+
+@receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
+def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
+    """
+        Create user account at nodeBB when user created at edx Platform
+    """
+    if created:
+        data_to_sync = {
+            'edx_user_id': instance.id,
+            'email': instance.email,
+            'first_name': instance.first_name,
+            'last_name': instance.last_name,
+            'username': instance.username,
+            'date_joined': instance.date_joined.strftime('%d/%m/%Y'),
+        }
+
+        status_code, response_body = NodeBBClient().users.create(username=instance.username, kwargs=data_to_sync)
+        log_action_response(instance, status_code, response_body)
 
         return status_code
+
+    else:
+        data_to_sync = {
+            'first_name': instance.first_name,
+            'last_name': instance.last_name
+        }
+        status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
+        log_action_response(instance, status_code, response_body)
 
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
@@ -104,12 +99,7 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
         status_code, response_body = NodeBBClient().users.activate(username=instance.username,
                                                                    active=instance.is_active)
 
-        if status_code != 200:
-            log.error("Error: Can not change active status of a user(%s) on nodebb due to %s"
-                      % (instance.username, response_body))
-        else:
-            log.info("Success: User(%s)'s active status('is_active:%s') has been changed on nodebb"
-                     % (instance.username, instance.is_active))
+        log_action_response(instance, status_code, response_body)
 
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")

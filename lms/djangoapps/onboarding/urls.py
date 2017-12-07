@@ -17,5 +17,6 @@ urlpatterns = [
     url(r"^get_user_organizations/$", views.get_user_organizations, name="get_user_organizations"),
     url(r"^get_currencies/$", views.get_currencies, name="get_currencies"),
     url(r"^organization_detail/$", views.org_detail_survey, name="org_detail_survey"), # signup step 4
+    url(r"^delete_account/$", views.delete_my_account, name="delete_my_account"), # signup step 4
     url(r"^admin_activate/(?P<org_id>[^/]*)/(?P<activation_key>[^/]*)$", views.admin_activation, name="admin_activation"),
 ]
