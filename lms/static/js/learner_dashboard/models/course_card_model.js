@@ -148,8 +148,8 @@
                 formatDateString: function(run) {
                     var pacingType = run.pacing_type,
                         dateString,
-                        start = run.start_date || this.get('start_date'),
-                        end = run.end_date || this.get('end_date'),
+                        start = this.valueIsDefined(run.start_date) ? run.start_date : this.get('start_date'),
+                        end = this.valueIsDefined(run.end_date) ? run.end_date : this.get('end_date'),
                         now = new Date(),
                         startDate = new Date(start),
                         endDate = new Date(end);
