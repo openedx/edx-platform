@@ -222,7 +222,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
                       <% course_refund_url = reverse('course_run_refund_status', args=[unicode(course_overview.id)]) %>
                           % if not is_course_blocked:
-                          <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
+                          <a href="#unenroll-modal" id="unenroll-${dashboard_index}" class="action action-unenroll" rel="leanModal"
                              data-course-id="${course_overview.id}"
                              data-course-number="${course_overview.number}"
                              data-course-name="${course_overview.display_name_with_default}"
@@ -234,7 +234,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                             ${_('Unenroll')}
                           </a>
                           % else:
-                          <a class="action action-unenroll is-disabled"
+                          <a id="unenroll-${dashboard_index}" class="action action-unenroll is-disabled"
                              data-course-id="${course_overview.id}"
                              data-course-number="${course_overview.number}"
                              data-course-name="${course_overview.display_name_with_default}"
