@@ -51,24 +51,33 @@ def find_fixme(options):
     num_fixme = 0
     systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
 
+    process_list = []
     for system in systems:
         # Directory to put the pylint report in.
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        apps_list = ' '.join(top_python_dirs(system))
+        apps_list = top_python_dirs(system)
 
-        cmd = (
-            "pylint --disable all --enable=fixme "
-            "--output-format=parseable {apps} "
-            "> {report_dir}/pylint_fixme.report".format(
-                apps=apps_list,
-                report_dir=report_dir
-            )
-        )
+        args = [
+            'pylint',
+            '--disable=all',
+            '--enable=fixme',
+            '--output-format=parseable'
+        ] + apps_list
 
-        sh(cmd, ignore_error=True)
+        with open("{}/pylint_fixme.report".format(report_dir), 'w') as report:
+            print("RUNNING: {}".format(' '.join(args)))
+            process_list.append((
+                system,
+                Popen(
+                    args,
+                    stdout=report
+                )
+            ))
 
+    for system, process in process_list:
+        process.communicate()
         num_fixme += _count_pylint_violations(
             "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
 
