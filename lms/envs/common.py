@@ -2969,6 +2969,10 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
+### Analytics API
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "http://localhost:18100"
+
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
