@@ -6,10 +6,12 @@
     define([
         'backbone',
         'underscore',
+        'gettext',
         'jquery',
-        'edx-ui-toolkit/js/utils/date-utils'
+        'edx-ui-toolkit/js/utils/date-utils',
+        'edx-ui-toolkit/js/utils/string-utils'
     ],
-        function(Backbone, _, $, DateUtils) {
+        function(Backbone, _, gettext, $, DateUtils, StringUtils) {
             return Backbone.Model.extend({
                 initialize: function(data) {
                     if (data) {
@@ -140,7 +142,7 @@
 
                 formatDateString: function(run) {
                     var pacingType = run.pacing_type,
-                        dateString = '',
+                        dateString,
                         start = this.get('start_date') || run.start_date,
                         end = this.get('end_date') || run.end_date,
                         now = new Date(),
@@ -148,21 +150,24 @@
                         endDate = new Date(end);
 
                     if (pacingType === 'self_paced') {
-                        dateString = 'Self-paced';
-                        if (start && startDate > now) {
-                            dateString += ' - Starts ' + start;
+                        if (start) {
+                            dateString = startDate > now ?
+                                StringUtils.interpolate(gettext('(Self-paced) Starts {start}'), {start: start}) :
+                                StringUtils.interpolate(gettext('(Self-paced) Started {start}'), {start: start});
                         } else if (end && endDate > now) {
-                            dateString += ' - Ends ' + end;
+                            dateString = StringUtils.interpolate(gettext('(Self-paced) Ends {end}'), {end: end});
                         } else if (end && endDate < now) {
-                            dateString += ' - Ended ' + end;
+                            dateString = StringUtils.interpolate(gettext('(Self-paced) Ended {end}'), {end: end});
                         }
                     } else {
                         if (start && end) {
                             dateString = start + ' - ' + end;
                         } else if (start) {
-                            dateString = 'Starts ' + start;
+                            dateString = startDate > now ?
+                                StringUtils.interpolate(gettext('Starts {start}'), {start: start}) :
+                                StringUtils.interpolate(gettext('Started {start}'), {start: start});
                         } else if (end) {
-                            dateString = 'Ends ' + end;
+                            dateString = StringUtils.interpolate(gettext('Ends {end}'), {end: end});
                         }
                     }
                     return dateString;
