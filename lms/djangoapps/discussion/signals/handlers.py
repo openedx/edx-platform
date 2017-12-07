@@ -7,7 +7,6 @@ from django.dispatch import receiver
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common import signals
-from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS, SEND_NOTIFICATIONS_FOR_COURSE
 from lms.djangoapps.discussion import tasks
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -21,14 +20,6 @@ ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY = 'enable_forum_notifications'
 
 @receiver(signals.comment_created)
 def send_discussion_email_notification(sender, user, post, **kwargs):
-    if not waffle().is_enabled(FORUM_RESPONSE_NOTIFICATIONS):
-        log.debug('Discussion: Response notifications waffle switch not enabled')
-        return
-
-    if not SEND_NOTIFICATIONS_FOR_COURSE.is_enabled(CourseKey.from_string(post.thread.course_id)):
-        log.debug('Discussion: Response notifications not enabled for course: %s.', post.thread.course_id)
-        return
-
     current_site = get_current_site()
     if current_site is None:
         log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
