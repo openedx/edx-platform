@@ -10,8 +10,16 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
 # Start with the common settings
-from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .common import *
 from openedx.core.lib.derived import derive_settings
 
 # Use an in-memory database since this settings file is only used for updating assets

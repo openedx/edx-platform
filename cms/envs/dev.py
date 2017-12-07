@@ -1,5 +1,10 @@
 """
-This config file runs the simplest dev environment"""
+This config file runs the simplest dev environment.
+"""
+
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order, wrong-import-position
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
@@ -176,7 +181,7 @@ CMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *  # pylint: disable=import-error
+    from .private import *
 except ImportError:
     pass
 

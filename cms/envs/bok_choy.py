@@ -10,6 +10,14 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order, wrong-import-position
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
 import os
 from path import Path as path
 
@@ -24,7 +32,7 @@ from openedx.core.release import RELEASE_LINE
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .aws import *
 
 ######################### Testing overrides ####################################
 
@@ -147,6 +155,6 @@ if RELEASE_LINE == "master":
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=import-error
+    from .private import *
 except ImportError:
     pass

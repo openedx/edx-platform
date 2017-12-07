@@ -7,6 +7,10 @@ so that we can run the lettuce acceptance tests.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order, wrong-import-position
+
 from .test import *
 from lms.envs.sauce import *
 
@@ -26,6 +30,7 @@ import os
 
 def seed():
     return os.getppid()
+
 
 # Silence noisy logs
 LOG_OVERRIDES = [
@@ -132,7 +137,7 @@ SELENIUM_GRID = {
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *  # pylint: disable=import-error
+    from .private import *
 except ImportError:
     pass
 

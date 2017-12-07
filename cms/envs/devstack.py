@@ -2,9 +2,17 @@
 Specific overrides to the base prod settings to make development easier.
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order, wrong-import-position
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
 from os.path import abspath, dirname, join
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .aws import *
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
