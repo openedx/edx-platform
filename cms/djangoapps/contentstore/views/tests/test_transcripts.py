@@ -526,7 +526,7 @@ class TestDownloadTranscripts(BaseTranscripts):
 
         self.assertEqual(resp.status_code, 404)
 
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
@@ -567,7 +567,7 @@ class TestDownloadTranscripts(BaseTranscripts):
             self.assertEqual(response.get(attribute), value)
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
         Mock(return_value=False),
     )
     def test_download_fallback_transcript_feature_disabled(self):
@@ -829,7 +829,7 @@ class TestCheckTranscripts(BaseTranscripts):
         (False, 'not_found')
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled')
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data', Mock(return_value=True))
     def test_command_for_fallback_transcript(self, feature_enabled, expected_command, video_transcript_feature):
         """

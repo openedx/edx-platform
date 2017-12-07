@@ -887,7 +887,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_transcripts_with_feature_enabled(self, transcripts, english_sub, val_transcripts,
                                                   expected_transcripts, mock_get_transcript_languages):
@@ -939,7 +939,7 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
         self.api_response(expected_response_code=200, lang='en')
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
         Mock(return_value=True),
     )
     @patch(
@@ -976,7 +976,7 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
             self.assertEqual(response.get(attribute), value)
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
         Mock(return_value=False),
     )
     @patch(

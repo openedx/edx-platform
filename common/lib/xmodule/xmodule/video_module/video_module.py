@@ -44,9 +44,11 @@ from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
     get_video_ids_info,
-    is_val_transcript_feature_enabled_for_course,
     Transcript,
     VideoTranscriptsMixin,
+)
+from .transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url

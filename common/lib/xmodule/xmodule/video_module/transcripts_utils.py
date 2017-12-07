@@ -12,7 +12,6 @@ from pysrt import SubRipTime, SubRipItem, SubRipFile
 from lxml import etree
 from HTMLParser import HTMLParser
 
-from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -498,16 +497,6 @@ def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     video_ids = filter(lambda item: bool(clean(item)), video_ids)
 
     return external, video_ids
-
-
-def is_val_transcript_feature_enabled_for_course(course_id):
-    """
-    Get edx-val transcript feature flag
-
-    Arguments:
-        course_id(CourseKey): Course key identifying a course whose feature flag is being inspected.
-    """
-    return VideoTranscriptEnabledFlag.feature_enabled(course_id=course_id)
 
 
 def get_video_transcript_content(language_code, edx_video_id, youtube_id_1_0, html5_sources):
