@@ -125,7 +125,7 @@ class CourseEntitlement(TimeStampedModel):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
     course_uuid = models.UUIDField(help_text='UUID for the Course, not the Course Run')
     expired_at = models.DateTimeField(
         null=True,
@@ -212,3 +212,10 @@ class CourseEntitlement(TimeStampedModel):
         Returns a boolean as to whether or not the entitlement can be redeemed based on the entitlement's policy
         """
         return self.policy.is_entitlement_redeemable(self)
+
+    @classmethod
+    def set_enrollment(cls, entitlement, enrollment):
+        """
+        Fulfills an entitlement by specifying a session.
+        """
+        cls.objects.filter(id=entitlement.id).update(enrollment_course_run=enrollment)
