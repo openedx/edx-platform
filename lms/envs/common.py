@@ -3007,6 +3007,38 @@ PROFILE_IMAGE_SIZES_MAP = {
     'small': 30
 }
 
+# ORGANIZATION LOGO CONFIG
+# WARNING: Certain django storage backends do not support atomic
+# file overwrites (including the default, OverwriteStorage) - instead
+# there are separate calls to delete and then write a new file in the
+# storage backend.  This introduces the risk of a race condition
+# occurring when a user uploads a new logo image to replace an
+# earlier one (the file will temporarily be deleted).
+ORGANIZATION_LOGO_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': os.path.join(MEDIA_ROOT, 'organization-logo-images/'),
+        'base_url': os.path.join(MEDIA_URL, 'organization-logo-images/'),
+    },
+}
+
+# This secret key is used in generating unguessable URLs to users'
+# profile images.  Once it has been set, changing it will make the
+# platform unaware of current image URLs, resulting in reverting all
+# users' profile images to the default placeholder image.
+ORGANIZATION_LOGO_IMAGE_SECRET_KEY = 'placeholder secret key'
+ORGANIZATION_LOGO_IMAGE_DEFAULT_FILENAME = 'images/organization-logo/default'
+ORGANIZATION_LOGO_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+
+# logo image for organization in mobile apps
+ORGANIZATION_LOGO_IMAGE_SIZES_MAP = {
+    'full': '500x135',
+    'large': '375x105',
+    'medium': '250x70',
+    'small': '187x52',
+    'x-small': '125x35',
+}
+
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
 HOMEPAGE_COURSE_MAX = None

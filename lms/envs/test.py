@@ -628,6 +628,27 @@ PROFILE_IMAGE_SECRET_KEY = 'secret'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
+# Set dummy values for organization logo image settings.
+ORGANIZATION_LOGO_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': os.path.join(MEDIA_ROOT, 'organization-logo-images/'),
+        'base_url': os.path.join(MEDIA_URL, 'organization-logo-images/'),
+    },
+}
+ORGANIZATION_LOGO_IMAGE_SECRET_KEY = 'placeholder secret key'
+ORGANIZATION_LOGO_IMAGE_DEFAULT_FILENAME = 'images/organization-logo/default'
+ORGANIZATION_LOGO_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+
+# logo image for organization in mobile apps
+ORGANIZATION_LOGO_IMAGE_SIZES_MAP = {
+    'full': '500x135',
+    'large': '375x105',
+    'medium': '250x70',
+    'small': '187x52',
+    'x-small': '125x35',
+}
+
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
