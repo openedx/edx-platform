@@ -89,7 +89,6 @@ def login_and_registration_form(request, initial_mode="login"):
             except User.DoesNotExist:
                 pass
             else:
-                pipeline.sync_user_with_sso_provider_data(current_provider, user_details, user)
                 return redirect(reverse('signin_user'), next=redirect_to)
 
     # Retrieve the form descriptions from the user API

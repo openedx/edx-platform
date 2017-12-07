@@ -2128,7 +2128,6 @@ def _apply_third_party_auth_overrides(request, extra_fields):
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
             # Make input fields read-only for fields passed in via SSO callback data.
             if current_provider and current_provider.sync_learner_profile_data:
-
                 for field_name, field_value in extra_fields.items():
                     if field_name not in REGISTRATION_DISPLAY_FIELD_NAMES_FOR_THIRD_PARTY_AUTH and \
                             field_value == 'required':
