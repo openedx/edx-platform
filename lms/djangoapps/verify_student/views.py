@@ -265,10 +265,11 @@ class PayAndVerifyView(View):
         #   let someone upgrade into a verified track if they can't complete verification?
         #
         verification_deadline = VerificationDeadline.deadline_for_course(course.id)
-        response = self._response_if_deadline_passed(course, self.VERIFICATION_DEADLINE, verification_deadline)
-        if response is not None:
-            log.info(u"Verification deadline for '%s' has passed.", course.id)
-            return response
+        if not settings.FEATURES.get('IGNORE_VERIFICATION_DEADLINE_FOR_PAY', False):
+            response = self._response_if_deadline_passed(course, self.VERIFICATION_DEADLINE, verification_deadline)
+            if response is not None:
+                log.info(u"Verification deadline for '%s' has passed.", course.id)
+                return response
 
         # Retrieve the relevant course mode for the payment/verification flow.
         #
