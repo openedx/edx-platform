@@ -1095,6 +1095,8 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
+# The time a block needs to be viewed to be considered complete, in milliseconds.
+COMPLETION_BY_VIEWING_DELAY_MS = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS', COMPLETION_BY_VIEWING_DELAY_MS)
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
