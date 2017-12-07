@@ -70,7 +70,7 @@ def find_fixme(options):
         with open(report_file, 'w') as report:
             print("RUNNING: {}".format(' '.join(args)))
             process_list.append((
-                report_dir,
+                report_file,
                 Popen(
                     args,
                     stdout=report
