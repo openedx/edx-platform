@@ -118,17 +118,17 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
                 '--output-format=parseable'
             ] + apps_list
 
-            with open("{}/pylint.report".format(report_dir), 'w') as report:
+            with open(system_report, 'w') as report:
                 print("RUNNING: {}".format(' '.join(args)))
                 process_list.append((
-                    system,
+                    system_report,
                     Popen(
                         args,
                         stdout=report
                     )
                 ))
 
-    for system, process in process_list:
+    for system_report, process in process_list:
         process.communicate()
         num_violations += _count_pylint_violations(system_report)
         with open(system_report) as report_contents:
