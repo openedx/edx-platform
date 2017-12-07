@@ -349,7 +349,8 @@
                   .action {
                     @include margin-right(0);
 
-                    &:hover, &:focus {
+                    &:hover,
+                    &:focus {
                       border: 1px solid transparent;
                     }
                   }
@@ -361,7 +362,7 @@
           .course-status {
             background: $yellow;
             border: 1px solid $border-color-2;
-            box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
+            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             margin-top: 17px;
 
             @include margin-right(flex-gutter());
@@ -971,18 +972,16 @@
 
           .action-certificate .btn {
             @extend %btn-inherited-primary;
-
             @include box-sizing(border-box);
+            @include padding(7px, ($baseline*0.75), 7px, ($baseline*0.75));
 
             float: none;
             border-radius: 3px;
             display: block;
-
-                    @include padding(7px, ($baseline*0.75), 7px, ($baseline*0.75));
-
             text-align: center;
 
-            a:link, a:visited {
+            a:link,
+            a:visited {
               color: #fff;
             }
           }
