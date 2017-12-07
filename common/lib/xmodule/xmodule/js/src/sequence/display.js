@@ -7,7 +7,7 @@
     this.Sequence = (function() {
         function Sequence(element) {
             var self = this;
-            //alert("in Sequence for element" + element);
+            console.log("in Sequence for element" + element);
             this.removeBookmarkIconFromActiveNavItem = function(event) {
                 return Sequence.prototype.removeBookmarkIconFromActiveNavItem.apply(self, [event]);
             };
@@ -63,18 +63,20 @@
             this.ajaxUrl = this.el.data('ajax-url');
             this.nextUrl = this.el.data('next-url');
             this.prevUrl = this.el.data('prev-url');
-            this.gateContent = this.el.data('gate-content');
+            this.gateContent = this.el.data('gate-content').toLowerCase();
             this.prereqUrl = this.el.data('prereq-url');
             this.prereqSectionName = this.el.data('prereq-section-name');
             this.unitName  = this.el.data('unit-name');
-            this.scoreReached = this.el.data('score-reached');
-            this.calculateScore = this.el.data('calculate-score');
+            this.scoreReached = this.el.data('score-reached').toLowerCase();
+            this.calculateScore = this.el.data('calculate-score').toLowerCase();
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
             this.bind();
             this.render(parseInt(this.el.data('position'), 10));
-            if (this.calculateScore) {
-                this.recalcGrade();
+            console.log("calculateScore=" + this.calculateScore + " typeof=" + (typeof this.calculateScore));
+            if (this.calculateScore == "True" || this.calculateScore == "true") {
+                // TODO - remove setTimeout, just for testing
+                setTimeout(this.recalcGrade, 200);
             }
         }
 
@@ -111,6 +113,9 @@
                     self.sr_container = self.$('.sr-is-focusable');
                     self.num_contents = self.contents.length;
                     self.bind();
+                    // TODO - for some reason the content only renders for HTML
+                    // And not for Problems/Videos. How to force rendering of
+                    // the Xblocks?
                     self.render(1);
                 }
             );
@@ -134,14 +139,15 @@
                     self.gateContent = response.gate_content;
                     self.scoreReached = response.score_reached;
                     self.calculateScore = response.calculate_score;
+                    console.log("scoreReached=" + self.scoreReached + " type=" + (typeof self.scoreReached));
                     $('.ui-loading').hide();
                     $('#main-content').html(response.html);
-                    if (self.scoreReached) {
+                    if (self.scoreReached == true) {
                         // if we reached the score, load the contents
                         // after a short delay
-                        self.el.find('.icon .fa .fa-lock').removeClass('fa-lock').addClass('fa-unlock');
+                        $('.fa-lock').removeClass('fa-lock').addClass('fa-unlock');
                         $('#loading-content').show();
-                        setTimeout(self.loadSeqContents, 6000);
+                        setTimeout(self.loadSeqContents, 3000);
                     }
                 }
             );
@@ -240,7 +246,7 @@
             *   'new_content_state' is the updated content of the problem.
             *   'new_state' is the updated state of the problem.
             */
-            alert("in addToUpdatedProblems for problemId=" + problemId);
+            console.log("in addToUpdatedProblems for problemId=" + problemId);
             // initialize for the current sequence if there isn't any updated problem for this position.
             if (!this.anyUpdatedProblems(this.position)) {
                 this.updatedProblems[this.position] = {};
@@ -325,7 +331,7 @@
 
                 if (this.anyUpdatedProblems(newPosition)) {
                     $.each(this.updatedProblems[newPosition], function(problemId, latestData) {
-                        alert("updating problem index=" + newPosition + " problemId=" + problemId);
+                        console.log("updating problem index=" + newPosition + " problemId=" + problemId);
                         var latestContent, latestResponse;
                         latestContent = latestData[0];
                         latestResponse = latestData[1];

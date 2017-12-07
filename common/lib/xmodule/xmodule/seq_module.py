@@ -208,7 +208,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         elif dispatch == 'recalc_grade':
             # force a grade recalculation
             unlock = self._is_prereq_met(True)
-            unlock = True
 
             params = {
                 'gate_content': not unlock,
@@ -350,8 +349,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'prereq_url': milestone_meta_info['url'] if gate_content else None,
             'prereq_section_name': milestone_meta_info['display_name'] if gate_content else None,
             'unit_name': "My Unit",
-            'score_reached': False,
-            'calculate_score': True
+            'score_reached': not gate_content,
+            'calculate_score': gate_content
         }
 
         fragment.add_content(self.system.render_template("seq_module.html", params))

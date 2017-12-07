@@ -36,7 +36,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <p>
         % if score_reached:
         <h3>
-            <span class="icon fa fa-check-circle-o" aria-hidden="true">&nbsp</span>${_("Congratulations you have unlocked this section!")}
+            <span class="icon fa fa-check-circle-o" style="color:green" aria-hidden="true">&nbsp</span>${_("Congratulations you have unlocked this section!")}
             <div id="loading-content" class="ui-loading is-hidden">
                     <p>
                     <span class="spin">
@@ -53,9 +53,6 @@ from openedx.core.djangolib.markup import HTML, Text
             )).format(section_name=prereq_section_name)}
             <p>
                 <button><a href="${prereq_url}">${_("Go to Prerequiste Section")}</a></button>
-            </p>
-            <p>
-                <button><span class="recalc-grade">Recalculate Grade</span></button>
             </p>
         % endif
     </p>

@@ -371,11 +371,10 @@ def is_prereq_met(course_id, content_id, user_id, recalc_on_unmet=False):
         user_id: The id of the user
         recalc_on_unmet: Recalculate the grade if prereq has not yet been met
     """
-    # first check source of truth.. the database
     #prereq_met = milestones_api.user_has_milestone({'id': user_id}, milestone)
+    # if unfullfilled milestones exist it means prereq has not been met
     unfulfilled_milestones = milestones_api.get_course_content_milestones(course_id, content_id, 'requires', {'id': user_id})
     prereq_met = not unfulfilled_milestones
-
 
     if prereq_met or not recalc_on_unmet:
         return prereq_met
@@ -396,9 +395,11 @@ def is_prereq_met(course_id, content_id, user_id, recalc_on_unmet=False):
             subsection_percentage = _get_subsection_percentage(subsection_grade)
             if subsection_percentage >= min_percentage:
                 prereq_met = True
+                # TODO - should save to database here or let happen through async listener?
                 #milestones_helpers.add_user_milestone({'id': user.id}, prereq_milestone)
             else:
                 prereq_met = False
+                # TODO - should save to database here or let happen through async listener
                 #milestones_helpers.remove_user_milestone({'id': user.id}, prereq_milestone)
 
     return prereq_met
