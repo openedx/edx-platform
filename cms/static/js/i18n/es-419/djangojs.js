@@ -452,7 +452,6 @@
     "Create a content group": "Crear contenido de grupo", 
     "Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know.": "Crea un nuevo equipo si no puedes encontrar uno existente para unirte o si deseas aprender con personas que ya conoces.", 
     "Create account using %(providerName)s.": "Crear una cuenta usando %(providerName)s", 
-    "Create an Account": "Crear una cuenta", 
     "Create an Account.": "Crear una cuenta.", 
     "Create an account using": "Crear una cuenta usando", 
     "Create team.": "Crear el equipo.", 
