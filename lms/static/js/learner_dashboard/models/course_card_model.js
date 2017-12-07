@@ -148,8 +148,8 @@
                 formatDateString: function(run) {
                     var pacingType = run.pacing_type,
                         dateString,
-                        start = this.get('start_date') || run.start_date,
-                        end = this.get('end_date') || run.end_date,
+                        start = run.start_date || this.get('start_date'),
+                        end = run.end_date || this.get('end_date'),
                         now = new Date(),
                         startDate = new Date(start),
                         endDate = new Date(end);
@@ -226,7 +226,7 @@
                 updateCourseRun: function(courseRunKey) {
                     var selectedCourseRun = _.findWhere(this.get('course_runs'), {key: courseRunKey});
                     if (selectedCourseRun) {
-                        // Set the course run to the enrolled state
+                        // Update the current context to set the course run to the enrolled state
                         _.each(this.context.course_runs, function(run) {
                             if (run.key === selectedCourseRun.key) run.is_enrolled = true; // eslint-disable-line no-param-reassign, max-len
                         });

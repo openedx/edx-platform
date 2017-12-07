@@ -1044,8 +1044,8 @@
 
       .related-programs-preface {
         @include float(left);
-        @include margin-right($baseline/2;)
 
+        margin: 0 $baseline/2;
         font-weight: bold;
       }
 

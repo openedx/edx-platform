@@ -85,15 +85,12 @@ defineFn(['common/js/vendor/bootstrap']);
                  },
 
                  postRender: function() {
-                     // Close popover on click-away
+                     // Close any visible popovers on click-away
                      $(document).on('click', function(e) {
-                         if (!($(e.target).closest('.enroll-btn-initial, .popover').length)) {
+                         if (this.$('.popover:visible').length &&
+                             !($(e.target).closest('.enroll-btn-initial, .popover').length)) {
                              this.hideDialog(this.$('.enroll-btn-initial'));
                          }
-                     }.bind(this));
-
-                     this.$('.enroll-btn-initial').click(function(e) {
-                         this.showDialog($(e.target));
                      }.bind(this));
                  },
 
@@ -291,7 +288,6 @@ defineFn(['common/js/vendor/bootstrap']);
                       */
                      var confirmationMsgTitle,
                          confirmationMsgBody,
-                         popoverDialogHtml,
                          currentSessionId = this.entitlementModel.get('currentSessionId'),
                          newSessionId = this.$('.session-select').find('option:selected').data('session_id');
 
@@ -307,41 +303,35 @@ defineFn(['common/js/vendor/bootstrap']);
                          confirmationMsgBody = gettext('Any course progress or grades from your current session will be lost.'); // eslint-disable-line max-len
                      }
 
-                     // Remove existing popover and re-initialize
-                     this.removeDialog(invokingElement);
-                     popoverDialogHtml = this.verificationTpl({
-                         confirmationMsgTitle: confirmationMsgTitle,
-                         confirmationMsgBody: confirmationMsgBody
-                     });
-
+                     // Re-initialize the popover
                      invokingElement.popover({
                          placement: 'bottom',
                          container: this.$el,
                          html: true,
                          trigger: 'click',
-                         animation: true,
-                         content: popoverDialogHtml.text
+                         content: this.verificationTpl({
+                             confirmationMsgTitle: confirmationMsgTitle,
+                             confirmationMsgBody: confirmationMsgBody
+                         }).text
                      });
                  },
 
                  removeDialog: function(el) {
                      /* Removes the Bootstrap v4 dialog modal from the update session enrollment button. */
                      var $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
-                     $el.popover('dispose');
-                 },
-
-                 showDialog: function(invokingElement) {
-                     /* Given an element with an associated dialog modal, shows the modal. */
-                     invokingElement.popover('show');
-                     this.$('.final-confirmation-btn:first').focus();
+                     if (this.$('popover').length) {
+                        $el.popover('dispose');
+                     }
                  },
 
                  hideDialog: function(el, returnFocus) {
-                     /* Hides the  modal without removing it from the DOM. */
+                     /* Hides the modal if it is visible without removing it from the DOM. */
                      var $el = el instanceof jQuery ? el : this.$('.enroll-btn-initial');
-                     $el.popover('hide');
-                     if (returnFocus) {
-                         $el.focus();
+                     if (this.$('.popover:visible').length) {
+                         $el.popover('hide');
+                         if (returnFocus) {
+                             $el.focus();
+                         }
                      }
                  },
 
@@ -399,7 +389,7 @@ defineFn(['common/js/vendor/bootstrap']);
                          formattedSession.enrollment_end = this.formatDate(formattedSession.enrollment_end, dateFormat);
                          formattedSession.session_dates = this.courseCardModel.formatDateString({
                              start_date: session.advertised_start || startDate,
-                             end_date: session.advertised_start ? null : endDate,
+                             end_date: session.advertised_start ? '' : endDate,
                              pacing_type: formattedSession.pacing_type
                          });
                          return formattedSession;
@@ -407,7 +397,7 @@ defineFn(['common/js/vendor/bootstrap']);
                  },
 
                  formatDate: function(date, dateFormat) {
-                     return date ? moment((new Date(date))).format(dateFormat) : null;
+                     return date ? moment((new Date(date))).format(dateFormat) : '';
                  },
 
                  getAvailableSessionWithId: function(sessionId) {
