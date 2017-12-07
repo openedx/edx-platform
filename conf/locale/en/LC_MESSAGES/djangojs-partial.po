@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 13:03+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.458020\n"
+"POT-Creation-Date: 2017-12-07 11:32+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.294797\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1783,6 +1783,168 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
+msgstr ""
+
+#: common/static/bundles/AssetsPage.bace7aaf2adb48c51598.js
+msgid "end"
+msgstr ""
+
+#: common/static/bundles/CourseGoals.c4996c40fda9d3059c82.js
+msgid "Thank you for setting your course goal to "
+msgstr ""
+
+#: common/static/bundles/CourseGoals.c4996c40fda9d3059c82.js
+msgid ""
+"There was an error in setting your goal, please reload the page and try "
+"again."
+msgstr ""
+
+#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+
+#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr ""
+
+#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show more"
+msgstr ""
+
+#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "Show less"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Please fix the following errors:"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Files that you upload must be smaller than 5MB in size."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid ""
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Something went wrong. Please try again later."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Add Attachment"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "(Optional)"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Remove file"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Course Name"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "What can we help you with, "
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Details"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Submit"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Sign in to "
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Sign in"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Create an "
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Enter a valid email address."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Enter a subject for your support request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Enter some details for your support request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Contact Us"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Find answers to the top questions asked by learners."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Go to my Dashboard"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Go to "
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid ""
+"Thank you for submitting a request! We will contact you within 24 hours."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+msgid "Cancel upload"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
+msgid "Organization:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
+msgid "Course Number:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
+msgid "Course Run:"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
+msgid "(Read-only)"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
+msgid "Re-run Course"
+msgstr ""
+
+#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
+msgid "View Live"
 msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js
@@ -3894,10 +4056,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr ""
-
-#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr ""
 
@@ -4583,22 +4741,6 @@ msgstr ""
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show more"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "Show less"
 msgstr ""
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js

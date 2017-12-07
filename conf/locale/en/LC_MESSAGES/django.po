@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 13:05+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.377689\n"
+"POT-Creation-Date: 2017-12-07 11:34+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.240520\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5972,18 +5972,6 @@ msgid ""
 "sailthru."
 msgstr ""
 
-#: lms/djangoapps/grades/admin.py lms/djangoapps/instructor/views/api.py
-msgid "Course Id"
-msgstr ""
-
-#: lms/djangoapps/grades/admin.py
-msgid "Usage Key"
-msgstr ""
-
-#: lms/djangoapps/grades/admin.py
-msgid "User Id"
-msgstr ""
-
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #, python-brace-format
 msgid "{platform_name} Staff"
@@ -6262,6 +6250,11 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Coupon Code"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -9458,11 +9451,15 @@ msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\").
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
-msgid "KnownErrorCases"
+msgid "Known Error Case"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Schedule start < course start"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
@@ -9489,6 +9486,11 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/models.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
 msgid "Schedule"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
+#, python-format
+msgid " By %(filter_title)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
@@ -14156,7 +14158,27 @@ msgid "Updates to Discussion Posts You Follow"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
+msgid "Purchase the Program ("
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -14225,18 +14247,6 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -18440,10 +18450,6 @@ msgstr ""
 msgid "Important Course Dates"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr ""
@@ -18492,6 +18498,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
@@ -18810,6 +18820,10 @@ msgstr ""
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
+msgstr ""
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
@@ -21807,6 +21821,10 @@ msgstr ""
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX

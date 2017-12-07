@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 13:05+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.377689\n"
+"POT-Creation-Date: 2017-12-07 11:34+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.240520\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6620,18 +6620,6 @@ msgstr ""
 "فاث رعوزثق خب سثذخريس فخ يثمشغ/فهوثخعف صشهف فخ لثف ذخخنهث دشمعثس بقخو "
 "سشهمفاقع."
 
-#: lms/djangoapps/grades/admin.py lms/djangoapps/instructor/views/api.py
-msgid "Course Id"
-msgstr "ذخعقسث هي"
-
-#: lms/djangoapps/grades/admin.py
-msgid "Usage Key"
-msgstr "عسشلث نثغ"
-
-#: lms/djangoapps/grades/admin.py
-msgid "User Id"
-msgstr "عسثق هي"
-
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #, python-brace-format
 msgid "{platform_name} Staff"
@@ -6926,6 +6914,11 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Coupon Code"
 msgstr "ذخعحخر ذخيث"
+
+#: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
+msgstr "ذخعقسث هي"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "% Discount"
@@ -10503,12 +10496,16 @@ msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\").
 msgstr "حشفا عسثي فخ ذخرسفقعذف عقمس فخ حقخلقشوس وشقنثفهرل حشلثس (ث.ل., \"/بخخ\")."
 
 #: openedx/core/djangoapps/schedules/admin.py
-msgid "KnownErrorCases"
-msgstr "نرخصرثققخقذشسثس"
+msgid "Known Error Case"
+msgstr "نرخصر ثققخق ذشسث"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Schedule start < course start"
 msgstr "سذاثيعمث سفشقف < ذخعقسث سفشقف"
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
+msgstr "شمم"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
@@ -10535,6 +10532,11 @@ msgstr "يثشيمهرث زغ صاهذا فاث مثشقرثق وعسف عحلق
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
 msgid "Schedule"
 msgstr "سذاثيعمث"
+
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " زغ %(filter_title)s "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
@@ -15751,8 +15753,28 @@ msgid "Updates to Discussion Posts You Follow"
 msgstr "عحيشفثس فخ يهسذعسسهخر حخسفس غخع بخممخص"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
-msgstr "حعقذاشسث فاث حقخلقشو"
+msgid "Purchase the Program ("
+msgstr "حعقذاشسث فاث حقخلقشو ("
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr "خقهلهرشم حقهذث"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr "${oldPrice}"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr "يهسذخعرفثي حقهذث"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr "${newPrice}"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
+msgstr "{currency})"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Start Learning"
@@ -15823,18 +15845,6 @@ msgstr "{number_of_courses} ذخعقسثس هر حقخلقشو"
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
 msgstr "حقهذث (عسي)"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr "خقهلهرشم حقهذث"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr "${oldPrice}"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
-msgstr "يهسذخعرفثي حقهذث"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${newPrice}{htmlEnd} for entire program"
@@ -20527,10 +20537,6 @@ msgstr "سخوث قهلافس قثسثقدثي"
 msgid "Important Course Dates"
 msgstr "هوحخقفشرف ذخعقسث يشفثس"
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr "فخيشغ هس {date}"
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr "ساخص/اهيث"
@@ -20582,6 +20588,10 @@ msgstr "{subsection_format} يعث {{date}}"
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
+msgstr "فخيشغ هس {date}"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
@@ -20955,6 +20965,10 @@ msgstr ""
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
 msgstr "هب فاث حقخزمثو حثقسهسفس, حمثشسث ثوشهم عس شف {email_link}."
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
+msgstr "سفعيهخ شذذثسسهزهمهفغ حخمهذغ"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
@@ -24457,6 +24471,10 @@ msgid ""
 msgstr ""
 "صث'دث سثرف شر ثوشهم وثسسشلث فخ {email} صهفا هرسفقعذفهخرس بخق شذفهدشفهرل غخعق"
 " شذذخعرف."
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
+msgstr "شذذثسسهزهمهفغ شذذخووخيشفهخر قثضعثسف"
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.

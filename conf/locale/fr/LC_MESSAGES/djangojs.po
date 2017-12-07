@@ -170,9 +170,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-14 09:29+0000\n"
-"PO-Revision-Date: 2017-11-14 09:49+0000\n"
-"Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
+"POT-Creation-Date: 2017-12-06 10:06+0000\n"
+"PO-Revision-Date: 2017-12-05 09:15+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -249,7 +249,6 @@ msgstr "Supprimer"
 msgid "Cancel"
 msgstr "Annuler"
 
-#. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
@@ -309,9 +308,6 @@ msgstr "Suppression en cours"
 msgid "Your changes have been saved."
 msgstr "Vos modifications ont été enregistrées."
 
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
@@ -351,52 +347,36 @@ msgstr "title_word_{uniqueId}"
 msgid "text_word_{uniqueId}"
 msgstr "text_word_{uniqueId}"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] "%(num_points)s point possible (non noté, résultats masqués)"
 msgstr[1] "%(num_points)s points possible (non noté, résultats masqués)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] "%(num_points)s point possible (non noté)"
 msgstr[1] "%(num_points)s points possibles (non notés)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
@@ -436,8 +416,6 @@ msgstr ""
 msgid "You did not select any files to submit."
 msgstr ""
 
-#. Translators: This is only translated to allow for reordering of label and
-#. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
 msgstr ""
@@ -565,37 +543,30 @@ msgstr "Vitesse"
 msgid "Volume"
 msgstr "Volume"
 
-#. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
 msgstr "Son coupé"
 
-#. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
 msgstr "Très faible"
 
-#. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
 msgstr "Faible"
 
-#. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
 msgstr "Moyen"
 
-#. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
 msgstr "Fort"
 
-#. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
 msgstr "Très fort"
 
-#. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
 msgstr "Maximum"
@@ -1030,13 +1001,11 @@ msgstr "curseur pour le dépôt"
 msgid "dropped on target"
 msgstr "déposé sur la cible"
 
-#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
 msgstr "il y a %s "
 
-#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s from now"
@@ -1157,13 +1126,6 @@ msgstr "Recherche"
 msgid "Users"
 msgstr "Utilisateurs"
 
-#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
-#. page that shows all
-#. notes organized by the tags the student has associated with them (if any).
-#. When defining a
-#. note in the courseware, the student can choose to associate 1 or more tags
-#. with the note
-#. in order to group similar notes together and help with search.
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "Tags"
@@ -1219,21 +1181,16 @@ msgstr "Éditer"
 msgid "Tags:"
 msgstr "Balises : "
 
-#. Translators: please note that this is not a literal flag, but rather a
-#. report
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove all flags."
 msgstr "Cochez la case pour supprimer tous les drapeaux."
 
-#. Translators: 'totalFlags' is the number of flags solely for that annotation
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(totalFlags)s flag."
 msgid_plural "Check the box to remove %(totalFlags)s flags."
 msgstr[0] "Cochez la case pour supprimer %(totalFlags)s drapeau."
 msgstr[1] "Cochez la case pour supprimer %(totalFlags)s drapeaux."
 
-#. Translators: 'count' is the number of flags solely for that annotation that
-#. will be removed
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(count)s flag."
 msgid_plural "Check the box to remove %(count)s flags."
@@ -1252,7 +1209,6 @@ msgstr "Vous avez déjà signalé cette annotation."
 msgid "Report annotation as inappropriate or offensive."
 msgstr "Signaler une annotation comme inappropriée ou offensante."
 
-#. Translators: 'count' is the number of flags solely for that annotation
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
@@ -1297,8 +1253,6 @@ msgstr "places disponibles"
 msgid "name"
 msgstr "nom"
 
-#. Translators: This refers to the number of teams (a count of how many teams
-#. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "total équipe"
@@ -1399,14 +1353,10 @@ msgstr ""
 msgid "This team does not have any members."
 msgstr "Cette équipe n'a pas de membres."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Inscrit %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Dernière activité %(date)s"
@@ -1444,14 +1394,10 @@ msgstr "Equipe \"{team}\" supprimée avec succès."
 msgid "You are not currently a member of any team."
 msgstr "Actuellement, vous n'êtes membre d'aucune équipe."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "et autres"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity %(date)s"
 msgstr "Dernière activité %(date)s"
@@ -1620,14 +1566,6 @@ msgstr "Sujet"
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr "Voir les équipes du sujet %(topic_name)s"
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -1721,7 +1659,6 @@ msgstr "URL"
 msgid "Please provide a valid URL."
 msgstr "Veuillez entrer une URL valide"
 
-#. Translators: 'errorCount' is the number of errors found in the form.
 #: lms/static/js/Markdown.Editor.js
 msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
@@ -2169,10 +2106,6 @@ msgstr ""
 msgid "Search Results"
 msgstr "Résultats de la recherche"
 
-#. Translators: this is a title shown before all Notes that have no associated
-#. tags. It is put within
-#. brackets to differentiate it from user-defined tags, but it should still be
-#. translated.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[aucun tag]"
@@ -2564,7 +2497,6 @@ msgstr ""
 "Erreur lors de l'ajout/suppression d'utilisateurs en que tant que bêta-"
 "testeurs."
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
 msgstr "Ces utilisateurs ont été ajoutés comme bêta-testeurs avec succès :"
@@ -2575,17 +2507,14 @@ msgid ""
 "not yet activated:"
 msgstr ""
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
 msgstr "Ces utilisateurs ont été supprimés des bêta-testeurs avec succès :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
 msgstr "Ces utilisateurs n'ont pas été ajoutés comme bêta-testeurs :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
 msgstr ""
@@ -2621,12 +2550,10 @@ msgid "Successfully enrolled and sent email to the following users:"
 msgstr ""
 "Inscriptions et envoi d'e-mail réussis pour les utilisateurs suivants :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
 msgstr "Inscription réussie pour les utilisateurs suivants :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
@@ -2636,14 +2563,12 @@ msgstr ""
 "seront autorisés à s'inscrire au cours une fois qu'ils se seront enregistrés"
 " sur la plateforme : "
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr ""
 "Ces étudiants seront autorisés à s'inscrire une fois qu'il se seront "
 "enregistrés  sur la plateforme :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
@@ -2652,14 +2577,12 @@ msgstr ""
 "E-mails d'inscription envoyés avec succès aux utilisateurs suivants. Ils "
 "seront inscrits dès qu'ils se seront enregistrés sur la plateforme :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
 msgstr ""
 "Les utilisateurs suivants seront inscrits dès leur enregistrement sur la "
 "plate-forme :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
@@ -2668,7 +2591,6 @@ msgstr ""
 "Les e-mails ont été envoyés avec succès. Les utilisateurs suivants ont été "
 "désinscrits du cours :"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
 msgstr "Les utilisateurs suivants ont été désinscrits du cours :"
@@ -2960,54 +2882,63 @@ msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Type"
 msgstr "Type de tâche"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task inputs"
 msgstr "Données d'entrées de la tâche"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task ID"
 msgstr "Id de la tâche"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Requester"
 msgstr "Demandeur"
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Submitted"
 msgstr "Soumis"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Duration (sec)"
 msgstr "Durée (sec)"
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "State"
 msgstr "État"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Status"
 msgstr "État de la tâche"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Progress"
 msgstr "Progression de la tâche"
@@ -3191,6 +3122,7 @@ msgstr "Une erreur est survenue."
 #. Translators: This string is appended to optional field labels on the
 #. student login, registration, and
 #. profile forms.
+#. */
 #: lms/static/js/student_account/views/FormView.js
 msgid "(optional)"
 msgstr ""
@@ -3559,8 +3491,6 @@ msgstr "Payer"
 msgid "Checkout with PayPal"
 msgstr "Payer avec PayPal"
 
-#. Translators: 'processor' is the name of a third-party payment processing
-#. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout with {processor}"
 msgstr "Payer avec {processor}"
@@ -3908,8 +3838,6 @@ msgstr ""
 msgid "Yes, allow edits to the active Certificate"
 msgstr "Oui, permettre les modifications du certificat actif"
 
-#. Translators: This field pertains to the custom label for a certificate.
-#. Translators: this refers to a collection of certificates.
 #: cms/static/js/certificates/views/certificate_item.js
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "certificate"
@@ -3919,8 +3847,6 @@ msgstr "certificat"
 msgid "Set up your certificate"
 msgstr "Configurer  votre certificat"
 
-#. Translators: This line refers to the initial state of the form when no data
-#. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "You have not created any certificates yet."
 msgstr "Vous n'avez pas encore crée de certificat."
@@ -3957,6 +3883,7 @@ msgstr "Groupe %s"
 #. Translators: Dictionary used for creation ids that are used in
 #. default group names. For example: A, B, AA in Group A,
 #. Group B, ..., Group AA, etc.
+#. */
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -4067,19 +3994,14 @@ msgstr ""
 msgid "Internal Server Error."
 msgstr "Erreur interne du serveur."
 
-#. Translators: This is the status of a video upload that is queued
-#. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
 msgid "Queued"
 msgstr "Mis en file d'attente"
 
-#. Translators: This is the status of a video upload that has
-#. completed successfully
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload completed"
 msgstr "Chargement terminé"
 
-#. Translators: This is the status of a video upload that has failed
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
 msgstr "Le chargement a échoué"
@@ -4478,6 +4400,7 @@ msgstr "Une erreur est survenue lors de l'export."
 
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
+#. */
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
@@ -4491,8 +4414,10 @@ msgstr "Non utilisé"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
+#. */
 #. Translators: 'count' is number of locations that the group
 #. configuration is used in.
+#. */
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
 msgid "Used in {count} location"
@@ -4500,7 +4425,6 @@ msgid_plural "Used in {count} locations"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
@@ -4599,12 +4523,10 @@ msgstr ""
 "license identique à celle s'appliquant à votre œuvre. Cette option est "
 "incompatible avec \"No Derivatives\"."
 
-#. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
 msgstr ""
 
-#. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
 msgstr ""
@@ -4701,6 +4623,18 @@ msgid "Highlights for {display_name}"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
+msgid "Enable Weekly Highlight Emails"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Enable"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Not yet"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
 msgstr ""
 
@@ -4716,7 +4650,6 @@ msgstr "Basique"
 msgid "Visibility"
 msgstr ""
 
-#. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "Modification: %(title)s"
@@ -4787,8 +4720,6 @@ msgstr ""
 msgid "Date added"
 msgstr "Date ajoutée"
 
-#. Translators: "title" is the name of the current component or unit being
-#. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: %(title)s"
 msgstr ""
@@ -4862,48 +4793,34 @@ msgstr "Cacher les aperçus"
 msgid "Show Previews"
 msgstr "Montrer les aperçus"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} ascending"
 msgstr ""
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} descending"
 msgstr ""
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "ascending"
 msgstr ""
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "descending"
 msgstr ""
 
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
 msgstr ""
 
-#. Translators: This refers to a content group that can be linked to a student
-#. cohort.
 #: cms/static/js/views/partition_group_item.js
 #: cms/static/js/views/partition_group_list.js
 msgid "content group"
@@ -5184,7 +5101,6 @@ msgstr ""
 msgid "Edit Thumbnail"
 msgstr ""
 
-#. Translators: This is a 2 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
 "{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
@@ -5195,30 +5111,24 @@ msgstr ""
 msgid "Image upload failed"
 msgstr ""
 
-#. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
 "{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
 " {videoImageSupportedFileFormats}{spanEnd}"
 msgstr ""
 
-#. Translators: message will be like 1280x720 pixels
 #: cms/static/js/views/video_thumbnail.js
 msgid "{maxWidth}x{maxHeight} pixels"
 msgstr ""
 
-#. Translators: message will be like Thumbnail for Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Thumbnail for {videoName}"
 msgstr ""
 
-#. Translators: message will be like Add Thumbnail - Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail - {videoName}"
 msgstr ""
 
-#. Translators: humanizeDuration will be like 10 minutes, an hour and 20
-#. minutes etc
 #: cms/static/js/views/video_thumbnail.js
 msgid "Video duration is {humanizeDuration}"
 msgstr ""
@@ -5231,7 +5141,6 @@ msgstr ""
 msgid "minute"
 msgstr ""
 
-#. Translators: message will be like 15 minutes, 1 minute
 #: cms/static/js/views/video_thumbnail.js
 msgid "{minutes} {unit}"
 msgstr ""
@@ -5244,13 +5153,10 @@ msgstr ""
 msgid "second"
 msgstr ""
 
-#. Translators: message will be like 20 seconds, 1 second
 #: cms/static/js/views/video_thumbnail.js
 msgid "{seconds} {unit}"
 msgstr ""
 
-#. Translators: `and` will be used to combine both miuntes and seconds like
-#. `13 minutes and 45 seconds`
 #: cms/static/js/views/video_thumbnail.js
 msgid " and "
 msgstr ""
@@ -5269,12 +5175,10 @@ msgid ""
 "{supportedFileFormats}."
 msgstr ""
 
-#. Translators: maxFileSizeInMB will be like 2 MB.
 #: cms/static/js/views/video_thumbnail.js
 msgid "The selected image must be smaller than {maxFileSizeInMB}."
 msgstr ""
 
-#. Translators: minFileSizeInKB will be like 2 KB.
 #: cms/static/js/views/video_thumbnail.js
 msgid "The selected image must be larger than {minFileSizeInKB}."
 msgstr ""
@@ -5300,9 +5204,6 @@ msgstr "Paramètres"
 msgid "New {component_type}"
 msgstr ""
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "Attention"
@@ -6894,10 +6795,6 @@ msgid "Sign in."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "Créer un compte avec"
 
@@ -6909,6 +6806,10 @@ msgstr "Créer un compte avec %(providerName)s."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "ou en créer un nouveau ici"
+
+#: lms/templates/student_account/register.underscore
+msgid "Support education research by providing additional information"
+msgstr ""
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -7894,6 +7795,18 @@ msgid ""
 "If you select an option other than \"%(hide_label)s\", published units in "
 "this subsection become available to learners unless they are explicitly "
 "hidden."
+msgstr ""
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Weekly Highlight Emails"
+msgstr ""
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enabled"
+msgstr ""
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enable Now"
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore

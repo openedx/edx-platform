@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 12:56+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.791998\n"
+"POT-Creation-Date: 2017-12-07 11:28+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.569844\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -49,6 +49,10 @@ msgstr ""
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
+msgstr ""
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
@@ -3164,6 +3168,10 @@ msgstr ""
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX

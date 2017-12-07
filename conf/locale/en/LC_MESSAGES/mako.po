@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 12:56+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.628107\n"
+"POT-Creation-Date: 2017-12-07 11:28+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.420025\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3635,7 +3635,30 @@ msgid "Updates to Discussion Posts You Follow"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
+msgid "Purchase the Program ("
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -3704,18 +3727,6 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -8170,10 +8181,6 @@ msgstr ""
 msgid "Important Course Dates"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr ""
@@ -8229,6 +8236,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html

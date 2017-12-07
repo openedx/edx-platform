@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 13:05+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.377689\n"
+"POT-Creation-Date: 2017-12-07 11:34+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.240520\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -7716,18 +7716,6 @@ msgstr ""
 "Thé nümßér öf séçönds tö déläý/tïméöüt wäït tö gét çöökïé välüés fröm "
 "säïlthrü. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: lms/djangoapps/grades/admin.py lms/djangoapps/instructor/views/api.py
-msgid "Course Id"
-msgstr "Çöürsé Ìd Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/grades/admin.py
-msgid "Usage Key"
-msgstr "Ûsägé Kéý Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/grades/admin.py
-msgid "User Id"
-msgstr "Ûsér Ìd Ⱡ'σяєм ιρѕυм #"
-
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #, python-brace-format
 msgid "{platform_name} Staff"
@@ -8044,6 +8032,11 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Coupon Code"
 msgstr "Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
+msgstr "Çöürsé Ìd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "% Discount"
@@ -12123,12 +12116,16 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/schedules/admin.py
-msgid "KnownErrorCases"
-msgstr "KnöwnÉrrörÇäsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Known Error Case"
+msgstr "Knöwn Érrör Çäsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Schedule start < course start"
 msgstr "Sçhédülé stärt < çöürsé stärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
+msgstr "Àll Ⱡ'σяєм#"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
@@ -12160,6 +12157,11 @@ msgstr ""
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/schedule.html
 msgid "Schedule"
 msgstr "Sçhédülé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Bý %(filter_title)s  Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
@@ -18011,8 +18013,28 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
-msgstr "Pürçhäsé thé Prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Purchase the Program ("
+msgstr "Pürçhäsé thé Prögräm ( Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr "Örïgïnäl Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr "${oldPrice} Ⱡ'σяєм ι#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr "Dïsçöüntéd Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr "${newPrice} Ⱡ'σяєм ι#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
+msgstr "{currency}) Ⱡ'σяєм ι#"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Start Learning"
@@ -18084,18 +18106,6 @@ msgstr ""
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
 msgstr "Prïçé (ÛSD) Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr "Örïgïnäl Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr "${oldPrice} Ⱡ'σяєм ι#"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
-msgstr "Dïsçöüntéd Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${newPrice}{htmlEnd} for entire program"
@@ -23542,10 +23552,6 @@ msgstr "Sömé Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Important Course Dates"
 msgstr "Ìmpörtänt Çöürsé Dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr "Shöw/Hïdé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -23609,6 +23615,10 @@ msgid "This course does not have any updates."
 msgstr ""
 "Thïs çöürsé döés nöt hävé äný üpdätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
+msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
@@ -24054,6 +24064,10 @@ msgid "If the problem persists, please email us at {email_link}."
 msgstr ""
 "Ìf thé prößlém pérsïsts, pléäsé émäïl üs ät {email_link}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
+msgstr "Stüdïö Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
@@ -28233,6 +28247,11 @@ msgid ""
 msgstr ""
 "Wé'vé sént än émäïl méssägé tö {email} wïth ïnstrüçtïöns för äçtïvätïng ýöür"
 " äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
+msgstr ""
+"Àççéssïßïlïtý Àççömmödätïön Réqüést Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.

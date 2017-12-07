@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 12:59+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.282484\n"
+"POT-Creation-Date: 2017-12-07 11:28+0000\n"
+"PO-Revision-Date: 2017-12-07 11:34:34.150932\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5868,18 +5868,6 @@ msgid ""
 "sailthru."
 msgstr ""
 
-#: lms/djangoapps/grades/admin.py lms/djangoapps/instructor/views/api.py
-msgid "Course Id"
-msgstr ""
-
-#: lms/djangoapps/grades/admin.py
-msgid "Usage Key"
-msgstr ""
-
-#: lms/djangoapps/grades/admin.py
-msgid "User Id"
-msgstr ""
-
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #, python-brace-format
 msgid "{platform_name} Staff"
@@ -6143,6 +6131,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Coupon Code"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -9282,11 +9275,15 @@ msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\").
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
-msgid "KnownErrorCases"
+msgid "Known Error Case"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Schedule start < course start"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
@@ -9312,6 +9309,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedule"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
+#, python-format
+msgid " By %(filter_title)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html

@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-14 09:37+0000\n"
+"POT-Creation-Date: 2017-12-06 10:06+0000\n"
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -137,6 +137,11 @@ msgstr "תת פרק"
 #: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "יחידה"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid "Empty"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -1079,6 +1084,14 @@ msgid ""
 msgstr ""
 "אם אפשרות זו נבחרה, משתמשים יועברו לדף הרישום מייד לאחר ההזדהות עם צד שלישי "
 "במקום דף ההתחברות."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Synchronize user profile data received from the identity provider with the "
+"edX user account on each SSO login. The user will be notified if the email "
+"address associated with their account is changed as a part of this "
+"synchronization."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
@@ -3407,6 +3420,16 @@ msgstr ""
 "מהדרישות הבסיסיות, כגון בחינה, נגישות, אינטרנציונליזציה ותיעוד."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Highlights Enabled for Messaging"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, any highlights associated with content in the "
+"course will be messaged to learners at their scheduled time."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "כללי"
 
@@ -5273,8 +5296,8 @@ msgstr ""
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "כל הזכויות שמורות"
 
@@ -6305,29 +6328,20 @@ msgstr "תפקיד"
 msgid "full_name"
 msgstr "full_name"
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "Hi %(thread_username)s"
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
 msgstr ""
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.html
-#, python-format
-msgid ""
-"<h1> Hi %(thread_username)s, </h1> <p> %(comment_username)s made the "
-"following reply to %(thread_title)s at %(comment_created_at)s. </p> <p> "
-"%(comment_body)s </p> <p> <a href=\"%(post_link)s\"> View the "
-"discussion.</a> </p>"
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+msgid "View discussion"
 msgstr ""
 
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/body.txt
-msgid "This is the reply to your thread:"
-msgstr ""
-
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/response_notification/email/subject.txt
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
-msgid ""
-"\n"
-"Someone replied to your thread on %(platform_name)s\n"
+msgid "Response to %(thread_title)s"
 msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
@@ -6742,6 +6756,7 @@ msgid "Coupon Code"
 msgstr "קודי שובר"
 
 #: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
 msgid "Course Id"
 msgstr "מזהה קורס"
 
@@ -8688,7 +8703,8 @@ msgstr "אוניברסיטה"
 msgid "Course Announce Date"
 msgstr "תאריך הכרזת הקורס"
 
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/course_outline.html
+#: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "תאריך תחילת קורס"
@@ -9713,6 +9729,94 @@ msgstr "שחזור לעדכון זה ימחק את המאמר."
 msgid "LMS Administration"
 msgstr ""
 
+#: openedx/core/djangoapps/ace_common/apps.py
+msgid "ACE Common"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "Go to %(platform_name)s Home Page"
+msgstr ""
+
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr "כניסה"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on LinkedIn"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Twitter"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Facebook"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Google Plus"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Reddit"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Download the iOS app on the Apple Store"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Download the Android app on the Google Play Store"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "View on Web"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from this list"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Our mailing address is"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
+msgid "edX Email"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#, python-format
+msgid ""
+"Don't miss the opportunity to highlight your new knowledge and skills by "
+"earning a verified certificate. Upgrade by "
+"%(user_schedule_upgrade_deadline_time)s."
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+msgid "Upgrade Now"
+msgstr ""
+
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
 msgid ""
@@ -10204,6 +10308,22 @@ msgstr "לא סופק קובץ עבור תמונת פרופיל"
 msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr "נתיב המשמש לבניית כתובות URL לדפי שיווק תכניות (לדוגמה,  \"/foo\")."
 
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Known Error Case"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Schedule start < course start"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Experience"
+msgstr ""
+
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedules"
@@ -10225,94 +10345,9 @@ msgstr ""
 msgid "Schedule"
 msgstr "קבע תאריך"
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
 #, python-format
-msgid "Go to %(platform_name)s Home Page"
-msgstr ""
-
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
-msgstr "כניסה"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on LinkedIn"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Twitter"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Facebook"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Google Plus"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Reddit"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Download the iOS app on the Apple Store"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Download the Android app on the Google Play Store"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Unsubscribe from this list"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Our mailing address is"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_head.html
-msgid "edX Email"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
-#, python-format
-msgid ""
-"Don't miss the opportunity to highlight your new knowledge and skills by "
-"earning a verified certificate. Upgrade by "
-"%(user_schedule_upgrade_deadline_time)s."
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
-msgid "Upgrade Now"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
-#, python-format
-msgid ""
-"Don't miss the opportunity to highlight your new knowledge and skills by "
-"earning a verified certificate. Upgrade by "
-"%(user_schedule_upgrade_deadline_time)s. Upgrade Now! <%(upsell_link)s>"
+msgid " By %(filter_title)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -10352,6 +10387,7 @@ msgid "Welcome to week %(week_num)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 #, python-format
 msgid ""
 "Many %(platform_name)s learners are completing more problems every week, and"
@@ -10360,6 +10396,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 #, python-format
 msgid ""
 "Many %(platform_name)s learners in %(course_name)s are completing more "
@@ -10373,18 +10410,11 @@ msgid "Keep up the momentum!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
-msgid ""
-"Many edX learners are completing more problems every week, and participating"
-" in the discussion forums. What do you want to do to keep learning?"
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #, python-format
 msgid ""
-"Many edX learners in <strong>%(course_name)s</strong> are completing more "
-"problems every week, and participating in the discussion forums. What do you"
-" want to do to keep learning?"
+"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
+"completing more problems every week, and participating in the discussion "
+"forums. What do you want to do to keep learning?"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10392,30 +10422,21 @@ msgstr ""
 msgid "Keep learning"
 msgstr ""
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Many edX learners in %(course_name)s are completing more problems every "
-"week, and participating in the discussion forums. What do you want to do to "
-"keep learning?"
+"Remember when you enrolled in %(course_name)s, and other courses on "
+"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
+" is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
-msgstr ""
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in %(course_name)s on %(platform_name)s? We do, "
+"and we’re glad to have you! Come see what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
@@ -10426,15 +10447,16 @@ msgstr ""
 #, python-format
 msgid ""
 "Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on edX.org? We do, and we’re glad to have you! Come see what "
-"everyone is learning."
+"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
+"what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #, python-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on edX.org? "
-"We do, and we’re glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
+" is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
@@ -10660,6 +10682,10 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "לא ניתן לערוך שדה '{field_name}'"
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
@@ -10669,8 +10695,6 @@ msgstr ""
 #. a field on the password reset form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the registration form meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "username@domain.com"
 msgstr "username@domain.com"
@@ -10715,12 +10739,6 @@ msgstr "זה מה שתשתמש/י בו על מנת להתחבר."
 msgid "Confirm Email"
 msgstr "אשר/י דוא\"ל"
 
-#. Translators: This example name is used as a placeholder in
-#. a field on the registration form meant to hold the user's name.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Jane Q. Learner"
-msgstr "ג'יין קיו. לרנר"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
@@ -10748,12 +10766,6 @@ msgid ""
 msgstr ""
 "שם משתמש באנגלית וללא רווחים, שיזהה אותך בקורסים. אינו ניתן לשינוי מאוחר "
 "יותר."
-
-#. Translators: This example username is used as a placeholder in
-#. a field on the registration form meant to hold the user's username.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Jane_Q_Learner"
-msgstr "ג'יין_קיו_לרנר"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -10820,10 +10832,6 @@ msgstr ""
 msgid "The country or region where you live."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Honor Code"
-msgstr "סקור את הקוד האתי"
-
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -10831,17 +10839,11 @@ msgid "Terms of Service and Honor Code"
 msgstr "תנאי שימוש וקוד אתי"
 
 #: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service and Honor Code"
-msgstr "סקור את תנאי השימוש והקוד האתי"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
-msgstr "אני מסכים ל{terms_of_service} של {platform_name}"
+msgid ""
+"I agree to the {platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+msgstr ""
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
@@ -10855,6 +10857,13 @@ msgstr "עליך להסכים ל{terms_of_service} של {platform_name}"
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Review the Terms of Service"
 msgstr "סקור את תנאי השימוש"
+
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "I agree to the {platform_name} {terms_of_service}"
+msgstr "אני מסכים ל{terms_of_service} של {platform_name}"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -10924,13 +10933,16 @@ msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "מפתח הקורס עבור הקורס שברצוננו להפוך לקבוצת לימוד אוטומטית."
 
 #: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of video pipeline service."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
 msgid "edx-video-pipeline API URL."
 msgstr ""
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid ""
-"Username created for Video Pipeline Integration, e.g. "
-"video_pipeline_service_user."
+"Username created for Video Pipeline Integration, e.g. veda_service_user."
 msgstr ""
 
 #: openedx/core/djangoapps/waffle_utils/models.py
@@ -11081,6 +11093,20 @@ msgid ""
 "Welcome to the new learner profile page. Your full profile now displays more"
 " information to other learners. You can instead choose to display a limited "
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
+msgstr ""
+
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
+" We do, and we’re glad to have you! Come see what everyone is learning."
+msgstr ""
+
+#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
+"glad to have you! Come see what everyone is learning."
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -11359,10 +11385,6 @@ msgstr "הקורס יוצַא בהצלחה למאגר git"
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
 msgstr "אנכי"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Empty"
-msgstr "ריק"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
@@ -11805,11 +11827,6 @@ msgstr "מספר הקורס"
 msgid "Course Outline"
 msgstr ""
 
-#: cms/templates/course_outline.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Start Date:"
-msgstr "תאריך תחילת קורס:"
-
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "שגיאה:"
@@ -12055,6 +12072,26 @@ msgstr "מידע נוסף:"
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
 msgstr "משוב משתמש"
+
+#: common/templates/emails/sync_learner_profile_data_email_change_body.txt
+msgid ""
+"The email associated with your {platform_name} account has changed from "
+"{old_email} to {new_email}."
+msgstr ""
+
+#: common/templates/emails/sync_learner_profile_data_email_change_body.txt
+msgid "No action is needed on your part."
+msgstr ""
+
+#: common/templates/emails/sync_learner_profile_data_email_change_body.txt
+msgid ""
+"If this change is not correct, contact {link_start}{platform_name} "
+"Support{link_end} or your administrator."
+msgstr ""
+
+#: common/templates/emails/sync_learner_profile_data_email_change_subject.txt
+msgid "Your {platform_name} account email has been updated"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
@@ -15241,7 +15278,27 @@ msgid "Updates to Discussion Posts You Follow"
 msgstr "עדכונים לדיונים שאתה עוקב אחריהם"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
+msgid "Purchase the Program ("
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15310,18 +15367,6 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15496,21 +15541,17 @@ msgstr "היי,"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive course credit from {providers} "
-"for successfully completing your {platform_name} course! {link_start}Get "
-"your credit now.{link_end}"
+"Congratulations! You are now eligible to receive course credit from "
+"{providers} for successfully completing your {platform_name} course! "
+"{link_start}Purchase credit now.{link_end}"
 msgstr ""
-"ברכות! אתה זכאי לקבל נקודות זכות בקורס מ-{providers} על השלמת  קורס "
-"{platform_name} בהצלחה! {link_start}קבל עתה את נקודות הזכות שלך.{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
-"Congratulations! You are eligible to receive course credit for successfully "
-"completing your {platform_name} course! {link_start}Get your credit "
-"now.{link_end}"
+"Congratulations! You are now eligible to receive course credit for "
+"successfully completing your {platform_name} course! {link_start}Purchase "
+"credit now.{link_end}"
 msgstr ""
-"ברכות! אתה זכאי לקבל נקודות זכות בקורס על השלמת קורס {platform_name} בהצלחה!"
-" {link_start}קבל עתה את נקודות הזכות שלך.{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -15522,15 +15563,23 @@ msgstr ""
 "לסיים את התואר שהתחלת או להשלים את הדרישות במוסד אקדמי אחר."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-msgid ""
-"To get course credit, simply go to your {link_start}{platform_name} "
-"dashboard{link_end} and click the <b>Get Credit</b> button. After you "
-"receive your credit, you will also have an official academic transcript at "
-"the institution that granted the credit."
+msgid "There are 2 steps to getting course credit."
 msgstr ""
-"כדי לקבל נקודות זכות בקורס, עבור אל {link_start}{platform_name} מרכז "
-"השליטה{link_end} ולחץ על הלחצן <b>קבל נקודות זכות</b>. לאחר קבלת נקודות "
-"הזכות, תקבל גם תעתיק אקדמי רשמי במוסד שהעניק לך את נקודות הזכות."
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"Purchase credit by going to your {link_start}{platform_name} "
+"dashboard{link_end} and clicking the {bold_start}Get Credit{bold_end} button"
+" below the course title."
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"When your payment is complete, return to the dashboard and click the "
+"{bold_start}Request Credit{bold_end} button under the course title to "
+"request an official academic transcript at the institution that granted the "
+"credit."
+msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -15662,10 +15711,6 @@ msgstr ""
 "היות ואין בידינו סדרה תקפה של תמונות מאומתות ממועד הכנת {cert_name_long}, לא"
 " יכולנו להעניק לך תעודה מאומתת של {cert_name_short}. במקום זאת, הוכנה תעודה "
 "{cert_name_short} על בסיס קוד אתי.    "
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course details"
-msgstr "פרטי הקורס"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
@@ -17242,6 +17287,10 @@ msgstr "שם הקורס:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
 msgstr "שם תצורת הקורס"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Start Date:"
+msgstr "תאריך תחילת קורס:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
@@ -19533,7 +19582,7 @@ msgid "Student Support: Certificates"
 msgstr "תמיכת סטודנט: תעודות"
 
 #: lms/templates/support/contact_us.html
-msgid "{platform_name} Support: Contact Us"
+msgid "Contact {platform_name} Support"
 msgstr ""
 
 #: lms/templates/support/enrollment.html
@@ -19825,10 +19874,6 @@ msgstr ""
 msgid "Important Course Dates"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr ""
@@ -19875,12 +19920,12 @@ msgstr ""
 msgid "{subsection_format} due {{date}}"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "This is your last visited course section."
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
@@ -20229,6 +20274,10 @@ msgstr ""
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
 msgstr "אם הבעיה ממשיכה, אנא שלח לנו דוא\"ל ב{email_link}."
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
+msgstr ""
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
@@ -20861,9 +20910,9 @@ msgstr "תצוגה בזמן אמת"
 msgid "Edit Start Date"
 msgstr "ערוך תאריך התחלה"
 
-#: cms/templates/course_outline.html
-msgid "Course Pacing:"
-msgstr "קצב קורס:"
+#: cms/templates/course_outline.html cms/templates/settings.html
+msgid "Course Pacing"
+msgstr "קצב קורס"
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
@@ -23105,10 +23154,6 @@ msgid ""
 msgstr "הציון שעל הסטודנט להגיע אליו על מנת להשלים בהצלחה את מבחן הכניסה. "
 
 #: cms/templates/settings.html
-msgid "Course Pacing"
-msgstr "קצב קורס"
-
-#: cms/templates/settings.html
 msgid "Set the pacing for this course"
 msgstr "הגדר את הקצב לקורס זה"
 
@@ -23593,6 +23638,10 @@ msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
 msgstr "שלחנו הודעת דואר אלקטרוני אל {email} עם הוראות להפעלת החשבון."
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
+msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
