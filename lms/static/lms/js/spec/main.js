@@ -46,6 +46,8 @@
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'backbone-super': 'js/vendor/backbone-super',
+            'popper': 'common/js/vendor/popper',
+            'bootstrap': 'common/js/vendor/bootstrap',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
@@ -196,6 +198,10 @@
             },
             'backbone-super': {
                 deps: ['backbone']
+            },
+            'bootstrap': {
+                deps: ['jquery', 'popper'],
+                exports: 'bootstrap'
             },
             'paging-collection': {
                 deps: ['jquery', 'underscore', 'backbone.paginator']
@@ -762,7 +768,6 @@
         'js/spec/learner_dashboard/unenroll_view_spec.js',
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
-        'js/spec/learner_dashboard/course_entitlement_view_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',

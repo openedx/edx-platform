@@ -2,6 +2,7 @@
 .course-entitlement-selection-container {
   width: 100%;
   position: relative;
+  flex-grow: 1;
 
   .action-header {
     padding-bottom: $baseline/4;
@@ -17,6 +18,7 @@
       height: $baseline*1.5;
       flex-grow: 5;
       margin-bottom: $baseline*0.4;
+      max-width: calc(100% - 200px);
     }
 
     .enroll-btn-initial {
@@ -49,6 +51,10 @@
 
     @include media-breakpoint-down(xs) {
       flex-direction: column;
+
+      .session-select {
+        max-width: 100%;
+      }
 
       .enroll-btn-initial {
         margin: $baseline/4 0 $baseline/4;
@@ -101,7 +107,7 @@
     }
 
     .change-session {
-      @include margin(0, 0, 0, $baseline/4);
+      @include margin(0, 0, $baseline/4, $baseline/4);
 
       padding: 0;
       font-size: $font-size-sm;

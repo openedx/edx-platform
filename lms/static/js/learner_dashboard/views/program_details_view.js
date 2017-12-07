@@ -37,6 +37,8 @@
                  initialize: function(options) {
                      this.options = options;
 
+                     console.log(this.courseData);
+
                      this.programModel = new Backbone.Model(this.options.programData);
                      this.courseData = new Backbone.Model(this.options.courseData);
                      this.certificateCollection = new Backbone.Collection(this.options.certificateData);

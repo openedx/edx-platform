@@ -1,11 +1,3 @@
-// This is required for karma testing due to a known issue in Bootstrap-v4: https://github.com/twbs/bootstrap/pull/22888
-// The issue is that bootstrap tries to access Popper's global Popper object which is not initialized on loading
-// from the karma configuration. The next version of bootstrap (>v4.2) will solve this issue.
-// Once this is resolved, we should import bootstrap through require-config.js and main.js (for jasmine testing)
-var defineFn = require || RequireJS.require;  // eslint-disable-line global-require
-var Popper = defineFn(['common/js/vendor/popper']);
-defineFn(['common/js/vendor/bootstrap']);
-
 (function(define) {
     'use strict';
 
@@ -18,7 +10,9 @@ defineFn(['common/js/vendor/bootstrap']);
         'js/learner_dashboard/models/course_entitlement_model',
         'js/learner_dashboard/models/course_card_model',
         'text!../../../templates/learner_dashboard/course_entitlement.underscore',
-        'text!../../../templates/learner_dashboard/verification_popover.underscore'
+        'text!../../../templates/learner_dashboard/verification_popover.underscore',
+        'popper',
+        'bootstrap'
     ],
          function(
              Backbone,
@@ -91,6 +85,11 @@ defineFn(['common/js/vendor/bootstrap']);
                              !($(e.target).closest('.enroll-btn-initial, .popover').length)) {
                              this.hideDialog(this.$('.enroll-btn-initial'));
                          }
+                     }.bind(this));
+
+                     // Initialize focus to cancel button on popover load
+                     $(document).on('shown.bs.popover', function () {
+                        this.$('.final-confirmation-btn:first').focus();
                      }.bind(this));
                  },
 
