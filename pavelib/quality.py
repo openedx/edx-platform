@@ -56,6 +56,7 @@ def find_fixme(options):
         # Directory to put the pylint report in.
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
+        report_file = "{}/pylint_fixme.report".format(report_dir)
 
         apps_list = top_python_dirs(system)
 
@@ -66,20 +67,20 @@ def find_fixme(options):
             '--output-format=parseable'
         ] + apps_list
 
-        with open("{}/pylint_fixme.report".format(report_dir), 'w') as report:
+        with open(report_file, 'w') as report:
             print("RUNNING: {}".format(' '.join(args)))
             process_list.append((
-                system,
+                report_dir,
                 Popen(
                     args,
                     stdout=report
                 )
             ))
 
-    for system, process in process_list:
+    for report_file, process in process_list:
+
         process.communicate()
-        num_fixme += _count_pylint_violations(
-            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
+        num_fixme += _count_pylint_violations(report_file)
 
     print "Number of pylint fixmes: " + str(num_fixme)
 
