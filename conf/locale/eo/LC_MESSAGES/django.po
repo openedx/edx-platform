@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-30 13:05+0000\n"
-"PO-Revision-Date: 2017-11-30 13:05:28.377689\n"
+"POT-Creation-Date: 2017-12-07 12:14+0000\n"
+"PO-Revision-Date: 2017-12-07 12:14:22.810167\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6306,8 +6306,8 @@ msgstr ""
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "Àll rïghts résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -7716,18 +7716,6 @@ msgstr ""
 "Thé nümßér öf séçönds tö déläý/tïméöüt wäït tö gét çöökïé välüés fröm "
 "säïlthrü. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: lms/djangoapps/grades/admin.py lms/djangoapps/instructor/views/api.py
-msgid "Course Id"
-msgstr "Çöürsé Ìd Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/grades/admin.py
-msgid "Usage Key"
-msgstr "Ûsägé Kéý Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/grades/admin.py
-msgid "User Id"
-msgstr "Ûsér Ìd Ⱡ'σяєм ιρѕυм #"
-
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #, python-brace-format
 msgid "{platform_name} Staff"
@@ -8044,6 +8032,11 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Coupon Code"
 msgstr "Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
+msgstr "Çöürsé Ìd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "% Discount"
@@ -11499,6 +11492,103 @@ msgstr ""
 msgid "LMS Administration"
 msgstr "LMS Àdmïnïsträtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: openedx/core/djangoapps/ace_common/apps.py
+msgid "ACE Common"
+msgstr "ÀÇÉ Çömmön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "Go to %(platform_name)s Home Page"
+msgstr "Gö tö %(platform_name)s Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr "Sïgn Ìn Ⱡ'σяєм ιρѕυм #"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on LinkedIn"
+msgstr "%(platform_name)s ön LïnkédÌn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Twitter"
+msgstr "%(platform_name)s ön Twïttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Facebook"
+msgstr "%(platform_name)s ön Fäçéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Google Plus"
+msgstr "%(platform_name)s ön Gööglé Plüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Reddit"
+msgstr "%(platform_name)s ön Réddït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Download the iOS app on the Apple Store"
+msgstr ""
+"Döwnlöäd thé ïÖS äpp ön thé Àpplé Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Download the Android app on the Google Play Store"
+msgstr ""
+"Döwnlöäd thé Àndröïd äpp ön thé Gööglé Pläý Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "View on Web"
+msgstr "Vïéw ön Wéß Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from this list"
+msgstr "Ûnsüßsçrïßé fröm thïs lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Our mailing address is"
+msgstr "Öür mäïlïng äddréss ïs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
+msgid "edX Email"
+msgstr "édX Émäïl Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#, python-format
+msgid ""
+"Don't miss the opportunity to highlight your new knowledge and skills by "
+"earning a verified certificate. Upgrade by "
+"%(user_schedule_upgrade_deadline_time)s."
+msgstr ""
+"Dön't mïss thé öppörtünïtý tö hïghlïght ýöür néw knöwlédgé änd skïlls ßý "
+"éärnïng ä vérïfïéd çértïfïçäté. Ûpgrädé ßý "
+"%(user_schedule_upgrade_deadline_time)s. Ⱡ'σяєм ιρѕυ#"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+msgid "Upgrade Now"
+msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
 msgid ""
@@ -12123,12 +12213,16 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/schedules/admin.py
-msgid "KnownErrorCases"
-msgstr "KnöwnÉrrörÇäsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Known Error Case"
+msgstr "Knöwn Érrör Çäsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Schedule start < course start"
 msgstr "Sçhédülé stärt < çöürsé stärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
+msgstr "Àll Ⱡ'σяєм#"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
@@ -12161,98 +12255,10 @@ msgstr ""
 msgid "Schedule"
 msgstr "Sçhédülé Ⱡ'σяєм ιρѕυм ∂#"
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
 #, python-format
-msgid "Go to %(platform_name)s Home Page"
-msgstr "Gö tö %(platform_name)s Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
-msgstr "Sïgn Ìn Ⱡ'σяєм ιρѕυм #"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on LinkedIn"
-msgstr "%(platform_name)s ön LïnkédÌn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Twitter"
-msgstr "%(platform_name)s ön Twïttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Facebook"
-msgstr "%(platform_name)s ön Fäçéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Google Plus"
-msgstr "%(platform_name)s ön Gööglé Plüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Reddit"
-msgstr "%(platform_name)s ön Réddït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Download the iOS app on the Apple Store"
-msgstr ""
-"Döwnlöäd thé ïÖS äpp ön thé Àpplé Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Download the Android app on the Google Play Store"
-msgstr ""
-"Döwnlöäd thé Àndröïd äpp ön thé Gööglé Pläý Störé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr "Vïéw ön Wéß Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Unsubscribe from this list"
-msgstr "Ûnsüßsçrïßé fröm thïs lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Our mailing address is"
-msgstr "Öür mäïlïng äddréss ïs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_head.html
-msgid "edX Email"
-msgstr "édX Émäïl Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
-#, python-format
-msgid ""
-"Don't miss the opportunity to highlight your new knowledge and skills by "
-"earning a verified certificate. Upgrade by "
-"%(user_schedule_upgrade_deadline_time)s."
-msgstr ""
-"Dön't mïss thé öppörtünïtý tö hïghlïght ýöür néw knöwlédgé änd skïlls ßý "
-"éärnïng ä vérïfïéd çértïfïçäté. Ûpgrädé ßý "
-"%(user_schedule_upgrade_deadline_time)s. Ⱡ'σяєм ιρѕυ#"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
-msgid "Upgrade Now"
-msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
+msgid " By %(filter_title)s "
+msgstr " Bý %(filter_title)s  Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
@@ -12716,6 +12722,12 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 "Thé '{field_name}' fïéld çännöt ßé édïtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+"Füll Nämé çännöt çöntäïn thé föllöwïng çhäräçtérs: < > Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
@@ -18011,8 +18023,28 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
-msgstr "Pürçhäsé thé Prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Purchase the Program ("
+msgstr "Pürçhäsé thé Prögräm ( Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr "Örïgïnäl Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr "${oldPrice} Ⱡ'σяєм ι#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr "Dïsçöüntéd Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr "${newPrice} Ⱡ'σяєм ι#"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
+msgstr "{currency}) Ⱡ'σяєм ι#"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Start Learning"
@@ -18084,18 +18116,6 @@ msgstr ""
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
 msgstr "Prïçé (ÛSD) Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr "Örïgïnäl Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr "${oldPrice} Ⱡ'σяєм ι#"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
-msgstr "Dïsçöüntéd Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${newPrice}{htmlEnd} for entire program"
@@ -23542,10 +23562,6 @@ msgstr "Sömé Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Important Course Dates"
 msgstr "Ìmpörtänt Çöürsé Dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr "Shöw/Hïdé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -23609,6 +23625,10 @@ msgid "This course does not have any updates."
 msgstr ""
 "Thïs çöürsé döés nöt hävé äný üpdätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
+msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
@@ -24054,6 +24074,10 @@ msgid "If the problem persists, please email us at {email_link}."
 msgstr ""
 "Ìf thé prößlém pérsïsts, pléäsé émäïl üs ät {email_link}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
+msgstr "Stüdïö Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
@@ -26188,19 +26212,48 @@ msgid "What content is imported?"
 msgstr "Whät çöntént ïs ïmpörtéd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/import.html
-msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are imported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, remains the same as it was in the existing course."
+msgid "The following content is imported."
 msgstr ""
-"Önlý thé çöürsé çöntént änd strüçtüré (ïnçlüdïng séçtïöns, süßséçtïöns, änd "
-"ünïts) äré ïmpörtéd. Öthér dätä, ïnçlüdïng stüdént dätä, grädïng "
-"ïnförmätïön, dïsçüssïön förüm dätä, çöürsé séttïngs, änd çöürsé téäm "
-"ïnförmätïön, rémäïns thé sämé äs ït wäs ïn thé éxïstïng çöürsé. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєq#"
+"Thé föllöwïng çöntént ïs ïmpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/import.html
+msgid "Course content and structure"
+msgstr "Çöürsé çöntént änd strüçtüré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/templates/import.html
+msgid "Course dates"
+msgstr "Çöürsé dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/import.html
+msgid "Grading policy"
+msgstr "Grädïng pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/import.html
+msgid "Any group configurations"
+msgstr "Àný gröüp çönfïgürätïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/templates/import.html
+msgid "Settings on the Advanced Settings page"
+msgstr ""
+"Séttïngs ön thé Àdvänçéd Séttïngs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/templates/import.html
+msgid "The following content is not imported."
+msgstr ""
+"Thé föllöwïng çöntént ïs nöt ïmpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/templates/import.html
+msgid ""
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+"Léärnér-spéçïfïç çöntént, süçh äs léärnér grädés änd dïsçüssïön förüm dätä "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/templates/import.html
+msgid "The course team"
+msgstr "Thé çöürsé téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
@@ -28233,6 +28286,11 @@ msgid ""
 msgstr ""
 "Wé'vé sént än émäïl méssägé tö {email} wïth ïnstrüçtïöns för äçtïvätïng ýöür"
 " äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
+msgstr ""
+"Àççéssïßïlïtý Àççömmödätïön Réqüést Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
