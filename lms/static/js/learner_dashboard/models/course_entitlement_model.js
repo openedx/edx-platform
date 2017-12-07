@@ -13,7 +13,9 @@
                     availableSessions: [],
                     entitlementUUID: '',
                     currentSessionId: '',
-                    courseName: ''
+                    courseName: '',
+                    expiredAt: null,
+                    daysUntilExpiration: Number.MAX_VALUE
                 }
             });
         }

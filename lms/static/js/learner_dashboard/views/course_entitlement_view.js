@@ -45,6 +45,10 @@
                          availableSessions: this.formatDates(JSON.parse(options.availableSessions)),
                          entitlementUUID: options.entitlementUUID,
                          currentSessionId: options.currentSessionId,
+                         expiredAt: options.expiredAt,
+                         expiresAtDate: this.courseCardModel.formatDate(
+                             new moment().utc().add(options.daysUntilExpiration, 'days')
+                         ),
                          courseName: options.courseName
                      });
                      this.listenTo(this.entitlementModel, 'change', this.render);

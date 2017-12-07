@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name" expression_filter="h"/>
 
 <%!
 import urllib
@@ -131,7 +131,15 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % if is_unfulfilled_entitlement:
                     <span class="info-date-block" aria-live="polite">
                         <span class="icon fa fa-warning" aria-hidden="true"></span>
-                        ${_('You must select a session to access the course.')}
+                        % if entitlement_expired_at:
+                            ${_('You can no longer select a session, your final day to select a session was {entitlement_expired_at}.').format(entitlement_expired_at=entitlement_expired_at)}
+                        % else:
+                            % if entitlement_expiration_date:
+                                ${_('You must select a session by {expiration_date} to access the course.').format(expiration_date=entitlement_expiration_date)}
+                            % else:
+                                ${_('You must select a session to access the course.')}
+                            % endif
+                        % endif
                     </span>
                 % else:
                     % if isinstance(course_date, basestring):
@@ -141,9 +149,19 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     % endif
                 % endif
                 % if entitlement:
-                    <button class="change-session btn-link ${'hidden' if is_unfulfilled_entitlement else ''}" aria-controls="change-session-${str(entitlement.uuid)}">${_('Change Session')}</button>
+                    % if not entitlement_expired_at:
+                        <button class="change-session btn-link ${'hidden' if is_unfulfilled_entitlement else ''}" aria-controls="change-session-${str(entitlement.uuid)}">${_('Change Session')}</button>
+                    % endif
                 % endif
             </span>
+            % if entitlement and entitlement_expiration_date:
+                % if not is_unfulfilled_entitlement:
+                    <div class="info-expires-at">
+                            <span class="msg-icon fa fa-info" aria-hidden="true"></span>
+                            ${_('You can change sessions until {entitlement_expiration_date}.').format(entitlement_expiration_date=entitlement_expiration_date)}
+                    </div>
+                % endif
+            % endif
         </div>
         <div class="wrapper-course-actions">
           <div class="course-actions">
@@ -278,8 +296,9 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
   <footer class="wrapper-messages-primary">
     <div class="messages-list">
 
-      % if entitlement:
+      % if entitlement and not entitlement_expired_at:
         <div class="course-entitlement-selection-container ${'' if is_unfulfilled_entitlement else 'hidden'}"></div>
+        <% print entitlement %>
         <%static:require_module module_name="js/learner_dashboard/course_entitlement_factory" class_name="EntitlementFactory">
           EntitlementFactory({
               el: '${ '#course-card-' + str(course_card_index) + ' .course-entitlement-selection-container' | n, js_escaped_string }',
@@ -293,7 +312,9 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               entitlementUUID: '${ entitlement.course_uuid | n, js_escaped_string }',
               currentSessionId: '${ entitlement_session.course_id if entitlement_session else "" | n, js_escaped_string }',
               enrollUrl: '${ reverse('entitlements_api:v1:enrollments', args=[str(entitlement.uuid)]) | n, js_escaped_string }',
-              courseHomeUrl: '${ course_target | n, js_escaped_string }'
+              courseHomeUrl: '${ course_target | n, js_escaped_string }',
+              expiredAt: '${ entitlement.expired_at_datetime | n, js_escaped_string }',
+              daysUntilExpiration: '${ entitlement.get_days_until_expiration() | n, js_escaped_string }',
           });
         </%static:require_module>
       %endif

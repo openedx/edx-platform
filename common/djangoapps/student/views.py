@@ -694,10 +694,11 @@ def dashboard(request):
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
     course_entitlements = list(CourseEntitlement.objects.filter(user=user).select_related('enrollment_course_run'))
-    course_entitlement_available_sessions = {
-        str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid))
-        for entitlement in course_entitlements
-    }
+    course_entitlement_available_sessions = {}
+    for course_entitlement in course_entitlements:
+        course_entitlement.update_expired_at()
+        course_entitlement_available_sessions[str(course_entitlement.uuid)] = \
+            get_course_runs_for_course(str(course_entitlement.course_uuid))
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
