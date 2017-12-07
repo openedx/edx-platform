@@ -786,13 +786,14 @@ class RegistrationFormFactory(object):
         # in order to register a new account.
         terms_label = _(u"Terms of Service")
         terms_link = marketing_link("TOS")
-        terms_text = _(u"Review the Terms of Service")
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
+        label = Text(_(u"I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
+            terms_of_service=terms_label,
+            tos_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            tos_link_end=HTML("</a>"),
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
@@ -811,8 +812,6 @@ class RegistrationFormFactory(object):
             error_messages={
                 "required": error_msg
             },
-            supplementalLink=terms_link,
-            supplementalText=terms_text
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):
