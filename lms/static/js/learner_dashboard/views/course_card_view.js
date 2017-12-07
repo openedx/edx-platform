@@ -91,7 +91,9 @@
                              currentSessionId: this.model.isEnrolledInSession() ?
                                  this.model.get('course_run_key') : null,
                              enrollUrl: this.model.get('enroll_url'),
-                             courseHomeUrl: this.model.get('course_url')
+                             courseHomeUrl: this.model.get('course_url'),
+                             expiredAt: this.entitlement.expired_at,
+                             daysUntilExpiration: this.entitlement.days_until_expiration
                          });
                      }
 

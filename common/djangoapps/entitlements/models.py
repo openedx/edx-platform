@@ -1,12 +1,13 @@
 import uuid as uuid_tools
 from datetime import datetime, timedelta
+from util.date_utils import strftime_localized
 
 import pytz
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 
-from certificates.models import GeneratedCertificate  # pylint: disable=import-error
+from certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -214,11 +215,28 @@ class CourseEntitlement(TimeStampedModel):
         return self.policy.is_entitlement_redeemable(self)
 
     def to_dict(self):
-        """ Convert entitlement to dictionary representation. """
+        """
+        Convert entitlement to dictionary representation including relevant policy information.
+
+        Returns:
+            The entitlement UUID
+            The associated course's UUID
+            The date at which the entitlement expired. None if it is still active.
+            The localized string representing the date at which the entitlement expires.
+        """
+        expiration_date = None
+        if self.get_days_until_expiration() < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD:
+            expiration_date = strftime_localized(
+                datetime.now(tz=pytz.UTC) + timedelta(days=self.get_days_until_expiration()),
+                'SHORT_DATE'
+            )
+        expired_at = strftime_localized(self.expired_at_datetime, 'SHORT_DATE') if self.expired_at_datetime else None
+
         return {
             'uuid': str(self.uuid),
             'course_uuid': str(self.course_uuid),
-            'expired_at': self.expired_at
+            'expired_at': expired_at,
+            'expiration_date': expiration_date
         }
 
     def set_enrollment(self, enrollment):

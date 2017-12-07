@@ -475,7 +475,8 @@
         }
       }
 
-      .run-period {
+      .run-period,
+      .info-expires-at {
         color: palette(grayscale, base);
         font-size: 0.9375em;
       }
@@ -505,7 +506,6 @@
         vertical-align: top;
         padding: 0 10px 0 0;
         float: left;
-        width: calc(100% - 205px);
       }
     }
 
