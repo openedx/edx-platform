@@ -6,6 +6,7 @@ Check code quality using pep8, pylint, and diff_quality.
 import json
 import os
 import re
+from subprocess import Popen
 
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
@@ -86,6 +87,8 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
     num_violations = 0
     violations_list = []
 
+    process_list = []
+
     for system in systems:
         # Directory to put the pylint report in.
         # This makes the folder if it doesn't already exist.
@@ -95,20 +98,28 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
         if errors_only:
             flags.append("--errors-only")
 
-        apps_list = ' '.join(top_python_dirs(system))
+        apps_list = top_python_dirs(system)
 
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
-            sh(
-                "pylint {flags} --output-format=parseable {apps} "
-                "> {report_dir}/pylint.report".format(
-                    flags=" ".join(flags),
-                    apps=apps_list,
-                    report_dir=report_dir
-                ),
-                ignore_error=True,
-            )
+            args = [
+                'pylint'
+            ] + flags + [
+                '--output-format=parseable'
+            ] + apps_list
 
+            with open("{}/pylint.report".format(report_dir), 'w') as report:
+                print("RUNNING: {}".format(' '.join(args)))
+                process_list.append((
+                    system,
+                    Popen(
+                        args,
+                        stdout=report
+                    )
+                ))
+
+    for system, process in process_list:
+        process.communicate()
         num_violations += _count_pylint_violations(system_report)
         with open(system_report) as report_contents:
             violations_list.extend(report_contents)
