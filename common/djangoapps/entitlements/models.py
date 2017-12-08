@@ -219,3 +219,7 @@ class CourseEntitlement(TimeStampedModel):
         Fulfills an entitlement by specifying a session.
         """
         cls.objects.filter(id=entitlement.id).update(enrollment_course_run=enrollment)
+
+    @classmethod
+    def unexpired_entitlements_for_user(cls, user):
+        return cls.objects.filter(user=user, expired_at=None).select_related('user')

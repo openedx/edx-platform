@@ -19,6 +19,7 @@ from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 
 from course_modes.models import CourseMode
+from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
@@ -90,6 +91,9 @@ class ProgramProgressMeter(object):
             # We can't use dict.keys() for this because the course run ids need to be ordered
             self.course_run_ids.append(enrollment_id)
 
+        self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
+        self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
+
         self.course_grade_factory = CourseGradeFactory()
 
         if uuid:
@@ -100,9 +104,9 @@ class ProgramProgressMeter(object):
     def invert_programs(self):
         """Intersect programs and enrollments.
 
-        Builds a dictionary of program dict lists keyed by course run ID. The
-        resulting dictionary is suitable in applications where programs must be
-        filtered by the course runs they contain (e.g., the student dashboard).
+        Builds a dictionary of program dict lists keyed by course run ID and by course UUID.
+        The resulting dictionary is suitable in applications where programs must be
+        filtered by the course runs or courses they contain (e.g., the student dashboard).
 
         Returns:
             defaultdict, programs keyed by course run ID
@@ -111,6 +115,12 @@ class ProgramProgressMeter(object):
 
         for program in self.programs:
             for course in program['courses']:
+                course_uuid = course['uuid']
+                if course_uuid in self.course_uuids:
+                    program_list = inverted_programs[course_uuid]
+                    if program not in program_list:
+                        program_list.append(program)
+                    continue
                 for course_run in course['course_runs']:
                     course_run_id = course_run['key']
                     if course_run_id in self.course_run_ids:
@@ -142,6 +152,11 @@ class ProgramProgressMeter(object):
             for program in inverted_programs[course_run_id]:
                 # Dicts aren't a hashable type, so we can't use a set. Sets also
                 # aren't ordered, which is important here.
+                if program not in programs:
+                    programs.append(program)
+
+        for course_uuid in self.course_uuids:
+            for program in inverted_programs[course_uuid]:
                 if program not in programs:
                     programs.append(program)
 

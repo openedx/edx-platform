@@ -27,6 +27,7 @@ class CourseEntitlementFactory(factory.django.DjangoModelFactory):
 
     uuid = factory.LazyFunction(uuid4)
     course_uuid = factory.LazyFunction(uuid4)
+    expired_at = None
     mode = FuzzyChoice([CourseMode.VERIFIED, CourseMode.PROFESSIONAL])
     user = factory.SubFactory(UserFactory)
     order_number = FuzzyText(prefix='TEXTX', chars=string.digits)
