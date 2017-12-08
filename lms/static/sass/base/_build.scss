@@ -7,8 +7,13 @@
 @import 'bootstrap/variables';
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/box-shadow';
 @import 'bootstrap/scss/mixins/breakpoints';
 @import 'bootstrap/scss/mixins/grid';
+@import 'bootstrap/scss/mixins/reset-text';
+
+// Bootstrap components
+@import 'bootstrap/scss/popover';
 
 // LMS-specific variables
 @import '../variables';
