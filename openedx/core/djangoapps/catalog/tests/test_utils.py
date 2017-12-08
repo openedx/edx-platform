@@ -187,7 +187,7 @@ class TestGetProgramsWithType(TestCase):
         mock_get_program_types.return_value = program_types
 
         actual = get_programs_with_type(self.site)
-        self.assertEqual(actual, programs_with_program_type)
+        self.assertItemsEqual(actual, programs_with_program_type)
 
     @ddt.data(False, True)
     @mock.patch(UTILS_MODULE + '.get_programs')
@@ -213,7 +213,7 @@ class TestGetProgramsWithType(TestCase):
         mock_get_program_types.return_value = program_types
 
         actual = get_programs_with_type(self.site, include_hidden=include_hidden)
-        self.assertEqual(actual, programs_with_program_type)
+        self.assertItemsEqual(actual, programs_with_program_type)
 
 
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
