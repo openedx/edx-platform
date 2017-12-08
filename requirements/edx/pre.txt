@@ -15,3 +15,8 @@ numpy==1.6.2
 
 # Needed for meliae
 Cython==0.21.2
+
+
+# Ginkgo only!
+Django==1.8.18
+git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
