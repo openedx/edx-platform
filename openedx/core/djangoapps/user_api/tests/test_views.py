@@ -1593,12 +1593,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         # Terms of service field should also be present
         link_label = "Terms of Service"
+        link_template = "<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
                 "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_label=link_label
+                    link_label=link_template.format(link_label=link_label)
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
@@ -1640,12 +1641,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         link_label = 'Terms of Service'
         # Terms of service field should also be present
+        link_template = "<a href='/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
                 "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_label=link_label
+                    link_label=link_template.format(link_label=link_label)
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
