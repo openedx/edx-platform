@@ -156,13 +156,13 @@
             'sinon': {
                 exports: 'sinon'
             },
-            'common/js/spec_helpers/jasmine-extensions': {
+            'common/static/common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
-            'common/js/spec_helpers/jasmine-stealth': {
+            'common/static/common/js/spec_helpers/jasmine-stealth': {
                 deps: ['underscore', 'underscore.string']
             },
-            'common/js/spec_helpers/jasmine-waituntil': {
+            'common/static/common/js/spec_helpers/jasmine-waituntil': {
                 deps: ['jquery']
             },
             'xblock/core': {
