@@ -137,7 +137,10 @@
                 'change .post-option-input': 'postOptionChange',
                 'click .cancel': 'cancel',
                 'click  .add-post-cancel': 'cancel',
-                'reset .forum-new-post-form': 'updateStyles'
+                'reset .forum-new-post-form': 'updateStyles',
+                'keydown .wmd-button': function(event) {
+                    return DiscussionUtil.handleKeypressInToolbar(event);
+                }
             };
 
             NewPostView.prototype.toggleGroupDropdown = function($target) {
