@@ -38,6 +38,7 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
+import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.lib.license import LicenseMixin
@@ -47,6 +48,8 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
+# Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
+COPYRIGHT_YEAR = "2017"
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
@@ -248,6 +251,10 @@ FEATURES = {
     # courses listed in the announcement dates order - this is default Open edX behavior.
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
+
+    # When set to True, a list of programs is displayed along with the list of courses
+    # when the user visits the homepage or the find courses page.
+    'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
@@ -897,6 +904,16 @@ ACTIVATION_EMAIL_FROM_ADDRESS = ''
 
 ADMINS = ()
 MANAGERS = ADMINS
+
+EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
+
+if not EDX_PLATFORM_REVISION:
+    try:
+        # Get git revision of the current file
+        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
+    except TypeError:
+        # Not a git repository
+        EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/'
@@ -1781,6 +1798,15 @@ REQUIRE_JS = "common/js/vendor/require.js"
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
 
+# A tuple of files to exclude from the compilation result of r.js.
+REQUIRE_EXCLUDE = ("build.txt",)
+
+# The execution environment in which to run r.js: auto, node or rhino.
+# auto will autodetect the environment and make use of node if available and rhino if not.
+# It can also be a path to a custom class that subclasses require.environments.Environment
+# and defines some "args" function that returns a list with the command arguments to execute.
+REQUIRE_ENVIRONMENT = "node"
+
 # In production, the Django pipeline appends a file hash to JavaScript file names.
 # This makes it difficult for RequireJS to load its requirements, since module names
 # specified in JavaScript code do not include the hash.
@@ -2221,6 +2247,9 @@ INSTALLED_APPS = (
     # Static i18n support
     'statici18n',
 
+    # Review widgets
+    'openedx.core.djangoapps.coursetalk',
+
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
@@ -2266,6 +2295,12 @@ INSTALLED_APPS = (
 
     'experiments',
 )
+
+# Migrations which are not in the standard module "migrations"
+MIGRATION_MODULES = {
+    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
+}
+
 
 ######################### CSRF #########################################
 
@@ -2490,6 +2525,12 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
+
+# Set this True to ignore CSRF referer check from s3 bucket. This is
+# required for SCORM xblock to work.
+# We should find a better alternative for this and change our approach
+# for how SCORM xblock is used.
+CORS_REPLACE_HTTPS_REFERER = True
 
 ###################### Registration ##################################
 
@@ -2963,6 +3004,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
 # E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = None
 ECOMMERCE_API_URL = None
+ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
@@ -3007,6 +3049,12 @@ PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
+PROFILE_IMAGE_SIZES_MAP = {
+    'full': 500,
+    'large': 120,
+    'medium': 50,
+    'small': 30
+}
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
@@ -3062,6 +3110,8 @@ LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 # For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
 JWT_PRIVATE_SIGNING_KEY = None
 JWT_EXPIRED_PRIVATE_SIGNING_KEYS = []
+PUBLIC_RSA_KEY = None
+PRIVATE_RSA_KEY = None
 
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
@@ -3257,6 +3307,7 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
 ############## Settings for LMS Context Sensitive Help ##############
 
+DOC_LINK_BASE_URL = None
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
 HELP_TOKENS_BOOKS = {
     'learner': 'http://edx.readthedocs.io/projects/open-edx-learner-guide',

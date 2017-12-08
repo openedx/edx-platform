@@ -25,8 +25,8 @@ from startup_configurations.validate_config import validate_cms_config
 log = logging.getLogger(__name__)
 
 # edx notifications related imports
-from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
+from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from edx_solutions_projects.scope_resolver import GroupProjectParticipantsScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver
 from edx_notifications.namespaces import register_namespace_resolver

@@ -33,6 +33,9 @@ from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 ######################### Testing overrides ####################################
 
+# Needed for the reset database management command
+INSTALLED_APPS += ('django_extensions',)
+
 # Redirect to the test_root folder within the repo
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
 LOG_DIR = (TEST_ROOT / "log").abspath()
@@ -223,8 +226,10 @@ BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBacke
 
 # Configure the LMS to use our stub eCommerce implementation
 ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
+ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
 
 LMS_ROOT_URL = "http://localhost:8000"
+DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/edx-guide-for-students'
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.
     HELP_TOKENS_BOOKS = {
