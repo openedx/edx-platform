@@ -10,7 +10,7 @@ from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage
-from common.test.acceptance.pages.studio.index import DashboardPage, HomePage, IndexPage
+from common.test.acceptance.pages.studio.index import DashboardPage, HomePage, IndexPage, AccessibilityPage
 from common.test.acceptance.pages.studio.login import CourseOutlineSignInRedirectPage, LoginPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
@@ -28,7 +28,8 @@ class LoggedOutTest(AcceptanceTest):
     """
     def setUp(self):
         super(LoggedOutTest, self).setUp()
-        self.pages = [LoginPage(self.browser), IndexPage(self.browser), SignupPage(self.browser)]
+        self.pages = [LoginPage(self.browser), IndexPage(self.browser), SignupPage(self.browser),
+                      AccessibilityPage(self.browser)]
 
     def test_page_existence(self):
         """

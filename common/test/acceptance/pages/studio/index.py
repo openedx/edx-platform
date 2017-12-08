@@ -3,6 +3,7 @@ Studio Index, home and dashboard pages. These are the starting pages for users.
 """
 from bok_choy.page_object import PageObject
 from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.login import LoginPage
@@ -287,3 +288,71 @@ class HomePage(DashboardPage):
     Home page for Studio when logged in.
     """
     url = BASE_URL + "/home/"
+
+
+class AccessibilityPage(IndexPage):
+    """
+    Home page for Studio when logged in.
+    """
+    url = BASE_URL + "/accessibility"
+
+    def is_browser_on_page(self):
+        """
+        Is the page header visible?
+        """
+        return self.q(css='#root h2').visible
+
+    def header_text_on_page(self):
+        """
+        Check that the page header has the right text.
+        """
+        return 'Individualized Accessibility Process for Course Creators' in self.q(css='#root h2').text
+
+    def fill_form(self, email, name, message):
+        """
+        Fill the accessibility feedback form out.
+        """
+        email_input = self.q(css='#root input#email')
+        name_input = self.q(css='#root input#fullName')
+        message_input = self.q(css='#root textarea#message')
+
+        email_input.fill(email)
+        name_input.fill(name)
+        message_input.fill(message)
+
+        # Tab off the message textarea to trigger any error messages
+        message_input[0].send_keys(Keys.TAB)
+
+    def submit_form(self):
+        """
+        Click the submit button on the accessibiltiy feedback form.
+        """
+        button = self.q(css='#root section button')[0]
+        button.click()
+        self.wait_for_element_visibility('#root div.alert-dialog', 'Form submission alert is visible')
+
+    def leave_field_blank(self, field_id, field_type='input'):
+        """
+        To simulate leaving a field blank, click on the field, then press TAB to move off focus off the field.
+        """
+        field = self.q(css='#root {}#{}'.format(field_type, field_id))[0]
+        field.click()
+        field.send_keys(Keys.TAB)
+
+    def alert_has_text(self, text=''):
+        """
+        Check that the alert dialog contains the specified text.
+        """
+        return text in self.q(css='#root div.alert-dialog').text
+
+    def error_message_is_shown_with_text(self, field_id, text=''):
+        """
+        Check that at least one error message is shown and at least one contains the specified text.
+        """
+        selector = '#root div#error-{}'.format(field_id)
+        self.wait_for_element_visibility(selector, 'An error message is visible')
+        error_messages = self.q(css=selector)
+        for message in error_messages:
+            if text in message.text:
+                return True
+        return False
