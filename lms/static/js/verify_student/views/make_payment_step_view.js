@@ -125,8 +125,7 @@ var edx = edx || {};
                     errorMsg: gettext('Try the transaction again in a few minutes.'),
                     shown: true
                 });
-            }
-            else {
+            } else {
                 // create a button for each payment processor
                 _.each(processors.reverse(), function(processorName) {
                     $('div.payment-buttons').append(self._getPaymentButtonHtml(processorName));
@@ -155,10 +154,10 @@ var edx = edx || {};
         createOrder: function(event) {
             var paymentAmount = this.getPaymentAmount(),
                 postData = {
-                    'processor': event.target.id,
-                    'contribution': paymentAmount,
-                    'course_id': this.stepData.courseKey,
-                    'sku': this.templateContext().sku
+                    processor: event.target.id,
+                    contribution: paymentAmount,
+                    course_id: this.stepData.courseKey,
+                    sku: this.templateContext().sku
                 };
 
             // Disable the payment button to prevent multiple submissions
@@ -187,19 +186,19 @@ var edx = edx || {};
             // these parameters, then submit it to the payment processor.
             // This will send the user to an externally-hosted page
             // where she can proceed with payment.
-            var form = $('#payment-processor-form');
+            var $form = $('#payment-processor-form');
 
-            $('input', form).remove();
+            $('input', $form).remove();
 
-            form.attr('action', paymentData.payment_page_url);
-            form.attr('method', 'POST');
+            $form.attr('action', paymentData.payment_page_url);
+            $form.attr('method', 'POST');
 
             _.each(paymentData.payment_form_data, function(value, key) {
                 $('<input>').attr({
                     type: 'hidden',
                     name: key,
                     value: value
-                }).appendTo(form);
+                }).appendTo($form);
             });
 
             // Marketing needs a way to tell the difference between users
@@ -207,7 +206,7 @@ var edx = edx || {};
             // this page. A virtual pageview can be used to do this.
             window.analytics.page('payment', 'payment_processor_step');
 
-            this.submitForm(form);
+            this.submitForm($form);
         },
 
         handleCreateOrderError: function(xhr) {
@@ -230,13 +229,13 @@ var edx = edx || {};
         },
 
         getPaymentAmount: function() {
-            var contributionInput = $('input[name="contribution"]:checked', this.el),
+            var $contributionInput = $('input[name="contribution"]:checked', this.el),
                 amount = null;
 
-            if (contributionInput.attr('id') === 'contribution-other') {
+            if ($contributionInput.attr('id') === 'contribution-other') {
                 amount = $('input[name="contribution-other-amt"]', this.el).val();
             } else {
-                amount = contributionInput.val();
+                amount = $contributionInput.val();
             }
 
             // If no suggested prices are available, then the user does not
@@ -283,4 +282,4 @@ var edx = edx || {};
         }
 
     });
-})(jQuery, _, gettext, interpolate_text);
+}(jQuery, _, gettext, interpolate_text));

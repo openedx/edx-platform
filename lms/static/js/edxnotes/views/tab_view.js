@@ -41,7 +41,7 @@
                             this.destroySubView();
                         }
                     },
-                    'destroy': function() {
+                    destroy: function() {
                         this.destroySubView();
                         this.tabModel = null;
                         this.onClose();

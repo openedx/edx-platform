@@ -24,8 +24,7 @@ define([
                 // Confirm delete dialog
                 if (confirm) {
                     $('.action-primary').click();
-                }
-                else {
+                } else {
                     $('.action-secondary').click();
                 }
             },

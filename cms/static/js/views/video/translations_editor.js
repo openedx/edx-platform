@@ -10,9 +10,9 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
     var VideoUploadDialog = UploadDialog.extend({
         error: function() {
             this.model.set({
-                'uploading': false,
-                'uploadedBytes': 0,
-                'title': gettext('Sorry, there was an error parsing the subtitles that you uploaded. Please check the format and try again.')
+                uploading: false,
+                uploadedBytes: 0,
+                title: gettext('Sorry, there was an error parsing the subtitles that you uploaded. Please check the format and try again.')
             });
         }
     });
@@ -41,7 +41,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             AbstractEditor.prototype.initialize.apply(this, arguments);
         },
 
-        getDropdown: function() {
+        getDropdown: (function() {
             var dropdown,
                 disableOptions = function(element, values) {
                     var dropdown = $(element).clone();
@@ -82,7 +82,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
 
                 return disableOptions(dropdown, values);
             };
-        }(),
+        }()),
 
         getValueFromEditor: function() {
             var dict = {},
@@ -115,9 +115,9 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
 
             _.each(values, function(value, key) {
                 var html = $(self.templateItem({
-                    'lang': key,
-                    'value': value,
-                    'url': self.model.get('urlRoot') + '/' + key
+                    lang: key,
+                    value: value,
+                    url: self.model.get('urlRoot') + '/' + key
                 })).prepend(dropdown.clone().val(key))[0];
 
                 frag.appendChild(html);
@@ -149,8 +149,8 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             event.preventDefault();
 
             var self = this,
-                target = $(event.currentTarget),
-                lang = target.data('lang'),
+                $target = $(event.currentTarget),
+                lang = $target.data('lang'),
                 model = new FileUpload({
                     title: gettext('Upload translation'),
                     fileFormats: ['srt']
@@ -158,13 +158,13 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                 view = new VideoUploadDialog({
                     model: model,
                     url: self.model.get('urlRoot') + '/' + lang,
-                    parentElement: target.closest('.xblock-editor'),
+                    parentElement: $target.closest('.xblock-editor'),
                     onSuccess: function(response) {
-                        if (!response['filename']) { return; }
+                        if (!response.filename) { return; }
 
                         var dict = $.extend(true, {}, self.model.get('value'));
 
-                        dict[lang] = response['filename'];
+                        dict[lang] = response.filename;
                         self.model.setValue(dict);
                     }
                 });

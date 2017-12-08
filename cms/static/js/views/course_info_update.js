@@ -1,12 +1,12 @@
 define(['codemirror',
-        'js/utils/modal',
-        'js/utils/date_utils',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'js/views/course_info_helper',
-        'js/views/validation',
-        'js/models/course_update',
-        'common/js/components/views/feedback_prompt',
-        'common/js/components/views/feedback_notification'],
+    'js/utils/modal',
+    'js/utils/date_utils',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'js/views/course_info_helper',
+    'js/views/validation',
+    'js/models/course_update',
+    'common/js/components/views/feedback_prompt',
+    'common/js/components/views/feedback_notification'],
     function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, ValidatingView, CourseUpdateModel,
              PromptView, NotificationView) {
         'use strict';
@@ -184,9 +184,9 @@ define(['codemirror',
                 this.closeEditor(false);
 
                 analytics.track('Saved Course Update', {
-                    'course': course_location_analytics,
-                    'date': this.dateEntry(event).val(),
-                    'push_notification_selected': this.push_notification_selected(event)
+                    course: course_location_analytics,
+                    date: this.dateEntry(event).val(),
+                    push_notification_selected: this.push_notification_selected(event)
                 });
             },
 
@@ -214,8 +214,7 @@ define(['codemirror',
             // translate long-form date (for viewing) into short-form date (for input)
                 if (targetModel.get('date') && targetModel.isValid()) {
                     $(this.dateEntry(event)).val($.datepicker.formatDate('mm/dd/yy', new Date(targetModel.get('date'))));
-                }
-                else {
+                } else {
                     $(this.dateEntry(event)).val('MM/DD/YY');
                 }
                 this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
@@ -245,8 +244,8 @@ define(['codemirror',
                             text: gettext('OK'),
                             click: function() {
                                 analytics.track('Deleted Course Update', {
-                                    'course': course_location_analytics,
-                                    'date': self.dateEntry(event).val()
+                                    course: course_location_analytics,
+                                    date: self.dateEntry(event).val()
                                 });
                                 self.modelDom(event).remove();
                                 var deleting = new NotificationView.Mini({

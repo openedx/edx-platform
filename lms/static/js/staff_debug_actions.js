@@ -144,7 +144,8 @@ var StaffDebug = (function() {
         getUser: getUser,
         getScore: getScore,
         sanitizeString: sanitizeString
-    }; })();
+    };
+}());
 
 // Register click handlers
 $(document).ready(function() {

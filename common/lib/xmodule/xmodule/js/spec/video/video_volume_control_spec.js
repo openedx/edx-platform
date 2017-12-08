@@ -59,26 +59,26 @@
             });
 
             it('add ARIA attributes to live region', function() {
-                var liveRegion = $('.video-live-region');
+                var $liveRegion = $('.video-live-region');
 
-                expect(liveRegion).toHaveAttrs({
+                expect($liveRegion).toHaveAttrs({
                     'aria-live': 'polite'
                 });
             });
 
             it('add ARIA attributes to volume control', function() {
-                var button = $('.volume .control');
+                var $button = $('.volume .control');
 
-                expect(button).toHaveAttrs({
+                expect($button).toHaveAttrs({
                     'aria-disabled': 'false'
                 });
             });
 
             it('bind the volume control', function() {
-                var button = $('.volume .control');
+                var $button = $('.volume .control');
 
-                expect(button).toHandle('keydown');
-                expect(button).toHandle('mousedown');
+                expect($button).toHandle('keydown');
+                expect($button).toHandle('mousedown');
                 expect($('.volume')).not.toHaveClass('is-opened');
 
                 $('.volume').mouseenter();
@@ -98,7 +98,7 @@
                     assertLiveRegionState: function() {
                         return {
                             compare: function(actual, volume, expectation) {
-                                var region = $('.video-live-region');
+                                var $region = $('.video-live-region');
 
                                 var getExpectedText = function(text) {
                                     return text + ' Volume.';
@@ -106,7 +106,7 @@
 
                                 actual.setVolume(volume, true, true);
                                 return {
-                                    pass: region.text() === getExpectedText(expectation)
+                                    pass: $region.text() === getExpectedText(expectation)
                                 };
                             }
                         };
@@ -199,12 +199,12 @@
             });
 
             it('volume is increased correctly', function() {
-                var button = $('.volume .control');
+                var $button = $('.volume .control');
                 volumeControl.volume = 60;
 
             // adjust the volume
-                button.focus();
-                button.trigger(keyPressEvent(KEY.UP));
+                $button.focus();
+                $button.trigger(keyPressEvent(KEY.UP));
                 expect(volumeControl.volume).toEqual(80);
             });
 
@@ -222,12 +222,12 @@
             });
 
             it('volume is decreased correctly', function() {
-                var button = $('.volume .control');
+                var $button = $('.volume .control');
                 volumeControl.volume = 60;
 
             // adjust the volume
-                button.focus();
-                button.trigger(keyPressEvent(KEY.DOWN));
+                $button.focus();
+                $button.trigger(keyPressEvent(KEY.DOWN));
                 expect(volumeControl.volume).toEqual(40);
             });
 

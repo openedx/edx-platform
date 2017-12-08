@@ -74,6 +74,5 @@ define([
             expect($enrollmentResultRow.find('td:nth-child(5)').text())
                 .toBe('Sep 1, 2017 4:00 PM UTC'); // Verification Deadline
         });
-
     });
 });

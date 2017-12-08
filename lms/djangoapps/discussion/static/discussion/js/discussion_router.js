@@ -28,7 +28,6 @@
                     } else {
                         this.startHeader = 2; // Start the header levels at H<startHeader>
                     }
-
                 },
 
                 start: function() {

@@ -197,26 +197,26 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
              * @returns {Promise} A promise representing the loading of the resource.
              */
             loadResource: function(resource) {
-                var head = $('head'),
+                var $head = $('head'),
                     mimetype = resource.mimetype,
                     kind = resource.kind,
                     placement = resource.placement,
                     data = resource.data;
                 if (mimetype === 'text/css') {
                     if (kind === 'text') {
-                        head.append("<style type='text/css'>" + data + '</style>');
+                        $head.append("<style type='text/css'>" + data + '</style>');
                     } else if (kind === 'url') {
-                        head.append("<link rel='stylesheet' href='" + data + "' type='text/css'>");
+                        $head.append("<link rel='stylesheet' href='" + data + "' type='text/css'>");
                     }
                 } else if (mimetype === 'application/javascript') {
                     if (kind === 'text') {
-                        head.append('<script>' + data + '</script>');
+                        $head.append('<script>' + data + '</script>');
                     } else if (kind === 'url') {
                         return ViewUtils.loadJavaScript(data);
                     }
                 } else if (mimetype === 'text/html') {
                     if (placement === 'head') {
-                        head.append(data);
+                        $head.append(data);
                     }
                 }
                 // Return an already resolved promise for synchronous updates

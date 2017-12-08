@@ -21,7 +21,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 },
                 events: {
                     'change input[name=textbook-name]': 'setName',
-                    'submit': 'setAndClose',
+                    submit: 'setAndClose',
                     'click .action-cancel': 'cancel',
                     'click .action-add-chapter': 'createChapter'
                 },
@@ -49,8 +49,8 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                         var chapter = that.model.get('chapters').at(i);
                         if (!chapter) { return; }
                         chapter.set({
-                            'name': $('.chapter-name', li).val(),
-                            'asset_path': $('.chapter-asset-path', li).val()
+                            name: $('.chapter-name', li).val(),
+                            asset_path: $('.chapter-asset-path', li).val()
                         });
                     });
                     return this;

@@ -43,9 +43,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
 
             updatePreviewButton: function(show_previews) {
                 var text = (show_previews) ? gettext('Hide Previews') : gettext('Show Previews'),
-                    button = $('.nav-actions .button-toggle-preview');
+                    $button = $('.nav-actions .button-toggle-preview');
 
-                this.$('.preview-text', button).text(text);
+                this.$('.preview-text', $button).text(text);
                 this.$('.toggle-preview-button').removeClass('is-hidden');
             }
         });

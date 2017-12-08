@@ -5,8 +5,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             var model, modal, showModal;
 
             showModal = function(requests, mockHtml, options) {
-                var xblockElement = $('.xblock');
-                return EditHelpers.showEditModal(requests, xblockElement, model, mockHtml, options);
+                var $xblockElement = $('.xblock');
+                return EditHelpers.showEditModal(requests, $xblockElement, model, mockHtml, options);
             };
 
             beforeEach(function() {

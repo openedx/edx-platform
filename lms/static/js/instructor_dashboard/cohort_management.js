@@ -10,7 +10,7 @@
         CohortManagement.prototype.onClickTitle = function() {};
 
         return CohortManagement;
-    })();
+    }());
 
     window.InstructorDashboard.sections.CohortManagement = CohortManagement;
 }).call(this);

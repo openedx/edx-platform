@@ -124,5 +124,4 @@ describe('Tests for accessibility_tools.js', function() {
             );
         });
     });
-
 });

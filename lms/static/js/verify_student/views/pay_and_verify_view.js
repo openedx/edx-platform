@@ -121,12 +121,12 @@ var edx = edx || {};
         },
 
         renderCurrentStep: function() {
-            var stepName, stepView, stepEl;
+            var stepName, stepView, $stepEl;
 
             // Get or create the step container
-            stepEl = $('#current-step-container');
-            if (!stepEl.length) {
-                stepEl = $('<div id="current-step-container"></div>').appendTo(this.el);
+            $stepEl = $('#current-step-container');
+            if (!$stepEl.length) {
+                $stepEl = $('<div id="current-step-container"></div>').appendTo(this.el);
             }
 
             // Render the subview
@@ -134,7 +134,7 @@ var edx = edx || {};
             // step in the DOM.
             stepName = this.displaySteps[this.currentStepIndex].name;
             stepView = this.subviews[stepName];
-            stepView.el = stepEl;
+            stepView.el = $stepEl;
             stepView.render();
         },
 
@@ -159,4 +159,4 @@ var edx = edx || {};
             this.render();
         }
     });
-})(jQuery, _, Backbone, gettext);
+}(jQuery, _, Backbone, gettext));

@@ -43,7 +43,7 @@ define(['backbone'],
         };
 
         return {
-            'getLocationHash': getLocationHash,
-            'preventBackboneChangingUrl': preventBackboneChangingUrl
+            getLocationHash: getLocationHash,
+            preventBackboneChangingUrl: preventBackboneChangingUrl
         };
     });

@@ -46,10 +46,10 @@
                                 // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
                                 _.escape(gettext("{browse_span_start}Browse teams in other topics{span_end} or {search_span_start}search teams{span_end} in this topic. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.")),
                             {
-                                'browse_span_start': '<a class="browse-teams" href="">',
-                                'search_span_start': '<a class="search-teams" href="">',
-                                'create_span_start': '<a class="create-team" href="">',
-                                'span_end': '</a>'
+                                browse_span_start: '<a class="browse-teams" href="">',
+                                search_span_start: '<a class="search-teams" href="">',
+                                create_span_start: '<a class="create-team" href="">',
+                                span_end: '</a>'
                             }
                             );
                         self.$el.append(_.template(teamActionsTemplate)({message: message}));
@@ -64,10 +64,10 @@
             },
 
             searchTeams: function(event) {
-                var searchField = $('.page-header-search .search-field');
+                var $searchField = $('.page-header-search .search-field');
                 event.preventDefault();
-                searchField.focus();
-                searchField.select();
+                $searchField.focus();
+                $searchField.select();
                 $('html, body').animate({
                     scrollTop: 0
                 }, 500);

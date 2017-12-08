@@ -89,8 +89,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery
 
             progress: function(event, position, total) {
                 this.model.set({
-                    'uploadedBytes': position,
-                    'totalBytes': total
+                    uploadedBytes: position,
+                    totalBytes: total
                 });
             },
 
@@ -110,9 +110,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery
 
             error: function() {
                 this.model.set({
-                    'uploading': false,
-                    'uploadedBytes': 0,
-                    'title': gettext("We're sorry, there was an error")
+                    uploading: false,
+                    uploadedBytes: 0,
+                    title: gettext("We're sorry, there was an error")
                 });
             }
         });

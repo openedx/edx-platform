@@ -160,8 +160,7 @@
                 describe('[loadedmetadata]', function() {
                     it(
                         'player state was changed, start/end was defined, ' +
-                        'onReady called', function(done)
-                    {
+                        'onReady called', function(done) {
                         jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;

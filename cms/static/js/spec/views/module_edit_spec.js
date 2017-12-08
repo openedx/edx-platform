@@ -154,7 +154,7 @@
                             success: jasmine.any(Function)
                         });
                         this.moduleEdit.clickEditButton({
-                            'preventDefault': jasmine.createSpy('event.preventDefault')
+                            preventDefault: jasmine.createSpy('event.preventDefault')
                         });
                         mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
                         $.ajax.calls.mostRecent().args[0].success({

@@ -194,20 +194,20 @@
             state.videoEventsPlugin.destroy();
             expect(state.videoEventsPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
-                'ready': plugin.onReady,
-                'play': plugin.onPlay,
-                'pause': plugin.onPause,
+                ready: plugin.onReady,
+                play: plugin.onPlay,
+                pause: plugin.onPause,
                 'ended stop': plugin.onEnded,
-                'seek': plugin.onSeek,
-                'skip': plugin.onSkip,
-                'speedchange': plugin.onSpeedChange,
+                seek: plugin.onSeek,
+                skip: plugin.onSkip,
+                speedchange: plugin.onSpeedChange,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
                 'transcript:show': plugin.onShowTranscript,
                 'transcript:hide': plugin.onHideTranscript,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
-                'destroy': plugin.destroy
+                destroy: plugin.destroy
             });
         });
     });
