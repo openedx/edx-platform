@@ -80,15 +80,10 @@ def login_and_registration_form(request, initial_mode="login"):
         enterprise_customer = enterprise_customer_for_request(request)
         if enterprise_customer and current_provider and current_provider.sync_learner_profile_data:
             user_details = running_pipeline['kwargs']['details']
-
-            try:
-                # pylint: disable=invalid-name
-                qs = {'email': user_details['email']} if user_details.get('email') else \
-                    {'username': user_details.get('username')}
-                user = User.objects.get(**qs)
-            except User.DoesNotExist:
-                pass
-            else:
+            # pylint: disable=invalid-name
+            qs = {'email': user_details['email']} if user_details.get('email') else \
+                {'username': user_details.get('username')}
+            if User.objects.filter(**qs).exists():
                 return redirect(reverse('signin_user'), next=redirect_to)
 
     # Retrieve the form descriptions from the user API
