@@ -221,12 +221,12 @@ class CourseEntitlement(TimeStampedModel):
             'expired_at': self.expired_at
         }
 
-    @classmethod
-    def set_enrollment(cls, entitlement, enrollment):
+    def set_enrollment(self, enrollment):
         """
         Fulfills an entitlement by specifying a session.
         """
-        cls.objects.filter(id=entitlement.id).update(enrollment_course_run=enrollment)
+        self.enrollment_course_run = enrollment
+        self.save()
 
     @classmethod
     def unexpired_entitlements_for_user(cls, user):
