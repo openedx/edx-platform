@@ -35,6 +35,7 @@ from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
@@ -727,8 +728,10 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         MessageMiddleware().process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
-    def test_context(self):
-
+    @mock.patch('student_account.views.get_enterprise_learner_data')
+    def test_context(self, mock_get_enterprise_learner_data):
+        self.request.site = SiteFactory.create()
+        mock_get_enterprise_learner_data.return_value = []
         context = account_settings_context(self.request)
 
         user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
@@ -750,6 +753,59 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(context['duplicate_provider'], 'facebook')
         self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
         self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+
+        self.assertEqual(context['sync_learner_profile_data'], False)
+        self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
+        self.assertEqual(context['enterprise_name'], None)
+        self.assertEqual(
+            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+        )
+
+    @mock.patch('student_account.views.get_enterprise_learner_data')
+    @mock.patch('student_account.views.third_party_auth.provider.Registry.get')
+    def test_context_for_enterprise_learner(
+            self, mock_get_auth_provider, mock_get_enterprise_learner_data
+    ):
+        dummy_enterprise_customer = {
+            'uuid': 'real-ent-uuid',
+            'name': 'Dummy Enterprise',
+            'identity_provider': 'saml-ubc'
+        }
+        mock_get_enterprise_learner_data.return_value = [
+            {'enterprise_customer': dummy_enterprise_customer}
+        ]
+        self.request.site = SiteFactory.create()
+        mock_get_auth_provider.return_value.sync_learner_profile_data = True
+        context = account_settings_context(self.request)
+
+        user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
+        self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
+
+        user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
+        self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
+
+        for attribute in self.FIELDS:
+            self.assertIn(attribute, context['fields'])
+
+        self.assertEqual(
+            context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
+        )
+        self.assertEqual(
+            context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(context['duplicate_provider'], 'facebook')
+        self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
+        self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+
+        self.assertEqual(
+            context['sync_learner_profile_data'], mock_get_auth_provider.return_value.sync_learner_profile_data
+        )
+        self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
+        self.assertEqual(context['enterprise_name'], dummy_enterprise_customer['name'])
+        self.assertEqual(
+            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+        )
 
     def test_view(self):
         """

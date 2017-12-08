@@ -244,6 +244,28 @@ define(['backbone',
             }
         };
 
+        var verifyReadonlyField = function(view, data) {
+            if (data.editable === 'toggle') {
+                expect(view.el).toHaveClass('mode-placeholder');
+                expectTitleToContain(view, data.title);
+                expectMessageContains(view, view.indicators.canEdit);
+                view.$el.click();
+            } else {
+                expectTitleAndMessageToContain(view, data.title, data.helpMessage);
+            }
+            expect(view.el).toHaveClass('u-field-readonly');
+
+            if (view.fieldValue() !== null) {
+                expect(view.fieldValue()).not.toContain(data.validValue);
+            }
+        };
+
+        var verifyUneditableDropdownField = function(view, data) {
+            expectTitleAndMessageToContain(view, data.title, data.helpMessage);
+            expect(view.el).toHaveClass('u-field-dropdown');
+            expect(view.el).toHaveClass('editable-never');
+        };
+
         var verifyTextField = function(view, data, requests) {
             verifyEditableField(view, _.extend({
                 valueSelector: '.u-field-value',
@@ -252,12 +274,24 @@ define(['backbone',
                 requests);
         };
 
+        var verifyReadonlyTextField = function(view, data) {
+            verifyReadonlyField(view, _.extend({
+                valueSelector: '.u-field-value'
+            }, data));
+        };
+
         var verifyDropDownField = function(view, data, requests) {
             verifyEditableField(view, _.extend({
                 valueSelector: '.u-field-value',
                 valueInputSelector: '.u-field-value > select'
             }, data
             ), requests);
+        };
+
+        var verifyReadonlyDropDownField = function(view, data) {
+            verifyUneditableDropdownField(view, _.extend({
+                valueSelector: '.editable-never'
+            }, data));
         };
 
         return {
@@ -274,7 +308,9 @@ define(['backbone',
             verifySuccessMessageReset: verifySuccessMessageReset,
             verifyEditableField: verifyEditableField,
             verifyTextField: verifyTextField,
+            verifyReadonlyTextField: verifyReadonlyTextField,
             verifyDropDownField: verifyDropDownField,
+            verifyReadonlyDropDownField: verifyReadonlyDropDownField,
             verifyPersistence: verifyPersistence
         };
     });

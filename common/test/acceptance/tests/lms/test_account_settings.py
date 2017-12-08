@@ -163,7 +163,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
                 'fields': [
                     'Username',
                     'Full Name',
-                    'Email Address',
+                    'Email Address (Sign In)',
                     'Password',
                     'Language',
                     'Country or Region of Residence',
@@ -289,7 +289,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         self.visit_account_settings_page()
         self._test_text_field(
             u'email',
-            u'Email Address',
+            u'Email Address (Sign In)',
             email,
             u'test@example.com' + XSS_INJECTION,
             [u'me@here.com', u'you@there.com'],
