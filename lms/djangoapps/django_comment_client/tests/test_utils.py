@@ -5,7 +5,6 @@ import json
 import ddt
 import mock
 import pytest
-
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from mock import Mock, patch
@@ -21,11 +20,7 @@ from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from django_comment_common.models import (
-    CourseDiscussionSettings,
-    ForumsConfig,
-    assign_role
-)
+from django_comment_common.models import CourseDiscussionSettings, ForumsConfig, assign_role
 from django_comment_common.utils import (
     get_course_discussion_settings,
     seed_permissions_roles,

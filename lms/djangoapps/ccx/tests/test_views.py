@@ -12,11 +12,11 @@ from django.conf import settings
 from django.core.urlresolvers import resolve, reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import MagicMock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id

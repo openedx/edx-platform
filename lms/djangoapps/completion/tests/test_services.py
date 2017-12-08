@@ -4,6 +4,7 @@ Tests of completion xblock runtime services
 import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
 from student.tests.factories import UserFactory
 
 from ..models import BlockCompletion

@@ -7,6 +7,8 @@ from time import time
 
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import UsageKey
+from xblock.runtime import KvsFieldData
+from xblock.scorable import Score
 
 import dogstats_wrapper as dog_stats_api
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -18,10 +20,8 @@ from lms.djangoapps.grades.events import GRADES_OVERRIDE_EVENT_TYPE, GRADES_RESC
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic
-
-from xblock.runtime import KvsFieldData
-from xblock.scorable import Score
 from xmodule.modulestore.django import modulestore
+
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
 from .utils import UNKNOWN_TASK_ID, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UPDATE_STATUS_SUCCEEDED

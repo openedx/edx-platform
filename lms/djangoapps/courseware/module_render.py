@@ -11,12 +11,14 @@ from functools import partial
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.template.context_processors import csrf
+from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
@@ -38,9 +40,8 @@ from courseware.masquerade import (
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
-from lms.djangoapps.completion.models import BlockCompletion
 from lms.djangoapps.completion import waffle as completion_waffle
+from lms.djangoapps.completion.models import BlockCompletion
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -66,7 +67,6 @@ from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from django.utils.text import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore

@@ -2,9 +2,10 @@
 Tests related to the Site Configuration feature
 """
 
+from contextlib import contextmanager
+
 import pytest
 from bs4 import BeautifulSoup
-from contextlib import contextmanager
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings

@@ -7,13 +7,14 @@ from collections import OrderedDict
 from urllib import urlencode
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
-import ddt
 from certificates.api import get_certificate_url
 from certificates.models import (
     CertificateGenerationCourseSetting,
@@ -37,7 +38,6 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches

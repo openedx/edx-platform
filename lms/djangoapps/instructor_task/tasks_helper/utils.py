@@ -1,4 +1,5 @@
 from eventtracking import tracker
+
 from lms.djangoapps.instructor_task.models import ReportStore
 from util.file import course_filename_prefix_generator
 

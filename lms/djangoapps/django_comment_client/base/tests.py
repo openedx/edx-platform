@@ -2,10 +2,10 @@
 """Tests for django comment client views."""
 import json
 import logging
-import mock
 from contextlib import contextmanager
 
 import ddt
+import mock
 import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -28,13 +28,9 @@ from django_comment_client.tests.group_id import (
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
-from django_comment_common.models import (
-    assign_role,
-    CourseDiscussionSettings,
-    FORUM_ROLE_STUDENT,
-    Role
-)
+from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role, assign_role
 from django_comment_common.utils import ThreadContext, seed_permissions_roles, set_course_discussion_settings
+from event_transformers import ForumThreadViewedEventTransformer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -42,20 +38,14 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
+from track.middleware import TrackMiddleware
+from track.views import segmentio
+from track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import (
-    SegmentIOTrackingTestCaseBase,
-    SEGMENTIO_TEST_USER_ID
-)
-
-from event_transformers import ForumThreadViewedEventTransformer
-
 
 log = logging.getLogger(__name__)
 

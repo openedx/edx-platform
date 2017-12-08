@@ -20,12 +20,10 @@ from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+import events
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from request_cache import get_cache
-
-import events
-
 
 log = logging.getLogger(__name__)
 

@@ -2,6 +2,7 @@
 Test for LMS instructor background task queue management
 """
 import ddt
+from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 
@@ -44,7 +45,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from celery.states import FAILURE
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):

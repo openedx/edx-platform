@@ -1,10 +1,11 @@
-from celery import task
 from logging import getLogger
 
+from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.contrib.auth.models import User
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 from .api import generate_user_certificates
 

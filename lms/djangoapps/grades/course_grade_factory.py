@@ -2,7 +2,6 @@ from collections import namedtuple
 from logging import getLogger
 
 import dogstats_wrapper as dog_stats_api
-
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
 
 from .config import assume_zero_if_absent, should_persist_grades

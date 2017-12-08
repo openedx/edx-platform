@@ -4,29 +4,30 @@ Grades related signals.
 from contextlib import contextmanager
 from logging import getLogger
 
-from courseware.model_data import get_score, set_score
 from django.dispatch import receiver
+from submissions.models import score_reset, score_set
+from xblock.scorable import ScorableXBlockMixin, Score
+
+from courseware.model_data import get_score, set_score
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
 from student.signals import ENROLLMENT_TRACK_UPDATED
-from submissions.models import score_reset, score_set
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.date_utils import to_timestamp
-from xblock.scorable import ScorableXBlockMixin, Score
 
+from .. import events
+from ..constants import ScoreDatabaseTableEnum
+from ..course_grade_factory import CourseGradeFactory
+from ..scores import weighted_score
+from ..tasks import RECALCULATE_GRADE_DELAY_SECONDS, recalculate_subsection_grade_v3
 from .signals import (
     PROBLEM_RAW_SCORE_CHANGED,
     PROBLEM_WEIGHTED_SCORE_CHANGED,
     SCORE_PUBLISHED,
-    SUBSECTION_SCORE_CHANGED,
     SUBSECTION_OVERRIDE_CHANGED,
+    SUBSECTION_SCORE_CHANGED
 )
-from ..constants import ScoreDatabaseTableEnum
-from ..course_grade_factory import CourseGradeFactory
-from .. import events
-from ..scores import weighted_score
-from ..tasks import RECALCULATE_GRADE_DELAY_SECONDS, recalculate_subsection_grade_v3
 
 log = getLogger(__name__)
 

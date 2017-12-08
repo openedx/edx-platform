@@ -15,23 +15,19 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from pytz import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import UTC
 from xblock.core import XBlock
 
-from courseware.access_response import (
-    MilestoneAccessError,
-    MobileAvailabilityError,
-    VisibilityError,
-)
+from courseware.access_response import MilestoneAccessError, MobileAvailabilityError, VisibilityError
 from courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
     adjust_start_date,
+    check_course_open_for_learner,
     check_start_date,
     debug,
-    in_preview_mode,
-    check_course_open_for_learner,
+    in_preview_mode
 )
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException

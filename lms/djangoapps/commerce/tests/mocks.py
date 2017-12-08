@@ -6,8 +6,8 @@ from django.conf import settings
 
 from . import factories
 
-
 # pylint: disable=invalid-name
+
 
 class mock_ecommerce_api_endpoint(object):
     """

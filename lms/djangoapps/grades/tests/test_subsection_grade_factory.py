@@ -1,8 +1,9 @@
 import ddt
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from django.conf import settings
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
+
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 
 from ..models import PersistentSubsectionGrade
 from ..subsection_grade_factory import ZeroSubsectionGrade

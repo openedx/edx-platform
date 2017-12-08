@@ -3,13 +3,13 @@ Discussion API internal interface
 """
 import itertools
 from collections import defaultdict
+from enum import Enum
 from urllib import urlencode
 from urlparse import urlunparse
 
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from enum import Enum
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied

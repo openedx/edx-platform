@@ -32,6 +32,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from submissions import api as sub_api  # installed from the edx-submissions repository
 
 import instructor_analytics.basic
 import instructor_analytics.csvs
@@ -45,17 +46,17 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule
 from django_comment_client.utils import (
-    has_forum_access,
     get_course_discussion_settings,
+    get_group_id_for_user,
     get_group_name,
-    get_group_id_for_user
+    has_forum_access
 )
 from django_comment_common.models import (
-    Role,
     FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role
 )
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
@@ -105,7 +106,6 @@ from student.models import (
     unique_id_for_user
 )
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from submissions import api as sub_api  # installed from the edx-submissions repository
 from util.file import (
     FileValidationException,
     UniversalNewlineIterator,

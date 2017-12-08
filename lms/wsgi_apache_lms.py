@@ -5,6 +5,9 @@ This module contains the WSGI application used for Apache deployment.
 It exposes a module-level variable named ``application``.
 """
 
+# The import order matters for modules like safe_lxml.
+# pylint: disable=wrong-import-order, wrong-import-position
+
 # Patch the xml libs before anything else.
 from safe_lxml import defuse_xml_libs
 defuse_xml_libs()

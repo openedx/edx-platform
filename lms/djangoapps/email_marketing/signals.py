@@ -5,20 +5,21 @@ import datetime
 import logging
 
 import crum
+from celery.exceptions import TimeoutError
 from django.conf import settings
 from django.dispatch import receiver
 from sailthru.sailthru_error import SailthruClientError
-from celery.exceptions import TimeoutError
 
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
+from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.cookies import CREATE_LOGON_COOKIE
 from student.signals import ENROLL_STATUS_CHANGE
 from student.views import REGISTER_USER
 from util.model_utils import USER_FIELD_CHANGED
+
 from .tasks import update_course_enrollment
 
 log = logging.getLogger(__name__)

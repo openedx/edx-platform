@@ -18,6 +18,7 @@ from django.test.client import RequestFactory
 from django.utils.timezone import now
 from mock import patch
 from nose.plugins.attrib import attr
+from submissions import api as submissions_api
 
 from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
@@ -35,7 +36,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import CourseEnrollment, anonymous_id_for_user
-from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition

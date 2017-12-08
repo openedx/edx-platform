@@ -14,8 +14,8 @@ from celery.states import READY_STATES
 from bulk_email.models import CourseEmail
 from certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
-    check_arguments_for_rescoring,
     check_arguments_for_overriding,
+    check_arguments_for_rescoring,
     check_entrance_exam_problems_for_rescoring,
     encode_entrance_exam_and_student_input,
     encode_problem_and_student_input,
@@ -23,7 +23,6 @@ from lms.djangoapps.instructor_task.api_helper import (
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
-    override_problem_score,
     calculate_grades_csv,
     calculate_may_enroll_csv,
     calculate_problem_grade_report,
@@ -36,6 +35,7 @@ from lms.djangoapps.instructor_task.tasks import (
     exec_summary_report_csv,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     proctored_exam_results_csv,
     rescore_problem,
     reset_problem_attempts,

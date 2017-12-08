@@ -46,7 +46,6 @@ from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangolib.model_mixins import DeprecatedModelMixin
 from openedx.core.storage import get_storage
 
-
 log = logging.getLogger(__name__)
 
 

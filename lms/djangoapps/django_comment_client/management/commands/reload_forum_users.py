@@ -3,9 +3,10 @@ Reload forum (comment client) users from existing users.
 """
 from __future__ import print_function
 
-import lms.lib.comment_client as cc
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+
+import lms.lib.comment_client as cc
 
 
 class Command(BaseCommand):

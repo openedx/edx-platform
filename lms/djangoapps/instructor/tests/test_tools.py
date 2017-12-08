@@ -9,9 +9,9 @@ import unittest
 import mock
 from django.test import TestCase
 from django.test.utils import override_settings
-from pytz import UTC
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
 from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides

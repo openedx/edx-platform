@@ -33,10 +33,7 @@ from openedx.core.djangoapps.user_api.api import (
     get_login_session_form,
     get_password_reset_form
 )
-from openedx.core.djangoapps.user_api.errors import (
-    UserNotFound,
-    UserAPIInternalError
-)
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNotFound
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_learner_data

@@ -28,16 +28,11 @@ from django_comment_client.tests.utils import (
     topic_name_to_id
 )
 from django_comment_client.utils import strip_none
-from django_comment_common.models import (
-    CourseDiscussionSettings,
-    ForumsConfig,
-    FORUM_ROLE_STUDENT,
-)
+from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, ForumsConfig
 from django_comment_common.utils import ThreadContext, seed_permissions_roles
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
-from lms.djangoapps.discussion.views import _get_discussion_default_topic_id
-from lms.djangoapps.discussion.views import course_discussions_settings_handler
+from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup

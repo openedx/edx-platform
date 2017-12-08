@@ -1,8 +1,9 @@
 """
 Tests for the Bulk Enrollment views.
 """
-import ddt
 import json
+
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -14,12 +15,7 @@ from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from microsite_configuration import microsite
-from student.models import (
-    CourseEnrollment,
-    ManualEnrollmentAudit,
-    ENROLLED_TO_UNENROLLED,
-    UNENROLLED_TO_ENROLLED,
-)
+from student.models import ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

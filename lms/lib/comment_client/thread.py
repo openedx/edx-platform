@@ -1,10 +1,9 @@
 import logging
 
 import settings
-
-import models
 from eventtracking import tracker
 
+import models
 import utils
 
 log = logging.getLogger(__name__)

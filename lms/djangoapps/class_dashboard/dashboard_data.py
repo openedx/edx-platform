@@ -5,7 +5,6 @@ import json
 
 from django.db.models import Count
 from django.utils.translation import ugettext as _
-
 from opaque_keys.edx.locations import Location
 
 from courseware import models

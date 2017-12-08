@@ -2,9 +2,9 @@
 """
 Tests for course access
 """
+import datetime
 import itertools
 
-import datetime
 import ddt
 import mock
 import pytz

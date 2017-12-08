@@ -11,14 +11,15 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 
-import ddt
 import datetime
+
+import ddt
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
-import pytz
 from rest_framework.test import APITestCase
 
 from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError

@@ -2,13 +2,13 @@
 Unit tests for course tools.
 """
 
-import crum
 import datetime
 
-from mock import patch
-from nose.plugins.attrib import attr
+import crum
 import pytz
 from django.test import RequestFactory
+from mock import patch
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

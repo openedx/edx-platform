@@ -14,8 +14,8 @@ from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
-from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule

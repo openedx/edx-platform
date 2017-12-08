@@ -5,11 +5,11 @@ Test signal handlers.
 from datetime import datetime
 
 import ddt
+import six
 from django.test import TestCase
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-import six
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 

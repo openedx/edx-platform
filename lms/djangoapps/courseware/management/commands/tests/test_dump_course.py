@@ -7,12 +7,12 @@ Tests for Django management commands
 import json
 from StringIO import StringIO
 
-from nose.plugins.attrib import attr
-from six import text_type
-
 import factory
 from django.conf import settings
 from django.core.management import call_command
+from nose.plugins.attrib import attr
+from six import text_type
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (

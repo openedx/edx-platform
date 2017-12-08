@@ -11,7 +11,6 @@ from lms.djangoapps.discussion import tasks
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
 
-
 log = logging.getLogger(__name__)
 
 

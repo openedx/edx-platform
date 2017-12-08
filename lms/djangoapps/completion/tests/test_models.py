@@ -10,8 +10,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from student.tests.factories import UserFactory
 
-from .. import models
-from .. import waffle
+from .. import models, waffle
 
 
 class PercentValidatorTestCase(TestCase):

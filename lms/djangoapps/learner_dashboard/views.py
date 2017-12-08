@@ -3,8 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
-
-from lms.djangoapps.learner_dashboard.programs import ProgramsFragmentView, ProgramDetailsFragmentView
+from lms.djangoapps.learner_dashboard.programs import ProgramDetailsFragmentView, ProgramsFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 

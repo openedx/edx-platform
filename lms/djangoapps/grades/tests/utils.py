@@ -4,7 +4,7 @@ Utilities for grades related tests
 from contextlib import contextmanager
 from datetime import datetime
 
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
