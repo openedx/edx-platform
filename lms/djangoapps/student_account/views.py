@@ -74,18 +74,6 @@ def login_and_registration_form(request, initial_mode="login"):
     if request.user.is_authenticated():
         return redirect(redirect_to)
 
-    running_pipeline = pipeline.get(request)
-    if running_pipeline and initial_mode == 'register':
-        current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
-        enterprise_customer = enterprise_customer_for_request(request)
-        if enterprise_customer and current_provider and current_provider.sync_learner_profile_data:
-            user_details = running_pipeline['kwargs']['details']
-            # pylint: disable=invalid-name
-            qs = {'email': user_details['email']} if user_details.get('email') else \
-                {'username': user_details.get('username')}
-            if User.objects.filter(**qs).exists():
-                return redirect(reverse('signin_user'), next=redirect_to)
-
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
 

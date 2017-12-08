@@ -52,6 +52,7 @@ def apply_settings(django_settings):
         'third_party_auth.pipeline.associate_by_email_if_login_api',
         'social_core.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
+        'third_party_auth.pipeline.force_user_login_when_email_already_present',
         'third_party_auth.pipeline.ensure_user_information',
         'social_core.pipeline.user.create_user',
         'social_core.pipeline.social_auth.associate_user',

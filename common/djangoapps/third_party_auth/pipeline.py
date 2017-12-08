@@ -790,3 +790,21 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 except SMTPException:
                     logger.exception('Error sending IdP learner data sync-initiated email change '
                                      'notification email for user [%s].', user.username)
+
+
+@partial.partial
+def force_user_login_when_email_already_present(auth_entry, strategy, details, user=None, *args, **kwargs):
+    """
+    Force user to login when user email is already present in the system.
+    """
+    # continue pipeline when user is logged in
+    if user is not None:
+        return
+
+    current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
+    if current_provider and current_provider.sync_learner_profile_data:
+        # pylint: disable=invalid-name
+        qs = {'email': details['email']} if details.get('email') else \
+            {'username': details.get('username')}
+        if User.objects.filter(**qs).exists():
+            return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
