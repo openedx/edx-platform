@@ -22,6 +22,7 @@ def evaluate_prerequisite(course, subsection_grade, user):
     by dependent subsections, the related milestone will be marked
     fulfilled for the user.
     """
+
     prereq_milestone = gating_api.get_gating_milestone(course.id, subsection_grade.location, 'fulfills')
     if prereq_milestone:
         gated_content_milestones = defaultdict(list)
@@ -61,7 +62,7 @@ def _get_subsection_percentage(subsection_grade):
     """
     Returns the percentage value of the given subsection_grade.
     """
-    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
+    return int(round(_calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0))
 
 
 def _calculate_ratio(earned, possible):
