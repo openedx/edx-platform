@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-function CourseOrLibraryListing(props) {
+export function CourseOrLibraryListing(props) {
   const allowReruns = props.allowReruns;
   const linkClass = props.linkClass;
   const idBase = props.idBase;
@@ -75,57 +75,3 @@ CourseOrLibraryListing.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   linkClass: PropTypes.string.isRequired,
 };
-
-export class StudioCourseIndex {
-  constructor(selector, context, allowReruns) {
-    // The HTML element is only conditionally shown, based on number of courses.
-    const element = document.querySelector(selector);
-    if (element) {
-      ReactDOM.render(
-        <CourseOrLibraryListing
-          items={context}
-          linkClass="course-link"
-          idBase="course"
-          allowReruns={allowReruns}
-        />,
-        element,
-      );
-    }
-  }
-}
-
-export class StudioArchivedIndex {
-  constructor(selector, context, allowReruns) {
-    // The HTML element is only conditionally shown, based on number of archived courses.
-    const element = document.querySelector(selector);
-    if (element) {
-      ReactDOM.render(
-        <CourseOrLibraryListing
-          items={context}
-          linkClass="course-link"
-          idBase="archived"
-          allowReruns={allowReruns}
-        />,
-        element,
-      );
-    }
-  }
-}
-
-export class StudioLibraryIndex {
-  constructor(selector, context) {
-    // The HTML element is only conditionally shown, based on number of libraries.
-    const element = document.querySelector(selector);
-    if (element) {
-      ReactDOM.render(
-        <CourseOrLibraryListing
-          items={context}
-          linkClass="library-link"
-          idBase="library"
-          allowReruns={false}
-        />,
-        document.querySelector(selector),
-      );
-    }
-  }
-}
