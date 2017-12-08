@@ -64,12 +64,24 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test@edx.org'])
 
+    def test_login_with_username_success(self):
+        response, mock_audit_log = self._login_response('test', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        self._assert_response(response, success=True)
+        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test'])
+
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
+
+    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
+    def test_login_with_username_success_no_pii(self):
+        response, mock_audit_log = self._login_response('test', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        self._assert_response(response, success=True)
+        self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
 
     def test_login_success_unicode_email(self):
         unicode_email = u'test' + unichr(40960) + u'@edx.org'
@@ -85,7 +97,14 @@ class LoginTest(CacheIsolationTestCase):
         response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email or username', nonexistent_email])
+
+    def test_login_fail_with_username_no_user_exists(self):
+        nonexistent_username = u'not_a_user'
+        response, mock_audit_log = self._login_response(nonexistent_username, 'test_password')
+        self._assert_response(response, success=False,
+                              value='Email or password is incorrect')
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email or username', nonexistent_username])
 
     @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
     def test_login_fail_incorrect_email_with_advanced_security(self):
@@ -93,7 +112,7 @@ class LoginTest(CacheIsolationTestCase):
         response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email or username', nonexistent_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_no_user_exists_no_pii(self):
@@ -101,7 +120,7 @@ class LoginTest(CacheIsolationTestCase):
         response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email'])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email or username'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [nonexistent_email])
 
     def test_login_fail_wrong_password(self):
