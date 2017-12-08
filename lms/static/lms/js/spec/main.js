@@ -764,6 +764,7 @@
         'js/spec/learner_dashboard/program_details_view_spec.js',
         'js/spec/learner_dashboard/program_details_sidebar_view_spec.js',
         'js/spec/learner_dashboard/unenroll_view_spec.js',
+        'js/spec/learner_dashboard/entitlement_unenrollment_view_spec.js',
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/learner_dashboard/course_entitlement_view_spec.js',

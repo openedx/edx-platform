@@ -1534,6 +1534,12 @@ a.fade-cover {
 
 #unenroll-modal {
   margin-top: -60px;
+
+  .modal-form-error {
+    background: tint($red, 95%);
+    margin-left: $baseline;
+    margin-right: $baseline;
+  }
 }
 
 .reasons_survey {

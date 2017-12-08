@@ -29,7 +29,7 @@
                 var o = options;
 
                 $(this).click(function(e) {
-                    $('.modal').hide();
+                    $('.modal, .js-modal').hide();
 
                     var modal_id = $(this).attr('href');
 
@@ -113,8 +113,12 @@
 
     $(document).ready(function($) {
         $('a[rel*=leanModal]').each(function() {
-            $(this).leanModal({top: 120, overlay: 1, closeButton: '.close-modal', position: 'absolute'});
-            embed = $($(this).attr('href')).find('iframe');
+            var $link = $(this),
+                closeButton = $link.data('modalCloseButtonSelector') || '.close-modal',
+                embed;
+
+            $link.leanModal({top: 120, overlay: 1, closeButton: closeButton, position: 'absolute'});
+            embed = $($link.attr('href')).find('iframe');
             if (embed.length > 0 && embed.attr('src')) {
                 var sep = (embed.attr('src').indexOf('?') > 0) ? '&' : '?';
                 embed.data('src', embed.attr('src') + sep + 'autoplay=1&rel=0');

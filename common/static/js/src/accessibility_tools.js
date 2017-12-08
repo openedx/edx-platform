@@ -98,7 +98,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
         });
 
     // get modal to exit on escape key
-        $('.modal').on('keydown', function(e) {
+        $(modalId).on('keydown', function(e) {
             var keyCode = e.keyCode || e.which;
       // 27 is the javascript keycode for the ESC key
             if (keyCode === 27) {

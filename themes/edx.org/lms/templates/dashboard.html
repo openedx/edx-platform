@@ -62,6 +62,12 @@ from student.models import CourseEnrollment
       isEdx: true
     });
   </%static:require_module>
+  <%static:require_module module_name="js/learner_dashboard/entitlement_unenrollment_factory" class_name="EntitlementUnenrollmentFactory">
+    EntitlementUnenrollmentFactory({
+      dashboardPath: "${reverse('dashboard') | n, js_escaped_string}",
+      signInPath: "${reverse('signin_user') | n, js_escaped_string}"
+    });
+  </%static:require_module>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
@@ -157,6 +163,7 @@ from student.models import CourseEnrollment
             session_id = enrollment.course_id
             show_courseware_link = (session_id in show_courseware_links_for)
             cert_status = cert_statuses.get(session_id)
+            can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
             can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
             credit_status = credit_statuses.get(session_id)
             show_email_settings = (session_id in show_email_settings_for)
@@ -169,7 +176,7 @@ from student.models import CourseEnrollment
             show_consent_link = (session_id in consent_required_courses)
             course_overview = enrollment.course_overview
           %>
-          <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
+          <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
         % endfor
         </ul>
     % else:
@@ -332,3 +339,5 @@ from student.models import CourseEnrollment
     <%include file='dashboard/_reason_survey.html' />
   </div>
 </section>
+
+<%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>
