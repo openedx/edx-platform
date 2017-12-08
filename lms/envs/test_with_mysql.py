@@ -1,8 +1,13 @@
 """
 Used when testing with MySQL.
 """
-from .test import *  # pylint: disable=wildcard-import
-from .aws import *  # pylint: disable=wildcard-import
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
+from .test import *
+from .aws import *
 
 # Dummy secret key for dev
 SECRET_KEY = 'dev key'

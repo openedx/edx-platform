@@ -18,14 +18,18 @@ as they are for non-optimized devstack. Instead, update_assets must be
 invoked each time that changes have been made.
 """
 
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
 import os
 
 ########################## Devstack settings ###################################
 
 if 'BOK_CHOY_HOSTNAME' in os.environ:
-    from .devstack_docker import *  # pylint: disable=wildcard-import, unused-wildcard-import
+    from .devstack_docker import *
 else:
-    from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
+    from .devstack import *
 
 TEST_ROOT = REPO_ROOT / "test_root"
 
