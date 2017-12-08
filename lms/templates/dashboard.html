@@ -163,7 +163,7 @@ from student.models import CourseEnrollment
                 is_course_blocked = (session_id in block_courses)
                 course_verification_status = verification_status_by_course.get(session_id, {})
                 course_requirements = courses_requirements_not_met.get(session_id)
-                related_programs = inverted_programs.get(unicode(session_id))
+                related_programs = inverted_programs.get(unicode(entitlement.course_uuid if entitlement else session_id))
                 show_consent_link = (session_id in consent_required_courses)
                 course_overview = enrollment.course_overview
               %>
