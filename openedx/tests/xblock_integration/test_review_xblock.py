@@ -363,7 +363,6 @@ class TestReviewFunctions(TestReviewXBlock):
                 'section': review_section_actual.location.name,
             }
         ))
-        print response
 
         expected_header_text = 'Review Problems'
         # The problems are defaulted to correct upon load
