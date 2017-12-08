@@ -22,7 +22,6 @@ def evaluate_prerequisite(course, subsection_grade, user):
     by dependent subsections, the related milestone will be marked
     fulfilled for the user.
     """
-
     prereq_milestone = gating_api.get_gating_milestone(course.id, subsection_grade.location, 'fulfills')
     if prereq_milestone:
         gated_content_milestones = defaultdict(list)
