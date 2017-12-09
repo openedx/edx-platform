@@ -10,11 +10,14 @@ export LANGUAGE=en_US.utf8
 echo 'Run as edxapp user'
 sudo su edxapp -s /bin/bash 
 source /edx/app/edxapp/edxapp_env
-cd /edx/app/edxapp/edx-platform 
+cd /edx/app/edxapp/edx-platform
 
 # These variables are becoming unset inside docker container
 export CODE_COV_TOKEN=$CODE_COV_TOKEN
 export TRAVIS=true
+
+# Get the diff coverage and html reports for unit tests
+paver coverage
 
 pip install codecov==2.0.5
 codecov --token=$CODE_COV_TOKEN --branch=$BRANCH
