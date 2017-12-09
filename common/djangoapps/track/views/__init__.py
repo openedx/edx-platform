@@ -3,6 +3,7 @@ import json
 
 import pytz
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -32,12 +33,50 @@ def _get_request_header(request, header_name, default=''):
         return default
 
 
+def get_request_ip(request):
+    """Wrapper for helper method to get request ip."""
+    return _get_request_ip(request)
+
+
 def _get_request_ip(request, default=''):
-    """Helper method to get IP from a request's META dict, if present."""
-    if request is not None and hasattr(request, 'META'):
-        return get_ip(request)
-    else:
-        return default
+        """
+        Helper method to get IP from a request's META dict, if present.
+        If SQUELCH_PII_IN_LOGS is True:
+        Anonymize the ip address to the first two octets.
+        This gives enough data to be useful for Analysis
+        without explicitly identifying user
+            e.g. 127.0.0.1 => 127.0.X.X
+        """
+        if request is None:
+            return default
+
+        def _anonymize_if_needed(ip_address_str):
+            if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+                return _get_anonymous_ip(ip_address_str)
+            else:
+                return ip_address_str
+
+        if hasattr(request, 'META'):
+            ip_address = get_ip(request)
+            request_ip = _anonymize_if_needed(ip_address)
+        elif request.get('ip'):
+            request_ip = _anonymize_if_needed(request.get('ip'))
+        else:
+            request_ip = default
+
+        return request_ip
+
+
+def _get_anonymous_ip(ip_address_str):
+    """Helper method to obbuscate the last two octets of an ip address"""
+    try:
+        ip_comps = ip_address_str.split('.')
+        first = '.'.join(ip_comps[0:2])
+        ip_address = '{}.x.x'.format(first)
+    except:
+        ip_address = 'unknown'
+
+    return ip_address
 
 
 def _get_request_value(request, value_name, default=''):
@@ -99,7 +138,7 @@ def server_track(request, event_type, event, page=None):
     # define output:
     event = {
         "username": username,
-        "ip": _get_request_ip(request),
+        "ip": get_request_ip(request),
         "referer": _get_request_header(request, 'HTTP_REFERER'),
         "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
         "event_source": "server",
@@ -149,7 +188,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
     with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
         event = {
             "username": request_info.get('username', 'unknown'),
-            "ip": request_info.get('ip', 'unknown'),
+            "ip": _get_request_ip(request_info, 'unknown'),
             "event_source": "task",
             "event_type": event_type,
             "event": full_event,

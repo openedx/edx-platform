@@ -4,7 +4,7 @@ from mock import patch, sentinel
 
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import modify_settings, override_settings
 
 from track import views
 from track.middleware import TrackMiddleware
@@ -171,6 +171,27 @@ class TestTrackViews(EventTrackingTestCase):
         }
         self.assert_mock_tracker_call_matches(expected_event)
 
+    @override_settings(FEATURES={'SQUELCH_PII_IN_LOGS': True})
+    def test_server_track_without_personal_data(self):
+        request = self.request_factory.get(self.path_with_course)
+        views.server_track(request, str(sentinel.event_type), '{}')
+
+        expected_event = {
+            'accept_language': '',
+            'referer': '',
+            'username': 'anonymous',
+            'ip': '127.0.x.x',
+            'event_source': 'server',
+            'event_type': str(sentinel.event_type),
+            'event': '{}',
+            'agent': '',
+            'page': None,
+            'time': FROZEN_TIME,
+            'host': 'testserver',
+            'context': {},
+        }
+        self.assert_mock_tracker_call_matches(expected_event)
+
     def assert_mock_tracker_call_matches(self, expected_event):
         self.assertEqual(len(self.mock_tracker.send.mock_calls), 1)
         actual_event = self.mock_tracker.send.mock_calls[0][1][0]
@@ -284,6 +305,42 @@ class TestTrackViews(EventTrackingTestCase):
         expected_event = {
             'username': 'anonymous',
             'ip': '127.0.0.1',
+            'event_source': 'task',
+            'event_type': str(sentinel.event_type),
+            'event': expected_event_data,
+            'agent': 'agent',
+            'page': None,
+            'time': FROZEN_TIME,
+            'host': 'testserver',
+            'context': {
+                'course_id': '',
+                'org_id': ''
+            },
+        }
+        self.assert_mock_tracker_call_matches(expected_event)
+
+    @override_settings(FEATURES={'SQUELCH_PII_IN_LOGS': True})
+    def test_task_track(self):
+        request_info = {
+            'accept_language': '',
+            'referer': '',
+            'username': 'anonymous',
+            'ip': '127.0.0.1',
+            'agent': 'agent',
+            'host': 'testserver',
+        }
+
+        task_info = {
+            sentinel.task_key: sentinel.task_value
+        }
+        expected_event_data = dict(task_info)
+        expected_event_data.update(self.event)
+
+        views.task_track(request_info, task_info, str(sentinel.event_type), self.event)
+
+        expected_event = {
+            'username': 'anonymous',
+            'ip': '127.0.x.x',
             'event_source': 'task',
             'event_type': str(sentinel.event_type),
             'event': expected_event_data,
