@@ -196,7 +196,12 @@ class TrackMiddleware(object):
     def get_username(self, request):
         """Gets the username of the logged in Django user"""
         try:
-            return request.user.username
+            username = request.user.username
+
+            if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+                return ''
+
+            return username
         except AttributeError:
             return ''
 

@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring,maybe-no-member
 
 from mock import patch, sentinel
+from random import randint
 
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -197,6 +198,55 @@ class TestTrackViews(EventTrackingTestCase):
         actual_event = self.mock_tracker.send.mock_calls[0][1][0]
         assert_event_matches(expected_event, actual_event)
 
+    @override_settings(
+        EVENT_TRACKING_PROCESSORS=[{'ENGINE': 'track.shim.LegacyFieldMappingProcessor'}],
+        FEATURES={'SQUELCH_PII_IN_LOGS': True}
+    )
+    def test_anonymize_video_user_track(self):
+        """Tests if the user_id and username are anonymized for the video events from the browser source"""
+        event_type = str(views.BROWSER_VIDEO_EVENT_TYPES[randint(0, 13)])
+
+        self.recreate_tracker()
+
+        middleware = TrackMiddleware()
+        payload = '{"foo": "bar"}'
+        user_id = 1
+
+        request = self.request_factory.post('/event', {
+            'page': self.url_with_course,
+            'event_type': event_type,
+            'event': payload
+        })
+
+        request.user = User.objects.create(pk=user_id, username=str(sentinel.username))
+        request.META['REMOTE_ADDR'] = '10.0.0.1'
+        middleware.process_request(request)
+        try:
+            views.user_track(request)
+
+            expected_event = {
+                'username': '',  # expect username to be anonymized
+                'session': '',
+                'ip': '10.0.x.x',  # expect ip address to be anonymized
+                'event_source': 'browser',
+                'event_type': event_type,
+                'name': event_type,
+                'event': payload,
+                'page': self.url_with_course,
+                'time': FROZEN_TIME,
+                'context': {
+                    'course_id': 'foo/bar/baz',
+                    'org_id': 'foo',
+                    'user_id': '',  # expect user id to be anonymized
+                    'path': u'/event'
+                },
+            }
+        finally:
+            middleware.process_response(request, None)
+
+        actual_event = self.get_event()
+        assert_event_matches(expected_event, actual_event)
+
     def test_server_track_with_middleware(self):
         middleware = TrackMiddleware()
         request = self.request_factory.get(self.path_with_course)
@@ -284,6 +334,63 @@ class TestTrackViews(EventTrackingTestCase):
         }
         self.assert_mock_tracker_call_matches(expected_event)
 
+    @override_settings(
+        EVENT_TRACKING_PROCESSORS=[{'ENGINE': 'track.shim.LegacyFieldMappingProcessor'}],
+        FEATURES={'SQUELCH_PII_IN_LOGS': True}
+    )
+    def test_anonymize_video_server_track(self):
+        """Tests if the user_id(both in context and event information for WAMS player) and username are anonymized for the video events from the server source"""
+        middleware = TrackMiddleware()
+        user_id = 1
+        payload = dict()
+        payload['user_id'] = user_id
+        payload['video_url'] = u'//amssamples.streaming.mediaservices.windows.net/bc57e088-27ec-44e0-ac20-a85ccbcd50da/TearsOfSteel.ism/manifest'
+        path = "/courses/course-v1:edX+DemoX+Demo_Course/xblock/block-v1:edX+DemoX+Demo_Course+type@azure_media_services+block@2dd679150566460eb2b272f4f6c18d9c/handler/publish_event"
+        expected_payload = dict()
+        expected_payload['user_id'] = ''
+        expected_payload['video_url'] = u'//amssamples.streaming.mediaservices.windows.net/bc57e088-27ec-44e0-ac20-a85ccbcd50da/TearsOfSteel.ism/manifest'
+
+        request = self.request_factory.post(path, {
+            'page': self.url_with_course,
+            'event_type': str(sentinel.event_type),
+            'event': payload
+        })
+        request.user = User.objects.create(pk=user_id, username=str(sentinel.username))
+        request.META['REMOTE_ADDR'] = '10.0.0.1'
+        request.META['HTTP_ACCEPT_LANGUAGE'] = str(sentinel.accept_language)
+        request.META['HTTP_USER_AGENT'] = str(sentinel.user_agent)
+        request.META[
+            'PATH_INFO'] = "/courses/course-v1:edX+DemoX+Demo_Course/xblock/block-v1:edX+DemoX+Demo_Course+type@azure_media_services+block@2dd679150566460eb2b272f4f6c18d9c/handler/publish_event"
+
+        middleware.process_request(request)
+        # The middleware emits an event, reset the mock to ignore it since we aren't testing that feature.
+        self.mock_tracker.reset_mock()
+        try:
+            views.server_track(request, str(sentinel.event_type), payload)
+            expected_event = {
+                'accept_language': str(sentinel.accept_language),
+                'referer': '',
+                'username': '',
+                'ip': '10.0.x.x',
+                'event_source': 'server',
+                'event_type': str(sentinel.event_type),
+                'event': expected_payload,
+                'agent': str(sentinel.user_agent),
+                'page': None,
+                'time': FROZEN_TIME,
+                'host': 'testserver',
+                'context': {
+                    'user_id': '',
+                    'course_id': u'course-v1:edX+DemoX+Demo_Course',
+                    'org_id': 'edX',
+                    'path': u'/courses/course-v1:edX+DemoX+Demo_Course/xblock/block-v1:edX+DemoX+Demo_Course+type@azure_media_services+block@2dd679150566460eb2b272f4f6c18d9c/handler/publish_event'
+                },
+            }
+        finally:
+            middleware.process_response(request, None)
+
+        self.assert_mock_tracker_call_matches(expected_event)
+
     def test_task_track(self):
         request_info = {
             'accept_language': '',
@@ -320,7 +427,7 @@ class TestTrackViews(EventTrackingTestCase):
         self.assert_mock_tracker_call_matches(expected_event)
 
     @override_settings(FEATURES={'SQUELCH_PII_IN_LOGS': True})
-    def test_task_track(self):
+    def test_task_track_without_personal_data(self):
         request_info = {
             'accept_language': '',
             'referer': '',
@@ -339,7 +446,7 @@ class TestTrackViews(EventTrackingTestCase):
         views.task_track(request_info, task_info, str(sentinel.event_type), self.event)
 
         expected_event = {
-            'username': 'anonymous',
+            'username': '',
             'ip': '127.0.x.x',
             'event_source': 'task',
             'event_type': str(sentinel.event_type),
