@@ -2220,6 +2220,9 @@ INSTALLED_APPS = (
 
     # Philu Overrides
     'lms.djangoapps.philu_overrides',
+
+    #third party surveys
+    'lms.djangoapps.third_party_surveys',
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',
 

@@ -12,7 +12,7 @@ from celery.schedules import crontab
 log = logging.getLogger('edx.celery.task')
 
 
-@periodic_task(run_every=crontab(minute=1, hour=0))
+@periodic_task(run_every=crontab())
 def task_course_notifications():
     log.info('Getting courses')
     courses = get_visible_courses()

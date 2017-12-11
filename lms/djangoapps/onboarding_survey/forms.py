@@ -428,10 +428,9 @@ class RegModelForm(forms.ModelForm):
         }
 
     def clean_organization_name(self):
-        is_currently_unemployed = True if self.data.get('is_currently_employed') == 'true' else False
         organization_name = self.cleaned_data['organization_name']
 
-        if not is_currently_unemployed and not organization_name:
+        if not self.data.get('is_currently_employed') and not organization_name:
             raise forms.ValidationError("Please enter organization name")
 
         return organization_name
