@@ -2,15 +2,14 @@
 """
 Tests for CountryMiddleware.
 """
-from mock import patch
 import pygeoip
-
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import patch
 
 from openedx.core.djangoapps.geoinfo.middleware import CountryMiddleware
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 class CountryMiddlewareTests(TestCase):

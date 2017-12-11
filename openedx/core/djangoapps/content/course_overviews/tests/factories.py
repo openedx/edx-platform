@@ -2,9 +2,9 @@ import json
 
 import factory
 from factory.django import DjangoModelFactory
+from opaque_keys.edx.locator import CourseLocator
 
 from ..models import CourseOverview
-from opaque_keys.edx.locator import CourseLocator
 
 
 class CourseOverviewFactory(DjangoModelFactory):

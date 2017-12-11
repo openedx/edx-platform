@@ -4,11 +4,11 @@ based on the current site.
 """
 from django import template
 from django.conf import settings
-from django.templatetags.static import static
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.templatetags.static import static
 
-from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 register = template.Library()  # pylint: disable=invalid-name
 

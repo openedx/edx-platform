@@ -2,17 +2,18 @@
 Tests for verified_track_content/partition_scheme.py.
 """
 from datetime import datetime, timedelta
+
 import pytz
 
-from ..partition_scheme import EnrollmentTrackPartitionScheme, EnrollmentTrackUserPartition, ENROLLMENT_GROUP_IDS
-from ..models import VerifiedTrackCohortedCourse
 from course_modes.models import CourseMode
-
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.partitions.partitions import UserPartition, MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition
+
+from ..models import VerifiedTrackCohortedCourse
+from ..partition_scheme import ENROLLMENT_GROUP_IDS, EnrollmentTrackPartitionScheme, EnrollmentTrackUserPartition
 
 
 class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):

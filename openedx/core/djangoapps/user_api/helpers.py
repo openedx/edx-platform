@@ -10,7 +10,7 @@ from functools import wraps
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseBadRequest, HttpRequest
+from django.http import HttpRequest, HttpResponseBadRequest
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 

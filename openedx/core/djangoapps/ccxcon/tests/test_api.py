@@ -3,24 +3,19 @@ Unit tests for the API module
 """
 
 import datetime
+import urlparse
+
 import mock
 import pytz
-import urlparse
 from nose.plugins.attrib import attr
-
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import AdminFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
-)
-from xmodule.modulestore.tests.factories import (
-    CourseFactory,
-    ItemFactory,
-)
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
+from student.tests.factories import AdminFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 from .factories import CcxConFactory
 
 

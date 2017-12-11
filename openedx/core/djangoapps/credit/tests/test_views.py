@@ -13,23 +13,30 @@ import ddt
 import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import (
-    CreditCourse, CreditProvider, CreditRequest, CreditRequirement, CreditRequirementStatus,
+    CreditCourse,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
 )
-from openedx.core.djangoapps.credit.serializers import CreditProviderSerializer, CreditEligibilitySerializer
+from openedx.core.djangoapps.credit.serializers import CreditEligibilitySerializer, CreditProviderSerializer
 from openedx.core.djangoapps.credit.signature import signature
 from openedx.core.djangoapps.credit.tests.factories import (
-    CreditProviderFactory, CreditEligibilityFactory, CreditCourseFactory, CreditRequestFactory,
+    CreditCourseFactory,
+    CreditEligibilityFactory,
+    CreditProviderFactory,
+    CreditRequestFactory
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import AdminFactory, UserFactory
 from util.date_utils import to_timestamp
 
 JSON = 'application/json'

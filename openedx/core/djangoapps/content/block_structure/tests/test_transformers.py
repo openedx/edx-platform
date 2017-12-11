@@ -1,16 +1,15 @@
 """
 Tests for transformers.py
 """
-from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from unittest import TestCase
 
+from mock import MagicMock, patch
+from nose.plugins.attrib import attr
+
 from ..block_structure import BlockStructureModulestoreData
-from ..exceptions import TransformerException, TransformerDataIncompatible
+from ..exceptions import TransformerDataIncompatible, TransformerException
 from ..transformers import BlockStructureTransformers
-from .helpers import (
-    ChildrenMapTestMixin, MockTransformer, MockFilteringTransformer, mock_registered_transformers
-)
+from .helpers import ChildrenMapTestMixin, MockFilteringTransformer, MockTransformer, mock_registered_transformers
 
 
 @attr(shard=2)

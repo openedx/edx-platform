@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """ Tests for the language API. """
 
-from mock import patch
+import ddt
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
-from django.contrib.auth.models import User
-import ddt
+from mock import patch
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import api as language_api

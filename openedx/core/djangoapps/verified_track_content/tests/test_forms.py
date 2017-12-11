@@ -1,10 +1,9 @@
 """
 Test for forms helpers.
 """
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
 from openedx.core.djangoapps.verified_track_content.forms import VerifiedTrackCourseForm
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):

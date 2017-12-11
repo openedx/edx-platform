@@ -3,11 +3,10 @@ Tests for the sync course runs management command.
 """
 import ddt
 import mock
-
 from django.core.management import call_command
 
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.core.djangoapps.catalog.management.commands.sync_course_runs import Command as sync_command
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

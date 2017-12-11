@@ -19,7 +19,8 @@ from enum import Enum
 
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from openedx.core.djangolib.markup import Text, HTML
+
+from openedx.core.djangolib.markup import HTML, Text
 
 
 class UserMessageType(Enum):

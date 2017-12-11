@@ -4,18 +4,17 @@ Command to load course blocks.
 import logging
 
 from django.core.management.base import BaseCommand
-from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
-import openedx.core.djangoapps.content.block_structure.tasks as tasks
 import openedx.core.djangoapps.content.block_structure.store as store
+import openedx.core.djangoapps.content.block_structure.tasks as tasks
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
-    validate_dependent_option,
     parse_course_keys,
+    validate_dependent_option
 )
-
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

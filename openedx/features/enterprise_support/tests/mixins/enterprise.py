@@ -2,9 +2,9 @@
 Mixins for the EnterpriseApiClient.
 """
 import json
-import mock
 
 import httpretty
+import mock
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse

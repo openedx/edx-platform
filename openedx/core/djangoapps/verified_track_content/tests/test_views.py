@@ -4,13 +4,12 @@ Tests for verified track content views.
 
 import json
 
-from nose.plugins.attrib import attr
-
 from django.http import Http404
 from django.test.client import RequestFactory
+from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

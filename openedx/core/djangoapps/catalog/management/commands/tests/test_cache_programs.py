@@ -4,10 +4,7 @@ import httpretty
 from django.core.cache import cache
 from django.core.management import call_command
 
-from openedx.core.djangoapps.catalog.cache import (
-    PROGRAM_CACHE_KEY_TPL,
-    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
-)
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin

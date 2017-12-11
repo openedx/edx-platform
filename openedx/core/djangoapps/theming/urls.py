@@ -7,7 +7,6 @@ from django.conf.urls import url
 from .helpers import is_comprehensive_theming_enabled
 from .views import ThemingAdministrationFragmentView
 
-
 if is_comprehensive_theming_enabled():
     urlpatterns = [
         url(

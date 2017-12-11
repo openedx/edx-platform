@@ -3,37 +3,35 @@ Tests for EmbargoMiddleware
 """
 
 from contextlib import contextmanager
-import mock
-from nose.plugins.attrib import attr
-import pygeoip
-import ddt
 
+import ddt
+import mock
+import pygeoip
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.cache import cache
 from django.db import connection
+from django.test.utils import override_settings
+from mock import patch
+from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
 from student.roles import (
-    GlobalStaff, CourseRole, OrgRole,
-    CourseStaffRole, CourseInstructorRole,
-    OrgStaffRole, OrgInstructorRole
+    CourseInstructorRole,
+    CourseRole,
+    CourseStaffRole,
+    GlobalStaff,
+    OrgInstructorRole,
+    OrgRole,
+    OrgStaffRole
 )
-
-from ..models import (
-    RestrictedCourse, Country, CountryAccessRule,
-)
-
+from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.factories import CourseFactory
+
 from .. import api as embargo_api
 from ..exceptions import InvalidAccessPoint
-from mock import patch
-
+from ..models import Country, CountryAccessRule, RestrictedCourse
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 

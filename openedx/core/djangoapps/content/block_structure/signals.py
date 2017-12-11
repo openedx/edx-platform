@@ -3,10 +3,9 @@ Signal handlers for invalidating cached data.
 """
 from django.conf import settings
 from django.dispatch.dispatcher import receiver
+from opaque_keys.edx.locator import LibraryLocator
 
 from xmodule.modulestore.django import SignalHandler
-
-from opaque_keys.edx.locator import LibraryLocator
 
 from . import config
 from .api import clear_course_from_cache

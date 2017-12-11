@@ -6,8 +6,6 @@ forums, and to the cohort admin views.
 import logging
 import random
 
-import request_cache
-from courseware import courses
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -17,6 +15,9 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from eventtracking import tracker
+
+import request_cache
+from courseware import courses
 from request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
 

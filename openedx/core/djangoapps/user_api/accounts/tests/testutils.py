@@ -4,11 +4,12 @@ Utility functions, constants, etc. for testing.
 """
 
 from openedx.core.djangoapps.user_api.accounts import (
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH,
     EMAIL_MAX_LENGTH,
-    PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
-
 
 INVALID_NAMES = [
     None,

@@ -4,7 +4,8 @@ Code to delete rows from a table within a Django mgmt command using best practic
 
 import logging
 import time
-from django.core.management.base import CommandError, BaseCommand
+
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 log = logging.getLogger(__name__)

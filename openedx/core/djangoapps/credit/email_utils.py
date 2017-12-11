@@ -17,10 +17,10 @@ from django.core.cache import cache
 from django.core.mail import EmailMessage, SafeMIMEText
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from eventtracking import tracker
 
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
-from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

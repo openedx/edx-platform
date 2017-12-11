@@ -2,9 +2,9 @@
 Tests for comprehensive themes.
 """
 from django.conf import settings
+from django.contrib import staticfiles
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms

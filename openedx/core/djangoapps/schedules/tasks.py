@@ -3,24 +3,21 @@ import logging
 
 import analytics
 from celery import task
+from celery_utils.logged_task import LoggedTask
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-
 from django.db.utils import DatabaseError
-
-from celery_utils.logged_task import LoggedTask
-from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.monitoring_utils import set_custom_metric
-from openedx.core.djangoapps.schedules import message_types
+from openedx.core.djangoapps.schedules import message_types, resolvers
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
-from openedx.core.djangoapps.schedules import resolvers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 LOG = logging.getLogger(__name__)

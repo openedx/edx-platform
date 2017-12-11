@@ -9,10 +9,10 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_course_run_key,
-    ProgramFactory,
     CourseFactory,
     CourseRunFactory,
+    ProgramFactory,
+    generate_course_run_key
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin

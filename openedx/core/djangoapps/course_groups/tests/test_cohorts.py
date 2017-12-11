@@ -1,17 +1,17 @@
 """
 Tests for cohorts
 """
+import before_after
 # pylint: disable=no-member
 import ddt
-from mock import call, patch
-from nose.plugins.attrib import attr
-
-import before_after
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
+from mock import call, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore

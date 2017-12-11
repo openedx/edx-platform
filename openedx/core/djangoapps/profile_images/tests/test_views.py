@@ -1,30 +1,29 @@
 """
 Test cases for the HTTP endpoints of the profile image api.
 """
-from contextlib import closing
 import datetime
-from nose.plugins.attrib import attr
-from pytz import UTC
-
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from contextlib import closing
 
 import ddt
 import mock
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from mock import patch
+from nose.plugins.attrib import attr
 from PIL import Image
-from rest_framework.test import APITestCase, APIClient
+from pytz import UTC
+from rest_framework.test import APIClient, APITestCase
 
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import (
-    set_has_profile_image,
     get_profile_image_names,
     get_profile_image_storage,
+    set_has_profile_image
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import UserFactory
+from student.tests.tests import UserSettingsEventTestMixin
 
-from ..images import create_profile_images, ImageValidationError
+from ..images import ImageValidationError, create_profile_images
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
 from .helpers import make_image_file
 

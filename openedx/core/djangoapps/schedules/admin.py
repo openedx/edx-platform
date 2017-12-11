@@ -1,15 +1,16 @@
 import functools
 
-from django.contrib import admin
 from django import forms
-from django.db.models import F
+from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
+from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML
 
 from . import models
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from opaque_keys.edx.keys import CourseKey
 
 
 class ScheduleExperienceAdminInline(admin.StackedInline):

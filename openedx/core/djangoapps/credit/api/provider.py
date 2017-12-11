@@ -8,30 +8,25 @@ import uuid
 
 import pytz
 from django.db import transaction
-
 from edx_proctoring.api import get_last_exam_completion_date
+
 from openedx.core.djangoapps.credit.exceptions import (
-    UserIsNotEligible,
     CreditProviderNotConfigured,
-    RequestAlreadyCompleted,
     CreditRequestNotFound,
     InvalidCreditStatus,
+    RequestAlreadyCompleted,
+    UserIsNotEligible
 )
 from openedx.core.djangoapps.credit.models import (
-    CreditProvider,
-    CreditRequirementStatus,
-    CreditRequest,
     CreditEligibility,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirementStatus
 )
-
-from student.models import (
-    User,
-    CourseEnrollment,
-)
-from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+from openedx.core.djangoapps.credit.signature import get_shared_secret_key, signature
+from student.models import CourseEnrollment, User
 from util.date_utils import to_timestamp
 from util.json_request import JsonResponse
-
 
 # TODO: Cleanup this mess! ECOM-2908
 

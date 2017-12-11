@@ -12,7 +12,6 @@ from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_group_info_for_cohort
 
-
 log = logging.getLogger(__name__)
 
 

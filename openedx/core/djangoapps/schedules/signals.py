@@ -5,6 +5,7 @@ import random
 import analytics
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from edx_ace.utils import date
 
 from course_modes.models import CourseMode
 from courseware.models import (
@@ -12,16 +13,15 @@ from courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from edx_ace.utils import date
-from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
+from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.signals.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
+
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
 from .models import Schedule, ScheduleConfig
 from .tasks import update_course_schedules
-
 
 log = logging.getLogger(__name__)
 

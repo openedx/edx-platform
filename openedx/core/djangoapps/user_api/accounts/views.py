@@ -7,21 +7,21 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 
 from django.db import transaction
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from rest_framework import permissions
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser
-from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import User
+
+from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
+from .api import get_account_settings, update_account_settings
+from .permissions import CanDeactivateUser
 
 
 class AccountViewSet(ViewSet):

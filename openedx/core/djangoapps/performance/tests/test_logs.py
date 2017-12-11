@@ -3,14 +3,14 @@
 Tests that performance data is successfully logged.
 """
 import datetime
-import dateutil
 import json
-
 import logging
 from StringIO import StringIO
 
+import dateutil
 from django.test import TestCase
 from django.test.client import RequestFactory
+
 from openedx.core.djangoapps.performance.views import performance_log
 
 

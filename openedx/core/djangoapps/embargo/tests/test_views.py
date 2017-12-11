@@ -3,20 +3,20 @@
 import ddt
 import mock
 import pygeoip
-
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from mock import patch
 
-from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
-from .. import messages
 from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from .. import messages
+from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 
 
 @skip_unless_lms

@@ -8,7 +8,7 @@ import httpretty
 import mock
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
-from django.test import override_settings, TestCase
+from django.test import TestCase, override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient

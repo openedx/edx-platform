@@ -2,12 +2,11 @@
 Test helpers for Site Configuration.
 """
 
-from functools import wraps
 import contextlib
-
-from mock import patch
+from functools import wraps
 
 from django.contrib.sites.models import Site
+from mock import patch
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 

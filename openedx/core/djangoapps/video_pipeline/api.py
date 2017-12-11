@@ -11,7 +11,6 @@ from slumber.exceptions import HttpClientError
 from openedx.core.djangoapps.video_pipeline.models import VideoPipelineIntegration
 from openedx.core.djangoapps.video_pipeline.utils import create_video_pipeline_api_client
 
-
 log = logging.getLogger(__name__)
 
 

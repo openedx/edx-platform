@@ -3,12 +3,11 @@
 import json
 import unittest
 
+import ddt
+from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.test import TestCase
-
-import ddt
-from config_models.models import cache
 
 # cors_csrf is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':

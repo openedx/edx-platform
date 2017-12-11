@@ -4,19 +4,19 @@ Models used by the block structure framework.
 
 from contextlib import contextmanager
 from datetime import datetime
+from logging import getLogger
+
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile
 from django.db import models, transaction
-from logging import getLogger
-
 from model_utils.models import TimeStampedModel
+
 from openedx.core.djangoapps.xmodule_django.models import UsageKeyWithRunField
 from openedx.core.storage import get_storage
 
 from . import config
 from .exceptions import BlockStructureNotFound
-
 
 log = getLogger(__name__)
 

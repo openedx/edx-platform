@@ -3,25 +3,18 @@
 Test site_configuration middleware.
 """
 import ddt
-from mock import patch
-
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
+from mock import patch
 
-from student.tests.factories import UserFactory
-from microsite_configuration.microsite import (
-    get_backend,
-)
 from microsite_configuration.backends.base import BaseMicrositeBackend
-from microsite_configuration.tests.tests import (
-    DatabaseMicrositeTestCase,
-    side_effect_for_get_value,
-    MICROSITE_BACKENDS,
-)
+from microsite_configuration.microsite import get_backend
+from microsite_configuration.tests.tests import MICROSITE_BACKENDS, DatabaseMicrositeTestCase, side_effect_for_get_value
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import UserFactory
 
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure

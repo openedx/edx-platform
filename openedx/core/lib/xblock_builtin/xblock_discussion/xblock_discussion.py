@@ -9,7 +9,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
 from django.utils.translation import get_language_bidi
 from xblock.core import XBlock
-from xblock.fields import Scope, String, UNIQUE_ID
+from xblock.fields import UNIQUE_ID, Scope, String
 from xblock.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin

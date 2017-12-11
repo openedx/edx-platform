@@ -3,14 +3,15 @@ Tests for helpers.py
 """
 import datetime
 import hashlib
+
+from django.test import TestCase
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
 
-from django.test import TestCase
-
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
+
 from ..image_helpers import get_profile_image_urls_for_user
 
 TEST_SIZES = {'full': 50, 'small': 10}

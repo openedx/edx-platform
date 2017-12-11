@@ -1,19 +1,19 @@
 """ Tests for DiscussionXBLock"""
-from collections import namedtuple
-import ddt
 import itertools
-import mock
-from nose.plugins.attrib import attr
 import random
 import string
+from collections import namedtuple
 from unittest import TestCase
 
-from safe_lxml import etree
+import ddt
+import mock
+from nose.plugins.attrib import attr
+from xblock.field_data import DictFieldData
+from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
+from xblock.runtime import Runtime
 
 from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds, UNIQUE_ID, NO_CACHE_VALUE
-from xblock.runtime import Runtime
+from safe_lxml import etree
 
 
 def attribute_pair_repr(self):

@@ -3,11 +3,11 @@ Test for contentstore signals receiver
 """
 
 import mock
-from nose.plugins.attrib import attr
-
 from django.test import TestCase
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore, SignalHandler
+
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 
 @attr(shard=2)

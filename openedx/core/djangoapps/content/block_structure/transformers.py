@@ -4,10 +4,9 @@ Module for a collection of BlockStructureTransformers.
 import functools
 from logging import getLogger
 
-from .exceptions import TransformerException, TransformerDataIncompatible
+from .exceptions import TransformerDataIncompatible, TransformerException
 from .transformer import FilteringTransformerMixin
 from .transformer_registry import TransformerRegistry
-
 
 logger = getLogger(__name__)  # pylint: disable=C0103
 

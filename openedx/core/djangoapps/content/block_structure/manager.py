@@ -5,7 +5,7 @@ BlockStructures.
 from contextlib import contextmanager
 
 from . import config
-from .exceptions import UsageKeyNotInBlockStructure, TransformerDataIncompatible, BlockStructureNotFound
+from .exceptions import BlockStructureNotFound, TransformerDataIncompatible, UsageKeyNotInBlockStructure
 from .factory import BlockStructureFactory
 from .store import BlockStructureStore
 from .transformers import BlockStructureTransformers

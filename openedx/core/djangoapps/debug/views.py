@@ -6,6 +6,7 @@ in a 404 error.
 from django.http import HttpResponseNotFound
 from django.template import TemplateDoesNotExist
 from django.utils.translation import ugettext as _
+
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 

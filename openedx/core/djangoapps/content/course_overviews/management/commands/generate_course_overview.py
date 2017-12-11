@@ -5,7 +5,6 @@ Command to load course overviews.
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
-
 from opaque_keys import InvalidKeyError
 
 from openedx.core.djangoapps.content.course_overviews.tasks import (
@@ -14,7 +13,6 @@ from openedx.core.djangoapps.content.course_overviews.tasks import (
     DEFAULT_FORCE_UPDATE,
     enqueue_async_course_overview_update_tasks
 )
-
 
 log = logging.getLogger(__name__)
 

@@ -55,7 +55,7 @@ from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_
 if django.VERSION < (1, 9):
     from birdcage.v1_11.csrf import CsrfViewMiddleware
 else:
-    from django.middleware.csrf import CsrfViewMiddleware
+    from django.middleware.csrf import CsrfViewMiddleware  # pylint: disable=ungrouped-imports
 
 
 log = logging.getLogger(__name__)

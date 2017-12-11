@@ -14,6 +14,7 @@ from rest_framework.test import APIClient
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum
+
 from .test_api import BookmarkApiEventTestMixin
 from .test_models import BookmarksTestsBase
 

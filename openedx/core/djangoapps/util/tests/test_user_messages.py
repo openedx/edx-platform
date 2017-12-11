@@ -3,7 +3,6 @@ Unit tests for user messages.
 """
 
 import ddt
-
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory, TestCase
 

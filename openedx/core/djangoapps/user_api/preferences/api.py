@@ -2,22 +2,28 @@
 API for managing user preferences.
 """
 import logging
-import analytics
-from eventtracking import tracker
 
+import analytics
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django_countries import countries
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
+from django_countries import countries
+from eventtracking import tracker
+from pytz import common_timezones, common_timezones_set, country_timezones
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from pytz import common_timezones, common_timezones_set, country_timezones
 from student.models import User, UserProfile
+
 from ..errors import (
-    UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
-    PreferenceValidationError, PreferenceUpdateError, CountryCodeError
+    CountryCodeError,
+    PreferenceUpdateError,
+    PreferenceValidationError,
+    UserAPIInternalError,
+    UserAPIRequestError,
+    UserNotAuthorized,
+    UserNotFound
 )
 from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference

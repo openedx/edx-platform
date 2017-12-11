@@ -2,22 +2,21 @@
 Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
+import copy
 # pylint: disable=no-member
 from contextlib import contextmanager
-import copy
-from mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
-from django.test.client import Client
-from django.test.client import RequestFactory
+from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from mock import Mock, patch
 
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import openedx.core.djangoapps.external_auth.views as external_auth_views
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from openedx.tests.util import expected_redirect_url

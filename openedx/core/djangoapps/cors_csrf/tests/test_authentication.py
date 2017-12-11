@@ -1,11 +1,9 @@
 """Tests for the CORS CSRF version of Django Rest Framework's SessionAuthentication."""
-from mock import patch
-
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.test.client import RequestFactory
 from django.conf import settings
-
+from django.test import TestCase
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from mock import patch
 from rest_framework.exceptions import PermissionDenied
 
 from ..authentication import SessionAuthenticationCrossDomainCsrf

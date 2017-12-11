@@ -16,7 +16,6 @@ from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.token_utils import JwtBuilder
 
-
 LOGGER = get_task_logger(__name__)
 # Under cms the following setting is not defined, leading to errors during tests.
 ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)

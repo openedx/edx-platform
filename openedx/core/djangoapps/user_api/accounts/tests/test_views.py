@@ -27,13 +27,8 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import LanguageProficiency, PendingEmailChange, UserProfile
-from student.tests.factories import (
-    TEST_PASSWORD,
-    ContentTypeFactory,
-    PermissionFactory,
-    SuperuserFactory,
-    UserFactory
-)
+from student.tests.factories import TEST_PASSWORD, ContentTypeFactory, PermissionFactory, SuperuserFactory, UserFactory
+
 from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)

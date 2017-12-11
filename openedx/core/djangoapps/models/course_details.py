@@ -1,17 +1,16 @@
 """
 CourseDetails
 """
-import re
 import logging
+import re
 
 from django.conf import settings
 
-from xmodule.fields import Date
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.courses import course_image_url
+from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
-
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be

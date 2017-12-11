@@ -5,7 +5,7 @@ Illustration: https://gist.github.com/efischer19/d62f8ee42b7fbfbc6c9a
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CohortMembership
+from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroup
 
 
 class Command(BaseCommand):

@@ -4,12 +4,11 @@ schedule experience built on the Schedules app.
 """
 import logging
 
-from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from request_cache import get_request_or_stub
-
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

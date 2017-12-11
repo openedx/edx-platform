@@ -2,10 +2,9 @@
 import contextlib
 
 import mock
+import pygeoip
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-
-import pygeoip
 
 from .models import Country, CountryAccessRule, RestrictedCourse
 

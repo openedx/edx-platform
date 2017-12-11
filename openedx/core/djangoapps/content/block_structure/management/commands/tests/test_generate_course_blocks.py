@@ -1,18 +1,20 @@
 """
 Tests for generate_course_blocks management command.
 """
+import itertools
+
 import ddt
 from django.core.management.base import CommandError
-import itertools
 from mock import patch
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from .. import generate_course_blocks
 from openedx.core.djangoapps.content.block_structure.tests.helpers import (
     is_course_in_block_structure_cache,
-    is_course_in_block_structure_storage,
+    is_course_in_block_structure_storage
 )
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from .. import generate_course_blocks
 
 
 @ddt.ddt

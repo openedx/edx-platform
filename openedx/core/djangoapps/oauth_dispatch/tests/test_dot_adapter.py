@@ -5,12 +5,12 @@ Tests for DOT Adapter
 import unittest
 from datetime import timedelta
 
+import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
-
-import ddt
 from oauth2_provider import models
+
 from student.tests.factories import UserFactory
 
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection

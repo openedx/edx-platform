@@ -3,6 +3,7 @@
 import unittest
 
 from django.contrib.auth.models import AnonymousUser
+
 from ..user_utils import SystemUser
 
 

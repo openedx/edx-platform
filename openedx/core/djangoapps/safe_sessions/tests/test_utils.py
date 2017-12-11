@@ -3,6 +3,7 @@ Shared test utilities for Safe Sessions tests
 """
 
 from contextlib import contextmanager
+
 from mock import patch
 
 

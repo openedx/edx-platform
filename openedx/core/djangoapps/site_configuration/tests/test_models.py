@@ -1,13 +1,12 @@
 """
 Tests for site configuration's django models.
 """
+from django.contrib.sites.models import Site
+from django.db import IntegrityError, transaction
+from django.test import TestCase
 from mock import patch
 
-from django.test import TestCase
-from django.db import IntegrityError, transaction
-from django.contrib.sites.models import Site
-
-from openedx.core.djangoapps.site_configuration.models import SiteConfigurationHistory, SiteConfiguration
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration, SiteConfigurationHistory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 

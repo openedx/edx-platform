@@ -3,6 +3,7 @@ Setup for discussion-forum XBlock.
 """
 
 import os
+
 from setuptools import setup
 
 

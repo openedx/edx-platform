@@ -15,31 +15,40 @@ from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
-from pytz import common_timezones_set, UTC
-from social_django.models import UserSocialAuth, Partial
+from pytz import UTC, common_timezones_set
+from social_django.models import Partial, UserSocialAuth
 
 from django_comment_common import models
 from openedx.core.djangoapps.site_configuration.helpers import get_value
-from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
-from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.lib.api.test_utils import TEST_API_KEY, ApiTestCase
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from third_party_auth.tests.utils import (
-    ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+    ThirdPartyOAuthTestMixin,
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle
 )
-from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..accounts import (
-    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
+    EMAIL_MAX_LENGTH,
+    EMAIL_MIN_LENGTH,
+    NAME_MAX_LENGTH,
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    USERNAME_BAD_LENGTH_MSG,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
 from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
+from .test_helpers import TestCaseForm
 
 USER_LIST_URI = "/user_api/v1/users/"
 USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"

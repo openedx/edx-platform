@@ -4,8 +4,10 @@ credit_historicalcreditrequirementstatus tables.
 """
 
 import logging
+
 from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
-from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand
+from openedx.core.djangoapps.util.row_delete import BaseDeletionCommand, delete_rows
+
 log = logging.getLogger(__name__)
 
 

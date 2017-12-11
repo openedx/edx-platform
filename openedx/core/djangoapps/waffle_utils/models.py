@@ -1,11 +1,11 @@
 """
 Models for configuring waffle utils.
 """
+from config_models.models import ConfigurationModel
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 
-from config_models.models import ConfigurationModel
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import request_cached
 

@@ -9,29 +9,32 @@ from importlib import import_module
 from urllib import urlencode
 
 import pytest
-from ddt import ddt, data
+from ddt import data, ddt
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser, User
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test import TestCase
-from django.test.client import RequestFactory, Client as DjangoTestClient
+from django.test.client import Client as DjangoTestClient
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import AnonymousUser, User
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.external_auth.views import (
-    shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
-)
 from mock import patch
 from nose.plugins.attrib import attr
 
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.views import (
+    _flatten_to_ascii,
+    course_specific_login,
+    course_specific_register,
+    shib_login
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.views import change_enrollment
-from student.models import UserProfile, CourseEnrollment
+from student.models import CourseEnrollment, UserProfile
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.views import change_enrollment
 from xmodule.modulestore import ModuleStoreEnum
-
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 # Shib is supposed to provide 'REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider'
 # attributes via request.META.  We can count on 'Shib-Identity-Provider', and 'REMOTE_USER' being present

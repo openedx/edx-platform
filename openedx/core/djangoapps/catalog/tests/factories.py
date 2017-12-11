@@ -1,11 +1,10 @@
 """Factories for generating fake catalog data."""
+import uuid
 # pylint: disable=missing-docstring, invalid-name
 from functools import partial
 
 import factory
-import uuid
 from faker import Faker
-
 
 fake = Faker()
 VERIFIED_MODE = 'verified'

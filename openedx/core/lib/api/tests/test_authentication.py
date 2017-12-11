@@ -21,6 +21,7 @@ from django.test import TestCase
 from django.utils.http import urlencode
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
+from provider import constants, scope
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
@@ -30,7 +31,6 @@ from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
-from provider import constants, scope
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
