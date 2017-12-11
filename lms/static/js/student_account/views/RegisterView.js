@@ -94,26 +94,34 @@
                 buildForm: function(data) {
                     var html = [],
                         i,
+                        field,
                         len = data.length,
                         requiredFields = [],
                         optionalFields = [];
 
                     this.fields = data;
 
+                    this.hasOptionalFields = false;
                     for (i = 0; i < len; i++) {
-                        if (data[i].errorMessages) {
+                        field = data[i];
+                        if (field.errorMessages) {
                             // eslint-disable-next-line no-param-reassign
-                            data[i].errorMessages = this.escapeStrings(data[i].errorMessages);
+                            field.errorMessages = this.escapeStrings(field.errorMessages);
                         }
 
-                        if (data[i].required) {
-                            requiredFields.push(data[i]);
+                        if (field.required) {
+                            requiredFields.push(field);
                         } else {
-                            optionalFields.push(data[i]);
+                            if (field.type !== 'hidden') {
+                                // For the purporse of displaying the optional field toggle,
+                                // the form should be considered to have optional fields
+                                // only if all of the optional fields are being rendering as
+                                // input elements that are visible on the page.
+                                this.hasOptionalFields = true;
+                            }
+                            optionalFields.push(field);
                         }
                     }
-
-                    this.hasOptionalFields = optionalFields.length > 0;
 
                     html = this.renderFields(requiredFields, 'required-fields');
 
