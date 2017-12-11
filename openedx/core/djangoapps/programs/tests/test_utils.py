@@ -67,6 +67,11 @@ class TestProgramProgressMeter(TestCase):
         for course_run_id in course_run_ids:
             CourseEnrollmentFactory(user=self.user, course_id=course_run_id, mode=CourseMode.VERIFIED)
 
+    def _create_entitlements(self, *course_uuids):
+        """ Variadic helper used to create course entitlements. """
+        for course_uuid in course_uuids:
+            CourseEntitlementFactory(user=self.user, course_uuid=course_uuid)
+
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
         self.assertEqual(meter.progress(), list(progresses))
@@ -93,8 +98,8 @@ class TestProgramProgressMeter(TestCase):
 
         return result
 
-    def test_no_enrollments(self, mock_get_programs):
-        """Verify behavior when programs exist, but no relevant enrollments do."""
+    def test_no_enrollments_or_entitlements(self, mock_get_programs):
+        """Verify behavior when programs exist, but no relevant enrollments or entitlements do."""
         data = [ProgramFactory()]
         mock_get_programs.return_value = data
 
@@ -104,7 +109,7 @@ class TestProgramProgressMeter(TestCase):
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-    def test_no_programs(self, mock_get_programs):
+    def test_enrollments_but_no_programs(self, mock_get_programs):
         """Verify behavior when enrollments exist, but no matching programs do."""
         mock_get_programs.return_value = []
 
@@ -116,7 +121,16 @@ class TestProgramProgressMeter(TestCase):
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-    def test_single_program_engagement(self, mock_get_programs):
+    def test_entitlements_but_no_programs(self, mock_get_programs):
+        """ Verify engaged_programs is empty when entitlements exist, but no matching programs do. """
+        mock_get_programs.return_value = []
+
+        self._create_entitlements(uuid.uuid4())
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self.assertEqual(meter.engaged_programs, [])
+
+    def test_single_program_enrollment(self, mock_get_programs):
         """
         Verify that correct program is returned when the user is enrolled in a
         course run appearing in one program.
@@ -145,6 +159,25 @@ class TestProgramProgressMeter(TestCase):
             ProgressFactory(uuid=program['uuid'], in_progress=1, grades={course_run_key: 0.0})
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_single_program_entitlement(self, mock_get_programs):
+        """
+        Verify that the correct program is returned when the user holds an entitlement
+        to a course appearing in one program.
+        """
+        course_uuid = uuid.uuid4()
+        data = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(course_uuid))]),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        self._create_entitlements(course_uuid)
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._attach_detail_url(data)
+        program = data[0]
+        self.assertEqual(meter.engaged_programs, [program])
 
     def test_course_progress(self, mock_get_programs):
         """
@@ -259,7 +292,7 @@ class TestProgramProgressMeter(TestCase):
 
         self.assertEqual(meter.progress(count_only=True), expected)
 
-    def test_mutiple_program_engagement(self, mock_get_programs):
+    def test_mutiple_program_enrollment(self, mock_get_programs):
         """
         Verify that correct programs are returned in the correct order when the
         user is enrolled in course runs appearing in programs.
@@ -302,6 +335,28 @@ class TestProgramProgressMeter(TestCase):
             *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_multiple_program_entitlement(self, mock_get_programs):
+        """
+        Verify that the correct programs are returned in the correct order
+        when the user holds entitlements to courses appearing in those programs.
+        """
+        newer_course_uuid, older_course_uuid = (uuid.uuid4() for __ in range(2))
+        data = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(older_course_uuid)), ]),
+            ProgramFactory(courses=[CourseFactory(uuid=str(newer_course_uuid)), ]),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        # The creation time of the entitlements matters to the test. We want
+        # the newer_course_uuid to represent the newest entitlement.
+        self._create_entitlements(older_course_uuid, newer_course_uuid)
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._attach_detail_url(data)
+        programs = data[:2]
+        self.assertEqual(meter.engaged_programs, programs)
 
     def test_shared_enrollment_engagement(self, mock_get_programs):
         """
@@ -353,6 +408,34 @@ class TestProgramProgressMeter(TestCase):
             *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_shared_entitlement_engagement(self, mock_get_programs):
+        """
+        Verify that correct programs are returned when the user holds an entitlement
+        to a single course appearing in multiple programs.
+        """
+        shared_course_uuid, solo_course_uuid = (uuid.uuid4() for __ in range(2))
+
+        batch = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(shared_course_uuid)), ])
+            for __ in range(2)
+        ]
+
+        joint_programs = sorted(batch, key=lambda program: program['title'])
+        data = joint_programs + [
+            ProgramFactory(courses=[CourseFactory(uuid=str(solo_course_uuid)), ]),
+            ProgramFactory(),
+        ]
+
+        mock_get_programs.return_value = data
+
+        # Entitlement for the shared course created last (most recently).
+        self._create_entitlements(shared_course_uuid, solo_course_uuid)
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._attach_detail_url(data)
+        programs = data[:3]
+        self.assertEqual(meter.engaged_programs, programs)
 
     @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
     def test_simulate_progress(self, mock_completed_course_runs, mock_get_programs):
