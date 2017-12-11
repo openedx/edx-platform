@@ -2,11 +2,11 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'text!../../../templates/learner_dashboard/explore_new_programs.underscore'
-           ],
+        'jquery',
+        'underscore',
+        'gettext',
+        'text!../../../templates/learner_dashboard/explore_new_programs.underscore'
+    ],
          function(
              Backbone,
              $,

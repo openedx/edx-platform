@@ -131,22 +131,22 @@
         };
 
         return {
-            'installViewTemplates': installViewTemplates,
-            'createNotificationSpy': createNotificationSpy,
-            'verifyNotificationShowing': verifyNotificationShowing,
-            'verifyNotificationHidden': verifyNotificationHidden,
-            'confirmPrompt': confirmPrompt,
-            'createPromptSpy': createPromptSpy,
-            'verifyPromptShowing': verifyPromptShowing,
-            'verifyPromptHidden': verifyPromptHidden,
-            'inlineEdit': inlineEdit,
-            'verifyInlineEditChange': verifyInlineEditChange,
-            'installMockAnalytics': installMockAnalytics,
-            'removeMockAnalytics': removeMockAnalytics,
-            'clickDeleteItem': clickDeleteItem,
-            'patchAndVerifyRequest': patchAndVerifyRequest,
-            'submitAndVerifyFormSuccess': submitAndVerifyFormSuccess,
-            'submitAndVerifyFormError': submitAndVerifyFormError
+            installViewTemplates: installViewTemplates,
+            createNotificationSpy: createNotificationSpy,
+            verifyNotificationShowing: verifyNotificationShowing,
+            verifyNotificationHidden: verifyNotificationHidden,
+            confirmPrompt: confirmPrompt,
+            createPromptSpy: createPromptSpy,
+            verifyPromptShowing: verifyPromptShowing,
+            verifyPromptHidden: verifyPromptHidden,
+            inlineEdit: inlineEdit,
+            verifyInlineEditChange: verifyInlineEditChange,
+            installMockAnalytics: installMockAnalytics,
+            removeMockAnalytics: removeMockAnalytics,
+            clickDeleteItem: clickDeleteItem,
+            patchAndVerifyRequest: patchAndVerifyRequest,
+            submitAndVerifyFormSuccess: submitAndVerifyFormSuccess,
+            submitAndVerifyFormError: submitAndVerifyFormError
         };
     });
 }).call(this, define || RequireJS.define);

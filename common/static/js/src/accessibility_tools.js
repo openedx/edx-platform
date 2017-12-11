@@ -33,7 +33,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-var focusedElementBeforeModal;
+var $focusedElementBeforeModal;
 
 var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
   // Modifies a lean modal to optimize focus management.
@@ -50,7 +50,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     var focusableElementsString = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]';
 
     $(trigger).click(function() {
-        focusedElementBeforeModal = $(trigger);
+        $focusedElementBeforeModal = $(trigger);
 
     // when modal is opened, adjust tabindexes and aria-hidden attributes
         $(mainPageId).attr('aria-hidden', 'true');
@@ -63,15 +63,15 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
         $(closeButtonId).focus();
 
     // define the last tabbable element to complete tab cycle
-        var last;
+        var $last;
         if (focusableItems.length !== 0) {
-            last = focusableItems.last();
+            $last = focusableItems.last();
         } else {
-            last = $(closeButtonId);
+            $last = $(closeButtonId);
         }
 
     // tab on last element in modal returns to the first one
-        last.on('keydown', function(e) {
+        $last.on('keydown', function(e) {
             var keyCode = e.keyCode || e.which;
       // 9 is the js keycode for tab
             if (!e.shiftKey && keyCode === 9) {
@@ -86,7 +86,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
       // 9 is the js keycode for tab
             if (e.shiftKey && keyCode == 9) {
                 e.preventDefault();
-                last.focus();
+                $last.focus();
             }
         });
 
@@ -94,7 +94,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
         $('#lean_overlay, ' + closeButtonId).click(function() {
             $(mainPageId).attr('aria-hidden', 'false');
             $(modalId).attr('aria-hidden', 'true');
-            focusedElementBeforeModal.focus();
+            $focusedElementBeforeModal.focus();
         });
 
     // get modal to exit on escape key
@@ -192,7 +192,7 @@ $(function() {
         };
 
         return SRAlert;
-    })();
+    }());
 
     window.SR = new SRAlert();
 });

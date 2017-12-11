@@ -1,12 +1,12 @@
 define(['edx-ui-toolkit/js/utils/html-utils',
-        'js/views/baseview',
-        'underscore',
-        'jquery',
-        'gettext',
-        'common/js/components/views/feedback_notification',
-        'common/js/components/views/feedback_alert',
-        'js/views/baseview',
-        'jquery.smoothScroll'],
+    'js/views/baseview',
+    'underscore',
+    'jquery',
+    'gettext',
+    'common/js/components/views/feedback_notification',
+    'common/js/components/views/feedback_alert',
+    'js/views/baseview',
+    'jquery.smoothScroll'],
     function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         var ValidatingView = BaseView.extend({
     // Intended as an abstract class which catches validation errors on the model and
@@ -89,8 +89,7 @@ define(['edx-ui-toolkit/js/utils/html-utils',
                 var inputElements = 'input, textarea';
                 if ($(ele).is(inputElements)) {
                     return $(ele);
-                }
-                else {
+                } else {
             // put error on the contained inputs
                     return $(ele).find(inputElements);
                 }
@@ -115,18 +114,18 @@ define(['edx-ui-toolkit/js/utils/html-utils',
                     message: message,
                     actions: {
                         primary: {
-                            'text': gettext('Save Changes'),
-                            'class': 'action-save',
-                            'click': function() {
+                            text: gettext('Save Changes'),
+                            class: 'action-save',
+                            click: function() {
                                 primaryClick();
                                 self.confirmation.hide();
                                 self.notificationBarShowing = false;
                             }
                         },
                         secondary: [{
-                            'text': gettext('Cancel'),
-                            'class': 'action-cancel',
-                            'click': function() {
+                            text: gettext('Cancel'),
+                            class: 'action-cancel',
+                            click: function() {
                                 if (secondaryClick) {
                                     secondaryClick();
                                 }

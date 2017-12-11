@@ -7,7 +7,7 @@
         // Otherwise, create new one.
         if (!this.tooltip.length) {
             this.tooltip = $('<div />', {
-                'class': this.className
+                class: this.className
             }).appendTo(this.element);
         }
 
@@ -32,8 +32,8 @@
 
         getCoords: function(pageX, pageY) {
             return {
-                'left': pageX - 0.5 * this.tooltip.outerWidth(),
-                'top': pageY - (this.tooltip.outerHeight() + 15)
+                left: pageX - 0.5 * this.tooltip.outerWidth(),
+                top: pageY - (this.tooltip.outerHeight() + 15)
             };
         },
 

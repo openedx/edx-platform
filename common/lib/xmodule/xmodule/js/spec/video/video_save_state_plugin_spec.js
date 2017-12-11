@@ -241,11 +241,11 @@
             state.videoSaveStatePlugin.destroy();
             expect(state.videoSaveStatePlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
-                'speedchange': plugin.onSpeedChange,
-                'play': plugin.bindUnloadHandler,
+                speedchange: plugin.onSpeedChange,
+                play: plugin.bindUnloadHandler,
                 'pause destroy': plugin.saveStateHandler,
                 'language_menu:change': plugin.onLanguageChange,
-                'youtube_availability': plugin.onYoutubeAvailability
+                youtube_availability: plugin.onYoutubeAvailability
             });
             expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
             expect($.fn.off).toHaveBeenCalledWith('unload', plugin.onUnload);

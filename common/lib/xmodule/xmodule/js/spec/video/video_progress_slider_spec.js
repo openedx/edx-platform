@@ -40,15 +40,15 @@
                 });
 
                 it('add ARIA attributes to time control', function() {
-                    var timeControl = $('div.slider > .progress-handle');
+                    var $timeControl = $('div.slider > .progress-handle');
 
-                    expect(timeControl).toHaveAttrs({
-                        'role': 'slider',
+                    expect($timeControl).toHaveAttrs({
+                        role: 'slider',
                         'aria-label': 'Video position. Press space to toggle playback',
                         'aria-disabled': 'false'
                     });
 
-                    expect(timeControl).toHaveAttr('aria-valuetext');
+                    expect($timeControl).toHaveAttr('aria-valuetext');
                 });
             });
 
@@ -293,15 +293,15 @@
 
         it('getTimeDescription', function() {
             var cases = {
-                    '0': '0 seconds',
-                    '1': '1 second',
-                    '10': '10 seconds',
+                    0: '0 seconds',
+                    1: '1 second',
+                    10: '10 seconds',
 
-                    '60': '1 minute 0 seconds',
-                    '121': '2 minutes 1 second',
+                    60: '1 minute 0 seconds',
+                    121: '2 minutes 1 second',
 
-                    '3670': '1 hour 1 minute 10 seconds',
-                    '21541': '5 hours 59 minutes 1 second'
+                    3670: '1 hour 1 minute 10 seconds',
+                    21541: '5 hours 59 minutes 1 second'
                 },
                 getTimeDescription;
 

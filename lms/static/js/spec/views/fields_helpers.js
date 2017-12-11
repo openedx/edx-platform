@@ -1,11 +1,11 @@
 define(['backbone',
-        'jquery',
-        'underscore',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/views/fields',
-        'string_utils'],
+    'jquery',
+    'underscore',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/template_helpers',
+    'js/views/fields',
+    'string_utils'],
     function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         'use strict';
 
@@ -38,14 +38,14 @@ define(['backbone',
 
             switch (fieldType) {
             case FieldViews.DropdownFieldView:
-                data['required'] = fieldData.required || false;
-                data['options'] = fieldData.options || SELECT_OPTIONS;
+                data.required = fieldData.required || false;
+                data.options = fieldData.options || SELECT_OPTIONS;
                 break;
             case FieldViews.LinkFieldView:
             case FieldViews.PasswordFieldView:
-                data['linkTitle'] = fieldData.linkTitle || 'Link Title';
-                data['linkHref'] = fieldData.linkHref || '/path/to/resource';
-                data['emailAttribute'] = 'email';
+                data.linkTitle = fieldData.linkTitle || 'Link Title';
+                data.linkHref = fieldData.linkHref || '/path/to/resource';
+                data.emailAttribute = 'email';
                 break;
             }
 
@@ -57,10 +57,10 @@ define(['backbone',
         var createErrorMessage = function(attribute, user_message) {
             var field_errors = {};
             field_errors[attribute] = {
-                'user_message': user_message
+                user_message: user_message
             };
             return {
-                'field_errors': field_errors
+                field_errors: field_errors
             };
         };
 

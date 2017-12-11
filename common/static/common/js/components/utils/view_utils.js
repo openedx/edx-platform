@@ -5,7 +5,7 @@
     'use strict';
 
     define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
-            'common/js/components/views/feedback_prompt'],
+        'common/js/components/views/feedback_prompt'],
         function($, _, gettext, NotificationView, PromptView) {
             var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
                 runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
@@ -189,7 +189,8 @@
              * @returns {boolean} Returns true if attribute changes are found.
              */
             hasChangedAttributes = function(model, attributes) {
-                var i, changedAttributes = model.changedAttributes();
+                var i,
+                    changedAttributes = model.changedAttributes();
                 if (!changedAttributes) {
                     return false;
                 }
@@ -221,8 +222,7 @@
                     if (/\s/g.test(item)) {
                         return gettext('Please do not use any spaces in this field.');
                     }
-                }
-                else {
+                } else {
                     if (item !== encodeURIComponent(item) || item.match(/[!'()*]/)) {
                         return gettext('Please do not use any spaces or special characters in this field.');
                     }
@@ -270,25 +270,25 @@
             };
 
             return {
-                'toggleExpandCollapse': toggleExpandCollapse,
-                'showLoadingIndicator': showLoadingIndicator,
-                'hideLoadingIndicator': hideLoadingIndicator,
-                'confirmThenRunOperation': confirmThenRunOperation,
-                'runOperationShowingMessage': runOperationShowingMessage,
-                'withDisabledElement': withDisabledElement,
-                'disableElementWhileRunning': disableElementWhileRunning,
-                'deleteNotificationHandler': deleteNotificationHandler,
-                'setScrollTop': setScrollTop,
-                'getScrollOffset': getScrollOffset,
-                'setScrollOffset': setScrollOffset,
-                'redirect': redirect,
-                'reload': reload,
-                'hasChangedAttributes': hasChangedAttributes,
-                'validateRequiredField': validateRequiredField,
-                'validateURLItemEncoding': validateURLItemEncoding,
-                'validateTotalKeyLength': validateTotalKeyLength,
-                'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations,
-                'loadJavaScript': loadJavaScript
+                toggleExpandCollapse: toggleExpandCollapse,
+                showLoadingIndicator: showLoadingIndicator,
+                hideLoadingIndicator: hideLoadingIndicator,
+                confirmThenRunOperation: confirmThenRunOperation,
+                runOperationShowingMessage: runOperationShowingMessage,
+                withDisabledElement: withDisabledElement,
+                disableElementWhileRunning: disableElementWhileRunning,
+                deleteNotificationHandler: deleteNotificationHandler,
+                setScrollTop: setScrollTop,
+                getScrollOffset: getScrollOffset,
+                setScrollOffset: setScrollOffset,
+                redirect: redirect,
+                reload: reload,
+                hasChangedAttributes: hasChangedAttributes,
+                validateRequiredField: validateRequiredField,
+                validateURLItemEncoding: validateURLItemEncoding,
+                validateTotalKeyLength: validateTotalKeyLength,
+                checkTotalKeyLengthViolations: checkTotalKeyLengthViolations,
+                loadJavaScript: loadJavaScript
             };
         });
 }).call(this, define || RequireJS.define, require || RequireJS.require);

@@ -70,20 +70,20 @@
          * file should be skipped because it has no dependencies.
          */
         paths: {
-            'gettext': 'empty:',
+            gettext: 'empty:',
             'coffee/src/ajax_prefix': 'empty:',
-            'jquery': 'empty:',
+            jquery: 'empty:',
             'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',
             'jquery.url': 'empty:',
-            'backbone': 'empty:',
-            'underscore': 'empty:',
+            backbone: 'empty:',
+            underscore: 'empty:',
             'underscore.string': 'empty:',
-            'logger': 'empty:',
-            'utility': 'empty:',
-            'URI': 'empty:',
+            logger: 'empty:',
+            utility: 'empty:',
+            URI: 'empty:',
             'common/js/discussion/views/discussion_inline_view': 'empty:',
-            'modernizr': 'empty',
+            modernizr: 'empty',
             'which-country': 'empty',
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace

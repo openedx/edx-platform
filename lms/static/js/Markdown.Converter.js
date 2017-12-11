@@ -1,9 +1,9 @@
 var Markdown;
 
 if (typeof exports === 'object' && typeof require === 'function') // we're in a CommonJS (e.g. Node.js) module
-    Markdown = exports;
+    {Markdown = exports;}
 else
-    Markdown = {};
+    {Markdown = {};}
 
 // The following text is included for historical reasons, but should
 // be taken with a pinch of salt; it's not all true anymore.
@@ -61,16 +61,16 @@ else
         chain: function(hookname, func) {
             var original = this[hookname];
             if (!original)
-                throw new Error('unknown hook ' + hookname);
+                {throw new Error('unknown hook ' + hookname);}
 
             if (original === identity)
-                this[hookname] = func;
+                {this[hookname] = func;}
             else
-                this[hookname] = function(x) { return func(original(x)); };
+                {this[hookname] = function(x) { return func(original(x)); };}
         },
         set: function(hookname, func) {
             if (!this[hookname])
-                throw new Error('unknown hook ' + hookname);
+                {throw new Error('unknown hook ' + hookname);}
             this[hookname] = func;
         },
         addNoop: function(hookname) {
@@ -130,7 +130,7 @@ else
             // This will only happen if makeHtml on the same converter instance is called from a plugin hook.
             // Don't do that.
             if (g_urls)
-                throw new Error('Recursive call to converter.makeHtml');
+                {throw new Error('Recursive call to converter.makeHtml');}
 
             // Create the private state objects.
             g_urls = new SaveHash();
@@ -570,8 +570,7 @@ else
                     if (g_titles.get(link_id) != undefined) {
                         title = g_titles.get(link_id);
                     }
-                }
-                else {
+                }                else {
                     if (whole_match.search(/\(\s*\)$/m) > -1) {
                         // Special case for explicit empty url
                         url = '';
@@ -680,8 +679,7 @@ else
                     if (g_titles.get(link_id) != undefined) {
                         title = g_titles.get(link_id);
                     }
-                }
-                else {
+                }                else {
                     return whole_match;
                 }
             }
@@ -893,8 +891,7 @@ else
 
                     if (contains_double_newline || last_item_had_a_double_newline) {
                         item = _RunBlockGamut(_Outdent(item), /* doNotUnhash = */true);
-                    }
-                    else {
+                    }                    else {
                         // Recursion for sub-lists:
                         item = _DoLists(_Outdent(item));
                         item = item.replace(/\n$/, ''); // chomp(item)
@@ -1090,7 +1087,7 @@ else
                         function(wholeMatch, m1) {
                             var pre = m1;
                             // attacklab: hack around Konqueror 3.5.4 bug:
-                            pre = pre.replace(/^  /mg, '~0');
+                            pre = pre.replace(/^ {2}/mg, '~0');
                             pre = pre.replace(/~0/g, '');
                             return pre;
                         });
@@ -1126,8 +1123,7 @@ else
                 // if this is an HTML marker, copy it
                 if (markerRe.test(str)) {
                     grafsOut.push(str);
-                }
-                else if (/\S/.test(str)) {
+                }                else if (/\S/.test(str)) {
                     str = _RunSpanGamut(str);
                     str = str.replace(/^([ \t]*)/g, '<p>');
                     str += '</p>';
@@ -1255,7 +1251,7 @@ else
 
         function _Detab(text) {
             if (!/\t/.test(text))
-                return text;
+                {return text;}
 
             var spaces = ['    ', '   ', '  ', ' '],
                 skew = 0,
@@ -1304,4 +1300,4 @@ else
             return '~E' + charCodeToEscape + 'E';
         }
     }; // end of the Markdown.Converter constructor
-})();
+}());

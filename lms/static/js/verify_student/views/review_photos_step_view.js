@@ -103,4 +103,4 @@ var edx = edx || {};
                 .attr('aria-disabled', !isEnabled);
         }
     });
-})(jQuery, gettext);
+}(jQuery, gettext));

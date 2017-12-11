@@ -136,7 +136,7 @@
                                     _results.push(new Thread(data));
                                 }
                                 return _results;
-                            })()
+                            }())
                         ][0];
                         new_collection = _.union(models, new_threads);
                         Content.loadContentInfos(response.annotated_content_info);
@@ -220,6 +220,6 @@
             };
 
             return Discussion;
-        })(Backbone.Collection);
+        }(Backbone.Collection));
     }
 }).call(window);

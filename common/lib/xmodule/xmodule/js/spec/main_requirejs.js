@@ -18,12 +18,10 @@
             if (globalValue) {
                 if (noShim) {
                     define(name, {});
-                }
-                else {
+                } else {
                     define(name, [], function() { return globalValue; });
                 }
-            }
-            else {
+            } else {
                 console.error('Expected library to be included on page, but not found on window object: ' + name);
             }
         };

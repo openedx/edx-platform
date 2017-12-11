@@ -19,8 +19,8 @@
             };
 
             if ($('#lean_overlay').length == 0) {
-                var overlay = $("<div id='lean_overlay'></div>");
-                $('body').append(overlay);
+                var $overlay = $("<div id='lean_overlay'></div>");
+                $('body').append($overlay);
             }
 
             options = $.extend(defaults, options);
@@ -59,28 +59,28 @@
                     var modal_height = $(modal_id).outerHeight();
                     var modal_width = $(modal_id).outerWidth();
 
-                    $('#lean_overlay').css({'display': 'block', opacity: 0});
+                    $('#lean_overlay').css({display: 'block', opacity: 0});
                     $('#lean_overlay').fadeTo(200, o.overlay);
 
                     $('iframe', modal_id).attr('src', $('iframe', modal_id).data('src'));
                     if ($(modal_id).hasClass('email-modal')) {
                         $(modal_id).css({
-                            'width': 80 + '%',
-                            'height': 80 + '%',
-                            'position': o.position,
-                            'opacity': 0,
+                            width: 80 + '%',
+                            height: 80 + '%',
+                            position: o.position,
+                            opacity: 0,
                             'z-index': 11000,
-                            'left': 10 + '%',
-                            'top': 10 + '%'
+                            left: 10 + '%',
+                            top: 10 + '%'
                         });
                     } else {
                         $(modal_id).css({
-                            'position': o.position,
-                            'opacity': 0,
+                            position: o.position,
+                            opacity: 0,
                             'z-index': 11000,
-                            'left': 50 + '%',
+                            left: 50 + '%',
                             'margin-left': -(modal_width / 2) + 'px',
-                            'top': o.top + 'px'
+                            top: o.top + 'px'
                         });
                     }
 
@@ -102,7 +102,7 @@
             function close_modal(modal_id, e) {
                 $('#lean_overlay').fadeOut(200);
                 $('iframe', modal_id).attr('src', '');
-                $(modal_id).css({'display': 'none'});
+                $(modal_id).css({display: 'none'});
                 if (modal_id == '#modal_clone') {
                     $(modal_id).remove();
                 }
@@ -122,4 +122,4 @@
             }
         });
     });
-})(jQuery);
+}(jQuery));

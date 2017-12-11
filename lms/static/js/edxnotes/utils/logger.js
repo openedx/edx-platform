@@ -133,7 +133,7 @@
             var args = [eventName, data];
             this.log(eventName, data);
             if (timeout) {
-                args.push(null, {'timeout': timeout});
+                args.push(null, {timeout: timeout});
             }
             return Logger.log.apply(Logger, args);
         };

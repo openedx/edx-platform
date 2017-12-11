@@ -50,9 +50,9 @@
                 var REQUEST_TIMEOUT = 2000;
                 event.preventDefault();
                 this.logger.emit('edx.course.student_notes.used_unit_link', {
-                    'note_id': this.model.get('id'),
-                    'component_usage_id': this.model.get('usage_id'),
-                    'view': this.options.view
+                    note_id: this.model.get('id'),
+                    component_usage_id: this.model.get('usage_id'),
+                    view: this.options.view
                 }, REQUEST_TIMEOUT).always(_.bind(function() {
                     this.redirectTo(event.target.href);
                 }, this));

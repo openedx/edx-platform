@@ -1,11 +1,15 @@
 describe('TooltipManager', function() {
     'use strict';
-    var PAGE_X = 100, PAGE_Y = 100, WIDTH = 100, HEIGHT = 100, DELTA = 10,
+    var PAGE_X = 100,
+        PAGE_Y = 100,
+        WIDTH = 100,
+        HEIGHT = 100,
+        DELTA = 10,
         showTooltip;
 
     beforeEach(function() {
         setFixtures(sandbox({
-            'id': 'test-id',
+            id: 'test-id',
             'data-tooltip': 'some text here.'
         }));
         this.element = $('#test-id');
