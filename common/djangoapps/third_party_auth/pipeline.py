@@ -568,11 +568,12 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
     if not user:
         details = kwargs.get('details', {})
-        # pylint: disable=invalid-name
-        qs = {'email': details['email']} if details.get('email') else \
-            {'username': details.get('username')}
-        if User.objects.filter(**qs).exists():
-            return dispatch_to_login()
+        if 'email' in details or 'username' in details:
+            # pylint: disable=invalid-name
+            qs = {'email': details['email']} if details.get('email') else \
+                {'username': details.get('username')}
+            if User.objects.filter(**qs).exists():
+                return dispatch_to_login()
 
         if is_api(auth_entry):
             return HttpResponseBadRequest()
