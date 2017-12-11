@@ -64,6 +64,30 @@ class UnitTestLibraries(CourseTestCase):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), True)
 
+    @ddt.data(
+        (False, False, True),
+        (False, True, False),
+        (True, False, True),
+        (True, True, False),
+        (True, None, False),
+        (False, None, True)
+    )
+    @ddt.unpack
+    def test_library_creator_status_settings(self, disable_course, disable_library, expected_status):
+        """
+        Ensure that the setting DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION as expected.
+        """
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        with mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True):
+            with mock.patch.dict(
+                "django.conf.settings.FEATURES",
+                {
+                    "DISABLE_COURSE_CREATION": disable_course,
+                    "DISABLE_LIBRARY_CREATION": disable_library
+                }
+            ):
+                self.assertEqual(get_library_creator_status(nostaff_user), expected_status)
+
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
     @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
