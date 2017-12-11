@@ -1125,6 +1125,9 @@ INSTALLED_APPS = [
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # Entitlements, used in openedx tests
+    'entitlements',
 ]
 
 
