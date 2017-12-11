@@ -33,6 +33,9 @@ PYTHON_REQ_FILES = [
     'requirements/edx/testing.txt',
     'requirements/edx/post.txt',
 ]
+if 'TOXENV' in os.environ:
+    # Let tox manage the Django version
+    PYTHON_REQ_FILES.remove('requirements/edx/django.txt')
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.

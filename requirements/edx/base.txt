@@ -155,7 +155,7 @@ ddt==0.8.0
 django-crum==0.7.2
 django_nose==1.4.1
 factory_boy==2.8.1
-flaky==3.3.0
+flaky==3.4.0
 freezegun==0.3.8
 moto==0.3.1
 needle==0.5.0

@@ -71,8 +71,16 @@ END
 
 if [[ $DJANGO_VERSION == '1.11' ]]; then
     PAVER_ARGS="-v --django_version=1.11"
+    TOX="tox -e py27-django111 --"
+elif [[ $DJANGO_VERSION == '1.10' ]]; then
+    PAVER_ARGS="-v --django_version=1.10"
+    TOX="tox -e py27-django110 --"
+elif [[ $DJANGO_VERSION == '1.9' ]]; then
+    PAVER_ARGS="-v --django_version=1.9"
+    TOX="tox -e py27-django19 --"
 else
     PAVER_ARGS="-v"
+    TOX=""
 fi
 PARALLEL="--processes=-1"
 export SUBSET_JOB=$JOB_NAME
@@ -82,7 +90,7 @@ function run_paver_quality {
     shift
     mkdir -p test_root/log/
     LOG_PREFIX=test_root/log/$QUALITY_TASK
-    paver $QUALITY_TASK $* 2> $LOG_PREFIX.err.log > $LOG_PREFIX.out.log || {
+    $TOX paver $QUALITY_TASK $* 2> $LOG_PREFIX.err.log > $LOG_PREFIX.out.log || {
         echo "STDOUT (last 100 lines of $LOG_PREFIX.out.log):";
         tail -n 100 $LOG_PREFIX.out.log;
         echo "STDERR (last 100 lines of $LOG_PREFIX.err.log):";
@@ -155,12 +163,12 @@ case "$TEST_SUITE" in
         ;;
 
     "js-unit")
-        paver test_js --coverage
-        paver diff_coverage
+        $TOX paver test_js --coverage
+        $TOX paver diff_coverage
         ;;
 
     "commonlib-js-unit")
-        paver test_js --coverage --skip-clean || { EXIT=1; }
+        $TOX paver test_js --coverage --skip-clean || { EXIT=1; }
         paver test_lib --skip-clean $PAVER_ARGS || { EXIT=1; }
 
         # This is to ensure that the build status of the shard is properly set.
@@ -178,11 +186,11 @@ case "$TEST_SUITE" in
         ;;
 
     "lms-acceptance")
-        paver test_acceptance -s lms -vvv --with-xunit
+        $TOX paver test_acceptance -s lms -vvv --with-xunit
         ;;
 
     "cms-acceptance")
-        paver test_acceptance -s cms -vvv --with-xunit
+        $TOX paver test_acceptance -s cms -vvv --with-xunit
         ;;
 
     "bok-choy")
@@ -192,15 +200,15 @@ case "$TEST_SUITE" in
         case "$SHARD" in
 
             "all")
-                paver test_bokchoy $PAVER_ARGS
+                $TOX paver test_bokchoy $PAVER_ARGS
                 ;;
 
             [1-9]|10)
-                paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
+                $TOX paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
                 ;;
 
             11|"noshard")
-                paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
+                $TOX paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
