@@ -65,7 +65,7 @@ define([
                 var badges = [];
                 var placeholder;
                 var rows;
-                for (var i = 0; i < 4; i++) {
+                for (let i = 0; i < 4; i++) {
                     badges.push(LearnerProfileHelpers.makeBadge(i));
                 }
                 view = createView(badges, 1, 2, true);

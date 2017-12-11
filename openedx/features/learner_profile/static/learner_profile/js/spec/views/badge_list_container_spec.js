@@ -25,7 +25,7 @@ define([
                 var request;
                 var path;
                 badgeCollection.url = '/api/badges/v1/assertions/user/staff/';
-                for (var idx = 0; idx < badgeListObject.count; idx++) {
+                for (let idx = 0; idx < badgeListObject.count; idx++) {
                     models.push(LearnerProfileHelpers.makeBadge(idx));
                 }
                 badgeListObject.results = models; // eslint-disable-line no-param-reassign

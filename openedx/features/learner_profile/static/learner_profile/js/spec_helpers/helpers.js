@@ -227,15 +227,15 @@ define(['URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'], function(UR
         };
     }
 
-    for(var i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
         firstPageBadges.results.push(makeBadge(i));
     }
 
-    for(var i = 10; i < 20; i++) {
+    for (let i = 10; i < 20; i++) {
         secondPageBadges.results.push(makeBadge(i));
     }
 
-    for(var i = 20; i < 30; i++) {
+    for (let i = 20; i < 30; i++) {
         thirdPageBadges.results.push(makeBadge(i));
     }
 
