@@ -218,13 +218,13 @@ class CourseEntitlement(TimeStampedModel):
     def to_dict(self):
         """ Convert entitlement to dictionary representation. """
         entitlement_expiration_date, entitlement_expired_at = None, None
+        entitlement_expired_at = strftime_localized(
+            self.expired_at_datetime, 'SHORT_DATE') if self.expired_at_datetime else None
         if self.get_days_until_expiration() < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD:
             entitlement_expiration_date = strftime_localized(
                 datetime.now(tz=pytz.UTC) + timedelta(days=self.get_days_until_expiration()),
                 'SHORT_DATE'
             )
-            entitlement_expired_at = strftime_localized(
-                self.expired_at_datetime, 'SHORT_DATE') if self.expired_at_datetime else None
 
         return {
             'uuid': str(self.uuid),

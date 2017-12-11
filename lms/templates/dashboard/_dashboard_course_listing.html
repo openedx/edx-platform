@@ -154,13 +154,15 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     % endif
                 % endif
             </span>
-            % if entitlement and entitlement_expiration_date:
-                % if not is_unfulfilled_entitlement:
-                    <div class="info-expires-at">
-                            <span class="msg-icon fa fa-info" aria-hidden="true"></span>
+            % if entitlement and not is_unfulfilled_entitlement and entitlement_expiration_date:
+                <div class="info-expires-at">
+                        <span class="msg-icon fa fa-info" aria-hidden="true"></span>
+                        % if entitlement_expired_at:
+                            ${_('You can no longer change sessions.')}
+                        % else:
                             ${_('You can change sessions until {entitlement_expiration_date}.').format(entitlement_expiration_date=entitlement_expiration_date)}
-                    </div>
-                % endif
+                        % endif
+                </div>
             % endif
         </div>
         <div class="wrapper-course-actions">
