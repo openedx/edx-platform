@@ -33,6 +33,10 @@ from student.models import CourseEnrollment
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
+% if course_entitlements:
+    <script type="text/javascript" src="${static.url('common/js/vendor/popper.js')}"></script>
+    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.js')}"></script>
+% endif
 </%block>
 
 <%block name="js_extra">
