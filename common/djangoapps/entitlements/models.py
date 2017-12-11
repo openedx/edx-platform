@@ -1,7 +1,9 @@
 import uuid as uuid_tools
 from datetime import datetime, timedelta
+from util.date_utils import strftime_localized
 
 import pytz
+import time
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
@@ -215,10 +217,20 @@ class CourseEntitlement(TimeStampedModel):
 
     def to_dict(self):
         """ Convert entitlement to dictionary representation. """
+        entitlement_expiration_date, entitlement_expired_at = None, None
+        if self.get_days_until_expiration() < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD:
+            entitlement_expiration_date = strftime_localized(
+                datetime.now(tz=pytz.UTC) + timedelta(days=self.get_days_until_expiration()),
+                'SHORT_DATE'
+            )
+            entitlement_expired_at = strftime_localized(
+                self.expired_at_datetime, 'SHORT_DATE') if self.expired_at_datetime else None
+
         return {
             'uuid': str(self.uuid),
             'course_uuid': str(self.course_uuid),
-            'expired_at': self.expired_at
+            'expired_at': entitlement_expired_at,
+            'expiration_date': entitlement_expiration_date
         }
 
     @classmethod

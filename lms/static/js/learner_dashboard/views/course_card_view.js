@@ -90,7 +90,9 @@
                              entitlementUUID: this.entitlement.uuid,
                              currentSessionId: this.model.get('course_run_key'),
                              enrollUrl: this.model.get('enroll_url'),
-                             courseHomeUrl: this.model.get('course_url')
+                             courseHomeUrl: this.model.get('course_url'),
+                             expiredAt: this.entitlement.expired_at,
+                             daysUntilExpiration: this.entitlement.days_util_expiration
                          });
                      }
 
