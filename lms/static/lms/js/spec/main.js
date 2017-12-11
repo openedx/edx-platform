@@ -762,7 +762,6 @@
         'js/spec/learner_dashboard/unenroll_view_spec.js',
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
-        'js/spec/learner_dashboard/course_entitlement_view_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',
