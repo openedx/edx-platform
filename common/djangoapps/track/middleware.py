@@ -196,17 +196,18 @@ class TrackMiddleware(object):
     def get_username(self, request):
         """Gets the username of the logged in Django user"""
         try:
-            return request.user.username
+            username = request.user.username
+
+            if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+                return ''
+
+            return username
         except AttributeError:
             return ''
 
     def get_request_ip_address(self, request):
         """Gets the IP address of the request"""
-        ip_address = get_ip(request)
-        if ip_address is not None:
-            return ip_address
-        else:
-            return ''
+        return views.get_request_ip(request)
 
     def process_response(self, _request, response):
         """Exit the context if it exists."""
