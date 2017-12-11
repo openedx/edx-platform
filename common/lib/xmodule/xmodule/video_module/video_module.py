@@ -979,6 +979,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         encoded_videos = {}
         val_video_data = {}
+        all_sources = self.html5_sources or []
+
+        # `source` is a deprecated field, but we include it for backwards compatibility.
+        if self.source:
+            all_sources.append(self.source)
 
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
@@ -1010,10 +1015,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         # Fall back to other video URLs in the video module if not found in VAL
         if not encoded_videos:
-            video_url = self.html5_sources[0] if self.html5_sources else self.source
-            if video_url:
+            if all_sources:
                 encoded_videos["fallback"] = {
-                    "url": video_url,
+                    "url": all_sources[0],
                     "file_size": 0,  # File size is unknown for fallback URLs
                 }
 
@@ -1038,4 +1042,5 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "duration": val_video_data.get('duration', None),
             "transcripts": transcripts,
             "encoded_videos": encoded_videos,
+            "all_sources": all_sources,
         }
