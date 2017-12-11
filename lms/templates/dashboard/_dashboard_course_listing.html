@@ -299,7 +299,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         </%static:require_module>
       %endif
 
-      % if related_programs and not entitlement:
+      % if related_programs:
       <div class="message message-related-programs is-shown">
         <span class="related-programs-preface" tabindex="0">${_('Related Programs')}:</span>
         <ul>

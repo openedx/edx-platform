@@ -19,6 +19,7 @@ from opaque_keys import InvalidKeyError
 from pyquery import PyQuery as pq
 
 from entitlements.tests.factories import CourseEntitlementFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.cookies import get_user_info_cookie_data
@@ -339,16 +340,20 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('<div class="prerequisites">', response.content)
 
+    @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
-    def test_unfulfilled_entitlement(self, mock_course_overview, mock_course_runs):
+    def test_unfulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has an unfulfilled entitlement, their course dashboard should have:
             - a hidden 'View Course' button
             - the text 'In order to view the course you must select a session:'
             - an unhidden course-entitlement-selection-container
+            - a related programs message
         """
-        CourseEntitlementFactory(user=self.user)
+        program = ProgramFactory()
+        CourseEntitlementFactory(user=self.user, course_uuid=program['courses'][0]['uuid'])
+        mock_get_programs.return_value = [program]
         mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
         mock_course_runs.return_value = [
             {
@@ -362,6 +367,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn('class="enter-course hidden"', response.content)
         self.assertIn('You must select a session to access the course.', response.content)
         self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
+        self.assertIn('Related Programs:', response.content)
 
     @patch('student.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
