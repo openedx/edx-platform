@@ -259,6 +259,20 @@
       display: none;
     }
 
+    input[readonly] {
+      font-family: OpenSans-Regular;
+      background-color: #e6e4e4;
+      color: #292b2c;
+      font-size: 22px;
+      border: none;
+      margin: 5px 0;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+
     .auto-register-message {
       font-size: 1.1em;
       line-height: 1.3em;
@@ -281,48 +295,6 @@
       color: #636c72;
       font-family: OpenSans-Regular;
       padding: 10px 0;
-    }
-  }
-
-  .sync-profile-registration-form {
-    .register-button {
-      width: 100%;
-    }
-
-    div[class^="hidden-"] {
-      display: none;
-    }
-
-    .form-field label {
-      font-size: 16px;
-      color: #636c72;
-      font-family: OpenSans-Regular;
-    }
-
-    input[readonly] {
-      font-family: OpenSans-Regular;
-      background-color: #e6e4e4;
-      color: #292b2c;
-      font-size: 22px;
-      border: none;
-      margin: 5px 0;
-
-      &:focus {
-        outline: none;
-      }
-    }
-
-    .checkbox-honor_code {
-      font-family: OpenSans-Regular;
-      margin: 30px 0;
-      color: #292b2c;
-      font-size: 16px;
-      padding: 4px;
-      background-color: #f2f8fd;
-
-      .supplemental-link {
-        margin-top: 20px;
-      }
     }
   }
 
