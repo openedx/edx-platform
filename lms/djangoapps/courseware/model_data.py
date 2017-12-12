@@ -1011,7 +1011,7 @@ def set_score(user_id, usage_key, score, max_score):
 
     except DatabaseError:
         # adding temporary log to get information for EDUCATOR-1930
-        log.exception("Creating duplicate entry for module %s and user %d", usage_key, user_id)
+        log.exception("Error creating an entry for the module %s and user %d", usage_key, user_id)
         raise
 
     return student_module.modified
