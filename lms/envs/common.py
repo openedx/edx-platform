@@ -418,6 +418,10 @@ FEATURES = {
 
     # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
+
+    # Whether to show currency symbol before or after price of a course.
+    # Default value: before price, as in US dollars.
+    'SHOW_CURRENCY_SYMBOL_BEFORE_PRICE': True,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
