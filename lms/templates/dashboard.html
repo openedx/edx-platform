@@ -33,11 +33,6 @@ from student.models import CourseEnrollment
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
-% if course_entitlements:
-    <!-- This is a temporary solution before we land a fix to load these through Webpack, tracked by LEARNER-3483 -->
-    <script type="text/javascript" src="${static.url('common/js/vendor/popper.js')}"></script>
-    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.js')}"></script>
-% endif
 </%block>
 
 <%block name="js_extra">
@@ -52,6 +47,7 @@ from student.models import CourseEnrollment
       });
     });
   </script>
+  <%static:webpack entry="Bootstrap"></%static:webpack>
   <%static:require_module module_name="js/learner_dashboard/unenrollment_factory" class_name="UnenrollmentFactory">
     UnenrollmentFactory({
       urls: {

@@ -26,7 +26,6 @@ module.exports = {
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
         AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
         Bootstrap: './lms/static/common/js/vendor/bootstrap.js',
-        EntitlementView: './lms/static/js/learner_dashboard/views/course_entitlement_view.js',
 
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
@@ -63,7 +62,8 @@ module.exports = {
             _: 'underscore',
             $: 'jquery',
             jQuery: 'jquery',
-            'window.jQuery': 'jquery'
+            'window.jQuery': 'jquery',
+            Popper: ['popper.js', 'default']
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
