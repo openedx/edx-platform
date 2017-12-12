@@ -1,5 +1,5 @@
 /**
- *  Store data for the current
+ *  Store data for the current entitlement.
  */
 (function(define) {
     'use strict';
@@ -13,7 +13,6 @@
                     availableSessions: [],
                     entitlementUUID: '',
                     currentSessionId: '',
-                    userId: '',
                     courseName: ''
                 }
             });

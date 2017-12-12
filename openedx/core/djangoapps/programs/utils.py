@@ -222,15 +222,26 @@ class ProgramProgressMeter(object):
             completed, in_progress, not_started = [], [], []
 
             for course in program_copy['courses']:
+                try:
+                    entitlement = CourseEntitlement.objects.get(user=self.user, course_uuid=course['uuid'])
+                except CourseEntitlement.DoesNotExist:
+                    entitlement = None
+
                 if self._is_course_complete(course):
                     completed.append(course)
-                elif self._is_course_enrolled(course):
-                    course_in_progress = self._is_course_in_progress(now, course)
-                    if course_in_progress:
+                elif self._is_course_enrolled(course) or entitlement:
+                    # Show all currently enrolled courses and entitlements as in progress
+                    if entitlement:
+                        course['user_entitlement'] = entitlement.to_dict()
+                        course['enroll_url'] = reverse('entitlements_api:v1:enrollments', args=[str(entitlement.uuid)])
                         in_progress.append(course)
                     else:
-                        course['expired'] = not course_in_progress
-                        not_started.append(course)
+                        course_in_progress = self._is_course_in_progress(now, course)
+                        if course_in_progress:
+                            in_progress.append(course)
+                        else:
+                            course['expired'] = not course_in_progress
+                            not_started.append(course)
                 else:
                     not_started.append(course)
 
