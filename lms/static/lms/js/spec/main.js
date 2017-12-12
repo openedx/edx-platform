@@ -46,8 +46,6 @@
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'backbone-super': 'js/vendor/backbone-super',
-            'popper': 'common/js/vendor/popper',
-            'bootstrap': 'common/js/vendor/bootstrap',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
@@ -198,10 +196,6 @@
             },
             'backbone-super': {
                 deps: ['backbone']
-            },
-            'bootstrap': {
-                deps: ['jquery', 'popper'],
-                exports: 'bootstrap'
             },
             'paging-collection': {
                 deps: ['jquery', 'underscore', 'backbone.paginator']

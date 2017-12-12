@@ -65,9 +65,6 @@ module.exports = {
             jQuery: 'jquery',
             'window.jQuery': 'jquery'
         }),
-        new webpack.ProvidePlugin({
-            Popper: 'popper.js'
-        }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
         // the CommonsChunkPlugin. We have a kludge in karma.common.conf.js
@@ -174,7 +171,6 @@ module.exports = {
         gettext: 'gettext',
         jquery: 'jQuery',
         logger: 'Logger',
-        popper: 'Popper',
         underscore: '_',
         URI: 'URI'
     },
