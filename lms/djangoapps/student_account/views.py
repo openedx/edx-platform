@@ -124,6 +124,12 @@ def login_and_registration_form(request, initial_mode="login"):
         } for message in messages.get_messages(request) if 'account-activation' in message.tags
     ]
 
+    # add user details from running pipeline
+    pipeline_user_details = {}
+    running_pipeline = pipeline.get(request)
+    if running_pipeline:
+        pipeline_user_details = running_pipeline['kwargs']['details']
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
@@ -146,7 +152,9 @@ def login_and_registration_form(request, initial_mode="login"):
             'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
             'account_creation_allowed': configuration_helpers.get_value(
-                'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True))
+                'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+            ),
+            'pipeline_user_details': pipeline_user_details
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
