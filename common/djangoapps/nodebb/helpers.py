@@ -1,7 +1,10 @@
 import collections
+
+from django.core.urlresolvers import reverse
+
 from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-from django.core.urlresolvers import reverse
+from nodebb.models import DiscussionCommunity
 
 
 def get_course_related_tabs(request, course):
@@ -49,3 +52,12 @@ def get_all_course_progress(student, course):
         percentage = 0
 
     return int(percentage)
+
+
+def get_community_url(course_id):
+    """
+    Get community url(if exists) based on the course id
+    """
+    discussion_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
+    if discussion_community:
+        return discussion_community.community_url
