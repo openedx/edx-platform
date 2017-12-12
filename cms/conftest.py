@@ -14,6 +14,11 @@ import contracts
 import pytest
 
 
+# Patch the xml libs before anything else.
+from safe_lxml import defuse_xml_libs
+defuse_xml_libs()
+
+
 def pytest_configure(config):
     """
     Do core setup operations from manage.py before collecting tests.
