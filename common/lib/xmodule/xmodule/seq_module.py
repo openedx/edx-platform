@@ -292,7 +292,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._update_position(context, len(display_items))
         prereq_met = True
 
-        if self._find_gating_milestone():
+        if self._is_prereq_required():
             if self.runtime.user_is_staff:
                 banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
             else:
@@ -323,13 +323,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         return fragment
 
-    def _find_gating_milestone(self):
+    def _is_prereq_required(self):
         """
-        Checks whether a gating milestone exists for this Section
+        Checks whether a prerequiste is required for this Section
+
+        Returns:
+            milestone if a prereq is required, False otherwise
         """
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
-            milestone = gating_service.get_gating_milestone(
+            milestone = gating_service.is_prereq_required(
                 self.course_id, self.location, 'requires'
             )
             return milestone

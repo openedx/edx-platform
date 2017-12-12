@@ -148,7 +148,7 @@ def get_prerequisites(course_key):
     milestones_by_block_id = {}
     block_ids = []
     for milestone in course_content_milestones:
-        prereq_content_key = milestone['namespace'].replace(GATING_NAMESPACE_QUALIFIER, '')
+        prereq_content_key = _get_gating_block_id(milestone)
         block_id = UsageKey.from_string(prereq_content_key).block_id
         block_ids.append(block_id)
         milestones_by_block_id[block_id] = milestone
@@ -273,7 +273,7 @@ def get_required_content(course_key, gated_content_key):
     milestone = get_gating_milestone(course_key, gated_content_key, 'requires')
     if milestone:
         return (
-            milestone.get('namespace', '').replace(GATING_NAMESPACE_QUALIFIER, ''),
+            _get_gating_block_id(milestone),
             milestone.get('requirements', {}).get('min_score')
         )
     else:
@@ -317,7 +317,7 @@ def is_prereq_met(content_id, user_id, recalc_on_unmet=False):
 
     Returns:
         tuple: True|False,
-        prereq_meta_info = { 'url': prereq_url, 'display_name': prereq_name}
+        prereq_meta_info = { 'url': prereq_url|None, 'display_name': prereq_name|None}
     """
     course_id = content_id.course_key
 
@@ -329,9 +329,10 @@ def is_prereq_met(content_id, user_id, recalc_on_unmet=False):
         user_id
     )
     prereq_met = not unfulfilled_milestones
+    prereq_meta_info = {'url': None, 'display_name': None}
 
     if prereq_met or not recalc_on_unmet:
-        return prereq_met, {}
+        return prereq_met, prereq_meta_info
 
     milestone = unfulfilled_milestones[0]
     student = User.objects.get(id=user_id)
@@ -341,7 +342,7 @@ def is_prereq_met(content_id, user_id, recalc_on_unmet=False):
         course_structure = get_course_blocks(student, store.make_course_usage_key(course_id))
         course = store.get_course(course_id, depth=0)
         subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
-        subsection_usage_key = UsageKey.from_string(milestone['namespace'].replace(GATING_NAMESPACE_QUALIFIER, ''))
+        subsection_usage_key = UsageKey.from_string(_get_gating_block_id(milestone))
 
         if subsection_usage_key in course_structure:
             # this will force a recalcuation of the subsection grade
@@ -375,6 +376,12 @@ def update_milestone(milestone, subsection_grade, prereq_milestone, user_id):
     else:
         milestones_helpers.remove_user_milestone({'id': user_id}, prereq_milestone)
         return False
+
+def _get_gating_block_id(milestone):
+    """
+    Return the block id of the gating milestone
+    """
+    return milestone.get('namespace', '').replace(GATING_NAMESPACE_QUALIFIER, '')
 
 def _get_minimum_required_percentage(milestone):
     """

@@ -1,47 +1,39 @@
 """
-A wrapper class around requested methods exposed in api.py
+A wrapper class to communicate with Gating api
 """
-import types
-
 from . import api as gating_api
 
 
-class GatingService(object):  # pylint: disable=too-few-public-methods
+class GatingService(object):
     """
-    An xBlock service for xBlocks to talk to the Gating api.
-
-    NOTE: This is a Singleton class. We should only have one instance of it!
+    An XBlock service to talk to the Gating api.
     """
 
-    _instance = None
+    def is_prereq_met(self, content_id, user_id, recalc_on_unmet=False):
+        """
+        Returns true if the prequiste has been met for a given milestone
 
-    REQUESTED_FUNCTIONS = [
-        'get_gating_milestone_meta_info',
-        'get_gating_milestone',
-        'is_prereq_met'
-    ]
+        Arguments:
+            content_id (BlockUsageLocator): BlockUsageLocator for the content
+            user_id: The id of the user
+            recalc_on_unmet: Recalculate the grade if prereq has not yet been met
 
-    def __new__(cls, *args, **kwargs):
-        """
-        This is the class factory to make sure this is a Singleton
-        """
-        if not cls._instance:
-            cls._instance = super(GatingService, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
+        Returns:
+            tuple: True|False,
+            prereq_meta_info = { 'url': prereq_url|None, 'display_name': prereq_name|None}
+        """       
+        return gating_api.is_prereq_met(content_id, user_id, recalc_on_unmet)
 
-    def __init__(self):
+    def is_prereq_required(self, course_key, content_key, relationship):
         """
-        Class initializer, which just inspects the libraries and exposes the same functions
-        listed in REQUESTED_FUNCTIONS
-        """
-        self._bind_to_requested_functions()
+        Returns the prerequiste if one is required
 
-    def _bind_to_requested_functions(self):
+        Arguments:
+            course_key (str|CourseKey): The course key
+            content_key (str|UsageKey): The content usage key
+            relationship (str): The relationship type (e.g. 'requires')
+
+        Returns:
+            dict or None: The gating milestone dict or None
         """
-        bind module functions. Since we use underscores to mean private methods, let's exclude those.
-        """
-        for attr_name in self.REQUESTED_FUNCTIONS:
-            attr = getattr(gating_api, attr_name, None)
-            if isinstance(attr, types.FunctionType) and not attr_name.startswith('_'):
-                if not hasattr(self, attr_name):
-                    setattr(self, attr_name, attr)
+        return gating_api.get_gating_milestone(course_key, content_key, relationship)
