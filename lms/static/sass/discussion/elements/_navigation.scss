@@ -4,8 +4,10 @@
 @import '../../edx-pattern-library-shims/base/variables';
 
 .forum-nav {
-  border: 1px solid #aaa;
-  border-radius: $forum-border-radius;
+    border: 1px solid #aaa;
+    border-radius: $forum-border-radius;
+}
+
 div.discussion-course, div.content-wrapper {
   section.discussion {
     div.forum-nav {

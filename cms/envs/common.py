@@ -49,7 +49,7 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
+    update_module_store_settings, ASSET_IGNORE_REGEX,
     PARENTAL_CONSENT_AGE_LIMIT, COMPREHENSIVE_THEME_DIRS, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
@@ -183,9 +183,6 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
-    # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': None,
-
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 
@@ -199,7 +196,7 @@ FEATURES = {
     'ENABLE_CONTENT_LIBRARIES': True,
 
     # Solutions apps flag
-    'EDX_SOLUTIONS_API': True,
+    'EDX_SOLUTIONS_API': False,
 
     # Milestones application flag
     'MILESTONES_APP': False,
@@ -701,10 +698,6 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
-    'discussion': {
-        'source_filenames': ['sass/discussion-forum.css'],
-        'output_filename': 'css/cms-style-discussion-forum.css'
-    }
 }
 
 base_vendor_js = [
@@ -795,22 +788,8 @@ REQUIRE_BUILD_PROFILE = "cms/js/build.js"
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
-# A dictionary of standalone modules to build with almond.js.
-REQUIRE_STANDALONE_MODULES = {}
-
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
-
-# A tuple of files to exclude from the compilation result of r.js.
-REQUIRE_EXCLUDE = ("build.txt",)
-
-# The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and
-# rhino if not.
-# It can also be a path to a custom class that subclasses
-# require.environments.Environment and defines some "args" function that
-# returns a list with the command arguments to execute.
-REQUIRE_ENVIRONMENT = "node"
 
 ########################## DJANGO WEBPACK LOADER ##############################
 
@@ -937,7 +916,6 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
-    'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
     'xblock_config',
 
     # Maintenance tools
@@ -1012,9 +990,6 @@ INSTALLED_APPS = (
 
     # Bookmarks
     'openedx.core.djangoapps.bookmarks',
-
-    # programs support
-    'openedx.core.djangoapps.programs',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',
@@ -1409,8 +1384,6 @@ PARTNER_SUPPORT_EMAIL = ''
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
-
-DOC_LINK_BASE_URL = None
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
 
