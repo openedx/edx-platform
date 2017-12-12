@@ -179,7 +179,7 @@
 
                             // Show each input tip
                             $(this).children().each(function() {
-                                if (inputTipSelectorsHidden.includes($(this).attr('class'))) {
+                                if (inputTipSelectorsHidden.indexOf($(this).attr('class')) >= 0) {
                                     $(this).removeClass('hidden');
                                 }
                             });
@@ -193,7 +193,7 @@
 
                             // Hide each input tip
                             $(this).children().each(function() {
-                                if (inputTipSelectors.includes($(this).attr('class'))) {
+                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 0) {
                                     $(this).addClass('hidden');
                                 }
                             });
@@ -207,7 +207,7 @@
 
                             // Initially hide each input tip
                             input.children().each(function() {
-                                if (inputTipSelectors.includes($(this).attr('class'))) {
+                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 0) {
                                     $(this).addClass('hidden');
                                 }
                             });
