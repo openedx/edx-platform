@@ -36,7 +36,6 @@ django-method-override==0.1.0
 django-user-tasks==0.1.5
 django-waffle==0.12.0
 djangorestframework-jwt==1.11.0
-enum34==1.1.6
 edx-ace==0.1.6
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
@@ -47,7 +46,6 @@ edx-lint==0.5.4
 # Pin this to test a fix to pylint-django
 git+https://github.com/cpennington/pylint-django@fix-field-inference-during-monkey-patching#egg=pylint-django==0.0
 
-enum34==1.1.6
 edx-django-oauth2-provider==1.2.5
 edx-django-sites-extensions==2.3.0
 edx-enterprise==0.55.4
