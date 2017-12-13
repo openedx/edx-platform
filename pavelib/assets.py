@@ -52,7 +52,7 @@ COMMON_LOOKUP_PATHS = [
 NPM_INSTALLED_LIBRARIES = [
     'backbone.paginator/lib/backbone.paginator.js',
     'backbone/backbone.js',
-    'bootstrap/dist/js/bootstrap.js',
+    'bootstrap/dist/js/bootstrap.bundle.js',
     'hls.js/dist/hls.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
@@ -60,7 +60,6 @@ NPM_INSTALLED_LIBRARIES = [
     'moment-timezone/builds/moment-timezone-with-data.js',
     'moment/min/moment-with-locales.js',
     'picturefill/dist/picturefill.js',
-    'popper.js/dist/umd/popper.js',
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',

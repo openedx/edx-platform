@@ -74,6 +74,7 @@
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
+            'bootstrap': 'common/js/vendor/bootstrap.bundle',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
 
             // Manually specify LMS files that are not converted to RequireJS
@@ -185,6 +186,9 @@
             'backbone': {
                 deps: ['underscore', 'jquery'],
                 exports: 'Backbone'
+            },
+            'bootstrap': {
+                deps: ['jquery']
             },
             'backbone.associations': {
                 deps: ['backbone'],
