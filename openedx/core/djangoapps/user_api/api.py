@@ -62,7 +62,7 @@ def get_password_reset_form():
     return form_desc
 
 
-def get_login_session_form():
+def get_login_session_form(request):
     """Return a description of the login form.
 
     This decouples clients from the API definition:
@@ -92,16 +92,34 @@ def get_login_session_form():
         platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
+    email = ''
+    email_field_restrictions = {
+        "min_length": accounts.EMAIL_MIN_LENGTH,
+        "max_length": accounts.EMAIL_MAX_LENGTH,
+    }
+
+    if third_party_auth.is_enabled():
+        running_pipeline = third_party_auth.pipeline.get(request)
+        if running_pipeline:
+            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            if current_provider and enterprise_customer_for_request(request):
+                pipeline_kwargs = running_pipeline.get('kwargs')
+
+                # Details about the user sent back from the provider.
+                details = pipeline_kwargs.get('details').copy()
+                email = details.get('email', '')
+                if email:
+                    email_field_restrictions.update({"readonly": True})
+
+
     form_desc.add_field(
         "email",
         field_type="email",
         label=email_label,
         placeholder=email_placeholder,
         instructions=email_instructions,
-        restrictions={
-            "min_length": accounts.EMAIL_MIN_LENGTH,
-            "max_length": accounts.EMAIL_MAX_LENGTH,
-        }
+        default=email,
+        restrictions=email_field_restrictions
     )
 
     # Translators: This label appears above a field on the login form
