@@ -64,7 +64,7 @@ GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
 help-tokens==1.0.3
-httpretty==0.8.3
+httpretty==0.8.14
 lazy==1.1
 mako==1.0.2
 Markdown>=2.6,<2.7
