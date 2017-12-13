@@ -18,7 +18,8 @@ define([
         transcriptOrganizationCredentials,
         videoTranscriptSettings,
         isVideoTranscriptEnabled,
-        videoImageSettings
+        videoImageSettings,
+        transcriptAvailableLanguages
     ) {
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
@@ -51,7 +52,11 @@ define([
                                 videoHandlerUrl: videoHandlerUrl,
                                 collection: updatedCollection,
                                 encodingsDownloadUrl: encodingsDownloadUrl,
-                                videoImageSettings: videoImageSettings
+                                videoImageSettings: videoImageSettings,
+                                videoTranscriptSettings: videoTranscriptSettings,
+                                transcriptAvailableLanguages: transcriptAvailableLanguages,
+                                videoSupportedFileFormats: videoSupportedFileFormats,
+                                isVideoTranscriptEnabled: isVideoTranscriptEnabled
                             });
                         $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
                     });
@@ -63,7 +68,11 @@ define([
                 videoHandlerUrl: videoHandlerUrl,
                 collection: new Backbone.Collection(previousUploads),
                 encodingsDownloadUrl: encodingsDownloadUrl,
-                videoImageSettings: videoImageSettings
+                videoImageSettings: videoImageSettings,
+                videoTranscriptSettings: videoTranscriptSettings,
+                transcriptAvailableLanguages: transcriptAvailableLanguages,
+                videoSupportedFileFormats: videoSupportedFileFormats,
+                isVideoTranscriptEnabled: isVideoTranscriptEnabled
             });
         $contentWrapper.append(activeView.render().$el);
         $contentWrapper.append(previousView.render().$el);
