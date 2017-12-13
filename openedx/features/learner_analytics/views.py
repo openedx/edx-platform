@@ -48,3 +48,55 @@ class LearnerAnalyticsView(View):
             'uses_pattern_library': True,
         }
         return render_to_response('learner_analytics/dashboard.html', context)
+
+    def get_grade_data(self, user, course_key):
+        """
+        Collects and formats the grades data for a particular user and course.
+
+        Args:
+            user: User
+            course_key: CourseKey
+        """
+        course_grade = CourseGradeFactory().read(user, course_key=course_key)
+        grades = {}
+        for (subsection, subsection_grade) in course_grade.subsection_grades.iteritems():
+            grades[unicode(subsection)] = {
+                'assignment_type': subsection_grade.format,
+                'total_earned': subsection_grade.graded_total.earned,
+                'total_possible': subsection_grade.graded_total.possible,
+            }
+        return json.dumps(grades)
+
+    def get_discussion_data(self, user, course_key):
+        """
+        Collects and formats the discussion data from a particular user and course.
+
+        Args:
+            user: User
+            course_key: CourseKey
+        """
+        pass
+
+    def get_schedule(self, request, course_key):
+        """
+        Get the schedule of graded assignments in the course.
+
+        Args:
+            request: HttpRequest
+            course_key: CourseKey
+        """
+        course_usage_key = modulestore().make_course_usage_key(course_key)
+        all_blocks = get_blocks(
+            request,
+            course_usage_key,
+            user=request.user,
+            nav_depth=3,
+            requested_fields=['display_name', 'due', 'graded', 'format'],
+            block_types_filter=['sequential']
+        )
+        graded_blocks = {}
+        for (location, block) in all_blocks['blocks'].iteritems():
+            if block.get('graded', False) and block.get('due') is not None:
+                graded_blocks[location] = block
+                block['due'] = block['due'].isoformat()
+        return json.dumps(graded_blocks)
