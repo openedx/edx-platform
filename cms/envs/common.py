@@ -1135,6 +1135,9 @@ INSTALLED_APPS = [
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # Entitlement API
+    'entitlements',
 ]
 
 
