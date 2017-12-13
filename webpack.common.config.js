@@ -25,6 +25,7 @@ module.exports = {
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
         AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
+        LearnerAnalyticsDashboard: './lms/static/js/learner_analytics_dashboard/index.jsx',
 
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
