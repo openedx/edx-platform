@@ -70,18 +70,15 @@ END
 }
 
 if [[ $DJANGO_VERSION == '1.11' ]]; then
-    PAVER_ARGS="-v --django_version=1.11"
     TOX="tox -e py27-django111 --"
 elif [[ $DJANGO_VERSION == '1.10' ]]; then
-    PAVER_ARGS="-v --django_version=1.10"
     TOX="tox -e py27-django110 --"
 elif [[ $DJANGO_VERSION == '1.9' ]]; then
-    PAVER_ARGS="-v --django_version=1.9"
     TOX="tox -e py27-django19 --"
 else
-    PAVER_ARGS="-v"
     TOX=""
 fi
+PAVER_ARGS="-v"
 PARALLEL="--processes=-1"
 export SUBSET_JOB=$JOB_NAME
 
@@ -135,13 +132,13 @@ case "$TEST_SUITE" in
     "lms-unit")
         case "$SHARD" in
             "all")
-                paver test_system -s lms --disable_capture $PAVER_ARGS $PARALLEL 2> lms-tests.log
+                $TOX paver test_system -s lms --disable_capture $PAVER_ARGS $PARALLEL 2> lms-tests.log
                 ;;
             [1-3])
-                paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
+                $TOX paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
                 ;;
             4|"noshard")
-                paver test_system -s lms --disable_capture --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
+                $TOX paver test_system -s lms --disable_capture --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -155,11 +152,11 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms --disable_capture $PAVER_ARGS 2> cms-tests.log
+        $TOX paver test_system -s cms --disable_capture $PAVER_ARGS 2> cms-tests.log
         ;;
 
     "commonlib-unit")
-        paver test_lib --disable_capture $PAVER_ARGS 2> common-tests.log
+        $TOX paver test_lib --disable_capture $PAVER_ARGS 2> common-tests.log
         ;;
 
     "js-unit")
