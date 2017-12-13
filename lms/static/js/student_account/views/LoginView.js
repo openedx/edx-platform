@@ -50,6 +50,7 @@
                 this.accountActivationMessages = data.accountActivationMessages;
                 this.hideAuthWarnings = data.hideAuthWarnings;
                 this.pipelineUserDetails = data.pipelineUserDetails;
+                this.enterpriseName = data.enterpriseName;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -68,7 +69,9 @@
                         hasSecondaryProviders: this.hasSecondaryProviders,
                         platformName: this.platformName,
                         createAccountOption: this.createAccountOption,
-                        pipelineUserDetails: this.pipelineUserDetails
+                        pipelineUserDetails: this.pipelineUserDetails,
+                        enterpriseName: this.enterpriseName
+
                     }
                 }));
 

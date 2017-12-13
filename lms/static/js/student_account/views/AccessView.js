@@ -136,7 +136,8 @@
                             passwordResetSupportUrl: this.passwordResetSupportUrl,
                             createAccountOption: this.createAccountOption,
                             hideAuthWarnings: this.hideAuthWarnings,
-                            pipelineUserDetails: this.pipelineUserDetails
+                            pipelineUserDetails: this.pipelineUserDetails,
+                            enterpriseName: this.enterpriseName
                         });
 
                     // Listen for 'password-help' event to toggle sub-views
