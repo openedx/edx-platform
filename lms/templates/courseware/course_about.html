@@ -274,7 +274,7 @@ from openedx.core.lib.courses import course_image_url
               <li class="important-dates-item">
                 <span class="icon fa fa-money" aria-hidden="true"></span>
                 <p class="important-dates-item-title">${_("Price")} ${mode.name}</p>
-                <span class="important-dates-item-text">${mode.min_price}${settings.PAID_COURSE_REGISTRATION_CURRENCY[1]}</span>
+                <span class="important-dates-item-text">${settings.PAID_COURSE_REGISTRATION_CURRENCY[1]}${mode.min_price}</span>
               </li>
             %endfor
           %endif
