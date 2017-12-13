@@ -9,7 +9,7 @@ class GatingService(object):
     An XBlock service to talk to the Gating api.
     """
 
-    def is_prereq_met(self, content_id, user_id, recalc_on_unmet=False):
+    def compute_is_prereq_met(self, content_id, user_id, recalc_on_unmet=False):
         """
         Returns true if the prequiste has been met for a given milestone
 
@@ -22,7 +22,7 @@ class GatingService(object):
             tuple: True|False,
             prereq_meta_info = { 'url': prereq_url|None, 'display_name': prereq_name|None}
         """       
-        return gating_api.is_prereq_met(content_id, user_id, recalc_on_unmet)
+        return gating_api.compute_is_prereq_met(content_id, user_id, recalc_on_unmet)
 
     def is_prereq_required(self, course_key, content_key, relationship):
         """

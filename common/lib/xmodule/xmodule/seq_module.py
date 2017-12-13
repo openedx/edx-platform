@@ -297,7 +297,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
             else:
                 # check if prerequiste has been met
-                prereq_met, prereq_meta_info = self._is_prereq_met(True)
+                prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
 
         fragment = Fragment()
         params = {
@@ -339,7 +339,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         return False
 
-    def _is_prereq_met(self, recalc_on_unmet):
+    def _compute_is_prereq_met(self, recalc_on_unmet):
         """
         Evaluate if the user has completed the prerequiste
 
@@ -352,7 +352,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
-            return gating_service.is_prereq_met(self.location, self.runtime.user_id, recalc_on_unmet)
+            return gating_service.compute_is_prereq_met(self.location, self.runtime.user_id, recalc_on_unmet)
 
         return False, {}
 

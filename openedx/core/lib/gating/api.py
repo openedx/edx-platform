@@ -306,9 +306,10 @@ def get_gated_content(course, user):
         ]
 
 
-def is_prereq_met(content_id, user_id, recalc_on_unmet=False):
+def compute_is_prereq_met(content_id, user_id, recalc_on_unmet=False):
     """
-    Returns true if the prequiste has been met for a given milestone
+    Returns true if the prequiste has been met for a given milestone.
+    Will recalculate the subsection grade if specified and prereq unmet
 
     Arguments:
         content_id (BlockUsageLocator): BlockUsageLocator for the content
@@ -339,14 +340,13 @@ def is_prereq_met(content_id, user_id, recalc_on_unmet=False):
     store = modulestore()
 
     with store.bulk_operations(course_id):
-        course_structure = get_course_blocks(student, store.make_course_usage_key(course_id))
-        course = store.get_course(course_id, depth=0)
-        subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
         subsection_usage_key = UsageKey.from_string(_get_gating_block_id(milestone))
+        subsection_structure = get_course_blocks(student, subsection_usage_key)
+        subsection_grade_factory = SubsectionGradeFactory(student, None, subsection_structure)
 
-        if subsection_usage_key in course_structure:
+        if subsection_usage_key in subsection_structure:
             # this will force a recalcuation of the subsection grade
-            subsection_grade = subsection_grade_factory.update(course_structure[subsection_usage_key])
+            subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key])
             prereq_met = update_milestone(milestone, subsection_grade, milestone, user_id)
             prereq_meta_info = {
                 'url': reverse('jump_to', kwargs={'course_id': course_id, 'location': subsection_usage_key}),
@@ -405,7 +405,7 @@ def _get_subsection_percentage(subsection_grade):
     """
     Returns the percentage value of the given subsection_grade.
     """
-    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
+    return subsection_grade.percent_graded * 100.0
 
 
 def _calculate_ratio(earned, possible):
