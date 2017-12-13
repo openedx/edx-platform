@@ -14,6 +14,9 @@
                 <div class="video-head-col video-col name-col"><%- gettext("Name") %></div>
                 <div class="video-head-col video-col date-col"><%- gettext("Date Added") %></div>
                 <div class="video-head-col video-col video-id-col"><%- gettext("Video ID") %></div>
+                <% if (isVideoTranscriptEnabled) { %>
+                <div class="video-head-col video-col transcripts-col"><%- gettext("Transcripts") %></div>
+                <% } %>
                 <div class="video-head-col video-col status-col"><%- gettext("Status") %></div>
                 <div  class="video-head-col video-col actions-col"><%- gettext("Action") %></div>
             </div>
