@@ -679,6 +679,14 @@ urlpatterns += [
         r'^u/',
         include('openedx.features.learner_profile.urls'),
     ),
+
+    # Learner analytics dashboard
+    url(
+        r'^courses/{}/learner_analytics/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.learner_analytics.urls'),
+    ),
 ]
 
 if settings.FEATURES['ENABLE_TEAMS']:
