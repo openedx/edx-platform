@@ -994,19 +994,26 @@ def set_score(user_id, usage_key, score, max_score):
     """
     Set the score and max_score for the specified user and xblock usage.
     """
-    student_module, created = StudentModule.objects.get_or_create(
-        student_id=user_id,
-        module_state_key=usage_key,
-        course_id=usage_key.course_key,
-        defaults={
-            'grade': score,
-            'max_grade': max_score,
-        }
-    )
-    if not created:
-        student_module.grade = score
-        student_module.max_grade = max_score
-        student_module.save()
+    try:
+        student_module, created = StudentModule.objects.get_or_create(
+            student_id=user_id,
+            module_state_key=usage_key,
+            course_id=usage_key.course_key,
+            defaults={
+                'grade': score,
+                'max_grade': max_score,
+            }
+        )
+        if not created:
+            student_module.grade = score
+            student_module.max_grade = max_score
+            student_module.save()
+
+    except DatabaseError:
+        # adding temporary log to get information for EDUCATOR-1930
+        log.exception("Error creating an entry for the module %s and user %d", usage_key, user_id)
+        raise
+
     return student_module.modified
 
 
