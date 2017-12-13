@@ -22,16 +22,16 @@ define([
             initialSessionId = isAlreadyEnrolled ? testSessionIds[0] : '';
             entitlementAvailableSessions = [{
                 enrollment_end: null,
-                session_start: '2013-02-05T05:00:00+00:00',
+                start: '2019-02-05T05:00:00+00:00',
                 pacing_type: 'instructor_paced',
                 session_id: testSessionIds[0],
-                session_end: null
+                end: null
             }, {
-                enrollment_end: '2017-12-22T03:30:00Z',
-                session_start: '2018-01-03T13:00:00+00:00',
+                enrollment_end: '2019-12-22T03:30:00Z',
+                start: '2020-01-03T13:00:00+00:00',
                 pacing_type: 'self_paced',
                 session_id: testSessionIds[1],
-                session_end: '2018-03-09T21:30:00+00:00'
+                end: '2020-03-09T21:30:00+00:00'
             }];
 
             view = new CourseEntitlementView({
