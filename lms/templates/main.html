@@ -88,8 +88,7 @@ from pipeline_mako import render_require_js_path_overrides
 
   % if uses_bootstrap:
     ## xss-lint: disable=mako-invalid-js-filter
-    <script type="text/javascript" src="${static.url('common/js/vendor/popper.js')}"></script>
-    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.js')}"></script>
+    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.bundle.js')}"></script>
   % endif
 
   <script>

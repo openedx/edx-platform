@@ -10,7 +10,8 @@
         'js/learner_dashboard/models/course_entitlement_model',
         'js/learner_dashboard/models/course_card_model',
         'text!../../../templates/learner_dashboard/course_entitlement.underscore',
-        'text!../../../templates/learner_dashboard/verification_popover.underscore'
+        'text!../../../templates/learner_dashboard/verification_popover.underscore',
+        'bootstrap'
     ],
          function(
              Backbone,
