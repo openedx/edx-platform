@@ -21,7 +21,6 @@ import unicodedata
 from copy import deepcopy
 from xml.sax.saxutils import unescape
 
-import requests
 import sympy
 from lxml import etree
 from sympy import latex, sympify
@@ -428,10 +427,7 @@ class formula(object):
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
         self.the_pmathml = pmathml  # pylint: disable=attribute-defined-outside-init
-
-        # convert to cmathml
-        self.the_cmathml = self.GetContentMathML(self.asciimath, pmathml)
-        return self.the_cmathml
+        return self.the_pmathml
 
     cmathml = property(get_content_mathml, None, None, 'content MathML representation')
 
@@ -586,35 +582,3 @@ class formula(object):
             raise Exception('[formula] unknown tag %s' % tag)
 
     sympy = property(make_sympy, None, None, 'sympy representation')
-
-    def GetContentMathML(self, asciimath, mathml):  # pylint: disable=invalid-name
-        """
-        Handle requests to snuggletex API to convert the Ascii math to MathML
-        """
-        url = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-
-        payload = {
-            'asciiMathInput': asciimath,
-            'asciiMathML': mathml,
-        }
-        headers = {
-            'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"
-        }
-        request = requests.post(url, data=payload, headers=headers, verify=False)
-        request.encoding = 'utf-8'
-        ret = request.text
-
-        mode = 0
-        cmathml = []
-        for k in ret.split('\n'):
-            if 'conversion to Content MathML' in k:
-                mode = 1
-                continue
-            if mode == 1:
-                if '<h3>Maxima Input Form</h3>' in k:
-                    mode = 0
-                    continue
-                cmathml.append(k)
-        cmathml = '\n'.join(cmathml[2:])
-        cmathml = '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' + unescape(cmathml) + '\n</math>'
-        return cmathml
