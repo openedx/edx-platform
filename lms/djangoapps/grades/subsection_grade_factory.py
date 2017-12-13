@@ -63,7 +63,7 @@ class SubsectionGradeFactory(object):
         )
         self._unsaved_subsection_grades.clear()
 
-    def update(self, subsection, only_if_higher=None, score_deleted=False, force_update_subsections=False):
+    def update(self, subsection, only_if_higher=None, score_deleted=False, force_update_subsections=False, persist_grade=True):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
@@ -73,7 +73,7 @@ class SubsectionGradeFactory(object):
             subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
         )
 
-        if should_persist_grades(self.course_data.course_key):
+        if persist_grade and should_persist_grades(self.course_data.course_key):
             if only_if_higher:
                 try:
                     grade_model = PersistentSubsectionGrade.read_grade(self.student.id, subsection.location)

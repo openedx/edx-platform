@@ -342,11 +342,11 @@ def compute_is_prereq_met(content_id, user_id, recalc_on_unmet=False):
     with store.bulk_operations(course_id):
         subsection_usage_key = UsageKey.from_string(_get_gating_block_id(milestone))
         subsection_structure = get_course_blocks(student, subsection_usage_key)
-        subsection_grade_factory = SubsectionGradeFactory(student, None, subsection_structure)
+        subsection_grade_factory = SubsectionGradeFactory(student, course_structure=subsection_structure)
 
         if subsection_usage_key in subsection_structure:
             # this will force a recalcuation of the subsection grade
-            subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key])
+            subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key], persist_grade=False)
             prereq_met = update_milestone(milestone, subsection_grade, milestone, user_id)
             prereq_meta_info = {
                 'url': reverse('jump_to', kwargs={'course_id': course_id, 'location': subsection_usage_key}),
