@@ -34,4 +34,10 @@ class EnterpriseSupportSignals(TestCase):
             user_id=self.user.id,
             enterprise_customer=enterprise_customer
         )
-        self.assertTrue(mock_update_user.called)
+        mock_update_user.assert_called_with(
+            sailthru_vars={
+                'is_enterprise_learner': True,
+                'enterprise_name': enterprise_customer.name,
+            },
+            email=self.user.email
+        )
