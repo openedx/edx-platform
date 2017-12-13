@@ -1,6 +1,8 @@
 """
 Learner analytics dashboard views
 """
+import math
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
@@ -39,6 +41,8 @@ class LearnerAnalyticsView(View):
         course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
+        grading_policy = course.grading_policy
+
         # Render the course bookmarks page
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -46,10 +50,13 @@ class LearnerAnalyticsView(View):
             'course_url': course_url,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
+            'grading_policy': grading_policy,
+            'assignment_grades': self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS']),
+            'assignment_schedule': self.get_schedule(request, course_key),
         }
         return render_to_response('learner_analytics/dashboard.html', context)
 
-    def get_grade_data(self, user, course_key):
+    def get_grade_data(self, user, course_key, grade_cutoffs):
         """
         Collects and formats the grades data for a particular user and course.
 
@@ -58,13 +65,21 @@ class LearnerAnalyticsView(View):
             course_key: CourseKey
         """
         course_grade = CourseGradeFactory().read(user, course_key=course_key)
-        grades = {}
-        for (subsection, subsection_grade) in course_grade.subsection_grades.iteritems():
-            grades[unicode(subsection)] = {
-                'assignment_type': subsection_grade.format,
-                'total_earned': subsection_grade.graded_total.earned,
-                'total_possible': subsection_grade.graded_total.possible,
-            }
+        grades = []
+        for (location, subsection_grade) in course_grade.subsection_grades.iteritems():
+            if subsection_grade.format is not None:
+                possible = subsection_grade.graded_total.possible
+                passing_grade = math.ceil(possible * grade_cutoffs['Pass'])
+                grades.append({
+                    'assignment_type': subsection_grade.format,
+                    'total_earned': subsection_grade.graded_total.earned,
+                    'total_possible': possible,
+                    'passing_grade': passing_grade,
+                    'assigment_url': reverse('jump_to_id', kwargs={
+                        'course_id': unicode(course_key),
+                        'module_id': unicode(location),
+                    })
+                })
         return json.dumps(grades)
 
     def get_discussion_data(self, user, course_key):
