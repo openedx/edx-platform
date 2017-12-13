@@ -33,7 +33,6 @@ import imp
 import sys
 import os
 
-import dealer.git
 import django
 from path import Path as path
 from warnings import simplefilter
@@ -3452,11 +3451,5 @@ ACE_CHANNEL_SAILTHRU_API_SECRET = None
 
 ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'

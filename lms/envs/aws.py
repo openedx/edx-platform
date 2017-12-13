@@ -1080,6 +1080,9 @@ ACE_CHANNEL_SAILTHRU_API_KEY = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_KEY', A
 ACE_CHANNEL_SAILTHRU_API_SECRET = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_SECRET', ACE_CHANNEL_SAILTHRU_API_SECRET)
 ACE_ROUTING_KEY = ENV_TOKENS.get('ACE_ROUTING_KEY', ACE_ROUTING_KEY)
 
+# Do NOT calculate this dynamically at startup with git because it's *slow*.
+EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
+
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
