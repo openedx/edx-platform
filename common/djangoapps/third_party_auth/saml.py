@@ -230,6 +230,10 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
     def odata_client_id(self):
         return self.conf['odata_client_id']
 
+    @property
+    def oauth_user_id(self):
+        return self.conf.get('oauth_user_id')
+
     def invalid_configuration(self):
         """
         Check that we have all the details we need to properly retrieve rich data from the
@@ -282,12 +286,15 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         """
         Obtain a SAML assertion from the SAP SuccessFactors BizX OAuth2 identity provider service using
         information specified in the third party authentication configuration "Advanced Settings" section.
+        Utilizes the OAuth user_id if defined in Advanced Settings in order to generate the SAML assertion,
+        otherwise utilizes the user_id for the current user in context.
         """
         session = requests.Session()
+        oauth_user_id = self.oauth_user_id if self.oauth_user_id else user_id
         transaction_data = {
             'token_url': self.sapsf_token_url,
             'client_id': self.odata_client_id,
-            'user_id': user_id,
+            'user_id': oauth_user_id,
             'private_key': self.sapsf_private_key,
         }
         try:
