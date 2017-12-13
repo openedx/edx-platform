@@ -6,16 +6,10 @@ ConfigurationModels rather than django.settings
 from social_core.backends.oauth import OAuthAuth
 from social_django.strategy import DjangoStrategy
 
-import logging
 from .models import OAuth2ProviderConfig
 from .pipeline import get as get_pipeline_from_request
 from .pipeline import AUTH_ENTRY_CUSTOM
-from social.backends.oauth import OAuthAuth
-from social.strategies.django_strategy import DjangoStrategy
 from .provider import Registry
-
-
-log = logging.getLogger(__name__)
 
 
 class ConfigurationModelStrategy(DjangoStrategy):

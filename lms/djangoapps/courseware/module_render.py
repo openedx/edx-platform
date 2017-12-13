@@ -7,6 +7,8 @@ import json
 import logging
 from collections import OrderedDict
 from functools import partial
+from datetime import datetime
+from django.utils.timezone import UTC
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -61,6 +63,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock
 )
 from progress.models import CourseModuleCompletion
+from social_engagement.services import DiscussionService
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -688,6 +691,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         'credit': CreditService(),
         'bookmarks': BookmarksService(user=user),
         'courseware_parent_info': CoursewareParentInfoService(),
+        'discussion': DiscussionService(),
     }
 
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):

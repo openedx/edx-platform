@@ -12,7 +12,6 @@ from ratelimitbackend import admin
 from courseware.views.index import CoursewareIndex
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
-from courseware.module_render import XblockCallbackView
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -47,6 +46,10 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
+    # Note: these are older versions of the User API that will eventually be
+    # subsumed by api/user listed below.
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
+
     url(r'^notifier_api/', include('notifier_api.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -65,6 +68,9 @@ urlpatterns = (
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
+
+    # User API endpoints
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Bookmarks API endpoints
     url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
@@ -136,33 +142,6 @@ if settings.FEATURES.get('EDX_SOLUTIONS_API'):
         url(r'^api/server/', include('edx_solutions_api_integration.urls')),
         url(r'^api/completion/v0/', include('lms.djangoapps.completion_api.urls')),
     )
-
-# OPEN EDX USER API
-# mattdrayer: Please note that the user_api declaration must follow
-# the server api declaration.  When declared ahead of the server api
-# the user_api will oddly begin to return server-oriented user URIs
-# At this time I'm not sure why this seems to be a one-way scenario.
-urlpatterns += (
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-)
-urlpatterns += (
-    # User API endpoints
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
-)
-
-# if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
-urlpatterns += (
-    # TODO Namespace these!
-    url(r'^verify_student/', include('verify_student.urls')),
-    url(r'^course_modes/', include('course_modes.urls')),
-)
-
-# OPEN EDX API
-if settings.FEATURES["API"]:
-    urlpatterns += (
-        url(r'^api/server/', include('api_manager.urls')),
-    )
-
 
 if settings.FEATURES["ENABLE_OPENBADGES"]:
     urlpatterns += (
@@ -253,7 +232,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        XblockCallbackView.as_view(),
+        'courseware.module_render.handle_xblock_callback',
         name='xblock_handler',
     ),
     url(
