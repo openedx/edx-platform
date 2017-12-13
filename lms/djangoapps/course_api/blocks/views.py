@@ -128,6 +128,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             the child blocks.  Returned only if "children" is included in the
             "requested_fields" parameter.
 
+          * completion: (float or None) The level of completion of the block.
+            Its value can vary between 0.0 and 1.0 or be equal to None
+            if block is not completable. Returned only if "completion"
+            is included in the "requested_fields" parameter.
+
           * block_counts: (dict) For each block type specified in the
             block_counts parameter to the endpoint, the aggregate number of
             blocks of that type for this block and all of its descendants.
