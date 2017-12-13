@@ -3,7 +3,6 @@ import os
 import sys
 import time
 import yaml
-import xml.sax.saxutils as saxutils
 
 from contracts import contract, new_contract
 from functools import partial
@@ -25,18 +24,18 @@ from xblock.fields import (
     String, Dict, ScopeIds, Reference, ReferenceList,
     ReferenceValueDict, UserScope
 )
+
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
-from xmodule import course_metadata_utils
+from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 from xmodule.exceptions import UndefinedContext
 import dogstats_wrapper as dog_stats_api
-
 
 log = logging.getLogger(__name__)
 
@@ -65,6 +64,11 @@ STUDIO_VIEW = 'studio_view'
 
 # Views that present a "preview" view of an xblock (as opposed to an editing view).
 PREVIEW_VIEWS = [STUDENT_VIEW, AUTHOR_VIEW]
+
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
 
 
 class OpaqueKeyReader(IdReader):
@@ -144,7 +148,7 @@ class OpaqueKeyReader(IdReader):
         return aside_id.aside_type
 
 
-class AsideKeyGenerator(IdGenerator):  # pylint: disable=abstract-method
+class AsideKeyGenerator(IdGenerator):
     """
     An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
     """
@@ -156,8 +160,8 @@ class AsideKeyGenerator(IdGenerator):  # pylint: disable=abstract-method
         Returns:
             (aside_definition_id, aside_usage_id)
         """
-        def_key = AsideDefinitionKeyV1(definition_id, aside_type)
-        usage_key = AsideUsageKeyV1(usage_id, aside_type)
+        def_key = AsideDefinitionKeyV2(definition_id, aside_type)
+        usage_key = AsideUsageKeyV2(usage_id, aside_type)
         return (def_key, usage_key)
 
     def create_usage(self, def_id):
@@ -257,8 +261,8 @@ class XModuleFields(object):
     Common fields for XModules.
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
@@ -279,6 +283,10 @@ class XModuleMixin(XModuleFields, XBlock):
     # (like a practice problem).
     has_score = False
 
+    # Whether this module can be displayed in read-only mode.  It is safe to set this to True if
+    # all user state is handled through the FieldData API.
+    show_in_read_only_mode = False
+
     # Class level variable
 
     # True if this descriptor always requires recalculation of grades, for
@@ -296,6 +304,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None
+        self._asides = []
 
         super(XModuleMixin, self).__init__(*args, **kwargs)
 
@@ -336,7 +345,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     @property
     def url_name(self):
-        return course_metadata_utils.url_name_for_course_location(self.location)
+        return block_metadata_utils.url_name_for_block(self)
 
     @property
     def display_name_with_default(self):
@@ -344,7 +353,29 @@ class XModuleMixin(XModuleFields, XBlock):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         """
-        return course_metadata_utils.display_name_with_default(self)
+        return block_metadata_utils.display_name_with_default(self)
+
+    @property
+    def display_name_with_default_escaped(self):
+        """
+        DEPRECATED: use display_name_with_default
+
+        Return an html escaped display name for the module: use display_name if
+        defined in metadata, otherwise convert the url name.
+
+        Note: This newly introduced method should not be used.  It was only
+        introduced to enable a quick search/replace and the ability to slowly
+        migrate and test switching to display_name_with_default, which is no
+        longer escaped.
+        """
+        return block_metadata_utils.display_name_with_default_escaped(self)
+
+    @property
+    def tooltip_title(self):
+        """
+        Return the title for the sequence item containing this xmodule as its top level item.
+        """
+        return self.display_name_with_default
 
     @property
     def xblock_kvs(self):
@@ -365,6 +396,18 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         return self._field_data
 
+    def add_aside(self, aside):
+        """
+        save connected asides
+        """
+        self._asides.append(aside)
+
+    def get_asides(self):
+        """
+        get the list of connected asides
+        """
+        return self._asides
+
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
         Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
@@ -372,8 +415,16 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         result = {}
         for field in self.fields.values():
-            if (field.scope == scope and field.is_set_on(self)):
-                result[field.name] = field.read_json(self)
+            if field.scope == scope and field.is_set_on(self):
+                try:
+                    result[field.name] = field.read_json(self)
+                except TypeError as exception:
+                    exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
+                        message=exception.message,
+                        location=unicode(self.location),
+                        field_name=field.name
+                    )
+                    raise TypeError(exception_message)
         return result
 
     def has_children_at_depth(self, depth):
@@ -422,7 +473,7 @@ class XModuleMixin(XModuleFields, XBlock):
         if self.has_children:
             return sum((child.get_content_titles() for child in self.get_children()), [])
         else:
-            return [self.display_name_with_default]
+            return [self.display_name_with_default_escaped]
 
     def get_children(self, usage_id_filter=None, usage_key_filter=None):  # pylint: disable=arguments-differ
         """Returns a list of XBlock instances for the children of
@@ -591,7 +642,6 @@ class XModuleMixin(XModuleFields, XBlock):
                 # not the most elegant way of doing this, but if we're removing
                 # a field from the module's field_data_cache, we should also
                 # remove it from its _dirty_fields
-                # pylint: disable=protected-access
                 if field in self._dirty_fields:
                     del self._dirty_fields[field]
 
@@ -749,7 +799,7 @@ module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disa
 
 
 @XBlock.needs("i18n")
-class XModule(HTMLSnippet, XModuleMixin):  # pylint: disable=abstract-method
+class XModule(HTMLSnippet, XModuleMixin):
     """ Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -761,6 +811,8 @@ class XModule(HTMLSnippet, XModuleMixin):  # pylint: disable=abstract-method
     entry_point = "xmodule.v1"
 
     has_score = descriptor_attr('has_score')
+    max_score = descriptor_attr('max_score')
+    show_in_read_only_mode = descriptor_attr('show_in_read_only_mode')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
     _dirty_fields = descriptor_attr('_dirty_fields')
@@ -1155,7 +1207,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
     get_progress = module_attr('get_progress')
     get_score = module_attr('get_score')
     handle_ajax = module_attr('handle_ajax')
-    max_score = module_attr('max_score')
     student_view = module_attr(STUDENT_VIEW)
     get_child_descriptors = module_attr('get_child_descriptors')
     xmodule_handler = module_attr('xmodule_handler')
@@ -1173,11 +1224,11 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         return Fragment(self.get_html())
 
 
-class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
+class ConfigurableFragmentWrapper(object):
     """
     Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
-    def __init__(self, wrappers=None, **kwargs):
+    def __init__(self, wrappers=None, wrappers_asides=None, **kwargs):
         """
         :param wrappers: A list of wrappers, where each wrapper is:
 
@@ -1190,6 +1241,10 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
             self.wrappers = wrappers
         else:
             self.wrappers = []
+        if wrappers_asides is not None:
+            self.wrappers_asides = wrappers_asides
+        else:
+            self.wrappers_asides = []
 
     def wrap_xblock(self, block, view, frag, context):
         """
@@ -1200,11 +1255,23 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
 
         return frag
 
+    def wrap_aside(self, block, aside, view, frag, context):    # pylint: disable=unused-argument
+        """
+        See :func:`Runtime.wrap_child`
+        """
+        for wrapper in self.wrappers_asides:
+            frag = wrapper(aside, view, frag, context)
+
+        return frag
+
 
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
-# the Runtime part of its interface. This function matches the Runtime.handler_url interface
-def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=invalid-name, unused-argument
+# the Runtime part of its interface. This function mostly matches the
+# Runtime.handler_url interface.
+#
+# The monkey-patching happens in (lms|cms)/startup.py
+def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=unused-argument
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
     """
@@ -1214,6 +1281,8 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
+#
+# The monkey-patching happens in (lms|cms)/startup.py
 def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid-name, unused-argument
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
@@ -1301,13 +1370,13 @@ class MetricsMixin(object):
             )
 
 
-class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
     # pylint: disable=bad-continuation
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=(), **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1375,7 +1444,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         """
         Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type`.
         """
-        if block_type in self.disabled_xblock_types:
+        if block_type in self.disabled_xblock_types():
             return self.default_class
         return super(DescriptorSystem, self).load_block_type(block_type)
 
@@ -1426,8 +1495,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         """
         potential_set = set(super(DescriptorSystem, self).applicable_aside_types(block))
         if getattr(block, 'xmodule_runtime', None) is not None:
-            application_set = set(block.xmodule_runtime.applicable_aside_types(block))
-            return list(potential_set.intersection(application_set))
+            if hasattr(block.xmodule_runtime, 'applicable_aside_types'):
+                application_set = set(block.xmodule_runtime.applicable_aside_types(block))
+                return list(potential_set.intersection(application_set))
         return list(potential_set)
 
     def resource_url(self, resource):
@@ -1444,6 +1514,28 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
     def publish(self, block, event_type, event):
         # A stub publish method that doesn't emit any events from XModuleDescriptors.
         pass
+
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        # getting the service from parent module. making sure of block service declarations.
+        service = super(DescriptorSystem, self).service(block=block, service_name=service_name)
+        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # service to handle the passing argument.
+        if callable(service):
+            return service(block)
+        return service
 
 
 new_contract('DescriptorSystem', DescriptorSystem)
@@ -1502,12 +1594,18 @@ class XMLParsingSystem(DescriptorSystem):
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
 
-        self.parse_asides(node, def_id, usage_id, id_generator)
+        aside_children = self.parse_asides(node, def_id, usage_id, id_generator)
+        asides_tags = [x.tag for x in aside_children]
 
         block = block_class.parse_xml(node, self, keys, id_generator)
         self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
         block.parent = parent_id
         block.save()
+
+        asides = self.get_asides(block)
+        for asd in asides:
+            if asd.scope_ids.block_type in asides_tags:
+                block.add_aside(asd)
 
         return block
 
@@ -1525,6 +1623,7 @@ class XMLParsingSystem(DescriptorSystem):
         for child in aside_children:
             self._aside_from_xml(child, def_id, usage_id, id_generator)
             node.remove(child)
+        return aside_children
 
     def _make_usage_key(self, course_key, value):
         """
@@ -1535,7 +1634,7 @@ class XMLParsingSystem(DescriptorSystem):
             return value
         return course_key.make_usage_key_from_deprecated_string(value)
 
-    def _convert_reference_fields_to_keys(self, xblock):  # pylint: disable=invalid-name
+    def _convert_reference_fields_to_keys(self, xblock):
         """
         Find all fields of type reference and convert the payload into UsageKeys
         """
@@ -1557,129 +1656,7 @@ class XMLParsingSystem(DescriptorSystem):
                     setattr(xblock, field.name, field_value)
 
 
-class DiscussionService(object):
-    """
-    This is a temporary service that provides everything needed to render the discussion template.
-
-    Used by xblock-discussion
-    """
-
-    def __init__(self, runtime):
-        self.runtime = runtime
-
-    def get_course_template_context(self):
-        """
-        Returns the context to render the course-level discussion templates.
-
-        """
-        # for some reason pylint reports courseware.access, courseware.courses and django_comment_client.forum.views
-        # pylint: disable=import-error
-        import json
-        from django.conf import settings
-        from django.http import HttpRequest
-        import lms.lib.comment_client as cc
-        from courseware.access import has_access
-        from courseware.courses import get_course_with_access
-        from django_comment_client.permissions import has_permission
-        from django_comment_client.forum.views import get_threads, make_course_settings
-        import django_comment_client.utils as utils
-        from openedx.core.djangoapps.course_groups.cohorts import (
-            is_course_cohorted,
-            get_cohort_id,
-            get_cohorted_commentables,
-            get_course_cohorts
-        )
-
-        escapedict = {'"': '&quot;'}
-
-        request = HttpRequest()
-        user = self.runtime.user
-        request.user = user
-        user_info = cc.User.from_django_user(self.runtime.user).to_dict()
-        course_id = self.runtime.course_id
-        course = get_course_with_access(self.runtime.user, 'load', course_id, check_if_enrolled=True)
-        user_cohort_id = get_cohort_id(user, course_id)
-
-        unsafethreads, query_params = get_threads(request, course)
-        threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
-        utils.add_courseware_context(threads, course, user)
-
-        flag_moderator = has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
-
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
-        category_map = utils.get_discussion_category_map(course, user)
-
-        cohorts = [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)]
-        cohorted_commentables = get_cohorted_commentables(course_id)
-
-        course_settings = make_course_settings(course, user)
-
-        context = {
-            'user': user,
-            'settings': settings,
-            'course': course,
-            'course_id': course_id,
-            'staff_access': has_access(user, 'staff', course),
-            'threads': saxutils.escape(json.dumps(threads), escapedict),
-            'thread_pages': query_params['num_pages'],
-            'user_info': saxutils.escape(json.dumps(user_info), escapedict),
-            'flag_moderator': flag_moderator,
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
-            'category_map': category_map,
-            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
-            'is_moderator': has_permission(user, "see_all_cohorts", course_id),
-            'cohorts': cohorts,
-            'user_cohort': user_cohort_id,
-            'sort_preference': user_info['default_sort_key'],
-            'cohorted_commentables': cohorted_commentables,
-            'is_course_cohorted': is_course_cohorted(course_id),
-            'has_permission_to_create_thread': has_permission(user, "create_thread", course_id),
-            'has_permission_to_create_comment': has_permission(user, "create_comment", course_id),
-            'has_permission_to_create_subcomment': has_permission(user, "create_subcomment", course_id),
-            'has_permission_to_openclose_thread': has_permission(user, "openclose_thread", course_id),
-            'course_settings': saxutils.escape(json.dumps(course_settings), escapedict),
-        }
-
-        return context
-
-    def get_inline_template_context(self):
-        """
-        Returns the context to render inline discussion templates.
-        """
-        # for some reason pylint reports courseware.access, courseware.courses and django_comment_client.forum.views
-        # pylint: disable=import-error
-        from django.conf import settings
-        from courseware.courses import get_course_with_access
-        from courseware.access import has_access
-        from django_comment_client.permissions import has_permission
-        from django_comment_client.utils import get_discussion_category_map
-
-        course_id = self.runtime.course_id
-        user = self.runtime.user
-
-        course = get_course_with_access(user, 'load', course_id, check_if_enrolled=True)
-        category_map = get_discussion_category_map(course, user)
-
-        is_moderator = has_permission(user, "see_all_cohorts", course_id)
-        flag_moderator = has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
-
-        context = {
-            'user': user,
-            'settings': settings,
-            'course': course,
-            'category_map': category_map,
-            'is_moderator': is_moderator,
-            'flag_moderator': flag_moderator,
-            'has_permission_to_create_thread': has_permission(user, "create_thread", course_id),
-            'has_permission_to_create_comment': has_permission(user, "create_comment", course_id),
-            'has_permission_to_create_subcomment': has_permission(user, "create_subcomment", course_id),
-            'has_permission_to_openclose_thread': has_permission(user, "openclose_thread", course_id)
-        }
-
-        return context
-
-
-class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
@@ -1698,7 +1675,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
             replace_urls, descriptor_runtime, user=None, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
-            open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
@@ -1769,10 +1745,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
            modules, which have an anonymous handler, to set legitimate users' data
         """
 
-        # Add the DiscussionService for the LMS and Studio.
-        services = kwargs.setdefault('services', {})
-        services['discussion'] = DiscussionService(self)
-
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
@@ -1796,9 +1768,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
         if publish:
             self.publish = publish
-
-        self.open_ended_grading_interface = open_ended_grading_interface
-        self.s3_interface = s3_interface
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
@@ -1851,6 +1820,28 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
     def publish(self, block, event_type, event):
         pass
 
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        # getting the service from parent module. making sure of block service declarations.
+        service = super(ModuleSystem, self).service(block=block, service_name=service_name)
+        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # service to handle the passing argument.
+        if callable(service):
+            return service(block)
+        return service
+
 
 class CombinedSystem(object):
     """
@@ -1866,7 +1857,6 @@ class CombinedSystem(object):
     #
     # At runtime, the ModuleSystem and/or DescriptorSystem will define those methods
     #
-    # pylint: disable=abstract-method
     def __init__(self, module_system, descriptor_system):
         # These attributes are set directly to __dict__ below to avoid a recursion in getattr/setattr.
         self._module_system = module_system
@@ -1943,6 +1933,7 @@ class CombinedSystem(object):
         DescriptorSystem, instead. This allows XModuleDescriptors that are bound as XModules
         to still function as XModuleDescriptors.
         """
+        # First we try a lookup in the module system...
         try:
             return getattr(self._module_system, name)
         except AttributeError:
