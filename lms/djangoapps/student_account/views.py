@@ -2,9 +2,9 @@
 
 import json
 import logging
-import urlparse
 from datetime import datetime
 
+import urlparse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -16,7 +16,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-
 import third_party_auth
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -403,6 +402,65 @@ def _get_form_descriptions(request):
     }
 
 
+def _get_extended_profile_fields():
+    """Retrieve the extended profile fields from site configuration to be shown on the
+       Account Settings page
+
+    Returns:
+        A list of dicts. Each dict corresponds to a single field. The keys per field are:
+            "field_name"  : name of the field stored in user_profile.meta
+            "field_label" : The label of the field.
+            "field_type"  : TextField or ListField
+            "field_options": a list of tuples for options in the dropdown in case of ListField
+    """
+
+    extended_profile_fields = []
+    fields_already_showing = ['username', 'name', 'email', 'pref-lang', 'country', 'time_zone', 'level_of_education',
+                              'gender', 'year_of_birth', 'language_proficiencies', 'social_links']
+
+    field_labels_map = {
+        "first_name": _(u"First Name"),
+        "last_name": _(u"Last Name"),
+        "city": _(u"City"),
+        "state": _(u"State/Province/Region"),
+        "company": _(u"Company"),
+        "title": _(u"Title"),
+        "mailing_address": _(u"Mailing address"),
+        "goals": _(u"Tell us why you're interested in {platform_name}").format(
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+        ),
+        "profession": _("Profession"),
+        "specialty": _("Specialty")
+    }
+
+    extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
+    for field_to_exclude in fields_already_showing:
+        if field_to_exclude in extended_profile_field_names:
+            extended_profile_field_names.remove(field_to_exclude)  # pylint: disable=no-member
+
+    extended_profile_field_options = configuration_helpers.get_value('EXTRA_FIELD_OPTIONS', [])
+    extended_profile_field_option_tuples = {}
+    for field in extended_profile_field_options.keys():
+        field_options = extended_profile_field_options[field]
+        extended_profile_field_option_tuples[field] = [(option.lower(), option) for option in field_options]
+
+    for field in extended_profile_field_names:
+        field_dict = {
+            "field_name": field,
+            "field_label": field_labels_map.get(field, field),
+        }
+
+        field_options = extended_profile_field_option_tuples.get(field)
+        if field_options:
+            field_dict["field_type"] = "ListField"
+            field_dict["field_options"] = field_options
+        else:
+            field_dict["field_type"] = "TextField"
+        extended_profile_fields.append(field_dict)
+
+    return extended_profile_fields
+
+
 def _external_auth_intercept(request, mode):
     """Allow external auth to intercept a login/registration request.
 
@@ -564,7 +622,8 @@ def account_settings_context(request):
         'disable_courseware_js': True,
         'show_program_listing': ProgramsApiConfig.is_enabled(),
         'show_dashboard_tabs': True,
-        'order_history': user_orders
+        'order_history': user_orders,
+        'extended_profile_fields': _get_extended_profile_fields(),
     }
 
     enterprise_customer_name = None
