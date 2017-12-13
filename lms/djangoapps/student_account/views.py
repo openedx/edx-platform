@@ -350,6 +350,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "errorMessage": None,
         "registerFormSubmitButtonText": _("Create Account"),
         "syncLearnerProfileData": False,
+        "hideSignInLink": False,
     }
 
     if third_party_auth.is_enabled():

@@ -31,7 +31,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         'token_type': 'token_type_value',
     }
     USER_RESPONSE_DATA = {
-        'email': 'email_value@example.com',
+        'email': 'user@email.com',
         'family_name': 'family_name_value',
         'given_name': 'given_name_value',
         'id': 'id_value',
@@ -85,8 +85,8 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
             'backend_name': 'google-oauth2',
             'provider_id': 'oa2-google-oauth2',
             'user_details': {
-                'username': 'email_value',
-                'email': 'email_value@example.com',
+                'username': 'user',
+                'email': 'user@email.com',
                 'fullname': 'name_value',
                 'first_name': 'given_name_value',
                 'last_name': 'family_name_value',
