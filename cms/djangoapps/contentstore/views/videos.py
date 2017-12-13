@@ -30,7 +30,8 @@ from edxval.api import (
     remove_transcript_preferences,
     remove_video_for_course,
     update_video_image,
-    update_video_status
+    update_video_status,
+    get_available_transcript_languages
 )
 from opaque_keys.edx.keys import CourseKey
 
@@ -71,6 +72,9 @@ VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
 
 # maximum time for video to remain in upload state
 MAX_UPLOAD_HOURS = 24
+
+# Transcript download format
+TRANSCRIPT_DOWNLOAD_FILE_FORMAT = 'srt'
 
 
 class TranscriptProvider(object):
@@ -528,11 +532,19 @@ def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
     videos = list(get_videos_for_course(unicode(course.id), VideoSortField.created, SortDirection.desc))
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
         video["status"] = convert_video_status(video)
+
+        if is_video_transcript_enabled:
+            all_languages = get_all_transcript_languages()
+            video['transcripts'] = {
+                lang_code: all_languages[lang_code]
+                for lang_code in get_available_transcript_languages([video['edx_video_id']])
+            }
 
     return videos
 
@@ -551,6 +563,9 @@ def _get_index_videos(course):
     course_id = unicode(course.id)
     attrs = ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'courses']
 
+    if VideoTranscriptEnabledFlag.feature_enabled(course.id):
+        attrs += ['transcripts']
+
     def _get_values(video):
         """
         Get data for predefined video attributes.
@@ -568,6 +583,24 @@ def _get_index_videos(course):
     return [
         _get_values(video) for video in _get_videos(course)
     ]
+
+
+def get_all_transcript_languages():
+    """
+    Returns all possible languages for transcript.
+    """
+    third_party_transcription_languages = {}
+    transcription_plans = get_3rd_party_transcription_plans()
+    cielo_fidelity = transcription_plans[TranscriptProvider.CIELO24]['fidelity']
+
+    # Get third party transcription languages.
+    third_party_transcription_languages.update(transcription_plans[TranscriptProvider.THREE_PLAY_MEDIA]['languages'])
+    third_party_transcription_languages.update(cielo_fidelity['MECHANICAL']['languages'])
+    third_party_transcription_languages.update(cielo_fidelity['PREMIUM']['languages'])
+    third_party_transcription_languages.update(cielo_fidelity['PROFESSIONAL']['languages'])
+
+    # Return combined system settings and 3rd party transcript languages.
+    return dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
 
 
 def videos_index_html(course):
@@ -596,7 +629,8 @@ def videos_index_html(course):
         'is_video_transcript_enabled': is_video_transcript_enabled,
         'video_transcript_settings': None,
         'active_transcript_preferences': None,
-        'transcript_credentials': None
+        'transcript_credentials': None,
+        'transcript_available_languages': None
     }
 
     if is_video_transcript_enabled:
@@ -610,10 +644,12 @@ def videos_index_html(course):
                 unicode(course.id)
             ),
             'transcription_plans': get_3rd_party_transcription_plans(),
+            'trancript_download_file_format': TRANSCRIPT_DOWNLOAD_FILE_FORMAT
         }
         context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
         # Cached state for transcript providers' credentials (org-specific)
         context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
+        context['transcript_available_languages'] = get_all_transcript_languages()
 
     return render_to_response('videos_index.html', context)
 
