@@ -18,6 +18,11 @@
 
         LearnerProfileFieldViews.AccountPrivacyFieldView = FieldViews.DropdownFieldView.extend({
 
+            events: {
+                'click button.btn-change-privacy': 'finishEditing',
+                'change select': 'showSaveButton'
+            },
+
             render: function() {
                 this._super();
                 this.showNotificationMessage();
@@ -57,6 +62,10 @@
                     this.$('.u-field-value select').val('private');
                     this.disableField(true);
                 }
+            },
+
+            showSaveButton: function() {
+                $('.btn-change-privacy').removeClass('hidden');
             }
         });
 
