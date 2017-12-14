@@ -14,5 +14,13 @@
             "name": "course_experience.enable_course_goals",
             "everyone": true
         }
+    },
+    {
+        "pk": 1,
+        "model": "waffle.switch",
+        "fields": {
+            "name": "accessibility.enable_policy_page",
+            "active": true
+        }
     }
 ]
