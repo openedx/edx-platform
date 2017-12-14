@@ -406,10 +406,3 @@ def _get_subsection_percentage(subsection_grade):
     Returns the percentage value of the given subsection_grade.
     """
     return subsection_grade.percent_graded * 100.0
-
-
-def _calculate_ratio(earned, possible):
-    """
-    Returns the percentage of the given earned and possible values.
-    """
-    return float(earned) / float(possible) if possible else 0.0
