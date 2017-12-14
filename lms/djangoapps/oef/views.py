@@ -35,9 +35,8 @@ def oef_instructions(request):
     View for instructions page of OEF
     """
     survey_info = get_user_survey_status(request.user, create_new_survey=False)
-    if survey_info['error']:
-        return redirect(reverse('oef_dashboard'))
-    return render(request, 'oef/oef-instructional.html', {})
+    oef_url = reverse('oef_dashboard') if survey_info['error'] else reverse('oef_survey')
+    return render(request, 'oef/oef-instructional.html', {'oef_url': oef_url})
 
 
 @login_required
