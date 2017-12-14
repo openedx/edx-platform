@@ -1075,3 +1075,9 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             name='submit_financial_assistance_request'
         )
     ]
+
+# Branch.io Text Me The App
+if settings.BRANCH_IO_KEY:
+    urlpatterns += [
+        url(r'^text-me-the-app', 'student.views.text_me_the_app', name='text_me_the_app'),
+    ]

@@ -11,6 +11,7 @@ import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
+from django.test.utils import override_settings
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -28,6 +29,7 @@ from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
+from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -398,3 +400,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         response = self.client.get(self.path)
         self.assertEqual(response.content.count('<li class="course-item">'), 1)
         self.assertIn('<button class="change-session btn-link "', response.content)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@override_settings(BRANCH_IO_KEY='test_key')
+class TextMeTheAppViewTests(UrlResetMixin, TestCase):
+    """ Tests for the TextMeTheAppView. """
+
+    def test_text_me_the_app(self):
+        response = self.client.get(reverse('text_me_the_app'))
+        self.assertContains(response, 'Send me a text with the link')
