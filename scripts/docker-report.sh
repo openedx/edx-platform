@@ -17,7 +17,7 @@ export CODE_COV_TOKEN=$CODE_COV_TOKEN
 export TRAVIS=true
 
 # Get the diff coverage and html reports for unit tests
-paver coverage
+paver coverage --compare-branch=$TRAVIS_BRANCH
 
 pip install codecov==2.0.5
 codecov --token=$CODE_COV_TOKEN --branch=$BRANCH
