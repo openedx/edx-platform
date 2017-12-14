@@ -1,16 +1,15 @@
 """ Test the change_enrollment command line script."""
 
-import ddt
 import unittest
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from enrollment.api import get_enrollment
 from student.tests.factories import UserFactory
-
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

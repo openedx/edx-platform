@@ -1,7 +1,7 @@
 import json
 from StringIO import StringIO
-from django.test import TestCase
 
+from django.test import TestCase
 from eventtracking import tracker as eventtracker
 
 from track.management.tracked_command import TrackedCommand

@@ -1,7 +1,8 @@
-import ddt
 import itertools
-from xmodule.tests import BulkAssertionTest, BulkAssertionError
 
+import ddt
+
+from xmodule.tests import BulkAssertionError, BulkAssertionTest
 
 STATIC_PASSING_ASSERTIONS = (
     ('assertTrue', True),

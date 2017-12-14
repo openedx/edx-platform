@@ -7,10 +7,9 @@ from datetime import datetime, timedelta
 
 import ddt
 from pytz import UTC
+
 from xmodule import graders
-from xmodule.graders import (
-    AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
-)
+from xmodule.graders import AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
 
 
 class GradesheetTest(unittest.TestCase):

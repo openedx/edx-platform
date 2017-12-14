@@ -1,10 +1,11 @@
 """
 Test capa problem.
 """
-import ddt
 import textwrap
-from lxml import etree
 import unittest
+
+import ddt
+from lxml import etree
 
 from capa.tests.helpers import new_loncapa_problem
 

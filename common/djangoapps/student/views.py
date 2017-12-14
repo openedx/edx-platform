@@ -10,8 +10,8 @@ import warnings
 from collections import defaultdict, namedtuple
 from urlparse import parse_qs, urlsplit, urlunsplit
 
-import django
 import analytics
+import django
 import edx_oauth2_provider
 from django.conf import settings
 from django.contrib import messages
@@ -20,7 +20,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
 from django.core import mail
-from django.template.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.core.validators import ValidationError, validate_email
@@ -29,6 +28,7 @@ from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
+from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import base36_to_int, is_safe_url, urlencode, urlsafe_base64_encode
@@ -37,6 +37,7 @@ from django.utils.translation import get_language, ungettext
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
+from eventtracking import tracker
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -52,7 +53,6 @@ from social_django import utils as social_utils
 import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
 import third_party_auth
-from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
 from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
@@ -67,14 +67,13 @@ from courseware.courses import get_courses, sort_by_announcement, sort_by_start_
 from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
-from eventtracking import tracker
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
+from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_programs_with_type
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -127,6 +126,7 @@ from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
 from third_party_auth import pipeline, provider
+from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse

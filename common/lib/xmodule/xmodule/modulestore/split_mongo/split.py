@@ -57,43 +57,57 @@ import copy
 import datetime
 import hashlib
 import logging
-import six
-
-from contracts import contract, new_contract
+from collections import defaultdict
 from importlib import import_module
-from mongodb_proxy import autoretry_read
-from path import Path as path
-from pytz import UTC
-from bson.objectid import ObjectId
+from types import NoneType
 
-from xblock.core import XBlock
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-from xmodule.course_module import CourseSummary
-from xmodule.library_content_module import LibrarySummary
-from xmodule.errortracker import null_error_tracker
+import six
+from bson.objectid import ObjectId
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
+from contracts import contract, new_contract
+from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
-    BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
+    BlockUsageLocator,
+    CourseLocator,
+    DefinitionLocator,
+    LibraryLocator,
+    LocalId,
+    VersionTree
 )
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
-    DuplicateCourseError, MultipleCourseBlocksFound
+from path import Path as path
+from pytz import UTC
+from xblock.core import XBlock
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+
+from xmodule.assetstore import AssetMetadata
+from xmodule.course_module import CourseSummary
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import null_error_tracker
+from xmodule.library_content_module import LibrarySummary
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
-    BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
+    BlockData,
+    BulkOperationsMixin,
+    BulkOpsRecord,
+    ModuleStoreEnum,
+    ModuleStoreWriteBase,
+    SortedAssetList,
+    inheritance
 )
+from xmodule.modulestore.exceptions import (
+    DuplicateCourseError,
+    DuplicateItemError,
+    InsufficientSpecificationError,
+    MultipleCourseBlocksFound,
+    VersionConflictError
+)
+from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, MongoConnection
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from xmodule.partitions.partitions_service import PartitionService
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
-from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-from xmodule.error_module import ErrorDescriptor
-from collections import defaultdict
-from types import NoneType
-from xmodule.assetstore import AssetMetadata
-
 
 log = logging.getLogger(__name__)
 

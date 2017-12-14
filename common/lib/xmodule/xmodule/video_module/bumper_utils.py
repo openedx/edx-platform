@@ -3,11 +3,11 @@ Utils for video bumper
 """
 import copy
 import json
-import pytz
 import logging
 from collections import OrderedDict
-
 from datetime import datetime, timedelta
+
+import pytz
 from django.conf import settings
 
 from .video_utils import set_query_parameter

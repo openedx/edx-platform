@@ -2,10 +2,12 @@
 Integration tests for third_party_auth LTI auth providers
 """
 import unittest
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from oauthlib.oauth1.rfc5849 import Client, SIGNATURE_TYPE_BODY
+from oauthlib.oauth1.rfc5849 import SIGNATURE_TYPE_BODY, Client
+
 from third_party_auth.tests import testutil
 
 FORM_ENCODED = 'application/x-www-form-urlencoded'

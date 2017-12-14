@@ -12,9 +12,9 @@ import csv
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys.edx.keys import CourseKey
 
 from student.models import anonymous_id_for_user
-from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):

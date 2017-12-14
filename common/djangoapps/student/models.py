@@ -13,7 +13,6 @@ file and check it in at the same time as your model changes. To do that,
 import hashlib
 import json
 import logging
-import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -22,6 +21,7 @@ from importlib import import_module
 from urllib import urlencode
 
 import analytics
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -48,7 +48,6 @@ from slumber.exceptions import HttpClientError, HttpServerError
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
-from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from courseware.models import (
@@ -57,10 +56,10 @@ from courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration
 )
 from enrollment.api import _default_course_mode
-
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict

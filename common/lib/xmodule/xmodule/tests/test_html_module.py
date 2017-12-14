@@ -1,9 +1,8 @@
 import unittest
-from mock import Mock
+
 import ddt
-
 from django.test.utils import override_settings
-
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds

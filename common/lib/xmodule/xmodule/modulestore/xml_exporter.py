@@ -3,22 +3,22 @@ Methods for exporting course data to XML
 """
 
 import logging
+import os
 from abc import abstractmethod
+from json import dumps
+
 import lxml.etree
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+from fs.osfs import OSFS
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+
+from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore import LIBRARY_ROOT, EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
-from xmodule.modulestore import LIBRARY_ROOT
-from fs.osfs import OSFS
-from json import dumps
-import os
-
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"

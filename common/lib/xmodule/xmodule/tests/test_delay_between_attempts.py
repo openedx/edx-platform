@@ -7,21 +7,21 @@ of the submit_problem method of a capa module when the "delay between quiz
 submissions" setting is set to different values
 """
 
-import unittest
-import textwrap
 import datetime
+import textwrap
+import unittest
 
 from mock import Mock
-
-import xmodule
-from xmodule.capa_module import CapaModule
 from opaque_keys.edx.locations import Location
+from pytz import UTC
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
+import xmodule
+from xmodule.capa_module import CapaModule
+
 from . import get_test_system
-from pytz import UTC
 
 
 class CapaFactoryWithDelay(object):

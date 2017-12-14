@@ -4,13 +4,13 @@ Support for inheritance of fields down an XBlock hierarchy.
 from __future__ import absolute_import
 
 from django.conf import settings
-
-from xmodule.partitions.partitions import UserPartition
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String, XBlockMixin
 from xblock.runtime import KeyValueStore, KvsFieldData
-from xmodule.fields import Date, Timedelta
-from ..course_metadata_utils import DEFAULT_START_DATE
 
+from xmodule.fields import Date, Timedelta
+from xmodule.partitions.partitions import UserPartition
+
+from ..course_metadata_utils import DEFAULT_START_DATE
 
 # Make '_' a no-op so we can scrape strings
 # Using lambda instead of `django.utils.translation.ugettext_noop` because Django cannot be imported in this file

@@ -2,8 +2,8 @@
 This file contains helper functions for configuring module_store_setting settings and support for backward compatibility with older formats.
 """
 
-import warnings
 import copy
+import warnings
 
 
 def convert_module_store_setting_if_needed(module_store_setting):

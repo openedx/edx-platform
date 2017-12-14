@@ -3,14 +3,14 @@ Tests the transfer student management command
 """
 import unittest
 
-from mock import call, patch
-from six import text_type
-
 import ddt
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.core.management import call_command
+from mock import call, patch
 from opaque_keys.edx import locator
+from six import text_type
+
+from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order  # pylint: disable=import-error
 from student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,

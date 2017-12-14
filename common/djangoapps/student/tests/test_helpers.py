@@ -12,8 +12,8 @@ from django.test.utils import override_settings
 from mock import patch
 from testfixtures import LogCapture
 
-from student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from student.helpers import get_next_url_for_login_page
 
 LOGGER_NAME = "student.helpers"
 

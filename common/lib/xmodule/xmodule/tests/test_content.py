@@ -2,15 +2,16 @@
 
 import os
 import unittest
+
 import ddt
 from mock import Mock, patch
-from path import Path as path
-
-from xmodule.contentstore.content import StaticContent, StaticContentStream
-from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import AssetLocation
-from xmodule.static_content import _write_js, _list_descriptors
+from path import Path as path
+
+from xmodule.contentstore.content import ContentStore, StaticContent, StaticContentStream
+from xmodule.static_content import _list_descriptors, _write_js
+
 
 SAMPLE_STRING = """
 This is a sample string with more than 1024 bytes, the default STREAM_DATA_CHUNK_SIZE

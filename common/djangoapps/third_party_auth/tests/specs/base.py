@@ -1,19 +1,18 @@
 """Base integration test for provider implementations."""
 
-import unittest
-
 import json
-import mock
-
+import unittest
 from contextlib import contextmanager
+
+import mock
 from django import test
+from django.conf import settings as django_settings
 from django.contrib import auth
 from django.contrib.auth import models as auth_models
 from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
 from django.core.urlresolvers import reverse
 from django.test import utils as django_utils
-from django.conf import settings as django_settings
 from social_core import actions, exceptions
 from social_django import utils as social_utils
 from social_django import views as social_views
@@ -24,7 +23,6 @@ from student import models as student_models
 from student import views as student_views
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
-
 from third_party_auth import middleware, pipeline
 from third_party_auth.tests import testutil
 

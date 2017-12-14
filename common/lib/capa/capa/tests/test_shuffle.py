@@ -1,10 +1,10 @@
 """Tests the capa shuffle and name-masking."""
 
-import unittest
 import textwrap
+import unittest
 
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
 from capa.responsetypes import LoncapaProblemError
+from capa.tests.helpers import new_loncapa_problem, test_capa_system
 
 
 class CapaShuffleTest(unittest.TestCase):

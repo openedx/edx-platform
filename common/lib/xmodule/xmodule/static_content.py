@@ -12,9 +12,9 @@ import sys
 from collections import defaultdict
 
 import django
-from docopt import docopt
 from path import Path as path
 
+from docopt import docopt
 from xmodule.x_module import XModuleDescriptor
 
 LOG = logging.getLogger(__name__)

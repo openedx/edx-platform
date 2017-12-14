@@ -5,20 +5,19 @@ Tests for vertical module.
 # pylint: disable=protected-access
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from collections import namedtuple
 import json
+from collections import namedtuple
 
 import ddt
+import six
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
-import six
 
 from . import get_test_system
+from ..x_module import AUTHOR_VIEW, STUDENT_VIEW
 from .helpers import StubUserService
-from .xml import XModuleXmlImportTest
 from .xml import factories as xml
-from ..x_module import STUDENT_VIEW, AUTHOR_VIEW
-
+from .xml import XModuleXmlImportTest
 
 JsonRequest = namedtuple('JsonRequest', ['method', 'body'])
 

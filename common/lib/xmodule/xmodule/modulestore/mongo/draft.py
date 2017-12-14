@@ -6,22 +6,30 @@ returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
 """
 
-import pymongo
 import logging
 
+import pymongo
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import Location
+
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
+    DuplicateCourseError,
+    DuplicateItemError,
+    InvalidBranchSetting,
+    ItemNotFoundError
 )
 from xmodule.modulestore.mongo.base import (
-    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT
+    SORT_REVISION_FAVOR_DRAFT,
+    MongoModuleStore,
+    MongoRevisionKey,
+    as_draft,
+    as_published
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
 

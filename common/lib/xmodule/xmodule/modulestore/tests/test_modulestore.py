@@ -3,7 +3,7 @@ Defines a test function, check_has_course_method, useful in various modulestore 
 
 This file should potentially be renamed "utilties" since this file contains no tests.
 """
-from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=no-name-in-module
+from nose.tools import assert_equals, assert_false, assert_true  # pylint: disable=no-name-in-module
 
 
 def check_has_course_method(modulestore, locator, locator_key_fields):

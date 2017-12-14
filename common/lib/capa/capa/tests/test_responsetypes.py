@@ -3,31 +3,29 @@
 Tests of responsetypes
 """
 
-from cStringIO import StringIO
-from datetime import datetime
 import json
 import os
-import pyparsing
 import random
 import textwrap
 import unittest
 import zipfile
+from cStringIO import StringIO
+from datetime import datetime
 
 import mock
-from pytz import UTC
+import pyparsing
 import requests
+from pytz import UTC
 
-from capa.tests.helpers import new_loncapa_problem, test_capa_system, load_fixture
 import calc
-
-from capa.responsetypes import LoncapaProblemError, \
-    StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
 from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
-    CodeResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
+    CodeResponseXMLFactory,
     CustomResponseXMLFactory,
     FormulaResponseXMLFactory,
     ImageResponseXMLFactory,
@@ -37,7 +35,7 @@ from capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory,
     StringResponseXMLFactory,
     SymbolicResponseXMLFactory,
-    TrueFalseResponseXMLFactory,
+    TrueFalseResponseXMLFactory
 )
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat

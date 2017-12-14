@@ -1,10 +1,11 @@
 """
 Custom field types for mongoengine
 """
-import mongoengine
-from opaque_keys.edx.locations import Location
 from types import NoneType
+
+import mongoengine
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import Location
 
 
 class CourseKeyField(mongoengine.StringField):

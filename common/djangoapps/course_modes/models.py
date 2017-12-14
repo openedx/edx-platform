@@ -13,9 +13,9 @@ from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
 from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import RequestCache, ns_request_cached
 

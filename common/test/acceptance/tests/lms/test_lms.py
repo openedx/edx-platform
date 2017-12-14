@@ -39,7 +39,7 @@ from common.test.acceptance.tests.helpers import (
     element_has_text,
     get_selected_option_text,
     load_data_str,
-    select_option_by_text,
+    select_option_by_text
 )
 
 

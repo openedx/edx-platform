@@ -6,9 +6,9 @@ import pytz
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
+from model_utils.models import TimeStampedModel
 
 from certificates.models import GeneratedCertificate
-from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 

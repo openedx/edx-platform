@@ -1,34 +1,33 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
-import datetime
 import cPickle as pickle
+import datetime
+import logging
 import math
-import zlib
-import pymongo
-import pytz
 import re
+import zlib
 from contextlib import contextmanager
 from time import time
 
+import pymongo
+import pytz
+from contracts import check, new_contract
+from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
+import dogstats_wrapper as dog_stats_api
+from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 try:
     from django.core.cache import caches, InvalidCacheBackendError
     DJANGO_AVAILABLE = True
 except ImportError:
     DJANGO_AVAILABLE = False
-
-import dogstats_wrapper as dog_stats_api
-import logging
-
-from contracts import check, new_contract
-from mongodb_proxy import autoretry_read
-from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore import BlockData
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 
 new_contract('BlockData', BlockData)

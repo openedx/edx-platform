@@ -22,15 +22,16 @@ import unittest
 import xml.sax.saxutils as saxutils
 from collections import OrderedDict
 
+from lxml import etree
+from lxml.html import fromstring
+from mock import ANY, patch
+from pyparsing import ParseException
+
 from capa import inputtypes
 from capa.checker import DemoSystem
 from capa.tests.helpers import test_capa_system
 from capa.xqueue_interface import XQUEUE_TIMEOUT
-from lxml import etree
-from lxml.html import fromstring
-from mock import ANY, patch
 from openedx.core.djangolib.markup import HTML
-from pyparsing import ParseException
 
 # just a handy shortcut
 lookup_tag = inputtypes.registry.get_class_for_tag

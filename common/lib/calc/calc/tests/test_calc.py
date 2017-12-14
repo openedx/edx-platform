@@ -3,9 +3,11 @@ Unit tests for calc.py
 """
 
 import unittest
+
 import numpy
-import calc
 from pyparsing import ParseException
+
+import calc
 
 # numpy's default behavior when it evaluates a function outside its domain
 # is to raise a warning (not an exception) which is then printed to STDOUT.

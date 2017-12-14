@@ -19,8 +19,6 @@ from mock import patch
 from nose.plugins.attrib import attr
 from rest_framework import status
 from rest_framework.test import APITestCase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -38,6 +36,8 @@ from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, UserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class EnrollmentTestMixin(object):

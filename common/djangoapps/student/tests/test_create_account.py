@@ -23,13 +23,19 @@ from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
-    USERNAME_BAD_LENGTH_MSG, USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
+    USERNAME_BAD_LENGTH_MSG,
+    USERNAME_INVALID_CHARS_ASCII,
+    USERNAME_INVALID_CHARS_UNICODE
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import UserAttribute
-from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS, \
-    skip_activation_email
 from student.tests.factories import UserFactory
+from student.views import (
+    REGISTRATION_AFFILIATE_ID,
+    REGISTRATION_UTM_CREATED_AT,
+    REGISTRATION_UTM_PARAMETERS,
+    skip_activation_email
+)
 from third_party_auth.tests import factories as third_party_auth_factory
 
 TEST_CS_URL = 'https://comments.service.test:123/'

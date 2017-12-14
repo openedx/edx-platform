@@ -7,11 +7,11 @@ import random
 import textwrap
 import unittest
 
+from codejail.jail_code import is_configured
+from codejail.safe_exec import SafeExecException
 from nose.plugins.skip import SkipTest
 
 from capa.safe_exec import safe_exec, update_hash
-from codejail.safe_exec import SafeExecException
-from codejail.jail_code import is_configured
 
 
 class TestSafeExec(unittest.TestCase):

@@ -6,7 +6,6 @@ import unittest
 from third_party_auth import pipeline
 from third_party_auth.tests import testutil
 
-
 # Allow tests access to protected methods (or module-protected methods) under test.
 # pylint: disable=protected-access
 

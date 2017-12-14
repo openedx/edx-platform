@@ -1,14 +1,13 @@
 """
 Tests for methods defined in mongo_utils.py
 """
-import ddt
 import os
 from unittest import TestCase
 from uuid import uuid4
 
-from pymongo import ReadPreference
-
+import ddt
 from django.conf import settings
+from pymongo import ReadPreference
 
 from xmodule.mongo_utils import connect_to_mongodb
 

@@ -6,10 +6,12 @@ Generates fake XML for asset metadata.
 """
 
 import random
-from lxml import etree
 from datetime import datetime, timedelta
-from xmodule.assetstore import AssetMetadata
+
+from lxml import etree
 from opaque_keys.edx.keys import CourseKey
+
+from xmodule.assetstore import AssetMetadata
 
 try:
     import click

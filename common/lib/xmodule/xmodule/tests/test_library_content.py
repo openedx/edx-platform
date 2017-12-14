@@ -6,19 +6,18 @@ Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 from bson.objectid import ObjectId
 from mock import Mock, patch
-
+from search.search_engine_base import SearchEngine
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
-from search.search_engine_base import SearchEngine
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 

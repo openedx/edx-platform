@@ -5,9 +5,12 @@ The data type and use of it for declaratively creating test courses.
 # used to create course subtrees in ModuleStoreTestCase.create_test_course
 # adds to self properties w/ the given block_id which hold the UsageKey for easy retrieval.
 # fields is a dictionary of keys and values. sub_tree is a collection of BlockInfo
-from collections import namedtuple
 import datetime
+from collections import namedtuple
+
 BlockInfo = namedtuple('BlockInfo', 'block_id, category, fields, sub_tree')
+
+
 default_block_info_tree = [  # pylint: disable=invalid-name
     BlockInfo(
         'chapter_x', 'chapter', {}, [

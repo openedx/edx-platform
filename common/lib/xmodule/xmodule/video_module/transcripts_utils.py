@@ -2,19 +2,20 @@
 Utility functions for transcripts.
 ++++++++++++++++++++++++++++++++++
 """
-from django.conf import settings
-import os
 import copy
 import json
-import requests
 import logging
-from pysrt import SubRipTime, SubRipItem, SubRipFile
-from lxml import etree
+import os
 from HTMLParser import HTMLParser
 
-from xmodule.exceptions import NotFoundError
+import requests
+from django.conf import settings
+from lxml import etree
+from pysrt import SubRipFile, SubRipItem, SubRipTime
+
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 
 from .bumper_utils import get_bumper_settings
 

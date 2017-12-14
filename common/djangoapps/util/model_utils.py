@@ -4,7 +4,6 @@ Utilities for django models.
 from django.conf import settings
 from django.dispatch import Signal
 from django_countries.fields import Country
-
 from eventtracking import tracker
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.

@@ -2,24 +2,23 @@
 Tests of XML export
 """
 
+import shutil
+import unittest
+from datetime import datetime, timedelta, tzinfo
+from tempfile import mkdtemp
+from textwrap import dedent
+
 import ddt
 import lxml.etree
 import mock
 import pytz
-import shutil
-import unittest
-
-from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
+from opaque_keys.edx.locations import Location
 from path import Path as path
-from tempfile import mkdtemp
-from textwrap import dedent
-
 from xblock.core import XBlock
-from xblock.fields import String, Scope, Integer
+from xblock.fields import Integer, Scope, String
 from xblock.test.tools import blocks_are_equivalent
 
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR

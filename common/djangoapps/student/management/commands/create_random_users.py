@@ -2,12 +2,14 @@
 A script to create some dummy users
 """
 from __future__ import print_function
+
 import uuid
 
 from django.core.management.base import BaseCommand
-from student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
+
 from student.forms import AccountCreationForm
+from student.models import CourseEnrollment
 from student.views import _do_create_account
 
 

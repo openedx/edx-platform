@@ -1,12 +1,14 @@
 """
 Tests for Asides
 """
+from unittest import TestCase
+
+from mock import patch
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
-from unittest import TestCase
+
 from xmodule.modulestore.tests.utils import XmlModulestoreBuilder
-from mock import patch
 
 
 class AsideTestType(XBlockAside):

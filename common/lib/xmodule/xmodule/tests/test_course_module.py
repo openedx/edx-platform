@@ -1,19 +1,18 @@
 """Tests the course modules and their functions"""
-import ddt
+import itertools
 import unittest
 from datetime import datetime, timedelta
-from dateutil import parser
 
-import itertools
+import ddt
+from dateutil import parser
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from opaque_keys.edx.keys import CourseKey
-
 
 ORG = 'test_org'
 COURSE = 'test_course'

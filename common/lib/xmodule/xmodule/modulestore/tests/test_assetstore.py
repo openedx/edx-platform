@@ -2,21 +2,24 @@
 Tests for assetstore using any of the modulestores for metadata. May extend to testing the storage options
 too.
 """
-from datetime import datetime, timedelta
-import ddt
-from nose.plugins.attrib import attr
-import pytz
 import unittest
+from datetime import datetime, timedelta
 
+import ddt
+import pytz
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+
 from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore import ModuleStoreEnum, SortedAssetList, IncorrectlySortedList
+from xmodule.modulestore import IncorrectlySortedList, ModuleStoreEnum, SortedAssetList
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import (
-    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
-    XmlModulestoreBuilder, MixedModulestoreBuilder
+    MIXED_MODULESTORE_BOTH_SETUP,
+    MODULESTORE_SETUPS,
+    MixedModulestoreBuilder,
+    XmlModulestoreBuilder
 )
 
 

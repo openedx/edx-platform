@@ -9,7 +9,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse
-from django.test import override_settings, TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from mock import Mock, patch
 

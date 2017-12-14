@@ -3,14 +3,15 @@ Tests for bulk operations in Split Modulestore.
 """
 # pylint: disable=protected-access
 import copy
-import ddt
 import unittest
+
+import ddt
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
-from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
-
 from opaque_keys.edx.locator import CourseLocator
+
+from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 
 
 class TestBulkWriteMixin(unittest.TestCase):

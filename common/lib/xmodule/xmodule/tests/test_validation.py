@@ -3,10 +3,11 @@ Test xblock/validation.py
 """
 
 import unittest
-from xblock.test.tools import assert_raises
 
-from xmodule.validation import StudioValidationMessage, StudioValidation
+from xblock.test.tools import assert_raises
 from xblock.validation import Validation, ValidationMessage
+
+from xmodule.validation import StudioValidation, StudioValidationMessage
 
 
 class StudioValidationMessageTest(unittest.TestCase):

@@ -2,9 +2,9 @@
 "Test for Annotation Xmodule functional logic."
 
 import unittest
-from mock import Mock
-from lxml import etree
 
+from lxml import etree
+from mock import Mock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 

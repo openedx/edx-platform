@@ -6,9 +6,9 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-from social_django.utils import load_strategy, load_backend, psa
-from social_django.views import complete
 from social_core.utils import setting_name
+from social_django.utils import load_backend, load_strategy, psa
+from social_django.views import complete
 
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email

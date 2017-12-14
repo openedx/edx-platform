@@ -2,11 +2,12 @@
 This module provides an abstraction for Module Stores that support Draft and Published branches.
 """
 
-import threading
 import logging
+import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
-from . import ModuleStoreEnum, BulkOperationsMixin
+
+from . import BulkOperationsMixin, ModuleStoreEnum
 from .exceptions import ItemNotFoundError
 
 # Things w/ these categories should never be marked as version=DRAFT
