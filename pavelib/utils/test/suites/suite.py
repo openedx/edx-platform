@@ -1,6 +1,7 @@
 """
 A class used for defining and running test suites
 """
+import os
 import sys
 import subprocess
 
@@ -27,6 +28,7 @@ class TestSuite(object):
         self.verbosity = int(kwargs.get('verbosity', 1))
         self.skip_clean = kwargs.get('skip_clean', False)
         self.passthrough_options = kwargs.get('passthrough_options', [])
+        self.stderr_path = kwargs.get('stderr', None)
 
     def __enter__(self):
         """
@@ -91,6 +93,10 @@ class TestSuite(object):
         sys.stdout.flush()
 
         kwargs = {'shell': True, 'cwd': None}
+        stderr = None
+        if self.stderr_path:
+            stderr = open(self.stderr_path, 'a')
+            kwargs['stderr'] = stderr
         process = None
 
         try:
@@ -99,12 +105,17 @@ class TestSuite(object):
         except KeyboardInterrupt:
             kill_process(process)
             sys.exit(1)
+        finally:
+            if stderr:
+                stderr.close()
 
     def run_suite_tests(self):
         """
         Runs each of the suites in self.subsuites while tracking failures
         """
         # Uses __enter__ and __exit__ for context
+        if self.stderr_path and os.path.isfile(self.stderr_path):
+            os.remove(self.stderr_path)
         with self:
             # run the tests for this class, and for all subsuites
             if self.cmd:
