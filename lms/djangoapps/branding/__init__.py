@@ -27,25 +27,23 @@ def get_visible_courses(org=None, filter_=None):
         filter_ (dict): Optional parameter that allows custom filtering by
             fields on the course.
     """
-    current_site_org = configuration_helpers.get_value('course_org_filter')
+    courses = []
+    current_site_orgs = configuration_helpers.get_current_site_orgs()
 
-    if org and current_site_org:
-        # Return an empty result if the org passed by the caller does not match the designated site org.
-        courses = CourseOverview.get_all_courses(
-            org=org,
-            filter_=filter_,
-        ) if org == current_site_org else []
+    if org:
+        # Check the current site's orgs to make sure the org's courses should be displayed
+        if not current_site_orgs or org in current_site_orgs:
+            courses = CourseOverview.get_all_courses(orgs=[org], filter_=filter_)
+    elif current_site_orgs:
+        # Only display courses that should be displayed on this site
+        courses = CourseOverview.get_all_courses(orgs=current_site_orgs, filter_=filter_)
     else:
-        # We only make it to this point if one of org or current_site_org is defined.
-        # If both org and current_site_org were defined, the code would have fallen into the
-        # first branch of the conditional above, wherein an equality check is performed.
-        target_org = org or current_site_org
-        courses = CourseOverview.get_all_courses(org=target_org, filter_=filter_)
+        courses = CourseOverview.get_all_courses(filter_=filter_)
 
     courses = sorted(courses, key=lambda course: course.number)
 
     # Filtering can stop here.
-    if current_site_org:
+    if current_site_orgs:
         return courses
 
     # See if we have filtered course listings in this domain
