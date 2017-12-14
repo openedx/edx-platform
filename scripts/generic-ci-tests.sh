@@ -131,14 +131,8 @@ case "$TEST_SUITE" in
 
     "lms-unit")
         case "$SHARD" in
-            "all")
-                $TOX paver test_system -s lms --disable_capture $PAVER_ARGS $PARALLEL 2> lms-tests.log
-                ;;
-            [1-3])
-                $TOX paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
-                ;;
-            4|"noshard")
-                $TOX paver test_system -s lms --disable_capture --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
+            "all"|[1-4]|"noshard")
+                $TOX bash scripts/unit-tests.sh
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -151,12 +145,8 @@ case "$TEST_SUITE" in
         esac
         ;;
 
-    "cms-unit")
-        $TOX paver test_system -s cms --disable_capture $PAVER_ARGS 2> cms-tests.log
-        ;;
-
-    "commonlib-unit")
-        $TOX paver test_lib --disable_capture $PAVER_ARGS 2> common-tests.log
+    "cms-unit"|"commonlib-unit")
+        $TOX bash scripts/unit-tests.sh
         ;;
 
     "js-unit")

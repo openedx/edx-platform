@@ -22,7 +22,6 @@ from .common import *
 import os
 from path import Path as path
 from uuid import uuid4
-from warnings import filterwarnings, simplefilter
 
 from util.db import NoOpMigrationModules
 from openedx.core.lib.derived import derive_settings
@@ -231,15 +230,6 @@ CACHES = {
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
-
-# hide ratelimit warnings while running tests
-filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
-
-# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
-# https://docs.python.org/2/library/warnings.html#the-warnings-filter
-# Change to "default" to see the first instance of each hit
-# or "error" to convert all into errors
-simplefilter('ignore')
 
 ############################# SECURITY SETTINGS ################################
 # Default to advanced security in common.py, so tests can reset here to use

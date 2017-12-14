@@ -161,7 +161,7 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 # TODO: Remove Django 1.11 upgrade shim
 # SHIM: Compensate for behavior change of default authentication backend in 1.10
-if django.VERSION[0] == 1 and django.VERSION[1] < 10:
+if django.VERSION < (1, 10):
     NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.ModelBackend'
 else:
     # We want to allow inactive users to log in only when their account is first created
@@ -169,6 +169,18 @@ else:
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
+
+
+def authenticate_new_user(request, username, password):
+    """
+    Immediately after a user creates an account, we log them in. They are only
+    logged in until they close the browser. They can't log in again until they click
+    the activation link from the email.
+    """
+    backend = load_backend(NEW_USER_AUTH_BACKEND)
+    user = backend.authenticate(request=request, username=username, password=password)
+    user.backend = NEW_USER_AUTH_BACKEND
+    return user
 
 
 def csrf_token(context):
@@ -2127,12 +2139,7 @@ def create_account_with_params(request, params):
     else:
         compose_and_send_activation_email(user, profile, registration)
 
-    # Immediately after a user creates an account, we log them in. They are only
-    # logged in until they close the browser. They can't log in again until they click
-    # the activation link from the email.
-    backend = load_backend(NEW_USER_AUTH_BACKEND)
-    new_user = backend.authenticate(request=request, username=user.username, password=params['password'])
-    new_user.backend = NEW_USER_AUTH_BACKEND
+    new_user = authenticate_new_user(request, user.username, params['password'])
     login(request, new_user)
     request.session.set_expiry(0)
 
@@ -2448,7 +2455,7 @@ def auto_auth(request):
 
     # Log in as the user
     if login_when_done:
-        user = authenticate(username=username, password=password)
+        user = authenticate_new_user(request, username, password)
         login(request, user)
 
     create_comments_service_user(user)
