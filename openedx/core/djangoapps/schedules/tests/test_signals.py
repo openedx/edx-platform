@@ -151,10 +151,8 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
     def assert_schedule_dates(self, schedule, expected_start):
         assert _strip_secs(schedule.start) == _strip_secs(expected_start)
-        assert (
-            _strip_secs(schedule.upgrade_deadline) ==
-            _strip_secs(expected_start) + datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS),
-        )
+        deadline_delta = datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS)
+        assert _strip_secs(schedule.upgrade_deadline) == _strip_secs(expected_start) + deadline_delta
 
     def test_updated_when_course_not_started(self, mock_get_current_site):
         mock_get_current_site.return_value = self.site

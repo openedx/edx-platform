@@ -659,7 +659,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         error = validate_video_image({})
         self.assertEquals(error, 'The image must have name, content type, and size information.')
 
-    def test_currupt_image_file(self):
+    def test_corrupt_image_file(self):
         """
         Test that when corrupt file is provided to validate_video_image, it gives proper error message.
         """

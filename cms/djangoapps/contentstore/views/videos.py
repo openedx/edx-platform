@@ -213,6 +213,8 @@ def validate_video_image(image_file):
             image_file_width, image_file_height = get_image_dimensions(image_file)
         except TypeError:
             return _('There is a problem with this image file. Try to upload a different file.')
+        if image_file_width is None or image_file_height is None:
+            return _('There is a problem with this image file. Try to upload a different file.')
         image_file_aspect_ratio = abs(image_file_width / float(image_file_height) - settings.VIDEO_IMAGE_ASPECT_RATIO)
         if image_file_width < settings.VIDEO_IMAGE_MIN_WIDTH or image_file_height < settings.VIDEO_IMAGE_MIN_HEIGHT:
             error = _('Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
