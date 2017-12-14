@@ -1136,7 +1136,7 @@ INSTALLED_APPS = [
     'django_filters',
     'cms.djangoapps.api',
 
-    # Entitlements, used in openedx tests
+    # Entitlements, used in openedx  tests
     'entitlements',
 ]
 
