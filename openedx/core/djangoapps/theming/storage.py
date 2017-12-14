@@ -4,14 +4,18 @@ See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
 import os.path
 import posixpath
+import re
 
+import django
 from django.conf import settings
 from django.contrib.staticfiles.finders import find
 from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage
 from django.utils._os import safe_join
-from django.utils.six.moves.urllib.parse import unquote, urlsplit  # pylint: disable=no-name-in-module, import-error
-from pipeline.storage import PipelineMixin
-
+from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
+    unquote,
+    urldefrag,
+    urlsplit
+)
 from openedx.core.djangoapps.theming.helpers import (
     get_current_theme,
     get_project_root_name,
@@ -19,6 +23,7 @@ from openedx.core.djangoapps.theming.helpers import (
     get_themes,
     is_comprehensive_theming_enabled
 )
+from pipeline.storage import PipelineMixin
 
 
 class ThemeStorage(StaticFilesStorage):
@@ -162,13 +167,8 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
 
         return super(ThemeCachedFilesMixin, self).url(asset_name, force)
 
-    def url_converter(self, name, template=None):
+    def _url_converter_110_and_older(self, name, hashed_files, template=None):
         """
-        This is an override of url_converter from CachedFilesMixin.
-        It just comments out two lines at the end of the method.
-
-        The purpose of this override is to make converter method return absolute urls instead of relative urls.
-        This behavior is necessary for theme overrides, as we get 404 on assets with relative urls on a themed site.
         """
         if template is None:
             template = self.default_template
@@ -216,6 +216,76 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
 
             # Return the hashed version to the file
             return template % unquote(hashed_url)
+
+        return converter
+
+    def url_converter(self, name, hashed_files, template=None):
+        """
+        This is an override of url_converter from CachedFilesMixin.
+        It just comments out two lines at the end of the method.
+
+        The purpose of this override is to make converter method return absolute urls instead of relative urls.
+        This behavior is necessary for theme overrides, as we get 404 on assets with relative urls on a themed site.
+        """
+        # TODO: Remove Django 1.11 upgrade shim
+        # SHIM: We should be able to get rid of this implementation selector post-upgrade
+        if django.VERSION[0] == 1 and django.VERSION[1] < 11:
+            return self._url_converter_110_and_older(name, hashed_files, template)
+
+        if template is None:
+            template = self.default_template
+
+        def converter(matchobj):
+            """
+            Convert the matched URL to a normalized and hashed URL.
+            This requires figuring out which files the matched URL resolves
+            to and calling the url() method of the storage.
+            """
+            matched, url = matchobj.groups()
+
+            # Ignore absolute/protocol-relative and data-uri URLs.
+            if re.match(r'^[a-z]+:', url):
+                return matched
+
+            # Ignore absolute URLs that don't point to a static file (dynamic
+            # CSS / JS?). Note that STATIC_URL cannot be empty.
+            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
+                return matched
+
+            # Strip off the fragment so a path-like fragment won't interfere.
+            url_path, fragment = urldefrag(url)
+
+            if url_path.startswith('/'):
+                # Otherwise the condition above would have returned prematurely.
+                assert url_path.startswith(settings.STATIC_URL)
+                target_name = url_path[len(settings.STATIC_URL):]
+            else:
+                # We're using the posixpath module to mix paths and URLs conveniently.
+                source_name = name if os.sep == '/' else name.replace(os.sep, '/')
+                target_name = posixpath.join(posixpath.dirname(source_name), url_path)
+
+            # Determine the hashed name of the target file with the storage backend.
+            hashed_url = self._url(
+                self._stored_name, unquote(target_name),
+                force=True, hashed_files=hashed_files,
+            )
+
+            # NOTE:
+            # following line is commented out so that absolute urls are used instead of relative urls
+            # to make themed assets work correctly.
+            #
+            # The line is commented and not removed to make future django upgrade easier and
+            # show exactly what is changed in this method override
+            #
+            #transformed_url = '/'.join(url_path.split('/')[:-1] + hashed_url.split('/')[-1:])
+            transformed_url = hashed_url  # This line was added.
+
+            # Restore the fragment that was stripped off earlier.
+            if fragment:
+                transformed_url += ('?#' if '?#' in url else '#') + fragment
+
+            # Return the hashed version to the file
+            return template % unquote(transformed_url)
 
         return converter
 
