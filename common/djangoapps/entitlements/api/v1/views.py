@@ -14,6 +14,7 @@ from entitlements.api.v1.filters import CourseEntitlementFilter
 from entitlements.api.v1.permissions import IsAdminOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import CourseEntitlementSerializer
 from entitlements.models import CourseEntitlement
+from entitlements.signals import REFUND_ENTITLEMENT
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from student.models import CourseEnrollment
@@ -149,7 +150,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         except AlreadyEnrolledError:
             enrollment = CourseEnrollment.get_enrollment(user, course_run_key)
             if enrollment.mode == entitlement.mode:
-                CourseEntitlement.set_enrollment(entitlement, enrollment)
+                entitlement.set_enrollment(enrollment)
             # Else the User is already enrolled in another Mode and we should
             # not do anything else related to Entitlements.
         except CourseEnrollmentException:
@@ -167,7 +168,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 data={'message': message}
             )
 
-        CourseEntitlement.set_enrollment(entitlement, enrollment)
+        entitlement.set_enrollment(enrollment)
         return None
 
     def _unenroll_entitlement(self, entitlement, course_run_key, user):
@@ -175,7 +176,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         Internal method to handle the details of Unenrolling a User in a Course Run.
         """
         CourseEnrollment.unenroll(user, course_run_key, skip_refund=True)
-        CourseEntitlement.set_enrollment(entitlement, None)
+        entitlement.set_enrollment(None)
 
     def create(self, request, uuid):
         """
@@ -196,7 +197,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 data='The Course Run ID was not provided.'
             )
 
-        # Verify that the user has an Entitlement for the provided Course UUID.
+        # Verify that the user has an Entitlement for the provided Entitlement UUID.
         try:
             entitlement = CourseEntitlement.objects.get(uuid=uuid, user=request.user, expired_at=None)
         except CourseEntitlement.DoesNotExist:
@@ -205,7 +206,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 data='The Entitlement for this UUID does not exist or is Expired.'
             )
 
-        # Verify the course run ID is of the same type as the Course entitlement.
+        # Verify the course run ID is of the same Course as the Course entitlement.
         course_run_valid = self._verify_course_run_for_entitlement(entitlement, course_run_id)
         if not course_run_valid:
             return Response(
@@ -257,7 +258,13 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
     def destroy(self, request, uuid):
         """
         On DELETE call to this API we will unenroll the course enrollment for the provided uuid
+
+        If is_refund parameter is provided then unenroll the user, set Entitlement expiration, and issue
+        a refund
         """
+        is_refund = True if request.query_params.get('is_refund', 'false') == 'true' else False
+
+        # Retrieve the entitlement for the UUID belongs to the current user.
         try:
             entitlement = CourseEntitlement.objects.get(uuid=uuid, user=request.user, expired_at=None)
         except CourseEntitlement.DoesNotExist:
@@ -266,12 +273,42 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 data='The Entitlement for this UUID does not exist or is Expired.'
             )
 
-        if entitlement.enrollment_course_run is None:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        if is_refund and entitlement.is_entitlement_refundable():
+            with transaction.atomic():
+                # Revoke and refund the entitlement
+                if entitlement.enrollment_course_run is not None:
+                    self._unenroll_entitlement(
+                        entitlement=entitlement,
+                        course_run_key=entitlement.enrollment_course_run.course_id,
+                        user=request.user
+                    )
 
-        self._unenroll_entitlement(
-            entitlement=entitlement,
-            course_run_key=entitlement.enrollment_course_run.course_id,
-            user=request.user
-        )
+                # Revoke the Course Entitlement and issue Refund
+                log.info(
+                    'Entitlement Refund requested for Course Entitlement[%s]',
+                    str(entitlement.uuid)
+                )
+
+                REFUND_ENTITLEMENT.send(sender=None, course_entitlement=entitlement)
+                entitlement.expired_at_datetime = timezone.now()
+                entitlement.save()
+
+                log.info(
+                    'Set expired_at to [%s] for course entitlement [%s]',
+                    entitlement.expired_at,
+                    entitlement.uuid
+                )
+        elif not is_refund:
+            if entitlement.enrollment_course_run is not None:
+                self._unenroll_entitlement(
+                    entitlement=entitlement,
+                    course_run_key=entitlement.enrollment_course_run.course_id,
+                    user=request.user
+                )
+        else:
+            log.info(
+                'Entitlement Refund failed for Course Entitlement [%s]. Entitlement is not refundable',
+                str(entitlement.uuid)
+            )
+
         return Response(status=status.HTTP_204_NO_CONTENT)
