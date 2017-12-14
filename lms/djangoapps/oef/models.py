@@ -34,6 +34,7 @@ class Option(TimeStampedModel):
     topic = models.ForeignKey(TopicQuestion, related_name='options')
     level = models.ForeignKey(OptionLevel)
     text = models.TextField()
+    short_text = models.TextField()
 
     def __str__(self):
         return self.text[:20]
