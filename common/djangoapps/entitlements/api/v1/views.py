@@ -262,7 +262,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         If is_refund parameter is provided then unenroll the user, set Entitlement expiration, and issue
         a refund
         """
-        is_refund = True if request.query_params.get('is_refund', 'false') == 'true' else False
+        is_refund = request.query_params.get('is_refund', 'false') == 'true'
 
         # Retrieve the entitlement for the UUID belongs to the current user.
         try:
@@ -310,5 +310,10 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 'Entitlement Refund failed for Course Entitlement [%s]. Entitlement is not refundable',
                 str(entitlement.uuid)
             )
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    'message': 'Entitlement refund failed, Entitlement is not refundable'
+                })
 
         return Response(status=status.HTTP_204_NO_CONTENT)
