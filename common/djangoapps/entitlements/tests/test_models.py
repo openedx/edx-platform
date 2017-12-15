@@ -46,6 +46,10 @@ class TestModels(TestCase):
 
         assert entitlement.is_entitlement_redeemable() is False
 
+        entitlement = CourseEntitlementFactory.create(expired_at=datetime.now())
+
+        assert entitlement.is_entitlement_refundable() is False
+
     def test_is_entitlement_refundable(self):
         """
         Test that the entitlement is refundable when created now, and is not refundable when created 70 days
@@ -83,6 +87,10 @@ class TestModels(TestCase):
 
         assert entitlement.is_entitlement_refundable() is True
 
+        entitlement = CourseEntitlementFactory.create(expired_at=datetime.now())
+
+        assert entitlement.is_entitlement_refundable() is False
+
     def test_is_entitlement_regainable(self):
         """
         Test that the entitlement is not expired when created now, and is expired when created20 days
@@ -112,6 +120,10 @@ class TestModels(TestCase):
         self.enrollment.save()
 
         assert entitlement.is_entitlement_regainable() is False
+
+        entitlement = CourseEntitlementFactory.create(expired_at=datetime.now())
+
+        assert entitlement.is_entitlement_regainable
 
     def test_get_days_until_expiration(self):
         """
