@@ -1011,7 +1011,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     if len(excerpt) > max_len:
                         excerpt = "{}...".format(excerpt[:max_len])
                     announcement_open_url = "https://{site_name}/courses/{course_id}/announcements/{date}/".format(
-                        site_name=settings.SITE_NAME,
+                        site_name=settings.LMS_BASE,
                         course_id=unicode(course_key),
                         date=dateutil.parser.parse(announcement_date).strftime('%m/%d/%Y'),
                     )
