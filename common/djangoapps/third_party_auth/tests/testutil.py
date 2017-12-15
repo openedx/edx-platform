@@ -279,7 +279,8 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     pipeline_data = {
         "backend": backend,
         "kwargs": {
-            "details": kwargs
+            "details": kwargs,
+            "response": kwargs.get("response", {})
         }
     }
 
