@@ -9,6 +9,11 @@ from logging import getLogger
 from common.lib.surveygizmo_client.client import SurveyGizmoClient
 from lms.djangoapps.third_party_surveys.models import ThirdPartySurvey
 
+from django.core.urlresolvers import reverse
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.conf import settings
+
+
 log = getLogger(__name__)
 
 
@@ -47,3 +52,25 @@ def save_responses(survey_responses):
             third_party_survey.save()
         except (IntegrityError, ValueError) as exc:
             log.error(exc)
+
+
+@periodic_task(run_every=crontab(minute='*/10'))
+def celery_test_task():
+    """
+    test task for new celery configuration
+    """
+
+    log.warning('The test task for testing celery configuration has been completed')
+    log.info("Opening email connection")
+    connection = get_connection()
+    connection.open()
+    email_msg = EmailMultiAlternatives(
+        subject='Test email for celery testing',
+        body="The test task for testing celery configuration has been completed",
+        from_email=settings.NOTIFICATION_FROM_EMAIL,
+        to=['omair.shamshir@arbisoft.com', 'muhammad.zeeshan@arbisoft.com', 'muhammad.nadeem@arbisoft.com'],
+        connection=connection
+    )
+
+    connection.send_messages([email_msg])
+
