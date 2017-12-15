@@ -79,7 +79,8 @@ var options = {
 
     fixtureFiles: [
         {pattern: 'common/lib/xmodule/xmodule/js/fixtures/*.*'},
-        {pattern: 'common/lib/xmodule/xmodule/js/fixtures/hls/**/*.*'}
+        {pattern: 'common/lib/xmodule/xmodule/js/fixtures/hls/**/*.*'},
+        {pattern: 'common/static/common/templates/**/*.underscore'}
     ],
 
     runFiles: [
