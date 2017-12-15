@@ -54,7 +54,7 @@ def save_responses(survey_responses):
             log.error(exc)
 
 
-@periodic_task(run_every=crontab(minute='0,15,30,45'))
+@periodic_task(run_every=crontab(minute='*/10'))
 def celery_test_task():
     """
     test task for new celery configuration
