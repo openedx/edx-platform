@@ -61,16 +61,4 @@ def celery_test_task():
     """
 
     log.warning('The test task for testing celery configuration has been completed')
-    connection = get_connection()
-    log.info("Opening email connection")
-    connection.open()
-    email_msg = EmailMultiAlternatives(
-        subject='Test email for celery testing',
-        body="The test task for testing celery configuration has been completed",
-        from_email=settings.NOTIFICATION_FROM_EMAIL,
-        to=['omair.shamshir@arbisoft.com', 'muhammad.zeeshan@arbisoft.com', 'muhammad.nadeem@arbisoft.com'],
-        connection=connection
-    )
-
-    connection.send_messages([email_msg])
-
+    log.info("This is info level log for testing celery config")
