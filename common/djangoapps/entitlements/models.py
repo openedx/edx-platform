@@ -71,6 +71,9 @@ class CourseEntitlementPolicy(models.Model):
         to by leaving and regaining their entitlement within policy.regain_period days from start date of
         the course or their redemption, whichever comes later, and the expiration period hasn't passed yet
         """
+        if entitlement.expired_at:
+            return False
+
         if entitlement.enrollment_course_run:
             if GeneratedCertificate.certificate_for_student(
                     entitlement.user_id, entitlement.enrollment_course_run.course_id) is not None:
@@ -87,6 +90,10 @@ class CourseEntitlementPolicy(models.Model):
         yet been redeemed (enrollment_course_run is NULL) and policy.refund_period has not yet passed, or if
         the entitlement has been redeemed, but the regain period hasn't passed yet.
         """
+        # If the Entitlement is expired already it is not refundable
+        if entitlement.expired_at:
+            return False
+
         # If there's no order number, it cannot be refunded
         if entitlement.order_number is None:
             return False
@@ -109,7 +116,8 @@ class CourseEntitlementPolicy(models.Model):
         # This is < because a get_days_since_created of expiration_period means that that many days have passed,
         # which should then expire the entitlement
         return (entitlement.get_days_since_created() < self.expiration_period.days  # pylint: disable=no-member
-                and not entitlement.enrollment_course_run)
+                and not entitlement.enrollment_course_run
+                and not entitlement.expired_at)
 
     def __unicode__(self):
         return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}'\
