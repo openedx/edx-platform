@@ -46,10 +46,11 @@ edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
 edx-drf-extensions==1.2.3
 edx-i18n-tools==0.4.2
-edx-lint==0.5.4
+#edx-lint==0.5.4
+git+https://github.com/edx/edx-lint.git@7318298401006028c77c67c4358a6a99626e5d6c#egg=edx_lint==0.0
 
 # Pin this to test a fix to pylint-django
-git+https://github.com/cpennington/pylint-django@fix-field-inference-during-monkey-patching#egg=pylint-django==0.0
+#git+https://github.com/cpennington/pylint-django@fix-field-inference-during-monkey-patching#egg=pylint-django==0.0
 
 enum34==1.1.6
 edx-django-oauth2-provider==1.2.5
