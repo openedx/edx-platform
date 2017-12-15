@@ -282,6 +282,15 @@
           max-width: calc(100% - 40px);
           min-width: auto;
         }
+
+        .btn-change-privacy {
+          @extend %btn-primary-blue;
+
+          padding-top: 4px;
+          padding-bottom: 5px;
+          background-image: none;
+          box-shadow: none;
+        }
       }
 
       .u-field-title {
