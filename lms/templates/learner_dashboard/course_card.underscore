@@ -17,12 +17,28 @@
                     <% } %>
                     <% if (dateString && !is_unfulfilled_entitlement) { %>
                         <span class="run-period"><%- dateString %></span>
-                        <% if (user_entitlement && !is_unfulfilled_entitlement) { %>
+                        <% if (user_entitlement && !user_entitlement.expired_at && !is_unfulfilled_entitlement) { %>
                             <button class="change-session btn-link" aria-controls="change-session-<%-user_entitlement.uuid%>"> <%- gettext('Change Session')%></button>
                         <% } %>
                     <% } %>
                 </div>
-            </div>
+                <% if (user_entitlement && user_entitlement.expiration_date) { %>
+                    <div class="info-expires-at">
+                        <% if (is_unfulfilled_entitlement) { %>
+                            <% if (user_entitlement.expired_at) { %>
+                                <%- StringUtils.interpolate(gettext('You can no longer select a session. Your final day to select a session was {expiration_date}.'), {expiration_date: user_entitlement.expiration_date}) %>
+                            <% } else { %>
+                                <%- StringUtils.interpolate(gettext('You must select a session by {expiration_date} to access the course.'), {expiration_date: user_entitlement.expiration_date}) %>
+                            <% } %>
+                        <% } else { %>
+                            <% if (user_entitlement.expired_at) { %>
+                                <%- gettext('You can no longer change sessions.')%>
+                            <% } else { %>
+                                <%- StringUtils.interpolate(gettext('You can change sessions until {expiration_date}.'), {expiration_date: user_entitlement.expiration_date}) %>
+                            <% } %>
+                        <% } %>
+                    </div>
+                 <% } %>
             <div class="course-actions"></div>
         </div>
         <div class="course-certificate certificate-status"></div>
