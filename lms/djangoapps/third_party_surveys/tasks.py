@@ -59,10 +59,11 @@ def celery_test_task():
     """
     test task for new celery configuration
     """
+
+    log.warning('The test task for testing celery configuration has been completed')
     connection = get_connection()
     log.info("Opening email connection")
     connection.open()
-    log.warning('The test task for testing celery configuration has been completed')
     email_msg = EmailMultiAlternatives(
         subject='Test email for celery testing',
         body="The test task for testing celery configuration has been completed",
