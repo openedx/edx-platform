@@ -40,6 +40,7 @@ from openedx.core.djangoapps.user_api.errors import (
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_learner_data
+from student.cookies import set_experiments_is_enterprise_cookie
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import register_user as old_register_view
@@ -161,6 +162,11 @@ def login_and_registration_form(request, initial_mode="login"):
     context = update_context_for_enterprise(request, context)
 
     response = render_to_response('student_account/login_and_register.html', context)
+
+    # This cookie can be used for tests or minor features,
+    # but should not be used for payment related or other critical work
+    # since users can edit their cookies
+    set_experiments_is_enterprise_cookie(request, response, context['enable_enterprise_sidebar'])
 
     # Remove enterprise cookie so that subsequent requests show default login page.
     response.delete_cookie(
