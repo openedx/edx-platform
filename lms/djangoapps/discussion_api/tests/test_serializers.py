@@ -44,6 +44,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         super(SerializerTestMixin, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -411,6 +412,7 @@ class ThreadSerializerDeserializationTest(
         super(ThreadSerializerDeserializationTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -612,6 +614,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         super(CommentSerializerDeserializationTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)

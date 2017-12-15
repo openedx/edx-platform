@@ -49,6 +49,9 @@ class SamlIntegrationTestUtilities(object):
         )
         # Mock out HTTP requests that may be made to TestShib:
         httpretty.enable()
+        httpretty.reset()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
 
         def metadata_callback(_request, _uri, headers):
             """ Return a cached copy of TestShib's metadata by reading it from disk """
@@ -66,8 +69,6 @@ class SamlIntegrationTestUtilities(object):
             content_type='text/xml',
             body=cache_duration_metadata_callback
         )
-        self.addCleanup(httpretty.disable)
-        self.addCleanup(httpretty.reset)
 
         # Configure the SAML library to use the same request ID for every request.
         # Doing this and freezing the time allows us to play back recorded request/response pairs
