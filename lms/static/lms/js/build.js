@@ -34,6 +34,7 @@
             'js/header_factory',
             'js/learner_dashboard/course_entitlement_factory',
             'js/learner_dashboard/unenrollment_factory',
+            'js/learner_dashboard/entitlement_unenrollment_factory',
             'js/learner_dashboard/program_details_factory',
             'js/learner_dashboard/program_list_factory',
             'js/student_account/logistration_factory',
