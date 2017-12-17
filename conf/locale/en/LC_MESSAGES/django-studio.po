@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-12 18:59+0000\n"
-"PO-Revision-Date: 2017-12-12 19:00:01.231385\n"
+"POT-Creation-Date: 2017-12-17 20:42+0000\n"
+"PO-Revision-Date: 2017-12-17 20:42:32.825364\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -524,11 +524,12 @@ msgid "This image file must be larger than {image_min_size}."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py:215
+#: cms/djangoapps/contentstore/views/videos.py:217
 msgid ""
 "There is a problem with this image file. Try to upload a different file."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:218
+#: cms/djangoapps/contentstore/views/videos.py:220
 #, python-brace-format
 msgid ""
 "Recommended image resolution is "
@@ -536,42 +537,42 @@ msgid ""
 "{image_file_min_width}x{image_file_min_height}."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:226
+#: cms/djangoapps/contentstore/views/videos.py:228
 #, python-brace-format
 msgid ""
 "This image file must have an aspect ratio of "
 "{video_image_aspect_ratio_text}."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:233
+#: cms/djangoapps/contentstore/views/videos.py:235
 msgid ""
 "The image file name can only contain letters, numbers, hyphens (-), and "
 "underscores (_)."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:247
+#: cms/djangoapps/contentstore/views/videos.py:249
 msgid "An image file is required."
 msgstr ""
 
 #. Translators: This is the header for a CSV file column
 #. containing URLs for video encodings for the named profile
 #. (e.g. desktop, mobile high quality, mobile low quality)
-#: cms/djangoapps/contentstore/views/videos.py:407
+#: cms/djangoapps/contentstore/views/videos.py:409
 #, python-brace-format
 msgid "{profile_name} URL"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:413
+#: cms/djangoapps/contentstore/views/videos.py:415
 msgid "Duration"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:414
+#: cms/djangoapps/contentstore/views/videos.py:416
 msgid "Date Added"
 msgstr ""
 
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
-#: cms/djangoapps/contentstore/views/videos.py:452
+#: cms/djangoapps/contentstore/views/videos.py:454
 #, python-brace-format
 msgid "{course}_video_urls"
 msgstr ""
@@ -647,11 +648,11 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr ""
 
-#: cms/envs/common.py:149
+#: cms/envs/common.py:148
 msgid "Your Platform Studio"
 msgstr ""
 
-#: cms/envs/common.py:150
+#: cms/envs/common.py:149
 msgid "Studio"
 msgstr ""
 

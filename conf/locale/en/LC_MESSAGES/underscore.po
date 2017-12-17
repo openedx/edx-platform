@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-12 18:59+0000\n"
-"PO-Revision-Date: 2017-12-12 19:00:01.314471\n"
+"POT-Creation-Date: 2017-12-17 20:42+0000\n"
+"PO-Revision-Date: 2017-12-17 20:42:32.717839\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -113,6 +113,7 @@ msgstr ""
 #: cms/templates/js/section-name-edit.underscore:3
 #: cms/templates/js/signatory-actions.underscore:3
 #: cms/templates/js/xblock-string-field-editor.underscore:13
+#: lms/templates/fields/field_dropdown.underscore:45
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore:147
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore:15
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore:35
@@ -1531,6 +1532,24 @@ msgstr ""
 #: lms/templates/learner_dashboard/course_card.underscore:21
 #: lms/templates/learner_dashboard/course_entitlement.underscore:27
 msgid "Change Session"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore:29
+msgid ""
+"You can no longer select a session. Your final day to select a session was "
+"{expiration_date}."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore:31
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore:35
+msgid "You can no longer change sessions."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore:37
+msgid "You can change sessions until {expiration_date}."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore:3
