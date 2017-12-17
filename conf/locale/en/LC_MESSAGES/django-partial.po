@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-12 18:59+0000\n"
-"PO-Revision-Date: 2017-12-12 19:00:01.173283\n"
+"POT-Creation-Date: 2017-12-17 20:42+0000\n"
+"PO-Revision-Date: 2017-12-17 20:42:32.328800\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -61,7 +61,7 @@ msgstr ""
 msgid "Empty"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:412
+#: cms/djangoapps/contentstore/views/videos.py:414
 #: lms/djangoapps/class_dashboard/dashboard_data.py:473
 #: lms/djangoapps/class_dashboard/dashboard_data.py:531
 #: lms/djangoapps/class_dashboard/dashboard_data.py:562
@@ -69,12 +69,12 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:415
+#: cms/djangoapps/contentstore/views/videos.py:417
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py:172
 msgid "Video ID"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py:416
+#: cms/djangoapps/contentstore/views/videos.py:418
 #: lms/djangoapps/shoppingcart/reports.py:135
 msgid "Status"
 msgstr ""
@@ -82,7 +82,7 @@ msgstr ""
 #. Translators: This is listed as the duration for a video that has not
 #. yet reached the point in its processing by the servers where its
 #. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py:429
+#: cms/djangoapps/contentstore/views/videos.py:431
 #: openedx/core/djangoapps/api_admin/models.py:31
 msgid "Pending"
 msgstr ""
@@ -351,7 +351,7 @@ msgid "Username and password fields cannot match"
 msgstr ""
 
 #: common/djangoapps/student/forms.py:281
-#: common/djangoapps/student/views.py:2617
+#: common/djangoapps/student/views.py:2619
 msgid "Password: "
 msgstr ""
 
@@ -594,82 +594,82 @@ msgstr ""
 msgid "Value of this user attribute."
 msgstr ""
 
-#: common/djangoapps/student/views.py:862
+#: common/djangoapps/student/views.py:864
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
 
-#: common/djangoapps/student/views.py:866
+#: common/djangoapps/student/views.py:868
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr ""
 
-#: common/djangoapps/student/views.py:966
+#: common/djangoapps/student/views.py:968
 msgid "Photos are mismatched"
 msgstr ""
 
-#: common/djangoapps/student/views.py:967
+#: common/djangoapps/student/views.py:969
 msgid "Name missing from ID photo"
 msgstr ""
 
-#: common/djangoapps/student/views.py:968
+#: common/djangoapps/student/views.py:970
 msgid "ID photo not provided"
 msgstr ""
 
-#: common/djangoapps/student/views.py:969
+#: common/djangoapps/student/views.py:971
 msgid "ID is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:970
+#: common/djangoapps/student/views.py:972
 msgid "Learner photo is blurry"
 msgstr ""
 
-#: common/djangoapps/student/views.py:971
+#: common/djangoapps/student/views.py:973
 msgid "Name on ID does not match name on account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:972
+#: common/djangoapps/student/views.py:974
 msgid "Learner photo not provided"
 msgstr ""
 
-#: common/djangoapps/student/views.py:973
+#: common/djangoapps/student/views.py:975
 msgid "ID photo is blurry"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1007
+#: common/djangoapps/student/views.py:1009
 msgid " and "
 msgstr ""
 
-#: common/djangoapps/student/views.py:1272
+#: common/djangoapps/student/views.py:1274
 msgid "Course id not specified"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1283
+#: common/djangoapps/student/views.py:1285
 #: lms/djangoapps/support/views/refund.py:61
 msgid "Invalid course id"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1298
+#: common/djangoapps/student/views.py:1300
 msgid "Course id is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1331
+#: common/djangoapps/student/views.py:1333
 msgid "Could not enroll"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1347
+#: common/djangoapps/student/views.py:1349
 msgid "You are not enrolled in this course"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1351
+#: common/djangoapps/student/views.py:1353
 msgid "Your certificate prevents you from unenrolling from this course"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1357
+#: common/djangoapps/student/views.py:1359
 msgid "Enrollment action is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1379
+#: common/djangoapps/student/views.py:1381
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -678,14 +678,14 @@ msgid ""
 "{platform} Support</a>."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1431
+#: common/djangoapps/student/views.py:1433
 #, python-brace-format
 msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1439
+#: common/djangoapps/student/views.py:1441
 #, python-brace-format
 msgid ""
 "Use your {platform_name} username and password to log into {platform_name} "
@@ -693,97 +693,97 @@ msgid ""
 "your dashboard."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1447
+#: common/djangoapps/student/views.py:1449
 #, python-brace-format
 msgid ""
 "If you don't have an {platform_name} account yet, click "
 "<strong>Register</strong> at the top of the page."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1461
+#: common/djangoapps/student/views.py:1463
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1493
+#: common/djangoapps/student/views.py:1495
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1504
+#: common/djangoapps/student/views.py:1506
 msgid ""
 "Your password has expired due to password policy on this account. You must "
 "reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1521
+#: common/djangoapps/student/views.py:1523
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1539
+#: common/djangoapps/student/views.py:1541
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1695
+#: common/djangoapps/student/views.py:1697
 msgid "Please enter a username"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1700
+#: common/djangoapps/student/views.py:1702
 msgid "Please choose an option"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1707
+#: common/djangoapps/student/views.py:1709
 msgid "User with username {} does not exist"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1715
+#: common/djangoapps/student/views.py:1717
 msgid "Successfully disabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1719
+#: common/djangoapps/student/views.py:1721
 msgid "Successfully reenabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1722
+#: common/djangoapps/student/views.py:1724
 msgid "Unexpected account status"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1817
+#: common/djangoapps/student/views.py:1819
 #, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1822
+#: common/djangoapps/student/views.py:1824
 #, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1924
+#: common/djangoapps/student/views.py:1926
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1993
+#: common/djangoapps/student/views.py:1995
 msgid "An access_token is required when passing value ({}) for provider."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2004
+#: common/djangoapps/student/views.py:2006
 msgid "The provided access_token is already associated with another user."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2006
+#: common/djangoapps/student/views.py:2008
 msgid "The provided access_token is not valid."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2254
-#: common/djangoapps/student/views.py:2380
-#: openedx/core/djangoapps/user_api/accounts/api.py:300
+#: common/djangoapps/student/views.py:2256
+#: common/djangoapps/student/views.py:2382
+#: openedx/core/djangoapps/user_api/accounts/api.py:311
 #: openedx/core/djangoapps/user_api/views.py:166
 msgid "Account creation not allowed."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2463
+#: common/djangoapps/student/views.py:2465
 #, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
@@ -791,12 +791,12 @@ msgid ""
 "issue."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2476
+#: common/djangoapps/student/views.py:2478
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2481
+#: common/djangoapps/student/views.py:2483
 #, python-brace-format
 msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
@@ -804,12 +804,12 @@ msgid ""
 "enrolled in. Sign In to continue."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2498
+#: common/djangoapps/student/views.py:2500
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2644
+#: common/djangoapps/student/views.py:2646
 #, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
@@ -820,7 +820,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:2655
+#: common/djangoapps/student/views.py:2657
 #, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
@@ -831,36 +831,36 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py:2702
+#: common/djangoapps/student/views.py:2704
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2728
+#: common/djangoapps/student/views.py:2730
 msgid "Error in resetting your password. Please try again."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2758
+#: common/djangoapps/student/views.py:2760
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2771
-#: common/djangoapps/student/views.py:2791
+#: common/djangoapps/student/views.py:2773
+#: common/djangoapps/student/views.py:2793
 msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py:2805
+#: common/djangoapps/student/views.py:2807
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2808
+#: common/djangoapps/student/views.py:2810
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2811
+#: common/djangoapps/student/views.py:2813
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:2854
+#: common/djangoapps/student/views.py:2856
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 
@@ -5000,14 +5000,14 @@ msgstr ""
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py:196
+#: lms/djangoapps/commerce/signals.py:284
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py:219
+#: lms/djangoapps/commerce/signals.py:307
 #: lms/djangoapps/shoppingcart/models.py:1893
 msgid "[Refund] User-Requested Refund"
 msgstr ""
@@ -6135,6 +6135,7 @@ msgstr ""
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py:1267
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py:111
+#: lms/djangoapps/student_account/views.py:424
 #: openedx/core/djangoapps/user_api/api.py:592
 msgid "City"
 msgstr ""
@@ -6763,6 +6764,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py:101
+#: lms/djangoapps/student_account/views.py:422
 #: openedx/core/djangoapps/user_api/api.py:664
 msgid "First Name"
 msgstr ""
@@ -6770,6 +6772,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py:102
+#: lms/djangoapps/student_account/views.py:423
 #: openedx/core/djangoapps/user_api/api.py:681
 msgid "Last Name"
 msgstr ""
@@ -6782,6 +6785,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py:104
+#: lms/djangoapps/student_account/views.py:427
 #: openedx/core/djangoapps/user_api/api.py:647
 msgid "Title"
 msgstr ""
@@ -8032,20 +8036,64 @@ msgstr ""
 msgid "You do not have permission to view this page."
 msgstr ""
 
-#: lms/djangoapps/student_account/views.py:222
+#: lms/djangoapps/student_account/views.py:221
 msgid "Some error occured during password change. Please try again"
 msgstr ""
 
-#: lms/djangoapps/student_account/views.py:226
+#: lms/djangoapps/student_account/views.py:225
 msgid "No email address provided."
 msgstr ""
 
-#: lms/djangoapps/student_account/views.py:329
+#: lms/djangoapps/student_account/views.py:328
 msgid "Create Account"
 msgstr ""
 
-#: lms/djangoapps/student_account/views.py:375
+#: lms/djangoapps/student_account/views.py:374
 msgid "Continue"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: lms/djangoapps/student_account/views.py:425
+#: openedx/core/djangoapps/user_api/api.py:613
+msgid "State/Province/Region"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: lms/djangoapps/student_account/views.py:426
+#: openedx/core/djangoapps/user_api/api.py:630
+msgid "Company"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: lms/djangoapps/student_account/views.py:428
+#: openedx/core/djangoapps/user_api/api.py:546
+msgid "Mailing address"
+msgstr ""
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: lms/djangoapps/student_account/views.py:429
+#: openedx/core/djangoapps/user_api/api.py:568
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: lms/djangoapps/student_account/views.py:432
+#: openedx/core/djangoapps/user_api/api.py:517
+msgid "Profession"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: lms/djangoapps/student_account/views.py:433
+#: openedx/core/djangoapps/user_api/api.py:533
+msgid "Specialty"
 msgstr ""
 
 #: lms/djangoapps/support/views/index.py:14
@@ -8262,122 +8310,122 @@ msgstr ""
 msgid "Verification photos received"
 msgstr ""
 
-#: lms/envs/common.py:55
+#: lms/envs/common.py:54
 msgid "Your Platform Name Here"
 msgstr ""
 
-#: lms/envs/common.py:56
+#: lms/envs/common.py:55
 msgid "Your Platform Description Here"
 msgstr ""
 
-#: lms/envs/common.py:694
+#: lms/envs/common.py:693
 msgid "Audit"
 msgstr ""
 
 #. Translators: This is the website name of www.facebook.com.  Please
 #. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py:2475
+#: lms/envs/common.py:2477
 msgid "Facebook"
 msgstr ""
 
-#: lms/envs/common.py:2477
+#: lms/envs/common.py:2479
 #, python-brace-format
 msgid "Like {platform_name} on Facebook"
 msgstr ""
 
 #. Translators: This is the website name of www.twitter.com.  Please
 #. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py:2482
+#: lms/envs/common.py:2484
 msgid "Twitter"
 msgstr ""
 
-#: lms/envs/common.py:2484
+#: lms/envs/common.py:2486
 #, python-brace-format
 msgid "Follow {platform_name} on Twitter"
 msgstr ""
 
 #. Translators: This is the website name of www.linkedin.com.  Please
 #. translate this the way that LinkedIn advertises in your language.
-#: lms/envs/common.py:2489
+#: lms/envs/common.py:2491
 msgid "LinkedIn"
 msgstr ""
 
-#: lms/envs/common.py:2491
+#: lms/envs/common.py:2493
 #, python-brace-format
 msgid "Follow {platform_name} on LinkedIn"
 msgstr ""
 
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
-#: lms/envs/common.py:2496
+#: lms/envs/common.py:2498
 msgid "Google+"
 msgstr ""
 
-#: lms/envs/common.py:2498
+#: lms/envs/common.py:2500
 #, python-brace-format
 msgid "Follow {platform_name} on Google+"
 msgstr ""
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
-#: lms/envs/common.py:2503
+#: lms/envs/common.py:2505
 msgid "Tumblr"
 msgstr ""
 
 #. Translators: This is the website name of www.meetup.com.  Please
 #. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py:2509
+#: lms/envs/common.py:2511
 msgid "Meetup"
 msgstr ""
 
 #. Translators: This is the website name of www.reddit.com.  Please
 #. translate this the way that Reddit advertises in your language.
-#: lms/envs/common.py:2515
+#: lms/envs/common.py:2517
 msgid "Reddit"
 msgstr ""
 
-#: lms/envs/common.py:2517
+#: lms/envs/common.py:2519
 #, python-brace-format
 msgid "Subscribe to the {platform_name} subreddit"
 msgstr ""
 
 #. Translators: This is the website name of https://vk.com.  Please
 #. translate this the way that VK advertises in your language.
-#: lms/envs/common.py:2522
+#: lms/envs/common.py:2524
 msgid "VK"
 msgstr ""
 
 #. Translators: This is the website name of http://www.weibo.com.  Please
 #. translate this the way that Weibo advertises in your language.
-#: lms/envs/common.py:2528
+#: lms/envs/common.py:2530
 msgid "Weibo"
 msgstr ""
 
 #. Translators: This is the website name of www.youtube.com.  Please
 #. translate this the way that YouTube advertises in your language.
-#: lms/envs/common.py:2534
+#: lms/envs/common.py:2536
 msgid "Youtube"
 msgstr ""
 
-#: lms/envs/common.py:2536
+#: lms/envs/common.py:2538
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr ""
 
-#: lms/envs/common.py:2981
+#: lms/envs/common.py:2983
 msgid "Your Platform Insights"
 msgstr ""
 
-#: lms/envs/common.py:2996
+#: lms/envs/common.py:2998
 msgid "Kosovo"
 msgstr ""
 
-#: lms/envs/common.py:3398
+#: lms/envs/common.py:3401
 #, python-brace-format
 msgid "Welcome to {platform_name}."
 msgstr ""
 
-#: lms/envs/common.py:3400
+#: lms/envs/common.py:3403
 #, python-brace-format
 msgid ""
 "{start_bold}{enterprise_name}{end_bold} has partnered with "
@@ -9855,44 +9903,6 @@ msgstr ""
 #. form used to select the user's year of birth.
 #: openedx/core/djangoapps/user_api/api.py:451
 msgid "Year of birth"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: openedx/core/djangoapps/user_api/api.py:517
-msgid "Profession"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: openedx/core/djangoapps/user_api/api.py:533
-msgid "Specialty"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/api.py:546
-msgid "Mailing address"
-msgstr ""
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/api.py:568
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/api.py:613
-msgid "State/Province/Region"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/api.py:630
-msgid "Company"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
