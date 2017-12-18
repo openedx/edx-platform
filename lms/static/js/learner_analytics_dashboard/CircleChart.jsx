@@ -34,14 +34,14 @@ class CircleChart extends React.Component {
     let lastY = 0;
 
     // Reverse a copy of the array so order start at 12 o'clock
-    return slices.slice(0).reverse().map(({ color, value }, index) => {
+    return slices.slice(0).reverse().map(({ value, sliceIndex }, index) => {
       // Should we just draw a circle?
       if (value === total) {
         return (
           <circle r={radius}
                   cx={center}
                   cy={center}
-                  fill={color}
+                  className="slice-1"
                   key={index} />
         );
       }
@@ -79,7 +79,7 @@ class CircleChart extends React.Component {
       lastY = nextY;
 
       return <path d={d}
-                   fill={color}
+                   className={`slice-${sliceIndex}`}
                    key={index}
                    stroke={strokeColor}
                    strokeWidth={strokeWidth} />;
@@ -109,7 +109,7 @@ CircleChart.defaultProps = {
 
 CircleChart.propTypes = {
   slices: PropTypes.array.isRequired,
-  centerHole: PropTypes.boolean,
+  centerHole: PropTypes.bool,
   sliceBorder: PropTypes.object
 };
 

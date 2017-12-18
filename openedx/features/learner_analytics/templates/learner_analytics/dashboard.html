@@ -52,13 +52,12 @@ from openedx.features.course_experience import course_home_page_title
             </nav>
         </div>
     </header>
-    <div class="page-content">
-        <div id="root" class="learner-analytics-dashboard">
+    <div class="page-content learner-analytics-dashboard-wrapper">
+        <div class="learner-analytics-dashboard">
             ${static.renderReact(
               component="LearnerAnalyticsDashboard",
               id="react-learner-analytics-dashboard",
               props={
-                'data': 'data',
                 'schedule': assignment_schedule,
                 'grading_policy': grading_policy,
               }
