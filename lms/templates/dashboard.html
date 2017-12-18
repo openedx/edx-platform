@@ -167,14 +167,17 @@ from student.models import CourseEnrollment
                     if not next_session:
                         continue
                     enrollment = CourseEnrollment(user=user, course_id=next_session['key'], mode=next_session['type'])
-
+                  # We only show email settings for entitlement cards if the entitlement has an associated enrollment
+                  show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
+                else:
+                  show_email_settings = (enrollment.course_id in show_email_settings_for)
+      
                 session_id = enrollment.course_id
                 show_courseware_link = (session_id in show_courseware_links_for)
                 cert_status = cert_statuses.get(session_id)
                 can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
                 can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
                 credit_status = credit_statuses.get(session_id)
-                show_email_settings = (session_id in show_email_settings_for)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
                 is_course_blocked = (session_id in block_courses)

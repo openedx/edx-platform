@@ -131,7 +131,6 @@
              if ($(event.target).data('optout') === 'False') {
                  $('#receive_emails').prop('checked', true);
              }
-             edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
          });
          $('.action-unenroll').click(function(event) {
              var isPaidCourse = $(event.target).data('course-is-paid-course') === 'True';
@@ -211,6 +210,7 @@
          });
 
          $('.action-email-settings').each(function(index) {
+             $(this).attr('id', 'email-settings-' + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
              var trigger = '#' + $(this).attr('id');
              accessibleModal(
@@ -219,7 +219,6 @@
                 '#email-settings-modal',
                 '#dashboard-main'
              );
-             $(this).attr('id', 'email-settings-' + index);
          });
 
          $('.action-unenroll').each(function(index) {
