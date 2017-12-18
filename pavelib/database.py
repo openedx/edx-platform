@@ -1,15 +1,38 @@
 """
-tasks for controlling the databases used in tests
+Tasks for controlling the databases used in tests
 """
 from __future__ import print_function
 import os
-import hashlib
 
-from paver.easy import sh, needs
+from paver.easy import needs
 
+from pavelib.utils.db_utils import (
+    remove_files_from_folder, apply_migrations, compute_fingerprint_and_write_to_disk,
+    fingerprint_bokchoy_db_files, does_fingerprint_on_disk_match, is_fingerprint_in_bucket,
+    get_file_from_s3, extract_files_from_zip, create_tarfile_from_db_cache, upload_to_s3
+)
 from pavelib.utils.passthrough_opts import PassthroughTask
 from pavelib.utils.timer import timed
-from pavelib.utils.envs import Env
+
+# Bokchoy db schema and data fixtures
+BOKCHOY_DB_FILES = [
+    'bok_choy_data_default.json',
+    'bok_choy_data_student_module_history.json',
+    'bok_choy_migrations_data_default.sql',
+    'bok_choy_migrations_data_student_module_history.sql',
+    'bok_choy_schema_default.sql',
+    'bok_choy_schema_student_module_history.sql'
+]
+
+# Output files from scripts/calculate-bokchoy-migrations.sh
+MIGRATION_OUTPUT_FILES = [
+    'bok_choy_default_migrations.yaml',
+    'bok_choy_student_module_history_migrations.yaml'
+]
+
+ALL_DB_FILES = BOKCHOY_DB_FILES + MIGRATION_OUTPUT_FILES
+CACHE_BUCKET_NAME = 'edx-tools-database-caches'
+CACHE_FOLDER = 'common/test/db_cache'
 
 
 @needs('pavelib.prereqs.install_prereqs')
@@ -17,88 +40,96 @@ from pavelib.utils.envs import Env
 @timed
 def update_bokchoy_db_cache():
     """
-    Update and cache the MYSQL database for bokchoy testing. This command
-    will remove any previously cached database files and apply migrations
-    on a fresh db. Additionally, the collective sha1 checksum for all of
-    these files will be written to file, for future comparisons/checking
-    for updates.
+    Update and cache the MYSQL database for bokchoy testing:
+    * Remove any previously cached database files
+    * Apply migrations on a fresh db
+    * Write the collective sha1 checksum for all of these files to disk
 
-    You can commit the resulting files in common/test/db_cache into
-    git to speed up test runs
+    WARNING: This will take several minutes.
     """
-    bokchoy_db_files = [
-        'bok_choy_data_default.json',
-        'bok_choy_data_student_module_history.json',
-        'bok_choy_migrations_data_default.sql',
-        'bok_choy_migrations_data_student_module_history.sql',
-        'bok_choy_schema_default.sql',
-        'bok_choy_schema_student_module_history.sql'
-    ]
     print('Removing cached db files for bokchoy tests')
-    for db_file in bokchoy_db_files:
-        try:
-            db_file_path = os.path.join(
-                '{}/common/test/db_cache'.format(Env.REPO_ROOT), db_file
-            )
-            os.remove(db_file_path)
-            print('\tRemoved {}'.format(db_file_path))
-        except OSError:
-            continue
-
-    sh('{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT))
-
-    # Write the fingerprint of the database files to disk for use in future
-    # comparisons
-    fingerprint = fingerprint_bokchoy_db_files()
-    with open('common/test/db_cache/bokchoy_migrations.sha1', 'w') as fingerprint_file:
-        fingerprint_file.write(fingerprint)
+    remove_files_from_folder(BOKCHOY_DB_FILES, CACHE_FOLDER)
+    apply_migrations(BOKCHOY_DB_FILES, update_cache_files=True)
+    compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
 
 
-def compare_bokchoy_db_fingerprints():
+@needs('pavelib.prereqs.install_prereqs')
+@PassthroughTask
+@timed
+def update_local_bokchoy_db_from_s3():
     """
-    Determine if the current state of the bokchoy databases and related files
-    have changed since the last time they were updated in the repository by
-    comparing their fingerprint to the fingerprint saved in the repo
+    Update the MYSQL database for bokchoy testing:
+    * Determine if your current cache files are up to date
+      with all the migrations
+    * If not then check if there is a copy up at s3
+    * If so then download then extract it
+    * Otherwise apply migrations as usual
     """
-    try:
-        fingerprint_filepath = '{}/common/test/db_cache/bokchoy_migrations.sha1'.format(Env.REPO_ROOT)
-        with open(fingerprint_filepath, 'r') as fingerprint_file:
-            cached_fingerprint = fingerprint_file.read().strip()
-    except IOError:
-        return False
-    current_fingerprint = fingerprint_bokchoy_db_files()
-    return current_fingerprint == cached_fingerprint
+    fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
+
+    if does_fingerprint_on_disk_match(fingerprint):
+        print ("DB cache files match the current migrations.")
+        # TODO: we don't really need to apply migrations, just to
+        # load the db cache files into the database.
+        apply_migrations(BOKCHOY_DB_FILES, update_cache_files=False)
+
+    elif is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
+        print ("Found updated bokchoy db files at S3.")
+        refresh_bokchoy_db_cache_from_s3(fingerprint=fingerprint)
+        # TODO: we don't really need to apply migrations, just to
+        # load the db cache files into the database.
+        apply_migrations(BOKCHOY_DB_FILES, update_cache_files=False)
+        # Write the new fingerprint to disk so that it reflects the
+        # current state of the system.
+        compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
+
+    else:
+        msg = "{} {} {}".format(
+            "Did not find updated bokchoy db files at S3.",
+            "Loading the bokchoy db files from disk",
+            "and running migrations."
+        )
+        print (msg)
+        apply_migrations(BOKCHOY_DB_FILES, update_cache_files=True)
+        # Write the new fingerprint to disk so that it reflects the
+        # current state of the system.
+        # E.g. you could have added a new migration in your PR.
+        compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
 
 
-def fingerprint_bokchoy_db_files():
+@needs('pavelib.prereqs.install_prereqs')
+@PassthroughTask
+@timed
+def refresh_bokchoy_db_cache_from_s3(fingerprint=None):
     """
-    Generate a sha1 checksum for files used to configure the bokchoy databases.
-    This checksum will represent the current 'state' of the databases,
-    including schema, migrations to be run and data. It can be used to determine
-    if the databases need to be updated.
+    If the cache files for the current fingerprint exist
+    in s3 then replace what you have on disk with those.
+    If no copy exists on s3 then continue without error.
     """
-    # Run the calculate-bokchoy-migrations script, which will generate two
-    # yml files. These tell whether or not we need to run migrations
-    sh('{}/scripts/calculate-bokchoy-migrations.sh'.format(Env.REPO_ROOT))
-    db_files = [
-        # Bokchoy db schema and data fixtures
-        'bok_choy_data_default.json',
-        'bok_choy_data_student_module_history.json',
-        'bok_choy_migrations_data_default.sql',
-        'bok_choy_migrations_data_student_module_history.sql',
-        'bok_choy_schema_default.sql',
-        'bok_choy_schema_student_module_history.sql',
-        # Output files from scripts/calculate-bokchoy-migrations.sh
-        'bok_choy_default_migrations.yaml',
-        'bok_choy_student_module_history_migrations.yaml'
-    ]
-    hasher = hashlib.sha1()
-    file_paths = [
-        os.path.join('common/test/db_cache', db_file) for db_file in db_files
-    ]
-    for file_path in file_paths:
-        with open(file_path, 'rb') as file_handle:
-            hasher.update(file_handle.read())
-    fingerprint = hasher.hexdigest()
-    print("Computed fingerprint for bokchoy db files: {}".format(fingerprint))
-    return fingerprint
+    if not fingerprint:
+        fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
+
+    bucket_name = CACHE_BUCKET_NAME
+    path = CACHE_FOLDER
+    if is_fingerprint_in_bucket(fingerprint, bucket_name):
+        zipfile_name = '{}.tar.gz'.format(fingerprint)
+        get_file_from_s3(bucket_name, zipfile_name, path)
+
+        zipfile_path = os.path.join(path, zipfile_name)
+        print ("Extracting db cache files.")
+        extract_files_from_zip(BOKCHOY_DB_FILES, zipfile_path, path)
+        os.remove(zipfile_path)
+
+
+@needs('pavelib.prereqs.install_prereqs')
+@PassthroughTask
+@timed
+def upload_db_cache_to_s3():
+    """
+    Update the S3 bucket with the bokchoy DB cache files.
+    """
+    fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
+    zipfile_name, zipfile_path = create_tarfile_from_db_cache(
+        fingerprint, BOKCHOY_DB_FILES, CACHE_FOLDER
+    )
+    upload_to_s3(zipfile_name, zipfile_path, CACHE_BUCKET_NAME)
