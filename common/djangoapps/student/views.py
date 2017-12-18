@@ -83,10 +83,14 @@ from openedx.core.djangoapps.external_auth.login_and_register import register as
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.programs.utils import (
+    ProgramDataExtender,
+    ProgramProgressMeter
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, WaffleFlag
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_url_name
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
@@ -780,7 +784,27 @@ def dashboard(request):
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
     meter = ProgramProgressMeter(request.site, user, enrollments=course_enrollments)
+    ecommerce_service = EcommerceService()
     inverted_programs = meter.invert_programs()
+
+    urls, program_data = {}, {}
+    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
+
+    if (bundles_on_dashboard_flag.is_enabled()):
+        programs_data = meter.programs
+        if programs_data:
+            program_data = meter.programs[0]
+            program_data = ProgramDataExtender(program_data, request.user).extend()
+            course_data = meter.progress(programs=[program_data], count_only=False)[0]
+
+            program_data.pop('courses')
+            skus = program_data.get('skus')
+
+            urls = {
+                'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
+                'buy_button_url': ecommerce_service.get_checkout_page_url(*skus)
+            }
+            urls['completeProgramURL'] = urls['buy_button_url'] + '&bundle=' + program_data.get('uuid')
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -879,6 +903,8 @@ def dashboard(request):
         course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id]  # pylint: disable=line-too-long
 
     context = {
+        'urls': urls,
+        'program_data': program_data,
         'enterprise_message': enterprise_message,
         'consent_required_courses': consent_required_courses,
         'enterprise_customer_name': enterprise_customer_name,
@@ -921,7 +947,6 @@ def dashboard(request):
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
     }
 
-    ecommerce_service = EcommerceService()
     if ecommerce_service.is_enabled(request.user):
         context.update({
             'use_ecommerce_payment_flow': True,
