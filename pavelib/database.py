@@ -6,6 +6,7 @@ import os
 import hashlib
 
 from paver.easy import sh, needs
+import boto
 
 from pavelib.utils.passthrough_opts import PassthroughTask
 from pavelib.utils.timer import timed
@@ -102,3 +103,27 @@ def fingerprint_bokchoy_db_files():
     fingerprint = hasher.hexdigest()
     print("Computed fingerprint for bokchoy db files: {}".format(fingerprint))
     return fingerprint
+
+
+def verify_fingerprint_in_bucket(fingerprint):
+    """
+    Ensure that a zip file matching the given fingerprint is present within an
+    s3 bucket
+    """
+    conn = boto.connect_s3()
+    bucket_name = os.environ.get(
+        'DB_CACHE_S3_BUCKET', 'edx-tools-database-caches'
+    )
+    bucket = conn.get_bucket(bucket_name)
+    zip_present = "{}.zip".format(fingerprint) in [
+        k.name for k in bucket.get_all_keys()
+    ]
+    if zip_present:
+        print(
+            "Found a match in the {} bucket".format(bucket_name)
+        )
+    else:
+        print(
+            "Couldn't find a match in the {} bucket".format(bucket_name)
+        )
+    return zip_present
