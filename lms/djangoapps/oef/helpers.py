@@ -3,6 +3,7 @@ import datetime
 from django.conf import settings
 
 from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserOefSurvey, UserAnswers, OptionLevel
+from oef.messages import NON_APPLICABLE_OEF, PENDING_DRAFT
 
 
 def get_user_survey_status(user, create_new_survey=True):
@@ -33,14 +34,14 @@ def get_user_survey_status(user, create_new_survey=True):
         }
 
     if uos.status == 'pending':
-        error = 'You have a pending survey'
+        error = PENDING_DRAFT
         is_eligible = False
         survey = uos.survey
     else:
         limit = settings.OEF_RENEWAL_DAYS
         if (datetime.date.today() - uos.started_on).days < limit:
             is_eligible = False
-            error = 'You can request a new OEF survey only after %s days of last survey' % limit
+            error = NON_APPLICABLE_OEF % limit
         elif create_new_survey:
             survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
 
