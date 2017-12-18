@@ -94,7 +94,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(2), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        with self.assertNumQueries(29), mock_get_score(1, 2):
+        with self.assertNumQueries(32), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(2):
@@ -106,7 +106,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        with self.assertNumQueries(12), mock_get_score(2, 2):
+        with self.assertNumQueries(15), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(2):

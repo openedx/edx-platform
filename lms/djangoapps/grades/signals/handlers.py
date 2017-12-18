@@ -248,4 +248,8 @@ def recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs)
     """
     previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
     if previous_course_grade and previous_course_grade.attempted:
-        CourseGradeFactory().update(user=user, course_key=course_key, force_update_subsections=True)
+        CourseGradeFactory().update(
+            user=user,
+            course_key=course_key,
+            force_update_subsections=True
+        )

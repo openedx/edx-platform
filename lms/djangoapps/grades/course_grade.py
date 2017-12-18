@@ -214,12 +214,12 @@ class CourseGradeBase(object):
         Returns a list of subsection grades for the given chapter.
         """
         return [
-            self._get_subsection_grade(course_structure[subsection_key])
+            self._get_subsection_grade(course_structure[subsection_key], self.force_update_subsections)
             for subsection_key in _uniqueify_and_keep_order(course_structure.get_children(chapter_key))
         ]
 
     @abstractmethod
-    def _get_subsection_grade(self, subsection):
+    def _get_subsection_grade(self, subsection, force_update_subsections=False):
         """
         Abstract method to be implemented by subclasses for returning
         the grade of the given subsection.
@@ -232,7 +232,7 @@ class ZeroCourseGrade(CourseGradeBase):
     Course Grade class for Zero-value grades when no problems were
     attempted in the course.
     """
-    def _get_subsection_grade(self, subsection):
+    def _get_subsection_grade(self, subsection, force_update_subsections=False):
         return ZeroSubsectionGrade(subsection, self.course_data)
 
 
@@ -276,9 +276,9 @@ class CourseGrade(CourseGradeBase):
                     return True
         return False
 
-    def _get_subsection_grade(self, subsection):
+    def _get_subsection_grade(self, subsection, force_update_subsections=False):
         if self.force_update_subsections:
-            return self._subsection_grade_factory.update(subsection)
+            return self._subsection_grade_factory.update(subsection, force_update_subsections)
         else:
             # Pass read_only here so the subsection grades can be persisted in bulk at the end.
             return self._subsection_grade_factory.create(subsection, read_only=True)
