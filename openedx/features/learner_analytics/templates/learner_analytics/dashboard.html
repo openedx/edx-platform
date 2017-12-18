@@ -58,12 +58,13 @@ from openedx.features.course_experience import course_home_page_title
               component="LearnerAnalyticsDashboard",
               id="react-learner-analytics-dashboard",
               props={
-                'data': 'data'
+                'data': 'data',
+                'schedule': assignment_schedule,
+                'grading_policy': grading_policy,
               }
             )}
         </div>
         <p>${assignment_grades}</p>
-        <p>${assignment_schedule}</p>
     </div>
 </div>
 </%block>
