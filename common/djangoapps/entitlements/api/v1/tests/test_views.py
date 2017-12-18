@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
+
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from mock import patch
 from opaque_keys.edx.locator import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -34,6 +37,13 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         self.user = UserFactory(is_staff=True)
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.course = CourseFactory()
+        self.course_mode = CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+
         self.entitlements_list_url = reverse('entitlements_api:v1:entitlements-list')
 
     def _get_data_set(self, user, course_uuid):
@@ -113,6 +123,37 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             user=self.user,
             course_uuid=course_uuid
         )
+        assert results == CourseEntitlementSerializer(course_entitlement).data
+
+    @patch("entitlements.api.v1.views.get_course_runs_for_course")
+    def test_add_entitlement_and_upgrade_audit_enrollment(self, mock_get_course_runs):
+        """
+        Verify that if an entitlement is added for a user, if the user has one upgradeable enrollment
+        that enrollment is upgraded to the mode of the entitlement and linked to the entitlement.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        mock_get_course_runs.return_value = [{'key': str(self.course.id)}]
+
+        # Add an audit course enrollment for user.
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.AUDIT)
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        results = response.data
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        # Assert that enrollment mode is now verified
+        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)[0]
+        assert enrollment_mode == course_entitlement.mode
+        assert course_entitlement.enrollment_course_run == enrollment
         assert results == CourseEntitlementSerializer(course_entitlement).data
 
     def test_non_staff_get_select_entitlements(self):
