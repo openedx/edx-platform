@@ -1,0 +1,120 @@
+<%namespace name='static' file='/static_content.html'/>
+
+<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.js')}"></script>
+<script type="text/javascript" src="${static.url('js/staff_debug_actions.js')}"></script>
+<script type="text/javascript">
+
+function setup_debug(element_id, edit_link, staff_context){
+    var staffDebugTrigger = $('#' + element_id + '_trig'),
+        xqaLogTrigger = $('#' + element_id + '_xqa_log'),
+        historyTrigger = $("#" + element_id + "_history_trig"),
+        debugModalSelector = '#' + element_id + '_debug',
+        historyModalSelector = '#' + element_id + '_history',
+        xqaModalSelector = '#' + element_id + '_xqa-modal',
+        leanOverlaySelector = $('#lean_overlay');
+
+    staffDebugTrigger.leanModal();
+    xqaLogTrigger.leanModal();
+    $('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
+
+    historyTrigger.leanModal();
+
+    $('#' + element_id + '_history_form').submit(
+        function () {
+            var username = $("#" + element_id + "_history_student_username").val();
+            var location = $("#" + element_id + "_history_location").val();
+
+            $("#" + element_id + "_history_text").load('/courses/' + "${unicode(course.id) | u}" +
+                "/submission_history/" + username + "/" + location);
+            return false;
+        }
+    );
+
+    DialogTabControls.setKeydownListener($(debugModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(historyModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(xqaModalSelector), leanOverlaySelector);
+
+    staffDebugTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(debugModalSelector);
+        $(debugModalSelector).attr("aria-hidden", "false");
+    });
+
+    historyTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(historyModalSelector);
+        $(historyModalSelector).attr("aria-hidden", "false");
+    });
+
+    xqaLogTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(xqaModalSelector);
+        $(xqaModalSelector).attr("aria-hidden", "false");
+    });
+
+    leanOverlaySelector.click(function () {
+        $(xqaModalSelector).attr("aria-hidden", "true");
+        $(historyModalSelector).attr("aria-hidden", "true");
+        $(debugModalSelector).attr("aria-hidden", "true");
+      })
+}
+
+function sendlog(element_id, edit_link, staff_context){
+
+    var xqaLog = {
+            authkey: staff_context.xqa_key,
+            location: staff_context.location,
+            category : staff_context.category,
+            'username' : staff_context.user.username,
+            'return' : 'query',
+            format : 'html',
+            email : staff_context.user.email,
+            tag:$('#' + element_id + '_xqa_tag').val(),
+            entry: $('#' + element_id + '_xqa_entry').val()
+        };
+
+    $.ajax({
+        url: '${xqa_server}/log',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaLog),
+        crossDomain: true,
+        dataType: 'jsonp',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
+        timeout : 1000,
+        success: function(result) {
+                $('#' + element_id + '_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
+            console.log('error!');
+        }
+    });
+    return false;
+};
+
+function getlog(element_id, staff_context){
+
+    var xqaQuery = {
+        authkey: staff_context.xqa_key,
+        location: staff_context.location,
+        format: 'html'
+    };
+
+    $.ajax({
+        url: '${xqa_server}/query',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaQuery),
+        crossDomain: true,
+        dataType: 'jsonp',
+        timeout : 1000,
+        success: function(result) {
+            $('#' + element_id + '_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
+        }
+    });
+
+
+};
+</script>

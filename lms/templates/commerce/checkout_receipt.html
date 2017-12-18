@@ -1,0 +1,61 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+<%block name="bodyclass">register verification-process step-requirements</%block>
+
+<%block name="pagetitle">${page_title}</%block>
+
+<%block name="header_extras">
+<script type="text/template" id="receipt-tpl">
+    <%static:include path="commerce/receipt.underscore" />
+</script>
+<script type="text/template" id="provider-tpl">
+    <%static:include path="commerce/provider.underscore" />
+</script>
+
+</%block>
+<%block name="js_extra">
+<script src="${static.url('js/vendor/jquery.ajax-retry.js')}"></script>
+<script src="${static.url('js/src/tooltip_manager.js')}"></script>
+<script src="${static.url('js/commerce/credit.js')}"></script>
+<script src="${static.url('js/commerce/views/receipt_view.js')}"></script>
+</%block>
+
+<%block name="content">
+<div id="error-container" class="hidden">
+    <div id="error" class="wrapper-msg wrapper-msg-activate">
+        <div class=" msg msg-activate">
+            <span class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+            <div class="msg-content">
+                <h3 class="title">
+                    <span class="sr">${error_summary}</span>
+                    ${error_summary}
+                </h3>
+                %if error_text:
+                <div class="copy">
+                    <p>${error_text}</p>
+                    <br/>
+                </div>
+                %endif
+                <div class="msg">
+                    <p>${for_help_text}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <section class="wrapper carousel">
+        <div id="receipt-container" class="pay-and-verify hidden" data-is-payment-complete='${is_payment_complete}'
+             data-platform-name='${platform_name}' data-verified='${verified}' data-username='${username}'
+                data-is-request-in-themed-site='${is_request_in_themed_site}'>
+            <h1>${_("Loading Order Data...")}</h1>
+            <span>${ _("Please wait while we retrieve your order details.") }</span>
+        </div>
+    </section>
+</div>
+</%block>

@@ -1,0 +1,13 @@
+<%page expression_filter="h" args="status, status_id='', hide_correctness=False"/>
+
+% if status_id == '':
+<span class="status ${'' if hide_correctness == True else status.classname}"
+      data-tooltip="${'' if hide_correctness == True else status.display_tooltip}">
+% else:
+<span class="status ${'' if hide_correctness == True else status.classname}" id="status_${status_id}"
+      data-tooltip="${'' if hide_correctness == True else status.display_tooltip}">
+% endif
+  % if hide_correctness == False:
+  <span class="sr">${status.display_name}</span><span class="status-icon" aria-hidden="true"></span>
+  % endif
+</span>

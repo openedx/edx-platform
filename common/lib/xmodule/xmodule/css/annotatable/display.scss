@@ -1,0 +1,192 @@
+/* TODO: move top-level variables to a common _variables.scss.
+ * NOTE: These variables were only added here because when this was integrated with the CMS,
+ * SASS compilation errors were triggered because the CMS didn't have the same variables defined
+ * that the LMS did, so the quick fix was to localize the LMS variables not shared by the CMS.
+ * -Abarrett and Vshnayder
+ */
+$annotatable--border-color: $gray-l3;
+$annotatable--body-font-size: em(14);
+
+.annotatable-wrapper {
+  position: relative;
+}
+
+.annotatable-header {
+  margin-bottom: 0.5em;
+}
+
+.annotatable-section {
+  position: relative;
+  padding: 0.5em 1em;
+  border: 1px solid $annotatable--border-color;
+  border-radius: 0.5em;
+  margin-bottom: 0.5em;
+
+  &.shaded { background-color: #ededed; }
+
+  .annotatable-section-title {
+    font-weight: bold;
+    a { font-weight: normal; }
+  }
+
+  .annotatable-section-body {
+    border-top: 1px solid $annotatable--border-color;
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+
+    @include clearfix();
+  }
+
+  ul.instructions-template {
+    list-style: disc;
+    margin-left: 4em;
+    b { font-weight: bold; }
+    i { font-style: italic; }
+
+    code {
+      display: inline;
+      white-space: pre;
+      font-family: Courier New, monospace;
+    }
+  }
+}
+
+.annotatable-toggle {
+  position: absolute;
+  right: 0;
+  margin: 2px 1em 2px 0;
+  &.expanded::after { content: " \2191"; }
+  &.collapsed::after { content: " \2193"; }
+}
+
+.annotatable-span {
+  @extend %ui-fake-link;
+
+  display: inline;
+
+  $highlight_index: 0;
+
+  @each $highlight in (
+    (yellow rgba(255, 255,10, 0.3) rgba(255, 255,10, 0.9)),
+    (red rgba(178,19,16,0.3) rgba(178,19,16,0.9)),
+    (orange rgba(255,165,0, 0.3) rgba(255,165,0, 0.9)),
+    (green rgba(25,255,132,0.3) rgba(25,255,132,0.9)),
+    (blue rgba(35,163,255,0.3) rgba(35,163,255,0.9)),
+    (purple rgba(115,9,178,0.3) rgba(115,9,178,0.9))) {
+
+    $highlight_index: $highlight_index + 1;
+    $marker: nth($highlight, 1);
+    $color: nth($highlight, 2);
+    $selected_color: nth($highlight, 3);
+
+    @if $highlight_index == 1 {
+      &.highlight {
+        background-color: $color;
+        &.selected { background-color: $selected_color; }
+      }
+    }
+
+    &.highlight-#{$marker} {
+      background-color: $color;
+      &.selected { background-color: $selected_color; }
+    }
+  }
+
+  &.hide {
+    cursor: none;
+    background-color: inherit;
+
+    .annotatable-icon {
+      display: none;
+    }
+  }
+
+  .annotatable-comment {
+    display: none;
+  }
+}
+
+.ui-tooltip.qtip.ui-tooltip {
+  font-size: $annotatable--body-font-size;
+  border: 1px solid #333;
+  border-radius: 1em;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: $white;
+  -webkit-font-smoothing: antialiased;
+
+  .ui-tooltip-titlebar {
+    font-size: em(16);
+    color: inherit;
+    background-color: transparent;
+    padding: ($baseline/4) ($baseline/2);
+    border: none;
+
+    .ui-tooltip-title {
+      padding: ($baseline/4) 0;
+      border-bottom: 2px solid #333;
+      font-weight: bold;
+    }
+
+    .ui-tooltip-icon {
+      right: 10px;
+      background: #333;
+    }
+
+    .ui-state-hover {
+      color: inherit;
+      border: 1px solid $gray-l3;
+    }
+  }
+
+  .ui-tooltip-content {
+    color: inherit;
+    font-size: em(14);
+    text-align: left;
+    font-weight: 400;
+    padding: 0 ($baseline/2) ($baseline/2) ($baseline/2);
+    background-color: transparent;
+    border-color: transparent;
+  }
+
+  p {
+    color: inherit;
+    line-height: normal;
+  }
+}
+
+.ui-tooltip.qtip.ui-tooltip-annotatable {
+  max-width: 375px;
+
+  .ui-tooltip-content {
+    padding: 0 ($baseline/2);
+
+    .annotatable-comment {
+      display: block;
+      margin: 0 0 ($baseline/2) 0;
+      max-height: 225px;
+      overflow: auto;
+      line-height: normal;
+    }
+
+    .annotatable-reply {
+      display: block;
+      border-top: 2px solid #333;
+      padding: ($baseline/4) 0;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  &::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    height: 0;
+    width: 0;
+    margin-left: -($baseline/4);
+    border: 10px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.85);
+  }
+}

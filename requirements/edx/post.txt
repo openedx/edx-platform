@@ -1,0 +1,12 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @edx/ospr - to check licensing
+#   * @edx/devops - to check system requirements
+
+# python-saml depends on lxml, which is referenced in base.txt. A bug exists
+# in setuptools 18.0.1 which results in an infinite loop during
+# resolution of this dependency during compilation. So we need to install
+# python-saml only after lxml has been successfully installed. 
+
+python-saml==2.2.1

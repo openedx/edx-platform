@@ -1,0 +1,158 @@
+<div class="wrapper-content-main payment-confirmation-step">
+  <article class="content-main">
+    <h3 class="title">
+      <%= HtmlUtils.interpolateHtml(
+        gettext( "Thank you! We have received your payment for {courseName}." ),
+        { courseName: HtmlUtils.joinHtml(
+          HtmlUtils.HTML('<span class="course-title">'),
+          courseName,
+          HtmlUtils.HTML('</span>')
+        ) }
+      ) %>
+    </h3>
+
+    <% if ( receipt ) { %>
+    <div class="list-info">
+      <div class="info-item payment-info">
+        <div class="copy">
+          <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %></p>
+        </div>
+
+        <div class="wrapper-report">
+          <table class="report report-receipt">
+            <thead>
+              <tr>
+                <th scope="col" ><%- gettext( "Order No." ) %></th>
+                <th scope="col" ><%- gettext( "Description" ) %></th>
+                <th scope="col" ><%- gettext( "Date" ) %></th>
+                <th scope="col" ><%- gettext( "Amount" ) %></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% for ( var i = 0; i < receipt.items.length; i++ ) { %>
+                <% if ( receipt.isRefunded ) { %>
+                  <td><del><%- receipt.orderNum %></del></td>
+                  <td><del><%- receipt.items[i].lineDescription %></del></td>
+                  <td><del><%- receipt.purchasedDatetime %></del></td>
+                  <td><del><%- receipt.items[i].cost %> (<%- receipt.currency.toUpperCase() %>)</del></td>
+                <% } else { %>
+                  <tr>
+                    <td><%- receipt.orderNum %></td>
+                    <td><%- receipt.items[i].lineDescription %></td>
+                    <td><%- receipt.purchasedDatetime %></td>
+                    <td><%- receipt.items[i].cost %> (<%- receipt.currency.toUpperCase() %>)</td>
+                  </tr>
+                <% } %>
+              <% } %>
+            </tbody>
+
+            <tfoot>
+              <tr>
+                <th scope="row" class="total-label" colspan="1"><%- gettext( "Total" ) %></th>
+                <td class="total-value" colspan="3">
+                  <span class="value-amount"><%- receipt.totalCost %></span>
+                   <span class="value-currency">(<%- receipt.currency.toUpperCase() %>)</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <% if ( receipt.isRefunded ) { %>
+          <div class="msg msg-refunds">
+            <h4 class="title sr"><%- gettext( "Please Note" ) %>: </h4>
+            <div class="copy">
+              <p><%- gettext( "Crossed out items have been refunded." ) %></p>
+            </div>
+          </div>
+          <% } %>
+        </div>
+
+        <div class="copy">
+          <p><%- gettext( "Billed to" ) %>:
+              <span class="name-first"><%- receipt.billedTo.firstName %></span>
+              <span class="name-last"><%- receipt.billedTo.lastName %></span>
+              (<span class="address-city"><%- receipt.billedTo.city %></span>,
+              <span class="address-state"><%- receipt.billedTo.state %></span>
+              <span class="address-postalcode"><%- receipt.billedTo.postalCode %></span>
+              <span class="address-country"><%- receipt.billedTo.country.toUpperCase() %></span>)
+          </p>
+        </div>
+      </div>
+    </div>
+    <% } else { %>
+        <p class="no-content"><%- gettext( "No receipt available" ) %></p>
+    <% } %>
+
+    <% if ( nextStepTitle ) { %>
+    <h3 class="title"><%- gettext( "Next Step: Confirm your identity" ) %></h3>
+
+    <div class="requirements-container">
+      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+        <% if ( requirements['account-activation-required'] ) { %>
+          <li class="req req-0 req-activate">
+            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+            <div class="placeholder-art">
+              <span class="icon fa fa-envelope-o" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-super"><%- gettext( "Check your email" ) %></span>
+                <span class="copy-sub"><%-
+                    gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email." )
+                  %>
+                </span>
+              </p>
+            </div>
+          </li>
+        <% } else { %>
+          <% if ( requirements['photo-id-required'] ) { %>
+          <li class="req req-1 req-id">
+            <h4 class="title"><%- gettext( "Photo ID" ) %></h4>
+            <div class="placeholder-art fa-lg">
+              <span class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></span>
+              <span class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-sub"><%- gettext( "A driver's license, passport, or government-issued ID with your name and photo." ) %></span>
+              </p>
+            </div>
+          </li>
+          <% } %>
+
+          <% if ( requirements['webcam-required'] ) { %>
+          <li class="req req-2 req-webcam">
+            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+            <div class="placeholder-art">
+              <span class="icon fa fa-video-camera" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy"></div>
+          </li>
+          <% } %>
+        <% } %>
+      </ul>
+    </div>
+
+    <nav class="nav-wizard is-ready">
+
+      <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- _.sprintf( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from %(platformName)s to verify your identity." ), { platformName: platformName } ) %>">
+        <%- gettext( "Want to confirm your identity later?" ) %>
+      </a>
+
+      <a id="verify_now_button"
+         class="next action-primary right"
+         href="<%- _.sprintf( '/verify_student/verify-now/%(courseKey)s', { courseKey: courseKey } ) %>"
+      >
+        <%- _.sprintf(
+          gettext( "Next: %(nextStepTitle)s" ),
+          { nextStepTitle: nextStepTitle }
+        ) %>
+      </a>
+    </nav>
+    <% } %>
+  </article>
+</div>

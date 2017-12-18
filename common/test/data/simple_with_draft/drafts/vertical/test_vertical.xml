@@ -1,0 +1,5 @@
+<vertical url_name='test_vertical' parent_sequential_url='i4x://edX/simple_with_draft/sequential/test_sequence' index_in_children_list="0">
+    <html url_name='test_html'>
+        Foobar - edit in draft
+    </html>
+</vertical>

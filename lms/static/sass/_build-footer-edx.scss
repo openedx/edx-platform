@@ -1,0 +1,18 @@
+// ----------------------------------------
+// LMS edx.org Footer: Shared Build Compile
+@import 'lms/theme/variables';
+@import 'bootstrap/variables';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/breakpoints';
+@import '../variables';
+@import 'lms/theme/variables-v1';
+@import 'base/mixins';
+
+footer#footer-edx-v3 {
+  @import 'base/extends';
+  @import 'base/base';
+}
+
+@import 'elements/typography';
+@import 'shared/footer-edx';
+@import 'lms/theme/extras';

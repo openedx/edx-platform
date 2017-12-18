@@ -1,0 +1,23 @@
+{
+  "extends": "eslint-config-edx-es5",
+  "globals": {  // Try to avoid adding any new globals.
+    // Old compatibility things and hacks
+    "edx": true,
+    "XBlock": true,
+
+    // added by Django i18n tools
+    "gettext": true,
+    "ngettext": true,
+
+    // added by jasmine-jquery
+    "loadFixtures": true,
+    "appendLoadFixtures": true,
+    "readFixtures": true,
+    "setFixtures": true,
+    "appendSetFixtures": true,
+    "spyOnEvent": true,
+
+    // used by our requirejs implementation
+    "RequireJS": true
+  }
+}

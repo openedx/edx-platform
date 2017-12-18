@@ -1,0 +1,11 @@
+[
+    {
+        "pk": 1,
+        "model": "grades.persistentgradesenabledflag",
+        "fields": {
+            "enabled": true,
+            "enabled_for_all_courses": true,
+            "change_date": "2016-09-01"
+        }
+    }
+]

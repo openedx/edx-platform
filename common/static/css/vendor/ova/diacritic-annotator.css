@@ -1,0 +1,8 @@
+.mark{
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 0%;
+}

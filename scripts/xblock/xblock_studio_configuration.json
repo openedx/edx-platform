@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "name": "audio",
+    },
+    {
+      "name": "discussion",
+    },
+    {
+      "name": "done",
+    },
+    {
+      "name": "drag-and-drop-v2",
+    },
+    {
+      "name": "html",
+    },
+    {
+      "name": "poll",
+    },
+    {
+      "name": "problem",
+    },
+    {
+      "name": "survey",
+    },
+    {
+      "name": "video",
+    },
+  ]
+}

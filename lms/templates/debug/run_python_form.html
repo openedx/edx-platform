@@ -1,0 +1,20 @@
+<%! from django.utils.translation import ugettext as _ %>
+<html><body>
+<div>
+<p>Python:</p>
+<form method='post'>
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    <div>
+        <textarea name='code' rows='20' cols='80'>${code|h}</textarea>
+    </div>
+    <input type='submit' value='Run it!'/>
+</form>
+</div>
+%if results:
+<div>
+    <p>${_("Results:")}</p>
+    <pre>
+${results|h}
+</pre>
+</div>
+%endif

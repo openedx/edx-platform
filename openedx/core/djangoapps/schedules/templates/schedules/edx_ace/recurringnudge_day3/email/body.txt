@@ -1,0 +1,20 @@
+{% autoescape off %}
+{% load i18n %}
+{% load ace %}
+{% if course_ids|length > 1 %}
+{% blocktrans trimmed %}
+    Remember when you enrolled in {{ course_name }}, and other courses on {{ platform_name }}? We do, and we’re glad
+    to have you! Come see what everyone is learning.
+{% endblocktrans %}
+
+{% trans "Start learning now" %} <{% with_link_tracking dashboard_url %}>
+{% else %}
+{% blocktrans trimmed %}
+    Remember when you enrolled in {{ course_name }} on {{ platform_name }}? We do, and we’re glad
+    to have you! Come see what everyone is learning.
+{% endblocktrans %}
+
+{% trans "Start learning now" %} <{% with_link_tracking course_url %}>
+{% endif %}
+{% include "ace_common/edx_ace/common/upsell_cta.txt"%}
+{% endautoescape %}

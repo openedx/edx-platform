@@ -1,0 +1,5 @@
+<course>
+  <chapter url_name="Overview">
+    <selfassessment url_name="SampleQuestion"/>
+  </chapter>
+</course>

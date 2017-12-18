@@ -1,0 +1,30 @@
+// ------------------------------
+// Open edX Certificates: Utilities
+
+// About: configuration, functions, variables, mixins, and general helpers for rendering.
+
+// #FUNCTIONS
+// #MIXINS
+// #HELPERS
+
+// ------------------------------
+// #FUNCTIONS
+// ------------------------------
+
+// ------------------------------
+// #MIXINS
+// ------------------------------
+
+// ------------------------------
+// #HELPERS
+// ------------------------------
+// visual dividers
+%divider-1 {
+  border-bottom-width: rem(4);
+  border-bottom-style: solid;
+}
+
+%divider-2 {
+  border-bottom-width: rem(2);
+  border-bottom-style: solid;
+}

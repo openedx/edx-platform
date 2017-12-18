@@ -1,0 +1,16 @@
+<%
+var copy = gettext("Never published");
+if (published_on && published_by) {
+    var message = gettext("Last published %(last_published_date)s by %(publish_username)s");
+    copy = interpolate(message, {
+        last_published_date: '<span class="date">' + published_on + '</span>',
+        publish_username: '<span class="user">' + published_by + '</span>'
+    }, true);
+} else if (published) {
+    copy = gettext("Previously published");
+}
+%>
+
+<div class="wrapper-last-publish">
+    <p class="copy"><%= copy %></p>
+</div>

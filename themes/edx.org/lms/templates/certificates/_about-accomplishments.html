@@ -1,0 +1,9 @@
+<%page expression_filter="h"/>
+<%! 
+from django.utils.translation import ugettext as _ 
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="accomplishment-metadata-bit accomplishment-metadata-aboutcert">
+    <h3 class="accomplishment-metadata-title">${_("About edX Verified Certificates")}</h3>
+    <p class="accomplishment-metadata-copy">${_("An edX Verified Certificate signifies that the learner has agreed to abide by the edX honor code and completed all of the required tasks of this course under its guidelines, as well as having their photo ID checked to verify their identity.")}</p>
+</div>

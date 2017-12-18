@@ -1,0 +1,120 @@
+/*
+ * This comes from the UXPL, and is modified for use.
+ * The UXPL isn't available retroactively, so this shims
+ * the headings from the UXPL with what we're using in
+ * the platform to better sync things up in the meantime.
+ * It is scoped to #seq_content, specifically for xblock.
+ *
+ * Once the UXPl is fitted retroactively, this can be removed.
+ */
+
+$headings-count: 8;
+
+$headings-font-weight-light:                200;
+$headings-font-weight-normal:               400;
+$headings-font-weight-bold:                 600;
+$headings-base-font-family:                 inherit;
+$headings-base-color:                       $gray-d2;
+
+%reset-headings {
+  margin: 0;
+  font-weight: $headings-font-weight-normal;
+  font-size: inherit;
+  line-height: inherit;
+  color: $headings-base-color;
+}
+
+%hd-1 {
+  margin-bottom: 1.41575em;
+  font-size: 2em;
+  line-height: 1.4em;
+}
+
+
+%hd-2 {
+  font-size: 1.1125em;
+  font-weight: $headings-font-weight-bold;
+  line-height: 1.4em;
+}
+
+
+%hd-3 {
+  margin-bottom: ($baseline / 2);
+  font-size: 1.35em;
+  font-weight: $headings-font-weight-normal;
+  line-height: 1.4em;
+}
+
+
+%hd-4 {
+  margin-bottom: ($baseline / 2);
+  font-size: 1.25em;
+  font-weight: $headings-font-weight-bold;
+  line-height: 1.4em;
+}
+
+
+%hd-5 {
+  margin-bottom: ($baseline / 2);
+  font-size: 1.1em;
+  font-weight: $headings-font-weight-bold;
+  line-height: 1.4em;
+}
+
+
+%hd-6 {
+  margin-bottom: ($baseline / 2);
+  font-size: 1em;
+  font-weight: $headings-font-weight-bold;
+  line-height: 1.4em;
+}
+
+%hd-7 {
+  margin-bottom: ($baseline / 4);
+  font-size: 14px;
+  font-weight: $headings-font-weight-bold;
+  text-transform: uppercase;
+  line-height: 1.6em;
+  letter-spacing: 1px;
+}
+
+%hd-8 {
+  margin-bottom: ($baseline / 8);
+  font-size: 12px;
+  font-weight: $headings-font-weight-bold;
+  text-transform: uppercase;
+  line-height: 1.5em;
+  letter-spacing: 1px;
+}
+
+.wrapper-xblock .xblock-render .xblock .xblock-render .xblock {
+  .hd-1,
+  .hd-2,
+  .hd-3,
+  .hd-4,
+  .hd-5,
+  .hd-6,
+  .hd-7,
+  .hd-8 {
+    @extend %reset-headings;
+  }
+
+
+  // ----------------------------
+  // #CANNED
+  // ----------------------------
+  // canned heading classes
+  @for $i from 1 through $headings-count {
+    .hd-#{$i} {
+      @extend %hd-#{$i};
+    }
+  }
+
+  h3 {
+    @extend %hd-2;
+
+    font-weight: $headings-font-weight-normal;
+    // override external modules and xblocks that use inline CSS
+    text-transform: initial;
+  }
+}

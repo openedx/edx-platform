@@ -1,0 +1,28 @@
+<form class="edit-textbook" id="edit_textbook_form">
+  <div class="wrapper-form">
+  <% if (error && error.message) { %>
+    <div id="edit_textbook_error" class="message message-status message-status error is-shown" name="edit_textbook_error">
+      <%- gettext(error.message) %>
+    </div>
+  <% } %>
+
+  <fieldset class="textbook-fields">
+    <legend class="sr"><%- gettext("Textbook information") %></legend>
+        <div class="input-wrap field text required add-textbook-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+          <label for="textbook-name-input"><%- gettext("Textbook Name") %></label>
+          <input id="textbook-name-input" name="textbook-name" type="text" placeholder="<%- gettext("Introduction to Cookie Baking") %>" value="<%- name %>">
+          <span class="tip tip-stacked"><%- gettext("provide the title/name of the text book as you would like your students to see it") %></span>
+        </div>
+  </fieldset>
+  <fieldset class="chapters-fields">
+    <legend class="sr"><%- gettext("Chapter information") %></legend>
+      <ol class="chapters list-input enum"></ol>
+
+    <button class="action action-add-chapter"><span class="icon fa fa-plus" aria-hidden="true"></span> <%- gettext("Add a Chapter") %></button>
+  </fieldset>
+  </div>
+  <div class="actions">
+    <button class="action action-primary" type="submit"><%- gettext("Save") %></button>
+    <button class="action action-secondary action-cancel"><%- gettext("Cancel") %></button>
+  </div>
+</form>

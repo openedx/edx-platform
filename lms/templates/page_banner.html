@@ -1,0 +1,28 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='static_content.html'/>
+<% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+%>
+
+<%
+banner_messages = list(PageLevelMessages.user_messages(request))
+%>
+
+% if banner_messages:
+    <div class="page-banner">
+        <div class="user-messages">
+            % for message in banner_messages:
+                <div class="alert ${message.css_class}" role="alert">
+                    <span class="icon icon-alert fa ${message.icon_class}" aria-hidden="true"></span>
+                    ${HTML(message.message_html)}
+                </div>
+            % endfor
+        </div>
+    </div>
+% endif

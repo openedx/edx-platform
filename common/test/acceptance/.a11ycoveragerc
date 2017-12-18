@@ -1,0 +1,36 @@
+[run]
+data_file = reports/a11y/.coverage
+source =
+    lms
+    cms
+    common/djangoapps
+    common/lib
+    openedx
+
+omit =
+    lms/envs/*
+    cms/envs/*
+    common/djangoapps/terrain/*
+    common/djangoapps/*/migrations/*
+    openedx/core/djangoapps/*/migrations/*
+    */test*
+    */management/*
+    */urls*
+    */wsgi*
+    lms/djangoapps/*/migrations/*
+    cms/djangoapps/*/migrations/*
+
+parallel = True
+
+[report]
+ignore_errors = True
+include =
+    **/views/*.py
+    **/views.py
+
+[html]
+title = Bok Choy A11y Test Coverage Report
+directory = reports/a11y/cover
+
+[xml]
+output = reports/a11y/coverage.xml

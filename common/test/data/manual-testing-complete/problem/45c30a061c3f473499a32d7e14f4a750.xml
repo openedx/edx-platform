@@ -1,0 +1,21 @@
+<problem weight="null" display_name="vsepr_input" markdown="null">
+  <p> The Dopamine molecule, as shown, cannot make ionic bonds. Edit the dopamine molecule so it can make ionic bonds. 
+    </p>
+  <p>
+        When you are ready, click "Check.” If you need to start over, click
+        "Reset.”
+    </p>
+  <script type="loncapa/python">
+def check1(expect, ans):
+    import json
+    mol_info = json.loads(ans)["info"]
+    return any(res == "Can Make Ionic Bonds" for res in mol_info)
+    </script>
+  <customresponse cfn="check1">
+    <editamoleculeinput file="/static/molecules/dopamine.mol">
+        </editamoleculeinput>
+  </customresponse>
+  <solution>
+    <img src="/static/Screen_Shot_2013-04-16_at_1.43.36_PM.png"/>
+  </solution>
+</problem>

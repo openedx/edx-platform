@@ -1,0 +1,24 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../main.html"/>
+<%!
+  from django.utils.translation import ugettext as _
+%>
+
+<%block name="pagetitle">${_("API Access Request")}</%block>
+
+<div id="api-access-wrapper" class="container">
+  <h1 id="api-header">
+    ${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}
+  </h1>
+
+  <div class="catalog-body">
+    <div class="api-form-container">
+      <form action="" method="post" class="api-form">
+        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+        ${form.as_p() | n}
+        <input id="api-access-submit" type="submit" value="${_('Request API Access')}"/>
+      </form>
+    </div>
+  </div>
+</div>

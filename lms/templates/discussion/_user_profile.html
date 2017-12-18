@@ -1,0 +1,10 @@
+<%! from django.utils.translation import ugettext as _, ungettext %>
+<%def name="span(num)"><span>${num}</span></%def>
+<div class="user-profile">
+  <div class="sidebar-username"><a class="learner-profile-link" href="${learner_profile_page_url}">${django_user.username | h}</a></div>
+  <div class="sidebar-user-roles">
+    ${", ".join(_(role_name) for role_name in django_user_roles)}
+  </div>
+  <div class="sidebar-threads-count">${ungettext('%s discussion started', '%s discussions started', profiled_user['threads_count']) % span(profiled_user['threads_count']) | h}</div>
+  <div class="sidebar-comments-count">${ungettext('%s comment', '%s comments', profiled_user['comments_count']) % span(profiled_user['comments_count']) | h}</div>
+</div>

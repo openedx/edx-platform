@@ -1,0 +1,57 @@
+<div class="tab-group tabs" tabindex="-1" role="dialog" aria-label="<%-
+    interpolate(
+        gettext('%(type)s Component Template Menu'),
+            {type: type},
+            true
+    )
+%>">
+    <ul class="problem-type-tabs nav-tabs" tabindex='-1'>
+        <li class="current">
+            <a class="link-tab" href="#tab1"><%- gettext("Common Problem Types") %></a>
+        </li>
+        <li>
+            <a class="link-tab" href="#tab2"><%- gettext("Advanced") %></a>
+        </li>
+    </ul>
+    <div class="tab current" id="tab1">
+        <ul class="new-component-template">
+            <% for (var i = 0; i < templates.length; i++) { %>
+                <% if (templates[i].tab == "common") { %>
+                    <% if (!templates[i].boilerplate_name) { %>
+                    <li class="editor-md empty">
+                        <button type="button" class="button-component" data-category="<%- templates[i].category %>">
+                            <%= HtmlUtils.HTML(support_indicator_template({support_level: templates[i].support_level})) %>
+                            <span class="name"><%- templates[i].display_name %></span>
+                        </button>
+                    </li>
+                    <% } else { %>
+                    <li class="editor-md">
+                        <button type="button" class="button-component" data-category="<%- templates[i].category %>"
+                           data-boilerplate="<%- templates[i].boilerplate_name %>">
+                            <%= HtmlUtils.HTML(support_indicator_template({support_level: templates[i].support_level})) %>
+                            <span class="name"><%- templates[i].display_name %></span>
+                        </button>
+                    </li>
+                    <% } %>
+                <% } %>
+            <% } %>
+        </ul>
+    </div>
+    <div class="tab" id="tab2">
+        <ul class="new-component-template">
+            <% for (var i = 0; i < templates.length; i++) { %>
+                <% if (templates[i].tab == "advanced") { %>
+                <li class="editor-manual">
+                    <button type="button" class="button-component" data-category="<%- templates[i].category %>"
+                       data-boilerplate="<%- templates[i].boilerplate_name %>">
+                        <%= HtmlUtils.HTML(support_indicator_template({support_level: templates[i].support_level})) %>
+                        <span class="name"><%- templates[i].display_name %></span>
+                    </button>
+                </li>
+                <% } %>
+            <% } %>
+        </ul>
+    </div>
+    <button class="cancel-button" data-type="<%- type %>"><%- gettext("Cancel") %></button>
+    <%= HtmlUtils.HTML(support_legend_template({support_legend: support_legend})) %>
+</div>

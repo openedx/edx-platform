@@ -1,0 +1,39 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+
+<%
+  import hashlib
+  import copy
+  import json
+  from xmodule.modulestore import EdxJSONEncoder
+  hlskey = hashlib.md5(module.location.to_deprecated_string().encode('utf-8')).hexdigest()
+%>
+
+## js templates
+% for template_name in ["metadata-editor", "license-selector"]:
+    <script id="${template_name}-tpl" type="text/template">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+% endfor
+% for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-list-entry", "metadata-dict-entry", "metadata-file-uploader-entry", "metadata-file-uploader-item"]:
+    <script id="${template_name}" type="text/template">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+% endfor
+
+<% showHighLevelSource='source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set'] and enable_latex_compiler %>
+<% metadata_field_copy = copy.copy(editable_metadata_fields) %>
+## Delete 'source_code' field (if it exists) so metadata editor view does not attempt to render it.
+% if 'source_code' in editable_metadata_fields:
+    ## source-edit.html needs access to the 'source_code' value, so delete from a copy.
+    <% del metadata_field_copy['source_code'] %>
+% endif
+
+% if showHighLevelSource:
+    <div class="launch-latex-compiler">
+      <a href="#hls-modal-${hlskey}" id="hls-trig-${hlskey}">${_("Launch Latex Source Compiler")}</a>
+    </div>
+    <%include file="source-edit.html" />
+% endif
+
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy, cls=EdxJSONEncoder) | h}'/>

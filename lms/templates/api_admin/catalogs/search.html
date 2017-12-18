@@ -1,0 +1,28 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../../main.html"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="pagetitle">${_("Catalog search")}</%block>
+
+<%block name="content">
+<div id="api-access-wrapper">
+  <h1 id="api-header">${_("Catalog Search")}</h1>
+
+  <div class="catalog-body">
+    <h2 class="api-subheading">${_("Enter a username to view catalogs belonging to that user.")}</h2>
+    <div class="api-form-container">
+      <form class="api-form" method="post" action="">
+        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <p>
+          <input name="username" type="text" maxlength="30" placeholder="${_('Username')}" />
+        </p>
+        <input id="catalog-search-submit" type="submit" value="${_('Search')}"/>
+      </form>
+    </div>
+  </div>
+</div>
+</%block>

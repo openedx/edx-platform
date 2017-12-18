@@ -1,0 +1,12 @@
+## mako
+Dear ${name},
+
+Your request for access to the ${platform_name} Course Catalog API has been approved. Sign in at ${api_management_url} using the same account you used to request API access to generate your API client credentials.
+
+Notes:
+- ${platform_name} recommends that you bookmark the ${api_management_url} page for easy access.
+- For more information about how to use the API client credentials to authenticate your API request, see the OAuth 2.0 documentation at ${authentication_docs_url}.
+- For questions about using this API, see the documentation at ${api_docs_url} or contact ${support_email_address}.
+
+Thanks!
+The ${platform_name} API team

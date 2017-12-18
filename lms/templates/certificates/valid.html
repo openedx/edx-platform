@@ -1,0 +1,15 @@
+<%inherit file="accomplishment-base.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+% if user.is_authenticated() and user.id == int(accomplishment_user_id):
+<%include file="_accomplishment-banner.html" />
+% endif
+<%include file="_accomplishment-introduction.html" />
+
+<%include file="_accomplishment-rendering.html" />
+<div class="wrapper-about">
+    <aside role="complementary" class="about" aria-label="About edX Certificates">
+        <%include file="_about-edx.html" />
+        <%include file="_about-accomplishments.html" />
+    </aside>
+</div>

@@ -1,0 +1,9 @@
+<div class="wrapper-comp-setting file-uploader">
+  <label class="label setting-label"><%= model.get('display_name') %></label>
+  <input type="hidden" id="<%= uniqueId %>" class="input setting-input" value="<%= model.get("value") %>">
+  <div class="wrapper-uploader-actions"></div>
+  <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
+        <span class="icon fa fa-undo" aria-hidden="true"></span><span class="sr">"<%= gettext("Clear Value") %>"</span>
+    </button>
+</div>
+<span class="tip setting-help"><%= model.get('help') %></span>

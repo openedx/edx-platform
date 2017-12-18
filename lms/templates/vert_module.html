@@ -1,0 +1,21 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
+%if unit_title:
+  <h2 class="hd hd-2 unit-title">${unit_title}</h2>
+% endif
+
+% if show_bookmark_button:
+    <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
+% endif
+
+<div class="vert-mod">
+% for idx, item in enumerate(items):
+  <div class="vert vert-${idx}" data-id="${item['id']}" \
+    % if item['id'] in watched_completable_blocks:
+      data-completable-by-viewing \
+    % endif
+      >
+    ${HTML(item['content'])}
+  </div>
+% endfor
+</div>

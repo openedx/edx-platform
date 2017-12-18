@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.markup import HTML, Text
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from django.conf import settings
+%>
+<%inherit file="main.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<section class="container unsubscribe">
+
+  <section class="message">
+    <h1>${_("Unsubscribe Successful!")}</h1>
+    <hr class="horizontal-divider">
+
+    <p>
+      ${Text(
+        _("You will no longer receive forum notification emails from {platform_name}. "
+          "You may {dashboard_link_start}return to your dashboard{link_end}. "
+          "If you did not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
+        )).format(
+            platform_name=settings.PLATFORM_NAME,
+            dashboard_link_start=HTML("<a href='{}'>").format(reverse('dashboard')),
+            undo_link_start=HTML("<a id='resub_link' href='{}'>").format(reverse('resubscribe_forum_update', args=[token])),
+            link_end=HTML("</a>"),
+        )}
+    </p>
+  </section>
+</section>

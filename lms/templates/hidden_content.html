@@ -1,0 +1,39 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="sequence hidden-content proctored-exam completed">
+    <h3>
+        % if self_paced:
+            ${_("The course has ended.")}
+        % else:
+            ${_("The due date for this assignment has passed.")}
+        % endif
+    </h3>
+    <hr>
+    <p>
+        % if self_paced:
+            ${Text(_(
+                "Because the course has ended, this assignment is no longer "
+                "available.{line_break}If you have completed this assignment, your "
+                "grade is available on the {link_start}progress page{link_end}."
+            )).format(
+                line_break=HTML("<br>"),
+                link_start=HTML("<a href='{}'>").format(progress_url),
+                link_end=HTML("</a>"),
+            )}
+        % else:
+            ${Text(_(
+                "Because the due date has passed, this assignment is no longer "
+                "available.{line_break}If you have completed this assignment, your "
+                "grade is available on the {link_start}progress page{link_end}."
+            )).format(
+                line_break=HTML("<br>"),
+                link_start=HTML("<a href='{}'>").format(progress_url),
+                link_end=HTML("</a>"),
+            )}
+        % endif
+    </p>
+</div>

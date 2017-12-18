@@ -1,0 +1,34 @@
+<div class="section" id="course-<%-uuid%>">
+    <div class="course-meta-container">
+        <div class="course-content">
+            <div class="course-details">
+                <h5 class="course-title">
+                    <% if ( (marketing_url || course_url) &&  !is_unfulfilled_entitlement) { %>
+                        <a href="<%- marketing_url || course_url %>" class="course-title-link">
+                            <%- title %>
+                        </a>
+                    <% } else { %>
+                        <%- title %>
+                    <% } %>
+                </h5>
+                <div class="course-text">
+                    <% if (enrolled && !user_entitlement) { %>
+                        <span class="enrolled"><%- enrolled %>: </span>
+                    <% } %>
+                    <% if (dateString && !is_unfulfilled_entitlement) { %>
+                        <span class="run-period"><%- dateString %></span>
+                        <% if (user_entitlement && !is_unfulfilled_entitlement) { %>
+                            <button class="change-session btn-link" aria-controls="change-session-<%-user_entitlement.uuid%>"> <%- gettext('Change Session')%></button>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+            <div class="course-actions"></div>
+        </div>
+        <div class="course-certificate certificate-status"></div>
+    </div>
+    <div class="course-entitlement-selection-container<% if (!is_unfulfilled_entitlement && user_entitlement) { %> hidden <% } %>"></div>
+</div>
+<div class="section action-msg-view"></div>
+<div class="section upgrade-message"></div>
+<div class="section expired-notification"></div>

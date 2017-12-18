@@ -1,0 +1,12 @@
+// Discussions - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+@import '../build-base-v1';
+
+// base - elements
+@import '../elements/typography';
+
+// app - discussion
+@import 'build-discussion';
+@import 'views/inline';

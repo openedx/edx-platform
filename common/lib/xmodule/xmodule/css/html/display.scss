@@ -1,0 +1,312 @@
+// HTML component display:
+* {
+  line-height: 1.4em;
+}
+
+h1 {
+  color: $body-color;
+  font: normal 2em/1.4em $font-family-sans-serif;
+  letter-spacing: 1px;
+
+  @include margin(0, 0, 1.416em, 0);
+}
+
+h2 {
+  color: #646464;
+  font: normal 1.2em/1.2em $font-family-sans-serif;
+  letter-spacing: 1px;
+  margin-bottom: ($baseline*0.75);
+  -webkit-font-smoothing: antialiased;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  @include margin(0, 0, ($baseline/2), 0);
+
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: 0.83em;
+}
+
+h6 {
+  font-size: 0.75em;
+}
+
+p {
+  margin-bottom: 1.416em;
+  font-size: 1em;
+  line-height: 1.6em !important;
+  color: $body-color;
+}
+
+em,
+i {
+  font-style: italic;
+
+  span {
+    font-style: italic;
+  }
+}
+
+strong,
+b {
+  font-weight: bold;
+
+  span {
+    font-weight: bold;
+  }
+}
+
+p + p,
+ul + p,
+ol + p {
+  margin-top: $baseline;
+}
+
+blockquote {
+  margin: 1em ($baseline*2);
+}
+
+ol,
+ul {
+  // Using the lower level Bi App Sass mixin to avoid @padding conflicts with bourbon.
+  @include bi-app-compact(padding, 0, 0, 0, 1em);
+
+  margin: 1em 0;
+  color: $body-color;
+
+  li {
+    margin-bottom: 0.708em;
+  }
+}
+
+ol {
+  list-style: decimal outside none;
+}
+
+ul {
+  list-style: disc outside none;
+}
+
+a {
+  &:link,
+  &:visited,
+  &:hover,
+  &:active,
+  &:focus {
+    color: $blue;
+  }
+}
+
+img {
+  max-width: 100%;
+}
+
+pre {
+  margin: 1em 0;
+  color: $body-color;
+  font-family: monospace, serif;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+code {
+  color: $body-color;
+  font-family: monospace, serif;
+  background: none;
+  padding: 0;
+}
+
+table {
+  width: 100%;
+  margin: $baseline 0;
+  border-collapse: collapse;
+  font-size: 16px;
+
+  td,
+  th {
+    margin: $baseline 0;
+    padding: ($baseline/2);
+    border: 1px solid $gray-l3;
+    font-size: 14px;
+
+    &.cont-justified-left {
+      text-align: left !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+    }
+
+    &.cont-justified-right {
+      text-align: right !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+    }
+
+    &.cont-justified-center {
+      text-align: center !important; // nasty, but needed to override the bad specificity of the xmodule css selectorsstyles
+    }
+  }
+}
+
+th {
+  background: #eee;
+  font-weight: bold;
+}
+
+
+// image modal
+// --------------------
+
+// modal - image zoom, fill window
+.wrapper-modal-image {
+  .modal-ui-icon {
+    @extend %ui-fake-link;
+
+    position: absolute;
+    display: block;
+    padding: ($baseline/4) 7px;
+    border-radius: 5px;
+    opacity: 0.9;
+    background: $white;
+    color: $black;
+    border: 2px solid $black;
+
+    .label {
+      font-weight: bold;
+    }
+
+    i {
+      font-style: normal;
+    }
+  }
+
+  .image-link {
+    @extend %ui-fake-link;
+
+    position: relative;
+    display: block;
+
+    .action-fullscreen {
+      display: none;
+      top: 10px;
+      left: 10px;
+    }
+
+    &:hover .action-fullscreen {
+      display: block;
+    }
+  }
+
+  .image-modal {
+    @extend %ui-fake-link;
+    @extend %ui-depth5;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+
+    .image-content {
+      position: relative;
+      top: 2.5%;
+      display: block;
+      height: 95%;
+      width: 95%;
+      margin: auto;
+      overflow: hidden;
+
+      .image-wrapper {
+        position: relative;
+
+        img {
+          position: relative;
+          display: block;
+          max-width: 100%;
+          max-height: 100%;
+          margin: auto;
+          cursor: default;
+        }
+      }
+
+      .action-close {
+        top: 10px;
+        right: 10px;
+      }
+
+      .image-controls {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        .image-control {
+          position: relative;
+          display: inline-block;
+          margin: 0;
+          padding: 0;
+
+          .modal-ui-icon {
+            position: relative;
+
+            &.action-zoom-in {
+              margin-right: ($baseline/4);
+            }
+
+            &.action-zoom-out {
+              margin-left: ($baseline/4);
+            }
+
+            &.is-disabled {
+              opacity: 0.5;
+              cursor: default;
+            }
+          }
+        }
+      }
+    }
+
+    &.image-is-fit-to-screen {
+      display: block;
+
+      // !important used here to override jQuery.
+      .image-content .image-wrapper {
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+
+        img {
+          top: 0 !important;
+          left: 0 !important;
+        }
+      }
+    }
+
+    &.image-is-zoomed {
+      display: block;
+
+      .image-content .image-wrapper {
+        img {
+          max-width: none;
+          max-height: none;
+          margin: 0;
+          cursor: move;
+        }
+      }
+    }
+  }
+}

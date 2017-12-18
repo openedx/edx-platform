@@ -1,0 +1,11 @@
+<% if (group_name) { %>
+    <%-
+    interpolate(
+        gettext('This post will be visible only to %(group_name)s.'),
+        {group_name: group_name},
+        true
+    )
+    %>
+<% } else { %>
+    <%- gettext('This post will be visible to everyone.') %>
+<% } %>

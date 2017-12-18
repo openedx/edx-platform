@@ -1,0 +1,12 @@
+{% load wiki_tags i18n %}
+{% include "wiki/includes/editormedia.html" %}
+
+<div>
+{% wiki_form edit_form %}
+<script language="javascript">
+  $(document).ready(function() {
+    $("#id_revision").val('{{ article.current_revision.id }}');
+    $("#div_id_title > .controls").attr('tabindex', -1).focus();
+  });
+</script>
+</div>
