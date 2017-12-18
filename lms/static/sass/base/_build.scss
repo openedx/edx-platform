@@ -3,17 +3,8 @@
 // Theme-specific variables
 @import 'lms/theme/variables';
 
-// Core Bootstrap functions, variables and mixins
-@import 'bootstrap/variables';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins/box-shadow';
-@import 'bootstrap/scss/mixins/breakpoints';
-@import 'bootstrap/scss/mixins/grid';
-@import 'bootstrap/scss/mixins/reset-text';
-
-// Bootstrap components
-@import 'bootstrap/scss/popover';
+// Bootstrap-specific mixins/functions/components
+@import 'bootstrap_for_legacy';
 
 // LMS-specific variables
 @import '../variables';
