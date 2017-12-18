@@ -2,19 +2,18 @@
 Tests for course wiki
 """
 
-import pytest
 from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
 from courseware.tests.tests import LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.tests.util import expected_redirect_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.
@@ -58,7 +57,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         resp = self.client.get(destination, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 302)
 
-        self.assertEqual(resp['Location'], 'http://testserver' + redirected_to)
+        self.assertEqual(resp['Location'], expected_redirect_url(redirected_to))
 
         # Now we test that the student will be redirected away from that page if the course doesn't exist
         # We do this in the same test because we want to make sure the redirected_to is constructed correctly
@@ -67,7 +66,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         resp = self.client.get(bad_course_wiki_page, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 302)
-        self.assertEqual(resp['Location'], 'http://testserver' + destination)
+        self.assertEqual(resp['Location'], expected_redirect_url(destination))
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': False})
     def test_wiki_no_root_access(self):
@@ -100,7 +99,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         ending_location = resp.redirect_chain[-1][0]
 
-        self.assertEquals(ending_location, 'http://testserver' + course_wiki_page)
+        self.assertEquals(ending_location, expected_redirect_url(course_wiki_page))
         self.assertEquals(resp.status_code, 200)
 
         self.has_course_navigator(resp)
