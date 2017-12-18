@@ -1,6 +1,6 @@
 import logging
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.authentication import JwtAuthentication
@@ -14,7 +14,7 @@ from entitlements.api.v1.filters import CourseEntitlementFilter
 from entitlements.api.v1.permissions import IsAdminOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import CourseEntitlementSerializer
 from entitlements.models import CourseEntitlement
-from entitlements.signals import REFUND_ENTITLEMENT
+from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.lib.api.paginators import DefaultPagination
@@ -30,6 +30,59 @@ class EntitlementsPagination(DefaultPagination):
     """
     page_size = 50
     max_page_size = 100
+
+
+@transaction.atomic
+def _unenroll_entitlement(course_entitlement, course_run_key):
+    """
+    Internal method to handle the details of Unenrolling a User in a Course Run.
+    """
+    CourseEnrollment.unenroll(course_entitlement.user, course_run_key, skip_refund=True)
+    course_entitlement.set_enrollment(None)
+
+
+@transaction.atomic
+def _process_revoke_and_unenroll_entitlement(course_entitlement, is_refund=False):
+    """
+    Process the revoke of the Course Entitlement and refund if needed
+
+    Arguments:
+        course_entitlement: Course Entitlement Object
+
+        is_refund (bool): True if a refund should be processed
+
+    Exceptions:
+        IntegrityError if there is an issue that should reverse the database changes
+    """
+    if course_entitlement.expired_at is None:
+        course_entitlement.expired_at = timezone.now()
+        log.info(
+            'Set expired_at to [%s] for course entitlement [%s]',
+            course_entitlement.expired_at,
+            course_entitlement.uuid
+        )
+        course_entitlement.save()
+
+    if course_entitlement.enrollment_course_run is not None:
+        course_id = course_entitlement.enrollment_course_run.course_id
+        _unenroll_entitlement(course_entitlement, course_id)
+        log.info(
+            'Unenrolled user [%s] from course run [%s] as part of revocation of course entitlement [%s]',
+            course_entitlement.user.username,
+            course_id,
+            course_entitlement.uuid
+        )
+
+    if is_refund:
+        refund_successful = refund_entitlement(course_entitlement=course_entitlement)
+        if not refund_successful:
+            # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
+            log.warn(
+                'Entitlement Refund failed for Course Entitlement [%s], alert User',
+                course_entitlement.uuid
+            )
+            # Force Transaction reset with an Integrity error exception, this will revert all previous transactions
+            raise IntegrityError
 
 
 class EntitlementViewSet(viewsets.ModelViewSet):
@@ -115,7 +168,10 @@ class EntitlementViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         # Note, the entitlement is re-serialized before getting added to the Response,
         # so that the 'modified' date reflects changes that occur when upgrading enrollment.
-        return Response(CourseEntitlementSerializer(entitlement).data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            CourseEntitlementSerializer(entitlement).data,
+            status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -149,31 +205,19 @@ class EntitlementViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         """
-        This method is an override and is called by the DELETE method
-        """
-        save_model = False
-        if instance.expired_at is None:
-            instance.expired_at = timezone.now()
-            log.info('Set expired_at to [%s] for course entitlement [%s]', instance.expired_at, instance.uuid)
-            save_model = True
+        This method is an override and is called by the destroy method, which is called when a DELETE operation occurs
 
-        if instance.enrollment_course_run is not None:
-            CourseEnrollment.unenroll(
-                user=instance.user,
-                course_id=instance.enrollment_course_run.course_id,
-                skip_refund=True
-            )
-            enrollment = instance.enrollment_course_run
-            instance.enrollment_course_run = None
-            save_model = True
-            log.info(
-                'Unenrolled user [%s] from course run [%s] as part of revocation of course entitlement [%s]',
-                instance.user.username,
-                enrollment.course_id,
-                instance.uuid
-            )
-        if save_model:
-            instance.save()
+        This method will revoke the User's entitlement and unenroll the user if they are enrolled
+        in a Course Run
+
+        It is assumed the user has already been refunded.
+        """
+        log.info(
+            'Entitlement Revoke requested for Course Entitlement[%s]',
+            instance.uuid
+        )
+        # This is not called with is_refund=True here because it is assumed the user has already been refunded.
+        _process_revoke_and_unenroll_entitlement(instance)
 
 
 class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
@@ -198,6 +242,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 return True
         return False
 
+    @transaction.atomic
     def _enroll_entitlement(self, entitlement, course_run_key, user):
         """
         Internal method to handle the details of enrolling a User in a Course Run.
@@ -234,13 +279,6 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
 
         entitlement.set_enrollment(enrollment)
         return None
-
-    def _unenroll_entitlement(self, entitlement, course_run_key, user):
-        """
-        Internal method to handle the details of Unenrolling a User in a Course Run.
-        """
-        CourseEnrollment.unenroll(user, course_run_key, skip_refund=True)
-        entitlement.set_enrollment(None)
 
     def create(self, request, uuid):
         """
@@ -299,10 +337,9 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             if response:
                 return response
         elif entitlement.enrollment_course_run.course_id != course_run_id:
-            self._unenroll_entitlement(
-                entitlement=entitlement,
-                course_run_key=entitlement.enrollment_course_run.course_id,
-                user=request.user
+            _unenroll_entitlement(
+                course_entitlement=entitlement,
+                course_run_key=entitlement.enrollment_course_run.course_id
             )
             response = self._enroll_entitlement(
                 entitlement=entitlement,
@@ -338,41 +375,33 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             )
 
         if is_refund and entitlement.is_entitlement_refundable():
-            with transaction.atomic():
-                # Revoke and refund the entitlement
-                if entitlement.enrollment_course_run is not None:
-                    self._unenroll_entitlement(
-                        entitlement=entitlement,
-                        course_run_key=entitlement.enrollment_course_run.course_id,
-                        user=request.user
-                    )
+            # Revoke the Course Entitlement and issue Refund
+            log.info(
+                'Entitlement Refund requested for Course Entitlement[%s]',
+                entitlement.uuid
+            )
 
-                # Revoke the Course Entitlement and issue Refund
-                log.info(
-                    'Entitlement Refund requested for Course Entitlement[%s]',
-                    str(entitlement.uuid)
-                )
+            try:
+                _process_revoke_and_unenroll_entitlement(course_entitlement=entitlement, is_refund=True)
+            except IntegrityError:
+                # This state is reached when there was a failure in revoke and refund process resulting
+                # in a reversion of DB changes
+                return Response(
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={
+                        'message': 'Entitlement revoke and refund failed due to refund internal process failure'
+                    })
 
-                REFUND_ENTITLEMENT.send(sender=None, course_entitlement=entitlement)
-                entitlement.expired_at_datetime = timezone.now()
-                entitlement.save()
-
-                log.info(
-                    'Set expired_at to [%s] for course entitlement [%s]',
-                    entitlement.expired_at,
-                    entitlement.uuid
-                )
         elif not is_refund:
             if entitlement.enrollment_course_run is not None:
-                self._unenroll_entitlement(
-                    entitlement=entitlement,
-                    course_run_key=entitlement.enrollment_course_run.course_id,
-                    user=request.user
+                _unenroll_entitlement(
+                    course_entitlement=entitlement,
+                    course_run_key=entitlement.enrollment_course_run.course_id
                 )
         else:
             log.info(
                 'Entitlement Refund failed for Course Entitlement [%s]. Entitlement is not refundable',
-                str(entitlement.uuid)
+                entitlement.uuid
             )
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
