@@ -84,6 +84,7 @@ import student
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from third_party_auth.utils import user_exists
 
 from . import provider
 
@@ -501,7 +502,7 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # choice of the user.
 
 
-def redirect_to_custom_form(request, auth_entry, kwargs):
+def redirect_to_custom_form(request, auth_entry, details, kwargs):
     """
     If auth_entry is found in AUTH_ENTRY_CUSTOM, this is used to send provider
     data to an external server's registration/login page.
@@ -520,7 +521,7 @@ def redirect_to_custom_form(request, auth_entry, kwargs):
         "auth_entry": auth_entry,
         "backend_name": backend_name,
         "provider_id": provider_id,
-        "user_details": kwargs['details'],
+        "user_details": details,
     })
     digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
     # Store the data in the session temporarily, then redirect to a page that will POST it to
@@ -535,7 +536,7 @@ def redirect_to_custom_form(request, auth_entry, kwargs):
 
 @partial.partial
 def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None, current_partial=None,
-                            allow_inactive_user=False, *args, **kwargs):
+                            allow_inactive_user=False, details=None, *args, **kwargs):
     """
     Ensure that we have the necessary information about a user (either an
     existing account or registration data) to proceed with the pipeline.
@@ -567,6 +568,11 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
     if not user:
+        if user_exists(details or {}):
+            # User has not already authenticated and the details sent over from
+            # identity provider belong to an existing user.
+            return dispatch_to_login()
+
         if is_api(auth_entry):
             return HttpResponseBadRequest()
         elif auth_entry == AUTH_ENTRY_LOGIN:
@@ -583,7 +589,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
             # Pass the username, email, etc. via query params to the custom entry page:
-            return redirect_to_custom_form(strategy.request, auth_entry, kwargs)
+            return redirect_to_custom_form(strategy.request, auth_entry, details or {}, kwargs)
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 
