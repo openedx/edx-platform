@@ -643,6 +643,10 @@ def videos_index_html(course):
                 'transcript_credentials_handler',
                 unicode(course.id)
             ),
+            'transcript_download_handler_url': reverse_course_url(
+                'transcript_download_handler',
+                unicode(course.id)
+            ),
             'transcription_plans': get_3rd_party_transcription_plans(),
             'trancript_download_file_format': TRANSCRIPT_DOWNLOAD_FILE_FORMAT
         }
