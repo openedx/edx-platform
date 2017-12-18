@@ -8,8 +8,6 @@
 	</div>
 <% } %>
 
-<h2><%- gettext('Create an Account')%></h2>
-
 <form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
 
     <% if (!context.currentProvider) { %>
