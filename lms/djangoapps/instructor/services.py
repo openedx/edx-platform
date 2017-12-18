@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import lms.djangoapps.instructor.enrollment as enrollment
 from courseware.models import StudentModule
-from lms.djangoapps.commerce.signals import create_zendesk_ticket
+from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from student import auth
 from student.roles import CourseStaffRole
