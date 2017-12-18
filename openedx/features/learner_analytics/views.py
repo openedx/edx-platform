@@ -65,7 +65,15 @@ class LearnerAnalyticsView(View):
             course_key: CourseKey
         """
         course_grade = CourseGradeFactory().read(user, course_key=course_key)
-        return course_grade.subsection_grades
+        grades = {}
+        for (subsection, subsection_grade) in course_grade.subsection_grades.iteritems():
+            grades[unicode(subsection)] = {
+                'assignment_type': subsection_grade.format,
+                'total_earned': subsection_grade.graded_total.earned,
+                'total_possible': subsection_grade.graded_total.possible,
+            }
+        return json.dumps(grades)
+
 
     def get_schedule(self, request, course_key):
         """
@@ -84,4 +92,8 @@ class LearnerAnalyticsView(View):
             requested_fields=['display_name', 'due', 'graded', 'format'],
             block_types_filter=['sequential']
         )
-        return all_blocks
+        graded_blocks = {}
+        for block in all_blocks['blocks']:
+            if all_blocks['blocks'][block].get('graded', False):
+                graded_blocks[block] = all_blocks['blocks'][block]
+        return json.dumps(graded_blocks)
