@@ -376,11 +376,15 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs):
         """
-        When a learner has an unfulfilled, expired entitlement, their course dashboard should have:
-            - a hidden 'View Course' button
-            - a message saying that they can no longer select a session
+        When a learner has an unfulfilled, expired entitlement, a card should NOT appear on the dashboard.
+        This use case represents either an entitlement that the user waited too long to fulfill, or an entitlement
+        for which they received a refund.
         """
-        CourseEntitlementFactory(user=self.user, created=self.THREE_YEARS_AGO)
+        CourseEntitlementFactory(
+            user=self.user,
+            created=self.THREE_YEARS_AGO,
+            expired_at=datetime.datetime.now()
+        )
         mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
         mock_course_runs.return_value = [
             {
@@ -391,9 +395,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
             }
         ]
         response = self.client.get(self.path)
-        self.assertIn('class="enter-course hidden"', response.content)
-        self.assertIn('You can no longer select a session', response.content)
-        self.assertNotIn('<div class="course-entitlement-selection-container ">', response.content)
+        self.assertEqual(response.content.count('<li class="course-item">'), 0)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.get_course_runs_for_course')

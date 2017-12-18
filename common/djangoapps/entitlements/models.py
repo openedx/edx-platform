@@ -257,3 +257,32 @@ class CourseEntitlement(TimeStampedModel):
     @classmethod
     def unexpired_entitlements_for_user(cls, user):
         return cls.objects.filter(user=user, expired_at=None).select_related('user')
+
+    @classmethod
+    def get_entitlement_if_active(cls, user, course_uuid):
+        """
+        Returns an entitlement for a given course uuid if an active entitlement exists, otherwise returns None.
+        An active entitlement is defined as an entitlement that has not yet expired or has a currently enrolled session.
+        """
+        return cls.objects.filter(
+            user=user,
+            course_uuid=course_uuid
+        ).exclude(expired_at__isnull=False, enrollment_course_run=None).first()
+
+    @classmethod
+    def get_active_entitlements_for_user(cls, user):
+        """
+        Returns a list of active (enrolled or not yet expired) entitlements.
+
+        Returns any entitlements that are:
+            1) Not expired and no session selected
+            2) Not expired and a session is selected
+            3) Expired and a session is selected
+
+        Does not return any entitlements that are:
+            1) Expired and no session selected
+        """
+        return cls.objects.filter(user=user).exclude(
+            expired_at__isnull=False,
+            enrollment_course_run=None
+        ).select_related('user').select_related('enrollment_course_run')

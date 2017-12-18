@@ -25,9 +25,7 @@
                 <% if (user_entitlement && user_entitlement.expiration_date) { %>
                     <div class="info-expires-at">
                         <% if (is_unfulfilled_entitlement) { %>
-                            <% if (user_entitlement.expired_at) { %>
-                                <%- StringUtils.interpolate(gettext('You can no longer select a session. Your final day to select a session was {expiration_date}.'), {expiration_date: user_entitlement.expiration_date}) %>
-                            <% } else { %>
+                            <% if (!user_entitlement.expired_at) { %>
                                 <%- StringUtils.interpolate(gettext('You must select a session by {expiration_date} to access the course.'), {expiration_date: user_entitlement.expiration_date}) %>
                             <% } %>
                         <% } else { %>

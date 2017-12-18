@@ -698,7 +698,7 @@ def dashboard(request):
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
-    course_entitlements = list(CourseEntitlement.objects.filter(user=user).select_related('enrollment_course_run'))
+    course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
     course_entitlement_available_sessions = {}
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
