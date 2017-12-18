@@ -18,6 +18,7 @@ define(
                         defaultVideoImageURL: options.defaultVideoImageURL,
                         videoHandlerUrl: options.videoHandlerUrl,
                         videoImageSettings: options.videoImageSettings,
+                        videoTranscriptSettings: options.videoTranscriptSettings,
                         model: model,
                         transcriptAvailableLanguages: options.transcriptAvailableLanguages,
                         videoSupportedFileFormats: options.videoSupportedFileFormats,

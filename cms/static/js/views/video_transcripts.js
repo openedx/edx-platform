@@ -85,7 +85,8 @@ define(
                         transcriptAvailableLanguages: this.sortByValue(this.transcriptAvailableLanguages),
                         edxVideoID: this.edxVideoID,
                         transcriptClientTitle: this.getTranscriptClientTitle(),
-                        transcriptDownloadFileFormat: this.videoTranscriptSettings.trancript_download_file_format
+                        transcriptDownloadFileFormat: this.videoTranscriptSettings.trancript_download_file_format,
+                        transcriptDownloadHandlerUrl: this.videoTranscriptSettings.transcript_download_handler_url
                     })
                 );
                 return this;
