@@ -395,16 +395,18 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn('You can no longer select a session', response.content)
         self.assertNotIn('<div class="course-entitlement-selection-container ">', response.content)
 
+    @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
     @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs):
+    def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has a fulfilled entitlement, their course dashboard should have:
             - exactly one course item, meaning it:
                 - has an entitlement card
                 - does NOT have a course card referencing the selected session
             - an unhidden Change Session button
+            - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
@@ -420,20 +422,27 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
                 'type': 'verified'
             }
         ]
-        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        program = ProgramFactory()
+        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['uuid'] = entitlement.course_uuid
+        mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
         self.assertEqual(response.content.count('<li class="course-item">'), 1)
         self.assertIn('<button class="change-session btn-link "', response.content)
+        self.assertIn('Related Programs:', response.content)
 
+    @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
     @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs):
+    def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has a fulfilled entitlement that is expired, their course dashboard should have:
             - exactly one course item, meaning it:
                 - has an entitlement card
             - Message that the learner can no longer change sessions
+            - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
@@ -449,10 +458,15 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
                 'type': 'verified'
             }
         ]
-        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
+        program = ProgramFactory()
+        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['uuid'] = entitlement.course_uuid
+        mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
         self.assertEqual(response.content.count('<li class="course-item">'), 1)
         self.assertIn('You can no longer change sessions.', response.content)
+        self.assertIn('Related Programs:', response.content)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

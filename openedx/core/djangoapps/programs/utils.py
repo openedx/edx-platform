@@ -120,7 +120,6 @@ class ProgramProgressMeter(object):
                     program_list = inverted_programs[course_uuid]
                     if program not in program_list:
                         program_list.append(program)
-                    continue
                 for course_run in course['course_runs']:
                     course_run_id = course_run['key']
                     if course_run_id in self.course_run_ids:
