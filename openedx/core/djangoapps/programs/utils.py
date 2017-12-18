@@ -222,10 +222,8 @@ class ProgramProgressMeter(object):
             completed, in_progress, not_started = [], [], []
 
             for course in program_copy['courses']:
-                try:
-                    entitlement = CourseEntitlement.objects.get(user=self.user, course_uuid=course['uuid'])
-                except CourseEntitlement.DoesNotExist:
-                    entitlement = None
+                entitlement = CourseEntitlement.objects.filter(user=self.user,
+                                                               course_uuid=course['uuid']).first()
 
                 if self._is_course_complete(course):
                     completed.append(course)
