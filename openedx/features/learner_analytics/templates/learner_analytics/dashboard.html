@@ -46,6 +46,7 @@ from openedx.features.course_experience import course_home_page_title
                         </span>
                         <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                         <span class="nav-item">${_('Learner Analytics')}</span>
+
                     </div>
                 </div>
             </nav>
@@ -57,10 +58,13 @@ from openedx.features.course_experience import course_home_page_title
               component="LearnerAnalyticsDashboard",
               id="react-learner-analytics-dashboard",
               props={
-                'data': 'data'
+                'data': 'data',
+                'schedule': assignment_schedule,
+                'grading_policy': grading_policy,
               }
             )}
         </div>
+        <p>${assignment_grades}</p>
     </div>
 </div>
 </%block>
