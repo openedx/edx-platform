@@ -18,6 +18,11 @@ WAFFLE_NAMESPACE = 'completion'
 # xblocks.
 ENABLE_COMPLETION_TRACKING = 'enable_completion_tracking'
 
+# Full name: completion.enable_completion_aggregation
+# Indicates whether or not to track completion of aggregate blocks.  Keeping
+# this disabled will prevent creation of AggregateCompletion objects in the database
+ENABLE_COMPLETION_AGGREGATION = 'enable_completion_aggregation'
+
 
 def waffle():
     """
