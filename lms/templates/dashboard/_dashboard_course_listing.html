@@ -131,9 +131,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % if is_unfulfilled_entitlement:
                     <span class="info-date-block" aria-live="polite">
                         <span class="icon fa fa-warning" aria-hidden="true"></span>
-                        % if entitlement_expired_at:
-                            ${_('You can no longer select a session, your final day to select a session was {entitlement_expired_at}.').format(entitlement_expired_at=entitlement_expired_at)}
-                        % else:
+                        % if not entitlement_expired_at:
                             % if entitlement_expiration_date:
                                 ${_('You must select a session by {expiration_date} to access the course.').format(expiration_date=entitlement_expiration_date)}
                             % else:
@@ -156,7 +154,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
             </span>
             % if entitlement and not is_unfulfilled_entitlement and entitlement_expiration_date:
                 <div class="info-expires-at">
-                        <span class="msg-icon fa fa-info" aria-hidden="true"></span>
+                        <span class="msg-icon fa fa-warning" aria-hidden="true"></span>
                         % if entitlement_expired_at:
                             ${_('You can no longer change sessions.')}
                         % else:
