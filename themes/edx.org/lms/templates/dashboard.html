@@ -63,9 +63,13 @@ from student.models import CourseEnrollment
     });
   </%static:require_module>
   <%static:require_module module_name="js/learner_dashboard/entitlement_unenrollment_factory" class_name="EntitlementUnenrollmentFactory">
-    EntitlementUnenrollmentFactory({
-      dashboardPath: "${reverse('dashboard') | n, js_escaped_string}",
-      signInPath: "${reverse('signin_user') | n, js_escaped_string}"
+    ## Wait until the document is fully loaded before initializing the EntitlementUnenrollmentView
+    ## to ensure events are setup correctly.
+    $(document).ready(function() {
+      EntitlementUnenrollmentFactory({
+        dashboardPath: "${reverse('dashboard') | n, js_escaped_string}",
+        signInPath: "${reverse('signin_user') | n, js_escaped_string}"
+      });
     });
   </%static:require_module>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):

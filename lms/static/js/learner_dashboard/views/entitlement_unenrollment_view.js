@@ -52,11 +52,7 @@
                     this.resetModal();
                     this.setHeaderText(courseName, courseNumber);
                     this.setSubmitData(apiEndpoint);
-
-                    if (window.edx && window.edx.dashboard && window.edx.dashboard.dropdown) {
-                        window.edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
-                        this.$el.css('position', 'fixed');
-                    }
+                    this.$el.css('position', 'fixed');
                 },
 
                 handleSubmit: function() {
