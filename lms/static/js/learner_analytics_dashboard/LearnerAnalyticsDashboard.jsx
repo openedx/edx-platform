@@ -8,29 +8,36 @@ import CircleChartLegend from './CircleChartLegend';
 import Table from './Table';
 
 export function LearnerAnalyticsDashboard(props) {
-  console.log('props: ', props);
-  const data = [
-      {
-        color: '#386F77',
-        value: 0.15,
-        label: 'Chucky'
-      },
-      {
-        color: '#1ABC9C',
-        value: 0.25,
-        label: 'Michael Myers'
-      },
-      {
-        color: '#92C9D3',
-        value: 0.3,
-        label: 'Freddy Krueger'
-      },
-      {
-        color: '#73bde7',
-        value: 0.3,
-        label: 'Jason Vorhees'
-      }
-  ];
+console.log('props: ', props);
+  const {grading_policy} = props;
+  const gradeBreakdown = grading_policy.GRADER.map(({type, weight}) => {
+    return {
+      value: weight,
+      label: type
+    }
+  });
+  // const data = [
+  //     {
+  //       color: '#386F77',
+  //       value: 0.15,
+  //       label: 'Chucky'
+  //     },
+  //     {
+  //       color: '#1ABC9C',
+  //       value: 0.25,
+  //       label: 'Michael Myers'
+  //     },
+  //     {
+  //       color: '#92C9D3',
+  //       value: 0.3,
+  //       label: 'Freddy Krueger'
+  //     },
+  //     {
+  //       color: '#73bde7',
+  //       value: 0.3,
+  //       label: 'Jason Vorhees'
+  //     }
+  // ];
 
   const tableHeadings = ['Assessment', 'Passing', 'You'];
   const tableData = [
@@ -62,7 +69,7 @@ export function LearnerAnalyticsDashboard(props) {
         <div className="grading-weight-wrapper">
           <div className="chart-wrapper">
             <CircleChart
-              slices={data}
+              slices={gradeBreakdown}
               centerHole={true}
               sliceBorder={{
                   strokeColor: '#fff',
@@ -70,7 +77,7 @@ export function LearnerAnalyticsDashboard(props) {
               }}
             />
           </div>
-          <CircleChartLegend data={data} />
+          <CircleChartLegend data={gradeBreakdown} />
         </div>
 
         <h3>Graded Assessments</h3>
