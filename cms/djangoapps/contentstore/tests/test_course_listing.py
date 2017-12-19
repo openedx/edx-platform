@@ -240,7 +240,6 @@ class TestCourseListing(ModuleStoreTestCase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 2, 2)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):
