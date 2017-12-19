@@ -21,6 +21,7 @@ from django.views.decorators.http import require_GET, require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
+from request_cache import get_cache
 from six import text_type
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -34,6 +35,7 @@ from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml_exporter import EXPORTER_REQUEST_CACHE_NAME, OFFLINE_EXPORT_CACHE_KEY
 
 __all__ = [
     'import_handler', 'import_status_handler',
@@ -324,6 +326,9 @@ def export_handler(request, course_key_string):
     requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     if request.method == 'POST':
+        download_videos = request.POST.get('download_course_videos')
+        if download_videos:
+            get_cache(EXPORTER_REQUEST_CACHE_NAME)[OFFLINE_EXPORT_CACHE_KEY] = download_videos
         export_olx.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
     elif 'text/html' in requested_format:

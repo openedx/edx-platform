@@ -28,6 +28,7 @@ from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
+from openedx.core.djangoapps.request_cache import get_cache
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -35,6 +36,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.modulestore.xml_exporter import EXPORTER_REQUEST_CACHE_NAME, OFFLINE_EXPORT_CACHE_KEY
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.video_module import manage_video_subtitles_save
@@ -239,7 +241,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # stream.
         if self.edx_video_id and edxval_api:
             try:
-                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4", "mobile_low"]
 
                 if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
                     val_profiles.append('hls')
@@ -251,10 +253,18 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # if it doesn't have an encoded video entry for that Video + Profile, the
                 # value will map to `None`
 
+                # Fallback to the mobile encoding since we sometimes export
+                # courses with only mobile video encodings (to keep the export size down).
+                desktop_profile_exists = bool(val_video_urls["desktop_mp4"])
+                if not desktop_profile_exists:
+                    val_video_urls["desktop_mp4"] = val_video_urls["mobile_low"]
+
                 # add the non-youtube urls to the list of alternative sources
                 # use the last non-None non-youtube non-hls url as the link to download the video
                 for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
                     if url:
+                        url = _convert_local_url(url)
+
                         if url not in sources:
                             sources.append(url)
                         # don't include hls urls for download
@@ -664,6 +674,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns an xml string representing this module.
         """
+        # FYI - this method is called by https://github.com/edx/edx-platform/blob/55c6387db6f169bc7b76a13ae964347e98993549/common/lib/xmodule/xmodule/xml_module.py#L444
+
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
@@ -703,6 +715,25 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', source)
             xml.append(ele)
 
+        cache = get_cache(EXPORTER_REQUEST_CACHE_NAME)
+        #  if cache.get(OFFLINE_EXPORT_CACHE_KEY):
+            #  pathname = name_to_pathname(self.url_name)
+            #  directory_path = u'{category}/{pathname}_encodings'.format(
+                #  category=self.category,
+                #  pathname=pathname
+            #  )
+            #  resource_fs.makedirs(directory_path, recreate=True)
+            #  for source in self.html5_sources:
+                #  # TODO: download the video content from the HTML5 location
+                #  # and add it to the output directory.
+                #  # Note: These videos may not actually be needed.
+                #  # As the videos on edx.org will be VEDA-encoded and should be
+                #  # copied over by edxval in the call to edxval_api.export_to_xml
+                #  # below.  So don't bother with this initially.
+                #  filepath = u'{}/{}'.format(directory_path, source)
+                #  with resource_fs.open(filepath, 'w') as filestream:
+                    #  filestream.write()
+
         if self.track:
             ele = etree.Element('track')
             ele.set('src', self.track)
@@ -727,12 +758,25 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 # Create static dir if not created earlier.
                 resource_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
 
+                download_videos_kwargs = {}
+                if cache.get(OFFLINE_EXPORT_CACHE_KEY):
+                    pathname = name_to_pathname(self.url_name)
+                    directory_path = u'{category}/{pathname}_encodings'.format(
+                        category=self.category,
+                        pathname=pathname
+                    )
+                    resource_fs.makedirs(directory_path, recreate=True)
+                    download_videos_kwargs = {
+                        'video_download_dir': directory_path,
+                    }
+
                 xml.append(
                     edxval_api.export_to_xml(
                         video_id=edx_video_id,
                         resource_fs=resource_fs,
                         static_dir=EXPORT_IMPORT_STATIC_DIR,
-                        course_id=unicode(self.runtime.course_id.for_branch(None))
+                        course_id=unicode(self.runtime.course_id.for_branch(None)),
+                        **download_videos_kwargs
                     )
                 )
             except edxval_api.ValVideoNotFoundError:
@@ -797,7 +841,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # override the source_url with it.
         if self.edx_video_id and edxval_api:
 
-            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
+            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4', 'mobile_low']
             if HLSPlaybackEnabledFlag.feature_enabled(self.runtime.course_id.for_branch(None)):
                 val_profiles.append('hls')
 
@@ -807,6 +851,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             # VAL's youtube source has greater priority over external youtube source.
             if val_video_encodings.get('youtube'):
                 source_url = self.create_youtube_url(val_video_encodings['youtube'])
+
+            # Fallback to the mobile encoding since we sometimes export
+            # courses with only mobile video encodings (to keep the export size down).
+            desktop_profile_exists = bool(val_video_encodings["desktop_mp4"])
+            if not desktop_profile_exists:
+                val_video_encodings["desktop_mp4"] = val_video_encodings["mobile_low"]
 
             # If no youtube source is provided externally or in VAl, update source_url in order: hls > mp4 and webm
             if not source_url:
@@ -1106,6 +1156,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             for lang in available_translations
         }
 
+        if encoded_videos:
+            for encoded_video in encoded_videos.itervalues():
+                encoded_video["url"] = _convert_local_url(encoded_video["url"])
+
         return {
             "only_on_web": self.only_on_web,
             "duration": val_video_data.get('duration', None),
@@ -1113,3 +1167,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "encoded_videos": encoded_videos,
             "all_sources": all_sources,
         }
+
+
+def _convert_local_url(url):
+    if url.startswith('local-video'):
+        return url.replace('local-video://video/', settings.VIDEO_STORAGE_URL)
+    return url
+

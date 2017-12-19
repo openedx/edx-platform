@@ -45,6 +45,14 @@
       padding: ($baseline*0.75) $baseline;
     }
 
+    .action-include-videos {
+      @extend %t-action1;
+
+      display: block;
+      margin: ($baseline*0.25);
+      padding: ($baseline*0.25);
+    }
+
     .action {
       .icon {
         @extend %t-icon2;
