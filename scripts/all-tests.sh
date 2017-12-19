@@ -11,7 +11,7 @@ set -e
 ###############################################################################
 
 # Violations thresholds for failing the build
-export LOWER_PYLINT_THRESHOLD=1000
+export LOWER_PYLINT_THRESHOLD=1
 export UPPER_PYLINT_THRESHOLD=5900
 export ESLINT_THRESHOLD=5700
 export STYLELINT_THRESHOLD=973
