@@ -108,7 +108,7 @@ class GoogleAnalyticsTrackingPixel(object):
         return u"https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
 
     def _get_tracking_id(self):
-        tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)
+        tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_TRACKING_ID", site=self.site)
         if tracking_id is None:
-            tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_TRACKING_ID", site=self.site)
+            tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)
         return tracking_id
