@@ -65,7 +65,6 @@ __test__ = False  # do not collect
         dest='disable_migrations',
         help="Create tables by applying migrations."
     ),
-    make_option('--stderr', help='redirect stderr from tests to a file at this path'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -141,7 +140,6 @@ def test_system(options, passthrough_options):
         "--disable_capture", action="store_true", dest="disable_capture",
         help="Disable capturing of stdout/stderr"
     ),
-    make_option('--stderr', help='redirect stderr from tests to a file at this path'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed

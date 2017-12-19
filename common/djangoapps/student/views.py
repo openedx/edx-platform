@@ -2437,9 +2437,7 @@ def auto_auth(request):
 
     # Log in as the user
     if login_when_done:
-        backend = load_backend(NEW_USER_AUTH_BACKEND)
-        user = backend.authenticate(request=request, username=username, password=password)
-        user.backend = NEW_USER_AUTH_BACKEND
+        user = authenticate(username=username, password=password)
         login(request, user)
 
     create_comments_service_user(user)
