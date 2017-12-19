@@ -232,11 +232,6 @@ def _update_course_context(request, context, course, platform_name):
     context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
     course_number = course.display_coursenumber if course.display_coursenumber else course.number
     context['course_number'] = course_number
-    context['certificate_title'] = course.certificate_title
-    context['certificate_title_color'] = course.certificate_title_color
-    context['certificate_subtitle'] = course.certificate_subtitle
-    context['certificate_subtitle_color'] = course.certificate_subtitle_color
-    context['certificate_image_url'] = request.build_absolute_uri(course_image_url(course, 'banner_image'))
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '

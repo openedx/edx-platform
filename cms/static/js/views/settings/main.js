@@ -28,10 +28,6 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                initialize: function(options) {
                    options = options || {};
         // fill in fields
-                   this.$el.find('#course-certificate-title').val(this.model.get('certificate_title'));
-                   this.$el.find('#course-certificate-title-color').val(this.model.get('certificate_title_color'));
-                   this.$el.find('#course-certificate-subtitle').val(this.model.get('certificate_subtitle'));
-                   this.$el.find('#course-certificate-subtitle-color').val(this.model.get('certificate_subtitle_color'));
                    this.$el.find('#course-language').val(this.model.get('language'));
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
@@ -158,10 +154,6 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    return this;
                },
                fieldToSelectorMap: {
-                   'certificate_title': 'course-certificate-title',
-                   'certificate_title_color': 'course-certificate-title-color',
-                   'certificate_subtitle': 'course-certificate-subtitle',
-                   'certificate_subtitle_color': 'course-certificate-subtitle-color',
                    'language': 'course-language',
                    'start_date': 'course-start',
                    'end_date': 'course-end',
@@ -305,10 +297,6 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    case 'course-pace-instructor-paced':
                        this.model.set('self_paced', JSON.parse(event.currentTarget.value));
                        break;
-                   case 'course-certificate-title':
-                   case 'course-certificate-title-color':
-                   case 'course-certificate-subtitle':
-                   case 'course-certificate-subtitle-color':
                    case 'course-language':
                    case 'course-effort':
                    case 'course-title':

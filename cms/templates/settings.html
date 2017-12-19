@@ -297,60 +297,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
               <ol class="list-input">
-                <li class="field-group field-group-certificate-title" id="certificate-title">
-                  <div class="field certificate-title" id="field-course-certificate-title">
-                    <label for="course-certificate-title">${_("Certificate Title")}</label>
-                    <input type="text" id="course-certificate-title" />
-                  </div>
-
-                  <div class="field certificate-title-color" id="field-course-certificate-title-color">
-                    <label for="course-certificate-title-color">${_("Certificate Title Color")}</label>
-                    <input type="text" id="course-certificate-title-color" placeholder="#00ff00" />
-                  </div>
-                </li>
-                <li class="field-group field-group-certificate-subtitle" id="certificate-subtitle">
-                  <div class="field certificate-subtitle" id="field-course-certificate-subtitle">
-                    <label for="course-certificate-subtitle">${_("Certificate Subtitle")}</label>
-                    <input type="text" id="course-certificate-subtitle" />
-                  </div>
-
-                  <div class="field certificate-subtitle-color" id="field-course-certificate-subtitle-color">
-                    <label for="course-certificate-subtitle-color">${_("Certificate Subtitle Color")}</label>
-                    <input type="text" id="course-certificate-subtitle-color" placeholder="#00ff00" />
-                  </div>
-                </li>
-                <li class="field image" id="field-banner-image">
-                  <label for="banner-image-url">${_("Certificate Image")}</label>
-                  <div class="current current-course-image">
-                    % if context_course.banner_image:
-                    <span class="wrapper-course-image">
-                      <img class="course-image" id="banner-image" src="${banner_image_url}" alt="${_('Certificate Image')}"/>
-                    </span>
-
-                    <span class="msg msg-help">
-                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
-                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
-                      a_link_end=HTML("</a>")
-                      )}
-                    </span>
-
-                    % else:
-                    <span class="wrapper-course-image">
-                      <img class="course-image placeholder" id="banner-image" src="${banner_image_url}" alt="${_('Certificate Image')}"/>
-                    </span>
-                    <span class="msg msg-empty">${_("Your certificate currently does not have an image. Please upload one (JPEG or PNG format)")}</span>
-                    % endif
-                  </div>
-
-                  <div class="wrapper-input">
-                    <div class="input">
-                      ## Translators: This is the placeholder text for a field that requests the URL for a course banner image
-                      <input type="text" dir="ltr" class="long new-course-image-url" id="banner-image-url" value="" placeholder="${_("Your certificate image URL")}" autocomplete="off" />
-                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your certificate image (Note: only JPEG or PNG format supported)")}</span>
-                    </div>
-                    <button type="button" class="action action-upload-image" id="upload-banner-image">${_("Upload Cerificate Image")}</button>
-                  </div>
-                </li>
 
                 % if enable_extended_course_details:
                 <li class="field text" id="field-course-title">
@@ -432,6 +378,39 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 </li>
 
                 % if enable_extended_course_details:
+                <li class="field image" id="field-banner-image">
+                  <label for="banner-image-url">${_("Course Banner Image")}</label>
+                  <div class="current current-course-image">
+                    % if context_course.banner_image:
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}"/>
+                    </span>
+
+                    <span class="msg msg-help">
+                    ${Text(_("You can manage this image along with all of your other {a_link_start}files and uploads{a_link_end}")).format(
+                      a_link_start=HTML("<a href='{upload_asset_url}'>").format(upload_asset_url=upload_asset_url),
+                      a_link_end=HTML("</a>")
+                      )}
+                    </span>
+
+                    % else:
+                    <span class="wrapper-course-image">
+                      <img class="course-image placeholder" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}"/>
+                    </span>
+                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 1440px wide by 400px tall)")}</span>
+                    % endif
+                  </div>
+
+                  <div class="wrapper-input">
+                    <div class="input">
+                      ## Translators: This is the placeholder text for a field that requests the URL for a course banner image
+                      <input type="text" dir="ltr" class="long new-course-image-url" id="banner-image-url" value="" placeholder="${_("Your banner image URL")}" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your banner image (Note: only JPEG or PNG format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-image" id="upload-banner-image">${_("Upload Course Banner Image")}</button>
+                  </div>
+                </li>
+
                 <li class="field image" id="field-video-thumbnail-image">
                   <label for="video-thumbnail-image-url">${_("Course Video Thumbnail Image")}</label>
                   <div class="current current-course-image">

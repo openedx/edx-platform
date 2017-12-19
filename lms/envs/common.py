@@ -12,7 +12,6 @@ make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
 Longer TODO:
-Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
