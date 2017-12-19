@@ -1027,6 +1027,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                             'open_url': announcement_open_url,
                             'announcement_date': announcement_date,
                             'title': title,
+                            'notification_type': 'courseannouncement'
                         }
                     )
 
