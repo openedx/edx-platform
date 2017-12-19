@@ -188,7 +188,6 @@
                  $('#unenroll_form input[type="submit"]').prop('disabled', true);
              });
 
-             edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
              $('#unenroll-modal').css('position', 'fixed');
          });
 
