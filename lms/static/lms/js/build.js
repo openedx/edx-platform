@@ -88,6 +88,10 @@
             modernizr: 'empty',
             'which-country': 'empty',
 
+            // Don't bundle bootstrap relevant files as they are loaded through webpack
+            'common/js/vendor/bootstrap': 'empty:',
+            'common/js/vendor/popper': 'empty:',
+
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
             'edx-ui-toolkit/js/utils/html-utils': 'empty:',
             'edx-ui-toolkit/js/utils/string-utils': 'empty:'
@@ -134,7 +138,7 @@
          * As of 1.0.3, this value can also be a string that is converted to a
          * RegExp via new RegExp().
          */
-        fileExclusionRegExp: /^\.|spec|spec_helpers/,
+        fileExclusionRegExp: /^\.|spec|spec_helpers|popper|bootstrap/,
         /**
          * Allow CSS optimizations. Allowed values:
          * - "standard": @import inlining and removal of comments, unnecessary
