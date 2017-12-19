@@ -28,6 +28,7 @@ from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
+from request_cache import get_request_or_stub
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -646,6 +647,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         )
 
         # update val with info extracted from `xml_object`
+        # TODO: You will want to update this code as well to import the video
+        # content in the OLX directory into edx-val's table and django storage.
         video.import_video_info_into_val(xml_object, getattr(id_generator, 'target_course_id', None))
 
         return video
@@ -654,6 +657,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns an xml string representing this module.
         """
+        # FYI - this method is called by https://github.com/edx/edx-platform/blob/55c6387db6f169bc7b76a13ae964347e98993549/common/lib/xmodule/xmodule/xml_module.py#L444
+
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
@@ -693,6 +698,25 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', source)
             xml.append(ele)
 
+        request = get_request_or_stub()
+        if hasattr(request, 'export_for_offline'):
+            pathname = name_to_pathname(self.url_name)
+            directory_path = u'{category}/{pathname}_encodings'.format(
+                category=self.category,
+                pathname=pathname
+            )
+            resource_fs.makedir(directory_path, recursive=True, allow_recreate=True)
+            for source in self.html5_sources:
+                # TODO: download the video content from the HTML5 location
+                # and add it to the output directory.
+                # Note: These videos may not actually be needed.
+                # As the videos on edx.org will be VEDA-encoded and should be
+                # copied over by edxval in the call to edxval_api.export_to_xml
+                # below.  So don't bother with this initially.
+                filepath = u'{}/{}'.format(directory_path, source)
+                with resource_fs.open(filepath, 'w') as filestream:
+                    filestream.write()
+
         if self.track:
             ele = etree.Element('track')
             ele.set('src', self.track)
@@ -716,6 +740,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             if video_ids:
                 try:
                     xml.append(
+                        # TODO: pass to edxval the directory into which it should
+                        # download the video content.
+                        # Update edxval's implementation of export_to_xml so
+                        # it downloads each of the encoded_video from the
+                        # encoded_video's url - only if export_for_offline
+                        # is set.
                         edxval_api.export_to_xml(
                             video_ids,
                             unicode(self.runtime.course_id.for_branch(None)),

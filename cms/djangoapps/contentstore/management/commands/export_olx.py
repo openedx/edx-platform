@@ -26,6 +26,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 
+from request_cache import get_request_or_stub
+
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 
@@ -39,6 +41,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('course_id')
         parser.add_argument('--output')
+        parser.add_argument('--export_for_offline')
 
     def handle(self, *args, **options):
         course_id = options['course_id']
@@ -56,6 +59,9 @@ class Command(BaseCommand):
         if filename is None:
             filename = mktemp()
             pipe_results = True
+
+        request = get_request_or_stub()
+        request.export_for_offline = options['export_for_offline']
 
         export_course_to_tarfile(course_key, filename)
 
