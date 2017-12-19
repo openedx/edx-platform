@@ -10,14 +10,11 @@ class CircleChartLegend extends React.Component {
   getList() {
     const {data} = this.props;
 
-    return data.map(({ value, label }) => {
-      // const style = {
-      //   backgroundColor: color
-      // }
-
+    return data.map(({ value, label, sliceIndex }, index) => {
+      const swatchClass = `swatch-${sliceIndex}`;
       return (
-        <li className="legend-item">
-          <div className="color-swatch"
+        <li className="legend-item" key={index}>
+          <div className={classNames('color-swatch', swatchClass)}
                aria-hidden="true"></div>
           <span className="label">{label}</span>
           <span className="percentage">{this.getPercentage(value)}</span>

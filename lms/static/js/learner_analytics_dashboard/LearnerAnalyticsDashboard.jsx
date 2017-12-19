@@ -10,16 +10,17 @@ import Table from './Table';
 export function LearnerAnalyticsDashboard(props) {
 console.log('props: ', props);
   const {grading_policy} = props;
-  const gradeBreakdown = grading_policy.GRADER.map(({type, weight}) => {
+  const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
     return {
       value: weight,
-      label: type
+      label: type,
+      sliceIndex: index + 1
     }
-  });
+  }).sort((a, b) => a.value > b.value);
   // const data = [
   //     {
   //       color: '#386F77',
-  //       value: 0.15,
+  //       value: 0.50,
   //       label: 'Chucky'
   //     },
   //     {
@@ -34,7 +35,7 @@ console.log('props: ', props);
   //     },
   //     {
   //       color: '#73bde7',
-  //       value: 0.3,
+  //       value: 0.15,
   //       label: 'Jason Vorhees'
   //     }
   // ];
@@ -83,7 +84,7 @@ console.log('props: ', props);
         <h3>Graded Assessments</h3>
         <div className="graded-assessments-wrapper">
           <Table headings={tableHeadings} data={tableData} />
-          <p class="footnote">*Calculated based on current average</p>
+          <p className="footnote">*Calculated based on current average</p>
         </div>
       </div>
     </div>

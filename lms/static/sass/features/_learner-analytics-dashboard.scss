@@ -1,5 +1,4 @@
-$slices: #386F77, #1ABC9C, #386F77, #1ABC9C, #386F77, #1ABC9C;
-
+$slices: #386F77, #1ABC9C, #92C9D3, #397D1C, #A39D3D, #0E5AAA;
 .content-wrapper {
   .page-content.learner-analytics-dashboard-wrapper {
     flex-direction: column;
@@ -54,41 +53,29 @@ $slices: #386F77, #1ABC9C, #386F77, #1ABC9C, #386F77, #1ABC9C;
         height: 45px;
         border-radius: 25%;
         margin-right: 20px;
+
+        &.swatch-1 {
+          background-color: nth($slices, 1);
+        }
+        &.swatch-2 {
+          background-color: nth($slices, 2);
+        }
+        &.swatch-3 {
+          background-color: nth($slices, 3);
+        }
+        &.swatch-4 {
+          background-color: nth($slices, 4);
+        }
+        &.swatch-5 {
+          background-color: nth($slices, 5);
+        }
+        &.swatch-6 {
+          background-color: nth($slices, 6);
+        }
       }
 
       .percentage {
         margin-left: auto;
-      }
-
-      &:nth-of-type(1) {
-        .color-swatch {
-          background-color: nth($slices, 1);
-        }
-      }
-      &:nth-of-type(2) {
-        .color-swatch {
-          background-color: nth($slices, 2);
-        }
-      }
-      &:nth-of-type(3) {
-        .color-swatch {
-          background-color: nth($slices, 3);
-        }
-      }
-      &:nth-of-type(4) {
-        .color-swatch {
-          background-color: nth($slices, 4);
-        }
-      }
-      &:nth-of-type(5) {
-        .color-swatch {
-          background-color: nth($slices, 5);
-        }
-      }
-      &:nth-of-type(6) {
-        .color-swatch {
-          background-color: nth($slices, 6);
-        }
       }
     }
   }

@@ -10,9 +10,9 @@ class Table extends React.Component {
   
   getTableBody() {
     const {data} = this.props;
-    const rows = data.map(({label, user, passing, total}) => {
+    const rows = data.map(({label, user, passing, total}, index) => {
       return (
-        <tr>
+        <tr key={index}>
           <td>{label}</td>
           <td>{user}/{total}</td>
           <td>{passing}/{total}</td>
@@ -25,7 +25,7 @@ class Table extends React.Component {
   
   getTableHead() {
     const {headings} = this.props;
-    const html = headings.map((title) => <th>{title}</th>);
+    const html = headings.map((title, index) => <th key={index}>{title}</th>);
     return (
       <thead className="table-head">
         <tr>
