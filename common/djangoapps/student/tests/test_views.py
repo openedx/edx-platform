@@ -397,6 +397,69 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         response = self.client.get(self.path)
         self.assertEqual(response.content.count('<li class="course-item">'), 0)
 
+    @patch('student.views.get_course_runs_for_course')
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch('opaque_keys.edx.keys.CourseKey.from_string')
+    def test_sessions_for_entitlement_course_runs(self, mock_course_key, mock_course_overview, mock_course_runs):
+        """
+        When a learner has a fulfilled entitlement for a course run in the past, there should be no availableSession
+        data passed to the JS view. When a learner has a fulfilled entitlement for a course run enrollment ending in the
+        future, there should not be an empty availableSession variable. When a learner has a fulfilled entitlement
+        for a course that doesn't have an enrollment ending, there should not be an empty availableSession variable.
+        """
+        # Test an enrollment end in the past
+        mocked_course_overview = CourseOverviewFactory.create(
+            start=self.TOMORROW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
+        )
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        mock_course_runs.return_value = [
+            {
+                'key': mocked_course_overview.id,
+                'enrollment_end': mocked_course_overview.enrollment_end,
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        response = self.client.get(self.path)
+        self.assertIn("availableSessions: '[]'", response.content)
+
+        # Test an enrollment end in the future sets an availableSession
+        mocked_course_overview.enrollment_end = self.TOMORROW
+        mocked_course_overview.save()
+
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        mock_course_runs.return_value = [
+            {
+                'key': mocked_course_overview.id,
+                'enrollment_end': mocked_course_overview.enrollment_end,
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        response = self.client.get(self.path)
+        self.assertNotIn("availableSessions: '[]'", response.content)
+
+        # Test an enrollment end that doesn't exist sets an availableSession
+        mocked_course_overview.enrollment_end = None
+        mocked_course_overview.save()
+
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        mock_course_runs.return_value = [
+            {
+                'key': mocked_course_overview.id,
+                'enrollment_end': mocked_course_overview.enrollment_end,
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        response = self.client.get(self.path)
+        self.assertNotIn("availableSessions: '[]'", response.content)
+
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')

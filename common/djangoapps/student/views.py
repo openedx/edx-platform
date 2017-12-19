@@ -702,8 +702,16 @@ def dashboard(request):
     course_entitlement_available_sessions = {}
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
-        course_entitlement_available_sessions[str(course_entitlement.uuid)] = \
-            get_course_runs_for_course(str(course_entitlement.course_uuid))
+        # Filter only the course runs that do not have an enrollment_end date set, or have one set in the future
+        course_runs_for_course = get_course_runs_for_course(str(course_entitlement.course_uuid))
+        enrollable_course_runs = []
+
+        for course_run in course_runs_for_course:
+            enrollment_end = course_run.get('enrollment_end')
+            if not enrollment_end or enrollment_end > datetime.datetime.now(UTC):
+                enrollable_course_runs.append(course_run)
+
+        course_entitlement_available_sessions[str(course_entitlement.uuid)] = enrollable_course_runs
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
