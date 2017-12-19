@@ -58,7 +58,7 @@ class LearnerAnalyticsView(View):
 
     def get_grade_data(self, user, course_key):
         """
-        Collects and formats the grade data to be piped to the front end.
+        Collects and formats the grades data for a particular user and course.
 
         Args:
             user: User
@@ -74,6 +74,15 @@ class LearnerAnalyticsView(View):
             }
         return json.dumps(grades)
 
+    def get_discussion_data(self, user, course_key):
+        """
+        Collects and formats the discussion data from a particular user and course.
+
+        Args:
+            user: User
+            course_key: CourseKey
+        """
+        pass
 
     def get_schedule(self, request, course_key):
         """
@@ -93,7 +102,8 @@ class LearnerAnalyticsView(View):
             block_types_filter=['sequential']
         )
         graded_blocks = {}
-        for block in all_blocks['blocks']:
-            if all_blocks['blocks'][block].get('graded', False):
-                graded_blocks[block] = all_blocks['blocks'][block]
+        for (location, block) in all_blocks['blocks'].iteritems():
+            if block.get('graded', False) and block.get('due') is not None:
+                graded_blocks[location] = block
+                block['due'] = block['due'].isoformat()
         return json.dumps(graded_blocks)
