@@ -1,31 +1,44 @@
 """
 Learner analytics dashboard views
 """
-import math
 import json
+import logging
+import math
+import urllib
+from datetime import datetime, timedelta
 
+import pytz
+import requests
+from analyticsclient.client import Client
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.template.context_processors import csrf
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
-from django.template.loader import render_to_string
+from django.template.context_processors import csrf
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
-
 from opaque_keys.edx.keys import CourseKey
+from student.models import CourseEnrollment
+from util.views import ensure_valid_course_key
+from xmodule.modulestore.django import modulestore
+
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.features.course_experience import default_course_url_name
-from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
-from util.views import ensure_valid_course_key
+
+log = logging.getLogger(__name__)
 
 
 class LearnerAnalyticsView(View):
+
+    def __init__(self):
+        View.__init__(self)
+        self.analytics_client = Client(base_url=settings.ANALYTICS_API_URL, auth_token=settings.ANALYTICS_API_KEY)
 
     @method_decorator(login_required)
     @method_decorator(ensure_csrf_cookie)
@@ -132,3 +145,105 @@ class LearnerAnalyticsView(View):
                 graded_blocks.append(block)
                 block['due'] = block['due'].isoformat()
         return graded_blocks
+
+    def get_weekly_course_activities(self, course_key):
+        """
+        Get the count of any course activity from previous 7 days
+
+        Args:
+            course_key: CourseKey
+        """
+        cache_key = 'learner_analytics_{course_key}_weekly_activities'.format(course_key=course_key)
+        activities = cache.get(cache_key)
+
+        if not activities:
+            log.info('Weekly course activities for course {course_key} was not cached - fetching from Analytics API'
+                     .format(course_key=course_key))
+            weekly_course_activities = self.analytics_client.courses(course_key).activity()
+
+            if not weekly_course_activities or 'any' not in weekly_course_activities[0]:
+                return 0
+
+            # weekly course activities should only have one item
+            activities = weekly_course_activities[0]
+            cache.set(cache_key, activities, LearnerAnalyticsView.seconds_to_cache_expiration())
+
+        return activities['any']
+
+    def consecutive_weeks_of_course_activity_for_user(self, username, course_key):
+        """
+        Get the most recent count of consecutive days that a user has performed a course activity
+
+        Args:
+            username: Username
+            course_key: CourseKey
+        """
+        cache_key = 'learner_analytics_{username}_{course_key}_engagement_timeline'\
+            .format(username=username, course_key=course_key)
+        timeline = cache.get(cache_key)
+
+        if not timeline:
+            log.info('Engagement timeline for course {course_key} was not cached - fetching from Analytics API'
+                     .format(course_key=course_key))
+
+            # TODO: @jaebradley replace this once the Analytics client has an engagement timeline method
+            url = '{base_url}/engagement_timelines/{username}?course_id={course_key}'\
+                .format(base_url=settings.ANALYTICS_API_URL,
+                        username=username,
+                        course_key=urllib.quote_plus(course_key))
+            headers = {'Authorization': 'Token {token}'.format(token=settings.ANALYTICS_API_KEY)}
+            response = requests.get(url=url, headers=headers)
+            data = response.json()
+
+            if not data or 'days' not in data or not data['days']:
+                return 0
+
+            # Analytics API returns data in ascending (by date) order - we want to count starting from most recent day
+            data_ordered_by_date_descending = list(reversed(data['days']))
+
+            cache.set(cache_key, data_ordered_by_date_descending, LearnerAnalyticsView.seconds_to_cache_expiration())
+            timeline = data_ordered_by_date_descending
+
+        return LearnerAnalyticsView.calculate_week_streak(timeline)
+
+    @staticmethod
+    def calculate_week_streak(daily_activities):
+        """
+        Check number of weeks in a row that a user has performed some activity.
+
+        Regardless of when a week starts, a sufficient condition for checking if a specific week had any user activity
+        (given a list of daily activities ordered by date) is to iterate through the list of days 7 days at a time and
+        check to see if any of those days had any activity.
+
+        Args:
+            daily_activities: list of dictionaries containing activities and their counts
+        """
+        week_streak = 0
+        seven_day_buckets = [daily_activities[i:i + 7] for i in range(0, len(daily_activities), 7)]
+        for bucket in seven_day_buckets:
+            if any(LearnerAnalyticsView.has_activity(day) for day in bucket):
+                week_streak += 1
+            else:
+                return week_streak
+        return week_streak
+
+    @staticmethod
+    def has_activity(daily_activity):
+        """
+        Validate that a course had some activity that day
+
+        Args:
+            daily_activity: dictionary of activities and their counts
+        """
+        return int(daily_activity['problems_attempted']) > 0 \
+            or int(daily_activity['problems_completed']) > 0 \
+            or int(daily_activity['discussion_contributions']) > 0 \
+            or int(daily_activity['videos_viewed']) > 0
+
+    @staticmethod
+    def seconds_to_cache_expiration():
+        """Calculate cache expiration seconds. Currently set to seconds until midnight UTC"""
+        next_midnight_utc = (datetime.today() + timedelta(days=1)).replace(hour=0, minute=0, second=0,
+                                                                           microsecond=0, tzinfo=pytz.utc)
+        now_utc = datetime.now(tz=pytz.utc)
+        return round((next_midnight_utc - now_utc).total_seconds())
