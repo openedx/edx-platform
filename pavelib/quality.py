@@ -91,18 +91,18 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        flags = []
-        if errors_only:
-            flags.append("--errors-only")
+        #flags = []
+        #if errors_only:
+        #    flags.append("--errors-only")
 
         apps_list = ' '.join(top_python_dirs(system))
 
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
             sh(
-                "pylint {flags} --output-format=parseable {apps} "
+                "pylint --disable=all --enable=W0122 "
+                "--output-format=parseable {apps} "
                 "> {report_dir}/pylint.report".format(
-                    flags=" ".join(flags),
                     apps=apps_list,
                     report_dir=report_dir
                 ),
