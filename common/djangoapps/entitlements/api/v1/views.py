@@ -53,6 +53,48 @@ class EntitlementViewSet(viewsets.ModelViewSet):
         # to Admin users
         return CourseEntitlement.objects.all().select_related('user').select_related('enrollment_course_run')
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        entitlement = serializer.instance
+        user = entitlement.user
+
+        # find all course_runs within the course
+        course_runs = get_course_runs_for_course(entitlement.course_uuid)
+
+        # check if the user has enrollments for any of the course_runs
+        user_run_enrollments = [
+            CourseEnrollment.get_enrollment(user, CourseKey.from_string(course_run.get('key')))
+            for course_run
+            in course_runs
+            if CourseEnrollment.get_enrollment(user, CourseKey.from_string(course_run.get('key')))
+        ]
+
+        # filter to just enrollments that can be upgraded.
+        upgradeable_enrollments = [
+            enrollment
+            for enrollment
+            in user_run_enrollments
+            if enrollment.upgrade_deadline and enrollment.upgrade_deadline > timezone.now()
+        ]
+
+        # if there is only one upgradeable enrollment, convert it from audit to the entitlement.mode
+        # if there is any ambiguity about which enrollment to upgrade
+        # (i.e. multiple upgradeable enrollments or no available upgradeable enrollment), dont enroll
+        if len(upgradeable_enrollments) == 1:
+            enrollment = upgradeable_enrollments[0]
+            log.info('Upgrading enrollment [%s] from audit to [%s] while adding entitlement for user [%s] for course [%s] ', enrollment, serializer.data.get('mode'), user.username, serializer.data.get('course_uuid'))
+            enrollment.update_enrollment(mode=entitlement.mode)
+            entitlement.set_enrollment(enrollment)
+        else:
+            log.info('No enrollment upgraded while adding entitlement for user [%s] for course [%s] ', user.username, serializer.data.get('course_uuid'))
+
+        headers = self.get_success_headers(serializer.data)
+        # Note, the entitlement is re-serialized before getting added to the Response, so that the 'modified' date reflects changes that occur when upgrading enrollment.
+        return Response(CourseEntitlementSerializer(entitlement).data, status=status.HTTP_201_CREATED, headers=headers)
+
     def retrieve(self, request, *args, **kwargs):
         """
         Override the retrieve method to expire a record that is past the
