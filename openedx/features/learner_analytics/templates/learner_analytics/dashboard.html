@@ -61,7 +61,9 @@ from openedx.features.course_experience import course_home_page_title
                 'schedule': assignment_schedule,
                 'grading_policy': grading_policy,
                 'grades': assignment_grades,
-                'discussion_info': discussion_info
+                'discussion_info': discussion_info,
+                'weekly_active_users': context['weekly_active_users'],
+                'week_streak': context['week_streak'],
               }
             )}
         </div>
