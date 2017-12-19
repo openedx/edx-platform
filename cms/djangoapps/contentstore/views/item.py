@@ -46,7 +46,10 @@ from contentstore.views.helpers import (
 )
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
+from help_tokens.core import HelpUrlExpert
 from models.settings.course_grading import CourseGradingModel
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls
@@ -77,6 +80,9 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
+
+
+highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
 
 
 def hash_resource(resource):
@@ -1181,6 +1187,20 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if xblock.category == 'sequential':
             xblock_info.update({
                 'hide_after_due': xblock.hide_after_due,
+            })
+        elif xblock.category in ('chapter', 'course'):
+            if xblock.category == 'chapter':
+                xblock_info.update({
+                    'highlights': xblock.highlights,
+                })
+            elif xblock.category == 'course':
+                xblock_info.update({
+                    'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
+                })
+            xblock_info.update({
+                'highlights_enabled': highlights_setting.is_enabled(),
+                'highlights_preview_only': not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course.id),
+                'highlights_doc_url': HelpUrlExpert.the_one().url_for_token('content_highlights'),
             })
 
         # update xblock_info with special exam information if the feature flag is enabled

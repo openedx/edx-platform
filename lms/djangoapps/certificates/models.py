@@ -58,8 +58,8 @@ from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.fields import CreationDateTimeField
 from model_utils import Choices
+from model_utils.fields import AutoCreatedField
 from model_utils.models import TimeStampedModel
 
 from badges.events.course_complete import course_badge_check
@@ -135,7 +135,7 @@ class CertificateWhitelist(models.Model):
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     whitelist = models.BooleanField(default=0)
-    created = CreationDateTimeField(_('created'))
+    created = AutoCreatedField(_('created'))
     notes = models.TextField(default=None, null=True)
 
     @classmethod

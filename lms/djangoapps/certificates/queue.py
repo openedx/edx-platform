@@ -510,7 +510,7 @@ class XQueueCertInterface(object):
         # for other certificates.  Although both tasks use the same queue,
         # we can distinguish whether the certificate was an example cert based
         # on which end-point XQueue uses once the task completes.
-        callback_url_path = reverse('certificates.views.update_example_certificate')
+        callback_url_path = reverse('update_example_certificate')
 
         try:
             self._send_to_xqueue(

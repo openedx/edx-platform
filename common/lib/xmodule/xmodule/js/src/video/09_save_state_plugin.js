@@ -37,11 +37,11 @@
 
             initialize: function() {
                 this.events = {
-                    'speedchange': this.onSpeedChange,
-                    'play': this.bindUnloadHandler,
+                    speedchange: this.onSpeedChange,
+                    play: this.bindUnloadHandler,
                     'pause destroy': this.saveStateHandler,
                     'language_menu:change': this.onLanguageChange,
-                    'youtube_availability': this.onYoutubeAvailability
+                    youtube_availability: this.onYoutubeAvailability
                 };
                 this.bindHandlers();
             },
@@ -111,7 +111,7 @@
                 $.ajax({
                     url: this.state.config.saveStateUrl,
                     type: 'POST',
-                    async: async ? true : false,
+                    async: !!async,
                     dataType: 'json',
                     data: data
                 });

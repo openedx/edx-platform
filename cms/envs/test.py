@@ -24,6 +24,7 @@ from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 from util.db import NoOpMigrationModules
+from openedx.core.lib.derived import derive_settings
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
@@ -39,29 +40,20 @@ from lms.envs.test import (
     REGISTRATION_EXTRA_FIELDS,
 )
 
+# Add some host names used in assorted tests
+ALLOWED_HOSTS = [
+    'localhost',
+    'logistration.testserver',
+    '.testserver.fake',
+    'test-site.testserver',
+    'testserver.fakeother',
+]
+
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
 THIS_UUID = uuid4().hex[:5]
-
-# Nose Test Runner
-TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
-
-_SYSTEM = 'cms'
-
-_REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
-_REPORT_DIR.makedirs_p()
-_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
-_NOSEID_DIR.makedirs_p()
-
-NOSE_ARGS = [
-    '--id-file', _NOSEID_DIR / 'noseids',
-]
-
-NOSE_PLUGINS = [
-    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
-]
 
 TEST_ROOT = path('test_root')
 
@@ -78,9 +70,6 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # For testing "push to lms"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
-
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -336,7 +325,7 @@ FEATURES['ENABLE_TEAMS'] = True
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ######### custom courses #########
-INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon')
+INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # API access management -- needed for simple-history to run.
@@ -363,3 +352,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     ),
     DIRECTORY_PREFIX='video-transcripts/',
 )
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

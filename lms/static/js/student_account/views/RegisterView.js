@@ -5,12 +5,14 @@
         'underscore',
         'gettext',
         'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/FormView',
         'text!templates/student_account/form_status.underscore'
     ],
         function(
             $, _, gettext,
             StringUtils,
+            HtmlUtils,
             FormView,
             formStatusTpl
         ) {
@@ -53,6 +55,7 @@
                         data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
                     );
                     this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+                    this.syncLearnerProfileData = data.thirdPartyAuth.syncLearnerProfileData || false;
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
@@ -63,6 +66,69 @@
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                     this.listenTo(this.model, 'validation', this.renderLiveValidations);
+                },
+
+
+                renderFields: function(fields, className) {
+                    var html = [],
+                        i,
+                        fieldTpl = this.fieldTpl;
+
+                    html.push(HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<div class="'),
+                        className,
+                        HtmlUtils.HTML('">')
+                    ));
+                    for (i = 0; i < fields.length; i++) {
+                        html.push(HtmlUtils.template(fieldTpl)($.extend(fields[i], {
+                            form: this.formType,
+                            requiredStr: this.requiredStr,
+                            optionalStr: this.optionalStr,
+                            supplementalText: fields[i].supplementalText || '',
+                            supplementalLink: fields[i].supplementalLink || ''
+                        })));
+                    }
+                    html.push('</div>');
+                    return html;
+                },
+
+                buildForm: function(data) {
+                    var html = [],
+                        i,
+                        field,
+                        len = data.length,
+                        requiredFields = [],
+                        optionalFields = [];
+
+                    this.fields = data;
+
+                    this.hasOptionalFields = false;
+                    for (i = 0; i < len; i++) {
+                        field = data[i];
+                        if (field.errorMessages) {
+                            // eslint-disable-next-line no-param-reassign
+                            field.errorMessages = this.escapeStrings(field.errorMessages);
+                        }
+
+                        if (field.required) {
+                            requiredFields.push(field);
+                        } else {
+                            if (field.type !== 'hidden') {
+                                // For the purporse of displaying the optional field toggle,
+                                // the form should be considered to have optional fields
+                                // only if all of the optional fields are being rendering as
+                                // input elements that are visible on the page.
+                                this.hasOptionalFields = true;
+                            }
+                            optionalFields.push(field);
+                        }
+                    }
+
+                    html = this.renderFields(requiredFields, 'required-fields');
+
+                    html.push.apply(html, this.renderFields(optionalFields, 'optional-fields'));
+
+                    this.render(html.join(''));
                 },
 
                 render: function(html) {
@@ -76,6 +142,7 @@
                         context: {
                             fields: fields,
                             currentProvider: this.currentProvider,
+                            syncLearnerProfileData: this.syncLearnerProfileData,
                             providers: this.providers,
                             hasSecondaryProviders: this.hasSecondaryProviders,
                             platformName: this.platformName,
@@ -95,11 +162,116 @@
 
                     if (this.autoSubmit) {
                         $(this.el).hide();
-                        $('#register-honor_code').prop('checked', true);
+                        $('#register-honor_code, #register-terms_of_service').prop('checked', true);
                         this.submitForm();
                     }
 
                     return this;
+                },
+
+                postRender: function() {
+                    var inputs = this.$('.form-field'),
+                        inputSelectors = 'input, select, textarea',
+                        inputTipSelectors = ['tip error', 'tip tip-input'],
+                        inputTipSelectorsHidden = ['tip error hidden', 'tip tip-input hidden'],
+                        onInputFocus = function() {
+                            // Apply on focus styles to input
+                            $(this).find('label').addClass('focus-in')
+                                .removeClass('focus-out');
+
+                            // Show each input tip
+                            $(this).children().each(function() {
+                                if (inputTipSelectorsHidden.indexOf($(this).attr('class')) >= 0) {
+                                    $(this).removeClass('hidden');
+                                }
+                            });
+                        },
+                        onInputFocusOut = function() {
+                            // If input has no text apply focus out styles
+                            if ($(this).find(inputSelectors).val().length === 0) {
+                                $(this).find('label').addClass('focus-out')
+                                    .removeClass('focus-in');
+                            }
+
+                            // Hide each input tip
+                            $(this).children().each(function() {
+                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 0) {
+                                    $(this).addClass('hidden');
+                                }
+                            });
+                        },
+                        handleInputBehavior = function(input) {
+                            // Initially put label in input
+                            if (input.find(inputSelectors).val().length === 0) {
+                                input.find('label').addClass('focus-out')
+                                    .removeClass('focus-in');
+                            }
+
+                            // Initially hide each input tip
+                            input.children().each(function() {
+                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 0) {
+                                    $(this).addClass('hidden');
+                                }
+                            });
+
+                            input.focusin(onInputFocus);
+                            input.focusout(onInputFocusOut);
+                        },
+                        handleAutocomplete = function() {
+                            $(inputs).each(function() {
+                                var $input = $(this),
+                                    isCheckbox = $input.attr('class').indexOf('checkbox') !== -1;
+
+                                if (!isCheckbox) {
+                                    if ($input.find(inputSelectors).val().length === 0
+                                        && !$input.is(':-webkit-autofill')) {
+                                        $input.find('label').addClass('focus-out')
+                                            .removeClass('focus-in');
+                                    } else {
+                                        $input.find('label').addClass('focus-in')
+                                            .removeClass('focus-out');
+                                    }
+                                }
+                            });
+                        };
+
+                    FormView.prototype.postRender.call(this);
+                    $('.optional-fields').addClass('hidden');
+                    $('#toggle_optional_fields').change(function() {
+                        window.analytics.track('edx.bi.user.register.optional_fields_selected');
+                        $('.optional-fields').toggleClass('hidden');
+                    });
+
+                    // We are swapping the order of these elements here because the honor code agreement
+                    // is a required checkbox field and the optional fields toggle is a cosmetic
+                    // improvement so that we don't have to show all the optional fields.
+                    // xss-lint: disable=javascript-jquery-insert-into-target
+                    $('.checkbox-optional_fields_toggle').insertAfter('.required-fields');
+                    if (!this.hasOptionalFields) {
+                        $('.checkbox-optional_fields_toggle').addClass('hidden');
+                    }
+                    // xss-lint: disable=javascript-jquery-insert-into-target
+                    $('.checkbox-honor_code').insertAfter('.optional-fields');
+                    // xss-lint: disable=javascript-jquery-insert-into-target
+                    $('.checkbox-terms_of_service').insertAfter('.optional-fields');
+
+                    // Clicking on links inside a label should open that link.
+                    $('label a').click(function(ev) {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        window.open($(this).attr('href'), $(this).attr('target'));
+                    });
+                    $('.form-field').each(function() {
+                        $(this).find('option:first').html('');
+                    });
+                    $(inputs).each(function() {
+                        var $input = $(this),
+                            isCheckbox = $input.attr('class').indexOf('checkbox') !== -1;
+                        if ($input.length > 0 && !isCheckbox) {
+                            handleInputBehavior($input);
+                        }
+                    });
+                    setTimeout(handleAutocomplete, 1000);
                 },
 
                 hideRequiredMessageExceptOnError: function($el) {

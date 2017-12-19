@@ -1,20 +1,12 @@
-"""
-Django admin page for course modes
-"""
-from django.conf import settings
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from django.contrib import admin
-
-from pytz import timezone, UTC
-
-from opaque_keys.edx.keys import CourseKey
+from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from pytz import UTC, timezone
 
-from util.date_utils import get_time_display
-from xmodule.modulestore.django import modulestore
 from course_modes.models import CourseMode, CourseModeExpirationConfig
-
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
 #
@@ -26,6 +18,8 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # but the test suite for Studio will fail because
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
+from util.date_utils import get_time_display
+from xmodule.modulestore.django import modulestore
 
 COURSE_MODE_SLUG_CHOICES = [(mode_slug, mode_slug) for mode_slug in settings.COURSE_ENROLLMENT_MODES]
 
@@ -170,6 +164,7 @@ class CourseModeForm(forms.ModelForm):
         return super(CourseModeForm, self).save(commit=commit)
 
 
+@admin.register(CourseMode)
 class CourseModeAdmin(admin.ModelAdmin):
     """Admin for course modes"""
     form = CourseModeForm
@@ -186,7 +181,7 @@ class CourseModeAdmin(admin.ModelAdmin):
         'bulk_sku'
     )
 
-    search_fields = ('course',)
+    search_fields = ('course__id',)
 
     list_display = (
         'id',
@@ -208,11 +203,4 @@ class CourseModeAdmin(admin.ModelAdmin):
     expiration_datetime_custom.short_description = "Upgrade Deadline"
 
 
-class CourseModeExpirationConfigAdmin(admin.ModelAdmin):
-    """Admin interface for the course mode auto expiration configuration. """
-
-    class Meta(object):
-        model = CourseModeExpirationConfig
-
-admin.site.register(CourseMode, CourseModeAdmin)
-admin.site.register(CourseModeExpirationConfig, CourseModeExpirationConfigAdmin)
+admin.site.register(CourseModeExpirationConfig)

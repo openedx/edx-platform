@@ -66,7 +66,7 @@
           .group-heading {
             @extend %t-strong;
 
-            color: $base-font-color;
+            color: $body-color;
           }
         }
 
@@ -108,8 +108,8 @@
               @include padding(($baseline/4) ($baseline/2));
 
               border-radius: ($baseline/4);
-              font-family: $sans-serif;
-              color: $base-font-color;
+              font-family: $font-family-sans-serif;
+              color: $body-color;
 
               p {
                 &.subtitle {
@@ -127,7 +127,7 @@
 
                   // definitions for proctored exam attempt status indicators
                   .verified {
-                    color: $success-color;
+                    color: theme-color("success");
                   }
 
                   .rejected {
@@ -146,7 +146,7 @@
 
               &:hover,
               &:focus {
-                color: $base-font-color;
+                color: $body-color;
                 background: $gray-l5;
 
                 .subtitle {

@@ -3,7 +3,6 @@
 Admin site configurations for verify_student.
 """
 
-from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification

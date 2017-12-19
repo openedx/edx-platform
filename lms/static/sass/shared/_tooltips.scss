@@ -2,7 +2,7 @@
   background: rgba($pink, 0.8);
   border: 0;
   color: $white;
-  font: bold 12px $body-font-family;
+  font: bold 12px $font-family-sans-serif;
   margin-bottom: 6px;
   margin-right: 0;
   overflow: visible;
@@ -20,7 +20,7 @@
     background: $dark-gray;
     border-radius: ($baseline/5);
     color: $white;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     line-height: lh();
     opacity: 0;
     padding: 6px;

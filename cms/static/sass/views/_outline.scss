@@ -48,7 +48,8 @@
     }
 
     // STATE: hover/focus
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .incontext-editor-open-action {
         opacity: 1;
       }
@@ -183,11 +184,13 @@
     margin-bottom: $baseline;
 
     .status-release,
-    .status-pacing {
+    .status-pacing,
+    .status-highlights-enabled {
       @extend %t-copy-base;
 
       display: inline-block;
       color: $color-copy-base;
+      margin-right: $baseline;
 
       // STATE: hover
       &:hover {
@@ -197,10 +200,17 @@
       }
     }
 
+    .status-highlights-enabled {
+      margin-left: $baseline * 1.6;
+    }
+
     .status-release-label,
     .status-release-value,
     .status-pacing-label,
     .status-pacing-value,
+    .status-highlights-enabled-label,
+    .status-highlights-enabled-value,
+    .status-highlights-enabled-info,
     .status-actions {
       display: inline-block;
       vertical-align: middle;
@@ -208,13 +218,28 @@
     }
 
     .status-release-label,
-    .status-pacing-label {
+    .status-pacing-label,
+    .status-highlights-enabled-label {
       margin-right: ($baseline/4);
     }
 
     .status-release-value,
-    .status-pacing-value {
+    .status-pacing-value,
+    .status-highlights-enabled-value {
       @extend %t-strong;
+      font-size: smaller;
+    }
+
+    .status-highlights-enabled-info {
+      font-size: smaller;
+      margin-left: $baseline / 2;
+    }
+
+    .status-highlights-enabled-value.button {
+      @extend %btn-primary-blue;
+      @extend %sizing;
+      padding: 5px 8px;
+      margin-top: 2px;
     }
 
     .status-actions {
@@ -634,6 +659,48 @@
     }
   }
 
+  // outline: highlight settings
+  .highlights-button {
+    cursor: pointer;
+    color: theme-color("primary");
+
+    // remove button styling
+    border: none;
+    background: none;
+    padding: 0;
+    font-weight: 600;
+  }
+
+  .number-highlights {
+    background: theme-color("primary");
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    color: $white;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 18px;
+    margin-right: 2px;
+    text-align: center;
+    width: 18px;
+  }
+
+  .highlights-section-modal {
+    .highlight-input-text {
+      width: 100%;
+      margin-bottom: ($baseline/4);
+      margin-top: ($baseline/4);
+    }
+
+    .highlight-input-label {
+      font-weight: 600;
+    }
+
+    .highlights-info {
+      font-size: smaller;
+    }
+  }
+
   // outline: edit item settings
   .wrapper-modal-window-bulkpublish-section,
   .wrapper-modal-window-bulkpublish-subsection,
@@ -723,10 +790,6 @@
   .bulkpublish-section-modal,
   .bulkpublish-subsection-modal,
   .bulkpublish-unit-modal {
-    .modal-introduction {
-      color: $gray-d2;
-    }
-
     .modal-section .outline-bulkpublish {
       max-height: ($baseline*20);
       overflow-y: auto;

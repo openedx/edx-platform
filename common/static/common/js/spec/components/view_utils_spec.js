@@ -1,25 +1,25 @@
 (function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'common/js/components/utils/view_utils',
-            'common/js/spec_helpers/view_helpers'],
+        'common/js/spec_helpers/view_helpers'],
         function($, _, Backbone, ViewUtils, ViewHelpers) {
             describe('ViewUtils', function() {
                 describe('disabled element while running', function() {
                     it("adds 'is-disabled' class to element while action is running and removes it after", function() {
-                        var link,
+                        var $link,
                             deferred = new $.Deferred(),
                             promise = deferred.promise();
                         setFixtures("<a href='#' id='link'>ripe apples drop about my head</a>");
-                        link = $('#link');
-                        expect(link).not.toHaveClass('is-disabled');
-                        ViewUtils.disableElementWhileRunning(link, function() { return promise; });
-                        expect(link).toHaveClass('is-disabled');
+                        $link = $('#link');
+                        expect($link).not.toHaveClass('is-disabled');
+                        ViewUtils.disableElementWhileRunning($link, function() { return promise; });
+                        expect($link).toHaveClass('is-disabled');
                         deferred.resolve();
-                        expect(link).not.toHaveClass('is-disabled');
+                        expect($link).not.toHaveClass('is-disabled');
                     });
 
                     it('disables elements within withDisabledElement', function() {
-                        var link,
+                        var $link,
                             eventCallback,
                             event,
                             deferred = new $.Deferred(),
@@ -31,14 +31,14 @@
                             }),
                             testView = new MockView();
                         setFixtures("<a href='#' id='link'>ripe apples drop about my head</a>");
-                        link = $('#link');
-                        expect(link).not.toHaveClass('is-disabled');
+                        $link = $('#link');
+                        expect($link).not.toHaveClass('is-disabled');
                         eventCallback = ViewUtils.withDisabledElement('testFunction');
-                        event = {currentTarget: link};
+                        event = {currentTarget: $link};
                         eventCallback.apply(testView, [event]);
-                        expect(link).toHaveClass('is-disabled');
+                        expect($link).toHaveClass('is-disabled');
                         deferred.resolve();
-                        expect(link).not.toHaveClass('is-disabled');
+                        expect($link).not.toHaveClass('is-disabled');
                     });
                 });
 

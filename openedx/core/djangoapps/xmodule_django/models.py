@@ -6,8 +6,9 @@ import warnings
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.lookups import IsNull
 from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
-
+from openedx.core.djangoapps.util.model_utils import CreatorMixin
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -36,13 +37,14 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
     """
     def _filter_or_exclude(self, *args, **kwargs):
         # pylint: disable=protected-access
-        for name in self.model._meta.get_all_field_names():
-            field_object, _model, direct, _m2m = self.model._meta.get_field_by_name(name)
+        for field_object in self.model._meta.get_fields():
+            direct = not field_object.auto_created or field_object.concrete
             if direct and hasattr(field_object, 'Empty'):
                 for suffix in ('', '_exact'):
-                    key = '{}{}'.format(name, suffix)
+                    key = '{}{}'.format(field_object.name, suffix)
                     if key in kwargs and kwargs[key] is None:
                         kwargs[key] = field_object.Empty
+
         return super(NoneToEmptyQuerySet, self)._filter_or_exclude(*args, **kwargs)
 
 
@@ -68,7 +70,7 @@ def _strip_value(value, lookup='exact'):
     return stripped_value
 
 
-class OpaqueKeyField(models.CharField):
+class OpaqueKeyField(CreatorMixin, models.CharField):
     """
     A django field for storing OpaqueKeys.
 
@@ -80,8 +82,6 @@ class OpaqueKeyField(models.CharField):
     to parse the key string, and will return an instance of KEY_CLASS.
     """
     description = "An OpaqueKey object, saved to the DB in the form of a string."
-
-    __metaclass__ = models.SubfieldBase
 
     Empty = object()
     KEY_CLASS = None
@@ -117,16 +117,6 @@ class OpaqueKeyField(models.CharField):
         else:
             return value
 
-    def get_prep_lookup(self, lookup, value):
-        if lookup == 'isnull':
-            raise TypeError('Use {0}.Empty rather than None to query for a missing {0}'.format(self.__class__.__name__))
-
-        return super(OpaqueKeyField, self).get_prep_lookup(
-            lookup,
-            # strip key before comparing
-            _strip_value(value, lookup)
-        )
-
     def get_prep_value(self, value):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
@@ -158,6 +148,19 @@ class OpaqueKeyField(models.CharField):
             return
 
         return super(OpaqueKeyField, self).run_validators(value)
+
+
+class OpaqueKeyFieldEmptyLookupIsNull(IsNull):
+    """
+    This overrides the default __isnull model filter to help enforce the special way
+    we handle null / empty values in OpaqueKeyFields.
+    """
+    def get_prep_lookup(self):
+        raise TypeError("Use this field's .Empty member rather than None or __isnull "
+                        "to query for missing objects of this type.")
+
+
+OpaqueKeyField.register_lookup(OpaqueKeyFieldEmptyLookupIsNull)
 
 
 class CourseKeyField(OpaqueKeyField):

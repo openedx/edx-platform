@@ -1,15 +1,15 @@
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
     var FileUpload = Backbone.Model.extend({
         defaults: {
-            'title': '',
-            'message': '',
-            'selectedFile': null,
-            'uploading': false,
-            'uploadedBytes': 0,
-            'totalBytes': 0,
-            'finished': false,
-            'mimeTypes': [],
-            'fileFormats': []
+            title: '',
+            message: '',
+            selectedFile: null,
+            uploading: false,
+            uploadedBytes: 0,
+            totalBytes: 0,
+            finished: false,
+            mimeTypes: [],
+            fileFormats: []
         },
         validate: function(attrs, options) {
             if (attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {

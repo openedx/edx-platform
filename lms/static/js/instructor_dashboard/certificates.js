@@ -46,7 +46,8 @@ var onCertificatesReady = null;
                 return;
             }
 
-            var $btn_generating_certs = $(this), $certificate_generation_status = $('.certificate-generation-status');
+            var $btn_generating_certs = $(this),
+                $certificate_generation_status = $('.certificate-generation-status');
             var url = $btn_generating_certs.data('endpoint');
             $.ajax({
                 type: 'POST',
@@ -82,8 +83,7 @@ var onCertificatesReady = null;
                     $btn_regenerating_certs.attr('disabled', 'disabled');
                     if (data.success) {
                         $certificate_regeneration_status.text(data.message).addClass('message');
-                    }
-                    else {
+                    } else {
                         $certificate_regeneration_status.text(data.message).addClass('message');
                     }
                 },
@@ -118,7 +118,7 @@ var onCertificatesReady = null;
             return this.instructor_tasks.task_poller.stop();
         };
         return Certificates;
-    })();
+    }());
 
     _.defaults(window, {
         InstructorDashboard: {}
@@ -131,4 +131,4 @@ var onCertificatesReady = null;
     _.defaults(window.InstructorDashboard.sections, {
         Certificates: Certificates
     });
-})($, gettext, _);
+}($, gettext, _));

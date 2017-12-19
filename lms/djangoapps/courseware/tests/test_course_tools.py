@@ -1,3 +1,8 @@
+"""
+Unit tests for course tools.
+"""
+
+import crum
 import datetime
 
 from mock import patch
@@ -59,6 +64,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
         )
         self.request = RequestFactory().request()
         self.request.user = self.enrollment.user
+        crum.set_current_request(self.request)
 
     def test_tool_visible(self):
         self.assertTrue(VerifiedUpgradeTool().is_enabled(self.request, self.course.id))

@@ -12,3 +12,6 @@ class CompletionAppConfig(AppConfig):
     """
     name = 'lms.djangoapps.completion'
     verbose_name = 'Completion'
+
+    def ready(self):
+        from . import handlers  # pylint: disable=unused-variable

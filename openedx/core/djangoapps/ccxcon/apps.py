@@ -10,4 +10,4 @@ class CCXConnectorConfig(AppConfig):
     verbose_name = "CCX Connector"
 
     def ready(self):
-        import openedx.core.djangoapps.ccxcon.signals
+        from . import signals

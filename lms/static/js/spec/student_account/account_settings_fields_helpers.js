@@ -1,10 +1,10 @@
 define(['backbone',
-        'jquery',
-        'underscore',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/spec/views/fields_helpers',
-        'string_utils'],
+    'jquery',
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/template_helpers',
+    'js/spec/views/fields_helpers',
+    'string_utils'],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
         'use strict';
 

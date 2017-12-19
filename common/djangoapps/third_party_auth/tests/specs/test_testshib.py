@@ -327,6 +327,8 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a 500 error when someone tries to call the URL.
             """
+            headers['CorrelationId'] = 'aefd38b7-c92c-445a-8c7a-487a3f0c7a9d'
+            headers['RequestNo'] = '[787177]'  # This is the format SAPSF returns for the transaction request number
             return 500, headers, 'Failure!'
 
         fields = ','.join(SapSuccessFactorsIdentityProvider.default_field_mapping.copy())
@@ -502,7 +504,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
 
         odata_company_id = 'NCC1701D'
         odata_api_root_url = 'http://api.successfactors.com/odata/v2/'
-        mocked_odata_ai_url = self._mock_odata_api_for_error(odata_api_root_url, self.USER_USERNAME)
+        mocked_odata_api_url = self._mock_odata_api_for_error(odata_api_root_url, self.USER_USERNAME)
         self._configure_testshib_provider(
             identity_provider_type='sap_success_factors',
             metadata_source=TESTSHIB_METADATA_URL,
@@ -516,16 +518,14 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         )
         with LogCapture(level=logging.WARNING) as log_capture:
             super(SuccessFactorsIntegrationTest, self).test_register()
-            expected_message = 'Unable to retrieve user details with username {username} from SAPSuccessFactors ' \
-                               'for company ID {company_id} with url "{odata_api_url}".  Error message: ' \
-                               '500 Server Error: Internal Server Error for url: {odata_api_url}.  System message: ' \
-                               'Not available.'.format(
-                                   username=self.USER_USERNAME,
-                                   company_id=odata_company_id,
-                                   odata_api_url=mocked_odata_ai_url,
-                               )
-            logging_messages = [log_msg.getMessage() for log_msg in log_capture.records]
-            self.assertTrue(expected_message in logging_messages)
+            logging_messages = str([log_msg.getMessage() for log_msg in log_capture.records]).replace('\\', '')
+            self.assertIn(odata_company_id, logging_messages)
+            self.assertIn(mocked_odata_api_url, logging_messages)
+            self.assertIn(self.USER_USERNAME, logging_messages)
+            self.assertIn("SAPSuccessFactors", logging_messages)
+            self.assertIn("Error message", logging_messages)
+            self.assertIn("System message", logging_messages)
+            self.assertIn("Headers", logging_messages)
 
     @skip('Test not necessary for this subclass')
     def test_get_saml_idp_class_with_fake_identifier(self):

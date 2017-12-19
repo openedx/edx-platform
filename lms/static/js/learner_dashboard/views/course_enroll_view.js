@@ -29,13 +29,18 @@
                      this.$parentEl = options.$parentEl;
                      this.enrollModel = options.enrollModel;
                      this.urlModel = options.urlModel;
+                     this.grade = options.grade;
+                     this.collectionCourseStatus = options.collectionCourseStatus;
                      this.render();
                  },
 
                  render: function() {
-                     var filledTemplate;
+                     var filledTemplate,
+                         context = this.model.toJSON();
                      if (this.$parentEl && this.enrollModel) {
-                         filledTemplate = this.tpl(this.model.toJSON());
+                         context.grade = this.grade;
+                         context.collectionCourseStatus = this.collectionCourseStatus;
+                         filledTemplate = this.tpl(context);
                          HtmlUtils.setHtml(this.$el, filledTemplate);
                          HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
                      }
@@ -52,7 +57,7 @@
                      // Enrollment click event handled here
                      var courseRunKey = $('.run-select').val() || this.model.get('course_run_key');
                      this.model.updateCourseRun(courseRunKey);
-                     if (!this.model.get('is_enrolled')) {
+                     if (this.model.get('is_enrolled')) {
                          // Create the enrollment.
                          this.enrollModel.save({
                              course_id: courseRunKey

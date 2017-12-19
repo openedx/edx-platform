@@ -9,71 +9,91 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 }
 
 // Rules for Bookmarks Results
-.bookmarks-results-list {
-  padding-top: ($baseline/2);
+.course-bookmarks {
+  flex-grow: 1;
 
-  .bookmarks-results-list-item {
-    @include padding(0, $baseline, ($baseline/4), $baseline);
+  .bookmarks-results-list {
+    padding-top: ($baseline/2);
 
-    display: block;
-    border: 1px solid $lms-border-color;
-    margin-bottom: $baseline;
+    .bookmarks-results-list-item {
+      @include padding(0, $baseline, ($baseline/4), $baseline);
 
-    &:hover {
-      border-color: palette(primary, base);
+      display: block;
+      border: 1px solid $border-color;
+      margin-bottom: $baseline;
 
-      .list-item-breadcrumbtrail {
-        color: palette(primary, base);
+      &:hover {
+        border-color: palette(primary, base);
+
+        .list-item-breadcrumbtrail {
+          color: palette(primary, base);
+        }
+      }
+    }
+
+    .results-list-item-view {
+      @include float(right);
+
+      margin-top: $baseline;
+    }
+
+    .list-item-date {
+      margin-top: ($baseline/4);
+      color: theme-color("dark");
+      font-size: font-size(small);
+    }
+
+    .bookmarks-results-list-item::before {
+      content: $bookmarked-icon;
+      position: relative;
+      top: -7px;
+      font-family: FontAwesome;
+      color: palette(primary, base);
+    }
+
+    .list-item-content {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .list-item-left-section {
+      display: inline-block;
+      vertical-align: middle;
+      width: 90%;
+    }
+
+    .list-item-right-section {
+      @include right(0);
+
+      bottom: $baseline*-0.75;
+      position: absolute;
+      vertical-align: middle;
+
+      .fa-arrow-right {
+        @include rtl {
+          @include transform(rotate(180deg));
+        }
       }
     }
   }
 
-  .results-list-item-view {
-    @include float(right);
-
-    margin-top: $baseline;
+  // Override the search count styling
+  .search-results .search-count {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
   }
 
-  .list-item-date {
-    margin-top: ($baseline/4);
-    color: $lms-gray;
-    font-size: font-size(small);
-  }
-
-  .bookmarks-results-list-item::before {
-    content: $bookmarked-icon;
-    position: relative;
-    top: -7px;
-    font-family: FontAwesome;
-    color: palette(primary, base);
-  }
-
-  .list-item-content {
-    overflow: hidden;
-  }
-
-  .list-item-left-section {
-    display: inline-block;
-    vertical-align: middle;
-    width: 90%;
-  }
-
-  .list-item-right-section {
-    display: inline-block;
-    vertical-align: middle;
-
-    .fa-arrow-right {
-      @include rtl {
-        @include transform(rotate(180deg));
-      }
-    }
+  // Override the pagination behavior
+  .pagination.pagination-full {
+    width: 100%;
+    text-align: center;
   }
 }
 
 // Rules for empty bookmarks list
 .bookmarks-empty {
   margin-top: $baseline;
-  border: 1px solid $lms-border-color;
+  border: 1px solid $border-color;
   padding: $baseline;
   background-color: $white;
 }

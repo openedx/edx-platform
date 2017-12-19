@@ -21,8 +21,8 @@
 
 // +Variables - Capa
 // ====================
-$annotation-yellow: rgba(255,255,10,0.3);
-$color-copy-tip: rgb(100,100,100);
+$annotation-yellow: rgba(255, 255, 10, 0.3);
+$color-copy-tip: rgb(100, 100, 100);
 
 // FontAwesome Icon code
 // ====================
@@ -45,9 +45,9 @@ $asterisk-icon: '\f069'; // .fa-asterisk
 
 // +Mixins - Status Icon - Capa
 // ====================
-@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d"){
+@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d") {
   .status-icon {
-    &:after {
+    &::after {
       @extend %use-font-awesome;
 
       color: $color;
@@ -219,8 +219,8 @@ div.problem {
     padding: ($baseline/2);
     width: 100%;
 
-    &:after {
-      @include margin-left($baseline*.75);
+    &::after {
+      @include margin-left($baseline*0.75);
     }
 
     &:hover {
@@ -329,7 +329,7 @@ div.problem {
 // Summary status indicators shown after the input area
 div.problem {
   .indicator-container {
-    @include margin-left($baseline*.75);
+    @include margin-left($baseline*0.75);
 
     .status {
       width: $baseline;
@@ -365,7 +365,7 @@ div.problem {
 div.problem {
   ol.enumerate {
     li {
-      &:before {
+      &::before {
         display: block;
         visibility: hidden;
         height: 0;
@@ -456,7 +456,7 @@ div.problem {
       margin-top: ($baseline / 2);
       margin-bottom: 0;
 
-      &:before {
+      &::before {
         @extend %t-strong;
 
         display: inline;
@@ -465,7 +465,7 @@ div.problem {
       }
 
       &:empty {
-        &:before {
+        &::before {
           display: none;
         }
       }
@@ -845,7 +845,7 @@ div.problem {
 
       .status {
         .status-icon {
-          &:after {
+          &::after {
             content: '';
           }
         }
@@ -871,11 +871,11 @@ div.problem {
     .indicator-container {
       display: inline-block;
 
-      .status.correct:after,
-      .status.partially-correct:after,
-      .status.incorrect:after,
-      .status.submitted:after,
-      .status.unanswered:after {
+      .status.correct::after,
+      .status.partially-correct::after,
+      .status.incorrect::after,
+      .status.submitted::after,
+      .status.unanswered::after {
         @include margin-left(0);
       }
     }
@@ -1089,15 +1089,15 @@ div.problem {
     line-height: $base-line-height;
 
     &.success {
-      @include notification-by-type($success-color);
+      @include notification-by-type($success);
     }
 
     &.error {
-      @include notification-by-type($error-color);
+      @include notification-by-type($danger);
     }
 
     &.warning {
-      @include notification-by-type($warning-color);
+      @include notification-by-type($warning);
     }
 
     &.general {
@@ -1263,7 +1263,6 @@ div.problem {
         @extend %t-strong;
 
         color: #aaa;
-        text-transform: uppercase;
         font-style: normal;
         font-size: 0.9em;
       }
@@ -1486,7 +1485,7 @@ div.problem {
       font-weight: normal;
     }
 
-    a.annotation-return:after { content: " \2191" }
+    a.annotation-return::after { content: " \2191" }
 
     .block, ul.tags {
       margin: .5em 0;
@@ -1558,12 +1557,11 @@ div.problem {
 
       pre { background-color: $gray-l3; color: $black; }
 
-      &:before {
+      &::before {
         @extend %t-strong;
 
         display: block;
         content: "debug input value";
-        text-transform: uppercase;
         font-size: 1.5em;
       }
     }
@@ -1605,8 +1603,8 @@ div.problem {
     }
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
-      &:after {
-        @include margin-left($baseline*.75);
+      &::after {
+        @include margin-left($baseline*0.75);
 
         content: url('#{$static-path}/images/correct-icon.png');
       }

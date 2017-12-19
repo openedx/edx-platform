@@ -5,13 +5,13 @@ define(['backbone'], function(Backbone) {
      */
     var Metadata = Backbone.Model.extend({
         defaults: {
-            'field_name': null,
-            'display_name': null,
-            'value': null,
-            'explicitly_set': null,
-            'default_value': null,
-            'options': null,
-            'type': null
+            field_name: null,
+            display_name: null,
+            value: null,
+            explicitly_set: null,
+            default_value: null,
+            options: null,
+            type: null
         },
 
         initialize: function() {

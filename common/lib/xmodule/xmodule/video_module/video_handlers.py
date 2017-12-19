@@ -22,7 +22,6 @@ from .transcripts_utils import (
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
     get_video_transcript_content,
-    is_val_transcript_feature_enabled_for_course,
     save_to_store,
     subs_filename,
     Transcript,
@@ -30,7 +29,9 @@ from .transcripts_utils import (
     TranscriptsGenerationException,
     youtube_speed_dict,
 )
-
+from .transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
+)
 
 log = logging.getLogger(__name__)
 
@@ -225,7 +226,8 @@ class VideoStudentViewHandlers(object):
                     For 'en' check if SJSON exists. For non-`en` check if SRT file exists.
         """
         is_bumper = request.GET.get('is_bumper', False)
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
+        # Currently, we don't handle video pre-load/bumper transcripts in edx-val.
+        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id) and not is_bumper
         transcripts = self.get_transcripts_info(is_bumper, include_val_transcripts=feature_enabled)
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')

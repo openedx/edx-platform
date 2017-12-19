@@ -38,27 +38,27 @@ define([
             };
 
             var expectPriceSelected = function(price) {
-                var sel = $('input[name="contribution"]');
+                var $sel = $('input[name="contribution"]');
 
                 // check that contribution value is same as price given
-                expect(sel.length).toEqual(1);
-                expect(sel.val()).toEqual(price);
+                expect($sel.length).toEqual(1);
+                expect($sel.val()).toEqual(price);
             };
 
             var expectPaymentButtonEnabled = function(isEnabled) {
-                var el = $('.payment-button'),
-                    appearsDisabled = el.hasClass('is-disabled'),
-                    isDisabled = el.prop('disabled');
+                var $el = $('.payment-button'),
+                    appearsDisabled = $el.hasClass('is-disabled'),
+                    isDisabled = $el.prop('disabled');
 
                 expect(!appearsDisabled).toEqual(isEnabled);
                 expect(!isDisabled).toEqual(isEnabled);
             };
 
             var expectPaymentDisabledBecauseInactive = function() {
-                var payButton = $('.payment-button');
+                var $payButton = $('.payment-button');
 
                 // Payment button should be hidden
-                expect(payButton.length).toEqual(0);
+                expect($payButton.length).toEqual(0);
             };
 
             var goToPayment = function(requests, kwargs) {
@@ -101,17 +101,17 @@ define([
                 var $el = $('.payment-button');
                 expect($el.length).toEqual(_.size(buttons));
                 _.each(buttons, function(expectedText, expectedId) {
-                    var buttonEl = $('#' + expectedId),
+                    var $buttonEl = $('#' + expectedId),
                         request;
 
-                    buttonEl.removeAttr('disabled');
-                    expect(buttonEl.length).toEqual(1);
-                    expect(buttonEl[0]).toHaveClass('payment-button');
-                    expect(buttonEl[0]).toHaveClass('action-primary');
-                    expect(buttonEl[0]).toHaveText(expectedText);
+                    $buttonEl.removeAttr('disabled');
+                    expect($buttonEl.length).toEqual(1);
+                    expect($buttonEl[0]).toHaveClass('payment-button');
+                    expect($buttonEl[0]).toHaveClass('action-primary');
+                    expect($buttonEl[0]).toHaveText(expectedText);
 
-                    buttonEl[0].click();
-                    expect(buttonEl[0]).toHaveClass('is-selected');
+                    $buttonEl[0].click();
+                    expect($buttonEl[0]).toHaveClass('is-selected');
                     expectPaymentButtonEnabled(false);
                     request = AjaxHelpers.currentRequest(requests);
                     expect(request.requestBody.split('&')).toContain('processor=' + expectedId);

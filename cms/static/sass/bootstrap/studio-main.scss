@@ -2,8 +2,10 @@
 // Studio main styles for Bootstrap
 // -----------------------------
 
-// Bootstrap theme
-@import 'cms/bootstrap/theme';
+// Studio theme variables
+@import 'cms/theme/variables';
+
+// Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
 // Legacy support

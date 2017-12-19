@@ -190,14 +190,14 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         problem.done = True
         problem.student_answers = {'1_2_1': 'choice_0'}
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<targetedfeedbackset/>")
+        self.assertRegexpMatches(the_html, r"<targetedfeedbackset>\s*</targetedfeedbackset>")
 
         # New problem with same XML -- try the correct choice.
         problem = new_loncapa_problem(xml_str)
         problem.done = True
         problem.student_answers = {'1_2_1': 'choice_2'}  # correct
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<targetedfeedbackset/>")
+        self.assertRegexpMatches(the_html, r"<targetedfeedbackset>\s*</targetedfeedbackset>")
 
     def test_targeted_feedback_no_solution_element(self):
         xml_str = textwrap.dedent("""
@@ -581,7 +581,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         # Q1 and Q2 have no feedback
         self.assertRegexpMatches(
             without_new_lines,
-            r'<targetedfeedbackset.*?/>.*<targetedfeedbackset.*?/>'
+            r'<targetedfeedbackset>\s*</targetedfeedbackset>.*<targetedfeedbackset>\s*</targetedfeedbackset>'
         )
 
     def test_targeted_feedback_multiple_answer_1(self):
@@ -594,7 +594,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegexpMatches(
             without_new_lines,
             r'<targetedfeedbackset.*?>.*?explanation-id="feedback1".*?</targetedfeedbackset>.*' +
-            r'<targetedfeedbackset.*?/>'
+            r'<targetedfeedbackset>\s*</targetedfeedbackset>'
         )
 
     def test_targeted_feedback_multiple_answer_2(self):

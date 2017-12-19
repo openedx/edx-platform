@@ -8,8 +8,8 @@ import mimetypes
 from django.conf import settings
 from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
+from django.template import TemplateDoesNotExist
 from django.views.decorators.csrf import ensure_csrf_cookie
-from mako.exceptions import TopLevelLookupException
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from util.cache import cache_if_anonymous
@@ -51,7 +51,7 @@ def render(request, template):
         if template == 'honor.html':
             context['allow_iframing'] = True
         return render_to_response('static_templates/' + template, context, content_type=content_type)
-    except TopLevelLookupException:
+    except TemplateDoesNotExist:
         raise Http404
 
 
@@ -68,7 +68,7 @@ def render_press_release(request, slug):
     template = slug.lower().replace('-', '_') + ".html"
     try:
         resp = render_to_response('static_templates/press_releases/' + template, {})
-    except TopLevelLookupException:
+    except TemplateDoesNotExist:
         raise Http404
     else:
         return resp

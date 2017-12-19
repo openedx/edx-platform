@@ -80,8 +80,7 @@
             panels;
 
         this.run = function() {
-            if (panels)
-                return; // already initialized
+            if (panels) { return; } // already initialized
 
             panels = new PanelCollection(idPostfix);
             var commandManager = new CommandManager(hooks);
@@ -92,7 +91,7 @@
                 undoManager = new UndoManager(function() {
                     previewManager.refresh();
                     if (uiManager) // not available on the first call
-                        uiManager.setUndoRedoButtonStates();
+                        { uiManager.setUndoRedoButtonStates(); }
                 }, panels);
                 this.textOperation = function(f) {
                     undoManager.setCommandMode();
@@ -162,7 +161,8 @@
     //
     // If remove is true, the whitespace disappears.
     Chunks.prototype.trimWhitespace = function(remove) {
-        var beforeReplacer, afterReplacer, that = this;
+        var beforeReplacer, afterReplacer,
+            that = this;
         if (remove) {
             beforeReplacer = afterReplacer = '';
         } else {
@@ -268,10 +268,9 @@
         if (window.getComputedStyle) {
             // Most browsers
             return window.getComputedStyle(elem, null).getPropertyValue('display') !== 'none';
-        }
-        else if (elem.currentStyle) {
+        } else if (elem.currentStyle) {
             // IE
-            return elem.currentStyle['display'] !== 'none';
+            return elem.currentStyle.display !== 'none';
         }
     };
 
@@ -282,8 +281,7 @@
         if (elem.attachEvent) {
             // IE only.  The "on" is mandatory.
             elem.attachEvent('on' + event, listener);
-        }
-        else {
+        } else {
             // Other browsers.
             elem.addEventListener(event, listener, false);
         }
@@ -296,8 +294,7 @@
         if (elem.detachEvent) {
             // IE only.  The "on" is mandatory.
             elem.detachEvent('on' + event, listener);
-        }
-        else {
+        } else {
             // Other browsers.
             elem.removeEventListener(event, listener, false);
         }
@@ -371,12 +368,10 @@
         if (self.innerHeight && self.scrollMaxY) {
             scrollWidth = doc.body.scrollWidth;
             scrollHeight = self.innerHeight + self.scrollMaxY;
-        }
-        else if (doc.body.scrollHeight > doc.body.offsetHeight) {
+        } else if (doc.body.scrollHeight > doc.body.offsetHeight) {
             scrollWidth = doc.body.scrollWidth;
             scrollHeight = doc.body.scrollHeight;
-        }
-        else {
+        } else {
             scrollWidth = doc.body.offsetWidth;
             scrollHeight = doc.body.offsetHeight;
         }
@@ -385,13 +380,11 @@
             // Non-IE browser
             innerWidth = self.innerWidth;
             innerHeight = self.innerHeight;
-        }
-        else if (doc.documentElement && doc.documentElement.clientHeight) {
+        } else if (doc.documentElement && doc.documentElement.clientHeight) {
             // Some versions of IE (IE 6 w/ a DOCTYPE declaration)
             innerWidth = doc.documentElement.clientWidth;
             innerHeight = doc.documentElement.clientHeight;
-        }
-        else if (doc.body) {
+        } else if (doc.body) {
             // Other versions of IE
             innerWidth = doc.body.clientWidth;
             innerHeight = doc.body.clientHeight;
@@ -424,8 +417,7 @@
 
             if (!uaSniffed.isIE || mode != 'moving') {
                 timer = setTimeout(refreshState, 1);
-            }
-            else {
+            } else {
                 inputStateObj = null;
             }
         };
@@ -459,8 +451,7 @@
                     // What about setting state -1 to null or checking for undefined?
                     lastState.restore();
                     lastState = null;
-                }
-                else {
+                } else {
                     undoStack[stackPtr] = new TextareaState(panels);
                     undoStack[--stackPtr].restore();
 
@@ -534,8 +525,7 @@
                 case 'z':
                     if (!event.shiftKey) {
                         undoObj.undo();
-                    }
-                    else {
+                    } else {
                         undoObj.redo();
                     }
                     handled = true;
@@ -563,22 +553,18 @@
                     // 33 - 40: page up/dn and arrow keys
                     // 63232 - 63235: page up/dn and arrow keys on safari
                     setMode('moving');
-                }
-                else if (keyCode == 8 || keyCode == 46 || keyCode == 127) {
+                } else if (keyCode == 8 || keyCode == 46 || keyCode == 127) {
                     // 8: backspace
                     // 46: delete
                     // 127: delete
                     setMode('deleting');
-                }
-                else if (keyCode == 13) {
+                } else if (keyCode == 13) {
                     // 13: Enter
                     setMode('newlines');
-                }
-                else if (keyCode == 27) {
+                } else if (keyCode == 27) {
                     // 27: escape
                     setMode('escape');
-                }
-                else if ((keyCode < 16 || keyCode > 20) && keyCode != 91) {
+                } else if ((keyCode < 16 || keyCode > 20) && keyCode != 91) {
                     // 16-20 are shift, etc.
                     // 91: left window key
                     // I think this might be a little messed up since there are
@@ -661,8 +647,7 @@
                 inputArea.selectionStart = stateObj.start;
                 inputArea.selectionEnd = stateObj.end;
                 inputArea.scrollTop = stateObj.scrollTop;
-            }
-            else if (doc.selection) {
+            } else if (doc.selection) {
                 if (doc.activeElement && doc.activeElement !== inputArea) {
                     return;
                 }
@@ -681,8 +666,7 @@
             if (!panels.ieCachedRange && (inputArea.selectionStart || inputArea.selectionStart === 0)) {
                 stateObj.start = inputArea.selectionStart;
                 stateObj.end = inputArea.selectionEnd;
-            }
-            else if (doc.selection) {
+            } else if (doc.selection) {
                 stateObj.text = util.fixEolChars(inputArea.value);
 
                 // IE loses the selection in the textarea when buttons are
@@ -713,8 +697,7 @@
                     range.text = fixedRange;
                 }
 
-                if (panels.ieCachedRange)
-                    stateObj.scrollTop = panels.ieCachedScrollTop; // this is set alongside with ieCachedRange
+                if (panels.ieCachedRange) { stateObj.scrollTop = panels.ieCachedScrollTop; } // this is set alongside with ieCachedRange
 
                 panels.ieCachedRange = null;
 
@@ -780,12 +763,10 @@
 
             if (window.innerHeight) {
                 result = window.pageYOffset;
-            }
-            else
+            } else
                 if (doc.documentElement && doc.documentElement.scrollTop) {
                     result = doc.documentElement.scrollTop;
-                }
-                else
+                } else
                     if (doc.body) {
                         result = doc.body.scrollTop;
                     }
@@ -796,15 +777,13 @@
         var makePreviewHtml = function() {
             // If there is no registered preview panel
             // there is nothing to do.
-            if (!panels.preview)
-                return;
+            if (!panels.preview) { return; }
 
 
             var text = panels.input.value;
             if (text && text == oldInputText) {
                 return; // Input text hasn't changed.
-            }
-            else {
+            } else {
                 oldInputText = text;
             }
 
@@ -858,8 +837,7 @@
             if (requiresRefresh) {
                 oldInputText = '';
                 makePreviewHtml();
-            }
-            else {
+            } else {
                 applyTimeout();
             }
         };
@@ -879,10 +857,7 @@
             var sibling = preview.nextSibling;
             parent.removeChild(preview);
             preview.innerHTML = text;
-            if (!sibling)
-                parent.appendChild(preview);
-            else
-                parent.insertBefore(preview, sibling);
+            if (!sibling) { parent.appendChild(preview); } else { parent.insertBefore(preview, sibling); }
         };
 
         var nonSuckyBrowserPreviewSet = function(text) {
@@ -892,8 +867,7 @@
         var previewSetter;
 
         var previewSet = function(text) {
-            if (previewSetter)
-                return previewSetter(text);
+            if (previewSetter) { return previewSetter(text); }
 
             try {
                 nonSuckyBrowserPreviewSet(text);
@@ -924,8 +898,7 @@
                 setTimeout(function() {
                     window.scrollBy(0, fullTop - emptyTop);
                 }, 0);
-            }
-            else {
+            } else {
                 window.scrollBy(0, fullTop - emptyTop);
             }
         };
@@ -959,8 +932,7 @@
 
         if (uaSniffed.isIE) {
             style.filter = 'alpha(opacity=50)';
-        }
-        else {
+        } else {
             style.opacity = '0.5';
         }
 
@@ -970,8 +942,7 @@
         if (uaSniffed.isIE) {
             style.left = doc.documentElement.scrollLeft;
             style.width = doc.documentElement.clientWidth;
-        }
-        else {
+        } else {
             style.left = '0';
             style.width = '100%';
         }
@@ -1038,8 +1009,7 @@
 
             if (isCancel) {
                 url = null;
-            }
-            else {
+            } else {
                 // Fixes common pasting errors.
                 url = url.replace(/^http:\/\/(https?|ftp):\/\//, '$1://');
                 // doesn't change url if started with '/' (local)
@@ -1075,7 +1045,7 @@
                             // Translators: 'errorCount' is the number of errors found in the form.
                             '%(errorCount)s error found in form.', '%(errorCount)s errors found in form.',
                             errorCount
-                        ), {'errorCount': errorCount}, true
+                        ), {errorCount: errorCount}, true
                     ),
                     !isValidUrl ? urlErrorMsg.textContent : '',
                     !isValidDesc ? descErrorMsg.textContent : ''
@@ -1191,8 +1161,7 @@
             if (urlInput.selectionStart !== undefined) {
                 urlInput.selectionStart = 0;
                 urlInput.selectionEnd = defTextLen;
-            }
-            else if (urlInput.createTextRange) {
+            } else if (urlInput.createTextRange) {
                 var range = urlInput.createTextRange();
                 range.collapse(false);
                 range.moveStart('character', -defTextLen);
@@ -1258,8 +1227,7 @@
                 case 'z':
                     if (key.shiftKey) {
                         doClick(buttons.redo);
-                    }
-                    else {
+                    } else {
                         doClick(buttons.undo);
                     }
                     break;
@@ -1412,8 +1380,7 @@
                 // It should become a separate commit applied to WMD's official HEAD if we remove this edited version
                 // of WMD from Git and install it from NPM / a maintained public fork.
                 button.removeAttribute('aria-disabled');
-            }
-            else {
+            } else {
                 image.style.backgroundPosition = button.XShift + ' ' + disabledYShift;
                 button.onmouseover = button.onmouseout = button.onclick = function() { };
                 // This line does not appear in vanilla WMD. It was added by edX to improve accessibility.
@@ -1424,8 +1391,7 @@
         }
 
         function bindCommand(method) {
-            if (typeof method === 'string')
-                method = commandManager[method];
+            if (typeof method === 'string') { method = commandManager[method]; }
             return function() { method.apply(commandManager, arguments); };
         }
 
@@ -1442,9 +1408,9 @@
             buttonRow.className = 'wmd-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
-            var makeButton = function(id, title, XShift, textOp) {
+            var makeButton = function(id, title, XShift, textOp, tabIndex) {
                 var button = document.createElement('button');
-                button.tabIndex = 0;
+                button.tabIndex = tabIndex;
                 button.className = 'wmd-button';
                 button.style.left = xPosition + 'px';
                 xPosition += 25;
@@ -1453,8 +1419,7 @@
                 button.appendChild(buttonImage);
                 button.title = title;
                 button.XShift = XShift;
-                if (textOp)
-                    button.textOp = textOp;
+                if (textOp) { button.textOp = textOp; }
                 setupButton(button, true);
                 buttonRow.appendChild(button);
                 return button;
@@ -1468,35 +1433,35 @@
                 xPosition += 25;
             };
 
-            buttons.bold = makeButton('wmd-bold-button', gettext('Bold (Ctrl+B)'), '0px', bindCommand('doBold'));
-            buttons.italic = makeButton('wmd-italic-button', gettext('Italic (Ctrl+I)'), '-20px', bindCommand('doItalic'));
+            buttons.bold = makeButton('wmd-bold-button', gettext('Bold (Ctrl+B)'), '0px', bindCommand('doBold'), 0);
+            buttons.italic = makeButton('wmd-italic-button', gettext('Italic (Ctrl+I)'), '-20px', bindCommand('doItalic'), -1);
             makeSpacer(1);
             buttons.link = makeButton('wmd-link-button', gettext('Hyperlink (Ctrl+L)'), '-40px', bindCommand(function(chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
-            }));
-            buttons.quote = makeButton('wmd-quote-button', gettext('Blockquote (Ctrl+Q)'), '-60px', bindCommand('doBlockquote'));
-            buttons.code = makeButton('wmd-code-button', gettext('Code Sample (Ctrl+K)'), '-80px', bindCommand('doCode'));
+            }), -1);
+            buttons.quote = makeButton('wmd-quote-button', gettext('Blockquote (Ctrl+Q)'), '-60px', bindCommand('doBlockquote'), -1);
+            buttons.code = makeButton('wmd-code-button', gettext('Code Sample (Ctrl+K)'), '-80px', bindCommand('doCode'), -1);
             buttons.image = makeButton('wmd-image-button', gettext('Image (Ctrl+G)'), '-100px', bindCommand(function(chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, true, imageUploadHandler);
-            }));
+            }), -1);
             makeSpacer(2);
             buttons.olist = makeButton('wmd-olist-button', gettext('Numbered List (Ctrl+O)'), '-120px', bindCommand(function(chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
-            }));
+            }), -1);
             buttons.ulist = makeButton('wmd-ulist-button', gettext('Bulleted List (Ctrl+U)'), '-140px', bindCommand(function(chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
-            }));
-            buttons.heading = makeButton('wmd-heading-button', gettext('Heading (Ctrl+H)'), '-160px', bindCommand('doHeading'));
-            buttons.hr = makeButton('wmd-hr-button', gettext('Horizontal Rule (Ctrl+R)'), '-180px', bindCommand('doHorizontalRule'));
+            }), -1);
+            buttons.heading = makeButton('wmd-heading-button', gettext('Heading (Ctrl+H)'), '-160px', bindCommand('doHeading'), -1);
+            buttons.hr = makeButton('wmd-hr-button', gettext('Horizontal Rule (Ctrl+R)'), '-180px', bindCommand('doHorizontalRule'), -1);
             makeSpacer(3);
-            buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null);
+            buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null, -1);
             buttons.undo.execute = function(manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 gettext('Redo (Ctrl+Y)') :
                 gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null);
+            buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null, -1);
             buttons.redo.execute = function(manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {
@@ -1586,16 +1551,14 @@
         if ((prevStars >= nStars) && (prevStars != 2 || nStars != 1)) {
             chunk.before = chunk.before.replace(re('[*]{' + nStars + '}$', ''), '');
             chunk.after = chunk.after.replace(re('^[*]{' + nStars + '}', ''), '');
-        }
-        else if (!chunk.selection && starsAfter) {
+        } else if (!chunk.selection && starsAfter) {
             // It's not really clear why this code is necessary.  It just moves
             // some arbitrary stuff around.
             chunk.after = chunk.after.replace(/^([*_]*)/, '');
             chunk.before = chunk.before.replace(/(\s?)$/, '');
             var whitespace = re.$1;
             chunk.before = chunk.before + starsAfter + whitespace;
-        }
-        else {
+        } else {
             // In most cases, if you don't have any selected text and click the button
             // you'll get a selected, marked up region with the default text inserted.
             if (!chunk.selection && !starsAfter) {
@@ -1661,8 +1624,7 @@
 
         if (linkDef) {
             addDefNumber(linkDef);
-        }
-        else {
+        } else {
             chunk.selection = chunk.selection.replace(regex, getLink);
         }
 
@@ -1711,8 +1673,7 @@
             chunk.startTag = chunk.startTag.replace(/!?\[/, '');
             chunk.endTag = '';
             this.addLinkDef(chunk, null);
-        }
-        else {
+        } else {
             // We're moving start and end tag back into the selection, since (as we're in the else block) we're not
             // *removing* a link, but *adding* one, so whatever findTags() found is now back to being part of the
             // link text. linkEnteredCallback takes care of escaping any brackets.
@@ -1758,10 +1719,9 @@
 
                     if (!chunk.selection) {
                         if (isImage) {
-                            chunk.selection = description ? description : '';
-                        }
-                        else {
-                            chunk.selection = description ? description : gettext('enter link description here');
+                            chunk.selection = description || '';
+                        } else {
+                            chunk.selection = description || gettext('enter link description here');
                         }
                     }
                 }
@@ -1787,8 +1747,7 @@
                         imageUploadHandler
                     );
                 }
-            }
-            else {
+            } else {
                 ui.prompt(
                     linkDialogText,
                     urlLabel,
@@ -1910,7 +1869,7 @@
                 if (/^>/.test(line)) {                // a)
                     good = true;
                     if (!inChain && line.length > 1)  // c) any line that starts with ">" and has at least one more character starts the chain
-                        inChain = true;
+                        { inChain = true; }
                 } else if (/^[ \t]*$/.test(line)) {   // b)
                     good = true;
                 } else {
@@ -2020,20 +1979,15 @@
             if (!chunk.selection) {
                 chunk.startTag = '    ';
                 chunk.selection = gettext('enter code here');
-            }
-            else {
+            } else {
                 if (/^[ ]{0,3}\S/m.test(chunk.selection)) {
-                    if (/\n/.test(chunk.selection))
-                        chunk.selection = chunk.selection.replace(/^/gm, '    ');
-                    else // if it's not multiline, do not select the four added spaces; this is more consistent with the doList behavior
-                        chunk.before += '    ';
-                }
-                else {
+                    if (/\n/.test(chunk.selection)) { chunk.selection = chunk.selection.replace(/^/gm, '    '); } else // if it's not multiline, do not select the four added spaces; this is more consistent with the doList behavior
+                        { chunk.before += '    '; }
+                } else {
                     chunk.selection = chunk.selection.replace(/^[ ]{4}/gm, '');
                 }
             }
-        }
-        else {
+        } else {
             // Use backticks (`) to delimit the code block.
 
             chunk.trimWhitespace();
@@ -2044,12 +1998,10 @@
                 if (!chunk.selection) {
                     chunk.selection = gettext('enter code here');
                 }
-            }
-            else if (chunk.endTag && !chunk.startTag) {
+            } else if (chunk.endTag && !chunk.startTag) {
                 chunk.before += chunk.endTag;
                 chunk.endTag = '';
-            }
-            else {
+            } else {
                 chunk.startTag = chunk.endTag = '';
             }
         }
@@ -2075,8 +2027,7 @@
             if (isNumberedList) {
                 prefix = ' ' + num + '. ';
                 num++;
-            }
-            else {
+            } else {
                 prefix = ' ' + bullet + ' ';
             }
             return prefix;
@@ -2216,4 +2167,4 @@
         chunk.selection = '';
         chunk.skipLines(2, 1, true);
     };
-})();
+}());

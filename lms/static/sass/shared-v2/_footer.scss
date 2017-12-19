@@ -9,7 +9,7 @@
   box-shadow: 0 -1px 5px 0 $shadow-l1;
   border-top: 1px solid palette(grayscale, x-back);
   padding: 25px ($baseline/2) ($baseline*1.5);
-  background: $footer-bg;
+  background: $body-bg;
 
   footer#footer-openedx {
     @include clearfix();
@@ -18,11 +18,11 @@
     margin: 0 auto;
 
     p, ol, ul {
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
 
       // override needed for poorly scoped font-family styling on p a:link {}
       a {
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
       }
     }
 

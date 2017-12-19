@@ -14,6 +14,7 @@ class SiteFactory(DjangoModelFactory):
     """
     class Meta(object):
         model = Site
+        django_get_or_create = ('domain',)
 
     name = "test microsite"
     domain = "test-site.testserver"

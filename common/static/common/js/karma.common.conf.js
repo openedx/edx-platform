@@ -43,7 +43,7 @@ var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
 var webdriver = require('selenium-webdriver');
 var firefox = require('selenium-webdriver/firefox');
-var webpackConfig = require(path.join(appRoot, 'webpack.config.js'));
+var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
 delete webpackConfig.entry;
 

@@ -148,6 +148,11 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
 
     if update_score:
         # Set the problem score in CSM.
+
+        # adding temporary log for understanding EDUCATOR-1931
+        if user.is_anonymous():
+            log.info("Problem [%s] was accessed by anonymous user", block.location)
+
         score_modified_time = set_score(user.id, block.location, raw_earned, raw_possible)
 
         # Set the problem score on the xblock.

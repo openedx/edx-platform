@@ -16,3 +16,5 @@ if is_comprehensive_theming_enabled():
             name='openedx.theming.update_theme_fragment_view',
         ),
     ]
+else:
+    urlpatterns = []

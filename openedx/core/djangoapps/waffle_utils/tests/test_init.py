@@ -1,8 +1,10 @@
 """
 Tests for waffle utils features.
 """
+import crum
 import ddt
 from django.test import TestCase
+from django.test.client import RequestFactory
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from request_cache.middleware import RequestCache
@@ -27,6 +29,12 @@ class TestCourseWaffleFlag(TestCase):
     TEST_NAMESPACE = WaffleFlagNamespace(NAMESPACE_NAME)
     TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME)
 
+    def setUp(self):
+        super(TestCourseWaffleFlag, self).setUp()
+        request = RequestFactory().request()
+        crum.set_current_request(request)
+        RequestCache.clear_request_cache()
+
     @ddt.data(
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on, 'waffle_enabled': False, 'result': True},
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off, 'waffle_enabled': True, 'result': False},
@@ -38,8 +46,6 @@ class TestCourseWaffleFlag(TestCase):
         Tests various combinations of a flag being set in waffle and overridden
         for a course.
         """
-        RequestCache.clear_request_cache()
-
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
             with override_flag(self.NAMESPACED_FLAG_NAME, active=data['waffle_enabled']):
                 # check twice to test that the result is properly cached
@@ -70,8 +76,6 @@ class TestCourseWaffleFlag(TestCase):
         """
         Test flag with various defaults provided for undefined waffle flags.
         """
-        RequestCache.clear_request_cache()
-
         test_course_flag = CourseWaffleFlag(
             self.TEST_NAMESPACE,
             self.FLAG_NAME,
@@ -91,3 +95,20 @@ class TestCourseWaffleFlag(TestCase):
                 self.NAMESPACED_FLAG_NAME,
                 self.TEST_COURSE_KEY
             )
+
+    @ddt.data(
+        {'flag_undefined_default': None, 'result': False},
+        {'flag_undefined_default': False, 'result': False},
+        {'flag_undefined_default': True, 'result': True},
+    )
+    def test_without_request(self, data):
+        """
+        Test the flag behavior when outside a request context.
+        """
+        crum.set_current_request(None)
+        test_course_flag = CourseWaffleFlag(
+            self.TEST_NAMESPACE,
+            self.FLAG_NAME,
+            flag_undefined_default=data['flag_undefined_default']
+        )
+        self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])

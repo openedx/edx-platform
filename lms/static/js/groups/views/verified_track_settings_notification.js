@@ -1,7 +1,7 @@
 (function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext', 'edx-ui-toolkit/js/utils/string-utils',
-            'js/models/notification', 'js/views/notification'],
+        'js/models/notification', 'js/views/notification'],
         function($, _, Backbone, gettext, StringUtils) {
             /* global NotificationModel, NotificationView */
 
@@ -22,8 +22,7 @@
                                         cohort.get('name') === verifiedCohortName) {
                                     verifiedCohortExists = true;
                                     cohort.disableEditingName = true;
-                                }
-                                else {
+                                } else {
                                     cohort.disableEditingName = false;
                                 }
                             }
@@ -36,8 +35,7 @@
                                         {verifiedCohortName: verifiedCohortName}
                                     )
                                 });
-                            }
-                            else {
+                            } else {
                                 this.showNotification({
                                     type: 'error',
                                     title: StringUtils.interpolate(
@@ -47,8 +45,7 @@
                                 });
                             }
                             enableCohortsCheckbox.prop('disabled', true);
-                        }
-                        else {
+                        } else {
                             this.showNotification({
                                 type: 'error',
                                 title: gettext('This course has automatic cohorting enabled for verified track learners, but cohorts are disabled. You must enable cohorts for the feature to work.')  // eslint-disable-line max-len

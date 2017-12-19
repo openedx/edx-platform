@@ -12,7 +12,6 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from lms.djangoapps.certificates.api import is_passing_status
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -201,3 +200,19 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
                 self.assertContains(response, 'Explore New Courses')
             else:
                 self.assertNotContains(response, 'Explore New Courses')
+
+    def test_certificate_for_visibility_for_not_viewable_course(self):
+        """
+        Verify that a certificate is not shown if certificate are not viewable to users.
+        """
+        # add new course with certificate_available_date is future date.
+        course = CourseFactory.create(
+            certificate_available_date=datetime.datetime.now() + datetime.timedelta(days=5)
+        )
+
+        cert = self._create_certificate(course_key=course.id)
+        cert.save()
+
+        response = self.client.get('/u/{username}'.format(username=self.user.username))
+
+        self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))

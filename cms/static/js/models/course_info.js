@@ -5,8 +5,8 @@ define(['backbone'], function(Backbone) {
         url: '',
 
         defaults: {
-            'updates': null,   // UpdateCollection
-            'handouts': null    // HandoutCollection
+            updates: null,   // UpdateCollection
+            handouts: null    // HandoutCollection
         }
     });
     return CourseInfo;

@@ -894,8 +894,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         strategy.storage.user.create_user(username=self.get_username(), email='user@email.com', password='password')
         backend = strategy.request.backend
         backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        # If learner already has an account then make sure login page is served instead of registration.
         # pylint: disable=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(backend, social_views._do_login))
+        self.assert_redirect_to_login_looks_correct(actions.do_complete(backend, social_views._do_login))
         distinct_username = pipeline.get(request)['kwargs']['username']
         self.assertNotEqual(original_username, distinct_username)
 
@@ -929,11 +930,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         with self.assertRaises(pipeline.AuthEntryError):
             strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
-    def test_pipeline_raises_auth_entry_error_if_auth_entry_missing(self):
+    def test_pipeline_assumes_login_if_auth_entry_missing(self):
         _, strategy = self.get_request_and_strategy(auth_entry=None, redirect_uri='social:complete')
-
-        with self.assertRaises(pipeline.AuthEntryError):
-            strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        response = self.fake_auth_complete(strategy)
+        self.assertEqual(response.url, reverse('signin_user'))
 
 
 # pylint: disable=test-inherits-tests, abstract-method

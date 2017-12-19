@@ -9,7 +9,10 @@ from contextlib import contextmanager
 from django.test import TestCase
 
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.video_config.models import CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import (
+    CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
+    CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
+)
 
 
 @contextmanager
@@ -184,8 +187,8 @@ class TestVideoTranscriptFlag(TestCase, FeatureFlagTestMixin):
         with course-specific flags.
         """
         self.verify_feature_flags(
-            all_courses_model_class=HLSPlaybackEnabledFlag,
-            course_specific_model_class=CourseHLSPlaybackEnabledFlag,
+            all_courses_model_class=VideoTranscriptEnabledFlag,
+            course_specific_model_class=CourseVideoTranscriptEnabledFlag,
             global_flag=global_flag,
             enabled_for_all_courses=enabled_for_all_courses,
             enabled_for_course_1=enabled_for_course_1
@@ -196,8 +199,8 @@ class TestVideoTranscriptFlag(TestCase, FeatureFlagTestMixin):
         Ensures that the Video Transcript course specific flag, once enabled for a course, can also be disabled.
         """
         self.verify_enable_disable_course_flag(
-            all_courses_model_class=HLSPlaybackEnabledFlag,
-            course_specific_model_class=CourseHLSPlaybackEnabledFlag
+            all_courses_model_class=VideoTranscriptEnabledFlag,
+            course_specific_model_class=CourseVideoTranscriptEnabledFlag
         )
 
     def test_enable_disable_globally(self):
@@ -205,6 +208,6 @@ class TestVideoTranscriptFlag(TestCase, FeatureFlagTestMixin):
         Ensures that the Video Transcript flag, once enabled globally, can also be disabled.
         """
         self.verify_enable_disable_globally(
-            all_courses_model_class=HLSPlaybackEnabledFlag,
-            course_specific_model_class=CourseHLSPlaybackEnabledFlag
+            all_courses_model_class=VideoTranscriptEnabledFlag,
+            course_specific_model_class=CourseVideoTranscriptEnabledFlag
         )

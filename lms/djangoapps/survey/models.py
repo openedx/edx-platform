@@ -27,6 +27,9 @@ class SurveyForm(TimeStampedModel):
     name = models.CharField(max_length=255, db_index=True, unique=True)
     form = models.TextField()
 
+    class Meta(object):
+        app_label = 'survey'
+
     def __unicode__(self):
         return self.name
 
@@ -169,6 +172,9 @@ class SurveyAnswer(TimeStampedModel):
     # adding the course_id where the end-user answered the survey question
     # since it didn't exist in the beginning, it is nullable
     course_key = CourseKeyField(max_length=255, db_index=True, null=True)
+
+    class Meta(object):
+        app_label = 'survey'
 
     @classmethod
     def do_survey_answers_exist(cls, form, user):

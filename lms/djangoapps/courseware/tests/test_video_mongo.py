@@ -69,6 +69,7 @@ class TestVideoYouTube(TestVideo):
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
                 'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
+                'duration': None,
                 'poster': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
@@ -149,6 +150,7 @@ class TestVideoNonYouTube(TestVideo):
                 'streams': '1.00:3_yD_cEKoCk',
                 'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
+                'duration': None,
                 'poster': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
@@ -206,6 +208,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'streams': '1.00:3_yD_cEKoCk',
             'sub': 'a_sub_file.srt.sjson',
             'sources': '[]',
+            'duration': 111.0,
             'poster': None,
             'captionDataDir': None,
             'showCaptions': 'true',
@@ -306,6 +309,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         for data in cases:
             metadata = self.default_metadata_dict
             metadata['sources'] = sources
+            metadata['duration'] = None
             DATA = SOURCE_XML.format(
                 download_track=data['download_track'],
                 track=data['track'],
@@ -424,6 +428,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             ],
             'poster': 'null',
         }
+        initial_context['metadata']['duration'] = None
 
         for data in cases:
             DATA = SOURCE_XML.format(
@@ -674,7 +679,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         result = create_video(
             dict(
                 client_video_id='A Client Video id',
-                duration=111,
+                duration=111.0,
                 edx_video_id=edx_video_id,
                 status='test',
                 encoded_videos=encoded_videos,
@@ -835,6 +840,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             ],
             'poster': 'null',
         }
+        initial_context['metadata']['duration'] = None
 
         for data in cases:
             DATA = SOURCE_XML.format(
@@ -1360,6 +1366,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                     "fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0},
                     "youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}
                 },
+                "all_sources": [self.TEST_SOURCE_URL],
             }
         )
 
@@ -1374,6 +1381,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "duration": None,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
                 "encoded_videos": {"youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}},
+                "all_sources": [],
             }
         )
 
@@ -1391,6 +1399,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "only_on_web": False,
                 "duration": self.TEST_DURATION,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+                'all_sources': [self.TEST_SOURCE_URL],
             }
         )
 
@@ -1461,7 +1470,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
@@ -1475,7 +1484,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
         Mock(return_value=False),
     )
     @patch(
@@ -1542,7 +1551,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         create_video({
             'edx_video_id': self.descriptor.edx_video_id,
             'client_video_id': 'test_client_video_id',
-            'duration': 111,
+            'duration': 111.0,
             'status': 'dummy',
             'encoded_videos': [{
                 'profile': 'mobile',
@@ -1643,7 +1652,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertEqual(video.edx_video_id, 'test_edx_video_id')
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
-        self.assertEqual(video_data['duration'], 111)
+        self.assertEqual(video_data['duration'], 111.0)
         self.assertEqual(video_data['status'], 'imported')
         self.assertEqual(video_data['courses'], [{id_generator.target_course_id: None}])
         self.assertEqual(video_data['encoded_videos'][0]['profile'], 'mobile')
@@ -1788,6 +1797,7 @@ class TestVideoWithBumper(TestVideo):
                 'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'poster': None,
+                'duration': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
                 'generalSpeed': 1.0,

@@ -5,10 +5,11 @@ import unittest
 import mock
 import ddt
 from django import test
-from django.conf import settings
 from django.contrib.auth import models
+from django.core import mail
 from social_django import models as social_models
 
+from student.tests.factories import UserFactory
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
 
@@ -304,9 +305,6 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
 class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
-    def setUp(self):
-        super(EnsureUserInformationTestCase, self).setUp()
-
     @ddt.data(
         (True, '/register'),
         (False, '/login')
@@ -336,3 +334,105 @@ class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
                 )
                 assert response.status_code == 302
                 assert response.url == expected_redirect_url
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
+    """Tests to ensure learner profile data is properly synced if the provider requires it."""
+
+    def setUp(self):
+        super(UserDetailsForceSyncTestCase, self).setUp()
+        # pylint: disable=attribute-defined-outside-init
+        self.user = UserFactory.create()
+        self.old_email = self.user.email
+        self.old_username = self.user.username
+        self.old_fullname = self.user.profile.name
+        self.details = {
+            'email': 'new+{}'.format(self.user.email),
+            'username': 'new_{}'.format(self.user.username),
+            'fullname': 'Grown Up {}'.format(self.user.profile.name),
+            'country': 'PK',
+            'non_existing_field': 'value',
+        }
+
+        # Mocks
+        self.strategy = mock.MagicMock()
+        self.strategy.storage.user.changed.side_effect = lambda user: user.save()
+
+        get_from_pipeline = mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        self.get_from_pipeline = get_from_pipeline.start()
+        self.get_from_pipeline.return_value = mock.MagicMock(sync_learner_profile_data=True)
+        self.addCleanup(get_from_pipeline.stop)
+
+    def test_user_details_force_sync(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+        # Begin the pipeline.
+        pipeline.user_details_force_sync(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        # User now has updated information in the DB.
+        user = User.objects.get()
+        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.username == 'new_{}'.format(self.old_username)
+        assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.country == 'PK'
+
+        assert len(mail.outbox) == 1
+
+    def test_user_details_force_sync_email_conflict(self):
+        """
+        The user details were attempted to be synced but the incoming email already exists for another account.
+        """
+        # Create a user with an email that conflicts with the incoming value.
+        UserFactory.create(email='new+{}'.format(self.old_email))
+
+        # Begin the pipeline.
+        pipeline.user_details_force_sync(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        # The email is not changed, but everything else is.
+        user = User.objects.get(pk=self.user.pk)
+        assert user.email == self.old_email
+        assert user.username == 'new_{}'.format(self.old_username)
+        assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.country == 'PK'
+
+        # No email should be sent for an email change.
+        assert len(mail.outbox) == 0
+
+    def test_user_details_force_sync_username_conflict(self):
+        """
+        The user details were attempted to be synced but the incoming username already exists for another account.
+
+        An email should still be sent in this case.
+        """
+        # Create a user with an email that conflicts with the incoming value.
+        UserFactory.create(username='new_{}'.format(self.old_username))
+
+        # Begin the pipeline.
+        pipeline.user_details_force_sync(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        # The username is not changed, but everything else is.
+        user = User.objects.get(pk=self.user.pk)
+        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.username == self.old_username
+        assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.country == 'PK'
+
+        # An email should still be sent because the email changed.
+        assert len(mail.outbox) == 1

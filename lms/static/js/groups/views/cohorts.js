@@ -26,7 +26,7 @@
                     'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
                     'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
                     'click .link-cross-reference': 'showSection',
-                    'click .toggle-cohort-management-secondary': 'showCsvUpload',
+                    'click .toggle-cohort-management-secondary': 'showCsvUpload'
                 },
 
                 initialize: function(options) {

@@ -4,8 +4,10 @@
 // Set the relative path to the static root
 $static-path: '../..';
 
-// Bootstrap theme
-@import 'bootstrap/theme';
+// Theme-specific variables
+@import 'lms/theme/variables';
+
+// Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
 // Legacy support

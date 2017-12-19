@@ -8,11 +8,11 @@ import pytz
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import force_text
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from opaque_keys.edx.keys import CourseKey
@@ -103,7 +103,8 @@ class CourseMode(models.Model):
     # DEPRECATED: the suggested prices for this mode
     # We used to allow users to choose from a set of prices, but we now allow only
     # a single price.  This field has been deprecated by `min_price`
-    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+                                        validators=[validate_comma_separated_integer_list])
 
     # optional description override
     # WARNING: will not be localized
@@ -135,10 +136,10 @@ class CourseMode(models.Model):
 
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
-    VERIFIED = "verified"
-    AUDIT = "audit"
-    NO_ID_PROFESSIONAL_MODE = "no-id-professional"
-    CREDIT_MODE = "credit"
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -415,7 +416,7 @@ class CourseMode(models.Model):
             return None
 
     @classmethod
-    def verified_mode_for_course(cls, course_id, modes=None):
+    def verified_mode_for_course(cls, course_id, modes=None, include_expired=False):
         """Find a verified mode for a particular course.
 
         Since we have multiple modes that can go through the verify flow,
@@ -436,7 +437,7 @@ class CourseMode(models.Model):
             Mode or None
 
         """
-        modes_dict = cls.modes_for_course_dict(course_id, modes=modes)
+        modes_dict = cls.modes_for_course_dict(course_id, modes=modes, include_expired=include_expired)
         verified_mode = modes_dict.get('verified', None)
         professional_mode = modes_dict.get('professional', None)
         # we prefer professional over verify
@@ -809,7 +810,8 @@ class CourseModesArchive(models.Model):
     min_price = models.IntegerField(default=0)
 
     # the suggested prices for this mode
-    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+                                        validators=[validate_comma_separated_integer_list])
 
     # the currency these prices are in, using lower case ISO currency codes
     currency = models.CharField(default="usd", max_length=8)

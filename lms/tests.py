@@ -1,5 +1,6 @@
 """Tests for the lms module itself."""
 
+import logging
 import mimetypes
 
 from django.core.urlresolvers import reverse
@@ -7,10 +8,12 @@ from django.test import TestCase
 from mock import patch
 
 from edxmako import LOOKUP, add_lookup
-from lms import startup
+from microsite_configuration import microsite
 from openedx.features.course_experience import course_home_url_name
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+log = logging.getLogger(__name__)
 
 
 class LmsModuleTests(TestCase):
@@ -38,7 +41,7 @@ class TemplateLookupTests(TestCase):
         self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 
         # This should not clear the directories list
-        startup.enable_microsites()
+        microsite.enable_microsites(log)
         directories = LOOKUP['main'].directories
         self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 

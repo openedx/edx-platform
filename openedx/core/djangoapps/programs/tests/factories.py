@@ -1,7 +1,6 @@
 """Factories for generating fake program-related data."""
 # pylint: disable=missing-docstring, invalid-name
 import factory
-from faker import Faker
 
 
 class ProgressFactory(factory.Factory):
@@ -12,3 +11,4 @@ class ProgressFactory(factory.Factory):
     completed = 0
     in_progress = 0
     not_started = 0
+    grades = dict()

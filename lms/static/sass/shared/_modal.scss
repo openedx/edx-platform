@@ -151,8 +151,8 @@
       .input-group {
         @include clearfix();
 
-        border-bottom: 1px solid rgb(210,210,210);
-        box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
+        border-bottom: 1px solid rgb(210, 210, 210);
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
         margin-bottom: ($baseline*1.5);
         padding-bottom: ($baseline/2);
       }
@@ -176,7 +176,7 @@
       }
 
       textarea {
-        background: rgb(255,255,255);
+        background: rgb(255, 255, 255);
         display: block;
         height: 45px;
         margin-bottom: $baseline;
@@ -297,7 +297,7 @@
       color: theme-color("secondary");
       font: normal 1.2rem/1.2rem $font-family-sans-serif;
       text-align: center;
-      text-shadow: 0 1px rgba(255,255,255, 0.8);
+      text-shadow: 0 1px rgba(255, 255, 255, 0.8);
 
       @include transition(all 0.15s ease-out 0s);
 

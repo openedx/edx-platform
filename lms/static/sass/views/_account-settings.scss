@@ -64,10 +64,10 @@
 
         font-size: em(14);
         color: $gray;
-        padding: 5px 25px 23px;
+        padding: $baseline/4 $baseline*1.25 $baseline;
         display: inline-block;
         box-shadow: none;
-        border: none;
+        border-bottom: 4px solid transparent;
         border-radius: 0;
         background: transparent none;
       }
@@ -78,17 +78,30 @@
 
         @include appearance(none);
 
-        display:block;
+        display: block;
         padding: ($baseline/4);
 
         &:hover,
         &:focus {
           text-decoration: none;
-          border-bottom: 4px solid $courseware-border-bottom-color !important;
+          border-bottom-color: $courseware-border-bottom-color;
         }
 
         &.active {
-          border-bottom: 4px solid $black-t3 !important;
+          border-bottom-color: theme-color("dark");
+        }
+      }
+    }
+
+    @include media-breakpoint-down(md) {
+      border-bottom-color: transparent;
+
+      .account-nav {
+        display: flex;
+        border-bottom: none;
+
+        .account-nav-link {
+          border-bottom: 4px solid theme-color("light");
         }
       }
     }
@@ -115,6 +128,59 @@
       line-height: normal;
       color: $dark-gray;
       padding-bottom: 10px;
+    }
+
+    .account-settings-section-message {
+      font-size: 16px;
+      line-height: 22px;
+      margin-top: 15px;
+      margin-bottom: 30px;
+
+      .alert-message {
+        color: #292b2c;
+        font-family: $font-family-sans-serif;
+        position: relative;
+        padding: 10px 10px 10px 35px;
+        border: 1px solid transparent;
+        border-radius: 0;
+        box-shadow: none;
+        margin-bottom: 8px;
+
+        & > .fa {
+          position: absolute;
+          left: 11px;
+          top: 13px;
+          font-size: 16px;
+        }
+
+        span {
+          display: block;
+
+          a {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .success {
+        background-color: #ecfaec;
+        border-color: #b9edb9;
+      }
+
+      .info {
+        background-color: #d8edf8;
+        border-color: #bbdff2;
+      }
+
+      .warning {
+        background-color: #fcf8e3;
+        border-color: #faebcc;
+      }
+
+      .error {
+        background-color: #f2dede;
+        border-color: #ebccd1;
+      }
     }
 
     .account-settings-section-body {
@@ -163,6 +229,7 @@
             font-size: 1rem;
             line-height: 1;
             color: $dark-gray;
+            white-space: nowrap;
           }
 
           .field-input {
@@ -206,8 +273,7 @@
           padding-top: $baseline;
           padding-bottom: $baseline;
           line-height: normal;
-          flex-direction: row;
-          flex-wrap: wrap;
+          flex-flow: row wrap;
 
           span {
             padding: $baseline;
@@ -288,7 +354,9 @@
             font-weight: $font-semibold;
             padding: 0;
 
-            &:focus, &:hover, &:active {
+            &:focus,
+            &:hover,
+            &:active {
               background-color: transparent;
               color: $m-blue-d3;
               border: none;
@@ -338,10 +406,80 @@
           border-bottom: none;
           margin-bottom: ($baseline*2);
         }
+
+        // Responsive behavior
+        @include media-breakpoint-down(md) {
+          .u-field-value {
+            width: 100%;
+          }
+
+          .u-field-message {
+            width: 100%;
+            padding: $baseline/2 0;
+
+            .u-field-message-notification {
+              position: relative;
+              padding: 0;
+            }
+          }
+
+          .u-field-order {
+            display: flex;
+            flex-wrap: nowrap;
+
+            .u-field-order-number,
+            .u-field-order-date,
+            .u-field-order-price,
+            .u-field-order-link {
+              width: auto;
+              float: none;
+              flex-grow: 1;
+
+              &:first-of-type {
+                flex-grow: 2;
+              }
+            }
+          }
+        }
+      }
+
+      .u-field {
+        &.u-field-dropdown, &.editable-never &.mode-display {
+          .u-field-value {
+            margin-bottom: ($baseline);
+
+            .u-field-title {
+              font-size: 16px;
+              line-height: 22px;
+              margin-bottom: 18px;
+            }
+
+            .u-field-value-readonly {
+              font-size: 22px;
+              color: #636c72;
+              line-height: 30px;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+
+      .u-field-readonly .u-field-title {
+        font-size: 16px;
+        color: #636c72;
+        line-height: 22px;
+        padding-top: ($baseline/2);
+        padding-bottom: 0;
+        margin-bottom: 8px !important;
       }
 
       .u-field-readonly .u-field-value {
-        padding-top: ($baseline/2);
+        font-size: 22px;
+        color: #636c72;
+        line-height: 30px;
+        padding-top: 8px;
+        padding-bottom: ($baseline);
+        white-space: nowrap;
       }
 
       .u-field-orderHistory {
@@ -354,7 +492,8 @@
           border-bottom: 1px solid $m-gray-l4;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: $light-gray4;
         }
       }
@@ -365,7 +504,8 @@
         margin-bottom: 0;
         padding-bottom: 0;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background-color: transparent;
         }
 

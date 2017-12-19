@@ -25,8 +25,7 @@ require([
         ModuleUtils,
         IframeUtils,
         DropdownMenuView
-    )
-{
+    ) {
         var $body;
 
         domReady(function() {

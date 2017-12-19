@@ -1,6 +1,6 @@
 // vars
 $baseline: 20px;
-$white: rgb(255,255,255);
+$white: rgb(255, 255, 255);
 
 .mediakit {
   @include box-sizing(border-box);
@@ -61,7 +61,7 @@ $white: rgb(255,255,255);
   a.action-download {
     position: relative;
     color: $blue;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     text-decoration: none;
 
     @include transition(all 0.1s linear 0s);
@@ -69,7 +69,7 @@ $white: rgb(255,255,255);
     .note {
       position: relative;
       color: $blue;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 13px;
       text-decoration: none;
 
@@ -137,12 +137,11 @@ $white: rgb(255,255,255);
 
       h3 {
         padding: ($baseline/2) ($baseline*0.75);
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-weight: bold;
         font-size: 16px;
         letter-spacing: 0;
         color: $white;
-        text-transform: uppercase;
 
         .org-name {
           color: $white !important;
@@ -202,7 +201,7 @@ $white: rgb(255,255,255);
         padding: 0;
         color: $dark-gray;
         font-size: 16px;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-weight: bold;
         letter-spacing: 0;
 

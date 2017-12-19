@@ -5,7 +5,6 @@ from django.dispatch import Signal
 
 # Signal that indicates that a user's grade for a course has been updated.
 # This is a downstream signal of SUBSECTION_SCORE_CHANGED.
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 # Signal that indicates that a user's raw score for a problem has been updated.
 # This signal is generated when a scoring event occurs within the core
@@ -26,6 +25,8 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
         'score_db_table',  # The database table that houses the score that changed.
+        'score_deleted',  # Boolean indicating whether the score changed due to
+                          # the user state being deleted.
     ]
 )
 
@@ -49,6 +50,8 @@ PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
         'score_db_table',  # The database table that houses the score that changed.
+        'score_deleted',  # Boolean indicating whether the score changed due to
+                          # the user state being deleted.
     ]
 )
 

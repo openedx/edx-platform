@@ -27,9 +27,47 @@ from openedx.core.djangoapps.user_api.accounts import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import UserAttribute
-from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS
+from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS, \
+    skip_activation_email
+from student.tests.factories import UserFactory
+from third_party_auth.tests import factories as third_party_auth_factory
 
 TEST_CS_URL = 'https://comments.service.test:123/'
+
+TEST_USERNAME = 'test_user'
+TEST_EMAIL = 'test@test.com'
+
+
+def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
+    """
+    Return mock pipeline data.
+    """
+    return {
+        'backend': 'tpa-saml',
+        'kwargs': {
+            'username': username,
+            'auth_entry': 'register',
+            'request': {
+                'SAMLResponse': [],
+                'RelayState': [
+                    'testshib-openedx'
+                ]
+            },
+            'is_new': True,
+            'new_association': True,
+            'user': None,
+            'social': None,
+            'details': {
+                'username': username,
+                'fullname': 'Test Test',
+                'last_name': 'Test',
+                'first_name': 'Test',
+                'email': email,
+            },
+            'response': {},
+            'uid': 'testshib-openedx:{}'.format(username)
+        }
+    }
 
 
 @ddt.ddt
@@ -422,6 +460,88 @@ class TestCreateAccount(SiteMixin, TestCase):
     def test_created_on_site_user_attribute_set(self):
         profile = self.create_account_and_fetch_profile(host=self.site.domain)
         self.assertEqual(UserAttribute.get_user_attribute(profile.user, 'created_on_site'), self.site.domain)
+
+    @ddt.data(
+        (
+            False, False, get_mock_pipeline_data(),
+            {
+                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
+            },
+            False  # Do not skip activation email for normal scenario.
+        ),
+        (
+            False, False, get_mock_pipeline_data(),
+            {
+                'SKIP_EMAIL_VALIDATION': True, 'AUTOMATIC_AUTH_FOR_TESTING': False,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
+            },
+            True  # Skip activation email when `SKIP_EMAIL_VALIDATION` FEATURE flag is active.
+        ),
+        (
+            False, False, get_mock_pipeline_data(),
+            {
+                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': True,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
+            },
+            True  # Skip activation email when `AUTOMATIC_AUTH_FOR_TESTING` FEATURE flag is active.
+        ),
+        (
+            True, False, get_mock_pipeline_data(),
+            {
+                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True,
+            },
+            True  # Skip activation email for external auth scenario.
+        ),
+        (
+            False, False, get_mock_pipeline_data(),
+            {
+                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True,
+            },
+            False  # Do not skip activation email when `BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH` feature flag is set
+                   # but it is not external auth scenario.
+        ),
+        (
+            False, True, get_mock_pipeline_data(),
+            {
+                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
+            },
+            True  # Skip activation email if `skip_email_verification` is set for third party authentication.
+        ),
+        (
+            False, False, get_mock_pipeline_data(email='invalid@yopmail.com'),
+            {
+                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
+                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
+            },
+            False  # Send activation email when `skip_email_verification` is not set.
+        )
+    )
+    @ddt.unpack
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_should_skip_activation_email(
+            self, do_external_auth, skip_email_verification, running_pipeline, feature_overrides, expected,
+    ):
+        """
+        Test `skip_activation_email` works as expected.
+        """
+        third_party_provider = third_party_auth_factory.SAMLProviderConfigFactory(
+            skip_email_verification=skip_email_verification,
+        )
+        user = UserFactory(username=TEST_USERNAME, email=TEST_EMAIL)
+
+        with override_settings(FEATURES=dict(settings.FEATURES, **feature_overrides)):
+            result = skip_activation_email(
+                user=user,
+                do_external_auth=do_external_auth,
+                running_pipeline=running_pipeline,
+                third_party_provider=third_party_provider
+            )
+
+            assert result == expected
 
 
 @ddt.ddt

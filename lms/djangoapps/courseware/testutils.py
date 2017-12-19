@@ -33,7 +33,7 @@ class RenderXBlockTestMixin(object):
         '<ol class="tabs course-tabs"',
         '<footer id="footer-openedx"',
         '<div class="window-wrap"',
-        '<div class="preview-menu container"',
+        '<div class="preview-menu"',
         '<div class="container"',
     ]
 

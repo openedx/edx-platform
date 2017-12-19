@@ -18,41 +18,34 @@ class Command(BaseCommand):
     Migrate a course from old-Mongo to split-Mongo. It reuses the old course id except where overridden.
     """
 
-    help = "Migrate a course from old-Mongo to split-Mongo. The new org, course, and run will default to the old one unless overridden"
-    args = "course_key email <new org> <new course> <new run>"
+    help = "Migrate a course from old-Mongo to split-Mongo. The new org, course, and run will " \
+           "default to the old one unless overridden."
 
-    def parse_args(self, *args):
+    def add_arguments(self, parser):
+        parser.add_argument('course_key')
+        parser.add_argument('email')
+        parser.add_argument('--org', help='New org to migrate to.')
+        parser.add_argument('--course', help='New course key to migrate to.')
+        parser.add_argument('--run', help='New run to migrate to.')
+
+    def parse_args(self, **options):
         """
         Return a 5-tuple of passed in values for (course_key, user, org, course, run).
         """
-        if len(args) < 2:
-            raise CommandError(
-                "migrate_to_split requires at least two arguments: "
-                "a course_key and a user identifier (email or ID)"
-            )
-
         try:
-            course_key = CourseKey.from_string(args[0])
+            course_key = CourseKey.from_string(options['course_key'])
         except InvalidKeyError:
             raise CommandError("Invalid location string")
 
         try:
-            user = user_from_str(args[1])
+            user = user_from_str(options['email'])
         except User.DoesNotExist:
-            raise CommandError("No user found identified by {}".format(args[1]))
+            raise CommandError("No user found identified by {}".format(options['email']))
 
-        org = course = run = None
-        try:
-            org = args[2]
-            course = args[3]
-            run = args[4]
-        except IndexError:
-            pass
-
-        return course_key, user.id, org, course, run
+        return course_key, user.id, options['org'], options['course'], options['run']
 
     def handle(self, *args, **options):
-        course_key, user, org, course, run = self.parse_args(*args)
+        course_key, user, org, course, run = self.parse_args(**options)
 
         migrator = SplitMigrator(
             source_modulestore=modulestore(),

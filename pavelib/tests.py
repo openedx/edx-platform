@@ -32,7 +32,7 @@ __test__ = False  # do not collect
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
         "--django_version", dest="django_version",
-        help="Run against which Django version (1.8 -or- 1.11)."
+        help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
     ),
     make_option(
         "--eval-attr", dest="eval_attr",
@@ -49,6 +49,10 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option(
+        "--disable_capture", action="store_true", dest="disable_capture",
+        help="Disable capturing of stdout/stderr"
+    ),
     make_option(
         '--disable-migrations',
         action='store_true',
@@ -73,7 +77,7 @@ def test_system(options, passthrough_options):
     django_version = getattr(options, 'django_version', None)
 
     assert(system in (None, 'lms', 'cms'))
-    assert(django_version in (None, '1.8', '1.11'))
+    assert(django_version in (None, '1.8', '1.9', '1.10', '1.11'))
 
     if test_id:
         # Testing a single test ID.
@@ -122,7 +126,7 @@ def test_system(options, passthrough_options):
     ("fail-fast", "x", "Run only failed tests"),
     make_option(
         "--django_version", dest="django_version",
-        help="Run against which Django version (1.8 -or- 1.11)."
+        help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
     ),
     make_option(
         '-c', '--cov-args', default='',
@@ -132,6 +136,10 @@ def test_system(options, passthrough_options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option(
+        "--disable_capture", action="store_true", dest="disable_capture",
+        help="Disable capturing of stdout/stderr"
+    ),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -143,7 +151,7 @@ def test_lib(options, passthrough_options):
     test_id = getattr(options, 'test_id', lib)
     django_version = getattr(options, 'django_version', None)
 
-    assert(django_version in (None, '1.8', '1.11'))
+    assert(django_version in (None, '1.8', '1.9', '1.10', '1.11'))
 
     if test_id:
         # Testing a single test id.

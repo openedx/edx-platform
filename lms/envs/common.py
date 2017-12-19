@@ -33,15 +33,20 @@ import imp
 import sys
 import os
 
-import dealer.git
+import django
 from path import Path as path
 from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
+from openedx.core.djangoapps.theming.helpers_dirs import (
+    get_themes_unchecked,
+    get_theme_base_dirs_from_settings
+)
+from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.release import doc_version
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
-from openedx.core.lib.license import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -60,6 +65,7 @@ DISCUSSION_SETTINGS = {
 }
 
 LMS_ROOT_URL = "http://localhost:8000"
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 
 # Features
@@ -231,8 +237,8 @@ FEATURES = {
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
 
-    # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to syncdb
-    # if you enable this; we don't create tables by default.
+    # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to run
+    # migrations if you enable this; we don't create tables by default.
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # Toggle to enable alternate urls for marketing links
@@ -406,6 +412,12 @@ FEATURES = {
 
     # Whether course goals is enabled.
     'ENABLE_COURSE_GOALS': True,
+
+    # Set to enable Enterprise integration
+    'ENABLE_ENTERPRISE_INTEGRATION': False,
+
+    # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
+    'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -507,6 +519,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
     'SCOPES': {
         'read': 'Read scope',
         'write': 'Write scope',
@@ -522,11 +535,9 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
-# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
-MAKO_TEMPLATES = {}
-MAKO_TEMPLATES['main'] = [
+MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
@@ -534,11 +545,59 @@ MAKO_TEMPLATES['main'] = [
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
+    OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
+]
+
+
+def _make_mako_template_dirs(settings):
+    """
+    Derives the final Mako template directories list from other settings.
+    """
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
+        for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
+            if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
+                settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
+    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
+        settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
+    return settings.MAKO_TEMPLATE_DIRS_BASE
+
+
+CONTEXT_PROCESSORS = [
+    'django.template.context_processors.request',
+    'django.template.context_processors.static',
+    'django.contrib.messages.context_processors.messages',
+    'django.template.context_processors.i18n',
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.template.context_processors.csrf',
+
+    # Added for django-wiki
+    'django.template.context_processors.media',
+    'django.template.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'sekizai.context_processors.sekizai',
+
+    # Hack to get required link URLs to password reset templates
+    'edxmako.shortcuts.marketing_link_context_processor',
+
+    # Shoppingcart processor (detects if request.user has a cart)
+    'shoppingcart.context_processor.user_has_cart_context_processor',
+
+    # Timezone processor (sends language and time_zone preference)
+    'courseware.context_processor.user_timezone_locale_prefs',
+
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.footer_context_processor',
+
+    # Online contextual help
+    'help_tokens.context_processor',
+    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
 ]
 
 # Django templating
 TEMPLATES = [
     {
+        'NAME': 'django',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
@@ -559,42 +618,42 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.template.context_processors.static',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',
-                'django.contrib.auth.context_processors.auth',  # this is required for admin
-                'django.template.context_processors.csrf',
-
-                # Added for django-wiki
-                'django.template.context_processors.media',
-                'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages',
-                'sekizai.context_processors.sekizai',
-
-                # Hack to get required link URLs to password reset templates
-                'edxmako.shortcuts.marketing_link_context_processor',
-
-                # Shoppingcart processor (detects if request.user has a cart)
-                'shoppingcart.context_processor.user_has_cart_context_processor',
-
-                # Timezone processor (sends language and time_zone preference)
-                'courseware.context_processor.user_timezone_locale_prefs',
-
-                # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.footer_context_processor',
-
-                # Online contextual help
-                'help_tokens.context_processor',
-                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
-            ],
+            'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
             'debug': False
         }
-    }
+    },
+    {
+        'NAME': 'mako',
+        'BACKEND': 'edxmako.backend.Mako',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': _make_mako_template_dirs,
+        # Options specific to this backend.
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            # Change 'debug' in your environment settings files - not here.
+            'debug': False,
+        }
+    },
 ]
+derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
+DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
+
+
+def _add_microsite_dirs_to_default_template_engine(settings):
+    """
+    Derives the final DEFAULT_TEMPLATE_ENGINE['DIRS'] setting from other settings.
+    """
+    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
+        DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
+    return DEFAULT_TEMPLATE_ENGINE_DIRS
+
+
+DEFAULT_TEMPLATE_ENGINE['DIRS'] = _add_microsite_dirs_to_default_template_engine
+derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 
@@ -602,6 +661,11 @@ DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 AUTHENTICATION_BACKENDS = ['ratelimitbackend.backends.RateLimitModelBackend']
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
+
+# Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
+# Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
@@ -612,10 +676,6 @@ EDX_ROOT_URL = ''
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/login'
 LOGIN_URL = EDX_ROOT_URL + '/login'
 
-COURSE_NAME = "6.002_Spring_2012"
-COURSE_NUMBER = "6.002x"
-COURSE_TITLE = "Circuits and Electronics"
-
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
@@ -623,16 +683,6 @@ ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see l
 WIKI_ENABLED = False
 
 ###
-
-COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {
-    '6.002x_Fall_2012': {
-        'number': '6.002x',
-        'title': 'Circuits and Electronics',
-        'xmlpath': '6002x/',
-        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-    }
-}
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
@@ -759,6 +809,9 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
+
+######################## BRANCH.IO ###########################
+BRANCH_IO_KEY = None
 
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
@@ -1011,8 +1064,18 @@ USE_L10N = True
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 STATICI18N_OUTPUT_DIR = "js/i18n"
 
-# Localization strings (e.g. django.po) are under this directory
-LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
+
+# Localization strings (e.g. django.po) are under these directories
+def _make_locale_paths(settings):
+    locale_paths = [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        # Add locale paths to settings for comprehensive theming.
+        for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
+            locale_paths += (path(locale_path), )
+    return locale_paths
+LOCALE_PATHS = _make_locale_paths
+derived('LOCALE_PATHS')
+
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -1063,6 +1126,7 @@ FEEDBACK_SUBMISSION_EMAIL = None
 ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
+ZENDESK_OAUTH_ACCESS_TOKEN = None
 ZENDESK_CUSTOM_FIELDS = {}
 
 ##### EMBARGO #####
@@ -1166,6 +1230,13 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
+if django.VERSION < (1, 9):
+    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
+else:
+    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
+
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
@@ -1207,7 +1278,7 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    _csrf_middleware,
 
     'splash.middleware.SplashMiddleware',
 
@@ -1614,6 +1685,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-learner-dashboard-rtl.css',
     },
+    'style-mobile': {
+        'source_filenames': [
+            'css/lms-mobile.css',
+        ],
+        'output_filename': 'css/lms-mobile.css',
+    },
+    'style-mobile-rtl': {
+        'source_filenames': [
+            'css/lms-mobile-rtl.css',
+        ],
+        'output_filename': 'css/lms-mobile-rtl.css',
+    },
 }
 
 
@@ -1797,6 +1880,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
     }
 }
+WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -1983,6 +2067,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djcelery',
 
+    # Common Initialization
+    'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',
+
+    # LMS-specific Initialization
+    'lms_initialization.apps.LMSInitializationConfig',
+
     # Common views
     'openedx.core.djangoapps.common_views',
 
@@ -2000,7 +2090,7 @@ INSTALLED_APPS = [
     'status',
 
     # For asset pipelining
-    'edxmako',
+    'edxmako.apps.EdxMakoConfig',
     'pipeline',
     'static_replace',
     'webpack_loader',
@@ -2013,7 +2103,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.contentserver',
 
     # Theming
-    'openedx.core.djangoapps.theming',
+    'openedx.core.djangoapps.theming.apps.ThemingConfig',
 
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
@@ -2021,8 +2111,11 @@ INSTALLED_APPS = [
     # Video module configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
+    # edX Video Pipeline integration
+    'openedx.core.djangoapps.video_pipeline',
+
     # Bookmarks
-    'openedx.core.djangoapps.bookmarks',
+    'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
 
     # Our courseware
     'courseware',
@@ -2035,7 +2128,7 @@ INSTALLED_APPS = [
     'util',
     'certificates.apps.CertificatesConfig',
     'dashboard',
-    'lms.djangoapps.instructor',
+    'lms.djangoapps.instructor.apps.InstructorConfig',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
@@ -2087,15 +2180,14 @@ INSTALLED_APPS = [
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
-    'django_nose',
     'debug',
-    'django_extensions',
+    'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'lms.djangoapps.discussion',
+    'lms.djangoapps.discussion.apps.DiscussionConfig',
 
     # Notes
     'notes',
@@ -2105,7 +2197,7 @@ INSTALLED_APPS = [
     'splash',
 
     # Monitoring
-    'openedx.core.djangoapps.datadog',
+    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # User API
     'rest_framework',
@@ -2120,31 +2212,31 @@ INSTALLED_APPS = [
     'notifier_api',
 
     # Different Course Modes
-    'course_modes',
+    'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
     'enrollment',
+
+    # Entitlement API
+    'entitlements',
 
     # Bulk Enrollment API
     'bulk_enroll',
 
     # Student Identity Verification
-    'lms.djangoapps.verify_student',
+    'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
 
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
 
     # Microsite configuration
-    'microsite_configuration',
+    'microsite_configuration.apps.MicrositeConfigurationConfig',
 
     # RSS Proxy
     'rss_proxy',
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',
-
-    # Monitoring functionality
-    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',
@@ -2162,10 +2254,10 @@ INSTALLED_APPS = [
     # Surveys
     'survey',
 
-    'lms.djangoapps.lms_xblock',
+    'lms.djangoapps.lms_xblock.apps.LMSXBlockConfig',
 
     # Course data caching
-    'openedx.core.djangoapps.content.course_overviews',
+    'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
@@ -2184,10 +2276,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'openedx.core.djangoapps.cors_csrf',
 
-    'commerce',
+    'lms.djangoapps.commerce.apps.CommerceConfig',
 
     # Credit courses
-    'openedx.core.djangoapps.credit',
+    'openedx.core.djangoapps.credit.apps.CreditConfig',
 
     # Course teams
     'lms.djangoapps.teams',
@@ -2195,7 +2287,7 @@ INSTALLED_APPS = [
     'xblock_django',
 
     # programs support
-    'openedx.core.djangoapps.programs',
+    'openedx.core.djangoapps.programs.apps.ProgramsConfig',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',
@@ -2233,7 +2325,7 @@ INSTALLED_APPS = [
     'django_sites_extensions',
 
     # Email marketing integration
-    'email_marketing',
+    'email_marketing.apps.EmailMarketingConfig',
 
     # additional release utilities to ease automation
     'release_util',
@@ -2249,6 +2341,7 @@ INSTALLED_APPS = [
     'database_fixups',
 
     'openedx.core.djangoapps.waffle_utils',
+    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # Course Goals
@@ -2261,7 +2354,7 @@ INSTALLED_APPS = [
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.course_search',
-    'openedx.features.enterprise_support',
+    'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
 
     'experiments',
@@ -2324,18 +2417,23 @@ SUPPORT_SITE_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
+# Days before the expired date that we warn the user
+ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
+
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
     'CUSTOM_COURSE_URLS': False,
     'DASHBOARD_FACEBOOK': False,
+    'FACEBOOK_BRAND': None,
     'CERTIFICATE_FACEBOOK': False,
     'CERTIFICATE_FACEBOOK_TEXT': None,
     'CERTIFICATE_TWITTER': False,
     'CERTIFICATE_TWITTER_TEXT': None,
     'DASHBOARD_TWITTER': False,
-    'DASHBOARD_TWITTER_TEXT': None
+    'DASHBOARD_TWITTER_TEXT': None,
+    'TWITTER_BRAND': None
 }
 
 ################# Social Media Footer Links #######################
@@ -2384,7 +2482,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
-        "icon": "fa-twitter",
+        "icon": "fa-twitter-square",
         "action": _("Follow {platform_name} on Twitter")
     },
     "linkedin": {
@@ -2417,7 +2515,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.reddit.com.  Please
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
-        "icon": "fa-reddit",
+        "icon": "fa-reddit-square",
         "action": _("Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
@@ -2436,7 +2534,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # Translators: This is the website name of www.youtube.com.  Please
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
-        "icon": "fa-youtube",
+        "icon": "fa-youtube-square",
         "action": _("Subscribe to the {platform_name} YouTube channel")
     }
 }
@@ -2824,20 +2922,19 @@ ALL_LANGUAGES = [
 # The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
 # that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = [
-    ('mentoring', None),
-    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews'),
+    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('edx_sga', None),
 
     # edx-ora2
-    ('submissions', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews'),
-    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews'),
+    ('submissions', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
     # edxval
-    ('edxval', 'openedx.core.djangoapps.content.course_overviews'),
+    ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
     # edX Proctoring
     ('edx_proctoring', None),
@@ -2849,6 +2946,7 @@ OPTIONAL_APPS = [
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
+    ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
 
     # Required by the Enterprise App
@@ -2884,6 +2982,10 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
+### Analytics API
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "http://localhost:18100"
+
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
@@ -2904,6 +3006,7 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
+DEFAULT_MOBILE_AVAILABLE = True
 
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
@@ -2995,6 +3098,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "requires_parental_consent",
         "account_privacy",
         "accomplishments_shared",
+        "extended_profile",
     ]
 }
 
@@ -3255,19 +3359,24 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
+HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
+HELP_TOKENS_VERSION = lambda settings: doc_version()
 HELP_TOKENS_BOOKS = {
     'learner': 'http://edx.readthedocs.io/projects/open-edx-learner-guide',
     'course_author': 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
 }
+derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
 # However, for all intents and purposes this service is treated as a standalone IDA.
 # These configuration settings are specific to the Enterprise service and you should
 # not find references to them within the edx-platform project.
+#
+# Only used if FEATURES['ENABLE_ENTERPRISE_INTEGRATION'] == True.
 
-ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
+ENTERPRISE_ENROLLMENT_API_URL = LMS_INTERNAL_ROOT_URL + LMS_ENROLLMENT_API_PATH
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''
 # The default value of this needs to be a 16 character string
@@ -3278,8 +3387,8 @@ ENTERPRISE_REPORTING_SECRET = '0000000000000000'
 # These default settings are utilized by the LMS when interacting with the service,
 # and are overridden by the configuration parameter accessors defined in aws.py
 
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_CONSENT_API_URL = LMS_ROOT_URL + '/consent/api/v1/'
+ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
@@ -3304,6 +3413,12 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'year_of_birth',
     'mailing_address',
 }
+ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
+    'username',
+    'name',
+    'email',
+    'country',
+]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
 
@@ -3339,11 +3454,5 @@ ACE_CHANNEL_SAILTHRU_API_SECRET = None
 
 ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'

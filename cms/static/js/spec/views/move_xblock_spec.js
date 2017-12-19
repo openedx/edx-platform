@@ -1,7 +1,7 @@
 define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_helpers/edit_helpers',
-        'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
-        'js/views/modals/move_xblock_modal', 'js/views/pages/container', 'edx-ui-toolkit/js/utils/html-utils',
-        'edx-ui-toolkit/js/utils/string-utils', 'js/models/xblock_info'],
+    'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
+    'js/views/modals/move_xblock_modal', 'js/views/pages/container', 'edx-ui-toolkit/js/utils/html-utils',
+    'edx-ui-toolkit/js/utils/string-utils', 'js/models/xblock_info'],
     function($, _, AjaxHelpers, EditHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, ContainerPage, HtmlUtils,
              StringUtils, XBlockInfo) {
         'use strict';

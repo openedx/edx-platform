@@ -7,9 +7,12 @@ from cStringIO import StringIO
 from datetime import datetime, timedelta
 import dateutil.parser
 
+from django.conf import settings
+
 import requests
 from lazy import lazy
 from lxml import etree
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
@@ -31,6 +34,8 @@ _ = lambda text: text
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
+
+DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
 
 class StringOrDate(Date):
@@ -337,7 +342,7 @@ class CourseFields(object):
     mobile_available = Boolean(
         display_name=_("Mobile Course Available"),
         help=_("Enter true or false. If true, the course will be available to mobile devices."),
-        default=False,
+        default=DEFAULT_MOBILE_AVAILABLE,
         scope=Scope.settings
     )
     video_upload_pipeline = Dict(
@@ -865,6 +870,14 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+    highlights_enabled_for_messaging = Boolean(
+        display_name=_("Highlights Enabled for Messaging"),
+        help=_(
+            "Enter true or false. If true, any highlights associated with content in the course will be messaged "
+            "to learners at their scheduled time."
+        ),
+        scope=Scope.settings, default=False
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
@@ -1325,7 +1338,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         Returns whether the video pipeline advanced setting is configured for this course.
         """
-        return (
+        return VideoUploadsEnabledByDefault.feature_enabled(course_id=self.id) or (
             self.video_upload_pipeline is not None and
             'course_video_upload_token' in self.video_upload_pipeline
         )

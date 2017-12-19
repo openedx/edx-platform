@@ -1,5 +1,3 @@
-## xss-lint: disable=mako-missing-default
-
 ## coding=utf-8
 
 ## This is the main Mako template that all page templates should include.
@@ -90,8 +88,7 @@ from pipeline_mako import render_require_js_path_overrides
 
   % if uses_bootstrap:
     ## xss-lint: disable=mako-invalid-js-filter
-    <script type="text/javascript" src="${static.url('common/js/vendor/popper.js')}"></script>
-    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.js')}"></script>
+    <script type="text/javascript" src="${static.url('common/js/vendor/bootstrap.bundle.js')}"></script>
   % endif
 
   <script>
@@ -139,6 +136,14 @@ from pipeline_mako import render_require_js_path_overrides
     </script>
 % endif
 
+<% branch_key = static.get_value("BRANCH_IO_KEY", settings.BRANCH_IO_KEY) %>
+% if branch_key:
+    <script type="text/javascript">
+        (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode".split(" "), 0);
+        branch.init('${branch_key | n, js_escaped_string}');
+    </script>
+% endif
+
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
@@ -156,8 +161,10 @@ from pipeline_mako import render_require_js_path_overrides
     % endif
 
     <%include file="/page_banner.html" />
+    
+    <div class="marketing-hero"><%block name="marketing_hero"></%block></div>
 
-    <div class="content-wrapper ${"container-fluid" if uses_bootstrap else "" } main-container" id="content">
+    <div class="content-wrapper main-container" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
@@ -176,6 +183,7 @@ from pipeline_mako import render_require_js_path_overrides
   <%include file="widgets/segment-io-footer.html" />
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
+  <script type="text/javascript" src="${static.url('js/header/header.js')}"></script>
   <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
 </body>
 </html>

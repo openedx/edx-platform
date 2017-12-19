@@ -13,7 +13,7 @@ var edx = edx || {};
 (function($, _) {
     'use strict';
     var errorView,
-        el = $('#pay-and-verify-container');
+        $el = $('#pay-and-verify-container');
 
     edx.verify_student = edx.verify_student || {};
 
@@ -32,70 +32,70 @@ var edx = edx || {};
     //
     return new edx.verify_student.PayAndVerifyView({
         errorModel: errorView.model,
-        displaySteps: el.data('display-steps'),
-        currentStep: el.data('current-step'),
-        courseKey: el.data('course-key'),
-        checkpointLocation: el.data('checkpoint-location'),
+        displaySteps: $el.data('display-steps'),
+        currentStep: $el.data('current-step'),
+        courseKey: $el.data('course-key'),
+        checkpointLocation: $el.data('checkpoint-location'),
         stepInfo: {
             'intro-step': {
-                courseName: el.data('course-name'),
-                hasPaid: el.data('msg-key') === 'verify-now' || el.data('msg-key') === 'verify-later',
-                isActive: el.data('is-active'),
-                platformName: el.data('platform-name'),
-                requirements: el.data('requirements')
+                courseName: $el.data('course-name'),
+                hasPaid: $el.data('msg-key') === 'verify-now' || $el.data('msg-key') === 'verify-later',
+                isActive: $el.data('is-active'),
+                platformName: $el.data('platform-name'),
+                requirements: $el.data('requirements')
             },
             'make-payment-step': {
-                isActive: el.data('is-active'),
-                requirements: el.data('requirements'),
-                courseKey: el.data('course-key'),
-                courseName: el.data('course-name'),
-                userEmail: el.data('user-email'),
-                userLanguage: el.data('user-language'),
-                userTimezone: el.data('user-timezone'),
+                isActive: $el.data('is-active'),
+                requirements: $el.data('requirements'),
+                courseKey: $el.data('course-key'),
+                courseName: $el.data('course-name'),
+                userEmail: $el.data('user-email'),
+                userLanguage: $el.data('user-language'),
+                userTimezone: $el.data('user-timezone'),
                 hasVisibleReqs: _.some(
-                    el.data('requirements'),
+                    $el.data('requirements'),
                     function(isVisible) { return isVisible; }
                 ),
-                upgrade: el.data('msg-key') === 'upgrade',
-                minPrice: el.data('course-mode-min-price'),
-                sku: el.data('course-mode-sku'),
-                contributionAmount: el.data('contribution-amount'),
+                upgrade: $el.data('msg-key') === 'upgrade',
+                minPrice: $el.data('course-mode-min-price'),
+                sku: $el.data('course-mode-sku'),
+                contributionAmount: $el.data('contribution-amount'),
                 suggestedPrices: _.filter(
-                    (el.data('course-mode-suggested-prices').toString()).split(','),
+                    ($el.data('course-mode-suggested-prices').toString()).split(','),
                     function(price) { return Boolean(price); }
                 ),
-                currency: el.data('course-mode-currency'),
-                processors: el.data('processors'),
-                verificationDeadline: el.data('verification-deadline'),
-                courseModeSlug: el.data('course-mode-slug'),
-                alreadyVerified: el.data('already-verified'),
-                verificationGoodUntil: el.data('verification-good-until'),
-                isABTesting: el.data('is-ab-testing')
+                currency: $el.data('course-mode-currency'),
+                processors: $el.data('processors'),
+                verificationDeadline: $el.data('verification-deadline'),
+                courseModeSlug: $el.data('course-mode-slug'),
+                alreadyVerified: $el.data('already-verified'),
+                verificationGoodUntil: $el.data('verification-good-until'),
+                isABTesting: $el.data('is-ab-testing')
             },
             'payment-confirmation-step': {
-                courseKey: el.data('course-key'),
-                courseName: el.data('course-name'),
-                coursewareUrl: el.data('courseware-url'),
-                platformName: el.data('platform-name'),
-                requirements: el.data('requirements')
+                courseKey: $el.data('course-key'),
+                courseName: $el.data('course-name'),
+                coursewareUrl: $el.data('courseware-url'),
+                platformName: $el.data('platform-name'),
+                requirements: $el.data('requirements')
             },
             'face-photo-step': {
-                platformName: el.data('platform-name'),
-                captureSoundPath: el.data('capture-sound')
+                platformName: $el.data('platform-name'),
+                captureSoundPath: $el.data('capture-sound')
             },
             'id-photo-step': {
-                platformName: el.data('platform-name'),
-                captureSoundPath: el.data('capture-sound')
+                platformName: $el.data('platform-name'),
+                captureSoundPath: $el.data('capture-sound')
             },
             'review-photos-step': {
-                fullName: el.data('full-name'),
-                platformName: el.data('platform-name')
+                fullName: $el.data('full-name'),
+                platformName: $el.data('platform-name')
             },
             'enrollment-confirmation-step': {
-                courseName: el.data('course-name'),
-                coursewareUrl: el.data('courseware-url'),
-                platformName: el.data('platform-name')
+                courseName: $el.data('course-name'),
+                coursewareUrl: $el.data('courseware-url'),
+                platformName: $el.data('platform-name')
             }
         }
     }).render();
-})(jQuery, _);
+}(jQuery, _));

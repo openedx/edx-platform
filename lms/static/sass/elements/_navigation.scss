@@ -120,7 +120,7 @@
   // +case - calculator spacing (needed for overriding calculator positioning)
   // --------------------
   &.has-utility-calculator {
-    @include right($baseline*2.50);
+    @include right($baseline*2.75);
   }
 }
 
@@ -142,7 +142,7 @@
     @extend %button-reset;
 
     display: inline-block;
-    padding: ($baseline*.75);
+    padding: ($baseline*0.75);
     color: $gray-d2;
 
     &.is-active {

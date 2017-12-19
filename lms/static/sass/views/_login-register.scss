@@ -10,16 +10,18 @@
     height: 100%;
     padding-left: $baseline;
     padding-right: $baseline;
+    margin-left: auto;
   }
 
   .login-register.border-left {
     border-left: 1px solid #d9d9d9;
     padding-left: ($baseline*1.5);
     padding-right: $baseline;
+    margin-left: 0;
   }
 }
 
-@media (max-width: 767px) {
+@include media-breakpoint-down(md) {
   .enterprise-content {
     margin: auto auto;
     display: block;
@@ -32,8 +34,23 @@
   }
 }
 
+.enterprise-tagline {
+  width: 300px;
+  font-size: 14px;
+  text-align: left;
+  display: inline-block;
+  line-height: normal;
+  padding: 15px 0 0 10px;
+}
+
+@include media-breakpoint-down(md) {
+  .enterprise-tagline {
+    display: none;
+  }
+}
+
 .window-wrap {
-  background: $white;
+  background: $body-bg;
 }
 
 .login-register-content {
@@ -54,7 +71,7 @@
 
     margin-top: $baseline;
     letter-spacing: normal;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     color: $uxpl-blue-hover-active;
   }
 
@@ -64,7 +81,7 @@
 
     margin: 0;
     letter-spacing: normal;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     color: $uxpl-gray-dark;
   }
 
@@ -125,7 +142,7 @@
       @include font-size(35);
 
       padding: 0 10px;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-weight: $font-semibold;
       text-align: left;
       margin-bottom: 0;
@@ -137,7 +154,7 @@
       @include font-size(24);
 
       padding: 0 10px;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-weight: $font-regular;
     }
   }
@@ -251,7 +268,7 @@
   %bold-label {
     @include font-size(16);
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-weight: $font-semibold;
   }
 
@@ -264,7 +281,7 @@
   .action-label {
     @include font-size(13);
 
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
   }
 
   .form-field {
@@ -274,6 +291,7 @@
     position: relative;
     width: 100%;
     margin: ($baseline/2) 0 0 0;
+
 
     &.select-year_of_birth {
       @include margin-left(15px);
@@ -293,9 +311,28 @@
       height: auto;
       line-height: 1.5em;
       border-radius: 0;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-style: normal;
       font-weight: 500;
+
+      &.focus-in {
+        position: relative;
+        padding-top: 0;
+        padding-left: 0;
+        opacity: 1;
+      }
+
+      &.focus-out {
+        position: absolute;
+        padding-top: 5px;
+        padding-left: 9px;
+        opacity: 0.75;
+        z-index: 1;
+      }
+
+      a {
+        z-index: 1;
+      }
     }
 
     #login-remember {
@@ -337,11 +374,11 @@
       box-shadow: none;
       text-transform: initial;
       letter-spacing: normal;
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
       font-weight: $font-regular;
       text-decoration: none;
       text-shadow: none;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
 
       &:hover,
       &:focus {
@@ -382,7 +419,7 @@
       }
 
       &.success {
-        border-color: $success-color-hover;
+        border-color: theme-color("success");
       }
     }
 
@@ -393,7 +430,7 @@
       }
 
       &.success {
-        outline-color: $success-color-hover;
+        outline-color: theme-color("success");
       }
     }
 
@@ -421,7 +458,7 @@
       }
 
       &.success {
-        color: $success-color-hover;
+        color: theme-color("success");
       }
     }
 
@@ -603,7 +640,7 @@
     .message-title {
       @extend %t-title5;
 
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       margin: 0 0 ($baseline/4) 0;
       font-weight: 600;
     }
@@ -612,7 +649,7 @@
     .message-copy p {
       @extend %t-copy-base;
 
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       margin: 0 !important;
       padding: 0;
 
@@ -780,7 +817,7 @@
 
       h1#modal-header-text {
         float: left;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-size: font-size(large);
         font-weight: bold;
         margin-bottom: 0;
@@ -798,7 +835,7 @@
         border-radius: 0;
         box-shadow: none;
         box-sizing: border-box;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         float: right;
         font-size: font-size(large);
         height: 48px;

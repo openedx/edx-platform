@@ -1,39 +1,31 @@
-#program-details-page {
-  font-size: 16px;
-
+#program-details-hero {
   .program_title {
     font-weight: bold;
-    margin-top: $baseline
-  }
-
-  .logo {
-    height: 100px;
-  }
-
-  .section_title {
-    margin-bottom: $baseline;
-    color: theme-color("dark");
-  }
-
-  .thick_rule {
-    height: 4px;
-    border: 0;
-    background-color: theme-color('secondary');
+    margin-top: $baseline;
   }
 
   .main-banner {
-    color: white;
+    color: $white;
     margin-bottom: 1px;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
 
     .authoring-org-logo {
       background-color: $white;
+      height: 100px;
+    }
+
+    .logo-space {
+      height: 50px;
     }
 
     .btn {
       font-size: 20px;
+      font-weight: $font-weight-bold;
+      .original-price {
+        text-decoration: line-through;
+        font-weight: $font-weight-normal;
+      }
     }
 
     .btn,
@@ -50,7 +42,7 @@
 
       button {
         background-color: transparent;
-        color: $white
+        color: $white;
       }
 
       iframe {
@@ -70,12 +62,31 @@
 
   .quick-nav {
     background-color: theme-color('light');
-    margin-bottom: $baseline/2;
 
     .nav-item {
       font-size: 18px;
       color: $white;
     }
+  }
+}
+
+#program-details-page {
+  margin-top: $baseline;
+  font-size: $font-size-base;
+
+  .logo {
+    height: 100px;
+  }
+
+  .section_title {
+    margin-bottom: $baseline;
+    color: theme-color("dark");
+  }
+
+  .thick_rule {
+    height: 4px;
+    border: 0;
+    background-color: theme-color('primary');
   }
 
   .program-info {

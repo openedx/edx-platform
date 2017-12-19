@@ -57,7 +57,7 @@ def setup_acceptance_db():
             sh("./manage.py lms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
             sh("./manage.py cms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
     else:
-        # If no cached database exists, syncdb before migrating, then create the cache
+        # If no cached database exists, migrate then create the cache
         for db_alias in sorted(DBS.keys()):
             sh("./manage.py lms --settings {} migrate --traceback --noinput --database {}".format(settings, db_alias))
             sh("./manage.py cms --settings {} migrate --traceback --noinput --database {}".format(settings, db_alias))

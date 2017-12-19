@@ -32,7 +32,9 @@
             'js/groups/views/cohorts_dashboard_factory',
             'js/discussions_management/views/discussions_dashboard_factory',
             'js/header_factory',
+            'js/learner_dashboard/course_entitlement_factory',
             'js/learner_dashboard/unenrollment_factory',
+            'js/learner_dashboard/entitlement_unenrollment_factory',
             'js/learner_dashboard/program_details_factory',
             'js/learner_dashboard/program_list_factory',
             'js/student_account/logistration_factory',
@@ -70,20 +72,20 @@
          * file should be skipped because it has no dependencies.
          */
         paths: {
-            'gettext': 'empty:',
+            gettext: 'empty:',
             'coffee/src/ajax_prefix': 'empty:',
-            'jquery': 'empty:',
+            jquery: 'empty:',
             'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',
             'jquery.url': 'empty:',
-            'backbone': 'empty:',
-            'underscore': 'empty:',
+            backbone: 'empty:',
+            underscore: 'empty:',
             'underscore.string': 'empty:',
-            'logger': 'empty:',
-            'utility': 'empty:',
-            'URI': 'empty:',
+            logger: 'empty:',
+            utility: 'empty:',
+            URI: 'empty:',
             'common/js/discussion/views/discussion_inline_view': 'empty:',
-            'modernizr': 'empty',
+            modernizr: 'empty',
             'which-country': 'empty',
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace

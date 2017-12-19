@@ -23,10 +23,10 @@ define(['jquery', 'js/factories/xblock_validation', 'common/js/spec_helpers/temp
                 var noContainerContent = 'no-container-content';
 
                 var notConfiguredMessages = {
-                    'empty': false,
-                    'summary': {'text': 'my summary', 'type': 'not-configured'},
-                    'messages': [],
-                    'xblock_id': 'id'
+                    empty: false,
+                    summary: {text: 'my summary', type: 'not-configured'},
+                    messages: [],
+                    xblock_id: 'id'
                 };
                 // Root is false, will not add noContainerContent.
                 XBlockValidationFactory(notConfiguredMessages, true, false, false, $messageDiv);
@@ -42,10 +42,10 @@ define(['jquery', 'js/factories/xblock_validation', 'common/js/spec_helpers/temp
 
                 beforeEach(function() {
                     messagesWithSummary = {
-                        'empty': false,
-                        'summary': {'text': 'my summary'},
-                        'messages': [{'text': 'one', 'type': 'warning'}, {'text': 'two', 'type': 'error'}],
-                        'xblock_id': 'id'
+                        empty: false,
+                        summary: {text: 'my summary'},
+                        messages: [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
+                        xblock_id: 'id'
                     };
                 });
 

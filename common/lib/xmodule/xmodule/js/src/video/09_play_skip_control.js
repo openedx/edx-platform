@@ -57,8 +57,8 @@
             bindHandlers: function() {
                 this.el.on('click', this.onClick);
                 this.state.el.on({
-                    'play': this.play,
-                    'destroy': this.destroy
+                    play: this.play,
+                    destroy: this.destroy
                 });
             },
 

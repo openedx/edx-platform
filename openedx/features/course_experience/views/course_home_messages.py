@@ -1,7 +1,7 @@
 """
 View logic for handling course messages.
 """
-import math
+
 from datetime import datetime
 
 from babel.dates import format_date, format_timedelta
@@ -172,7 +172,7 @@ def _register_course_goal_message(request, course):
             '{initial_tag}{goal_text}{closing_tag}'
         ).format(
             initial_tag=HTML(
-                '<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn" '
+                '<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn-outline-primary" '
                 'data-choice="{goal_key}">'
             ).format(
                 goal_key=goal_key,

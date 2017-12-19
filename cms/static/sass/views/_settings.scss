@@ -238,7 +238,7 @@
           margin: 0 0 ($baseline/4) 0;
 
           &.is-focused {
-            color: $uxpl-blue-base;
+            color: theme-color("primary");
           }
         }
 
@@ -423,7 +423,7 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            color: $uxpl-blue-base;
+            color: theme-color("primary");
 
             &:hover {
               color: $uxpl-blue-hover-active;
@@ -795,7 +795,7 @@
                 height: 50px;
                 width: 2px;
                 background-color: $white;
-                box-shadow: -1px 0 3px rgba(0,0,0,0.1);
+                box-shadow: -1px 0 3px rgba(0, 0, 0, 0.1);
                 cursor: ew-resize;
 
                 @include transition(none);
@@ -1147,7 +1147,7 @@
         border-radius: 2px;
         background-color: $lightGrey;
         font-family: $f-monospace;
-        color: $baseFontColor;
+        color: $body-color;
         outline: 0;
         height: auto;
         min-height: ($baseline*2.25);

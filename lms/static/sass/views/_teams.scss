@@ -9,7 +9,8 @@
     }
   }
 
-  p, span {
+  p,
+  span {
     color: inherit;
     font-weight: inherit;
   }
@@ -52,7 +53,7 @@
       @include text-align(right);
 
       display: inline-block;
-      width: flex-grid(4,12);
+      width: flex-grid(4, 12);
       vertical-align: text-bottom;
     }
   }
@@ -182,7 +183,7 @@
       box-shadow: 0 0 5px 1px $m-blue-t1;
 
       .card-description {
-        color: $base-font-color;
+        color: $body-color;
       }
     }
 
@@ -195,7 +196,6 @@
     .card-type {
       @extend %t-copy-sub2;
 
-      text-transform: uppercase;
       color: $gray;
     }
 
@@ -203,7 +203,7 @@
       @extend %t-title5;
       @extend %t-strong;
 
-      margin-bottom: rem(.5);
+      margin-bottom: rem(0.5);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -237,7 +237,7 @@
       color: $gray;
 
       .meta-detail {
-        @include margin(($baseline/4) ($baseline*.75) ($baseline/4) 0);
+        @include margin(($baseline/4) ($baseline*0.75) ($baseline/4) 0);
 
         color: $gray-d1;
 
@@ -339,8 +339,7 @@
 
         box-shadow: 1px 1px 1px 0 $blue-d1;
         background-color: $m-blue-l2;
-        padding: ($baseline/10) ($baseline*.75);
-        text-transform: uppercase;
+        padding: ($baseline/10) ($baseline*0.75);
         color: $white;
       }
     }
@@ -363,7 +362,7 @@
 
     .page-content-secondary {
       display: inline-block;
-      width: flex-grid(4,12);
+      width: flex-grid(4, 12);
 
       @include margin-left($baseline * 0.75);
 
@@ -373,7 +372,8 @@
 
       color: $gray;
 
-      div, .team-detail-header {
+      div,
+      .team-detail-header {
         margin-bottom: ($baseline/4);
       }
 
@@ -388,7 +388,8 @@
         margin-top: ($baseline/2);
       }
 
-      .invite-header, .invite-text {
+      .invite-header,
+      .invite-text {
         margin-bottom: ($baseline/2);
       }
 
@@ -551,7 +552,8 @@
     width: 33%;
     vertical-align: text-bottom;
 
-    .join-team.form-actions, .join-team-message {
+    .join-team.form-actions,
+    .join-team-message {
       @include text-align(right);
     }
   }
@@ -634,7 +636,7 @@
             textarea {
               width: 100%;
               height: ($baseline*5);
-              border-radius: ($baseline/5)
+              border-radius: ($baseline/5);
             }
           }
 
@@ -655,7 +657,7 @@
 
         .u-field-title {
           padding-bottom: ($baseline/4);
-          color: $base-font-color;
+          color: $body-color;
           width: 100%;
         }
       }
@@ -670,7 +672,7 @@
           margin-bottom: ($baseline/2);
 
           .u-field-title {
-            color: $base-font-color;
+            color: $body-color;
             font-weight: $font-semibold;
             margin-bottom: ($baseline/5);
           }
@@ -689,18 +691,19 @@
         }
 
         .u-field-title {
-          color: $base-font-color;
+          color: $body-color;
         }
 
         .u-field-message {
           @include padding-left(0);
         }
 
-        .u-field-title, .u-field-value, .u-field-message {
+        .u-field-title,
+        .u-field-value,
+        .u-field-message {
           width: 100%;
         }
       }
-
     }
 
     .u-field {
@@ -708,11 +711,13 @@
     }
 
     .u-field.error {
-      input, textarea {
+      input,
+      textarea {
         border-color: $error-color;
       }
 
-      .u-field-message-help, .u-field-description-message {
+      .u-field-message-help,
+      .u-field-description-message {
         color: $error-color !important;
       }
     }

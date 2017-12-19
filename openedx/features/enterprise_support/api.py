@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from edx_rest_api_client.client import EdxRestApiClient
-from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError, SlumberBaseException
+from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
@@ -22,7 +22,7 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
+    from enterprise.models import EnterpriseCustomer
 except ImportError:
     pass
 
@@ -125,6 +125,7 @@ class EnterpriseApiClient(object):
         Initialize an authenticated Enterprise service API client by using the
         provided user.
         """
+        self.user = user
         jwt = JwtBuilder(user).build_token([])
         self.client = EdxRestApiClient(
             configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
@@ -247,10 +248,11 @@ class EnterpriseApiClient(object):
             querystring = {'username': user.username}
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
-            message = ("An error occurred while getting EnterpriseLearner data for user {username}".format(
-                username=user.username
-            ))
-            LOGGER.exception(message)
+            LOGGER.exception(
+                'Failed to get enterprise-learner for user [%s] with client user [%s]',
+                user.username,
+                self.user.username
+            )
             return None
 
         return response
@@ -322,7 +324,7 @@ def enterprise_enabled():
     """
     Determines whether the Enterprise app is installed
     """
-    return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
+    return 'enterprise' in settings.INSTALLED_APPS and settings.FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION', False)
 
 
 def enterprise_customer_uuid_for_request(request):
@@ -545,3 +547,20 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
             }
         )
     return ''
+
+
+def insert_enterprise_pipeline_elements(pipeline):
+    """
+    If the enterprise app is enabled, insert additional elements into the
+    pipeline related to enterprise.
+    """
+    if not enterprise_enabled():
+        return
+
+    additional_elements = (
+        'enterprise.tpa_pipeline.handle_enterprise_logistration',
+    )
+
+    insert_point = pipeline.index('social_core.pipeline.social_auth.load_extra_data')
+    for index, element in enumerate(additional_elements):
+        pipeline.insert(insert_point + index, element)

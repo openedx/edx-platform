@@ -4,16 +4,11 @@
 // Set the relative path to the static root
 $static-path: '../..' !default;
 
-// Bootstrap support for use with shared partials
-@import 'bootstrap/theme';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import "bootstrap/scss/mixins/breakpoints";
+// Base build
+@import '../base-v2/build';
 
 // Configuration
 @import '../config';
-@import 'base/variables';
-@import '../base-v2/extends';
 
 // Common extensions
 @import '../shared-v2/variables';
@@ -49,3 +44,7 @@ $static-path: '../..' !default;
 
 // Site status banner
 @import '../notifications';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';
+@import 'lms/theme/extras-v2';

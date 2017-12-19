@@ -9,11 +9,14 @@
   cursor: pointer;
   text-decoration: none;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     text-decoration: none;
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     cursor: default;
     pointer-events: none;
   }
@@ -37,14 +40,18 @@
   @include transition(background-color 0.15s, box-shadow 0.15s);
 
   border-radius: 3px;
-  box-shadow: 0 1px 0 rgba($white, .3) inset, 0 0 0 rgba($black, 0);
+  box-shadow: 0 1px 0 rgba($white, 0.3) inset, 0 0 0 rgba($black, 0);
   padding: ($baseline/2) $baseline;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     text-decoration: none;
   }
 
-  &.disabled, &.is-disabled, &[disabled="disabled"] {
+  &.disabled,
+  &.is-disabled,
+  &[disabled="disabled"] {
     box-shadow: none;
   }
 }
@@ -52,18 +59,22 @@
 %btn-inherited-primary {
   @extend %btn-inherited;
 
-  @include linear-gradient(top, rgba($white, .3), rgba($white, 0));
+  @include linear-gradient(top, rgba($white, 0.3), rgba($white, 0));
 
   border: 1px solid shade($action-primary-bg, 10%);
   background-color: $action-primary-bg;
   color: $action-primary-fg;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background-color: $action-primary-focused-bg;
     color: $action-primary-focused-fg;
   }
 
-  &.disabled, &.is-disabled, &[disabled="disabled"] {
+  &.disabled,
+  &.is-disabled,
+  &[disabled="disabled"] {
     border: 1px solid tint($action-primary-disabled-bg, 10%);
     background: $action-primary-disabled-bg;
     color: $action-prmary-disabled-fg;
@@ -83,17 +94,9 @@
   text-align: center;
   text-shadow: none;
 
-  &:hover, &:active, &:focus {
-
-  }
-
-  &.current, &.active {
-    &:hover, &:active, &:focus {
-
-    }
-  }
-
-  &.disabled, &.is-disabled, &[disabled] {
+  &.disabled,
+  &.is-disabled,
+  &[disabled] {
     background: $m-gray-l2;
     color: $white-t3;
   }
@@ -107,23 +110,29 @@
   background: $m-gray;
   color: $white;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $m-gray-l1;
     color: $white;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 0 2px 1px 1px $m-gray-d2;
     background: $m-gray;
     color: $m-gray-l1;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 0 2px 1px 1px $m-gray-d3;
       color: $m-gray-d3;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -136,12 +145,15 @@
   background: shade($error-color, 25%);
   color: $white;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $error-color;
     color: $white;
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -153,21 +165,27 @@
   background: $m-blue-d3;
   color: $white;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $uxpl-blue-hover-active;
     color: $white;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     background: $m-blue;
     color: $m-blue-d2;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       color: $m-blue-d3;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -180,23 +198,29 @@
   background: $m-pink;
   color: $white;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $m-pink-l3;
     color: $white;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 0 2px 1px 1px $m-pink-d1;
     background: $m-pink-l2;
     color: $m-pink-d1;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 0 2px 1px 1px $m-pink-d2;
       color: $m-pink-d3;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -209,23 +233,29 @@
   background: $m-green-d1;
   color: $white;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $uxpl-green-hover-active;
     color: $white;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 0 2px 1px 1px $m-green;
     background: $m-green-l2;
     color: $m-green;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 0 2px 1px 1px $m-green-d1;
       color: $m-green-d1;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -239,7 +269,8 @@
   pointer-events: none;
   box-shadow: none;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     pointer-events: none;
   }
 }
@@ -256,24 +287,30 @@
   background: transparent;
   color: $m-blue-d3;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     box-shadow: 0 2px 1px 0 $m-blue-d4;
     background: $m-blue-d1;
     color: $white;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 0 2px 1px 1px $m-blue-d2;
     background: $m-blue;
     color: $m-blue-d2;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 0 2px 1px 1px $m-blue-d3;
       color: $m-blue-d3;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -284,12 +321,15 @@
 
   border: 1px solid $gray-l4;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     box-shadow: none;
     border: 1px solid $m-blue-d3;
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
   }
 }
@@ -305,11 +345,11 @@
 
   @extend %btn-primary;
 
-  border: 1px solid darken($action-primary-bg,10%);
+  border: 1px solid darken($action-primary-bg, 10%);
   border-radius: 3px;
   padding: 8px $baseline;
   background-color: transparent;
-  color: darken($action-primary-bg,10%);
+  color: darken($action-primary-bg, 10%);
   text-align: center;
 
   &:hover,
@@ -338,7 +378,7 @@
 %btn-pl-green-base {
   @extend %btn-pl-default-base;
 
-  background-color: darken($green-d1,10%);
+  background-color: darken($green-d1, 10%);
   color: $action-primary-fg;
 
   &:hover,
@@ -353,12 +393,12 @@
 
   border: 1px solid transparent;
   background-color: $credit-color-base;
-  color: $base-font-color;
+  color: $body-color;
 
   &:hover,
   &:focus {
-    border: 1px solid darken($credit-color-base,10%);
-    background-color: lighten($credit-color-base,20%);
+    border: 1px solid darken($credit-color-base, 10%);
+    background-color: lighten($credit-color-base, 20%);
   }
 }
 
@@ -367,11 +407,11 @@
 
   border: 1px solid $m-gray-d4;
   background-color: transparent;
-  color: $base-font-color;
+  color: $body-color;
 
   &:hover,
   &:focus {
-    border: 1px solid darken($m-gray-d4,10%);
+    border: 1px solid darken($m-gray-d4, 10%);
     background-color: $m-gray-d4;
   }
 }
@@ -385,9 +425,9 @@
 
   &:hover,
   &:focus {
-    border: 1px solid darken($m-gray-d4,10%);
+    border: 1px solid darken($m-gray-d4, 10%);
     background-color: transparent;
-    color: $base-font-color;
+    color: $body-color;
   }
 }
 
@@ -415,7 +455,7 @@
   &:hover {
     box-shadow: 0 3px 0 0 $action-primary-bg;
     border: 1px solid $action-primary-bg;
-    background-color: lighten($action-primary-bg,20%);
+    background-color: lighten($action-primary-bg, 20%);
     color: $white;
   }
 }
@@ -424,7 +464,8 @@
 
 // application: canned actions
 .btn {
-  font-family: $f-sans-serif;
+  font-family: $font-family-sans-serif;
+  text-decoration: none;
 }
 
 .btn-large {
@@ -432,7 +473,7 @@
   @extend %t-weight3;
 
   display: block;
-  padding:($baseline*0.75) ($baseline*1.5);
+  padding: ($baseline*0.75) ($baseline*1.5);
 }
 
 .btn-avg {
@@ -503,7 +544,12 @@
 %expand-clickable-area {
   position: relative;
 
-  &, &:link, &:visited, &:hover, &:active, &:focus {
+  &,
+  &:link,
+  &:visited,
+  &:hover,
+  &:active,
+  &:focus {
     &::after {
       content: " ";
       position: absolute;

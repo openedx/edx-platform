@@ -1,11 +1,11 @@
 """ Custom API permissions. """
-from django.conf import settings
+
 from django.contrib.auth.models import User
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
-from commerce.utils import is_account_activation_requirement_disabled
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+
+from ...utils import is_account_activation_requirement_disabled
 
 
 class ApiKeyOrModelPermission(BasePermission):

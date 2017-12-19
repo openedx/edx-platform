@@ -40,7 +40,7 @@
 
   .inner-wrapper {
     margin: auto;
-    max-width: 1180px;
+    max-width: map-get($container-max-widths, xl);
     min-width: 760px;
   }
 

@@ -2,10 +2,10 @@
 URLs for performance app
 """
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    'openedx.core.djangoapps.performance.views',
+from openedx.core.djangoapps.performance.views import performance_log
 
-    url(r'^performance$', 'performance_log'),
-)
+urlpatterns = [
+    url(r'^performance$', performance_log),
+]

@@ -1,9 +1,9 @@
 define(['backbone', 'underscore'], function(Backbone, _) {
     var LicenseModel = Backbone.Model.extend({
         defaults: {
-            'type': null,
-            'options': {},
-            'custom': false // either `false`, or a string
+            type: null,
+            options: {},
+            custom: false // either `false`, or a string
         },
 
         initialize: function(attributes) {
@@ -55,16 +55,16 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                 if (spaceIndex == -1) {
                     // if there's no space, it's a license type without options
                     return this.set({
-                        'type': string,
-                        'options': {},
-                        'custom': false
+                        type: string,
+                        options: {},
+                        custom: false
                     }, options);
                 } else {
                 // if there is a space, it's a custom license
                     return this.set({
-                        'type': null,
-                        'options': {},
-                        'custom': string
+                        type: null,
+                        options: {},
+                        custom: string
                     }, options);
                 }
             }
@@ -91,7 +91,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
             });
 
             return this.set({
-                'type': type, 'options': optionsObj, 'custom': false
+                type: type, options: optionsObj, custom: false
             }, options);
         }
     });

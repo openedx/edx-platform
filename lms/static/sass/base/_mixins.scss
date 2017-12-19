@@ -2,13 +2,13 @@
 // ====================
 
 // mixins - font sizing
-@mixin font-size($sizeValue: 16){
+@mixin font-size($sizeValue: 16) {
   font-size: $sizeValue + px;
   // font-size: ($sizeValue/10) + rem;
 }
 
 // mixins - line height
-@mixin line-height($fontSize: auto){
+@mixin line-height($fontSize: auto) {
   line-height: ($fontSize*1.48) + px;
   // line-height: (($fontSize/10)*1.48) + rem;
 }
@@ -31,7 +31,7 @@
 }
 
 // sunsetted, but still used mixins
-@mixin hide-text(){
+@mixin hide-text() {
   text-indent: -9999px;
   overflow: hidden;
   display: block;

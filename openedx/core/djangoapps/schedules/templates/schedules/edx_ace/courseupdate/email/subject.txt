@@ -1,3 +1,5 @@
+{% autoescape off %}
 {% load i18n %}
 
-{% blocktrans %}{{ course_name }} - Welcome to Week {{ week_num }} {% endblocktrans %}
+{% blocktrans %}Welcome to week {{ week_num }} {% endblocktrans %}
+{% endautoescape %}

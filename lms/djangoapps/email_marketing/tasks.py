@@ -291,3 +291,191 @@ def _retryable_sailthru_error(error):
     """
     code = error.get_error_code()
     return code == 9 or code == 43
+
+
+@task(bind=True)
+def update_course_enrollment(self, email, course_key, mode):
+    """Adds/updates Sailthru when a user adds to cart/purchases/upgrades a course
+         Args:
+            user: current user
+            course_key: course key of course
+        Returns:
+            None
+    """
+    course_url = build_course_url(course_key)
+    config = EmailMarketingConfiguration.current()
+
+    try:
+        sailthru_client = SailthruClient(config.sailthru_key, config.sailthru_secret)
+    except:
+        return
+
+    send_template = config.sailthru_enroll_template
+    cost_in_cents = 0
+
+    if not update_unenrolled_list(sailthru_client, email, course_url, False):
+        schedule_retry(self, config)
+
+    course_data = _get_course_content(course_key, course_url, sailthru_client, config)
+
+    item = _build_purchase_item(course_key, course_url, cost_in_cents, mode, course_data, None)
+    options = {}
+
+    if send_template:
+        options['send_template'] = send_template
+
+    if not _record_purchase(sailthru_client, email, item, options):
+        schedule_retry(self, config)
+
+
+def build_course_url(course_key):
+    """
+    Generates and return url of the course info page by using course_key
+    Arguments:
+         course_key: course_key of the given course
+    Returns
+        a complete url of the course info page
+    """
+    return '{base_url}/courses/{course_key}/info'.format(base_url=settings.LMS_ROOT_URL,
+                                                         course_key=unicode(course_key))
+
+
+def update_unenrolled_list(sailthru_client, email, course_url, unenroll):
+    """Maintain a list of courses the user has unenrolled from in the Sailthru user record
+    Arguments:
+        sailthru_client: SailthruClient
+        email (str): user's email address
+        course_url (str): LMS url for course info page.
+        unenroll (boolean): True if unenrolling, False if enrolling
+    Returns:
+        False if retryable error, else True
+    """
+    try:
+        # get the user 'vars' values from sailthru
+        sailthru_response = sailthru_client.api_get("user", {"id": email, "fields": {"vars": 1}})
+        if not sailthru_response.is_ok():
+            error = sailthru_response.get_error()
+            log.error("Error attempting to read user record from Sailthru: %s", error.get_message())
+            return not _retryable_sailthru_error(error)
+
+        response_json = sailthru_response.json
+
+        unenroll_list = []
+        if response_json and "vars" in response_json and response_json["vars"] \
+           and "unenrolled" in response_json["vars"]:
+            unenroll_list = response_json["vars"]["unenrolled"]
+
+        changed = False
+        # if unenrolling, add course to unenroll list
+        if unenroll:
+            if course_url not in unenroll_list:
+                unenroll_list.append(course_url)
+                changed = True
+
+        # if enrolling, remove course from unenroll list
+        elif course_url in unenroll_list:
+            unenroll_list.remove(course_url)
+            changed = True
+
+        if changed:
+            # write user record back
+            sailthru_response = sailthru_client.api_post(
+                'user', {'id': email, 'key': 'email', 'vars': {'unenrolled': unenroll_list}})
+
+            if not sailthru_response.is_ok():
+                error = sailthru_response.get_error()
+                log.error("Error attempting to update user record in Sailthru: %s", error.get_message())
+                return not _retryable_sailthru_error(error)
+
+        return True
+
+    except SailthruClientError as exc:
+        log.exception("Exception attempting to update user record for %s in Sailthru - %s", email, unicode(exc))
+        return False
+
+
+def schedule_retry(self, config):
+    """Schedule a retry"""
+    raise self.retry(countdown=config.sailthru_retry_interval,
+                     max_retries=config.sailthru_max_retries)
+
+
+def _get_course_content(course_id, course_url, sailthru_client, config):
+    """Get course information using the Sailthru content api or from cache.
+        If there is an error, just return with an empty response.
+        Arguments:
+            course_id (str): course key of the course
+            course_url (str): LMS url for course info page.
+            sailthru_client : SailthruClient
+            config : config options
+        Returns:
+            course information from Sailthru
+        """
+    # check cache first
+
+    cache_key = "{}:{}".format(course_id, course_url)
+    response = cache.get(cache_key)
+    if not response:
+        try:
+            sailthru_response = sailthru_client.api_get("content", {"id": course_url})
+            if not sailthru_response.is_ok():
+                log.error('Could not get course data from Sailthru on enroll/unenroll event. ')
+                response = {}
+            else:
+                response = sailthru_response.json
+                cache.set(cache_key, response, config.sailthru_content_cache_age)
+
+        except SailthruClientError:
+            response = {}
+
+    return response
+
+
+def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data, sku):
+    """Build and return Sailthru purchase item object"""
+
+    # build item description
+    item = {
+        'id': "{}-{}".format(course_id, mode),
+        'url': course_url,
+        'price': cost_in_cents,
+        'qty': 1,
+    }
+
+    # get title from course info if we don't already have it from Sailthru
+    if 'title' in course_data:
+        item['title'] = course_data['title']
+    else:
+        # can't find, just invent title
+        item['title'] = 'Course {} mode: {}'.format(course_id, mode)
+
+    if 'tags' in course_data:
+        item['tags'] = course_data['tags']
+
+    return item
+
+
+def _record_purchase(sailthru_client, email, item, options):
+    """
+    Record a purchase in Sailthru
+    Arguments:
+        sailthru_client: SailthruClient
+        email: user's email address
+        item: Sailthru required information
+        options: Sailthru purchase API options
+    Returns:
+        False if retryable error, else True
+    """
+
+    try:
+        sailthru_response = sailthru_client.purchase(email, [item], options=options)
+
+        if not sailthru_response.is_ok():
+            error = sailthru_response.get_error()
+            log.error("Error attempting to record purchase in Sailthru: %s", error.get_message())
+            return not _retryable_sailthru_error(error)
+
+    except SailthruClientError as exc:
+        log.exception("Exception attempting to record purchase for %s in Sailthru - %s", email, unicode(exc))
+        return False
+    return True

@@ -3,10 +3,12 @@
 from __future__ import unicode_literals
 
 import mock
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from branding.api import get_footer, get_logo_url
+from branding.api import get_footer, get_home_url, get_logo_url
+from edxmako.shortcuts import marketing_link
 
 
 class TestHeader(TestCase):
@@ -24,6 +26,18 @@ class TestHeader(TestCase):
 
         self.assertEqual(logo_url, cdn_url)
 
+    def test_home_url_with_mktg_disabled(self):
+        expected_url = get_home_url()
+        self.assertEqual(reverse('dashboard'), expected_url)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
+    @mock.patch.dict('django.conf.settings.MKTG_URLS', {
+        "ROOT": "https://edx.org",
+    })
+    def test_home_url_with_mktg_enabled(self):
+        expected_url = get_home_url()
+        self.assertEqual(marketing_link('ROOT'), expected_url)
+
 
 class TestFooter(TestCase):
     """Test retrieving the footer. """
@@ -33,6 +47,7 @@ class TestFooter(TestCase):
         "ABOUT": "/about-us",
         "NEWS": "/news-announcements",
         "CONTACT": "/contact",
+        "CAREERS": '/careers',
         "FAQ": "/student-faq",
         "BLOG": "/edx-blog",
         "DONATE": "/donate",
@@ -41,17 +56,20 @@ class TestFooter(TestCase):
         "TOS_AND_HONOR": "/edx-terms-service",
         "PRIVACY": "/edx-privacy-policy",
         "ACCESSIBILITY": "/accessibility",
+        "AFFILIATES": '/affiliates',
         "MEDIA_KIT": "/media-kit",
         "ENTERPRISE": "/enterprise"
     })
     @override_settings(PLATFORM_NAME='\xe9dX')
     def test_get_footer(self):
         actual_footer = get_footer(is_secure=True)
+        import pprint
+        pprint.pprint(actual_footer)
+        print('******************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!*******************************************')
         expected_footer = {
-            'copyright':
-                '\xa9 \xe9dX.  All rights reserved except where noted.  '
-                'EdX, Open edX and their respective logos '
-                'are trademarks or registered trademarks of edX Inc.',
+            'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
+                         ' EdX, Open edX and their respective logos are '
+                         'trademarks or registered trademarks of edX Inc.',
             'navigation_links': [
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
                 {'url': 'https://edx.org/enterprise', 'name': 'enterprise', 'title': '\xe9dX for Business'},
@@ -59,6 +77,34 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
                 {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/contact', 'name': 'contact', 'title': 'Contact'},
+                {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
+                {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
+            ],
+            'business_links': [
+                {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
+                {'url': 'https://edx.org/enterprise', 'name': 'enterprise', 'title': '\xe9dX for Business'},
+                {'url': 'https://edx.org/affiliates', 'name': 'affiliates', 'title': 'Affiliates'},
+                {'url': 'http://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
+                {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
+                {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
+
+            ],
+            'more_info_links': [
+                {'url': 'https://edx.org/edx-terms-service',
+                 'name': 'terms_of_service_and_honor_code',
+                 'title': 'Terms of Service & Honor Code'},
+                {'url': 'https://edx.org/edx-privacy-policy', 'name': 'privacy_policy', 'title': 'Privacy Policy'},
+                {'url': 'https://edx.org/accessibility',
+                 'name': 'accessibility_policy',
+                 'title': 'Accessibility Policy'},
+                {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
+
+            ],
+            'connect_links': [
+                {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
+                {'url': 'https://edx.org/contact', 'name': 'contact', 'title': 'Contact Us'},
+                {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
             ],
             'legal_links': [
@@ -70,21 +116,23 @@ class TestFooter(TestCase):
                  'name': 'accessibility_policy',
                  'title': 'Accessibility Policy'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
-                {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'}
+                {'name': 'media_kit',
+                 'title': u'Media Kit',
+                 'url': u'https://edx.org/media-kit'}
             ],
             'social_links': [
                 {'url': '#', 'action': 'Like \xe9dX on Facebook', 'name': 'facebook',
                  'icon-class': 'fa-facebook-square', 'title': 'Facebook'},
                 {'url': '#', 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
-                 'icon-class': 'fa-twitter', 'title': 'Twitter'},
+                 'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
                 {'url': '#', 'action': 'Subscribe to the \xe9dX YouTube channel',
-                 'name': 'youtube', 'icon-class': 'fa-youtube', 'title': 'Youtube'},
+                 'name': 'youtube', 'icon-class': 'fa-youtube-square', 'title': 'Youtube'},
                 {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
                 {'url': '#', 'action': 'Follow \xe9dX on Google+', 'name': 'google_plus',
                  'icon-class': 'fa-google-plus-square', 'title': 'Google+'},
                 {'url': '#', 'action': 'Subscribe to the \xe9dX subreddit',
-                 'name': 'reddit', 'icon-class': 'fa-reddit', 'title': 'Reddit'}
+                 'name': 'reddit', 'icon-class': 'fa-reddit-square', 'title': 'Reddit'}
             ],
             'mobile_links': [],
             'logo_image': 'https://edx.org/static/images/logo.png',
@@ -98,4 +146,5 @@ class TestFooter(TestCase):
                 'text': 'Take free online courses at edX.org',
             },
         }
+        pprint.pprint(expected_footer)
         self.assertEqual(actual_footer, expected_footer)

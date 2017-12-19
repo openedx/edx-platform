@@ -70,8 +70,8 @@ var edx = edx || {};
     edx.student.account.AccountView = Backbone.View.extend({
 
         events: {
-            'submit': 'submit',
-            'change': 'change',
+            submit: 'submit',
+            change: 'change',
             'click #password-reset': 'click'
         },
 
@@ -188,4 +188,4 @@ var edx = edx || {};
     } catch (e) {
         // TODO: handle exception
     }
-})(jQuery, _, Backbone, gettext);
+}(jQuery, _, Backbone, gettext));

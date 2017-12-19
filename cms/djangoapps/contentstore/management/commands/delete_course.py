@@ -1,3 +1,6 @@
+from __future__ import print_function
+from six import text_type
+
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -54,7 +57,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             # a course key may have unicode chars in it
-            course_key = unicode(options['course_key'], 'utf8')
+            course_key = text_type(options['course_key'], 'utf8')
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
             raise CommandError('Invalid course_key: {}'.format(options['course_key']))

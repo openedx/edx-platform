@@ -4,7 +4,7 @@
 .calc-main {
   @extend %ui-print-excluded;
 
-  bottom: -126px;
+  bottom: -129px;
   left: 0;
   position: fixed;
 
@@ -20,7 +20,7 @@
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
     @include float(right);
-    @include right($baseline*.75);
+    @include right($baseline*0.75);
 
     position: relative;
     top: -42px;

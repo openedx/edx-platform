@@ -1,7 +1,7 @@
 // styles duped from _unit.scss - Edit Header (Component Name, Mode-Editor, Mode-Settings)
 
 
-.tabs-wrapper{
+.tabs-wrapper {
   padding-top: 0;
   position: relative;
 
@@ -65,7 +65,7 @@
 
         a.tab {
           @include font-size(14);
-          @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+          @include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
 
           border: 1px solid $blue-d1;
           border-radius: 3px;
@@ -83,7 +83,8 @@
             cursor: default;
           }
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             box-shadow: inset 0 1px 2px 1px  $shadow;
             background-image: linear-gradient(#009fe6, #009fe6) !important;
           }
@@ -106,7 +107,7 @@
     .comp-subtitles-import-list {
       > li {
         display: block;
-        margin: $baseline/2 0px $baseline/2 0;
+        margin: $baseline/2 0;
       }
 
       .blue-button {
@@ -118,8 +119,6 @@
       }
     }
   }
-
-
 }
 
 .component-tab {

@@ -2,7 +2,7 @@
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
 define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-        'common/js/spec_helpers/template_helpers'],
+    'common/js/spec_helpers/template_helpers'],
     function($, NotificationView, Prompt, TemplateHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
@@ -72,17 +72,17 @@ define(['jquery', 'common/js/components/views/feedback_notification', 'common/js
         };
 
         return {
-            'installViewTemplates': installViewTemplates,
-            'createNotificationSpy': createNotificationSpy,
-            'verifyNotificationShowing': verifyNotificationShowing,
-            'verifyNotificationHidden': verifyNotificationHidden,
-            'confirmPrompt': confirmPrompt,
-            'createPromptSpy': createPromptSpy,
-            'verifyPromptShowing': verifyPromptShowing,
-            'verifyPromptHidden': verifyPromptHidden,
-            'inlineEdit': inlineEdit,
-            'verifyInlineEditChange': verifyInlineEditChange,
-            'installMockAnalytics': installMockAnalytics,
-            'removeMockAnalytics': removeMockAnalytics
+            installViewTemplates: installViewTemplates,
+            createNotificationSpy: createNotificationSpy,
+            verifyNotificationShowing: verifyNotificationShowing,
+            verifyNotificationHidden: verifyNotificationHidden,
+            confirmPrompt: confirmPrompt,
+            createPromptSpy: createPromptSpy,
+            verifyPromptShowing: verifyPromptShowing,
+            verifyPromptHidden: verifyPromptHidden,
+            inlineEdit: inlineEdit,
+            verifyInlineEditChange: verifyInlineEditChange,
+            installMockAnalytics: installMockAnalytics,
+            removeMockAnalytics: removeMockAnalytics
         };
     });

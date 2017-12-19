@@ -10,11 +10,12 @@ import warnings
 from collections import defaultdict, namedtuple
 from urlparse import parse_qs, urlsplit, urlunsplit
 
+import django
 import analytics
 import edx_oauth2_provider
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, load_backend, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
@@ -51,6 +52,7 @@ from social_django import utils as social_utils
 import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
 import third_party_auth
+from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
 from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
@@ -64,6 +66,7 @@ from courseware.access import has_access
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
+from entitlements.models import CourseEntitlement
 from eventtracking import tracker
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
@@ -71,7 +74,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -80,10 +83,14 @@ from openedx.core.djangoapps.external_auth.login_and_register import register as
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.programs.utils import (
+    ProgramDataExtender,
+    ProgramProgressMeter
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, WaffleFlag
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_url_name
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
@@ -122,6 +129,7 @@ from student.models import (
 )
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
+from student.text_me_the_app import TextMeTheAppFragmentView
 from third_party_auth import pipeline, provider
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
@@ -146,6 +154,14 @@ REGISTRATION_UTM_PARAMETERS = {
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "registration"])
+
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Compensate for behavior change of default authentication backend in 1.10
+if django.VERSION[0] == 1 and django.VERSION[1] < 10:
+    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.ModelBackend'
+else:
+    # We want to allow inactive users to log in only when their account is first created
+    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
@@ -195,6 +211,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # TO DISPLAY A YOUTUBE WELCOME VIDEO
     # 1) Change False to True
     context['show_homepage_promo_video'] = configuration_helpers.get_value('show_homepage_promo_video', False)
+
+    # Maximum number of courses to display on the homepage.
+    context['homepage_course_max'] = configuration_helpers.get_value(
+        'HOMEPAGE_COURSE_MAX', settings.HOMEPAGE_COURSE_MAX
+    )
 
     # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via site configuration
     # Note: This value should be moved into a configuration setting and plumbed-through to the
@@ -672,15 +693,23 @@ def dashboard(request):
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
 
-    # get the org whitelist or the org blacklist for the current site
+    # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(user)
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
+
+    # Get the entitlements for the user and a mapping to all available sessions for that entitlement
+    course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
+    course_entitlement_available_sessions = {}
+    for course_entitlement in course_entitlements:
+        course_entitlement.update_expired_at()
+        course_entitlement_available_sessions[str(course_entitlement.uuid)] = \
+            get_course_runs_for_course(str(course_entitlement.course_uuid))
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
     monitoring_utils.accumulate('num_courses', len(course_enrollments))
 
-    # sort the enrollment pairs by the enrollment date
+    # Sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
     # Retrieve the course modes for each course
@@ -728,6 +757,11 @@ def dashboard(request):
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
+    # Disable lookup of Enterprise consent_required_course due to ENT-727
+    # Will re-enable after fixing WL-1315
+    consent_required_courses = set()
+    enterprise_customer_name = None
+
     # Account activation message
     account_activation_messages = [
         message for message in messages.get_messages(request) if 'account-activation' in message.tags
@@ -750,7 +784,27 @@ def dashboard(request):
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
     meter = ProgramProgressMeter(request.site, user, enrollments=course_enrollments)
+    ecommerce_service = EcommerceService()
     inverted_programs = meter.invert_programs()
+
+    urls, program_data = {}, {}
+    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
+
+    if (bundles_on_dashboard_flag.is_enabled()):
+        programs_data = meter.programs
+        if programs_data:
+            program_data = meter.programs[0]
+            program_data = ProgramDataExtender(program_data, request.user).extend()
+            course_data = meter.progress(programs=[program_data], count_only=False)[0]
+
+            program_data.pop('courses')
+            skus = program_data.get('skus')
+
+            urls = {
+                'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
+                'buy_button_url': ecommerce_service.get_checkout_page_url(*skus)
+            }
+            urls['completeProgramURL'] = urls['buy_button_url'] + '&bundle=' + program_data.get('uuid')
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -844,12 +898,22 @@ def dashboard(request):
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
     display_sidebar_on_dashboard = len(order_history_list) or verification_status in valid_verification_statuses
 
+    # Filter out any course enrollment course cards that are associated with fulfilled entitlements
+    for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
+        course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id]  # pylint: disable=line-too-long
+
     context = {
+        'urls': urls,
+        'program_data': program_data,
         'enterprise_message': enterprise_message,
+        'consent_required_courses': consent_required_courses,
+        'enterprise_customer_name': enterprise_customer_name,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'account_activation_messages': account_activation_messages,
         'course_enrollments': course_enrollments,
+        'course_entitlements': course_entitlements,
+        'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'course_optouts': course_optouts,
         'banner_account_activation_message': banner_account_activation_message,
         'sidebar_account_activation_message': sidebar_account_activation_message,
@@ -883,7 +947,6 @@ def dashboard(request):
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
     }
 
-    ecommerce_service = EcommerceService()
     if ecommerce_service.is_enabled(request.user):
         context.update({
             'use_ecommerce_payment_flow': True,
@@ -1245,6 +1308,10 @@ def change_enrollment(request, check_access=True):
             request.POST.get("course_id"),
         )
         return HttpResponseBadRequest(_("Invalid course id"))
+
+    # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
+    # on a per-course basis.
+    monitoring_utils.set_custom_metric('course_id', unicode(course_id))
 
     if action == "enroll":
         # Make sure the course exists
@@ -2038,37 +2105,23 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    # Don't send email if we are:
-    #
-    # 1. Doing load testing.
-    # 2. Random user generation for other forms of testing.
-    # 3. External auth bypassing activation.
-    # 4. Have the platform configured to not require e-mail activation.
-    # 5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
-    #
-    # Note that this feature is only tested as a flag set one way or
-    # the other for *new* systems. we need to be careful about
-    # changing settings on a running system to make sure no users are
-    # left in an inconsistent state (or doing a migration if they are).
-    send_email = (
-        not settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) and
-        not settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') and
-        not (do_external_auth and settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH')) and
-        not (
-            third_party_provider and third_party_provider.skip_email_verification and
-            user.email == running_pipeline['kwargs'].get('details', {}).get('email')
-        )
+    # Check if we system is configured to skip activation email for the current user.
+    skip_email = skip_activation_email(
+        user, do_external_auth, running_pipeline, third_party_provider,
     )
-    if send_email:
-        compose_and_send_activation_email(user, profile, registration)
-    else:
+
+    if skip_email:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
+    else:
+        compose_and_send_activation_email(user, profile, registration)
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
-    new_user = authenticate(username=user.username, password=params['password'])
+    backend = load_backend(NEW_USER_AUTH_BACKEND)
+    new_user = backend.authenticate(request=request, username=user.username, password=params['password'])
+    new_user.backend = NEW_USER_AUTH_BACKEND
     login(request, new_user)
     request.session.set_expiry(0)
 
@@ -2097,6 +2150,54 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider):
+    """
+    Return `True` if activation email should be skipped.
+
+    Skip email if we are:
+        1. Doing load testing.
+        2. Random user generation for other forms of testing.
+        3. External auth bypassing activation.
+        4. Have the platform configured to not require e-mail activation.
+        5. Registering a new user using a trusted third party provider (with skip_email_verification=True)
+
+    Note that this feature is only tested as a flag set one way or
+    the other for *new* systems. we need to be careful about
+    changing settings on a running system to make sure no users are
+    left in an inconsistent state (or doing a migration if they are).
+
+    Arguments:
+        user (User): Django User object for the current user.
+        do_external_auth (bool): True if external authentication is in progress.
+        running_pipeline (dict): Dictionary containing user and pipeline data for third party authentication.
+        third_party_provider (ProviderConfig): An instance of third party provider configuration.
+
+    Returns:
+        (bool): `True` if account activation email should be skipped, `False` if account activation email should be
+            sent.
+    """
+    sso_pipeline_email = running_pipeline and running_pipeline['kwargs'].get('details', {}).get('email')
+
+    # Email is valid if the SAML assertion email matches the user account email or
+    # no email was provided in the SAML assertion. Some IdP's use a callback
+    # to retrieve additional user account information (including email) after the
+    # initial account creation.
+    valid_email = (
+        sso_pipeline_email == user.email or (
+            sso_pipeline_email is None and
+            third_party_provider and
+            getattr(third_party_provider, "identity_provider_type", None) == SAP_SUCCESSFACTORS_SAML_KEY
+        )
+    )
+
+    return (
+        settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
+        settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
+        (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
+        (third_party_provider and third_party_provider.skip_email_verification and valid_email)
+    )
 
 
 def _enroll_user_in_pending_courses(student):
@@ -2170,7 +2271,7 @@ def record_registration_attributions(request, user):
 def create_account(request, post_override=None):
     """
     JSON call to create new edX account.
-    Used by form in signup_modal.html, which is included into navigation.html
+    Used by form in signup_modal.html, which is included into header.html
     """
     # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
     if not configuration_helpers.get_value(
@@ -2988,3 +3089,19 @@ class LogoutView(TemplateView):
         })
 
         return context
+
+
+@ensure_csrf_cookie
+def text_me_the_app(request):
+    """
+    Text me the app view.
+    """
+    text_me_fragment = TextMeTheAppFragmentView().render_to_fragment(request)
+    context = {
+        'nav_hidden': True,
+        'show_dashboard_tabs': True,
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'fragment': text_me_fragment
+    }
+
+    return render_to_response('text-me-the-app.html', context)

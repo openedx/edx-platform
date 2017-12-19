@@ -30,7 +30,7 @@
 
 // headings/titles
 %t-title {
-  font-family: $f-sans-serif;
+  font-family: $font-family-sans-serif;
 }
 
 %t-title1 {
@@ -100,7 +100,7 @@
 
 // copy
 %t-copy {
-  font-family: $f-sans-serif;
+  font-family: $font-family-sans-serif;
 }
 
 %t-copy-base {
@@ -320,8 +320,10 @@
 %copy-link {
   border-bottom: 1px dotted transparent;
 
-  &:hover, &:active, &:focus {
-    border-color: $link-color-d1;
+  &:hover,
+  &:active,
+  &:focus {
+    border-color: $link-color;
   }
 }
 
@@ -331,6 +333,5 @@
 
   border-radius: ($baseline/5);
   padding: ($baseline/2) $baseline;
-  text-transform: uppercase;
   letter-spacing: 0.1rem;
 }

@@ -70,13 +70,12 @@
             },
 
             parse: function(response) {
-                var results = response['results'] || [];
+                var results = response.results || [];
                 this.latestModelsCount = results.length;
                 this.totalCount = response.total;
                 if (typeof response.facets !== 'undefined') {
                     this.facets = response.facets;
-                }
-                else {
+                } else {
                     this.facets = [];
                 }
                 return _.map(results, function(result) {
@@ -101,4 +100,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

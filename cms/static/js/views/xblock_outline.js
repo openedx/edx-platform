@@ -14,8 +14,8 @@
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-        'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor',
-        'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'],
+    'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor',
+    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'],
     function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor, StringUtils, HtmlUtils) {
         'use strict';
         var XBlockOutlineView = BaseView.extend({
@@ -58,8 +58,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
 
                 if (this.shouldRenderChildren() && this.shouldExpandChildren()) {
                     this.renderChildren();
-                }
-                else {
+                } else {
                     this.renderedChildren = false;
                 }
                 return this;
@@ -167,8 +166,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                     var wasExpanded = this.expandedLocators.contains(locator);
                     if (wasExpanded) {
                         this.expandedLocators.remove(locator);
-                    }
-                    else {
+                    } else {
                         this.expandedLocators.add(locator);
                     }
                 }
@@ -224,7 +222,11 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             onSync: function(event) {
-                if (ViewUtils.hasChangedAttributes(this.model, ['visibility_state', 'child_info', 'display_name'])) {
+                var hasChangedAttributes = ViewUtils.hasChangedAttributes(
+                    this.model,
+                    ['visibility_state', 'child_info', 'display_name', 'highlights']
+                );
+                if (hasChangedAttributes) {
                     this.onXBlockChange();
                 }
             },

@@ -12,8 +12,8 @@
             DiscussionSpecHelper.setUnderscoreFixtures();
             spyOn(DiscussionUtil, 'makeWmdEditor');
             this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({
-                'commentable_id': 'test_topic',
-                'title': 'test thread title'
+                commentable_id: 'test_topic',
+                title: 'test thread title'
             });
             this.thread = new Thread(this.threadData);
             this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
@@ -74,7 +74,7 @@
         });
 
         it('can save new data correctly in inline mode', function() {
-            this.createEditView({'mode': 'inline'});
+            this.createEditView({mode: 'inline'});
             testUpdate(this.view, this.thread, 'other_topic', 'Other Topic', 'inline');
         });
 
@@ -89,7 +89,7 @@
         });
 
         it('can close the view in inline mode', function() {
-            this.createEditView({'mode': 'inline'});
+            this.createEditView({mode: 'inline'});
             testCancel(this.view);
         });
 

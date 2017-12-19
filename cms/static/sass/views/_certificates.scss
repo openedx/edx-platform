@@ -11,7 +11,8 @@
 // * +Layout - Certificates
 // ====================
 .view-certificates {
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
 
     float: left;
@@ -66,10 +67,11 @@
     width: flex-grid(3, 12);
   }
 
-  .certificate-info-section{
+  .certificate-info-section {
     overflow: auto;
 
-    .course-title-section, .course-number-section{
+    .course-title-section,
+    .course-number-section {
       min-width: 47%;
 
       @include margin-right(2%);
@@ -150,7 +152,7 @@
 
     .collection-details {
       .actions {
-        @include transition(opacity .15s .25s ease-in-out);
+        @include transition(opacity 0.15s 0.25s ease-in-out);
 
         position: absolute;
         top: $baseline;
@@ -285,7 +287,9 @@
           }
         }
 
-        label, input, textarea {
+        label,
+        input,
+        textarea {
           display: block;
         }
 
@@ -306,7 +310,8 @@
         }
 
         //this section is borrowed from _account.scss - we should clean up and unify later
-        input, textarea {
+        input,
+        textarea {
           @extend %t-copy-base;
 
           height: 100%;
@@ -491,7 +496,8 @@
 }
 
 .view-certificates .certificates {
-  .certificate-details, .certificate-edit {
+  .certificate-details,
+  .certificate-edit {
     .title {
       @extend %t-title4;
       @extend %t-strong;
@@ -563,7 +569,8 @@
 // ====================
 // TO-DO: refactor to use collection styling where possible.
 .view-certificates .certificates {
-  .signatory-details, .signatory-edit {
+  .signatory-details,
+  .signatory-edit {
     @extend %ui-window;
 
     border-color: $gray-l4;
@@ -595,7 +602,8 @@
     }
 
     .signatory-panel-edit {
-      float:right;
+      @include float(right);
+
       padding: 8px;
       position: inherit;
     }
@@ -604,9 +612,11 @@
   .signatory-edit {
 
     // TO-DO: remove icon styling, use save / cancel pattern for Studio
-    .signatory-panel-close, .signatory-panel-save, .signatory-panel-delete {
-      float:right;
-      padding:10px;
+    .signatory-panel-close,
+    .signatory-panel-save,
+    .signatory-panel-delete {
+      float: right;
+      padding: $baseline/2;
     }
 
     .tip {
@@ -637,7 +647,9 @@
         }
       }
 
-      label, input, textarea {
+      label,
+      input,
+      textarea {
         display: block;
       }
 
@@ -658,7 +670,8 @@
       }
 
       //TO-DO: this section is borrowed from _account.scss - we should clean up and unify later
-      input, textarea {
+      input,
+      textarea {
         @extend %t-copy-base;
 
         height: 100%;
@@ -705,7 +718,7 @@
           border-color: $red;
         }
 
-        .message-error{
+        .message-error {
           color: $red;
         }
       }

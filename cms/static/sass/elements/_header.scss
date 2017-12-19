@@ -387,10 +387,10 @@ body.course.view-export .nav-course-tools-export,
 body.course.view-export-git .nav-course-tools-export-git,
 body.course.view-team .nav-library-settings .title,
 body.course.view-team .nav-library-settings-team {
-  color: $uxpl-blue-base;
+  color: theme-color("primary");
 
   a {
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
     pointer-events: none;
   }
 }

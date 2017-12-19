@@ -7,7 +7,10 @@ from django import forms
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
-from openedx.core.djangoapps.video_config.models import CourseHLSPlaybackEnabledFlag, CourseVideoTranscriptEnabledFlag
+from openedx.core.djangoapps.video_config.models import (
+    CourseHLSPlaybackEnabledFlag,
+    CourseVideoTranscriptEnabledFlag,
+)
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

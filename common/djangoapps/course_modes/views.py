@@ -3,6 +3,7 @@ Views for the course_mode module
 """
 
 import decimal
+import json
 import urllib
 
 import waffle
@@ -28,7 +29,6 @@ from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
 from third_party_auth.decorators import tpa_hint_ends_existing_session
-from util import organizations_helpers as organization_api
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
@@ -190,8 +190,11 @@ class ChooseModeView(View):
         context['currency_data'] = []
         if waffle.switch_is_active('local_currency'):
             if 'edx-price-l10n' not in request.COOKIES:
-                context['currency_data'] = get_currency_data()
-
+                currency_data = get_currency_data()
+                try:
+                    context['currency_data'] = json.dumps(currency_data)
+                except TypeError:
+                    pass
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(tpa_hint_ends_existing_session)

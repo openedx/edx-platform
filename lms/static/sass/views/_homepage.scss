@@ -67,9 +67,9 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
           padding: 0 $baseline;
           width: ($baseline*10);
           height: ($baseline*2.5);
-          border-color: $uxpl-blue-base;
+          border-color: theme-color("primary");
           border-radius: 3px;
-          background: $uxpl-blue-base;
+          background: theme-color("primary");
           color: $white;
           line-height: ($baseline*2.5);
           text-align: center;
@@ -80,10 +80,10 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
       .course-info {
         height: $course-info-height;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
 
         h2 {
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
         }
 
         .course-organization, .course-code, .course-date {

@@ -2,7 +2,7 @@
 """
 Admin site configuration for third party authentication
 """
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
 
@@ -116,8 +116,9 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return self.model._meta.get_all_field_names()  # pylint: disable=protected-access
+            return [field.name for field in self.model._meta.get_fields()]  # pylint: disable=protected-access
         return self.readonly_fields
+
 
 admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)
 

@@ -924,8 +924,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertEqual(course_mode, updated_mode)
 
     @httpretty.activate
-    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
+    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
+                       FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_enterprise_course_enrollment_with_ec_uuid(self):
         """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
         UserFactory.create(

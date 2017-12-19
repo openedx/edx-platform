@@ -9,10 +9,10 @@
             var request = $.ajaxWithPrefix ? $.ajaxWithPrefix : $.ajax;
 
             options = $.extend(true, {
-                'url': '/event',
-                'type': 'POST',
-                'data': data,
-                'async': true
+                url: '/event',
+                type: 'POST',
+                data: data,
+                async: true
             }, options);
             return request(options);
         };
@@ -57,9 +57,9 @@
                 }
                 // Regardless of whether any callbacks were made, log this event.
                 return sendRequest({
-                    'event_type': eventType,
-                    'event': JSON.stringify(data),
-                    'page': window.location.href
+                    event_type: eventType,
+                    event: JSON.stringify(data),
+                    page: window.location.href
                 }, requestOptions);
             },
 

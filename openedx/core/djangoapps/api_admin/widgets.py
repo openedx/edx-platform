@@ -1,5 +1,6 @@
 """ Form widget classes """
 
+import django
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.forms.utils import flatatt
@@ -15,7 +16,15 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
     """ Renders a checkbox with a label linking to the terms of service. """
 
     def render(self, name, value, attrs=None):
-        final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
+        # TODO: Remove Django 1.11 upgrade shim
+        # SHIM: Compensate for behavior change of default authentication backend in 1.10
+        if django.VERSION < (1, 11):
+            final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
+        else:
+            extra_attrs = attrs.copy()
+            extra_attrs.update({'type': 'checkbox', 'name': name})
+            final_attrs = self.build_attrs(self.attrs, extra_attrs=extra_attrs)  # pylint: disable=redundant-keyword-arg
+
         if self.check_test(value):
             final_attrs['checked'] = 'checked'
         if not (value is True or value is False or value is None or value == ''):

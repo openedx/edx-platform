@@ -19,8 +19,10 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import (
     get_video_transcript_content,
-    is_val_transcript_feature_enabled_for_course,
     Transcript,
+)
+from xmodule.video_module.transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
 )
 
 from ..decorators import mobile_course_access, mobile_view

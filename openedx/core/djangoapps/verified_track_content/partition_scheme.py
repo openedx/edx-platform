@@ -75,15 +75,7 @@ class EnrollmentTrackPartitionScheme(object):
         If a course is using the Verified Track Cohorting pilot feature, this method
         returns None regardless of the user's enrollment mode.
         """
-        def _log_for_educator_1511(log_statement):
-            # temporary logging for EDUCATOR-1511. Will be rolled back as soon as we have some logs
-            if course_key == CourseKey.from_string('course-v1:ASUx+ENG101x+2177A'):
-                LOGGER.warning('EDUCATOR-1511: get_group_for_user | {0}'.format(log_statement))
-
-        _log_for_educator_1511('Getting group for user id {0}'.format(user.id))
-
         if is_course_using_cohort_instead(course_key):
-            _log_for_educator_1511('Course is using cohort instead.')
             return None
 
         # First, check if we have to deal with masquerading.
@@ -101,12 +93,12 @@ class EnrollmentTrackPartitionScheme(object):
                 mode_slug,
                 modes=CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False),
             )
-            _log_for_educator_1511('Got enrollment for user {0}: mode slug is {1}'.format(user.id, mode_slug))
             if course_mode and CourseMode.is_credit_mode(course_mode):
-                _log_for_educator_1511('user {0} is in credit mode, returning verified partition'.format(user.id))
-                course_mode = CourseMode.verified_mode_for_course(course_key)
+                # We want the verified track even if the upgrade deadline has passed, since we
+                # are determining what content to show the user, not whether the user can enroll
+                # in the verified track.
+                course_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             if not course_mode:
-                _log_for_educator_1511('user {0} in track {1} added to default partition'.format(user.id, mode_slug))
                 course_mode = CourseMode.DEFAULT_MODE
             return Group(ENROLLMENT_GROUP_IDS[course_mode.slug], unicode(course_mode.name))
         else:

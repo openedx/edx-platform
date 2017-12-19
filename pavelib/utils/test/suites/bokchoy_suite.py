@@ -7,7 +7,7 @@ from textwrap import dedent
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
-from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call, call_task, dry
+from paver.easy import sh, cmdopts, task, needs, might_call, call_task, dry
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test.bokchoy_utils import (
@@ -205,7 +205,7 @@ class BokChoyTestSuite(TestSuite):
         self.har_dir = self.log_dir / 'hars'
         self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
         self.imports_dir = kwargs.get('imports_dir', None)
-        self.coveragerc = kwargs.get('coveragerc', Env.BOK_CHOY_COVERAGERC)
+        self.coveragerc = kwargs.get('coveragerc', None)
         self.save_screenshots = kwargs.get('save_screenshots', False)
 
     def __enter__(self):
@@ -333,12 +333,17 @@ class BokChoyTestSuite(TestSuite):
         ]
         if self.save_screenshots:
             cmd.append("NEEDLE_SAVE_BASELINE=True")
-        cmd += [
-            "coverage",
-            "run",
-        ]
         if self.coveragerc:
+            cmd += [
+                "coverage",
+                "run",
+            ]
             cmd.append("--rcfile={}".format(self.coveragerc))
+        else:
+            cmd += [
+                "python",
+                "-Wd",
+            ]
         cmd += [
             "-m",
             "pytest",

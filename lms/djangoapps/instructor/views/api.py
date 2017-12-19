@@ -150,7 +150,7 @@ def common_exceptions_400(func):
         except User.DoesNotExist:
             message = _('User does not exist.')
         except (AlreadyRunningError, QueueConnectionError) as err:
-            message = str(err)
+            message = unicode(err)
 
         if use_json:
             return JsonResponseBadRequest(message)

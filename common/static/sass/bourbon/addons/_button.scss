@@ -349,7 +349,7 @@
   text-decoration: none;
   background-clip: padding-box;
 
-  &:hover:not(:disabled){
+  &:hover:not(:disabled) {
     $base-color-hover:    adjust-color($base-color, $saturation: 4%, $lightness: 5%);
 
     @if $grayscale == true {

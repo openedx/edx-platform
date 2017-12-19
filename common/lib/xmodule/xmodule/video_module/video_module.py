@@ -24,7 +24,7 @@ from pkg_resources import resource_string
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, VideoTranscriptEnabledFlag
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.core import XBlock
@@ -44,9 +44,11 @@ from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
     get_video_ids_info,
-    is_val_transcript_feature_enabled_for_course,
     Transcript,
     VideoTranscriptsMixin,
+)
+from .transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
@@ -211,11 +213,13 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         download_video_link = None
         branding_info = None
         youtube_streams = ""
+        video_duration = None
 
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+        default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location, default_cdn_url)
 
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
@@ -253,7 +257,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 if val_video_urls["youtube"]:
                     youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
 
-            except edxval_api.ValInternalError:
+                # get video duration
+                video_data = edxval_api.get_video_info(self.edx_video_id.strip())
+                video_duration = video_data.get('duration')
+
+            except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
                 # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
                 # course data is ported to a machine that does not have the VAL data. So for now, pass on this
                 # exception and fallback to whatever we find in the VideoDescriptor.
@@ -326,6 +334,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'sub': self.sub,
             'sources': sources,
             'poster': poster,
+            'duration': video_duration,
             # This won't work when we move to data that
             # isn't on the filesystem
             'captionDataDir': getattr(self, 'data_dir', None),
@@ -970,6 +979,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         encoded_videos = {}
         val_video_data = {}
+        all_sources = self.html5_sources or []
+
+        # `source` is a deprecated field, but we include it for backwards compatibility.
+        if self.source:
+            all_sources.append(self.source)
 
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
@@ -1001,10 +1015,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         # Fall back to other video URLs in the video module if not found in VAL
         if not encoded_videos:
-            video_url = self.html5_sources[0] if self.html5_sources else self.source
-            if video_url:
+            if all_sources:
                 encoded_videos["fallback"] = {
-                    "url": video_url,
+                    "url": all_sources[0],
                     "file_size": 0,  # File size is unknown for fallback URLs
                 }
 
@@ -1029,4 +1042,5 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "duration": val_video_data.get('duration', None),
             "transcripts": transcripts,
             "encoded_videos": encoded_videos,
+            "all_sources": all_sources,
         }

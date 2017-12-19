@@ -1,9 +1,9 @@
 $a11y--gray: rgb(127, 127, 127);
 $a11y--blue: rgb(0, 159, 230);
-$a11y--gray-d1: shade($gray,20%);
-$a11y--gray-l2: tint($gray,40%);
-$a11y--gray-l3: tint($gray,60%);
-$a11y--blue-s1: saturate($blue,15%);
+$a11y--gray-d1: shade($gray, 20%);
+$a11y--gray-l2: tint($gray, 40%);
+$a11y--gray-l3: tint($gray, 60%);
+$a11y--blue-s1: saturate($blue, 15%);
 
 %use-font-awesome {
   font-family: FontAwesome;
@@ -50,12 +50,13 @@ $a11y--blue-s1: saturate($blue,15%);
         font-size: 14px;
         line-height: 23px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $a11y--gray-d1;
         }
       }
 
-      &.active{
+      &.active {
         a {
           color: $a11y--blue;
         }
@@ -84,11 +85,10 @@ $a11y--blue-s1: saturate($blue,15%);
         background-color: $action-primary-active-bg;
         color: $very-light-text;
 
-        &:after {
+        &::after {
           color: $very-light-text;
         }
       }
-
     }
 
     > a {
@@ -106,7 +106,7 @@ $a11y--blue-s1: saturate($blue,15%);
       overflow: hidden;
       text-overflow: ellipsis;
 
-      &:after {
+      &::after {
         @extend %use-font-awesome;
 
         content: "\f0d7";
@@ -137,7 +137,8 @@ $a11y--blue-s1: saturate($blue,15%);
 }
 
 
-.contextmenu, .submenu {
+.contextmenu,
+.submenu {
   @extend %ui-depth5;
 
   border: 1px solid #333;
@@ -157,7 +158,8 @@ $a11y--blue-s1: saturate($blue,15%);
     display: block;
   }
 
-  .menu-item, .submenu-item {
+  .menu-item,
+  .submenu-item {
     border-top: 1px solid $gray-l3;
     padding: ($baseline/4) ($baseline/2);
     outline: none;
@@ -184,7 +186,7 @@ $a11y--blue-s1: saturate($blue,15%);
     position: relative;
     padding: ($baseline/4) $baseline ($baseline/4) ($baseline/2);
 
-    &:after {
+    &::after {
       content: '\25B6';
       position: absolute;
       right: 5px;

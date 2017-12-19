@@ -258,7 +258,7 @@ def export_olx(self, user_id, course_key_string, language):
         artifact.save()
     # catch all exceptions so we can record useful error messages
     except Exception as exception:  # pylint: disable=broad-except
-        LOGGER.exception(u'Error exporting course %s', courselike_key)
+        LOGGER.exception(u'Error exporting course %s', courselike_key, exc_info=True)
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': text_type(exception)})
         return
@@ -288,7 +288,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
             tar_file.add(root_dir / name, arcname=name)
 
     except SerializationError as exc:
-        LOGGER.exception(u'There was an error exporting %s', course_key)
+        LOGGER.exception(u'There was an error exporting %s', course_key, exc_info=True)
         parent = None
         try:
             failed_item = modulestore().get_item(exc.location)
@@ -310,7 +310,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
                                     'edit_unit_url': context['edit_unit_url']}))
         raise
     except Exception as exc:
-        LOGGER.exception('There was an error exporting %s', course_key)
+        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
         context.update({
             'in_err': True,
             'edit_unit_url': None,
@@ -444,7 +444,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             shutil.rmtree(course_dir)
             LOGGER.info(u'Course import %s: Temp data cleared', courselike_key)
 
-        LOGGER.exception(u'Error importing course %s', courselike_key)
+        LOGGER.exception(u'Error importing course %s', courselike_key, exc_info=True)
         self.status.fail(text_type(exception))
         return
 
@@ -516,7 +516,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         LOGGER.info(u'Course import %s: Course import successful', courselike_key)
     except Exception as exception:   # pylint: disable=broad-except
-        LOGGER.exception(u'error importing course')
+        LOGGER.exception(u'error importing course', exc_info=True)
         self.status.fail(text_type(exception))
     finally:
         if course_dir.isdir():  # pylint: disable=no-value-for-parameter

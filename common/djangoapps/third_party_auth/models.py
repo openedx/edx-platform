@@ -20,7 +20,7 @@ from provider.oauth2.models import Client
 from provider.utils import long_token
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
-from social_core.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.backends.saml import SAMLAuth
 from social_core.exceptions import SocialAuthBaseException
 from social_core.utils import module_member
 
@@ -180,6 +180,14 @@ class ProviderConfig(ConfigurationModel):
             "If this option is selected, users will be directed to the registration page "
             "immediately after authenticating with the third party instead of the login page."
         ),
+    )
+    sync_learner_profile_data = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Synchronize user profile data received from the identity provider with the edX user "
+            "account on each SSO login. The user will be notified if the email address associated "
+            "with their account is changed as a part of this synchronization."
+        )
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass

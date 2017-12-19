@@ -1,11 +1,13 @@
-""" Grades API URLs. """
+"""
+Grades API URLs.
+"""
+
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from lms.djangoapps.grades.api import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^v0/course_grade/{course_id}/users/$'.format(
             course_id=settings.COURSE_ID_PATTERN,
@@ -18,4 +20,4 @@ urlpatterns = patterns(
         ),
         views.CourseGradingPolicy.as_view(), name='course_grading_policy'
     ),
-)
+]

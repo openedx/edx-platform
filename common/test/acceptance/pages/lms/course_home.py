@@ -69,7 +69,7 @@ class CourseHomePage(CoursePage):
         Search within a class for a particular term.
         """
         self.q(css='.search-form > .search-input').fill(search_term)
-        self.q(css='.search-form > .search-button').click()
+        self.q(css='.search-form .search-button').click()
         return CourseSearchResultsPage(self.browser, self.course_id)
 
 

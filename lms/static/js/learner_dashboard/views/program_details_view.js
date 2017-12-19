@@ -36,7 +36,6 @@
 
                  initialize: function(options) {
                      this.options = options;
-
                      this.programModel = new Backbone.Model(this.options.programData);
                      this.courseData = new Backbone.Model(this.options.courseData);
                      this.certificateCollection = new Backbone.Collection(this.options.certificateData);
@@ -91,7 +90,7 @@
                              el: '.js-course-list-remaining',
                              childView: CourseCardView,
                              collection: this.remainingCourseCollection,
-                             context: this.options
+                             context: $.extend(this.options, {collectionCourseStatus: 'remaining'})
                          }).render();
                      }
 
@@ -100,7 +99,7 @@
                              el: '.js-course-list-completed',
                              childView: CourseCardView,
                              collection: this.completedCourseCollection,
-                             context: this.options
+                             context: $.extend(this.options, {collectionCourseStatus: 'completed'})
                          }).render();
                      }
 
@@ -110,7 +109,9 @@
                              el: '.js-course-list-in-progress',
                              childView: CourseCardView,
                              collection: this.inProgressCourseCollection,
-                             context: $.extend(this.options, {enrolled: gettext('Enrolled')})
+                             context: $.extend(this.options,
+                               {enrolled: gettext('Enrolled'), collectionCourseStatus: 'in_progress'}
+                             )
                          }).render();
                      }
 

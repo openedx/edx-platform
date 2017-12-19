@@ -44,11 +44,11 @@ def event(request):
     return HttpResponse(status=204)
 
 
-def render_from_lms(template_name, dictionary, context=None, namespace='main'):
+def render_from_lms(template_name, dictionary, namespace='main'):
     """
-    Render a template using the LMS MAKO_TEMPLATES
+    Render a template using the LMS Mako templates
     """
-    return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
+    return render_to_string(template_name, dictionary, namespace="lms." + namespace)
 
 
 def get_parent_xblock(xblock):

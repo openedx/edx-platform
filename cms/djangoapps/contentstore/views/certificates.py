@@ -368,11 +368,11 @@ def certificates_list_handler(request, course_key_string):
             return JsonResponse({"error": msg}, status=403)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            certificate_url = reverse_course_url('certificates.certificates_list_handler', course_key)
+            certificate_url = reverse_course_url('certificates_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
             upload_asset_url = reverse_course_url('assets_handler', course_key)
             activation_handler_url = reverse_course_url(
-                handler_name='certificates.certificate_activation_handler',
+                handler_name='certificate_activation_handler',
                 course_key=course_key
             )
             course_modes = [
@@ -429,7 +429,7 @@ def certificates_list_handler(request, course_key_string):
                 course.certificates['certificates'].append(new_certificate.certificate_data)
                 response = JsonResponse(CertificateManager.serialize_certificate(new_certificate), status=201)
                 response["Location"] = reverse_course_url(
-                    'certificates.certificates_detail_handler',
+                    'certificates_detail_handler',
                     course.id,
                     kwargs={'certificate_id': new_certificate.id}
                 )

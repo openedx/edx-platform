@@ -12,7 +12,7 @@ function(VideoPlayer, HLS) {
 
         (function() {
             emptyArguments = arguments;
-        })();
+        }());
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
@@ -483,8 +483,7 @@ function(VideoPlayer, HLS) {
 
             describe(
                 'when the current time is unavailable from the player',
-                function()
-            {
+                function() {
                     beforeEach(function() {
                         state.videoPlayer.player.getCurrentTime = function() {
                             return NaN;
@@ -500,8 +499,7 @@ function(VideoPlayer, HLS) {
 
             describe(
                 'when the current time is available from the player',
-                function()
-            {
+                function() {
                     beforeEach(function() {
                         state.videoPlayer.player.getCurrentTime = function() {
                             return 60;
@@ -518,7 +516,8 @@ function(VideoPlayer, HLS) {
 
         // Disabled 1/13/14 due to flakiness observed in master
         xdescribe('update with start & end time', function() {
-            var START_TIME = 1, END_TIME = 2;
+            var START_TIME = 1,
+                END_TIME = 2;
 
             beforeEach(function() {
                 state = jasmine.initializePlayer(
@@ -538,8 +537,7 @@ function(VideoPlayer, HLS) {
 
             it(
                 'video is paused on first endTime, start & end time are reset',
-                function(done)
-            {
+                function(done) {
                     var duration;
 
                     state.videoProgressSlider.notifyThroughHandleEnd.calls.reset();
@@ -623,8 +621,7 @@ function(VideoPlayer, HLS) {
         // Disabled 1/13/14 due to flakiness observed in master
         xdescribe(
             'updatePlayTime when start & end times are defined',
-            function()
-        {
+            function() {
                 var START_TIME = 1,
                     END_TIME = 2;
 
@@ -646,8 +643,7 @@ function(VideoPlayer, HLS) {
 
                 it(
                 'when duration becomes available, updatePlayTime() is called',
-                function(done)
-            {
+                function(done) {
                     var duration;
 
                     expect(state.videoPlayer.initialSeekToStartTime).toBeTruthy();
@@ -823,8 +819,7 @@ function(VideoPlayer, HLS) {
             it('`is-touch` class name is added to container', function() {
                 $.each(
                     ['iPad', 'Android', 'iPhone'],
-                    function(index, device)
-                {
+                    function(index, device) {
                         window.onTouchBasedDevice.and.returnValue([device]);
                         state = jasmine.initializePlayer();
 
@@ -1008,6 +1003,21 @@ function(VideoPlayer, HLS) {
                 expect($('.video-hls-error').text().trim()).toEqual(
                     'Your browser does not support this video format. Try using a different browser.'
                 );
+            });
+        });
+
+        describe('Video duration', function() {
+            beforeEach(function() {
+                state = jasmine.initializePlayer();
+                spyOn(state.videoPlayer, 'duration').and.returnValue(61);
+            });
+
+            it('overrides the duration if not set', function(done) {
+                jasmine.waitUntil(function() {
+                    return state.duration !== undefined;
+                }).then(function() {
+                    expect(state.duration).toEqual(61);
+                }).always(done);
             });
         });
 

@@ -1,26 +1,33 @@
 """
 Verify the structure of courseware as to it's suitability for import
 """
-from django.core.management.base import BaseCommand, CommandError
+from __future__ import print_function
+from argparse import REMAINDER
+
+from django.core.management.base import BaseCommand
 
 from xmodule.modulestore.xml_importer import perform_xlint
 
 
 class Command(BaseCommand):
-    """Verify the structure of courseware as to it's suitability for import"""
-    help = "Verify the structure of courseware as to it's suitability for import"
+    """Verify the structure of courseware as to its suitability for import"""
+    help = """
+    Verify the structure of courseware as to its suitability for import.
+    To run: manage.py cms <data directory> [<course dir>...]
+    """
+
+    def add_arguments(self, parser):
+        parser.add_argument('data_dir')
+        parser.add_argument('source_dirs', nargs=REMAINDER)
 
     def handle(self, *args, **options):
-        "Execute the command"
-        if len(args) == 0:
-            raise CommandError("import requires at least one argument: <data directory> [<course dir>...]")
+        """Execute the command"""
 
-        data_dir = args[0]
-        if len(args) > 1:
-            source_dirs = args[1:]
-        else:
-            source_dirs = None
+        data_dir = options['data_dir']
+        source_dirs = options['source_dirs']
+
         print("Importing.  Data_dir={data}, source_dirs={courses}".format(
             data=data_dir,
             courses=source_dirs))
+
         perform_xlint(data_dir, source_dirs, load_error_modules=False)

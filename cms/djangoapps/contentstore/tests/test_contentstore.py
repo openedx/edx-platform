@@ -23,10 +23,12 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from path import Path as path
+from waffle.testutils import override_switch
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from contentstore.utils import delete_course, reverse_course_url, reverse_url
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+from contentstore.config import waffle
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from django_comment_common.utils import are_permissions_roles_seeded
@@ -44,7 +46,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.seq_module import SequenceDescriptor
@@ -1054,6 +1056,16 @@ class MiscCourseTests(ContentStoreTestCase):
             resp = self.client.get_html('/c4x/InvalidOrg/InvalidCourse/asset/invalid.png')
             self.assertEqual(resp.status_code, 404)
 
+    @override_switch(
+        '{}.{}'.format(waffle.WAFFLE_NAMESPACE, waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE),
+        active=False)
+    def test_disabled_accessibility_page(self):
+        """
+        Test that accessibility page returns 404 when waffle switch is disabled
+        """
+        resp = self.client.get_html('/accessibility')
+        self.assertEqual(resp.status_code, 404)
+
     def test_delete_course(self):
         """
         This test creates a course, makes a draft item, and deletes the course. This will also assert that the
@@ -1930,7 +1942,7 @@ class RerunCourseTest(ContentStoreTestCase):
         source_course = CourseFactory.create()
         destination_course_key = self.post_rerun_request(source_course.id)
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
-        videos = list(get_videos_for_course(destination_course_key))
+        videos = list(get_videos_for_course(unicode(destination_course_key)))
         self.assertEqual(0, len(videos))
         self.assertInCourseListing(destination_course_key)
 
@@ -1949,8 +1961,8 @@ class RerunCourseTest(ContentStoreTestCase):
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
 
         # Verify that the VAL copies videos to the rerun
-        source_videos = list(get_videos_for_course(source_course.id))
-        target_videos = list(get_videos_for_course(destination_course_key))
+        source_videos = list(get_videos_for_course(unicode(source_course.id)))
+        target_videos = list(get_videos_for_course(unicode(destination_course_key)))
         self.assertEqual(1, len(source_videos))
         self.assertEqual(source_videos, target_videos)
 
@@ -2150,6 +2162,12 @@ class EntryPageTestCase(TestCase):
     def test_logout(self):
         # Logout redirects.
         self._test_page("/logout", 302)
+
+    @override_switch(
+        '{}.{}'.format(waffle.WAFFLE_NAMESPACE, waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE),
+        active=True)
+    def test_accessibility(self):
+        self._test_page('/accessibility')
 
 
 class SigninPageTestCase(TestCase):

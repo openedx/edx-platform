@@ -1,6 +1,6 @@
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/previous_video_upload', 'common/js/spec_helpers/template_helpers',
-     'common/js/spec_helpers/view_helpers'],
+        'common/js/spec_helpers/view_helpers'],
     function($, _, Backbone, PreviousVideoUploadView, TemplateHelpers, ViewHelpers) {
         'use strict';
         describe('PreviousVideoUploadView', function() {

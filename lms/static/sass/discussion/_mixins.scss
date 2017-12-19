@@ -75,6 +75,10 @@
     @include padding-left($baseline*2);
     @include padding-right(0);
   }
+
+  svg {
+    max-width: 100% !important;
+  }
 }
 
 @-webkit-keyframes fadeIn {

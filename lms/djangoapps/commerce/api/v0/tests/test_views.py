@@ -8,26 +8,27 @@ import ddt
 import mock
 import pytz
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
 
-from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
-from commerce.constants import Messages
-from commerce.tests.mocks import mock_basket_order
-from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from enrollment.api import get_enrollment
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
-from course_modes.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ....constants import Messages
+from ....tests.mocks import mock_basket_order
+from ....tests.test_views import UserMixin
+from ..views import SAILTHRU_CAMPAIGN_COOKIE
 
 UTM_COOKIE_NAME = 'edx.test.utm'
 UTM_COOKIE_CONTENTS = {
@@ -250,7 +251,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
         self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
 
-    @mock.patch('commerce.api.v0.views.update_email_opt_in')
+    @mock.patch('lms.djangoapps.commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))
     @ddt.unpack
     def test_marketing_email_opt_in(self, is_opt_in, has_sku, is_exception, mock_update):
@@ -284,7 +285,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v0:baskets:retrieve_order'
     MOCK_ORDER = {'number': 1}
-    path = reverse(view_name, kwargs={'basket_id': 1})
+    path = reverse_lazy(view_name, kwargs={'basket_id': 1})
 
     def setUp(self):
         super(BasketOrderViewTests, self).setUp()

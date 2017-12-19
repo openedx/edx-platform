@@ -1,6 +1,10 @@
 """
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
+from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
+from mock import Mock, patch
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.entrance_exams import (
     course_has_entrance_exam,
@@ -12,10 +16,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
 from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from django.core.urlresolvers import reverse
-from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 from nose.plugins.attrib import attr
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request

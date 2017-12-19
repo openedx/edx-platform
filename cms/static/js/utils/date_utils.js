@@ -25,7 +25,7 @@ function($, date, TriggerChangeEventOnEnter) {
         };
 
         // instrument as date and time pickers
-        timefield.timepicker({'timeFormat': 'H:i'});
+        timefield.timepicker({timeFormat: 'H:i'});
         datefield.datepicker();
 
         // Using the change event causes setfield to be triggered twice, but it is necessary
@@ -52,7 +52,8 @@ function($, date, TriggerChangeEventOnEnter) {
         // given a pair of inputs (datepicker and timepicker), return a JS Date
         // object that corresponds to the datetime.js that they represent. Assume
         // UTC timezone, NOT the timezone of the user's browser.
-        var date = null, time = null;
+        var date = null,
+            time = null;
         if (datepickerInput.length > 0) {
             date = $(datepickerInput).datepicker('getDate');
         }
@@ -97,8 +98,7 @@ function($, date, TriggerChangeEventOnEnter) {
     var parseDateFromString = function(stringDate) {
         if (stringDate && typeof stringDate === 'string') {
             return new Date(stringDate);
-        }
-        else {
+        } else {
             return stringDate;
         }
     };

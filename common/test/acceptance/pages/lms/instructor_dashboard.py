@@ -25,7 +25,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Clicks the general Help button in the header.
         """
-        self.q(css='.doc-link').first.click()
+        self.q(css='.help-link').first.click()
 
     def select_membership(self):
         """

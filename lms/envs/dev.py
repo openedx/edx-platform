@@ -13,9 +13,9 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
+from openedx.core.lib.derived import derive_settings
 
 DEBUG = True
-TEMPLATE_DEBUG = True
 
 HTTPS = 'off'
 FEATURES['DISABLE_START_DATES'] = False
@@ -270,3 +270,7 @@ try:
     from .private import *      # pylint: disable=import-error
 except ImportError:
     pass
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

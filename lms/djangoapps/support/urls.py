@@ -1,14 +1,13 @@
 """
 URLs for the student support app.
 """
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from support import views
 
 from lms.djangoapps.support.views.contact_us import ContactUsView
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', views.index, name="index"),
     url(r'^certificates/?$', views.CertificatesSupportView.as_view(), name="certificates"),
     url(r'^refund/?$', views.RefundSupportView.as_view(), name="refund"),
@@ -19,4 +18,4 @@ urlpatterns = patterns(
         views.EnrollmentSupportListView.as_view(),
         name="enrollment_list"
     ),
-)
+]

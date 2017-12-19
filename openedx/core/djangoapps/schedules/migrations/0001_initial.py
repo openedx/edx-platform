@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import django_extensions.db.fields
+import django.utils.timezone
+import model_utils.fields
 
 
 class Migration(migrations.Migration):
@@ -16,8 +17,8 @@ class Migration(migrations.Migration):
             name='Schedule',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('active', models.BooleanField(default=True, help_text='Indicates if this schedule is actively used')),
                 ('start', models.DateTimeField(help_text='Date this schedule went into effect')),
                 ('upgrade_deadline', models.DateTimeField(help_text='Deadline by which the learner must upgrade to a verified seat', null=True, blank=True)),

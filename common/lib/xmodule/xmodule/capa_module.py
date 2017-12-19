@@ -15,7 +15,6 @@ from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
 
 from .capa_base import CapaFields, CapaMixin, ComplexEncoder
-from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
 

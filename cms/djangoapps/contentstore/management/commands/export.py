@@ -1,6 +1,7 @@
 """
 Script for exporting courseware from Mongo to a tar.gz file
 """
+from __future__ import print_function
 import os
 
 from django.core.management.base import BaseCommand, CommandError
@@ -37,7 +38,7 @@ class Command(BaseCommand):
 
         output_path = options['output_path']
 
-        print "Exporting course id = {0} to {1}".format(course_key, output_path)
+        print("Exporting course id = {0} to {1}".format(course_key, output_path))
 
         if not output_path.endswith('/'):
             output_path += '/'

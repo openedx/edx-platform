@@ -56,10 +56,10 @@ class TestGitExport(CourseTestCase):
         Test that the command interface works. Ignore stderr for clean
         test output.
         """
-        with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
+        with self.assertRaisesRegexp(CommandError, 'Error: unrecognized arguments:*'):
             call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO.StringIO())
 
-        with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
+        with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
             call_command('git_export', stderr=StringIO.StringIO())
 
         # Send bad url to get course not exported

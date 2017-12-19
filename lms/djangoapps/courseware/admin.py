@@ -8,4 +8,5 @@ admin.site.register(models.DynamicUpgradeDeadlineConfiguration, ConfigurationMod
 admin.site.register(models.OfflineComputedGrade)
 admin.site.register(models.OfflineComputedGradeLog)
 admin.site.register(models.CourseDynamicUpgradeDeadlineConfiguration, KeyedConfigurationModelAdmin)
+admin.site.register(models.OrgDynamicUpgradeDeadlineConfiguration, KeyedConfigurationModelAdmin)
 admin.site.register(models.StudentModule)

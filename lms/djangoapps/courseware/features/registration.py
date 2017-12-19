@@ -11,7 +11,7 @@ def i_register_for_the_course(_step, course):
     url = django_url('courses/%s/about' % world.scenario_dict['COURSE'].id.to_deprecated_string())
     world.browser.visit(url)
     world.css_click('.intro a.register')
-    assert world.is_css_present('.container.dashboard')
+    assert world.is_css_present('.dashboard')
 
 
 @step('I register to audit the course$')
@@ -27,7 +27,7 @@ def i_register_to_audit_the_course(_step):
         ignored_exceptions=AttributeError
     )
     time.sleep(1)
-    assert world.is_css_present('.container.dashboard')
+    assert world.is_css_present('.dashboard')
 
 
 @step(u'I should see an empty dashboard message')

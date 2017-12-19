@@ -115,7 +115,7 @@
     ol, ul {
       margin: 1em 0;
       padding: 0 0 0 1em;
-      color: $baseFontColor;
+      color: $body-color;
 
       li {
         margin-bottom: 0.708em;
@@ -134,14 +134,14 @@
       @extend %t-copy-base;
 
       margin: 1em 0;
-      color: $baseFontColor;
+      color: $body-color;
       font-family: monospace, serif;
       white-space: pre-wrap;
       word-wrap: break-word;
     }
 
     code {
-      color: $baseFontColor;
+      color: $body-color;
       font-family: monospace, serif;
       background: none;
       padding: 0;

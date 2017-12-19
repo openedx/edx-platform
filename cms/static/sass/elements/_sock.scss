@@ -45,8 +45,8 @@
       }
 
       &:hover {
-        background: $uxpl-blue-base;
-        color: $white;
+        background: theme-color("primary");
+        color: theme-color("inverse");
       }
     }
   }

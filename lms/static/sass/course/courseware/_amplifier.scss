@@ -63,11 +63,11 @@ section.tool-wrapper {
         a {
           border: none;
           color: #839496;
-          font: bold 12px $body-font-family;
+          font: bold 12px $font-family-sans-serif;
           letter-spacing: 1px;
-          text-transform: uppercase;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             color: #eee8d5;
           }
         }
@@ -105,7 +105,7 @@ section.tool-wrapper {
 
           display: block;
           float: right;
-          font: bold 14px $body-font-family;
+          font: bold 14px $font-family-sans-serif;
           margin-top: 19px;
 
           &:active {
@@ -115,7 +115,7 @@ section.tool-wrapper {
           &[value="Stop"] {
             @include button(simple, darken(#268bd2, 30%));
 
-            font: bold 14px $body-font-family;
+            font: bold 14px $font-family-sans-serif;
 
             &:active {
               box-shadow: none;
@@ -211,7 +211,7 @@ section.tool-wrapper {
         padding: 0 0 lh();
 
         select#musicTypeSelect {
-          font: 16px $body-font-family;
+          font: 16px $font-family-sans-serif;
           display: inline-block;
           margin-bottom: 0;
         }

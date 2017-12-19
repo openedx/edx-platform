@@ -39,6 +39,14 @@ class TestLongUsernameEmail(TestCase):
             USERNAME_BAD_LENGTH_MSG,
         )
 
+    def test_spoffed_name(self):
+        """
+        Test name cannot contains html.
+        """
+        self.url_params['name'] = '<p style="font-size:300px; color:green;"></br>Name<input type="text"></br>Content spoof'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+
     def test_long_email(self):
         """
         Test email cannot be more than 254 characters long.

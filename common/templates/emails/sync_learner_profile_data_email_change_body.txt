@@ -1,0 +1,25 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
+
+<p>
+${_("The email associated with your {platform_name} account has changed from {old_email} to {new_email}.").format(
+    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+    old_email=old_email,
+    new_email=new_email,
+)}
+</p>
+
+
+<p>${_("No action is needed on your part.")}</p>
+
+<p>
+${_("If this change is not correct, contact {link_start}{platform_name} Support{link_end} "
+    "or your administrator.").format(
+        platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        link_start=u"<a href='{support_link}'>".format(
+            support_link=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+        ),
+        link_end=u"</a>",
+    )
+}
+</p>

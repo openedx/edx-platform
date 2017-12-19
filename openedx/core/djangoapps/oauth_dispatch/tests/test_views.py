@@ -7,27 +7,31 @@ import unittest
 
 import ddt
 import httpretty
-from Crypto.PublicKey import RSA
+from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase, override_settings
 from oauth2_provider import models as dot_models
-from provider import constants
 
+from provider import constants
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 from . import mixins
-from .constants import DUMMY_REDIRECT_URL
-from .. import adapters
-from .. import models
 
 # NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed
 # in the current service--LMS or Studio. Normally we would check if settings.ROOT_URLCONF == 'lms.urls'; however,
 # simply importing the views will results in an error due to the requisite apps not being installed (in Studio). Thus,
 # we are left with this hack, of checking the feature flag which will never be True for Studio.
+#
+# NOTE (BJM): As of Django 1.9 we also can't import models for apps which aren't in INSTALLED_APPS, so making all of
+# these imports conditional except mixins, which doesn't currently import forbidden models, and is needed at test
+# discovery time.
 OAUTH_PROVIDER_ENABLED = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
 
 if OAUTH_PROVIDER_ENABLED:
+    from .constants import DUMMY_REDIRECT_URL
+    from .. import adapters
+    from .. import models
     from .. import views
 
 
@@ -75,11 +79,10 @@ class _DispatchingViewTestCase(TestCase):
 
     Subclasses need to define self.url.
     """
-    dop_adapter = adapters.DOPAdapter()
-    dot_adapter = adapters.DOTAdapter()
-
     def setUp(self):
         super(_DispatchingViewTestCase, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
+        self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_public_client(
             name='test dot application',
@@ -270,10 +273,9 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     Test class for AuthorizationView
     """
 
-    dop_adapter = adapters.DOPAdapter()
-
     def setUp(self):
         super(TestAuthorizationView, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_confidential_client(
             name='test dot application',
@@ -399,11 +401,10 @@ class TestViewDispatch(TestCase):
     Test that the DispatchingView dispatches the right way.
     """
 
-    dop_adapter = adapters.DOPAdapter()
-    dot_adapter = adapters.DOTAdapter()
-
     def setUp(self):
         super(TestViewDispatch, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
+        self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.view = views._DispatchingView()  # pylint: disable=protected-access
         self.dop_adapter.create_public_client(

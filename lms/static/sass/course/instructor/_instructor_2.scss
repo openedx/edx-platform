@@ -40,7 +40,7 @@
 
   .file-download-link a {
     font-size: 15px;
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
     text-decoration: underline;
     padding: ($baseline/4);
   }
@@ -78,7 +78,7 @@
   // TYPE: warning
   .msg-warning {
     display: none;
-    background: tint($warning-color,95%);
+    background: tint($warning-color, 95%);
     border-top: 2px solid $warning-color;
     color: $warning-color;
   }
@@ -187,7 +187,7 @@
       overflow: hidden;
 
       .browse {
-        @include button(simple, $uxpl-blue-base);
+        @include button(simple, $primary);
         @include margin-left(268px);
 
         border-radius: 0 3px 3px 0;
@@ -203,7 +203,7 @@
         height: 24px; // To match bull browse button
         width: 124%;
         margin: 0;
-        padding: 4px 0 0 0;
+        padding: 4px 0 0;
         cursor: pointer;
 
         // for visual sync, need to make button similar to firefox
@@ -263,7 +263,7 @@
     @extend .top-header;
 
     display: inline-block;
-    margin-bottom: ($baseline*.75);
+    margin-bottom: ($baseline*0.75);
     padding-bottom: 0;
     border-bottom: 0;
   }
@@ -284,7 +284,6 @@
   .instructor-nav {
     @extend %ui-no-list;
 
-    border-top: 1px solid $gray-l3;
     border-bottom: 1px solid $gray-l3;
 
     .nav-item {
@@ -294,18 +293,18 @@
 
       .btn-link {
         display: inline-block;
-        padding: ($baseline/2) $baseline;
+        padding: ($baseline/2);
         border: 0;
         box-shadow: none;
         text-shadow: none;
 
         &:hover,
         &:focus {
-          background: $gray-l5 !important;
+          border-bottom: 3px solid theme-color("primary");
         }
 
         &.active-section {
-          background: $gray-l5;
+          border-bottom: 3px solid theme-color("primary");
           color: $black;
         }
       }
@@ -355,7 +354,7 @@
     }
 
     .message-copy {
-      color: $base-font-color;
+      color: $body-color;
     }
   }
 
@@ -369,14 +368,14 @@
     }
 
     .message-copy {
-      color: $base-font-color;
+      color: $body-color;
     }
   }
 
   // type - warning
   .message-warning {
     border-top: 2px solid $warning-color;
-    background: tint($warning-color,95%);
+    background: tint($warning-color, 95%);
 
     .message-title {
       color: $warning-color;
@@ -571,7 +570,7 @@
         @include columns(2);
 
         .subheading {
-          font-size: .9em;
+          font-size: 0.9em;
         }
       }
 
@@ -608,7 +607,8 @@
     }
   }
 
-  .batch-enrollment, .batch-beta-testers {
+  .batch-enrollment,
+  .batch-beta-testers {
     textarea {
       margin-top: 0.2em;
       height: auto;
@@ -637,10 +637,6 @@
   }
   // Auto Enroll Csv Section
   .auto_enroll_csv {
-    .results {
-
-    }
-
     .enrollment_signup_button {
       @include margin-right($baseline/4);
     }
@@ -791,7 +787,7 @@
         // .add-field
 
         input[type="button"].add {
-          @include idashbutton($uxpl-blue-base);
+          @include idashbutton($primary);
 
           position: absolute;
 
@@ -867,7 +863,8 @@
       }
     }
 
-    .form-submit, .form-cancel {
+    .form-submit,
+    .form-cancel {
       display: inline-block;
       vertical-align: middle;
     }
@@ -878,7 +875,7 @@
   }
 
   .form-submit {
-    @include idashbutton($uxpl-blue-base);
+    @include idashbutton($primary);
     @include font-size(14);
     @include line-height(14);
 
@@ -902,7 +899,7 @@
     }
 
     .action-create {
-      @include idashbutton($uxpl-blue-base);
+      @include idashbutton($primary);
 
       @extend %t-weight4;
 
@@ -919,7 +916,7 @@
       }
 
       .action-create {
-        opacity: 0.50;
+        opacity: 0.5;
       }
     }
   }
@@ -928,7 +925,7 @@
 
     // specific message actions
     .message .action-create {
-      @include idashbutton($uxpl-blue-base);
+      @include idashbutton($primary);
     }
   }
 
@@ -979,7 +976,9 @@
       padding-bottom: ($baseline/2);
       border-bottom: 1px solid $gray-l4;
 
-      &:hover, &:active, &:focus {
+      &:hover,
+      &:active,
+      &:focus {
         .action-edit-name {
           opacity: 1;
           pointer-events: auto;
@@ -987,7 +986,9 @@
       }
     }
 
-    .title-value, .group-count, .action-edit {
+    .title-value,
+    .group-count,
+    .action-edit {
       display: inline-block;
       vertical-align: middle;
     }
@@ -1095,7 +1096,7 @@
     box-shadow: none;
     text-shadow: none;
     padding: 0;
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
 
     &:hover,
     &:focus {
@@ -1127,7 +1128,7 @@
     }
 
     .action-submit {
-      @include idashbutton($uxpl-blue-base);
+      @include idashbutton($primary);
       // needed to override very poor specificity and base rules for blue button
       @include font-size(14);
 
@@ -1271,7 +1272,7 @@
         border-radius: 0;
         border: 0;
         box-shadow: none;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         // These transitions null out previously/globally set transitions
         -webkit-transition: none;
         -moz-transition: none;
@@ -1346,7 +1347,7 @@
 
   // cohort management
   .form-submit {
-    @include idashbutton($uxpl-blue-base);
+    @include idashbutton($primary);
     @include font-size(14);
     @include line-height(14);
 
@@ -1391,7 +1392,7 @@
     }
 
     .divided-discussion-text {
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
     }
 
     .discussions-wrapper {
@@ -1427,7 +1428,7 @@
     margin-top: 0.7em;
   }
 
-  .task-history-all-table    {
+  .task-history-all-table {
     margin-top: 1em;
   }
 
@@ -1480,7 +1481,8 @@
 // view - metrics
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#metrics {
-  .metrics-container, .metrics-header-container {
+  .metrics-container,
+  .metrics-header-container {
     position: relative;
     clear: both;
     width: 100%;
@@ -1505,7 +1507,8 @@
       height: 640px;
     }
 
-    .metrics-right, .metrics-right-header {
+    .metrics-right,
+    .metrics-right-header {
       position: relative;
       width: 65%;
 
@@ -1542,7 +1545,7 @@
       right: 0;
       bottom: 0;
       left: 0;
-      background-color: rgba(255,255,255, .75);
+      background-color: rgba(255, 255, 255, .75);
 
       .metrics-overlay-content-wrapper {
         position: relative;
@@ -1575,7 +1578,8 @@
               background-color: #ddd;
             }
 
-            th, td {
+            th,
+            td {
               padding: 10px;
             }
           }
@@ -1659,7 +1663,7 @@ input[name="subject"] {
 }
 
 .ecommerce-wrapper {
-  h2{
+  h2 {
     height: 26px;
     line-height: 26px;
 
@@ -1689,7 +1693,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -1735,7 +1739,7 @@ input[name="subject"] {
     color:#b72667;
     text-align: center;
     padding: ($baseline/2) 0;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 15px;
     border-bottom: 1px solid #b72667;
     margin-bottom: $baseline;
@@ -1744,10 +1748,10 @@ input[name="subject"] {
 
   .success-msgs {
     background: #d0f5d5;
-    color:#008801;
+    color: #008801;
     text-align: center;
     padding: ($baseline/2) 0;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 15px;
     border-bottom: 1px solid #008801;
     margin-bottom: $baseline;
@@ -1759,7 +1763,8 @@ input[name="subject"] {
   }
 
   input[name="download_company_name"],
-  input[name="active_company_name"], input[name="spent_company_name"] {
+  input[name="active_company_name"],
+  input[name="spent_company_name"] {
     @include margin-right(8px);
 
     height: 36px;
@@ -1770,7 +1775,7 @@ input[name="subject"] {
   .coupons-table {
     width: 100%;
 
-    tr:nth-child(even){
+    tr:nth-child(even) {
       background-color: $gray-l6;
       border-bottom: 1px solid #f3f3f3;
     }
@@ -1792,7 +1797,7 @@ input[name="subject"] {
       height: 40px;
       border-bottom: 1px solid #bebebe;
 
-      th:nth-child(5){
+      th:nth-child(5) {
         text-align: center;
         width: 120px;
       }
@@ -1840,7 +1845,7 @@ input[name="subject"] {
 
     // in_active coupon rows style
     .inactive_coupon {
-      background:  #fff0f0 !important;
+      background: #fff0f0 !important;
       text-decoration: line-through;
       color: rgba(51, 51, 51, 0.2);
       border-bottom: 1px solid #fff;
@@ -1882,19 +1887,20 @@ input[name="subject"] {
         }
       }
 
-      td:nth-child(5),td:first-child {
+      td:nth-child(5),
+      td:first-child {
         @include padding-left($baseline);
       }
 
-      td:nth-child(2){
+      td:nth-child(2) {
         line-height: 22px;
 
-        @include padding-right(0px);
+        @include padding-right(0);
 
         word-wrap: break-word;
       }
 
-      td:nth-child(5){
+      td:nth-child(5) {
         @include padding-left(0);
 
         text-align: center;
@@ -1914,8 +1920,11 @@ input[name="subject"] {
     width: 930px;
   }
   // coupon edit and add modals
-  #add-coupon-modal, #invalidate_registration_code_modal, #edit-coupon-modal,
-  #set-course-mode-price-modal, #registration_code_generation_modal {
+  #add-coupon-modal,
+  #invalidate_registration_code_modal,
+  #edit-coupon-modal,
+  #set-course-mode-price-modal,
+  #registration_code_generation_modal {
     .inner-wrapper {
       background: $white;
     }
@@ -1924,7 +1933,7 @@ input[name="subject"] {
       display: block;
       margin-top: ($baseline/4);
       font-size: 12px;
-      color: #646464
+      color: #646464;
     }
 
     width: 650px;
@@ -1933,9 +1942,11 @@ input[name="subject"] {
 
     border-radius: 2px;
 
-    input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
-    input[type="button"]#set_course_button, input[type="button"]#lookup_regcode {
-      @include button(simple, $uxpl-blue-base);
+    input[type="button"]#update_coupon_button,
+    input[type="button"]#add_coupon_button,
+    input[type="button"]#set_course_button,
+    input[type="button"]#lookup_regcode {
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -1947,7 +1958,7 @@ input[name="subject"] {
     }
 
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
     }
@@ -1978,14 +1989,15 @@ input[name="subject"] {
         }
       }
 
-      li:nth-child(even){
+      li:nth-child(even) {
         @include margin-left(30px !important);
       }
 
-      li:nth-child(3), li:nth-child(4){
+      li:nth-child(3),
+      li:nth-child(4) {
         width: 100%;
 
-        @include margin-left(0px !important);
+        @include margin-left(0 !important);
       }
 
       li:nth-child(3) {
@@ -2058,8 +2070,8 @@ input[name="subject"] {
         margin-bottom: $baseline;
       }
 
-      li:nth-child(even){
-        @include margin-left(0px !important);
+      li:nth-child(even) {
+        @include margin-left(0 !important);
       }
 
       li:nth-child(3n) {
@@ -2082,7 +2094,7 @@ input[name="subject"] {
 
         min-height: 5px;
 
-        @include margin-left(0px !important);
+        @include margin-left(0 !important);
 
         input[type='checkbox'] {
           width: auto;
@@ -2090,9 +2102,9 @@ input[name="subject"] {
         }
       }
 
-      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-unit-price,
-      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-internal-reference {
-        @include margin-left(0px !important);
+      li#generate-registration-modal-field-country ~ li#generate-registration-modal-field-unit-price,
+      li#generate-registration-modal-field-country ~ li#generate-registration-modal-field-internal-reference {
+        @include margin-left(0 !important);
         @include margin-right(15px !important);
       }
 
@@ -2111,7 +2123,7 @@ input[name="subject"] {
     }
 
     li#set-course-mode-modal-field-currency {
-      @include margin-left(0px !important);
+      @include margin-left(0 !important);
 
       select {
         width: 100%;
@@ -2125,7 +2137,11 @@ input[name="subject"] {
       border-radius: 3px;
     }
 
-    #coupon-content, #course-content, #content, #registration-content, #regcode-content {
+    #coupon-content,
+    #course-content,
+    #content,
+    #registration-content,
+    #regcode-content {
       padding: $baseline;
 
       header {
@@ -2135,7 +2151,7 @@ input[name="subject"] {
         h2 {
           font-size: 24px;
           font-weight: 100;
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
 
           @include text-align(left);
         }
@@ -2178,7 +2194,7 @@ input[name="subject"] {
         }
 
         .field label {
-          margin: 0 0 5px 0;
+          margin: 0 0 5px;
           -webkit-transition: color 0.15s ease-in-out 0s;
           -moz-transition: color 0.15s ease-in-out 0s;
           transition: color 0.15s ease-in-out 0s;
@@ -2259,8 +2275,9 @@ input[name="subject"] {
   }
 }
 
-.ecommerce-wrapper, .proctoring-wrapper {
-  h2{
+.ecommerce-wrapper,
+.proctoring-wrapper {
+  h2 {
     height: 26px;
     line-height: 26px;
 
@@ -2292,7 +2309,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -2320,7 +2337,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -2352,7 +2369,7 @@ input[name="subject"] {
     line-height: 30px;
 
     .add {
-      @include button(simple, $uxpl-blue-base);
+      @include button(simple, $primary);
 
       @extend .button-reset;
 
@@ -2361,20 +2378,24 @@ input[name="subject"] {
   }
 }
 
-.special-allowance-container, .student-proctored-exam-container {
-  .allowance-table, .exam-attempts-table {
+.special-allowance-container,
+.student-proctored-exam-container {
+  .allowance-table,
+  .exam-attempts-table {
     width: 100%;
 
-    tr:nth-child(even){
+    tr:nth-child(even) {
       background-color: $gray-l6;
       border-bottom: 1px solid #f3f3f3;
     }
 
-    .allowance-headings, .exam-attempt-headings {
+    .allowance-headings,
+    .exam-attempt-headings {
       height: 40px;
       border-bottom: 1px solid #bebebe;
 
-      th:nth-child(5), th:nth-child(4){
+      th:nth-child(5),
+      th:nth-child(4) {
         text-align: center;
       }
 
@@ -2456,26 +2477,28 @@ input[name="subject"] {
         @include padding-left($baseline);
       }
 
-      td:nth-child(2){
+      td:nth-child(2) {
         line-height: 22px;
 
-        @include padding-right(0px);
+        @include padding-right(0);
 
         word-wrap: break-word;
       }
 
-      td:nth-child(5), td:nth-child(4), td:nth-child(6){
+      td:nth-child(5),
+      td:nth-child(4),
+      td:nth-child(6) {
         @include padding-left(0);
 
         text-align: center;
       }
 
-      td:nth-child(3){
+      td:nth-child(3) {
         word-wrap: break-word;
         text-align: center;
       }
 
-      td:nth-child(7){
+      td:nth-child(7) {
         word-wrap: break-word;
         text-align: center;
       }
@@ -2486,7 +2509,8 @@ input[name="subject"] {
     }
   }
 
-  .exam-attempts-content, .exam-allowances-content {
+  .exam-attempts-content,
+  .exam-allowances-content {
     padding-left: 0;
     padding-right: 0;
   }
@@ -2581,8 +2605,8 @@ input[name="subject"] {
       &:focus {
         z-index: 2;
         color: #fff;
-        background-color: $uxpl-blue-base;
-        border-color: $uxpl-blue-base;
+        background-color: theme-color("primary");
+        border-color: theme-color("primary");
         cursor: default;
       }
     }
@@ -2626,7 +2650,7 @@ input[name="subject"] {
   }
 
   p.under-heading {
-    margin: 12px 0 12px 0;
+    margin: 12px 0;
     line-height: 23px;
   }
 
@@ -2654,7 +2678,7 @@ input[name="subject"] {
           td {
             padding: 5px;
             vertical-align: middle;
-            text-align: left;;
+            text-align: left;
           }
         }
       }
@@ -2798,7 +2822,7 @@ input[name="subject"] {
         border: none;
         background: transparent;
         box-shadow: none;
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         font-weight: bold;
       }
     }

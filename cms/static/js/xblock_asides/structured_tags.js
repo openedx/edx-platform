@@ -45,4 +45,4 @@
     }
 
     window.StructuredTagsInit = initializeStructuredTags;
-})($);
+}($));

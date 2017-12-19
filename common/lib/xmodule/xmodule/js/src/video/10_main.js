@@ -120,7 +120,8 @@
                     new VideoPoster(el, {
                         poster: el.data('poster'),
                         onClick: _.once(function() {
-                            var mainVideoPlayer = player(state), bumper, bumperState;
+                            var mainVideoPlayer = player(state),
+                                bumper, bumperState;
                             if (storage.getItem('isBumperShown')) {
                                 mainVideoPlayer();
                             } else {

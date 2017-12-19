@@ -5,7 +5,7 @@ from cms.djangoapps.contentstore.signals.handlers import (
     GRADING_POLICY_COUNTDOWN_SECONDS,
     handle_grading_policy_changed
 )
-from student.models import CourseEnrollment, anonymous_id_for_user
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

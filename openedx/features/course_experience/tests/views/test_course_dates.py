@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 TEST_PASSWORD = 'test'
@@ -38,7 +38,6 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
 
     def test_course_dates_fragment(self):
         response = self.client.get(self.dates_fragment_url)
-        self.assertContains(response, 'Important Course Dates')
         self.assertContains(response, 'Today is')
         self.assertContains(response, 'Course End')
 

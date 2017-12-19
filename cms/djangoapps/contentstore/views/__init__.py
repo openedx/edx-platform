@@ -19,6 +19,7 @@ from .export_git import *
 from .user import *
 from .tabs import *
 from .videos import *
+from .transcript_settings import *
 from .transcripts_ajax import *
 try:
     from .dev import *

@@ -13,14 +13,27 @@ define([
             startDate = 'Feb 28, 2017',
             endDate = 'May 30, 2017',
 
-            setupView = function(data, isEnrolled) {
-                var programData = $.extend({}, data);
+            setupView = function(data, isEnrolled, collectionCourseStatus) {
+                var programData = $.extend({}, data),
+                    context = {
+                        courseData: {
+                            grades: {
+                                'course-v1:WageningenX+FFESx+1T2017': 0.8
+                            }
+                        },
+                        collectionCourseStatus: collectionCourseStatus
+                    };
+
+                if (typeof collectionCourseStatus === 'undefined') {
+                    context.collectionCourseStatus = 'completed';
+                }
 
                 programData.course_runs[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="program-course-card"></div>');
                 courseCardModel = new CourseCardModel(programData);
                 view = new CourseCardView({
-                    model: courseCardModel
+                    model: courseCardModel,
+                    context: context
                 });
             },
 
@@ -82,6 +95,18 @@ define([
             view.remove();
             setupView(course, true);
             validateCourseInfoDisplay();
+        });
+
+        it('should render final grade if course is completed', function() {
+            view.remove();
+            setupView(course, true);
+            expect(view.$('.grade-display').text()).toEqual('80%');
+        });
+
+        it('should not render final grade if course has not been completed', function() {
+            view.remove();
+            setupView(course, true, 'in_progress');
+            expect(view.$('.final-grade').length).toEqual(0);
         });
 
         it('should render the course card based on the data not enrolled', function() {
@@ -208,6 +233,37 @@ define([
             setupView(course, false);
 
             expect(view.$('.course-title-link').length).toEqual(0);
+        });
+
+        it('should show an unfulfilled user entitlement allows you to select a session', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, false);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You must select a session by');
+        });
+
+        it('should show a fulfilled expired user entitlement does not allow the changing of sessions', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expired_at: '2017-12-06 01:06:12',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, true);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You can no longer change sessions.');
+        });
+
+        it('should show a fulfilled user entitlement allows the changing of sessions', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, true);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You can change sessions until');
         });
     });
 }

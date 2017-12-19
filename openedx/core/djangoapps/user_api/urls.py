@@ -3,7 +3,7 @@ Defines the URL routes for this app.
 """
 
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountDeactivationView, AccountViewSet
@@ -24,8 +24,7 @@ ACCOUNT_DETAIL = AccountViewSet.as_view({
     'patch': 'partial_update',
 })
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^v1/me$',
         ME,
@@ -71,4 +70,4 @@ urlpatterns = patterns(
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
     ),
-)
+]

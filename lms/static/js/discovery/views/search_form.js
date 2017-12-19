@@ -24,8 +24,7 @@
             doSearch: function(term) {
                 if (term !== undefined) {
                     this.$searchField.val(term);
-                }
-                else {
+                } else {
                     term = this.$searchField.val();
                 }
                 this.trigger('search', $.trim(term));
@@ -67,4 +66,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

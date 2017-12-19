@@ -1,3 +1,5 @@
 # Requirements to run and test Paver
 Paver==1.2.4
 libsass==0.10.0
+markupsafe
+-r base_common.txt

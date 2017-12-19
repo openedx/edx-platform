@@ -11,10 +11,11 @@ from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory, ProgramTypeFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
+    get_course_runs_for_course,
     get_course_run_details,
     get_currency_data,
     get_program_types,
@@ -165,6 +166,10 @@ class TestGetProgramsWithType(TestCase):
     def setUp(self):
         super(TestGetProgramsWithType, self).setUp()
         self.site = SiteFactory()
+
+        # We have seen what seem like flaky tests for these, but can't debug them due to the diff being too large.
+        # If you fix the flakiness of the tests this could go away as well.
+        self.maxDiff = None
 
     @mock.patch(UTILS_MODULE + '.get_programs')
     @mock.patch(UTILS_MODULE + '.get_program_types')
@@ -328,6 +333,18 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         data = get_course_runs()
         self.assertTrue(mock_get_edx_api_data.called)
         self.assert_contract(mock_get_edx_api_data.call_args)
+        self.assertEqual(data, catalog_course_runs)
+
+    def test_get_course_runs_by_course(self, mock_get_edx_api_data):
+        """
+        Test retrievals of run from a Course.
+        """
+        catalog_course_runs = CourseRunFactory.create_batch(10)
+        catalog_course = CourseFactory(course_runs=catalog_course_runs)
+        mock_get_edx_api_data.return_value = catalog_course
+
+        data = get_course_runs_for_course(course_uuid=str(catalog_course['uuid']))
+        self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, catalog_course_runs)
 
 

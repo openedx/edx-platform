@@ -1,10 +1,10 @@
 // Utilities to provide v1-styling compatibility
 
-@mixin font-size($sizeValue: 16){
+@mixin font-size($sizeValue: 16) {
   font-size: $sizeValue + px;
 }
 
-@mixin line-height($fontSize: auto){
+@mixin line-height($fontSize: auto) {
   line-height: ($fontSize*1.48) + px;
 }
 

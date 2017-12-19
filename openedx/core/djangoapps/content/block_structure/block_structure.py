@@ -312,7 +312,7 @@ class FieldData(object):
         if self._is_own_field(field_name):
             return super(FieldData, self).__delattr__(field_name)
         else:
-            delattr(self.fields, field_name)
+            del self.fields[field_name]
 
     def _is_own_field(self, field_name):
         """
@@ -730,7 +730,7 @@ class BlockStructureBlockData(BlockStructure):
         Adds the given transformer to the block structure by recording
         its current version number.
         """
-        if transformer.READ_VERSION == 0 or transformer.WRITE_VERSION == 0:
+        if transformer.WRITE_VERSION == 0:
             raise TransformerException('Version attributes are not set on transformer {0}.', transformer.name())
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.WRITE_VERSION)
 

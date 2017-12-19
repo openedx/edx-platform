@@ -16,7 +16,7 @@ from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers.api import DEFAULT_OBSERVER_TIMEOUT
-from watchdog.observers.polling import PollingObserver
+from watchdog.observers import Observer
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -52,7 +52,7 @@ COMMON_LOOKUP_PATHS = [
 NPM_INSTALLED_LIBRARIES = [
     'backbone.paginator/lib/backbone.paginator.js',
     'backbone/backbone.js',
-    'bootstrap/dist/js/bootstrap.js',
+    'bootstrap/dist/js/bootstrap.bundle.js',
     'hls.js/dist/hls.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
@@ -60,14 +60,9 @@ NPM_INSTALLED_LIBRARIES = [
     'moment-timezone/builds/moment-timezone-with-data.js',
     'moment/min/moment-with-locales.js',
     'picturefill/dist/picturefill.js',
-    'popper.js/dist/umd/popper.js',
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
-    '@edx/studio-frontend/dist/assets.min.js',
-    '@edx/studio-frontend/dist/assets.min.js.map',
-    '@edx/studio-frontend/dist/studio-frontend.min.css',
-    '@edx/studio-frontend/dist/studio-frontend.min.css.map',
     'which-country/index.js'
 ]
 
@@ -769,12 +764,22 @@ def webpack(options):
     Run a Webpack build.
     """
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
+    static_root_lms = Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
+    static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
     environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
         node_env="production" if settings != Env.DEVSTACK_SETTINGS else "development",
-        static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-        static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
+        static_root_lms=static_root_lms,
+        static_root_cms=static_root_cms
     )
-    sh(cmd('{environment} $(npm bin)/webpack'.format(environment=environment)))
+    sh(
+        cmd(
+            '{environment} $(npm bin)/webpack --config={config_path}'.format(
+                environment=environment,
+                config_path=config_path
+            )
+        )
+    )
 
 
 def execute_webpack_watch(settings=None):
@@ -786,7 +791,9 @@ def execute_webpack_watch(settings=None):
     # from Watchdog like the other watchers do.
     run_background_process(
         'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
-            options='--watch --watch-poll=200',
+            options='--watch --config={config_path}'.format(
+                config_path=Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+            ),
             static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
             static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
         )
@@ -844,7 +851,6 @@ def watch_assets(options):
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
-    # wait comes in as a list of strings, define the default value similarly for convenience.
     default_wait = [unicode(DEFAULT_OBSERVER_TIMEOUT)]
     wait = float(get_parsed_option(options, 'wait', default_wait)[0])
 
@@ -855,7 +861,7 @@ def watch_assets(options):
         theme_dirs = [path(_dir) for _dir in theme_dirs]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
-    observer = PollingObserver(timeout=wait)
+    observer = Observer(timeout=wait)
 
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
@@ -955,6 +961,6 @@ def update_assets(args):
                 'background': not args.debug,
                 'theme_dirs': args.theme_dirs,
                 'themes': args.themes,
-                'wait': float(args.wait)
+                'wait': [float(args.wait)]
             },
         )

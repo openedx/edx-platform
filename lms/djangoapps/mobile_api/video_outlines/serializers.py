@@ -11,7 +11,7 @@ from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
-from xmodule.video_module.transcripts_utils import is_val_transcript_feature_enabled_for_course
+from xmodule.video_module.transcripts_model_utils import is_val_transcript_feature_enabled_for_course
 
 
 class BlockOutline(object):
@@ -172,6 +172,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "only_on_web": video_descriptor.only_on_web,
     }
 
+    all_sources = []
+
     if video_descriptor.only_on_web:
         ret = {
             "video_url": None,
@@ -180,6 +182,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
             "size": 0,
             "transcripts": {},
             "language": None,
+            "all_sources": all_sources,
         }
         ret.update(always_available_data)
         return ret
@@ -201,8 +204,12 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
     # Then fall back to VideoDescriptor fields for video URLs
     elif video_descriptor.html5_sources:
         video_url = video_descriptor.html5_sources[0]
+        all_sources = video_descriptor.html5_sources
     else:
         video_url = video_descriptor.source
+
+    if video_descriptor.source:
+        all_sources.append(video_descriptor.source)
 
     # Get duration/size, else default
     duration = video_data.get('duration', None)
@@ -236,7 +243,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "size": size,
         "transcripts": transcripts,
         "language": video_descriptor.get_default_transcript_language(transcripts_info),
-        "encoded_videos": video_data.get('profiles')
+        "encoded_videos": video_data.get('profiles'),
+        "all_sources": all_sources,
     }
     ret.update(always_available_data)
     return ret

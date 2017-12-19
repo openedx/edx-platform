@@ -5,10 +5,10 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from optparse import make_option
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from six import text_type
 
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class Command(BaseCommand):
-    """Management command to change many user enrollments at once."""
+    """
+    Management command to change many user enrollments at once.
+    """
 
     help = """
     Change the enrollment status for all users enrolled in a
@@ -31,54 +33,36 @@ class Command(BaseCommand):
     Without the --commit option, the command will have no effect.
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option(
-            '-f', '--from_mode',
-            dest='from_mode',
-            default=None,
-            help='move from this enrollment mode'
-        ),
-        make_option(
-            '-t', '--to_mode',
-            dest='to_mode',
-            default=None,
-            help='move to this enrollment mode'
-        ),
-        make_option(
+    def add_arguments(self, parser):
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
             '-c', '--course',
-            dest='course',
-            default=None,
-            help='the course to change enrollments in'
-        ),
-        make_option(
+            help='The course to change enrollments in')
+        group.add_argument(
             '-o', '--org',
-            dest='org',
-            default=None,
-            help='all courses belonging to this org will be selected for changing the enrollments'
-        ),
-        make_option(
+            help='All courses belonging to this org will be selected for changing the enrollments')
+
+        parser.add_argument(
+            '-f', '--from_mode',
+            required=True,
+            help='Move from this enrollment mode')
+        parser.add_argument(
+            '-t', '--to_mode',
+            required=True,
+            help='Move to this enrollment mode')
+        parser.add_argument(
             '--commit',
             action='store_true',
-            dest='commit',
-            default=False,
-            help='display what will be done without any effect'
-        )
-    )
+            help='Save the changes, without this flag only a dry run will be performed and nothing will be changed')
 
     def handle(self, *args, **options):
-        course_id = options.get('course')
-        org = options.get('org')
-        from_mode = options.get('from_mode')
-        to_mode = options.get('to_mode')
-        commit = options.get('commit')
-
-        if (not course_id and not org) or (course_id and org):
-            raise CommandError('You must provide either a course ID or an org, but not both.')
-
-        if from_mode is None or to_mode is None:
-            raise CommandError('Both `from` and `to` course modes must be given.')
-
+        course_id = options['course']
+        org = options['org']
+        from_mode = options['from_mode']
+        to_mode = options['to_mode']
+        commit = options['commit']
         course_keys = []
+
         if course_id:
             try:
                 course_key = CourseKey.from_string(course_id)
@@ -111,7 +95,7 @@ class Command(BaseCommand):
             commit (bool): required to make the change to the database. Otherwise
                                      just a count will be displayed.
         """
-        unicode_course_key = unicode(course_key)
+        unicode_course_key = text_type(course_key)
         if CourseMode.mode_for_course(course_key, to_mode) is None:
             logger.info('Mode ({}) does not exist for course ({}).'.format(to_mode, unicode_course_key))
             return
