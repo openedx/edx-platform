@@ -3,6 +3,7 @@ Student Views
 """
 
 import datetime
+import dateutil
 import json
 import logging
 import uuid
@@ -708,7 +709,7 @@ def dashboard(request):
 
         for course_run in course_runs_for_course:
             enrollment_end = course_run.get('enrollment_end')
-            if not enrollment_end or enrollment_end > datetime.datetime.now(UTC):
+            if not enrollment_end or (dateutil.parser.parse(enrollment_end) > datetime.datetime.now(UTC)):
                 enrollable_course_runs.append(course_run)
 
         course_entitlement_available_sessions[str(course_entitlement.uuid)] = enrollable_course_runs
