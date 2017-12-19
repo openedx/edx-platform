@@ -828,34 +828,6 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    certificate_title = String(
-        display_name=_("Certificate Title"),
-        help=_("Specify the title of your certificate."),
-        default=None,
-        scope=Scope.settings
-    )
-
-    certificate_title_color = String(
-        display_name=_("Certificate Title Color"),
-        help=_("Specify the title color of your certificate."),
-        default='#000',
-        scope=Scope.settings
-    )
-
-    certificate_subtitle = String(
-        display_name=_("Certificate Subtitle"),
-        help=_("Specify the subtitle of your certificate."),
-        default=None,
-        scope=Scope.settings
-    )
-
-    certificate_subtitle_color = String(
-        display_name=_("Certificate Subtitle Color"),
-        help=_("Specify the subtitle color of your certificate."),
-        default='#000',
-        scope=Scope.settings
-    )
-
     """
     instructor_info dict structure:
     {

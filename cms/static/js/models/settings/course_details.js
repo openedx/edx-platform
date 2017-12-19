@@ -2,10 +2,6 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
     function(Backbone, _, gettext, ValidationHelpers, DateUtils) {
         var CourseDetails = Backbone.Model.extend({
             defaults: {
-                certificate_title: '',
-                certificate_title_color: '',
-                certificate_subtitle: '',
-                certificate_subtitle_color: '',
                 org: '',
                 course_id: '',
                 run: '',
