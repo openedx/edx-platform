@@ -2,8 +2,8 @@
 Bookmarks Python API.
 """
 from django.conf import settings
-
 from eventtracking import tracker
+
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

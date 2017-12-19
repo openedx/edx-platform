@@ -1,33 +1,31 @@
 """
 Tests the execution of forum notification tasks.
 """
-from datetime import datetime, timedelta
 import json
 import math
+from datetime import datetime, timedelta
 
-from crum import CurrentRequestUserMiddleware
 import ddt
-from django.contrib.sites.models import Site
 import mock
-
-import lms.lib.comment_client as cc
-
-from django_comment_common.models import ForumsConfig
-from django_comment_common.signals import comment_created
+from crum import CurrentRequestUserMiddleware
+from django.contrib.sites.models import Site
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
+
+import lms.lib.comment_client as cc
+from django_comment_common.models import ForumsConfig
+from django_comment_common.signals import comment_created
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 
 NOW = datetime.utcnow()
 ONE_HOUR_AGO = NOW - timedelta(hours=1)

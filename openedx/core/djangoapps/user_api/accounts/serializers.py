@@ -4,25 +4,22 @@ Django REST Framework serializers for the User API Accounts sub-application
 import json
 import logging
 
-from rest_framework import serializers
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from rest_framework import serializers
 
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from student.models import UserProfile, LanguageProficiency, SocialLink
+from student.models import LanguageProficiency, SocialLink, UserProfile
 
-from . import (
-    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
-    ALL_USERS_VISIBILITY,
-)
+from . import ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY, NAME_MIN_LENGTH, PRIVATE_VISIBILITY
 from .image_helpers import get_profile_image_urls_for_user
-from .utils import validate_social_link, format_social_link
+from .utils import format_social_link, validate_social_link
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
 LOGGER = logging.getLogger(__name__)

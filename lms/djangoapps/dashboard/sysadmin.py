@@ -2,7 +2,6 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
-import unicodecsv as csv
 import json
 import logging
 import os
@@ -10,6 +9,7 @@ import StringIO
 import subprocess
 
 import mongoengine
+import unicodecsv as csv
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required

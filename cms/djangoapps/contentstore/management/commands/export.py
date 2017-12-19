@@ -2,6 +2,7 @@
 Script for exporting courseware from Mongo to a tar.gz file
 """
 from __future__ import print_function
+
 import os
 
 from django.core.management.base import BaseCommand, CommandError

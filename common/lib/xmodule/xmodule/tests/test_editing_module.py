@@ -1,15 +1,15 @@
 """ Tests for editing descriptors"""
-import unittest
-import os
 import logging
+import os
+import unittest
 
 from mock import Mock
-from pkg_resources import resource_string
 from opaque_keys.edx.locations import Location
-from xmodule.editing_module import TabsEditingDescriptor
+from pkg_resources import resource_string
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.tests import get_test_descriptor_system
 
 log = logging.getLogger(__name__)

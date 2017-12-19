@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
+from xblock.field_data import DictFieldData
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
@@ -17,7 +18,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import Registration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xblock.field_data import DictFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

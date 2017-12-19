@@ -18,20 +18,19 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
-    consent_needed_for_course,
-    data_sharing_consent_required,
     EnterpriseApiClient,
     EnterpriseApiServiceClient,
+    consent_needed_for_course,
+    data_sharing_consent_required,
     enterprise_customer_for_request,
+    enterprise_enabled,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
-    insert_enterprise_pipeline_elements,
-    enterprise_enabled,
+    insert_enterprise_pipeline_elements
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import get_cache_key
 from student.tests.factories import UserFactory
-
 
 FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True

@@ -14,11 +14,11 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
+from opaque_keys.edx.locator import CourseLocator
 
-from contentstore.tests.utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
 from contentstore.git_export_utils import GitExportError
-from opaque_keys.edx.locator import CourseLocator
+from contentstore.tests.utils import CourseTestCase
 
 FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()
 FEATURES_WITH_EXPORT_GIT['ENABLE_EXPORT_GIT'] = True

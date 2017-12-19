@@ -4,23 +4,26 @@ An API for retrieving user preference information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
-
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
-from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError, PreferenceUpdateError
+
+from ..errors import PreferenceUpdateError, PreferenceValidationError, UserNotAuthorized, UserNotFound
 from .api import (
-    get_user_preference, get_user_preferences, set_user_preference, update_user_preferences, delete_user_preference
+    delete_user_preference,
+    get_user_preference,
+    get_user_preferences,
+    set_user_preference,
+    update_user_preferences
 )
 
 

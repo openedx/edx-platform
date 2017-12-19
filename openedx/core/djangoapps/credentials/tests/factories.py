@@ -4,11 +4,7 @@ from functools import partial
 
 import factory
 
-from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_instances,
-    generate_course_run_key,
-    DictFactoryBase,
-)
+from openedx.core.djangoapps.catalog.tests.factories import DictFactoryBase, generate_course_run_key, generate_instances
 
 
 class ProgramCredential(DictFactoryBase):

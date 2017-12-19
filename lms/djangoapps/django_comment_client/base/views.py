@@ -5,6 +5,7 @@ import random
 import time
 import urlparse
 
+import eventtracking
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
@@ -41,12 +42,11 @@ from django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted,
     thread_followed,
     thread_unfollowed,
+    thread_voted
 )
 from django_comment_common.utils import ThreadContext
-import eventtracking
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from util.file import store_uploaded_file
 

@@ -3,7 +3,8 @@ Test grading events across apps.
 """
 # pylint: disable=protected-access
 
-from mock import call as mock_call, patch
+from mock import call as mock_call
+from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin

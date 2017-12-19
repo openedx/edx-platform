@@ -1,9 +1,9 @@
 """
 Django Admin for Block Structures.
 """
+from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from config_models.admin import ConfigurationModelAdmin
 from .config.models import BlockStructureConfiguration
 
 

@@ -9,11 +9,11 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
 from opaque_keys.edx.locator import CourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 

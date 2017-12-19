@@ -2,6 +2,7 @@
 API views for Bulk Enrollment
 """
 import json
+
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import status
 from rest_framework.response import Response

@@ -2,10 +2,12 @@
 Unit tests for stub XQueue implementation.
 """
 
-import mock
-import unittest
 import json
+import unittest
+
+import mock
 import requests
+
 from ..xqueue import StubXQueueService
 
 

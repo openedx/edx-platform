@@ -5,43 +5,41 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-import webob
+from unittest.case import SkipTest, TestCase
+
 import ddt
+import webob
 from factory import (
     BUILD_STRATEGY,
     Factory,
-    lazy_attribute,
     LazyAttributeSequence,
-    post_generation,
     SubFactory,
-    use_strategy,
+    lazy_attribute,
+    post_generation,
+    use_strategy
 )
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock
-from unittest.case import SkipTest, TestCase
-
+from opaque_keys.edx.locations import Location
+from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xblock.core import XBlock
 
-from opaque_keys.edx.locations import Location
-
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
+from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.poll_module import PollDescriptor
-from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.randomize_module import RandomizeDescriptor
 #from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.conditional_module import ConditionalDescriptor
-from xmodule.randomize_module import RandomizeDescriptor
-from xmodule.vertical_block import VerticalBlock
-from xmodule.wrapper_module import WrapperBlock
 from xmodule.tests import get_test_descriptor_system, get_test_system
-
+from xmodule.vertical_block import VerticalBlock
+from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.wrapper_module import WrapperBlock
+from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW, DescriptorSystem, ModuleSystem, XModule, XModuleDescriptor
 
 # A dictionary that maps specific XModuleDescriptor classes without children
 # to a list of sample field values to test with.

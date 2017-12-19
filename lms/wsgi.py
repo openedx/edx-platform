@@ -8,6 +8,9 @@ It exposes a module-level variable named ``application``. Django's
 ``WSGI_APPLICATION`` setting.
 """
 
+# The import order matters for modules like safe_lxml.
+# pylint: disable=wrong-import-order, wrong-import-position
+
 # Patch the xml libs
 from safe_lxml import defuse_xml_libs
 defuse_xml_libs()

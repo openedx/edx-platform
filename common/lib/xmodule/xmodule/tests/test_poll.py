@@ -3,6 +3,7 @@
 from mock import Mock
 
 from xmodule.poll_module import PollDescriptor
+
 from . import LogicTest
 from .test_import import DummySystem
 

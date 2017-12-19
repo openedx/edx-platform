@@ -11,11 +11,12 @@ In two separate processes on devstack:
     ./manage.py cms celery worker --settings=devstack_with_worker
 """
 
-import os
-
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
+
+import os
+
 if 'BOK_CHOY_HOSTNAME' in os.environ:
     from cms.envs.devstack_docker import *
 else:

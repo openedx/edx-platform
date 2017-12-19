@@ -5,7 +5,8 @@ Django-OAuth2-Provider.
 
 # pylint: disable=protected-access
 
-from unittest import skip, expectedFailure
+from unittest import expectedFailure, skip
+
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.oauth_dispatch import adapters

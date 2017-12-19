@@ -6,9 +6,9 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from eventtracking import tracker
 from mock import patch, sentinel
 
-from eventtracking import tracker
 from track.middleware import TrackMiddleware
 
 

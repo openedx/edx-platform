@@ -7,11 +7,13 @@ from django.contrib import admin
 
 from openedx.core.djangoapps.video_config.forms import (
     CourseHLSPlaybackFlagAdminForm,
-    CourseVideoTranscriptFlagAdminForm,
+    CourseVideoTranscriptFlagAdminForm
 )
 from openedx.core.djangoapps.video_config.models import (
-    CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
-    CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
+    CourseHLSPlaybackEnabledFlag,
+    CourseVideoTranscriptEnabledFlag,
+    HLSPlaybackEnabledFlag,
+    VideoTranscriptEnabledFlag
 )
 
 

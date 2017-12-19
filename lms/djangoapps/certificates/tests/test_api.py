@@ -1,11 +1,11 @@
 """Tests for the certificates Python API. """
 import uuid
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 from functools import wraps
 
 import ddt
-from datetime import datetime
-from datetime import timedelta
+import pytz
 from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -16,7 +16,6 @@ from freezegun import freeze_time
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
-import pytz
 
 from certificates import api as certs_api
 from certificates.models import (

@@ -2,6 +2,7 @@
 Views for verifying the health (heartbeat) of the app.
 """
 from dogapi import dog_stats_api
+
 from util.json_request import JsonResponse
 
 from .runchecks import runchecks

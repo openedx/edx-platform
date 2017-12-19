@@ -34,7 +34,7 @@ from contentstore.views.item import (
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
     create_xblock_info,
-    highlights_setting,
+    highlights_setting
 )
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration

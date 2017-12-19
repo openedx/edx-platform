@@ -1,10 +1,10 @@
 """Tests for certificates views. """
 
+import datetime
 import json
 from uuid import uuid4
 
 import ddt
-import datetime
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse

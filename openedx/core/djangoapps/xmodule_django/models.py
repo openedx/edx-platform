@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.lookups import IsNull
 from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
+
 from openedx.core.djangoapps.util.model_utils import CreatorMixin
 from xmodule.modulestore.django import modulestore
 

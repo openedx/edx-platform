@@ -6,10 +6,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.management import BaseCommand
 
-from openedx.core.djangoapps.catalog.cache import (
-    PROGRAM_CACHE_KEY_TPL,
-    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
-)
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 

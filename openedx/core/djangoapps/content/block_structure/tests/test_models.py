@@ -1,16 +1,16 @@
 """
 Unit tests for Block Structure models.
 """
+from itertools import product
+from uuid import uuid4
+
 # pylint: disable=protected-access
 import ddt
 from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
-from itertools import product
-from mock import patch, Mock
-from uuid import uuid4
-
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from mock import Mock, patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from ..config import PRUNE_OLD_VERSIONS, waffle
 from ..exceptions import BlockStructureNotFound

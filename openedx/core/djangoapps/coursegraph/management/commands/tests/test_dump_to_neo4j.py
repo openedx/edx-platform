@@ -10,26 +10,19 @@ import ddt
 import mock
 from django.core.management import call_command
 from django.utils import six
+
+from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
+from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import ModuleStoreSerializer
+from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeSelector
+from openedx.core.djangoapps.coursegraph.tasks import (
+    coerce_types,
+    serialize_course,
+    serialize_item,
+    should_dump_course,
+    strip_branch_and_version
+)
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
-    ModuleStoreSerializer
-)
-from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import (
-    MockGraph,
-    MockNodeSelector,
-)
-from openedx.core.djangoapps.coursegraph.tasks import (
-    serialize_item,
-    serialize_course,
-    coerce_types,
-    should_dump_course,
-    strip_branch_and_version,
-)
-from openedx.core.djangoapps.content.course_structures.signals import (
-    listen_for_course_publish
-)
 
 
 class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):

@@ -1,12 +1,14 @@
 """
 Unit tests for stub EdxNotes implementation.
 """
-import ddt
-import urlparse
 import json
 import unittest
-import requests
+import urlparse
 from uuid import uuid4
+
+import ddt
+import requests
+
 from ..edxnotes import StubEdxNotesService
 
 

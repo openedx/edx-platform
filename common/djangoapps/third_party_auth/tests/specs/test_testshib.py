@@ -2,23 +2,24 @@
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
 import datetime
-import ddt
-import unittest
-import httpretty
 import json
 import logging
-from mock import patch
-from freezegun import freeze_time
-from social_django.models import UserSocialAuth
-from testfixtures import LogCapture
+import unittest
 from unittest import skip
 
-from third_party_auth.saml import log as saml_log, SapSuccessFactorsIdentityProvider
+import ddt
+import httpretty
+from freezegun import freeze_time
+from mock import patch
+from social_django.models import UserSocialAuth
+from testfixtures import LogCapture
+
+from third_party_auth.saml import log as saml_log
+from third_party_auth.saml import SapSuccessFactorsIdentityProvider
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
 
 from .base import IntegrationTestMixin
-
 
 TESTSHIB_ENTITY_ID = 'https://idp.testshib.org/idp/shibboleth'
 TESTSHIB_METADATA_URL = 'https://mock.testshib.org/metadata/testshib-providers.xml'

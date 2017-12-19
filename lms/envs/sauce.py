@@ -3,6 +3,10 @@ This config file extends the test environment configuration
 so that we can run the lettuce acceptance tests on SauceLabs.
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order
+
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import os
 

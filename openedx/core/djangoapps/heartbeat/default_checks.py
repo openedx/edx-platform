@@ -10,16 +10,17 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.utils import DatabaseError
-from xmodule.modulestore.django import modulestore
+
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.django import modulestore
 
 from .defaults import HEARTBEAT_CELERY_TIMEOUT
 from .tasks import sample_task
 
-
 # DEFAULT SYSTEM CHECKS
 
 # Modulestore
+
 
 def check_modulestore():
     """ Check the modulestore connection

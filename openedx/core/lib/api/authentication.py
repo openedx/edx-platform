@@ -5,10 +5,9 @@ import logging
 import django.utils.timezone
 from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_oauth.authentication import OAuth2Authentication
-
 
 OAUTH2_TOKEN_ERROR = u'token_error'
 OAUTH2_TOKEN_ERROR_EXPIRED = u'token_expired'

@@ -1,11 +1,11 @@
-from collections import namedtuple
 import datetime
-import ddt
-from mock import patch
 import itertools
+from collections import namedtuple
 
-from edx_ace.utils.date import serialize
+import ddt
 from edx_ace.message import Message
+from edx_ace.utils.date import serialize
+from mock import patch
 
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 

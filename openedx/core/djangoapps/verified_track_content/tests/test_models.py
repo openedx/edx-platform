@@ -6,10 +6,10 @@ Tests for Verified Track Cohorting models
 
 import ddt
 import mock
-from mock import patch
-
 from django.test import TestCase
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.course_groups.cohorts import (
     DEFAULT_COHORT_NAME,
     CourseCohort,

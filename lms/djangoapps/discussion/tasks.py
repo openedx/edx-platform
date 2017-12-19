@@ -6,23 +6,21 @@ import logging
 from urlparse import urljoin
 
 from celery import task
+from celery_utils.logged_task import LoggedTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-
-from celery_utils.logged_task import LoggedTask
 from edx_ace import ace
-from edx_ace.utils import date
 from edx_ace.message import MessageType
 from edx_ace.recipient import Recipient
+from edx_ace.utils import date
 from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.django_comment_client.utils import permalink
+
 import lms.lib.comment_client as cc
-
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from lms.djangoapps.django_comment_client.utils import permalink
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.celery.task_utils import emulate_http_request
-
 
 log = logging.getLogger(__name__)
 

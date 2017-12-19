@@ -13,7 +13,6 @@ from .factory import BlockStructureFactory
 from .models import BlockStructureModel
 from .transformer_registry import TransformerRegistry
 
-
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 

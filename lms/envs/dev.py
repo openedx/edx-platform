@@ -8,6 +8,10 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order
+
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
@@ -267,7 +271,7 @@ REGISTRATION_CODE_LENGTH = 8
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=import-error
+    from .private import *
 except ImportError:
     pass
 

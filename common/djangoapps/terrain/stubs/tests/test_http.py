@@ -2,10 +2,12 @@
 Unit tests for stub HTTP server base class.
 """
 
-import unittest
-import requests
 import json
-from terrain.stubs.http import StubHttpService, StubHttpRequestHandler, require_params
+import unittest
+
+import requests
+
+from terrain.stubs.http import StubHttpRequestHandler, StubHttpService, require_params
 
 
 class StubHttpServiceTest(unittest.TestCase):

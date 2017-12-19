@@ -2,12 +2,13 @@
 Tests for the force_publish management command
 """
 import mock
-from django.core.management import call_command, CommandError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from django.core.management import CommandError, call_command
+
 from contentstore.management.commands.force_publish import Command
 from contentstore.management.commands.utils import get_course_versions
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestForcePublish(SharedModuleStoreTestCase):

@@ -8,15 +8,20 @@ from babel.dates import format_date, format_timedelta
 from django.contrib import auth
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
-from pytz import UTC
-from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language, to_locale
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_date_blocks, get_course_with_access
-from lms.djangoapps.course_goals.api import get_course_goal, get_course_goal_options, valid_course_goals_ordered, get_goal_api_url, has_course_goal_permission
+from lms.djangoapps.course_goals.api import (
+    get_course_goal,
+    get_course_goal_options,
+    get_goal_api_url,
+    has_course_goal_permission,
+    valid_course_goals_ordered
+)
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text

@@ -6,6 +6,7 @@ https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
 import logging
 
+import eventtracking
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
@@ -19,7 +20,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-import eventtracking
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.paginators import DefaultPagination
 from openedx.core.lib.api.permissions import IsUserInUrl

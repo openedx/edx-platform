@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 
 from crum import CurrentRequestUserMiddleware
-from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from django.http import HttpResponse
+
+from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from request_cache import get_request_or_stub
 
 

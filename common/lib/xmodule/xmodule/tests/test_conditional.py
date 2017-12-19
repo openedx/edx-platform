@@ -4,19 +4,20 @@ import unittest
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
-
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
-from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locator import BlockUsageLocator
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+
 from xmodule.conditional_module import ConditionalDescriptor
-from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
-from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
+from xmodule.error_module import NonStaffErrorDescriptor
+from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
+from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
+from xmodule.tests.xml import factories as xml
+from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.validation import StudioValidationMessage
-from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data

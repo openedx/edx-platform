@@ -1,8 +1,8 @@
-import re
 import logging
+import re
+import uuid
 from collections import namedtuple
 
-import uuid
 from xblock.core import XBlock
 
 DETACHED_XBLOCK_TYPES = set(name for name, __ in XBlock.load_tagged_classes("detached"))

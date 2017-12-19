@@ -1,5 +1,6 @@
-from lxml import etree
 from abc import ABCMeta, abstractmethod
+
+from lxml import etree
 
 
 class ResponseXMLFactory(object):

@@ -17,13 +17,8 @@ from rest_framework.response import Response
 from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import (
-    get_video_transcript_content,
-    Transcript,
-)
-from xmodule.video_module.transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
+from xmodule.video_module.transcripts_model_utils import is_val_transcript_feature_enabled_for_course
+from xmodule.video_module.transcripts_utils import Transcript, get_video_transcript_content
 
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary

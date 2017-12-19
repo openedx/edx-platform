@@ -1,6 +1,12 @@
-""" Overrides for Docker-based devstack. """
+"""
+Overrides for Docker-based devstack.
+"""
 
-from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
+from .devstack import *
 
 # Docker does not support the syslog socket at /dev/log. Rely on the console.
 LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {

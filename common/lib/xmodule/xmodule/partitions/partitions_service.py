@@ -3,13 +3,13 @@ This is a service-like API that assigns tracks which groups users are in for var
 user partitions.  It uses the user_service key/value store provided by the LMS runtime to
 persist the assignments.
 """
-from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 import logging
 
-from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
-from xmodule.modulestore.django import modulestore
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
+from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartition, UserPartitionError
 
 log = logging.getLogger(__name__)
 

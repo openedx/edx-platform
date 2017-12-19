@@ -1,12 +1,13 @@
 """Capa's specialized use of codejail.safe_exec."""
 
-from codejail.safe_exec import safe_exec as codejail_safe_exec
+import hashlib
+
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
-from codejail.safe_exec import json_safe, SafeExecException
-from . import lazymod
+from codejail.safe_exec import safe_exec as codejail_safe_exec
+from codejail.safe_exec import SafeExecException, json_safe
 from dogapi import dog_stats_api
 
-import hashlib
+from . import lazymod
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.

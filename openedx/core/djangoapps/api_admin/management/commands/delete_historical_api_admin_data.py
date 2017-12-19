@@ -3,8 +3,10 @@ Command to delete all rows from the api_admin_historicalapiaccessrequest table.
 """
 
 import logging
+
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand
+from openedx.core.djangoapps.util.row_delete import BaseDeletionCommand, delete_rows
+
 log = logging.getLogger(__name__)
 
 

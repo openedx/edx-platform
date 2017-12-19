@@ -8,9 +8,9 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
-from pytz import UTC
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import i4xEncoder
+from pytz import UTC
 
 from courseware import courses
 from courseware.access import has_access

@@ -31,8 +31,8 @@ from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.api import (
     ConsentApiServiceClient,
-    EnterpriseApiServiceClient,
     EnterpriseApiException,
+    EnterpriseApiServiceClient,
     enterprise_enabled
 )
 from student.auth import user_has_role

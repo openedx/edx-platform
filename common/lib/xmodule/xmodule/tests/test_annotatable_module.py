@@ -4,11 +4,11 @@ import unittest
 
 from lxml import etree
 from mock import Mock
-
+from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+
 from xmodule.annotatable_module import AnnotatableModule
-from opaque_keys.edx.locations import Location
 
 from . import get_test_system
 

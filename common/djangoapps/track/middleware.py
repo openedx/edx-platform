@@ -14,9 +14,9 @@ import re
 import sys
 
 from django.conf import settings
+from eventtracking import tracker
 from ipware.ip import get_ip
 
-from eventtracking import tracker
 from track import contexts, views
 
 log = logging.getLogger(__name__)

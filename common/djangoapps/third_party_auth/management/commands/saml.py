@@ -2,8 +2,10 @@
 """
 Management commands for third_party_auth
 """
-from django.core.management.base import BaseCommand, CommandError
 import logging
+
+from django.core.management.base import BaseCommand, CommandError
+
 from third_party_auth.tasks import fetch_saml_metadata
 
 

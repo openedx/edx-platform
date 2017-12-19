@@ -2,28 +2,15 @@
 Test Microsite database backends.
 """
 import logging
-from mock import patch
 
 from django.conf import settings
+from mock import patch
 
-from microsite_configuration.backends.base import (
-    BaseMicrositeBackend,
-    BaseMicrositeTemplateBackend,
-)
 from microsite_configuration import microsite
-from microsite_configuration.models import (
-    Microsite,
-    MicrositeHistory,
-    MicrositeTemplate,
-)
-from microsite_configuration.tests.tests import (
-    DatabaseMicrositeTestCase,
-)
-from microsite_configuration.tests.factories import (
-    SiteFactory,
-    MicrositeFactory,
-    MicrositeTemplateFactory,
-)
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
+from microsite_configuration.models import Microsite, MicrositeHistory, MicrositeTemplate
+from microsite_configuration.tests.factories import MicrositeFactory, MicrositeTemplateFactory, SiteFactory
+from microsite_configuration.tests.tests import DatabaseMicrositeTestCase
 
 log = logging.getLogger(__name__)
 

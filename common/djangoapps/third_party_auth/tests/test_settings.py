@@ -5,7 +5,6 @@ import unittest
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
 
-
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
 _ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']

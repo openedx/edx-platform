@@ -15,6 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
+from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
@@ -46,7 +47,6 @@ from contentstore.views.helpers import (
 )
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
-from help_tokens.core import HelpUrlExpert
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch

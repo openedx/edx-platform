@@ -2,16 +2,17 @@
 Tests for the gating API
 """
 
+from ddt import data, ddt
+from milestones import api as milestones_api
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from nose.plugins.attrib import attr
-from ddt import ddt, data
-from milestones.tests.utils import MilestonesTestCaseMixin
-from milestones import api as milestones_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=2)

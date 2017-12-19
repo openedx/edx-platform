@@ -3,16 +3,15 @@ Tests for helper functions.
 """
 import json
 import re
-import mock
+
 import ddt
+import mock
 from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 from nose.tools import raises
-from ..helpers import (
-    intercept_errors, shim_student_view,
-    FormDescription, InvalidFieldError
-)
+
+from ..helpers import FormDescription, InvalidFieldError, intercept_errors, shim_student_view
 
 
 class FakeInputException(Exception):

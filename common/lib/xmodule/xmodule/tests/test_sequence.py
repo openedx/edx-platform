@@ -3,13 +3,16 @@ Tests for sequence module.
 """
 # pylint: disable=no-member
 from datetime import timedelta
+
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import Mock, patch
+
 from xmodule.seq_module import SequenceModule
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
-from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
+from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.x_module import STUDENT_VIEW
 
 TODAY = now()

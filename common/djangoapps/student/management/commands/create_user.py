@@ -3,11 +3,11 @@ from __future__ import print_function
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import translation
-
 from opaque_keys.edx.keys import CourseKey
+
 from student.forms import AccountCreationForm
 from student.models import CourseEnrollment, create_comments_service_user
-from student.views import _do_create_account, AccountValidationError
+from student.views import AccountValidationError, _do_create_account
 from track.management.tracked_command import TrackedCommand
 
 

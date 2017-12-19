@@ -5,24 +5,24 @@ import json
 import logging
 from cStringIO import StringIO
 from datetime import datetime, timedelta
+
 import dateutil.parser
-
-from django.conf import settings
-
 import requests
+from django.conf import settings
 from lazy import lazy
 from lxml import etree
-from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
-from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.lib.license import LicenseMixin
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
+
 from .fields import Date
 
 log = logging.getLogger(__name__)

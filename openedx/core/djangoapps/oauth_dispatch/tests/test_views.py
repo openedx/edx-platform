@@ -12,10 +12,11 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase, override_settings
 from oauth2_provider import models as dot_models
-
 from provider import constants
+
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
+
 from . import mixins
 
 # NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed

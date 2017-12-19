@@ -2,6 +2,7 @@
 Signals handlers for the lti_provider Django app.
 """
 from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings
@@ -11,6 +12,7 @@ import lti_provider.outcomes as outcomes
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lti_provider.views import parse_course_and_usage_keys
 from xmodule.modulestore.django import modulestore
+
 from .tasks import send_composite_outcome, send_leaf_outcome
 
 log = logging.getLogger(__name__)

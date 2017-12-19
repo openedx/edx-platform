@@ -9,14 +9,13 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order
+
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
 
 from .common import *
 import os
@@ -71,7 +70,8 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
 
-# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to
+# repeat this sort of thing
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",

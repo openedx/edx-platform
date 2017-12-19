@@ -44,8 +44,8 @@ from courseware.module_render import get_module_for_descriptor, hash_resource
 from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from courseware.tests.tests import LoginEnrollmentTestCase
-from lms.djangoapps.completion.models import BlockCompletion
 from lms.djangoapps.completion import waffle as completion_waffle
+from lms.djangoapps.completion.models import BlockCompletion
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse

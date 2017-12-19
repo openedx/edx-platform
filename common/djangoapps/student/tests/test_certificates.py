@@ -1,8 +1,8 @@
 """Tests for display of certificates on the student dashboard. """
 
+import datetime
 import unittest
 
-import datetime
 import ddt
 import mock
 from django.conf import settings
@@ -20,7 +20,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 # pylint: disable=no-member
 

@@ -19,17 +19,17 @@ import random
 from collections import OrderedDict
 from operator import itemgetter
 
-from pkg_resources import resource_string
-
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
-from openedx.core.lib.cache_utils import memoize_in_request_cache
-from openedx.core.lib.license import LicenseMixin
+from pkg_resources import resource_string
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
+
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.exceptions import NotFoundError
@@ -41,15 +41,8 @@ from xmodule.x_module import XModule, module_attr
 from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
-from .transcripts_utils import (
-    get_html5_ids,
-    get_video_ids_info,
-    Transcript,
-    VideoTranscriptsMixin,
-)
-from .transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
+from .transcripts_model_utils import is_val_transcript_feature_enabled_for_course
+from .transcripts_utils import Transcript, VideoTranscriptsMixin, get_html5_ids, get_video_ids_info
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields

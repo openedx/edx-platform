@@ -6,8 +6,8 @@ from django.core.management import CommandError, call_command
 from django.test import TestCase
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestArgParsing(TestCase):

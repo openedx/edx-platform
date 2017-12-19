@@ -7,13 +7,16 @@ from nose.plugins.attrib import attr
 
 from ..block_structure import BlockStructureBlockData
 from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle
-from ..exceptions import UsageKeyNotInBlockStructure, BlockStructureNotFound
+from ..exceptions import BlockStructureNotFound, UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
-    MockModulestoreFactory, MockCache, MockTransformer,
-    ChildrenMapTestMixin, UsageKeyFactoryMixin,
-    mock_registered_transformers,
+    ChildrenMapTestMixin,
+    MockCache,
+    MockModulestoreFactory,
+    MockTransformer,
+    UsageKeyFactoryMixin,
+    mock_registered_transformers
 )
 
 

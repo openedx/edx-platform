@@ -19,11 +19,10 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -51,16 +50,17 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from edxmako.shortcuts import render_to_response
-from milestones import api as milestones_api
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url

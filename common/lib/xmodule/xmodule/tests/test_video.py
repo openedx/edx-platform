@@ -12,20 +12,18 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
+import datetime
 import os
 import unittest
-import datetime
 from uuid import uuid4
 
-from lxml import etree
-from mock import ANY, Mock, patch, MagicMock
 import ddt
-
 from django.conf import settings
 from django.test.utils import override_settings
-
-from opaque_keys.edx.locator import CourseLocator
+from lxml import etree
+from mock import ANY, MagicMock, Mock, patch
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -33,6 +31,7 @@ from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_module import VideoDescriptor, create_youtube_string
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
+
 from . import LogicTest
 from .test_import import DummySystem
 

@@ -1,27 +1,26 @@
 """
 Performance test for asset metadata in the modulestore.
 """
-from path import Path as path
-import unittest
-from tempfile import mkdtemp
-import itertools
-from shutil import rmtree
-from bson.code import Code
 import datetime
-import ddt
-#from nose.plugins.attrib import attr
+import itertools
+import unittest
+from shutil import rmtree
+from tempfile import mkdtemp
 
+import ddt
+from bson.code import Code
 from nose.plugins.skip import SkipTest
+from path import Path as path
+
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.perf_tests.generate_asset_xml import ASSET_XSD_FILE, make_asset_xml, validate_xml
+from xmodule.modulestore.tests.utils import MODULESTORE_SETUPS, SHORT_NAME_MAP, TEST_DATA_DIR
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.utils import (
-    MODULESTORE_SETUPS,
-    SHORT_NAME_MAP,
-    TEST_DATA_DIR,
-)
-from xmodule.modulestore.perf_tests.generate_asset_xml import make_asset_xml, validate_xml, ASSET_XSD_FILE
+from xmodule.modulestore.xml_importer import import_course_from_xml
+
+#from nose.plugins.attrib import attr
+
 
 # The dependency below needs to be installed manually from the development.txt file, which doesn't
 # get installed during unit tests!

@@ -6,28 +6,30 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 
 from __future__ import absolute_import
 
-from importlib import import_module
 import gettext
 import logging
-from pkg_resources import resource_filename
 import re
+from importlib import import_module
 
 from django.conf import settings
 
 # This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
 # Django not being configured properly. This mostly applies to tests.
+# pylint: disable=wrong-import-position
 if not settings.configured:
     settings.configure()
 
-from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
+from django.core.cache import InvalidCacheBackendError, caches
 from django.utils.translation import get_language, to_locale
+from pkg_resources import resource_filename
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
+
 
 try:
     # We may not always have the request_cache module available

@@ -1,9 +1,8 @@
 """Test that we have defused XML."""
 
 import defusedxml
-from lxml import etree
-
 import pytest
+from lxml import etree
 
 
 @pytest.mark.parametrize("attr", ["XML", "fromstring", "parse"])

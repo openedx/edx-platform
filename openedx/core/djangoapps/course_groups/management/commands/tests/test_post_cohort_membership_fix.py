@@ -5,10 +5,10 @@ from django.core.management import call_command
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
-from openedx.core.djangoapps.course_groups.views import cohort_handler
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.models import CohortMembership
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.course_groups.views import cohort_handler
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

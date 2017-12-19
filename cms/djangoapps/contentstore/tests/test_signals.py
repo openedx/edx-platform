@@ -1,10 +1,7 @@
 import ddt
-from mock import patch, Mock
+from mock import Mock, patch
 
-from cms.djangoapps.contentstore.signals.handlers import (
-    GRADING_POLICY_COUNTDOWN_SECONDS,
-    handle_grading_policy_changed
-)
+from cms.djangoapps.contentstore.signals.handlers import GRADING_POLICY_COUNTDOWN_SECONDS, handle_grading_policy_changed
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -7,16 +7,20 @@ import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
-from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory,
+    CourseRunFactory,
+    ProgramFactory,
+    ProgramTypeFactory
+)
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
+    get_course_run_details,
     get_course_runs,
     get_course_runs_for_course,
-    get_course_run_details,
     get_currency_data,
     get_program_types,
     get_programs,
@@ -24,6 +28,7 @@ from openedx.core.djangoapps.catalog.utils import (
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from student.tests.factories import UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name

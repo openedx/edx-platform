@@ -16,12 +16,10 @@ from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache, get_cosmetic_display_price
+from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
 from course_modes.tests.factories import CourseModeFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-)
 
 
 @ddt.ddt

@@ -7,9 +7,9 @@ from __future__ import unicode_literals
 
 from textwrap import dedent
 
+from django.core.management.base import BaseCommand
 from six import text_type
 
-from django.core.management.base import BaseCommand
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 

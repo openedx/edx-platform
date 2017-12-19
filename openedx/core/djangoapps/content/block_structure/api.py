@@ -2,6 +2,7 @@
 Higher order functions built on the BlockStructureManager to interact with a django cache.
 """
 from django.core.cache import cache
+
 from xmodule.modulestore.django import modulestore
 
 from .manager import BlockStructureManager

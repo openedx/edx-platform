@@ -3,11 +3,9 @@
 Tests for digital signatures used to validate messages to/from credit providers.
 """
 
-from nose.plugins.attrib import attr
-
 from django.test import TestCase
 from django.test.utils import override_settings
-
+from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.credit import signature
 

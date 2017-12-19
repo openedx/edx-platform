@@ -4,7 +4,7 @@ Test that inherited fields work correctly when parsing XML
 from nose.tools import assert_equals, assert_in  # pylint: disable=no-name-in-module
 
 from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory, XmlImportFactory
+from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory, XmlImportFactory
 
 
 class TestInheritedFieldParsing(XModuleXmlImportTest):

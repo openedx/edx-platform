@@ -3,20 +3,18 @@ Tests for bookmarks api.
 """
 import ddt
 import pytest
-from mock import patch
-from nose.plugins.attrib import attr
-
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-
+from mock import patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
 
+from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .. import api
 from ..models import Bookmark
-from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from .test_models import BookmarksTestsBase
 
 

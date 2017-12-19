@@ -4,18 +4,19 @@
 Group Configuration Tests.
 """
 import json
-import ddt
-from mock import patch
 from operator import itemgetter
 
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
+import ddt
+from mock import patch
+
+from contentstore.course_group_config import CONTENT_GROUP_CONFIGURATION_NAME, GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
-from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.modulestore.django import modulestore
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.validation import StudioValidation, StudioValidationMessage
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',

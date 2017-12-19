@@ -27,17 +27,17 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
-    copy_or_rename_transcript,
-    download_youtube_subs,
     GetTranscriptsFromYouTubeException,
-    get_video_transcript_content,
-    generate_subs_from_source,
-    get_transcripts_from_youtube,
-    manage_video_subtitles_save,
-    remove_subs_from_store,
     Transcript,
     TranscriptsRequestValidationException,
-    youtube_video_transcript_name,
+    copy_or_rename_transcript,
+    download_youtube_subs,
+    generate_subs_from_source,
+    get_transcripts_from_youtube,
+    get_video_transcript_content,
+    manage_video_subtitles_save,
+    remove_subs_from_store,
+    youtube_video_transcript_name
 )
 from xmodule.video_module.transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course

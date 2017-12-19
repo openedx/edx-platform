@@ -2,9 +2,11 @@
 Tests that check that we ignore the appropriate files when importing courses.
 """
 import unittest
+
 from mock import Mock
-from xmodule.modulestore.xml_importer import import_static_content
 from opaque_keys.edx.locator import CourseLocator
+
+from xmodule.modulestore.xml_importer import import_static_content
 from xmodule.tests import DATA_DIR
 
 

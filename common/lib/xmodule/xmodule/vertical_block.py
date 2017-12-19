@@ -4,17 +4,16 @@ VerticalBlock - an XBlock which renders its children in a column.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from copy import copy
 import logging
+from copy import copy
 
+import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-import six
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
 from xblock.fragment import Fragment
-
 
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
@@ -22,7 +21,6 @@ from xmodule.seq_module import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.x_module import STUDENT_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
-
 
 log = logging.getLogger(__name__)
 

@@ -3,9 +3,9 @@ Common utility functions related to courses.
 """
 from django import forms
 from django.conf import settings
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
+
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore

@@ -3,9 +3,8 @@ URLs for the student support app.
 """
 from django.conf.urls import url
 
-from support import views
-
 from lms.djangoapps.support.views.contact_us import ContactUsView
+from support import views
 
 urlpatterns = [
     url(r'^$', views.index, name="index"),

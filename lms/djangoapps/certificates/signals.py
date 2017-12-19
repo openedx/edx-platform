@@ -6,10 +6,7 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from certificates.models import (
-    CertificateWhitelist,
-    GeneratedCertificate
-)
+from certificates.models import CertificateWhitelist, GeneratedCertificate
 from certificates.tasks import generate_certificate
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -17,7 +14,6 @@ from openedx.core.djangoapps.certificates.api import auto_certificate_generation
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from student.models import CourseEnrollment
-
 
 log = logging.getLogger(__name__)
 CERTIFICATE_DELAY_SECONDS = 2

@@ -20,13 +20,13 @@ from django.core.urlresolvers import reverse as django_reverse
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
-from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import Mock, NonCallableMock, patch
 from nose.plugins.attrib import attr
 from nose.tools import raises
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
+from pytz import UTC
 
 import lms.djangoapps.instructor.views.api
 import lms.djangoapps.instructor_task.api

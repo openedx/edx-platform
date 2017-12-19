@@ -1,17 +1,17 @@
 """Tests for items views."""
 
 import copy
-import ddt
 import json
 import os
 import tempfile
 import textwrap
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from mock import patch, Mock
+from mock import Mock, patch
 from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get

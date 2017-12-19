@@ -1,9 +1,9 @@
-from django.test import TestCase
 import mock
+from django.test import TestCase
 
 from django_comment_common import signals
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 

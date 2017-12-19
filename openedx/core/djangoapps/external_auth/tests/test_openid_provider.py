@@ -4,20 +4,20 @@ Created on Jan 18, 2013
 
 @author: brian
 '''
-import openid
-from openid.fetchers import HTTPFetcher, HTTPResponse
+from unittest import skipUnless
 from urlparse import parse_qs, urlparse
 
+import openid
 from django.conf import settings
-from django.test import TestCase, LiveServerTestCase
 from django.core.cache import cache
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from django.test import LiveServerTestCase, TestCase
 from django.test.client import RequestFactory
-from unittest import skipUnless
+from django.test.utils import override_settings
+from openid.fetchers import HTTPFetcher, HTTPResponse
 
-from student.tests.factories import UserFactory
 from openedx.core.djangoapps.external_auth.views import provider_login
+from student.tests.factories import UserFactory
 
 
 class MyFetcher(HTTPFetcher):

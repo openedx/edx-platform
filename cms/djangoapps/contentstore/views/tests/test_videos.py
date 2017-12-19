@@ -15,24 +15,31 @@ import pytz
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
-from edxval.api import create_profile, create_video, get_video_info, get_course_video_image_url
+from edxval.api import (
+    create_or_update_transcript_preferences,
+    create_profile,
+    create_video,
+    get_course_video_image_url,
+    get_transcript_preferences,
+    get_video_info
+)
 from mock import Mock, patch
 
 from contentstore.models import VideoUploadConfig
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
-    _get_default_video_image_url,
-    validate_video_image,
+    KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
-    TranscriptProvider
+    StatusDisplayStrings,
+    TranscriptProvider,
+    _get_default_video_image_url,
+    convert_video_status,
+    validate_video_image
 )
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def override_switch(switch, active):

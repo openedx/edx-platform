@@ -3,8 +3,9 @@ Content Library Transformer.
 """
 import json
 
-from courseware.models import StudentModule
 from eventtracking import tracker
+
+from courseware.models import StudentModule
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin

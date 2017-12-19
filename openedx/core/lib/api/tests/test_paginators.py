@@ -1,13 +1,13 @@
 """ Tests paginator methods """
 
 from collections import namedtuple
+from unittest import TestCase
 
 import ddt
-from mock import Mock, MagicMock
-from nose.plugins.attrib import attr
-from unittest import TestCase
 from django.http import Http404
 from django.test import RequestFactory
+from mock import MagicMock, Mock
+from nose.plugins.attrib import attr
 from rest_framework import serializers
 
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination, paginate_search_results

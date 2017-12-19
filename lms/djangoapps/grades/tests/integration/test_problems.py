@@ -3,6 +3,7 @@ import itertools
 
 import ddt
 import pytz
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks

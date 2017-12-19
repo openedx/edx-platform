@@ -1,11 +1,12 @@
 import itertools
-from nose.plugins.attrib import attr
 
 import ddt
-from courseware.access import has_access
 from django.conf import settings
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
+from nose.plugins.attrib import attr
+
+from courseware.access import has_access
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

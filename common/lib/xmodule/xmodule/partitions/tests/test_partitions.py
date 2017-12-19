@@ -4,17 +4,20 @@ Test the partitions and partitions service
 """
 
 from unittest import TestCase
-from mock import Mock
 
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
+
 from xmodule.partitions.partitions import (
-    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError,
-    USER_PARTITION_SCHEME_NAMESPACE, ENROLLMENT_TRACK_PARTITION_ID
+    ENROLLMENT_TRACK_PARTITION_ID,
+    USER_PARTITION_SCHEME_NAMESPACE,
+    Group,
+    NoSuchUserPartitionGroupError,
+    UserPartition,
+    UserPartitionError
 )
-from xmodule.partitions.partitions_service import (
-    PartitionService, get_all_partitions_for_course, FEATURES
-)
+from xmodule.partitions.partitions_service import FEATURES, PartitionService, get_all_partitions_for_course
 
 
 class TestGroup(TestCase):

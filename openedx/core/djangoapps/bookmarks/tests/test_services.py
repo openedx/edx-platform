@@ -7,6 +7,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+
 from ..services import BookmarksService
 from .test_models import BookmarksTestsBase
 

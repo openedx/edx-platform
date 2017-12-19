@@ -14,9 +14,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
-from pytz import UTC
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog

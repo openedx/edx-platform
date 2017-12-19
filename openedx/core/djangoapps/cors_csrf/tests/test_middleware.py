@@ -2,23 +2,22 @@
 Tests for the CORS CSRF middleware
 """
 
-from mock import patch, Mock
 import ddt
-
 import django
+from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
+from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
-from django.http import HttpResponse
+from mock import Mock, patch
+
+from ..middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
 
 # TODO: Remove Django 1.11 upgrade shim
 # SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
 if django.VERSION < (1, 9):
     from birdcage.v1_11.csrf import CsrfViewMiddleware
 else:
-    from django.middleware.csrf import CsrfViewMiddleware
-
-from ..middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
+    from django.middleware.csrf import CsrfViewMiddleware  # pylint: disable=ungrouped-imports
 
 
 SENTINEL = object()

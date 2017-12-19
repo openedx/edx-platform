@@ -6,32 +6,33 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 
-import branding
 import pytz
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import Http404, QueryDict
+from fs.errors import ResourceNotFoundError
+from opaque_keys.edx.keys import UsageKey
+from path import Path as path
+
+import branding
 from courseware.access import has_access
-from courseware.access_response import StartDateError, MilestoneAccessError
+from courseware.access_response import MilestoneAccessError, StartDateError
 from courseware.date_summary import (
+    CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate,
-    CertificateAvailableDate
+    VerifiedUpgradeDeadlineDate
 )
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import Http404, QueryDict
-from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
-from fs.errors import ResourceNotFoundError
+from enrollment.api import get_course_enrollment_details
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from path import Path as path
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered

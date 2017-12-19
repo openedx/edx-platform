@@ -6,9 +6,9 @@ import json
 import dateutil
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
-from pytz import UTC
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+from pytz import UTC
 
 from courseware.field_overrides import disable_overrides
 from courseware.models import StudentFieldOverride

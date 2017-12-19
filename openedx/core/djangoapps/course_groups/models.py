@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.db import outer_atomic
 

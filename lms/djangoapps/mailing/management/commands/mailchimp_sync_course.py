@@ -11,6 +11,7 @@ from itertools import chain
 from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
+
 from student.models import UserProfile, unique_id_for_user
 
 BATCH_SIZE = 15000

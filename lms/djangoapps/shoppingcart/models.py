@@ -27,13 +27,13 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
+from eventtracking import tracker
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from shoppingcart.pdf import PDFInvoice

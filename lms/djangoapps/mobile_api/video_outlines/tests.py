@@ -2,18 +2,16 @@
 """
 Tests for video outline API
 """
-import ddt
 import itertools
 import json
-
 from collections import namedtuple
-from mock import Mock
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from edxval import api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import patch
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 
 from mobile_api.models import MobileApiConfig

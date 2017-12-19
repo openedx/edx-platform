@@ -8,8 +8,8 @@ from django.conf.urls import url
 from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountDeactivationView, AccountViewSet
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import PhotoVerificationStatusView
 from .validation.views import RegistrationValidationView
+from .verification_api.views import PhotoVerificationStatusView
 
 ME = AccountViewSet.as_view({
     'get': 'get',

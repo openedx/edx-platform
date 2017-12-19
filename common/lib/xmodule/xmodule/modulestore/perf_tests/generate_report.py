@@ -6,8 +6,10 @@ various parts of the system.
 """
 
 import sqlite3
-from lxml.builder import E
+
 import lxml.html
+from lxml.builder import E
+
 try:
     import click
 except ImportError:

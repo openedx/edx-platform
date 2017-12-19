@@ -45,7 +45,7 @@ from lms.djangoapps.ccx.utils import (
     get_ccx_creation_dict,
     get_ccx_for_coach,
     get_date,
-    parse_date,
+    parse_date
 )
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params

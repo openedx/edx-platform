@@ -1,7 +1,7 @@
 from ..models import PersistentSubsectionGrade
 from ..subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade
-from .utils import mock_get_score
 from .base import GradeTestBase
+from .utils import mock_get_score
 
 
 class SubsectionGradeTest(GradeTestBase):

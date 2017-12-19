@@ -2,16 +2,15 @@
 Tests for `saml` management command, this command fetches saml metadata from providers and updates
 existing data accordingly.
 """
-import unittest
 import os
-import mock
+import unittest
 
-from django.test import TestCase
+import mock
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.conf import settings
+from django.test import TestCase
 from django.utils.six import StringIO
-
 from requests import exceptions
 from requests.models import Response
 

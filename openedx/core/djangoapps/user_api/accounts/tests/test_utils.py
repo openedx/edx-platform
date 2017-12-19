@@ -1,11 +1,11 @@
 """ Unit tests for custom UserProfile properties. """
 
 import ddt
-
 from django.test import TestCase
+
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
-from ..utils import validate_social_link, format_social_link
+from ..utils import format_social_link, validate_social_link
 
 
 @ddt.ddt

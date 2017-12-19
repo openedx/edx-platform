@@ -3,6 +3,7 @@ Tests for the fix_not_found management command
 """
 
 from django.core.management import CommandError, call_command
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

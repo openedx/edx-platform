@@ -7,7 +7,6 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
-
 # To run from command line: ./manage.py cms fix_not_found course-v1:org+course+run
 
 

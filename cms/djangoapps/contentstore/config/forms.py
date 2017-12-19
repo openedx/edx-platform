@@ -4,12 +4,11 @@ Defines a form for providing validation.
 import logging
 
 from django import forms
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
 
 from contentstore.config.models import CourseNewAssetsPageFlag
-
-from opaque_keys import InvalidKeyError
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locator import CourseLocator
 
 log = logging.getLogger(__name__)
 

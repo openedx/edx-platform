@@ -13,11 +13,11 @@ from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView, XBlockVisibilityEditorView
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.html_component_editor import HtmlXBlockEditorView
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView, XBlockVisibilityEditorView
 from common.test.acceptance.tests.helpers import create_user_partition_json
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 

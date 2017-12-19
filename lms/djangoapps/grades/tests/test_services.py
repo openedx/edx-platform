@@ -1,11 +1,13 @@
+from datetime import datetime
+
 import ddt
 import pytz
-from datetime import datetime
 from freezegun import freeze_time
+from mock import call, patch
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.services import GradesService, _get_key
-from mock import patch, call
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

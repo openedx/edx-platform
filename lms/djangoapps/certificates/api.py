@@ -9,6 +9,7 @@ import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 from branding import api as branding_api
@@ -24,7 +25,6 @@ from certificates.models import (
     certificate_status_for_student
 )
 from certificates.queue import XQueueCertInterface
-from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.organizations_helpers import get_course_organization_id

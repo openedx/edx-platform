@@ -11,7 +11,6 @@ from xmodule.modulestore.django import modulestore
 from .prompt import query_yes_no
 from .utils import get_course_versions
 
-
 # To run from command line: ./manage.py cms force_publish course-v1:org+course+run
 
 

@@ -8,8 +8,8 @@ import ddt
 import pytz
 from django.test import TestCase
 from mock import MagicMock, patch
-
 from submissions.models import score_reset, score_set
+
 from util.date_utils import to_timestamp
 
 from ..constants import ScoreDatabaseTableEnum
@@ -17,7 +17,7 @@ from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
     problem_raw_score_changed_handler,
     submissions_score_reset_handler,
-    submissions_score_set_handler,
+    submissions_score_set_handler
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 

@@ -14,10 +14,9 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.testing.utils import get_mock_request
-
 from student.tests.factories import UserFactory
 
-from ..middleware import SafeSessionMiddleware, SafeCookieData
+from ..middleware import SafeCookieData, SafeSessionMiddleware
 from .test_utils import TestSafeSessionsLogMixin
 
 

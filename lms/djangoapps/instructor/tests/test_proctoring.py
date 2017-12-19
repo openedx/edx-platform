@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from student.roles import CourseStaffRole, CourseInstructorRole
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

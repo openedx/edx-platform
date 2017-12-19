@@ -4,10 +4,10 @@ CourseGrade Class
 from abc import abstractmethod
 from collections import OrderedDict, defaultdict
 
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from lazy import lazy
 
-from ccx_keys.locator import CCXLocator
 from xmodule import block_metadata_utils
 
 from .config import assume_zero_if_absent

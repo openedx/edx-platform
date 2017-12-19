@@ -7,34 +7,33 @@ Tests of the Capa XModule
 
 import datetime
 import json
-import random
-import requests
 import os
+import random
 import textwrap
 import unittest
 
 import ddt
+import requests
+import webob
 from django.utils.encoding import smart_text
 from lxml import etree
-from mock import Mock, patch, DEFAULT
-import webob
-from webob.multidict import MultiDict
-
-import xmodule
-from xmodule.tests import DATA_DIR
-from capa import responsetypes
-from capa.responsetypes import (StudentInputError, LoncapaProblemError,
-                                ResponseError)
-from capa.xqueue_interface import XQueueInterface
-from xmodule.capa_module import CapaModule, CapaDescriptor, ComplexEncoder
+from mock import DEFAULT, Mock, patch
 from opaque_keys.edx.locations import Location
+from pytz import UTC
+from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-from . import get_test_system
-from pytz import UTC
+import xmodule
+from capa import responsetypes
 from capa.correctmap import CorrectMap
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from capa.xqueue_interface import XQueueInterface
+from xmodule.capa_module import CapaDescriptor, CapaModule, ComplexEncoder
+from xmodule.tests import DATA_DIR
+
+from . import get_test_system
 from ..capa_base_constants import RANDOMIZATION, SHOWANSWER
 
 

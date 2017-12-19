@@ -4,8 +4,10 @@ Unit tests for preview.py
 """
 
 import unittest
-from calc import preview
+
 import pyparsing
+
+from calc import preview
 
 
 class LatexRenderedTest(unittest.TestCase):

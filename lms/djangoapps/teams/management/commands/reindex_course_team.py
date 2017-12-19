@@ -8,6 +8,7 @@ from textwrap import dedent
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand, CommandError
+
 from lms.djangoapps.teams.models import CourseTeam
 
 

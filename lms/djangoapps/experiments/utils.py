@@ -1,10 +1,6 @@
+from course_modes.models import get_cosmetic_verified_display_price
+from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from student.models import CourseEnrollment
-from course_modes.models import (
-    get_cosmetic_verified_display_price
-)
-from courseware.date_summary import (
-    verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-)
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):

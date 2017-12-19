@@ -7,9 +7,8 @@ import logging
 
 from lazy import lazy
 from lxml import etree
-from pkg_resources import resource_string
-
 from opaque_keys.edx.locator import BlockUsageLocator
+from pkg_resources import resource_string
 from xblock.fields import ReferenceList, Scope, String
 from xblock.fragment import Fragment
 

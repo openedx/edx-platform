@@ -1,4 +1,5 @@
 from xmodule.contentstore.content import StaticContent
+
 from .django import contentstore
 
 

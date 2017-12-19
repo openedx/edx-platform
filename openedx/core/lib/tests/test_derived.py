@@ -4,7 +4,8 @@ Tests for derived.py
 
 import sys
 from unittest import TestCase
-from openedx.core.lib.derived import derived, derived_collection_entry, derive_settings, clear_for_tests
+
+from openedx.core.lib.derived import clear_for_tests, derive_settings, derived, derived_collection_entry
 
 
 class TestDerivedSettings(TestCase):

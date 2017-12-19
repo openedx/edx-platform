@@ -4,8 +4,7 @@ automatically caching template fragments.
 """
 from django import template
 from django.core.cache import cache
-from django.template import Node, TemplateSyntaxError, Variable
-from django.template import resolve_variable
+from django.template import Node, TemplateSyntaxError, Variable, resolve_variable
 
 register = template.Library()  # pylint: disable=invalid-name
 

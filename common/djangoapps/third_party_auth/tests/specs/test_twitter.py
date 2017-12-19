@@ -3,6 +3,7 @@ Separate integration test for Twitter which is an OAuth1 provider.
 """
 
 from mock import patch
+
 from third_party_auth.tests.specs import base
 
 

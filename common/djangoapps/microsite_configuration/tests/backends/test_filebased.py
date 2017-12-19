@@ -2,20 +2,17 @@
 Test Microsite filebased backends.
 """
 import unittest
-from mock import patch
 
-from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+from mock import patch
 
-from microsite_configuration.backends.base import (
-    BaseMicrositeBackend,
-    BaseMicrositeTemplateBackend,
-)
 from microsite_configuration import microsite
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch(

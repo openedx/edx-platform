@@ -8,10 +8,7 @@ from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_HEADER, LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError
-from openedx.core.djangoapps.user_api.preferences.api import (
-    get_user_preference,
-    set_user_preference
-)
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 
 
 class LanguagePreferenceMiddleware(object):

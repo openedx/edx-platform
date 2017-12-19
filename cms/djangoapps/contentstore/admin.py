@@ -6,7 +6,7 @@ from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModel
 from django.contrib import admin
 
 from contentstore.config.forms import CourseNewAssetsPageAdminForm
-from contentstore.config.models import NewAssetsPageFlag, CourseNewAssetsPageFlag
+from contentstore.config.models import CourseNewAssetsPageFlag, NewAssetsPageFlag
 from contentstore.models import PushNotificationConfig, VideoUploadConfig
 
 

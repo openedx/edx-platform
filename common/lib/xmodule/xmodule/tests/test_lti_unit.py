@@ -2,17 +2,18 @@
 """Test for LTI Xmodule functional logic."""
 
 import datetime
-from pytz import UTC
-from mock import Mock, patch, PropertyMock
 import textwrap
-from lxml import etree
-from webob.request import Request
-from copy import copy
 import urllib
+from copy import copy
+
+from lxml import etree
+from mock import Mock, PropertyMock, patch
+from pytz import UTC
+from webob.request import Request
 
 from xmodule.fields import Timedelta
-from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
+from xmodule.lti_module import LTIDescriptor
 
 from . import LogicTest
 

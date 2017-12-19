@@ -1,5 +1,6 @@
 from crum import get_current_user
 from eventtracking import tracker
+
 from track import contexts
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
@@ -7,7 +8,6 @@ from track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
-
 
 COURSE_GRADE_CALCULATED = u'edx.grades.course.grade_calculated'
 GRADES_OVERRIDE_EVENT_TYPE = u'edx.grades.problem.score_overridden'

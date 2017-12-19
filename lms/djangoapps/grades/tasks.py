@@ -7,18 +7,19 @@ from logging import getLogger
 import six
 from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
-from courseware.model_data import get_score
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
+from submissions import api as sub_api
+
+from courseware.model_data import get_score
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.monitoring_utils import set_custom_metric, set_custom_metrics_for_course_key
 from student.models import CourseEnrollment
-from submissions import api as sub_api
 from track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore

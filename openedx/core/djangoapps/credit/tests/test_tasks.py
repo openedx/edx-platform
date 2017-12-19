@@ -2,9 +2,11 @@
 Tests for credit course tasks.
 """
 
-import mock
-from nose.plugins.attrib import attr
 from datetime import datetime
+
+import mock
+from edx_proctoring.api import create_exam
+from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
@@ -12,8 +14,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from edx_proctoring.api import create_exam
 
 
 @attr(shard=2)

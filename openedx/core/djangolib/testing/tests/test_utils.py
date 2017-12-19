@@ -8,7 +8,6 @@ from django.test import TestCase
 
 from ..utils import get_mock_request
 
-
 USER_MODEL = get_user_model()
 
 

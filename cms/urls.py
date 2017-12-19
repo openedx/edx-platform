@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
+from ratelimitbackend import admin
 
 import contentstore.views
 import openedx.core.djangoapps.common_views.xblock
@@ -10,7 +11,6 @@ import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.external_auth.views
 import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
-from ratelimitbackend import admin
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')

@@ -8,9 +8,10 @@ manipulate storage but use existing api's.
 '''
 import logging
 
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict
-from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locator import CourseLocator
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)

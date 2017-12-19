@@ -3,8 +3,12 @@
 Settings for Bok Choy tests that are used when running Studio in Docker-based devstack.
 """
 
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=wildcard-import, unused-wildcard-import
+
 # noinspection PyUnresolvedReferences
-from .bok_choy import *  # pylint: disable=wildcard-import
+from .bok_choy import *
 
 CMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ['BOK_CHOY_CMS_PORT'])
 LMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ['BOK_CHOY_LMS_PORT'])

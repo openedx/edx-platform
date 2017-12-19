@@ -3,12 +3,12 @@ import datetime
 import json
 import uuid  # pylint:disable=unused-import
 
-from django.contrib.auth.models import User
 import factory
-from factory.fuzzy import FuzzyText
 import pytz
+from django.contrib.auth.models import User
+from factory.fuzzy import FuzzyText
 
-from openedx.core.djangoapps.credit.models import CreditProvider, CreditEligibility, CreditCourse, CreditRequest
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility, CreditProvider, CreditRequest
 from util.date_utils import to_timestamp
 
 

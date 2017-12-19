@@ -13,13 +13,13 @@ import base64
 import hashlib
 import textwrap
 import urllib
+from http import StubHttpRequestHandler, StubHttpService
 from uuid import uuid4
 
 import mock
 import oauthlib.oauth1
 import requests
 from django.conf import settings
-from http import StubHttpRequestHandler, StubHttpService
 from oauthlib.oauth1.rfc5849 import parameters, signature
 
 

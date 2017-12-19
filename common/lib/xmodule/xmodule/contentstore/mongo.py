@@ -1,22 +1,24 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-import os
 import json
-import pymongo
-import gridfs
-from gridfs.errors import NoFile
-from fs.osfs import OSFS
-from bson.son import SON
+import os
 
+import gridfs
+import pymongo
+from bson.son import SON
+from fs.osfs import OSFS
+from gridfs.errors import NoFile
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
+
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
-from xmodule.util.misc import escape_invalid_characters
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-from .content import StaticContent, ContentStore, StaticContentStream
+from xmodule.util.misc import escape_invalid_characters
+
+from .content import ContentStore, StaticContent, StaticContentStream
 
 
 class MongoContentStore(ContentStore):

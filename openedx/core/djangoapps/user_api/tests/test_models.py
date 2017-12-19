@@ -6,12 +6,12 @@ from django.test import TestCase
 
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
 from ..models import UserPreference
 from ..preferences.api import set_user_preference
+from ..tests.factories import UserCourseTagFactory, UserOrgTagFactory, UserPreferenceFactory
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):

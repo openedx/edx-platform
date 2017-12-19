@@ -17,7 +17,7 @@ from django.template import Context, engines
 from mako.template import Template as MakoTemplate
 from six import text_type
 
-from . import Engines, LOOKUP
+from . import LOOKUP, Engines
 from .request_context import get_template_request_context
 from .shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
 

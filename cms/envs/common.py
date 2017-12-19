@@ -35,6 +35,10 @@ When refering to XBlocks, we use the entry-point name. For example,
 |   )
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order, wrong-import-position, ungrouped-imports
+
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=unused-import

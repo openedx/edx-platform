@@ -1,8 +1,10 @@
 """ Test the behavior of split_mongo/MongoConnection """
 import unittest
+
 from mock import patch
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 
 
 class TestHeartbeatFailureException(unittest.TestCase):

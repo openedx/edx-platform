@@ -12,6 +12,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
+
 from . import waffle
 
 # pylint: disable=ungrouped-imports

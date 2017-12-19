@@ -3,16 +3,16 @@ Tests for CourseDetails
 """
 
 import datetime
-import ddt
-from pytz import UTC
-from nose.plugins.attrib import attr
 
+import ddt
+from nose.plugins.attrib import attr
+from pytz import UTC
+
+from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
 @attr(shard=2)

@@ -2,14 +2,13 @@
 This is the default template for our main set of AWS servers.
 """
 
+# For Django settings files, the order of imports matters,
+# because each import can override variables in previous imports.
+# pylint: disable=wrong-import-order
+
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
 
 import json
 

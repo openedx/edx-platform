@@ -5,22 +5,21 @@ Tests for the Third Party Auth REST API
 import unittest
 
 import ddt
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
+from django.test.utils import override_settings
 from mock import patch
 from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import Client, AccessToken
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APITestCase
-from django.conf import settings
-from django.test.utils import override_settings
 from social_django.models import UserSocialAuth
 
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.tests.factories import UserFactory
 from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
-
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'

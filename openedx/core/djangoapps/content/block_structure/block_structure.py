@@ -12,10 +12,9 @@ from copy import deepcopy
 from functools import partial
 from logging import getLogger
 
-from openedx.core.lib.graph_traversals import traverse_topologically, traverse_post_order
+from openedx.core.lib.graph_traversals import traverse_post_order, traverse_topologically
 
 from .exceptions import TransformerException
-
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 

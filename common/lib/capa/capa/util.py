@@ -2,13 +2,13 @@
 Utility functions for capa.
 """
 import re
+from cmath import isinf, isnan
 from decimal import Decimal
 
 import bleach
 from lxml import etree
 
 from calc import evaluator
-from cmath import isinf, isnan
 from openedx.core.djangolib.markup import HTML
 
 

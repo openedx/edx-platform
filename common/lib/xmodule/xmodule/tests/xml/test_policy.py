@@ -4,8 +4,8 @@ Tests that policy json files import correctly when loading XML
 
 from nose.tools import assert_equals, assert_raises  # pylint: disable=no-name-in-module
 
-from xmodule.tests.xml.factories import CourseFactory
 from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml.factories import CourseFactory
 
 
 class TestPolicy(XModuleXmlImportTest):

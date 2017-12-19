@@ -3,12 +3,13 @@
 Unit tests for SafeCookieData
 """
 
+import itertools
+from time import time
+
 import ddt
 from django.test import TestCase
-import itertools
 from mock import patch
 from nose.plugins.attrib import attr
-from time import time
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin

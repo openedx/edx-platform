@@ -2,16 +2,17 @@
 """ Tests for student profile views. """
 
 import datetime
+
 import ddt
 import mock
-
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-from lms.djangoapps.certificates.api import is_passing_status
 from opaque_keys.edx.locator import CourseLocator
+
+from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from course_modes.models import CourseMode
+from lms.djangoapps.certificates.api import is_passing_status
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin

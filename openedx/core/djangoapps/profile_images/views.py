@@ -6,8 +6,8 @@ import itertools
 import logging
 from contextlib import closing
 
-from pytz import UTC
 from django.utils.translation import ugettext as _
+from pytz import UTC
 from rest_framework import permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response

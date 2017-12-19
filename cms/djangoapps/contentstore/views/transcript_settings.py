@@ -5,17 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
-from edxval.api import (
-    get_3rd_party_transcription_plans,
-    update_transcript_credentials_state_for_org,
-)
+from edxval.api import get_3rd_party_transcription_plans, update_transcript_credentials_state_for_org
 from opaque_keys.edx.keys import CourseKey
 
+from contentstore.views.videos import TranscriptProvider
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from util.json_request import JsonResponse, expect_json
-
-from contentstore.views.videos import TranscriptProvider
 
 __all__ = ['transcript_credentials_handler']
 

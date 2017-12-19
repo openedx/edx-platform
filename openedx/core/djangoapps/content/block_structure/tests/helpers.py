@@ -2,11 +2,12 @@
 Common utilities for tests in block_structure module
 """
 from contextlib import contextmanager
-from mock import patch
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from uuid import uuid4
 
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from mock import patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..api import get_cache
 from ..block_structure import BlockStructureBlockData

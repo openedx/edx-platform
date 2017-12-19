@@ -2,7 +2,9 @@
 """Test for Word cloud Xmodule functional logic."""
 
 from webob.multidict import MultiDict
+
 from xmodule.word_cloud_module import WordCloudDescriptor
+
 from . import LogicTest
 
 

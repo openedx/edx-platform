@@ -1,7 +1,7 @@
 ''' useful functions for finding content and its position '''
 from logging import getLogger
 
-from .exceptions import (ItemNotFoundError, NoPathToItem)
+from .exceptions import ItemNotFoundError, NoPathToItem
 
 LOGGER = getLogger(__name__)
 

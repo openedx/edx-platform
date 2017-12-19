@@ -4,8 +4,9 @@ via callable methods/lambdas. The derivation time can be controlled to happen af
 other settings have been set. The derived setting can also be overridden by setting the
 derived setting to an actual value.
 """
-import six
 import sys
+
+import six
 
 # Global list holding all settings which will be derived.
 __DERIVED = []

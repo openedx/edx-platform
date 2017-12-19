@@ -1,6 +1,5 @@
 """ Views for a student's profile information. """
 
-from badges.utils import badges_enabled
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -11,7 +10,10 @@ from django.shortcuts import render_to_response
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
+
+from badges.utils import badges_enabled
 from edxmako.shortcuts import marketing_link
+from learner_achievements import LearnerAchievementsFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -22,8 +24,6 @@ from openedx.core.djangolib.markup import HTML, Text
 from student.models import User
 
 from .. import SHOW_PROFILE_MESSAGE
-
-from learner_achievements import LearnerAchievementsFragmentView
 
 
 @login_required

@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.dispatch import receiver
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
 from model_utils import FieldTracker
@@ -21,15 +22,14 @@ from django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted,
     thread_followed,
     thread_unfollowed,
+    thread_voted
 )
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.utils import emit_team_event
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import CourseEnrollment, LanguageField
-from django.utils.text import slugify
 
 from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
 

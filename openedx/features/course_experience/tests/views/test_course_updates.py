@@ -1,8 +1,9 @@
 """
 Tests for the course updates page.
 """
-from courseware.courses import get_course_info_usage_key
 from django.core.urlresolvers import reverse
+
+from courseware.courses import get_course_info_usage_key
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.course_experience.views.course_updates import STATUS_VISIBLE
 from student.models import CourseEnrollment

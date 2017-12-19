@@ -1,8 +1,9 @@
 """
 Tests for extended due date utilities.
 """
-import mock
 import unittest
+
+import mock
 
 from ..util import duedate
 

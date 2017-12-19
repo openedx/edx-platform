@@ -1,8 +1,8 @@
-import ddt
 import json
-from mock import Mock, patch
 
+import ddt
 from django.test.testcases import TestCase
+from mock import Mock, patch
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url

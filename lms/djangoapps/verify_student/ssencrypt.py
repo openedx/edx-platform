@@ -23,7 +23,6 @@ import hmac
 import logging
 import os
 from hashlib import md5, sha256
-from six import text_type
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -33,6 +32,7 @@ from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.padding import PKCS7
+from six import text_type
 
 log = logging.getLogger(__name__)
 

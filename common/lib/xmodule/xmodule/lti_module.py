@@ -62,10 +62,10 @@ from xml.sax.saxutils import escape
 import bleach
 import mock
 import oauthlib.oauth1
-from pytz import UTC
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
 from pkg_resources import resource_string
+from pytz import UTC
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float

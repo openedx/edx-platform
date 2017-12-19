@@ -2,22 +2,21 @@
 Tests for EmbargoMiddleware with CountryAccessRules
 """
 
-from mock import patch
-from nose.plugins.attrib import attr
 import ddt
-
-from django.core.urlresolvers import reverse
+from config_models.models import cache as config_cache
 from django.conf import settings
 from django.core.cache import cache as django_cache
+from django.core.urlresolvers import reverse
+from mock import patch
+from nose.plugins.attrib import attr
 
-from config_models.models import cache as config_cache
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from util.testing import UrlResetMixin
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..models import RestrictedCourse, IPFilter
+from ..models import IPFilter, RestrictedCourse
 from ..test_utils import restrict_course
 
 

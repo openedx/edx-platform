@@ -2,13 +2,14 @@
 Tests: lang pref views
 """
 import json
+
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
+from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
+
 from student.tests.factories import UserFactory
-from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.utils.translation import get_language
 
 
 class TestLangPrefView(TestCase):

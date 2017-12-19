@@ -4,25 +4,26 @@ Tests for OAuth token exchange views
 
 # pylint: disable=no-member
 
-from datetime import timedelta
 import json
-import mock
 import unittest
+from datetime import timedelta
 
 import ddt
+import httpretty
+import mock
+import provider.constants
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-import httpretty
-import provider.constants
 from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APIClient
 from social_django.models import Partial
 
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
-from .utils import AccessTokenExchangeTestMixin, TPA_FEATURE_ENABLED, TPA_FEATURES_KEY
+from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
 
 
 @ddt.ddt

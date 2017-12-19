@@ -2,8 +2,8 @@
 Runtime service for communicating completion information to the xblock system.
 """
 
-from .models import BlockCompletion
 from . import waffle
+from .models import BlockCompletion
 
 
 class CompletionService(object):

@@ -3,18 +3,18 @@
 Test the course_info xblock
 """
 import mock
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.test.utils import override_settings
-
-from ccx_keys.locator import CCXLocator
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from nose.plugins.attrib import attr
+from pyquery import PyQuery as pq
+
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from util.date_utils import strftime_localized

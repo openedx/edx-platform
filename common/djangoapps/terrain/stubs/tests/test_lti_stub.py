@@ -1,10 +1,12 @@
 """
 Unit tests for stub LTI implementation.
 """
-from mock import Mock, patch
 import unittest
 import urllib2
+
 import requests
+from mock import Mock, patch
+
 from terrain.stubs.lti import StubLtiService
 
 

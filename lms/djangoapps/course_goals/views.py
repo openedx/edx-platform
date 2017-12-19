@@ -8,14 +8,14 @@ from django.http import JsonResponse
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.api.permissions import IsStaffOrOwner
-from rest_framework import permissions, serializers, viewsets, status
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
-from .api import get_course_goal_options
-from .models import CourseGoal, GOAL_KEY_CHOICES
+from openedx.core.lib.api.permissions import IsStaffOrOwner
 
+from .api import get_course_goal_options
+from .models import GOAL_KEY_CHOICES, CourseGoal
 
 User = get_user_model()
 

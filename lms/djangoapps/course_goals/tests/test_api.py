@@ -4,8 +4,9 @@ Unit tests for course_goals.api methods.
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from lms.djangoapps.course_goals.models import CourseGoal
 from rest_framework.test import APIClient
+
+from lms.djangoapps.course_goals.models import CourseGoal
 from student.models import CourseEnrollment
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

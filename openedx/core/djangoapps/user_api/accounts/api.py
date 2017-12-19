@@ -2,33 +2,34 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-import re
 import datetime
+import re
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import ValidationError, validate_email
+from django.db import IntegrityError, transaction
+from django.http import HttpResponseForbidden
+from django.utils.translation import override as override_language
+from django.utils.translation import ugettext as _
 from pytz import UTC
 
-from django.utils.translation import override as override_language, ugettext as _
-from django.db import transaction, IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
-from django.core.validators import validate_email, ValidationError
-from django.http import HttpResponseForbidden
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts, errors, forms, helpers
+from openedx.core.djangoapps.user_api.errors import AccountValidationError, PreferenceValidationError
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
-from openedx.core.djangoapps.user_api.errors import PreferenceValidationError, AccountValidationError
-
-from student.models import User, UserProfile, Registration
+from openedx.core.lib.api.view_utils import add_serializer_errors
 from student import forms as student_forms
 from student import views as student_views
+from student.models import Registration, User, UserProfile
 from util.model_utils import emit_setting_changed_event
 
-from openedx.core.lib.api.view_utils import add_serializer_errors
-
-from .serializers import (
-    AccountLegacyProfileSerializer, AccountUserSerializer,
-    UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
+from .serializers import (  # pylint: disable=invalid-name
+    AccountLegacyProfileSerializer,
+    AccountUserSerializer,
+    UserReadOnlySerializer,
+    _visible_fields
 )
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
-
 
 # Public access point for this function.
 visible_fields = _visible_fields

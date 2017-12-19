@@ -3,6 +3,7 @@ Code which dynamically discovers comprehensive themes. Deliberately uses no Djan
 as the discovery happens during the initial setup of Django settings.
 """
 import os
+
 from path import Path
 
 

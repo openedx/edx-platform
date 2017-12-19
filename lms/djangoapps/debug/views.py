@@ -3,12 +3,12 @@
 import pprint
 import traceback
 
+from codejail.safe_exec import safe_exec
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.utils.html import escape
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from codejail.safe_exec import safe_exec
 from edxmako.shortcuts import render_to_response
 
 

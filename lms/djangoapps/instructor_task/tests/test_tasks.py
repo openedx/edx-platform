@@ -24,9 +24,9 @@ from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     rescore_problem,
-    reset_problem_attempts,
-    override_problem_score
+    reset_problem_attempts
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory

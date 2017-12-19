@@ -5,11 +5,10 @@ Management command for compiling sass.
 from __future__ import unicode_literals
 
 from django.core.management import BaseCommand, CommandError
-
 from paver.easy import call_task
 
+from openedx.core.djangoapps.theming.helpers import get_theme_base_dirs, get_themes, is_comprehensive_theming_enabled
 from pavelib.assets import ALL_SYSTEMS
-from openedx.core.djangoapps.theming.helpers import get_themes, get_theme_base_dirs, is_comprehensive_theming_enabled
 
 
 class Command(BaseCommand):

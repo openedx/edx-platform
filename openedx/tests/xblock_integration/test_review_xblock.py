@@ -1,21 +1,20 @@
 """
 Test scenarios for the review xblock.
 """
-import ddt
 import unittest
 
+import crum
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
+from review import get_review_ids
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from review import get_review_ids
-import crum
 
 
 class TestReviewXBlock(SharedModuleStoreTestCase, LoginEnrollmentTestCase):

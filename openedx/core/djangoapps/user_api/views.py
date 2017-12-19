@@ -26,7 +26,11 @@ from openedx.core.djangoapps.user_api.api import (
 from openedx.core.djangoapps.user_api.helpers import require_post_params, shim_student_view
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
-from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
+from openedx.core.djangoapps.user_api.serializers import (
+    CountryTimeZoneSerializer,
+    UserPreferenceSerializer,
+    UserSerializer
+)
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.cookies import set_logged_in_cookies

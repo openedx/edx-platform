@@ -2,7 +2,7 @@
 This file contains a management command for exporting the modulestore to
 neo4j, a graph database.
 """
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
 
 import logging
 
@@ -10,10 +10,11 @@ from celery import task
 from django.conf import settings
 from django.utils import six, timezone
 from opaque_keys.edx.keys import CourseKey
-from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
-from py2neo.compat import integer, string, unicode as neo4j_unicode
-from request_cache.middleware import RequestCache
+from py2neo import Graph, Node, NodeSelector, Relationship, authenticate
+from py2neo.compat import unicode as neo4j_unicode
+from py2neo.compat import integer, string
 
+from request_cache.middleware import RequestCache
 
 log = logging.getLogger(__name__)
 celery_log = logging.getLogger('edx.celery.task')

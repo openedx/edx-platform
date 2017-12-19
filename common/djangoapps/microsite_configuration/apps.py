@@ -1,6 +1,8 @@
 
 import logging
+
 from django.apps import AppConfig
+
 from .microsite import enable_microsites
 
 log = logging.getLogger(__name__)

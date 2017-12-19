@@ -11,10 +11,10 @@ from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
 from django.test import TestCase
-from pytz import UTC
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
+from pytz import UTC
 
 import util.file
 from util.file import (

@@ -5,7 +5,6 @@ from django.conf.urls import url
 
 from .views import UserMappingView, UserView
 
-
 PROVIDER_PATTERN = r'(?P<provider_id>[\w.+-]+)(?:\:(?P<idp_slug>[\w.+-]+))?'
 
 urlpatterns = [

@@ -13,8 +13,8 @@ from collections import OrderedDict
 from datetime import datetime
 
 from contracts import contract
-from pytz import UTC
 from django.utils.translation import ugettext_lazy as _
+from pytz import UTC
 
 log = logging.getLogger("edx.courseware")
 

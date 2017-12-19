@@ -3,12 +3,10 @@ import logging
 from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
-
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

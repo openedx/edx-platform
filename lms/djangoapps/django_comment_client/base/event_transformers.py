@@ -2,8 +2,7 @@
 Transformers for Discussion-related events.
 """
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse, NoReverseMatch
-
+from django.core.urlresolvers import NoReverseMatch, reverse
 from eventtracking.processors.exceptions import EventEmissionExit
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
@@ -12,10 +11,7 @@ from django_comment_client.base.views import add_truncated_title_to_event_data
 from django_comment_client.permissions import get_team
 from django_comment_client.utils import get_cached_discussion_id_map_by_course_id
 from track.transformers import EventTransformer, EventTransformerRegistry
-from track.views.segmentio import (
-    BI_SCREEN_VIEWED_EVENT_NAME,
-    FORUM_THREAD_VIEWED_EVENT_LABEL
-)
+from track.views.segmentio import BI_SCREEN_VIEWED_EVENT_NAME, FORUM_THREAD_VIEWED_EVENT_LABEL
 
 
 def _get_string(dictionary, key, del_if_bad=True):

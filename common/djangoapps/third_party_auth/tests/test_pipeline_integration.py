@@ -2,8 +2,8 @@
 
 import unittest
 
-import mock
 import ddt
+import mock
 from django import test
 from django.contrib.auth import models
 from django.core import mail

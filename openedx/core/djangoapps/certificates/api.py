@@ -9,7 +9,6 @@ from certificates.models import CertificateWhitelist
 from openedx.core.djangoapps.certificates.config import waffle
 from student.models import CourseEnrollment
 
-
 SWITCHES = waffle.waffle()
 
 

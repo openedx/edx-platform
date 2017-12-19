@@ -6,7 +6,6 @@ from lettuce import step, world
 
 from common import *
 
-
 ############### ACTIONS ####################
 
 

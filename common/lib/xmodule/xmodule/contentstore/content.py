@@ -1,7 +1,19 @@
+import logging
+import os
 import re
+import StringIO
 import uuid
+from urllib import quote_plus, urlencode
+from urlparse import parse_qsl, urlparse, urlunparse
+
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import AssetKey, CourseKey
+from opaque_keys.edx.locator import AssetLocator
+from PIL import Image
 
 from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 STATIC_CONTENT_VERSION = 1
 XASSET_LOCATION_TAG = 'c4x'
@@ -10,19 +22,6 @@ XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 STREAM_DATA_CHUNK_SIZE = 1024
 VERSIONED_ASSETS_PREFIX = '/assets/courseware'
 VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
-
-import os
-import logging
-import StringIO
-from urlparse import urlparse, urlunparse, parse_qsl
-from urllib import urlencode, quote_plus
-
-from opaque_keys.edx.locator import AssetLocator
-from opaque_keys.edx.keys import CourseKey, AssetKey
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-from PIL import Image
 
 
 class StaticContent(object):

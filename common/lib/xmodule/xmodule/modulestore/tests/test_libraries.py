@@ -6,12 +6,11 @@ Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
 import ddt
-
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 

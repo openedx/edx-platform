@@ -1,8 +1,9 @@
 """
 Access methods to get EditInfo for xblocks
 """
-from xblock.fields import XBlockMixin
 from abc import ABCMeta, abstractmethod
+
+from xblock.fields import XBlockMixin
 
 
 class EditInfoMixin(XBlockMixin):

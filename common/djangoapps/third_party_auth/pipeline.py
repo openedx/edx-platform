@@ -69,20 +69,20 @@ from logging import getLogger
 from smtplib import SMTPException
 
 import analytics
+import social_django
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail.message import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
-import social_django
+from eventtracking import tracker
 from social_core.exceptions import AuthException
 from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 
 import student
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from third_party_auth.utils import user_exists
 

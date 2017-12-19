@@ -12,7 +12,7 @@ from web_fragments.fragment import Fragment
 from course_updates import get_ordered_updates
 from courseware.courses import get_course_info_section_module, get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.user_api.course_tag.api import set_course_tag, get_course_tag
+from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
 
 PREFERENCE_KEY = 'view-welcome-message'
 

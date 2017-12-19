@@ -2,11 +2,11 @@
 This module contains signals related to enterprise.
 """
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 from django.contrib.auth.models import User
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from enterprise.models import EnterpriseCustomerUser
+
 from email_marketing.tasks import update_user  # pylint: disable=import-error
 
 

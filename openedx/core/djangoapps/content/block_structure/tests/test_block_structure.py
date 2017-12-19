@@ -1,19 +1,20 @@
 """
 Tests for block_structure.py
 """
+import itertools
 # pylint: disable=protected-access
 from collections import namedtuple
 from copy import deepcopy
-import ddt
-import itertools
-from nose.plugins.attrib import attr
 from unittest import TestCase
+
+import ddt
+from nose.plugins.attrib import attr
 
 from openedx.core.lib.graph_traversals import traverse_post_order
 
 from ..block_structure import BlockStructure, BlockStructureModulestoreData
 from ..exceptions import TransformerException
-from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
+from .helpers import ChildrenMapTestMixin, MockTransformer, MockXBlock
 
 
 @attr(shard=2)

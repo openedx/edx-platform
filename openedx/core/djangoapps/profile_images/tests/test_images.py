@@ -1,29 +1,30 @@
 """
 Test cases for image processing functions in the profile image package.
 """
+import os
 from contextlib import closing
 from itertools import product
-import os
 from tempfile import NamedTemporaryFile
 
+import ddt
+import mock
+import piexif
 from django.core.files.uploadedfile import UploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-import ddt
-import mock
 from nose.plugins.attrib import attr
-import piexif
 from PIL import Image
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+
 from ..exceptions import ImageValidationError
 from ..images import (
-    create_profile_images,
-    remove_profile_images,
-    validate_uploaded_image,
     _get_exif_orientation,
     _get_valid_file_types,
-    _update_exif_orientation
+    _update_exif_orientation,
+    create_profile_images,
+    remove_profile_images,
+    validate_uploaded_image
 )
 from .helpers import make_image_file, make_uploaded_file
 

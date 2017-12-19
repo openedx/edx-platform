@@ -5,16 +5,16 @@ well-formed and not-well-formed XML.
 import os.path
 import unittest
 from glob import glob
-from mock import patch, Mock
 
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
-
-from xmodule.tests import DATA_DIR
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def glob_tildes_at_end(path):

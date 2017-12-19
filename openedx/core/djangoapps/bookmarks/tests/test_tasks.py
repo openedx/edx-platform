@@ -6,7 +6,8 @@ import pytest
 from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import check_mongo_calls, ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+
 from ..models import XBlockCache
 from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase

@@ -1,17 +1,18 @@
 """
 Tests for the models that configures HLS Playback feature.
 """
-import ddt
 import itertools
-
 from contextlib import contextmanager
 
+import ddt
 from django.test import TestCase
-
 from opaque_keys.edx.locator import CourseLocator
+
 from openedx.core.djangoapps.video_config.models import (
-    CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
-    CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
+    CourseHLSPlaybackEnabledFlag,
+    CourseVideoTranscriptEnabledFlag,
+    HLSPlaybackEnabledFlag,
+    VideoTranscriptEnabledFlag
 )
 
 

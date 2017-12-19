@@ -14,11 +14,13 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.utils.translation import override as override_language
+from eventtracking import tracker
+from submissions import api as sub_api  # installed from the edx-submissions repository
+from submissions.models import score_set
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
 from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
@@ -27,8 +29,6 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
-from submissions import api as sub_api  # installed from the edx-submissions repository
-from submissions.models import score_set
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,

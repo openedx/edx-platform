@@ -3,14 +3,14 @@
 Module contains utils specific for video_module but not for transcripts.
 """
 
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
 from urllib import urlencode
-from urlparse import parse_qs, urlsplit, urlunsplit, urlparse
+from urlparse import parse_qs, urlparse, urlsplit, urlunsplit
 
 from django.conf import settings
-from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 log = logging.getLogger(__name__)
 

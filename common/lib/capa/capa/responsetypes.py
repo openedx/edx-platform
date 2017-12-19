@@ -22,6 +22,7 @@ import re
 import sys
 import textwrap
 import traceback
+from cmath import isnan
 from collections import namedtuple
 from datetime import datetime
 from sys import float_info
@@ -40,7 +41,6 @@ import capa.xqueue_interface as xqueue_interface
 import dogstats_wrapper as dog_stats_api
 # specific library imports
 from calc import UndefinedVariable, evaluator
-from cmath import isnan
 from openedx.core.djangolib.markup import HTML, Text
 
 from . import correctmap

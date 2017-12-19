@@ -5,20 +5,21 @@ In this way, courses can be served up via either SplitMongoModuleStore or MongoM
 
 """
 
+import functools
+import itertools
 import logging
 from contextlib import contextmanager
-import itertools
-import functools
-from contracts import contract, new_contract
 
+from contracts import contract, new_contract
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+
 from xmodule.assetstore import AssetMetadata
 
-from . import ModuleStoreWriteBase, ModuleStoreEnum, XMODULE_FIELDS_WITH_USAGE_KEYS
-from .exceptions import ItemNotFoundError, DuplicateCourseError
+from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreEnum, ModuleStoreWriteBase
 from .draft_and_published import ModuleStoreDraftAndPublished
+from .exceptions import DuplicateCourseError, ItemNotFoundError
 from .split_migrator import SplitMigrator
 
 new_contract('CourseKey', CourseKey)

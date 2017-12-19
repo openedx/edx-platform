@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """ Tests for transcripts_utils. """
 import copy
-import ddt
 import textwrap
 import unittest
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.utils import translation

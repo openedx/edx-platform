@@ -3,10 +3,9 @@ Tests for the `api_admin` api module.
 """
 import json
 
-from rest_framework.reverse import reverse
-
 from django.contrib.auth.models import User
 from django.test import TestCase
+from rest_framework.reverse import reverse
 
 from openedx.core.djangoapps.api_admin.tests import factories
 from openedx.core.djangolib.testing.utils import skip_unless_lms
