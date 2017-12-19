@@ -61,6 +61,7 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
         context.update(sidebar_context)
         context['enable_enterprise_sidebar'] = True
         context['data']['hide_auth_warnings'] = True
+        context['data']['enterprise_name'] = enterprise_customer['name']
     else:
         context['enable_enterprise_sidebar'] = False
 

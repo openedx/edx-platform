@@ -250,6 +250,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         "errorMessage": None,
         "registerFormSubmitButtonText": _("Create Account"),
         "syncLearnerProfileData": False,
+        "pipeline_user_details": None
     }
 
     if third_party_auth.is_enabled():
@@ -275,6 +276,9 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            user_details = running_pipeline['kwargs']['details']
+            if user_details:
+                context['pipeline_user_details'] = user_details
 
             if current_provider is not None:
                 context["currentProvider"] = current_provider.name
@@ -309,7 +313,7 @@ def _get_form_descriptions(request):
 
     return {
         'password_reset': get_password_reset_form().to_json(),
-        'login': get_login_session_form().to_json(),
+        'login': get_login_session_form(request).to_json(),
         'registration': RegistrationFormFactory().get_registration_form(request).to_json()
     }
 
