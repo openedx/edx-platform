@@ -1,6 +1,7 @@
 """
 Learner analytics dashboard views
 """
+import math
 import json
 
 from django.contrib.auth.decorators import login_required
@@ -16,9 +17,10 @@ from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
+from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from util.views import ensure_valid_course_key
 
@@ -42,6 +44,8 @@ class LearnerAnalyticsView(View):
         course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
+        grading_policy = course.grading_policy
+
         # Render the course bookmarks page
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -49,31 +53,54 @@ class LearnerAnalyticsView(View):
             'course_url': course_url,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
-            'grading_policy': course.grading_policy,
-            'assignment_grades': self.get_grade_data(request.user, course_key),
-            'assignment_schedule': self.get_schedule(request, course_key)
+            'is_verified': CourseEnrollment.is_enrolled_as_verified(request.user, course_key),
+            'grading_policy': grading_policy,
+            'assignment_grades': self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS']),
+            'assignment_schedule': self.get_schedule(request, course_key),
+            'discussion_info': self.get_discussion_data(request, course_key)
         }
         return render_to_response('learner_analytics/dashboard.html', context)
 
-
-    def get_grade_data(self, user, course_key):
+    def get_grade_data(self, user, course_key, grade_cutoffs):
         """
-        Collects and formats the grade data to be piped to the front end.
+        Collects and formats the grades data for a particular user and course.
 
         Args:
             user: User
             course_key: CourseKey
         """
         course_grade = CourseGradeFactory().read(user, course_key=course_key)
-        grades = {}
-        for (subsection, subsection_grade) in course_grade.subsection_grades.iteritems():
-            grades[unicode(subsection)] = {
-                'assignment_type': subsection_grade.format,
-                'total_earned': subsection_grade.graded_total.earned,
-                'total_possible': subsection_grade.graded_total.possible,
-            }
-        return json.dumps(grades)
+        grades = []
+        for (location, subsection_grade) in course_grade.subsection_grades.iteritems():
+            if subsection_grade.format is not None:
+                possible = subsection_grade.graded_total.possible
+                passing_grade = math.ceil(possible * grade_cutoffs['Pass'])
+                grades.append({
+                    'assignment_type': subsection_grade.format,
+                    'total_earned': subsection_grade.graded_total.earned,
+                    'total_possible': possible,
+                    'passing_grade': passing_grade,
+                    'assigment_url': reverse('jump_to_id', kwargs={
+                        'course_id': unicode(course_key),
+                        'module_id': unicode(location),
+                    })
+                })
+        return grades
 
+    def get_discussion_data(self, request, course_key):
+        """
+        Collects and formats the discussion data from a particular user and course.
+
+        Args:
+            user: User
+            course_key: CourseKey
+        """
+        profile_context = create_user_profile_context(request, course_key, request.user.id)
+        discussion_data = {
+            'threads_authored': len(profile_context['threads']),
+            'subscribed_threads': len(profile_context['user_info']['subscribed_thread_ids']),
+        }
+        return discussion_data
 
     def get_schedule(self, request, course_key):
         """
@@ -93,7 +120,8 @@ class LearnerAnalyticsView(View):
             block_types_filter=['sequential']
         )
         graded_blocks = {}
-        for block in all_blocks['blocks']:
-            if all_blocks['blocks'][block].get('graded', False):
-                graded_blocks[block] = all_blocks['blocks'][block]
-        return json.dumps(graded_blocks)
+        for (location, block) in all_blocks['blocks'].iteritems():
+            if block.get('graded', False) and block.get('due') is not None:
+                graded_blocks[location] = block
+                block['due'] = block['due'].isoformat()
+        return graded_blocks

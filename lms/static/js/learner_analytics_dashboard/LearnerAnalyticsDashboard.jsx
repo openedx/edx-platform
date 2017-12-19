@@ -16,29 +16,10 @@ console.log('props: ', props);
       label: type,
       sliceIndex: index + 1
     }
-  }).sort((a, b) => a.value > b.value);
-  // const data = [
-  //     {
-  //       color: '#386F77',
-  //       value: 0.50,
-  //       label: 'Chucky'
-  //     },
-  //     {
-  //       color: '#1ABC9C',
-  //       value: 0.25,
-  //       label: 'Michael Myers'
-  //     },
-  //     {
-  //       color: '#92C9D3',
-  //       value: 0.3,
-  //       label: 'Freddy Krueger'
-  //     },
-  //     {
-  //       color: '#73bde7',
-  //       value: 0.15,
-  //       label: 'Jason Vorhees'
-  //     }
-  // ];
+  }).sort((a, b) => a.value < b.value);
+
+  // Get a list of assignment types minus duplicates
+  const assignmentTypes = [...new Set(gradeBreakdown.map(value => value['label']))];
 
   const tableHeadings = ['Assessment', 'Passing', 'You'];
   const tableData = [
@@ -64,29 +45,46 @@ console.log('props: ', props);
 
   return (
     <div className="learner-analytics-wrapper">
-      <div className="analytics-group">
-        <h2>Grading</h2>
-        <h3>Weight</h3>
-        <div className="grading-weight-wrapper">
-          <div className="chart-wrapper">
-            <CircleChart
-              slices={gradeBreakdown}
-              centerHole={true}
-              sliceBorder={{
-                  strokeColor: '#fff',
-                  strokeWidth: 1
-              }}
-            />
+      <div className="main-block">
+        <div className="analytics-group">
+          <h2 className="group-heading">Grading</h2>
+          <h3 className="section-heading">Weight</h3>
+          <div className="grading-weight-wrapper">
+            <div className="chart-wrapper">
+              <CircleChart
+                slices={gradeBreakdown}
+                centerHole={true}
+                sliceBorder={{
+                    strokeColor: '#f5f5f5',
+                    strokeWidth: 2
+                }}
+              />
+            </div>
+            <CircleChartLegend data={gradeBreakdown} />
           </div>
-          <CircleChartLegend data={gradeBreakdown} />
-        </div>
 
+<<<<<<< HEAD
         <h3>Graded Assessments</h3>
         <div className="graded-assessments-wrapper">
           <Table headings={tableHeadings} data={tableData} />
           <p className="footnote">*Calculated based on current average</p>
         </div>
       </div>
+=======
+          <h3 className="section-heading">Graded Assessments</h3>
+          <div className="graded-assessments-wrapper">
+            <GradeTable assignmentTypes={assignmentTypes} data={JSON.parse(grades)} />
+            <p className="footnote">*Calculated based on current average</p>
+          </div>
+        </div>
+        <div className="analytics-group">
+          <h2 className="group-heading">Discussions</h2>
+        </div>
+      </div>
+      <div className="analytics-group sidebar">
+        <h2 className="group-heading">Timing</h2>
+      </div>
+>>>>>>> ae79759... Add discussion information to learner context.
     </div>
   );
 }
