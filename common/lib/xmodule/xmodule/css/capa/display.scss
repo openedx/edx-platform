@@ -1675,3 +1675,10 @@ div.problem .annotation-input {
     content: '';
   }
 }
+
+// Loading Spinner
+// ====================
+.problems-wrapper .loading-spinner {
+  text-align: center;
+  color: $gray-d1;
+}
