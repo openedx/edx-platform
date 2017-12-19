@@ -18,7 +18,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-from lms.djangoapps.discussion.tasks import _should_send_message
+from lms.djangoapps.discussion.tasks import _should_send_message, _track_notification_sent
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -214,6 +214,7 @@ class TaskTestCase(ModuleStoreTestCase):
             self.assertEqual(expected_recipient, actual_message.recipient)
             self.assertEqual(self.course.language, actual_message.language)
             self._assert_rendered_email(actual_message)
+
         else:
             self.assertFalse(self.mock_ace_send.called)
 
@@ -253,3 +254,56 @@ class TaskTestCase(ModuleStoreTestCase):
 
     def test_second_comment_should_not_send_email(self):
         self.run_should_not_send_email_test(self.comment2)
+
+    @ddt.data((
+        {
+            'thread_id': 'dummy_discussion_id',
+            'thread_title': 'thread-title',
+            'thread_created_at': date.serialize(datetime(2000, 1, 1, 0, 0, 0)),
+            'course_id': 'fake_course_edx',
+            'thread_author_id': 'a_fake_dude'
+        },
+        {
+            'app_label': 'discussion',
+            'name': 'responsenotification',
+            'language': 'en',
+            'uuid': 'uuid1',
+            'send_uuid': 'uuid2',
+            'thread_id': 'dummy_discussion_id',
+            'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
+        }
+    ), (
+        {
+            'thread_id': 'dummy_discussion_id2',
+            'thread_title': 'thread-title2',
+            'thread_created_at': date.serialize(datetime(2000, 1, 1, 0, 0, 0)),
+            'course_id': 'fake_course_edx2',
+            'thread_author_id': 'a_fake_dude2'
+        },
+        {
+            'app_label': 'discussion',
+            'name': 'responsenotification',
+            'language': 'en',
+            'uuid': 'uuid3',
+            'send_uuid': 'uuid4',
+            'thread_id': 'dummy_discussion_id2',
+            'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
+        }
+
+    ))
+    @ddt.unpack
+    def test_track_notification_sent(self, context, test_props):
+        with mock.patch('edx_ace.ace.send').start() as message:
+            # Populate mock message (
+            # There are some cruft attrs, but they're harmless.
+            for key, entry in test_props.items():
+                setattr(message, key, entry)
+
+            with mock.patch('analytics.track') as mock_analytics_track:
+                _track_notification_sent(message, context)
+                mock_analytics_track.assert_called_once_with(
+                    user_id=context['thread_author_id'],
+                    event='edx.bi.email.sent',
+                    course_id=context['course_id'],
+                    properties=test_props
+                )

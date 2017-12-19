@@ -5,6 +5,7 @@ pertaining to new discussion forum comments.
 import logging
 from urlparse import urljoin
 
+import analytics
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -51,6 +52,28 @@ def send_ace_message(context):
             )
             log.info('Sending forum comment email notification with context %s', message_context)
             ace.send(message)
+            _track_notification_sent(message, context)
+
+
+def _track_notification_sent(message, context):
+    """
+    Send analytics event for a sent email
+    """
+    properties = {
+        'app_label': 'discussion',
+        'name': 'responsenotification',  # This is 'Campaign' in GA
+        'language': message.language,
+        'uuid': unicode(message.uuid),
+        'send_uuid': unicode(message.send_uuid),
+        'thread_id': context['thread_id'],
+        'thread_created_at': date.deserialize(context['thread_created_at'])
+    }
+    analytics.track(
+        user_id=context['thread_author_id'],
+        event='edx.bi.email.sent',
+        course_id=context['course_id'],
+        properties=properties
+    )
 
 
 def _should_send_message(context):
