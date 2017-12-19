@@ -153,7 +153,8 @@ module.exports = {
         },
         modules: [
             'node_modules',
-            'common/static/js/vendor/'
+            'common/static/js/vendor/',
+            'lms/static'
         ]
     },
 

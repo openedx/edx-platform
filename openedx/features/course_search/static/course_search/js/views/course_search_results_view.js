@@ -1,36 +1,35 @@
-(function(define) {
-    'use strict';
+'use strict';
 
-    define([
-        'course_search/js/views/search_results_view',
-        'text!course_search/templates/course_search_results.underscore',
-        'text!course_search/templates/course_search_item.underscore'
-    ], function(
-        SearchResultsView,
-        courseSearchResultsTemplate,
-        courseSearchItemTemplate
-    ) {
-        return SearchResultsView.extend({
-            el: '.search-results',
-            contentElement: '#course-content',
-            coursewareResultsWrapperElement: '.courseware-results-wrapper',
-            resultsTemplate: courseSearchResultsTemplate,
-            itemTemplate: courseSearchItemTemplate,
-            events: {
-                'click .search-load-next': 'loadNext'
-            },
+import SearchResultsView from 'course_search/js/views/search_results_view';
 
-            clear: function() {
-                SearchResultsView.prototype.clear.call(this);
-                $(this.coursewareResultsWrapperElement).hide();
-                this.$contentElement.css('display', 'table-cell');
-            },
+import courseSearchResultsTemplate from 'text!course_search/templates/course_search_results.underscore';
+import courseSearchItemTemplate from 'text!course_search/templates/course_search_item.underscore';
 
-            showResults: function() {
-                SearchResultsView.prototype.showResults.call(this);
-                $(this.coursewareResultsWrapperElement).css('display', 'table-cell');
-            }
+class CourseSearchResultsView extends SearchResultsView {
+  constructor(options) {
+    const defaults = {
+      el: '.search-results',
+      events: {
+        'click .search-load-next': 'loadNext',
+      },
+    };
+    super(Object.assign({}, defaults, options));
 
-        });
-    });
-}(define || RequireJS.define));
+    this.contentElement = '#course-content';
+    this.coursewareResultsWrapperElement = '.courseware-results-wrapper';
+    this.resultsTemplate = courseSearchResultsTemplate;
+    this.itemTemplate = courseSearchItemTemplate;
+  }
+
+  clear() {
+    super.clear(this);
+    $(this.coursewareResultsWrapperElement).hide();
+    this.$contentElement.css('display', 'table-cell');
+  }
+
+  showResults() {
+    super.showResults();
+    $(this.coursewareResultsWrapperElement).css('display', 'table-cell');
+  }
+}
+export { CourseSearchResultsView as default };

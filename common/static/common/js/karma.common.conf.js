@@ -297,6 +297,7 @@ function getBaseConfig(config, useRequireJs) {
         frameworks: ['custom'],
 
         plugins: [
+            'karma-babel-preprocessor',
             'karma-jasmine',
             'karma-jasmine-html-reporter',
             'karma-requirejs',
@@ -402,6 +403,13 @@ function getBaseConfig(config, useRequireJs) {
 
         client: {
             captureConsole: false
+        },
+
+        babelPreprocessor: {
+          options: {
+            plugins: ['transform-es2015-modules-amd'],
+            presets: [ [ 'env', {modules: false} ], 'babel-preset-react']
+          }
         },
 
         webpack: webpackConfig,

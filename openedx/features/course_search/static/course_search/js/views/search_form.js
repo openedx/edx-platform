@@ -1,68 +1,72 @@
-(function(define) {
-    'use strict';
+'use strict';
 
-    define(['jquery', 'backbone'], function($, Backbone) {
-        return Backbone.View.extend({
+import 'jquery';
+import Backbone from 'backbone';
 
-            el: '',
-            events: {
-                'submit .search-form': 'submitForm',
-                'click .cancel-button': 'clearSearch'
-            },
+class SearchForm extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      el: '',
+      events: {
+        'submit .search-form': 'submitForm',
+        'click .cancel-button': 'clearSearch',
+      },
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-            initialize: function(options) {
-                this.$searchField = this.$el.find('.search-field');
-                this.$searchButton = this.$el.find('.search-button');
-                this.$cancelButton = this.$el.find('.cancel-button');
-                this.supportsActive = options.supportsActive === undefined ? true : options.supportsActive;
-            },
+  initialize(options) {
+    this.$searchField = this.$el.find('.search-field');
+    this.$searchButton = this.$el.find('.search-button');
+    this.$cancelButton = this.$el.find('.cancel-button');
+    this.supportsActive = options.supportsActive === undefined ? true : options.supportsActive;
+  }
 
-            submitForm: function(event) {
-                event.preventDefault();
-                this.doSearch();
-            },
+  submitForm(event) {
+    event.preventDefault();
+    this.doSearch();
+  }
 
-            doSearch: function(term) {
-                var trimmedTerm;
-                if (term) {
-                    trimmedTerm = term.trim();
-                    this.$searchField.val(trimmedTerm);
-                } else {
-                    trimmedTerm = this.$searchField.val().trim();
-                }
-                if (trimmedTerm) {
-                    this.setActiveStyle();
-                    this.trigger('search', trimmedTerm);
-                } else {
-                    this.clearSearch();
-                }
-            },
+  doSearch(term) {
+    let trimmedTerm;
+    if (term) {
+      trimmedTerm = term.trim();
+      this.$searchField.val(trimmedTerm);
+    } else {
+      trimmedTerm = this.$searchField.val().trim();
+    }
+    if (trimmedTerm) {
+      this.setActiveStyle();
+      this.trigger('search', trimmedTerm);
+    } else {
+      this.clearSearch();
+    }
+  }
 
-            resetSearchForm: function() {
-                this.$searchField.val('');
-                this.setInitialStyle();
-            },
+  resetSearchForm() {
+    this.$searchField.val('');
+    this.setInitialStyle();
+  }
 
-            clearSearch: function() {
-                this.resetSearchForm();
-                this.trigger('clear');
-            },
+  clearSearch() {
+    this.resetSearchForm();
+    this.trigger('clear');
+  }
 
-            setActiveStyle: function() {
-                if (this.supportsActive) {
-                    this.$searchField.addClass('is-active');
-                    this.$searchButton.hide();
-                    this.$cancelButton.show();
-                }
-            },
+  setActiveStyle() {
+    if (this.supportsActive) {
+      this.$searchField.addClass('is-active');
+      this.$searchButton.hide();
+      this.$cancelButton.show();
+    }
+  }
 
-            setInitialStyle: function() {
-                if (this.supportsActive) {
-                    this.$searchField.removeClass('is-active');
-                    this.$searchButton.show();
-                    this.$cancelButton.hide();
-                }
-            }
-        });
-    });
-}(define || RequireJS.define));
+  setInitialStyle() {
+    if (this.supportsActive) {
+      this.$searchField.removeClass('is-active');
+      this.$searchButton.show();
+      this.$cancelButton.hide();
+    }
+  }
+}
+export { SearchForm as default };

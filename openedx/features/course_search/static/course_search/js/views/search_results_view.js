@@ -1,111 +1,117 @@
-(function(define) {
-    'use strict';
+/* globals ngettext */
 
-    define([
-        'jquery',
-        'underscore',
-        'backbone',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'edx-ui-toolkit/js/utils/string-utils',
-        'course_search/js/views/search_item_view',
-        'text!course_search/templates/search_loading.underscore',
-        'text!course_search/templates/search_error.underscore'
-    ], function($, _, Backbone, HtmlUtils, StringUtils, SearchItemView, searchLoadingTemplate, searchErrorTemplate) {
-        return Backbone.View.extend({
+'use strict';
 
-            // these should be defined by subclasses
-            el: '',
-            contentElement: '',
-            resultsTemplate: null,
-            itemTemplate: null,
-            loadingTemplate: searchLoadingTemplate,
-            errorTemplate: searchErrorTemplate,
-            events: {},
-            spinner: '.search-load-next .icon',
+import 'jquery';
+import Backbone from 'backbone';
 
-            initialize: function() {
-                this.$contentElement = this.contentElement ? $(this.contentElement) : $([]);
-            },
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
+import SearchItemView from 'course_search/js/views/search_item_view';
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
-            render: function() {
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.resultsTemplate)({
-                    totalCount: this.collection.totalCount,
-                    totalCountMsg: this.totalCountMsg(),
-                    pageSize: this.collection.pageSize,
-                    hasMoreResults: this.collection.hasNextPage()
-                }));
-                this.renderItems();
-                this.$el.find(this.spinner).hide();
-                this.showResults();
-                return this;
-            },
+import searchLoadingTemplate from 'text!course_search/templates/search_loading.underscore';
+import searchErrorTemplate from 'text!course_search/templates/search_error.underscore';
 
-            renderNext: function() {
-                // total count may have changed
-                this.$el.find('.search-count').text(this.totalCountMsg());
-                this.renderItems();
-                if (!this.collection.hasNextPage()) {
-                    this.$el.find('.search-load-next').remove();
-                }
-                this.$el.find(this.spinner).hide();
-            },
+class SearchResultsView extends Backbone.View {
+  constructor(options) {
+    // these defaults should be defined by subclasses
+    const defaults = {
+      el: '',
+      events: {},
+    };
+    super(Object.assign({}, defaults, options));
 
-            renderItems: function() {
-                var latest = this.collection.latestModels();
-                var items = latest.map(function(result) {
-                    var item = new SearchItemView({
-                        model: result,
-                        template: this.itemTemplate
-                    });
-                    return item.render().el;
-                }, this);
-                // xss-lint: disable=javascript-jquery-append
-                this.$el.find('ol').append(items);
-            },
+    // these properties should be defined by subclasses
+    this.contentElement = '';
+    this.resultsTemplate = null;
+    this.itemTemplate = null;
 
-            totalCountMsg: function() {
-                var fmt = ngettext('{total_results} result', '{total_results} results', this.collection.totalCount);
-                return StringUtils.interpolate(fmt, {
-                    total_results: this.collection.totalCount
-                });
-            },
+    this.loadingTemplate = searchLoadingTemplate;
+    this.errorTemplate = searchErrorTemplate;
+    this.spinner = '.search-load-next .icon';
+  }
 
-            clear: function() {
-                this.$el.hide().empty();
-                this.$contentElement.show();
-            },
+  initialize() {
+    this.$contentElement = this.contentElement ? $(this.contentElement) : $([]);
+  }
 
-            showResults: function() {
-                this.$el.show();
-                this.$contentElement.hide();
-            },
+  render() {
+    HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.resultsTemplate)({
+      totalCount: this.collection.totalCount,
+      totalCountMsg: this.totalCountMsg(),
+      pageSize: this.collection.pageSize,
+      hasMoreResults: this.collection.hasNextPage(),
+    }));
+    this.renderItems();
+    this.$el.find(this.spinner).hide();
+    this.showResults();
+    return this;
+  }
 
-            showLoadingMessage: function() {
-                // Empty any previous loading/error message
-                $('#loading-message').html('');
-                $('#error-message').html('');
+  renderNext() {
+    // total count may have changed
+    this.$el.find('.search-count').text(this.totalCountMsg());
+    this.renderItems();
+    if (!this.collection.hasNextPage()) {
+      this.$el.find('.search-load-next').remove();
+    }
+    this.$el.find(this.spinner).hide();
+  }
 
-                // Show the loading message
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.loadingTemplate)());
+  renderItems() {
+    const latest = this.collection.latestModels();
+    const items = latest.map((result) => {
+      const item = new SearchItemView({
+        model: result,
+        template: this.itemTemplate,
+      });
+      return item.render().el;
+    }, this);
+    // xss-lint: disable=javascript-jquery-append
+    this.$el.find('ol').append(items);
+  }
 
-                // Show the results
-                this.showResults();
-            },
-
-            showErrorMessage: function() {
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.errorTemplate)());
-                this.showResults();
-            },
-
-            loadNext: function(event) {
-                if (event) {
-                    event.preventDefault();
-                }
-                this.$el.find(this.spinner).show();
-                this.trigger('next');
-                return false;
-            }
-
-        });
+  totalCountMsg() {
+    const fmt = ngettext('{total_results} result', '{total_results} results', this.collection.totalCount);
+    return StringUtils.interpolate(fmt, {
+      total_results: this.collection.totalCount,
     });
-}(define || RequireJS.define));
+  }
+
+  clear() {
+    this.$el.hide().empty();
+    this.$contentElement.show();
+  }
+
+  showResults() {
+    this.$el.show();
+    this.$contentElement.hide();
+  }
+
+  showLoadingMessage() {
+    // Empty any previous loading/error message
+    $('#loading-message').html('');
+    $('#error-message').html('');
+
+    // Show the loading message
+    HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.loadingTemplate)());
+
+    // Show the results
+    this.showResults();
+  }
+
+  showErrorMessage() {
+    HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.errorTemplate)());
+    this.showResults();
+  }
+
+  loadNext(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.$el.find(this.spinner).show();
+    this.trigger('next');
+    return false;
+  }
+}
+export { SearchResultsView as default };

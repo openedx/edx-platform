@@ -1,55 +1,58 @@
-(function(define) {
-    'use strict';
+'use strict';
 
-    define([
-        'underscore', 'backbone', 'course_search/js/search_router', 'course_search/js/views/search_form',
-        'course_search/js/collections/search_collection', 'course_search/js/views/dashboard_search_results_view'
-    ],
-        function(_, Backbone, SearchRouter, SearchForm, SearchCollection, DashboardSearchResultsView) {
-            return function() {
-                var router = new SearchRouter();
-                var form = new SearchForm({
-                    el: $('#dashboard-search-bar')
-                });
-                var collection = new SearchCollection([]);
-                var results = new DashboardSearchResultsView({collection: collection});
-                var dispatcher = _.clone(Backbone.Events);
+import _ from 'underscore';
+import Backbone from 'backbone';
 
-                dispatcher.listenTo(router, 'search', function(query) {
-                    form.doSearch(query);
-                });
+import DashboardSearchResultsView from './views/dashboard_search_results_view';
+import SearchCollection from './collections/search_collection';
+import SearchForm from './views/search_form';
+import SearchRouter from './search_router';
 
-                dispatcher.listenTo(form, 'search', function(query) {
-                    results.showLoadingMessage();
-                    collection.performSearch(query);
-                    router.navigate('search/' + query, {replace: true});
-                });
+class DashboardSearchFactory {
+  constructor() {
+    const router = new SearchRouter();
+    const form = new SearchForm({
+      el: $('#dashboard-search-bar'),
+    });
+    const collection = new SearchCollection([]);
+    const results = new DashboardSearchResultsView({ collection });
+    const dispatcher = _.clone(Backbone.Events);
 
-                dispatcher.listenTo(form, 'clear', function() {
-                    collection.cancelSearch();
-                    results.clear();
-                    router.navigate('');
-                });
+    dispatcher.listenTo(router, 'search', (query) => {
+      form.doSearch(query);
+    });
 
-                dispatcher.listenTo(results, 'next', function() {
-                    collection.loadNextPage();
-                });
+    dispatcher.listenTo(form, 'search', (query) => {
+      results.showLoadingMessage();
+      collection.performSearch(query);
+      router.navigate(`search/${query}`, { replace: true });
+    });
 
-                dispatcher.listenTo(results, 'reset', function() {
-                    form.resetSearchForm();
-                });
+    dispatcher.listenTo(form, 'clear', () => {
+      collection.cancelSearch();
+      results.clear();
+      router.navigate('');
+    });
 
-                dispatcher.listenTo(collection, 'search', function() {
-                    results.render();
-                });
+    dispatcher.listenTo(results, 'next', () => {
+      collection.loadNextPage();
+    });
 
-                dispatcher.listenTo(collection, 'next', function() {
-                    results.renderNext();
-                });
+    dispatcher.listenTo(results, 'reset', () => {
+      form.resetSearchForm();
+    });
 
-                dispatcher.listenTo(collection, 'error', function() {
-                    results.showErrorMessage();
-                });
-            };
-        });
-}(define || RequireJS.define));
+    dispatcher.listenTo(collection, 'search', () => {
+      results.render();
+    });
+
+    dispatcher.listenTo(collection, 'next', () => {
+      results.renderNext();
+    });
+
+    dispatcher.listenTo(collection, 'error', () => {
+      results.showErrorMessage();
+    });
+  }
+}
+export { DashboardSearchFactory as default };

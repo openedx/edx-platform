@@ -1,75 +1,74 @@
-(function(define) {
-    'use strict';
+/* globals Logger */
 
-    define([
-        'jquery',
-        'underscore',
-        'backbone',
-        'gettext',
-        'logger',
-        'edx-ui-toolkit/js/utils/html-utils'
-    ], function($, _, Backbone, gettext, Logger, HtmlUtils) {
-        return Backbone.View.extend({
+'use strict';
 
-            tagName: 'li',
-            className: 'search-results-item',
-            attributes: {
-                role: 'region',
-                'aria-label': 'search result'
-            },
+import 'jquery';
+import _ from 'underscore';
+import Backbone from 'backbone';
 
-            events: {
-                click: 'logSearchItem'
-            },
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-            initialize: function(options) {
-                this.template = options.template;
-            },
+class SearchItemView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      tagName: 'li',
+      className: 'search-results-item',
+      attributes: {
+        role: 'region',
+        'aria-label': 'search result',
+      },
+      events: {
+        click: 'logSearchItem',
+      },
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-            render: function() {
-                var data = _.clone(this.model.attributes);
+  initialize(options) {
+    this.template = options.template;
+  }
 
-                // Drop the preview text and result type if the search term is found
-                // in the title/location in the course hierarchy
-                if (this.model.get('content_type') === 'Sequence') {
-                    data.excerpt = '';
-                    data.content_type = '';
-                }
-                data.excerptHtml = HtmlUtils.HTML(data.excerpt);
-                delete data.excerpt;
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.template)(data));
-                return this;
-            },
+  render() {
+    const data = _.clone(this.model.attributes);
 
-        /**
-         * Redirect to a URL.  Mainly useful for mocking out in tests.
-         * @param  {string} url The URL to redirect to.
-         */
-            redirect: function(url) {
-                window.location.href = url;
-            },
+    // Drop the preview text and result type if the search term is found
+    // in the title/location in the course hierarchy
+    if (this.model.get('content_type') === 'Sequence') {
+      data.excerpt = '';
+      data.content_type = '';
+    }
+    data.excerptHtml = HtmlUtils.HTML(data.excerpt);
+    delete data.excerpt;
+    HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.template)(data));
+    return this;
+  }
 
-            logSearchItem: function(event) {
-                var self = this;
-                var target = this.model.id;
-                var link = this.model.get('url');
-                var collection = this.model.collection;
-                var page = collection.page;
-                var pageSize = collection.pageSize;
-                var searchTerm = collection.searchTerm;
-                var index = collection.indexOf(this.model);
+  /**
+  * Redirect to a URL.  Mainly useful for mocking out in tests.
+  * @param  {string} url The URL to redirect to.
+  */
+  static redirect(url) {
+    window.location.href = url;
+  }
 
-                event.preventDefault();
+  logSearchItem(event) {
+    const target = this.model.id;
+    const link = this.model.get('url');
+    const collection = this.model.collection;
+    const page = collection.page;
+    const pageSize = collection.pageSize;
+    const searchTerm = collection.searchTerm;
+    const index = collection.indexOf(this.model);
 
-                Logger.log('edx.course.search.result_selected', {
-                    search_term: searchTerm,
-                    result_position: (page * pageSize) + index,
-                    result_link: target
-                }).always(function() {
-                    self.redirect(link);
-                });
-            }
+    event.preventDefault();
 
-        });
+    Logger.log('edx.course.search.result_selected', {
+      search_term: searchTerm,
+      result_position: (page * pageSize) + index,
+      result_link: target,
+    }).always(() => {
+      SearchItemView.redirect(link);
     });
-}(define || RequireJS.define));
+  }
+}
+export { SearchItemView as default };
