@@ -306,6 +306,34 @@ def get_gated_content(course, user):
         ]
 
 
+def is_gate_fulfilled(course_key, gating_content_key, user_id):
+    """
+    Determines if a prerequiste section specified by gating_content_key
+    has any unfulfilled milestones.
+
+    Arguments:
+        course_key (CourseUsageLocator): Course locator
+        gating_content_key (BlockUsageLocator): The locator for the section content
+        user_id: The id of the user
+
+    Returns:
+        Returns True if section has no unfufilled milestones or is not a prerequiste.
+        Returns False otherwise
+    """
+    gating_milestone = get_gating_milestone(course_key, gating_content_key, "fulfills")
+    if not gating_milestone:
+        return True
+
+    unfulfilled_milestones = [
+        m['content_id'] for m in milestones_helpers.get_course_content_milestones(
+            course_key,
+            None,
+            'requires',
+            user_id
+        ) if m['namespace'] == gating_milestone['namespace']
+    ]
+    return not unfulfilled_milestones
+
 def compute_is_prereq_met(content_id, user_id, recalc_on_unmet=False):
     """
     Returns true if the prequiste has been met for a given milestone.
@@ -329,6 +357,7 @@ def compute_is_prereq_met(content_id, user_id, recalc_on_unmet=False):
         'requires',
         user_id
     )
+
     prereq_met = not unfulfilled_milestones
     prereq_meta_info = {'url': None, 'display_name': None}
 

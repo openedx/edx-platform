@@ -298,6 +298,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             else:
                 # check if prerequiste has been met
                 prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
+        if prereq_met and not self._is_gate_fulfilled():
+            banner_text = _('This section is a prerequiste. You must complete this section in order to unlock additional content.')
 
         fragment = Fragment()
         params = {
@@ -322,6 +324,23 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._capture_current_unit_metrics(display_items)
 
         return fragment
+
+    def _is_gate_fulfilled(self):
+        """
+        Determines if this section is a prereq and has any unfulfilled milestones.
+
+        Returns:
+            True if section has no unfufilled milestones or is not a prerequiste.
+            False otherwise
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            fulfilled = gating_service.is_gate_fulfilled(
+                self.course_id, self.location, self.runtime.user_id
+            )
+            return fulfilled
+
+        return True
 
     def _is_prereq_required(self):
         """

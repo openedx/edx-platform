@@ -37,3 +37,19 @@ class GatingService(object):
             dict or None: The gating milestone dict or None
         """
         return gating_api.get_gating_milestone(course_key, content_key, relationship)
+
+    def is_gate_fulfilled(self, course_key, gating_content_key, user_id):
+        """
+        Determines if a prerequiste section specified by gating_content_key
+        has any unfulfilled milestones.
+
+        Arguments:
+            course_key (CourseUsageLocator): Course locator 
+            gating_content_key (BlockUsageLocator): The locator for the section content
+            user_id: The id of the user
+
+        Returns:
+            Returns True if section has no unfufilled milestones or is not a prerequiste. 
+            Returns False otherwise
+        """
+        return gating_api.is_gate_fulfilled(course_key, gating_content_key, user_id)
