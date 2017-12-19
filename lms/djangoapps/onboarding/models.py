@@ -25,8 +25,8 @@ class SchemaOrNoSchemaURLValidator(URLValidator):
     )
 
 # register User and UserProfile models for django-simple-history module
-register(User, inherit=True)
-register(UserProfile, inherit=True)
+register(User)
+register(UserProfile, table_name='auth_historicaluserprofile')
 
 
 class OrgSector(models.Model):
