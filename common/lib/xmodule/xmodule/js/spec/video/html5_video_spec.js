@@ -219,7 +219,7 @@
                         }).done(done);
                     });
 
-                    it('set new inccorrect values', function() {
+                    it('set new incorrect values', function() {
                         var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);

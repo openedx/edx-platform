@@ -3456,3 +3456,9 @@ ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
 # Initialize to 'unknown', but read from JSON in aws.py
 EDX_PLATFORM_REVISION = 'unknown'
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
