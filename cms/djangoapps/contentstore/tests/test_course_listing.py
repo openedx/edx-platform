@@ -264,31 +264,21 @@ class TestCourseListing(ModuleStoreTestCase):
                 else:
                     self._create_course_with_access_groups(course_location, store=store)
 
-        # time the get courses by iterating through all courses
-        with Timer() as iteration_over_courses_time_1:
-            courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
+        # get courses by iterating through all courses
+        courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
         self.assertEqual(len(list(courses_iter)), USER_COURSES_COUNT)
 
-        # time again the get courses by iterating through all courses
-        with Timer() as iteration_over_courses_time_2:
-            courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
+        # again get courses by iterating through all courses
+        courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
         self.assertEqual(len(list(courses_iter)), USER_COURSES_COUNT)
 
-        # time the get courses by reversing django groups
-        with Timer() as iteration_over_groups_time_1:
-            courses_list, __ = _accessible_courses_list_from_groups(self.request)
+        # get courses by reversing django groups
+        courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), USER_COURSES_COUNT)
 
-        # time again the get courses by reversing django groups
-        with Timer() as iteration_over_groups_time_2:
-            courses_list, __ = _accessible_courses_list_from_groups(self.request)
+        # again get courses by reversing django groups
+        courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), USER_COURSES_COUNT)
-
-        # Test that the time taken by getting courses through reversing django
-        # groups is lower then the time taken by traversing through all courses
-        # (if accessible courses are relatively small).
-        self.assertGreaterEqual(iteration_over_courses_time_1.elapsed, iteration_over_groups_time_1.elapsed)
-        self.assertGreaterEqual(iteration_over_courses_time_2.elapsed, iteration_over_groups_time_2.elapsed)
 
         # Now count the db queries
         with check_mongo_calls(courses_list_from_group_calls):
