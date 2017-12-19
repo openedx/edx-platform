@@ -148,7 +148,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % endif
                 % if entitlement:
                     % if not entitlement_expired_at:
-                        <button class="change-session btn-link ${'hidden' if is_unfulfilled_entitlement else ''}" aria-controls="change-session-${str(entitlement.uuid)}">${_('Change Session')}</button>
+                        <button class="change-session btn-link ${'hidden' if is_unfulfilled_entitlement else ''}" aria-controls="change-session-${str(entitlement.uuid)}">${_('Change or Leave Session')}</button>
                     % endif
                 % endif
             </span>

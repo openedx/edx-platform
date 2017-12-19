@@ -407,7 +407,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
             - exactly one course item, meaning it:
                 - has an entitlement card
                 - does NOT have a course card referencing the selected session
-            - an unhidden Change Session button
+            - an unhidden Change or Leave Session button
             - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
