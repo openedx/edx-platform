@@ -9,7 +9,6 @@ from logging import getLogger
 from common.lib.surveygizmo_client.client import SurveyGizmoClient
 from lms.djangoapps.third_party_surveys.models import ThirdPartySurvey
 
-from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 

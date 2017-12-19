@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('oef', '0002_auto_20171130_0231'),
+        ('oef', '0003_organizationoefscore'),
     ]
 
     operations = [

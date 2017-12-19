@@ -214,3 +214,27 @@ def get_country_iso(c_name):
             _iso = iso
 
     return _iso
+
+
+def reorder_registration_form_fields(fields):
+    required_order = {
+        'first_name': 0,
+        'last_name': 1,
+        'username': 2,
+        'email': 3,
+        'password': 4,
+        'confirm_password': 5,
+        'is_currently_employed': 6,
+        'organization_name': 7,
+        'is_poc': 8,
+        'org_admin_email': 9
+    }
+
+    ordered_list = []
+    for field in fields:
+        if field['name'] in required_order:
+            ordered_list.insert(required_order[field['name']], field)
+        else:
+            ordered_list.append(field)
+
+    return ordered_list

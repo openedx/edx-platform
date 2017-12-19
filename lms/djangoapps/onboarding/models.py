@@ -5,10 +5,13 @@ import re
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from django.contrib.auth.models import User
+from simple_history import register
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 from django.core.validators import MaxValueValidator, URLValidator
 from django.db import models
+
+from student.models import UserProfile
 
 log = logging.getLogger("edx.onboarding")
 
@@ -21,20 +24,9 @@ class SchemaOrNoSchemaURLValidator(URLValidator):
         re.IGNORECASE
     )
 
-
-class TimeStampedModelWithHistoryFields:
-    """
-    Maintain history for a model each field
-    """
-    history = HistoricalRecords()
-    __history_start_date = None
-    __history_end_date = None
-
-    def _history_start_date(self):
-        return self.__history_start_date
-
-    def _history_end_date(self):
-        return self.__history_end_date
+# register User and UserProfile models for django-simple-history module
+register(User, inherit=True)
+register(UserProfile, inherit=True)
 
 
 class OrgSector(models.Model):

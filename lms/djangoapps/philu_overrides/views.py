@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
 
@@ -112,13 +113,15 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
         'fields_to_disable': []
     }
 
+    registration_fields = context['data']['registration_form_desc']['fields']
+    context['data']['registration_form_desc']['fields'] = reorder_registration_form_fields(registration_fields)
+
     if org_name and admin_email:
         org_name = base64.b64decode(org_name)
         admin_email = base64.b64decode(admin_email)
 
-        registration_fields = context['data']['registration_form_desc']['fields']
-        email_field = registration_fields[0]
-        org_field = registration_fields[6]
+        email_field = registration_fields[3]
+        org_field = registration_fields[7]
         is_poc_field = registration_fields[8]
         email_field['defaultValue'] = admin_email
         org_field['defaultValue'] = org_name
