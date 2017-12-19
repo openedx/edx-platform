@@ -1,0 +1,87 @@
+/* HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-polyfill*/
+div.number-spin-btn-container {
+  display: inline-block;
+  position: absolute;
+  vertical-align: middle;
+  margin: 0 0 0 3px;
+  padding: 0;
+  left: 69%;
+  top: 6px;
+}
+
+div.number-spin-btn {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border-width: 2px;
+  border-color: #ededed #777777 #777777 #ededed;
+  border-style: solid;
+  background-color: #eeeeee;
+  width: 1em;
+  font-size: 14px; }
+  div.number-spin-btn:hover {
+    /* added blue hover color */
+    background-color: rgb(85, 151, 221);
+    cursor: pointer; }
+  div.number-spin-btn:active {
+    border-width: 2px;
+    border-color: #5e5e5e #d8d8d8 #d8d8d8 #5e5e5e;
+    border-style: solid;
+    background-color: #999999; }
+
+div.number-spin-btn-up {
+  border-bottom-width: 1px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius:  0px;
+  font-size: 14px; }
+  div.number-spin-btn-up:before {
+    border-width: 0 0.3em 0.3em 0.3em;
+    border-color: transparent transparent black transparent;
+    top: 25%; }
+  div.number-spin-btn-up:active {
+    border-bottom-width: 1px; }
+  div.number-spin-btn-up:active:before {
+    border-bottom-color: white;
+    top: 26%;
+    left: 51%; }
+
+div.number-spin-btn-down {
+  border-top-width: 1px;
+  -moz-border-radius: 0px 0px 3px 3px;
+  -webkit-border-radius: 0px 0px 3px 3px;
+  border-radius: 0px 0px 3px 3px; }
+  div.number-spin-btn-down:before {
+    border-width: 0.3em 0.3em 0 0.3em;
+    border-color: black transparent transparent transparent;
+    top: 75%; }
+  div.number-spin-btn-down:active {
+    border-top-width: 1px; }
+  div.number-spin-btn-down:active:before {
+    border-top-color: white;
+    top: 76%;
+    left: 51%; }
+
+div.number-spin-btn-up:before,
+div.number-spin-btn-down:before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  left: 50%;
+  margin: -0.15em 0 0 -0.3em;
+  padding: 0; }
+
+input:disabled + div.number-spin-btn-container > div.number-spin-btn-up:active, input:disabled + div.number-spin-btn-container > div.number-spin-btn-down:active {
+  border-color: #ededed #777777 #777777 #ededed;
+  border-style: solid;
+  background-color: #cccccc; }
+input:disabled + div.number-spin-btn-container > div.number-spin-btn-up:before, input:disabled + div.number-spin-btn-container > div.number-spin-btn-up:active:before {
+  border-bottom-color: #999999;
+  top: 25%;
+  left: 50%; }
+input:disabled + div.number-spin-btn-container > div.number-spin-btn-down:before, input:disabled + div.number-spin-btn-container > div.number-spin-btn-down:active:before {
+  border-top-color: #999999;
+  top: 75%;
+  left: 50%; }

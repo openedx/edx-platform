@@ -1,0 +1,35 @@
+<li class="field-group course-grading-assignment-list-item">
+  <div class="field text" id="field-course-grading-assignment-name">
+  	<label for="course-grading-assignment-name"><%= gettext("Assignment Type Name") %></label>
+  	<input type="text" class="long" id="course-grading-assignment-name" value="<%= model.get('type') %>" />
+  	<span class="tip tip-stacked"><%= gettext("The general category for this type of assignment, for example, Homework or Midterm Exam. This name is visible to learners.") %></span>
+  </div>
+
+  <div class="field text" id="field-course-grading-assignment-shortname">
+    <label for="course-grading-assignment-shortname"><%= gettext("Abbreviation") %></label>
+    <input type="text" class="short" id="course-grading-assignment-shortname" value="<%= model.get('short_label') %>" />
+    <span class="tip tip-stacked"><%= gettext("This short name for the assignment type (for example, HW or Midterm) appears next to assignments on a learner's Progress page.") %></span>
+  </div>
+
+  <div class="field text" id="field-course-grading-assignment-gradeweight">
+    <label for="course-grading-assignment-gradeweight"><%= gettext("Weight of Total Grade") %></label>
+    <input type="text" class="short" id="course-grading-assignment-gradeweight" value = "<%= model.get('weight') %>" />
+    <span class="tip tip-stacked"><%= gettext("The weight of all assignments of this type as a percentage of the total grade, for example, 40. Do not include the percent symbol.") %></span>
+  </div>
+
+  <div class="field text" id="field-course-grading-assignment-totalassignments">
+    <label for="course-grading-assignment-totalassignments"><%= gettext("Total Number") %></label>
+    <input type="text" class="short" id="course-grading-assignment-totalassignments" value = "<%= model.get('min_count') %>" />
+    <span class="tip tip-stacked"><%= gettext("The number of subsections in the course that contain problems of this assignment type.") %></span>
+  </div>
+
+  <div class="field text" id="field-course-grading-assignment-droppable">
+    <label for="course-grading-assignment-droppable"><%= gettext("Number of Droppable") %></label>
+    <input type="text" class="short" id="course-grading-assignment-droppable" value = "<%= model.get('drop_count') %>" />
+    <span class="tip tip-stacked"><%= gettext("The number of assignments of this type that will be dropped. The lowest scoring assignments are dropped first.") %></span>
+  </div>
+
+  <div class="actions">
+  	<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span><%= gettext("Delete") %></a>
+  </div>
+</li>

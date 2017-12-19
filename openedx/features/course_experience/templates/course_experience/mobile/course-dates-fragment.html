@@ -1,0 +1,13 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name="static" file="../../static_content.html"/>
+
+% for course_date in course_date_blocks:
+    <%include file="../dates-summary.html" args="course_date=course_date"/>
+% endfor
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(".localized-datetime");
+</%static:require_module_async>

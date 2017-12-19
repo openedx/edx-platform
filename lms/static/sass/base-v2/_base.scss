@@ -1,0 +1,6 @@
+// Base rules for Pattern Library pages
+
+.container {
+  @include make-container();
+  @include make-container-max-widths();
+}

@@ -1,0 +1,320 @@
+// studio animations & keyframes
+// ====================
+
+// Table of Contents
+// * +Fade In - Extend
+// * +Fade Out - Extend
+// * +Rotate Up - Extend
+// * +Rotate Down - Extend
+// * +Rotate Clockwise - Extend
+// * +Notifications - Slide -  Keyframes
+// * +Bounce In - Extend
+// * +Bounce Out - Extend
+// * +Flash - Once - Extend
+// * +Flash - Double - Extend
+// * +Pulse - Extend
+// * +Dropped - Extend
+
+// +Fade In - Extend
+// ====================
+// fade in keyframes
+@include keyframes(fadeIn) {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+// fade in  animation
+%anim-fadeIn {
+  @include animation(fadeIn $tmg-f2 linear 1);
+}
+
+// +Fade Out - Extend
+// ====================
+// fade out keyframes
+@include keyframes(fadeOut) {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+// fade out animation
+%anim-fadeOut {
+  @include animation(fadeOut $tmg-f2 linear 1);
+}
+
+// +Rotate Up - Extend
+// ====================
+// rotate up keyframes
+@include keyframes(rotateUp) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-90deg));
+  }
+
+  100% {
+    @include transform(rotate(-180deg));
+  }
+}
+
+// rotate up animation
+%anim-rotateUp {
+  @include animation(rotateUp $tmg-f2 ease-in-out 1);
+}
+
+
+// +Rotate Down - Extend
+// ====================
+// rotate down keyframes
+@include keyframes(rotateDown) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(90deg));
+  }
+
+  100% {
+    @include transform(rotate(180deg));
+  }
+}
+
+// rotate down animation
+%anim-rotateDown {
+  @include animation(rotateDown $tmg-f2 ease-in-out 1);
+}
+
+
+// +Rotate Clockwise - Extend
+// ====================
+// rotate clockwise keyframes
+@include keyframes(rotateCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+// rotate clockwise animation
+%anim-rotateCW {
+  @include animation(rotateCW $tmg-s1 linear infinite);
+}
+
+// +Rotate Clockwise - Extend
+// ====================
+// rotate clockwise keyframes
+@include keyframes(rotateCCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-180deg));
+  }
+
+  100% {
+    @include transform(rotate(-360deg));
+  }
+}
+
+// rotate clockwise animation
+%anim-rotateCCW {
+  @include animation(rotateCCW $tmg-s1 linear infinite);
+}
+
+
+// +Notifications - Slide - Keyframes
+// ====================
+// notifications slide up keyframes
+@include keyframes(notificationSlideUp) {
+  0% {
+    @include transform(translateY(0));
+  }
+
+  90% {
+    @include transform(translateY(-($ui-notification-height)));
+  }
+
+  100% {
+    @include transform(translateY(-($ui-notification-height*0.99)));
+  }
+}
+
+// notifications slide down keyframes
+@include keyframes(notificationSlideDown) {
+  0% {
+    @include transform(translateY(-($ui-notification-height*0.99)));
+  }
+
+  10% {
+    @include transform(translateY(-($ui-notification-height)));
+  }
+
+  100% {
+    @include transform(translateY(0));
+  }
+}
+
+
+// +Bounce In - Extend
+// ====================
+// bounce in keyframes
+@include keyframes(bounceIn) {
+  0% {
+    opacity: 0;
+
+    @include transform(scale(0.3));
+  }
+
+  50% {
+    opacity: 1;
+
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+}
+
+// bounce in animation
+%anim-bounceIn {
+  @include animation(bounceIn $tmg-f1 ease-in-out 1);
+}
+
+// +Bounce Out - Extend
+// ====================
+// bounce out keyframes
+@include keyframes(bounceOut) {
+  0% {
+    @include transform(scale(1));
+  }
+
+  50% {
+    opacity: 1;
+
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    opacity: 0;
+
+    @include transform(scale(0.3));
+  }
+}
+
+// bounce out animation
+%anim-bounceOut {
+  @include animation(bounceOut $tmg-f1 ease-in-out 1);
+}
+
+// +Flash - Once - Extend
+// ====================
+// flash keyframes
+@include keyframes(flash) {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+// flash animation
+%anim-flash {
+  @include animation(flash $tmg-f1 ease-in-out 1);
+}
+
+// +Flash - Double - Extend
+// ====================
+// flash double keyframes
+@include keyframes(flashDouble) {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0;
+  }
+}
+
+// flash double animation
+%anim-flashDouble {
+  @include animation(flashDouble $tmg-f1 ease-in-out 1);
+}
+
+// +Pulse - Extend
+// ====================
+// pulse keyframes
+@include keyframes(pulse) {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+// pulse animation
+%anim-pulse {
+  @include animation(pulse $tmg-f1 ease-in-out 1);
+}
+
+// Dropped - Extend
+// ====================
+// was dropped keyframes
+@include keyframes(was-dropped) {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+// was dropped animation
+%anim-was-dropped {
+  @include animation(was-dropped $tmg-f1 ease-in-out 1);
+}

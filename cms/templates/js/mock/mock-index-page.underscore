@@ -1,0 +1,221 @@
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions">
+    <h1 class="page-header">Studio Home</h1>
+    <nav class="nav-actions">
+      <h3 class="sr">Page Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button new-button new-course-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
+              New Course</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
+              New Library</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+
+      <div class="wrapper-create-element wrapper-create-course">
+        <form class="form-create create-course course-info" id="create-course-form" name="create-course-form">
+          <div class="wrap-error">
+            <div id="course_creation_error" name="course_creation_error" class="message message-status message-status error" role="alert">
+            <p>Please correct the highlighted fields below.</p>
+            </div>
+          </div>
+
+          <div class="wrapper-form">
+            <h3 class="title">Create a New Course</h3>
+
+            <fieldset>
+              <legend class="sr">Required Information to Create a New Course</legend>
+
+              <ol class="list-input">
+                <li class="field text required" id="field-course-name">
+                  <label for="new-course-name">Course Name</label>
+                  <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="e.g. Introduction to Computer Science" />
+                  <span class="tip">The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+                <li class="field text required">
+                  <label for="new-course-org">Organization</label>
+                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="e.g. UniversityX or OrganizationX" />
+                  <span class="tip">The name of the organization sponsoring the course.  <strong>Note: This is part of your course URL, so no spaces or special characters are allowed.</strong> This cannot be changed, but you can set a different display name in Advanced Settings later.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+
+                <li class="field text required" id="field-course-number">
+                  <label for="new-course-number">Course Number</label>
+                  <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" aria-required="true" placeholder="e.g. CS101" />
+                  <span class="tip">The unique number that identifies your course within your organization. <strong>Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.</strong></span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+
+                <li class="field text required" id="field-course-run">
+                  <label for="new-course-run">Course Run</label>
+                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="e.g. 2014_T1" />
+                  <span class="tip">The term in which your course will run. <strong>Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.</strong></span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+              </ol>
+
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <input type="hidden" value="true" class="allow-unicode-course-id" />
+            <input type="submit" value="Create" class="action action-primary new-course-save" />
+            <input type="button" value="Cancel" class="action action-secondary action-cancel new-course-cancel" />
+          </div>
+        </form>
+      </div>
+
+      <div class="wrapper-create-element wrapper-create-library">
+        <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
+          <div class="wrap-error">
+            <div id="library_creation_error" name="library_creation_error" class="message message-status message-status error" role="alert">
+            <p>Please correct the highlighted fields below.</p>
+            </div>
+          </div>
+
+          <div class="wrapper-form">
+            <h3 class="title">Create a New Library</h3>
+
+            <fieldset>
+              <legend class="sr">Required Information to Create a New Library</legend>
+
+              <ol class="list-input">
+                <li class="field text required" id="field-library-name">
+                  <label for="new-library-name">Library Name</label>
+                  <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" aria-required="true" placeholder="e.g. Computer Science Problems" />
+                  <span class="tip">The public display name for your library.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+                <li class="field text required">
+                  <label for="new-library-org">Organization</label>
+                  <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" aria-required="true" placeholder="e.g. UniversityX or OrganizationX" />
+                  <span class="tip">The public organization name for your library. This cannot be changed.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+
+                <li class="field text required" id="field-library-number">
+                  <label for="new-library-number">Major Version Number</label>
+                  <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" value="1" />
+                  <span class="tip">The <strong>major version number</strong> of your library. Minor revisions are tracked as edits happen within a library.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+              </ol>
+
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <input type="hidden" value="False" class="allow-unicode-course-id" />
+            <input type="submit" value="Create" class="action action-primary new-library-save" />
+            <input type="button" value="Cancel" class="action action-secondary action-cancel new-library-cancel" />
+          </div>
+        </form>
+      </div>
+
+      <!-- STATE: processing courses -->
+      <div class="courses courses-processing">
+          <h3 class="title">Courses Being Processed</h3>
+
+          <ul class="list-courses">
+            <!-- STATE: re-run is processing -->
+            <li class="wrapper-course has-status" data-test-unsucceeded="edX/DM101/2014">
+              <div class="course-item course-rerun is-processing">
+                <div class="course-details" href="#">
+                  <h3 class="course-title">Demo Course</h3>
+
+                  <div class="course-metadata">
+                    <span class="course-org metadata-item">
+                      <span class="label">Organization:</span> <span class="value">edX</span>
+                    </span>
+                    <span class="course-num metadata-item">
+                      <span class="label">Course Number:</span>
+                      <span class="value">DM101</span>
+                    </span>
+                    <span class="course-run metadata-item">
+                      <span class="label">Course Run:</span> <span class="value">2014</span>
+                    </span>
+                  </div>
+                </div>
+
+                <dl class="course-status">
+                  <dt class="label sr">This re-run processing status:</dt>
+                  <dd class="value">
+                    <span class="icon fa fa-refresh fa-spin" aria-hidden="true"></span>
+                    <span class="copy">Configuring as re-run</span>
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="status-message">
+                <p class="copy">The new course will be added to your course list in 5-10 minutes. Return to this page or refresh it to update the course list. The new course will need some manual configuration.</p>
+              </div>
+            </li>
+
+            <!-- - - - -->
+
+            <!-- STATE: re-run has error -->
+            <li class="wrapper-course has-status" data-test-unsucceeded="edX/DM102/2014">
+              <div class="course-item course-rerun has-error">
+                <div class="course-details" href="#">
+                  <h3 class="course-title">Demo Course 2</h3>
+
+                  <div class="course-metadata">
+                    <span class="course-org metadata-item">
+                      <span class="label">Organization:</span> <span class="value">edX</span>
+                    </span>
+                    <span class="course-num metadata-item">
+                      <span class="label">Course Number:</span>
+                      <span class="value">DM102</span>
+                    </span>
+                    <span class="course-run metadata-item">
+                      <span class="label">Course Run:</span> <span class="value">2014</span>
+                    </span>
+                  </div>
+                </div>
+
+                <dl class="course-status">
+                  <dt class="label sr">This re-run processing status:</dt>
+                  <dd class="value">
+                    <span class="icon fa fa-warning" aria-hidden="true"></span>
+                    <span class="copy">Configuration Error</span>
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="status-message has-actions">
+                <p class="copy">A system error occurred while your course was being processed. Please go to the original course to try the re-run again, or contact your PM for assistance.</p>
+
+                <ul  class="status-actions">
+                  <li class="action action-dismiss">
+                    <a href="#" class="button dismiss-button" data-dismiss-link="dummy_dismiss_url">
+                      <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+                      <span class="button-copy">Dismiss</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+      </div>
+
+      <ul id="course-index-tabs">
+        <li class="courses-tab active"><a>Courses</a></li>
+        <li class="libraries-tab"><a>Libraries</a></li>
+      </ul>
+
+      <div class="courses courses-tab active">
+      <div class="libraries libraries-tab"></div>
+
+    </article>
+  </section>
+</div>

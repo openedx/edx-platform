@@ -1,0 +1,25 @@
+[
+    {
+        "pk": 1000,
+        "model": "auth.user",
+        "fields": {
+            "date_joined": "2016-06-12 11:02:13.007790+00:00",
+            "username": "\u0639\u0645\u0631 \u0662",
+            "first_name": "Mike",
+            "last_name": "Doe",
+            "email":"unicode@example.com",
+            "password": "test",
+            "is_staff": false,
+            "is_active": true
+        }
+    },
+    {
+        "pk": 1000,
+        "model": "student.userprofile",
+        "fields": {
+            "user": 1000,
+            "name": "John Doe",
+            "courseware": "course.xml"
+        }
+    }
+]

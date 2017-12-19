@@ -1,0 +1,15 @@
+// studio - base styling
+// ====================
+html {
+  height: 102%; // force scrollbar to prevent jump when scroll appears, cannot use overflow because it breaks drag
+}
+
+body {
+  min-width: $fg-min-width;
+  background: $uxpl-grayscale-x-back;
+  color: $gray-d3;
+}
+
+footer.primary{
+  font-size: font-size(x-small);
+}

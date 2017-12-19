@@ -1,0 +1,27 @@
+<nav class="wrapper-preview-menu" aria-label="Course View">
+    <div class="preview-menu">
+        <ol class="preview-actions">
+            <li class="action-preview">
+                <form action="#" class="action-preview-form" method="post">
+                    <label for="action-preview-select" class="action-preview-label">View this course as:</label>
+                    <select class="action-preview-select" id="action-preview-select" name="select">
+                        <option value="staff" selected>Staff</option>
+                        <option value="student">Learner</option>
+                        <option value="specific student">Specific learner</option>
+                        <option value="group-a" data-group-id="group-a" data-partition-id="test_partition_a_id">
+                            Learner in Group A
+                        </option>
+                        <option value="group-b" data-group-id="group-b" data-partition-id="test_partition_b_id">
+                            Learner in Group B
+                        </option>
+                    </select>
+                    <div class="action-preview-username-container">
+                        <label for="action-preview-username" class="action-preview-label">Username or email:</label>
+                        <input type="text" class="action-preview-username" id="action-preview-username">
+                    </div>
+                    <button type="submit" class="sr" name="submit" value="submit">Set preview mode</button>
+                </form>
+            </li>
+        </ol>
+    </div>
+</nav>

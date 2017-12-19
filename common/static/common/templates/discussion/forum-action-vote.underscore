@@ -1,0 +1,18 @@
+<li class="actions-item">
+    <span aria-hidden="true" class="display-vote is-hidden" >
+      <span class="vote-count"></span>
+    </span>
+    <button class="btn-link action-button action-vote" role="checkbox" aria-checked="false">
+        <% // Vote counts are populated by JS %>
+        <span class="sr"><%- gettext("Vote for this post,") %>&nbsp;</span>
+        <span class="sr js-sr-vote-count"></span>
+
+        <span class="action-label" aria-hidden="true">
+          <span class="vote-count"></span>
+        </span>
+
+        <span class="action-icon" aria-hidden="true">
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
+        </span>
+    </button>
+</li>

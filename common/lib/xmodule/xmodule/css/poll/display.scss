@@ -1,0 +1,221 @@
+div.poll_question {
+  @media print {
+    display: block;
+    width: auto;
+    padding: 0;
+
+    canvas, img {
+      page-break-inside: avoid;
+    }
+  }
+
+  .inline {
+    display: inline;
+  }
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: ($baseline*0.75);
+    color: #fe57a1;
+    font-size: 1.9em;
+
+    &.problem-header {
+      div.staff {
+        margin-top: ($baseline*1.5);
+        font-size: 80%;
+      }
+    }
+
+    @media print {
+      display: block;
+      width: auto;
+      border-right: 0;
+    }
+  }
+
+  p {
+    text-align: justify;
+    font-weight: bold;
+  }
+
+  .poll_answer {
+    margin-bottom: $baseline;
+
+    &.short {
+      clear: both;
+    }
+
+    .question {
+      height: auto;
+      clear: both;
+      min-height: 30px;
+
+      &.short {
+        clear: none;
+        width: 30%;
+        display: inline;
+        float: left;
+      }
+
+      .button {
+        @extend %ui-fake-link;
+
+        -webkit-appearance: none;
+        -webkit-background-clip: padding-box;
+        -webkit-border-image: none;
+        -webkit-box-align: center;
+        -webkit-box-shadow: rgb(255, 255, 255) 0px 1px 0px 0px inset;
+        -webkit-font-smoothing: antialiased;
+        -webkit-rtl-ordering: logical;
+        -webkit-user-select: text;
+        -webkit-writing-mode: horizontal-tb;
+        background-clip: padding-box;
+        background-color: rgb(238, 238, 238);
+        background-image: -webkit-linear-gradient(top, rgb(238, 238, 238), rgb(210, 210, 210));
+        border-bottom-color: rgb(202, 202, 202);
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-left-color: rgb(202, 202, 202);
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-right-color: rgb(202, 202, 202);
+        border-right-style: solid;
+        border-right-width: 1px;
+        border-top-color: rgb(202, 202, 202);
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        border-top-style: solid;
+        border-top-width: 1px;
+        box-shadow: rgb(255, 255, 255) 0px 1px 0px 0px inset;
+        box-sizing: border-box;
+        color: rgb(51, 51, 51);
+
+        /* display: inline-block; */
+        display: inline;
+        float: left;
+        font-family: 'Open Sans', Verdana, Geneva, sans-serif;
+        font-size: 13px;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: bold;
+        letter-spacing: normal;
+        line-height: 25.59375px;
+        margin-bottom: ($baseline*0.75);
+        margin: 0;
+        padding: 0px;
+        text-align: center;
+        text-decoration: none;
+        text-indent: 0px;
+        text-shadow: rgb(248, 248, 248) 0px 1px 0px;
+        text-transform: none;
+        vertical-align: top;
+        white-space: pre-line;
+        width: 25px;
+        height: 25px;
+        word-spacing: 0px;
+        writing-mode: lr-tb;
+      }
+
+      .button.answered {
+        -webkit-box-shadow: rgb(97, 184, 225) 0px 1px 0px 0px inset;
+        background-color: rgb(29, 157, 217);
+        background-image: -webkit-linear-gradient(top, rgb(29, 157, 217), rgb(14, 124, 176));
+        border-bottom-color: rgb(13, 114, 162);
+        border-left-color: rgb(13, 114, 162);
+        border-right-color: rgb(13, 114, 162);
+        border-top-color: rgb(13, 114, 162);
+        box-shadow: rgb(97, 184, 225) 0px 1px 0px 0px inset;
+        color: rgb(255, 255, 255);
+        text-shadow: rgb(7, 103, 148) 0px 1px 0px;
+        background-image: none;
+      }
+
+      .text {
+        @extend %ui-fake-link;
+
+        display: inline;
+        float: left;
+        width: 80%;
+        text-align: left;
+        min-height: 30px;
+        margin-left: $baseline;
+        height: auto;
+        margin-bottom: $baseline;
+
+        &.short {
+          width: 100px;
+        }
+      }
+    }
+
+    .stats {
+      min-height: 40px;
+      margin-top: $baseline;
+      clear: both;
+
+      &.short {
+        margin-top: 0;
+        clear: none;
+        display: inline;
+        float: right;
+        width: 70%;
+      }
+
+      .bar {
+        width: 75%;
+        height: 20px;
+        border: 1px solid black;
+        display: inline;
+        float: left;
+        margin-right: ($baseline/2);
+
+        &.short {
+          width: 65%;
+          height: 20px;
+          margin-top: 3px;
+        }
+
+        .percent {
+          background-color: gray;
+          width: 0;
+          height: 20px;
+
+          &.short { }
+        }
+      }
+
+      .number {
+        width: 80px;
+        display: inline;
+        float: right;
+        height: 28px;
+        text-align: right;
+
+        &.short {
+          width: 120px;
+          height: auto;
+        }
+      }
+    }
+  }
+
+  .poll_answer.answered {
+    -webkit-box-shadow: rgb(97, 184, 225) 0 1px 0 0 inset;
+    background-color: rgb(29, 157, 217);
+    background-image: -webkit-linear-gradient(top, rgb(29, 157, 217), rgb(14, 124, 176));
+    border-bottom-color: rgb(13, 114, 162);
+    border-left-color: rgb(13, 114, 162);
+    border-right-color: rgb(13, 114, 162);
+    border-top-color: rgb(13, 114, 162);
+    box-shadow: rgb(97, 184, 225) 0 1px 0 0 inset;
+    color: rgb(255, 255, 255);
+    text-shadow: rgb(7, 103, 148) 0 1px 0;
+  }
+
+  .button.reset-button {
+    clear: both;
+    float: right;
+  }
+}

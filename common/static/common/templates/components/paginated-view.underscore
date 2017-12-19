@@ -1,0 +1,4 @@
+<div class="sr-is-focusable sr-<%= type %>-view" tabindex="-1"></div>
+<div class="<%= type %>-paging-header"></div>
+<ul class="<%= type %>-list cards-list"></ul>
+<div class="<%= type %>-paging-footer"></div>

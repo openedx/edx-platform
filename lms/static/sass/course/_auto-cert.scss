@@ -1,0 +1,39 @@
+.wrapper-msg.wrapper-auto-cert {
+  @include margin(0, 0, 0, 0); // Overrides .wrapper-msg
+  @include padding(0, 0, 0, 0); // Overrides .wrapper-msg
+
+  background: none; // Overrides .wrapper-msg
+
+  .errors-info {
+    margin-top: $baseline;
+    margin-bottom: $baseline;
+    color: $error-color;
+  }
+
+  .auto-cert-message {
+    margin: $baseline 0;
+    padding: $baseline;
+    border-left: 3px solid $m-blue-d1;
+    background: $gray-l5;
+
+    .has-actions {
+      .msg-content {
+        width: flex-grid(9, 12);
+      }
+
+      .msg-actions {
+        @extend %t-copy-base;
+
+        display: inline-block;
+        width: flex-grid(3, 12);
+
+        .btn {
+          @extend %btn-primary-blue;
+          @extend %t-weight4;
+
+          text-shadow: none;
+        }
+      }
+    }
+  }
+}

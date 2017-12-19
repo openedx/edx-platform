@@ -1,0 +1,4 @@
+<div class="team-actions">
+  <h3 class="title"><%- gettext("Are you having trouble finding a team to join?") %></h3>
+  <p class="copy"><%= message %></p>
+</div>

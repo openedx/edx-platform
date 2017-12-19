@@ -1,0 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
+<section class="container peer-grading-container">
+<h2>${_("Peer Grading")}</h2>
+    % if use_for_single_location:
+        <p>${_("The due date has passed, and peer grading for this problem is closed at this time.")} </p>
+    %else:
+        <p>${_("The due date has passed, and peer grading is closed at this time.")} </p>
+    %endif
+</section>

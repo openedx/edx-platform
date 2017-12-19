@@ -1,0 +1,374 @@
+// ------------------------------
+// // Open edX Certificates: Layouts
+
+// About: styling for generic layouts and responsive support.
+
+// #BASE
+// #ACCOMPLISHMENT
+
+// ------------------------------
+// #BASE
+// ------------------------------
+%layout-wrapper {
+  margin-bottom: spacing-vertical(base);
+  padding: 0 5%;
+
+  @media(min-width: $bp-screen-md) {
+    padding: 0 2.5%;
+  }
+}
+
+%layout {
+  @include grid-container();
+}
+
+// app header
+.wrapper-header {
+  @extend %layout-wrapper;
+
+  padding-top: spacing-vertical(small);
+  padding-bottom: spacing-vertical(small);
+}
+
+.header-app {
+  @extend %layout;
+
+  .logo {
+    display: block;
+
+    @include size(rem(100) auto);
+
+    margin: 0 auto;
+  }
+
+  .logo-img {
+    display: block;
+    width: 100%;
+  }
+}
+
+.header-app-title {
+  @include text-align(center);
+  @include span(12);
+
+  margin: 0;
+}
+
+// banner
+.wrapper-banner {
+  @extend %layout-wrapper;
+
+  padding-top: spacing-vertical(small);
+  padding-bottom: spacing-vertical(small);
+
+  .banner {
+    @extend %layout;
+  }
+}
+
+// message to user-centric banner
+.wrapper-banner-user {
+  margin-top: -(spacing-vertical(base)); // abut the global header, plz
+}
+
+.banner-user {
+  @include text-align(center);
+
+  @media(min-width: $bp-screen-lg) {
+    @include text-align(left);
+  }
+
+  .wrapper-copy-and-actions {
+    @include grid-container();
+
+    .message-copy {
+      margin-bottom: spacing-vertical(small);
+    }
+
+    .message-actions {
+      @include span(12);
+
+      .action {
+        display: block;
+        width: 100%;
+        margin: 0 auto spacing-vertical(small) auto;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        // CASE: icon display only
+        &.icon-only {
+          @media(min-width: $bp-screen-md) {
+            padding: spacing-vertical(x-small) spacing-horizontal(base);
+
+            .icon {
+              @include margin-right(0);
+            }
+          }
+        }
+
+        @media(min-width: $bp-screen-md) {
+          display: inline-block;
+          vertical-align: middle;
+          min-width: 130px;
+          width: auto;
+          margin-bottom: 0;
+          margin-right: spacing-horizontal(mid-small);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+// app footer
+.wrapper-footer {
+  @extend %layout-wrapper;
+}
+
+.footer-app {
+  @extend %layout;
+}
+
+.footer-app-copyright {
+  @media(min-width: $bp-screen-md) {
+    @include span(6, after);
+
+    margin-bottom: 0;
+  }
+}
+
+.footer-app-nav {
+  @media(min-width: $bp-screen-md) {
+    @include span(6, before);
+  }
+
+  .list {
+    .nav-item {
+      display: block;
+      margin-bottom: spacing-vertical(x-small);
+
+      @media(min-width: $bp-screen-md) {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include margin-right(spacing-horizontal(base));
+
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .list-legal {
+    @media(min-width: $bp-screen-md) {
+      @include text-align(right);
+    }
+  }
+}
+
+// ------------------------------
+// #ACCOMPLISHMENT
+// ------------------------------
+.layout-accomplishment {
+  .wrapper-introduction {
+    @extend %layout-wrapper;
+
+    margin-bottom: spacing-vertical(large);
+
+    .introduction {
+      @extend %layout;
+    }
+  }
+
+  .wrapper-accomplishment-rendering {
+    @extend %layout-wrapper;
+
+    margin-bottom: spacing-vertical(small);
+  }
+
+  .accomplishment-rendering {
+    @extend %layout;
+
+    position: relative;
+    top: -(spacing-vertical(base));
+
+    .accomplishment-course,
+    .accomplishment-recipient,
+    .accomplishment-type {
+      @include span(12);
+    }
+
+    .accomplishment-summary,
+    .accomplishment-statement-detail {
+      @include span(12);
+    }
+  }
+
+  .accomplishment-orgs {
+    @include grid-row;
+
+    .wrapper-orgs {
+      @include text-align(center);
+    }
+
+    .wrapper-organization {
+      @include span(6);
+      @include margin-right(spacing-horizontal(base));
+
+      display: inline-block;
+      vertical-align: middle;
+      height: rem(100);
+      margin-bottom: spacing-vertical(small);
+
+      &:last-child {
+        @include margin-right(0);
+      }
+
+      @media(min-width: $bp-screen-md) {
+        @include span(3);
+      }
+
+      @media(min-width: $bp-screen-lg) {
+        @include span(2);
+      }
+
+      @media(min-width: $bp-screen-xl) {
+        @include span(2);
+      }
+    }
+
+    .organization {
+      @include size(100%);
+
+      position: relative;
+
+    }
+
+    .organization-logo {
+      max-width: 80%;
+      position: absolute;
+      top: 50%;
+
+      @include left(50%);
+
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .accomplishment-signatories {
+    .wrapper-signatories {
+      @include text-align(center);
+    }
+
+    .signatory {
+      display: inline-block;
+      vertical-align: middle;
+
+      @include span(12);
+
+      @media(min-width: $bp-screen-md) {
+        @include span(4);
+      }
+
+      @media(min-width: $bp-screen-lg) {
+        @include span(3);
+      }
+
+      @media(min-width: $bp-screen-xl) {
+        @include span(3);
+      }
+
+      .signatory-signature {
+        display: block;
+        max-width: 100%;
+        max-height: rem(100);
+        padding: spacing-vertical(small) spacing-horizontal(small);
+      }
+    }
+  }
+
+  .wrapper-accomplishment-metadata {
+    @extend %layout-wrapper;
+
+    .accomplishment-metadata {
+      @extend %layout;
+
+      .accomplishment-metadata-title {
+        @include span(12);
+      }
+    }
+
+    .wrapper-metadata {
+      @extend %layout;
+
+      .metadata {
+        @extend %divider-2;
+
+        @include span(12);
+
+        margin-bottom: spacing-vertical(small);
+        border-bottom-color: palette(grayscale, x-back);
+        padding-bottom: spacing-vertical(small);
+
+        &:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        @media(min-width: $bp-screen-md) {
+          @include span(4);
+
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .wrapper-accomplishment-related {
+    @extend %layout-wrapper;
+
+    .accomplishment-related {
+      @extend %layout;
+    }
+
+    .accomplishment-brief {
+      margin-bottom: spacing-vertical(small);
+
+      @media(min-width: $bp-screen-md) {
+        @include span(6);
+      }
+
+      .accomplishment-type-symbol {
+        @include size(rem(50));
+        @include margin-right(spacing-horizontal(base));
+      }
+    }
+  }
+
+  .wrapper-about {
+    @extend %layout-wrapper;
+
+    .about {
+      @extend %layout;
+    }
+
+    .about-item {
+      margin-bottom: spacing-vertical(base);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      @media(min-width: $bp-screen-md) {
+        @include span(6);
+
+        margin-bottom: 0;
+      }
+    }
+  }
+}

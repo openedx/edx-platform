@@ -1,0 +1,121 @@
+"""
+Tests for the force_publish management command
+"""
+import mock
+from django.core.management import call_command, CommandError
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from contentstore.management.commands.force_publish import Command
+from contentstore.management.commands.utils import get_course_versions
+
+
+class TestForcePublish(SharedModuleStoreTestCase):
+    """
+    Tests for the force_publish management command
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestForcePublish, cls).setUpClass()
+        cls.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        cls.test_user_id = ModuleStoreEnum.UserID.test
+        cls.command = Command()
+
+    def test_no_args(self):
+        """
+        Test 'force_publish' command with no arguments
+        """
+        errstring = "Error: too few arguments"
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('force_publish')
+
+    def test_invalid_course_key(self):
+        """
+        Test 'force_publish' command with invalid course key
+        """
+        errstring = "Invalid course key."
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('force_publish', 'TestX/TS01')
+
+    def test_too_many_arguments(self):
+        """
+        Test 'force_publish' command with more than 2 arguments
+        """
+        errstring = "Error: unrecognized arguments: invalid-arg"
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('force_publish', unicode(self.course.id), '--commit', 'invalid-arg')
+
+    def test_course_key_not_found(self):
+        """
+        Test 'force_publish' command with non-existing course key
+        """
+        errstring = "Course not found."
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('force_publish', unicode('course-v1:org+course+run'))
+
+    def test_force_publish_non_split(self):
+        """
+        Test 'force_publish' command doesn't work on non split courses
+        """
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        errstring = 'The owning modulestore does not support this command.'
+        with self.assertRaisesRegexp(CommandError, errstring):
+            call_command('force_publish', unicode(course.id))
+
+
+class TestForcePublishModifications(ModuleStoreTestCase):
+    """
+    Tests for the force_publish management command that modify the courseware
+    during the test.
+    """
+
+    def setUp(self):
+        super(TestForcePublishModifications, self).setUp()
+        self.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.test_user_id = ModuleStoreEnum.UserID.test
+        self.command = Command()
+
+    def test_force_publish(self):
+        """
+        Test 'force_publish' command
+        """
+        # Add some changes to course
+        chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+        self.store.create_child(
+            self.test_user_id,
+            chapter.location,
+            'html',
+            block_id='html_component'
+        )
+
+        # verify that course has changes.
+        self.assertTrue(self.store.has_changes(self.store.get_item(self.course.location)))
+
+        # get draft and publish branch versions
+        versions = get_course_versions(unicode(self.course.id))
+        draft_version = versions['draft-branch']
+        published_version = versions['published-branch']
+
+        # verify that draft and publish point to different versions
+        self.assertNotEqual(draft_version, published_version)
+
+        with mock.patch('contentstore.management.commands.force_publish.query_yes_no') as patched_yes_no:
+            patched_yes_no.return_value = True
+
+            # force publish course
+            call_command('force_publish', unicode(self.course.id), '--commit')
+
+            # verify that course has no changes
+            self.assertFalse(self.store.has_changes(self.store.get_item(self.course.location)))
+
+            # get new draft and publish branch versions
+            versions = get_course_versions(unicode(self.course.id))
+            new_draft_version = versions['draft-branch']
+            new_published_version = versions['published-branch']
+
+            # verify that the draft branch didn't change while the published branch did
+            self.assertEqual(draft_version, new_draft_version)
+            self.assertNotEqual(published_version, new_published_version)
+
+            # verify that draft and publish point to same versions now
+            self.assertEqual(new_draft_version, new_published_version)

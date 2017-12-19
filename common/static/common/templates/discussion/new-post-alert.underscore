@@ -1,0 +1,13 @@
+<div class="alert alert-error pattern-library-shim" role="alert" aria-labelledby="alert-title-error-<%- alertId %>" tabindex="-1">
+    <span class="icon alert-icon fa fa-warning" aria-hidden="true"></span>
+
+    <div class="alert-message">
+        <h3 class="sr-only alert-title" id="alert-title-error-<%- alertId %>">
+            <%- gettext("Error posting your message.") %>
+        </h3>
+
+        <p class="alert-copy">
+            <%- gettext(message) %>
+        </p>
+    </div>
+</div>

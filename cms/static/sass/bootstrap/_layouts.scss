@@ -1,0 +1,356 @@
+// Open edX: Studio layout
+// =======================
+//
+// Note: these styles replicate the Studio styles directly
+// rather than benefiting from any Bootstrap classes. Ideally
+// the layouts should be reimagined using Bootstrap and then
+// these styles will no longer be necessary.
+
+.content-wrapper {
+  margin-top: $baseline;
+
+  .course-tabs {
+    padding-bottom: 0;
+
+    .nav-item {
+      &.active,
+      &:hover {
+        .nav-link {
+          border-bottom-color: theme-color("primary");
+          color: theme-color("primary");
+        }
+      }
+
+      .nav-link {
+        padding: $baseline/2 $baseline*3/4 $baseline*13/20;
+        border-style: solid;
+        border-width: 0 0 $baseline/5 0;
+        border-bottom-color: transparent;
+
+        @include media-breakpoint-down(md) {
+          border: none;
+          text-align: left;
+          padding: 0 0 $baseline/2 0;
+        }
+      }
+    }
+  }
+
+  .main-container {
+    border: 1px solid $border-color;
+    background-color: $body-bg;
+
+    .page-header {
+      border-bottom: 1px solid $border-color;
+      padding: 20px;
+    }
+
+    .page-content {
+      padding: 20px;
+    }
+  }
+
+  &.container-fluid {
+    max-width: $studio-max-width;
+  }
+}
+
+// studio - elements - layouts
+// ====================
+
+// layout - basic page header
+.wrapper-mast {
+  margin: ($baseline*1.5) 0 0 0;
+  padding: 0 $baseline;
+  position: relative;
+
+  .mast,
+  .metadata {
+    @include clearfix();
+
+    position: relative;
+    max-width: $studio-max-width;
+    width: flex-grid(12);
+    margin: 0 auto $baseline auto;
+    color: $body-color;
+  }
+
+  .mast {
+    border-bottom: 1px solid $border-color;
+    padding-bottom: ($baseline/2);
+
+    // layout without actions
+    .page-header {
+      display: flex;
+      flex-direction: column;
+
+      .subtitle {
+        font-size: $font-size-base;
+        margin-bottom: $baseline/4;
+      }
+    }
+
+    // layout with actions
+    &.has-actions {
+      @include clearfix();
+
+      .page-header {
+        float: left;
+        width: flex-grid(6, 12);
+        margin-right: flex-gutter();
+      }
+
+      .nav-actions {
+        position: relative;
+        bottom: -($baseline*0.75);
+        float: right;
+        width: flex-grid(6, 12);
+        text-align: right;
+
+        .nav-item {
+          display: inline-block;
+          vertical-align: top;
+          margin-right: ($baseline/2);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        // buttons
+        .button {
+          @extend %btn-primary-blue;
+          @extend %sizing;
+
+          .action-button-text {
+            display: inline-block;
+            vertical-align: baseline;
+          }
+
+          .icon {
+            display: inline-block;
+            vertical-align: baseline;
+          }
+
+          // CASE: new/create button
+          &.new-button,
+          &.button-new {
+            @extend %btn-primary-green;
+            @extend %sizing;
+          }
+        }
+      }
+    }
+
+    // layout with actions
+    &.has-subtitle {
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+    }
+
+    // layout with breadcrumb navigation
+    &.has-navigation {
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+
+      .navigation-item {
+        @extend %cont-truncated;
+
+        display: inline-block;
+        vertical-align: bottom; // correct for extra padding in FF
+        max-width: 250px;
+        color: $body-color;
+
+        &.navigation-current {
+          @extend %ui-disabled;
+
+          color: color("gray");
+          max-width: 250px;
+
+          &::before {
+            color: color("gray");
+          }
+        }
+      }
+
+      .navigation-link:hover {
+        color: theme-color("primary");
+      }
+
+      .navigation-item::before {
+        content: " / ";
+        margin: ($baseline/4);
+        color: color("gray");
+
+        &:hover {
+          color: color("gray");
+        }
+      }
+
+      .navigation .navigation-item:first-child::before {
+        content: "";
+        margin: 0;
+      }
+    }
+  }
+
+  // CASE: wizard-based mast
+  .mast-wizard {
+    .page-header-sub {
+      @extend %t-title4;
+
+      color: color("gray");
+      font-weight: 300;
+    }
+
+    .page-header-super {
+      @extend %t-title4;
+
+      float: left;
+      width: flex-grid(12, 12);
+      margin-top: ($baseline/2);
+      border-top: 1px solid $border-color;
+      padding-top: ($baseline/2);
+      font-weight: 600;
+    }
+  }
+}
+
+// layout - basic page content
+.wrapper-content {
+  @include make-container();
+  @include make-container-max-widths();
+}
+
+// Specify a two column layout for content
+.content {
+  @include make-row();
+
+  @media (min-width: 576px) {
+    .content-primary {
+      flex: 0 0 66.67%;
+      max-width: 66.67%;
+    }
+
+    .content-supplementary {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+  }
+
+  header {
+    position: relative;
+    margin-bottom: $baseline;
+    border-bottom: 1px solid $gray-300;
+    padding-bottom: ($baseline/2);
+
+    .title-sub {
+      @extend %t-copy-sub1;
+
+      display: block;
+      margin: 0;
+      color: $gray-500;
+    }
+
+    .title-1 {
+      @extend %t-title3;
+      @extend %t-strong;
+
+      margin: 0;
+      padding: 0;
+      color: theme-color("primary");
+    }
+  }
+}
+
+// layout - primary content
+.content-primary {
+  border: 1px solid theme-color("dark");
+  background-color: theme-color("inverse");
+  padding: $baseline ($baseline*1.5);
+  margin-right: $baseline;
+
+  .title-1 {
+    @extend %t-title3;
+  }
+
+  .title-2 {
+    @extend %t-title4;
+
+    margin: 0 0 ($baseline/2) 0;
+  }
+
+  .title-3 {
+    @extend %t-title6;
+
+    margin: 0 0 ($baseline/2) 0;
+  }
+
+  header {
+    @include clearfix();
+
+    .title-2 {
+      width: flex-grid(5, 12);
+      margin: 0 flex-gutter() 0 0;
+      float: left;
+    }
+
+    .tip {
+      @extend %t-copy-sub2;
+
+      width: flex-grid(7, 12);
+      float: right;
+      margin-top: ($baseline/2);
+      text-align: right;
+      color: theme-color("primary");
+    }
+  }
+}
+
+// layout - supplemental content
+.content-supplementary {
+  > section {
+    margin: 0 0 $baseline 0;
+  }
+}
+
+// ====================
+
+// layout - grandfathered
+.main-wrapper {
+  position: relative;
+  margin: 0 ($baseline*2);
+}
+
+.inner-wrapper {
+  @include clearfix();
+
+  position: relative;
+  max-width: 1280px;
+  margin: auto;
+
+  > article {
+    clear: both;
+  }
+}
+
+.main-column {
+  clear: both;
+  float: left;
+  width: 70%;
+}
+
+.sidebar {
+  float: right;
+  width: 28%;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}

@@ -1,0 +1,16 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-learner-dashboard" %>
+
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="pagetitle">${_("Program Details")}</%block>
+<%block name="bodyclass">program-details</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    ${HTML(program_fragment.body_html())}
+</main>

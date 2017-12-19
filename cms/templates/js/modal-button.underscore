@@ -1,0 +1,3 @@
+<li class="action-item">
+    <a href="#" class="button <%- isPrimary ? 'action-primary' : '' %> action-<%- type %>"><%- name %></a>
+</li>

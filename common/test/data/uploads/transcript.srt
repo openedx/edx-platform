@@ -1,0 +1,39 @@
+0
+00:00:00,000 --> 00:00:01,000
+Hi, edX welcomes you0.
+
+1
+00:00:01,000 --> 00:00:02,000
+Hi, edX welcomes you1.
+
+2
+00:00:02,000 --> 00:00:03,000
+Hi, edX welcomes you2.
+
+3
+00:00:03,000 --> 00:00:04,000
+Hi, edX welcomes you3.
+
+4
+00:00:04,000 --> 00:00:05,000
+Hi, edX welcomes you4.
+
+5
+00:00:05,000 --> 00:00:06,000
+Hi, edX welcomes you5.
+
+6
+00:00:06,000 --> 00:00:07,000
+Hi, edX welcomes you6.
+
+7
+00:00:07,000 --> 00:00:08,000
+Hi, edX welcomes you7.
+
+8
+00:00:08,000 --> 00:00:09,000
+Hi, edX welcomes you8.
+
+9
+00:00:09,000 --> 00:00:10,000
+Hi, edX welcomes you9.

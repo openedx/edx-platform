@@ -1,0 +1,29 @@
+<%! from django.utils.translation import ugettext as _ %>
+% if full_name is not UNDEFINED and full_name is not None:
+${_(u"Hi {name},").format(name=full_name)}
+% else:
+${_(u"Hi,")}
+% endif
+
+% if providers:
+    ${_(u"Congratulations! You are now eligible to receive course credit from {providers} for successfully completing your edX course!").format(providers=providers)}
+% else:
+    ${_(u"Congratulations! You are now eligible to receive course credit for successfully completing your edX course!")}
+% endif
+
+${_(u"Click on the link below to get your credit now:")}
+
+${dashboard_link}
+
+${_(u"Course credit can help you get a jump start on your university degree, finish a degree already started, or fulfill requirements at a different academic institution.")}
+
+${_(u'There are 2 steps to getting course credit.')}
+
+${_(u'1. Purchase credit by going to your edX dashboard and clicking the "Get Credit" button below the course title.')}'
+
+
+${_(u'2. When your payment is complete, return to the dashboard and click the "Request Credit" button under the course title to request an official academic transcript at the institution that granted the credit.')}
+
+
+${_(u"We hope you enjoyed the course, and we hope to see you in future edX courses!")}
+${_(u"The edX team")}

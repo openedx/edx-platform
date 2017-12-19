@@ -1,0 +1,6 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
+<%include file="${static.get_template_path('courseware/test_relative_path.html')}" />
+<%include file="${static.get_template_path('/courseware/test_absolute_path.html')}" />
+

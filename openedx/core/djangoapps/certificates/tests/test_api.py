@@ -1,0 +1,123 @@
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+import itertools
+
+import ddt
+import pytz
+import waffle
+from django.test import TestCase
+
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.certificates import api
+from openedx.core.djangoapps.certificates.config import waffle as certs_waffle
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+
+# TODO: Copied from lms.djangoapps.certificates.models,
+# to be resolved per https://openedx.atlassian.net/browse/EDUCATOR-1318
+class CertificateStatuses(object):
+    """
+    Enum for certificate statuses
+    """
+    deleted = 'deleted'
+    deleting = 'deleting'
+    downloadable = 'downloadable'
+    error = 'error'
+    generating = 'generating'
+    notpassing = 'notpassing'
+    restricted = 'restricted'
+    unavailable = 'unavailable'
+    auditing = 'auditing'
+    audit_passing = 'audit_passing'
+    audit_notpassing = 'audit_notpassing'
+    unverified = 'unverified'
+    invalidated = 'invalidated'
+    requesting = 'requesting'
+
+    ALL_STATUSES = (
+        deleted, deleting, downloadable, error, generating, notpassing, restricted, unavailable, auditing,
+        audit_passing, audit_notpassing, unverified, invalidated, requesting
+    )
+
+
+class MockGeneratedCertificate(object):
+    """
+    We can't import GeneratedCertificate from LMS here, so we roll
+    our own minimal Certificate model for testing.
+    """
+    def __init__(self, user=None, course_id=None, mode=None, status=None):
+        self.user = user
+        self.course_id = course_id
+        self.mode = mode
+        self.status = status
+
+    def is_valid(self):
+        """
+        Return True if certificate is valid else return False.
+        """
+        return self.status == CertificateStatuses.downloadable
+
+
+@contextmanager
+def configure_waffle_namespace(feature_enabled):
+    namespace = certs_waffle.waffle()
+
+    with namespace.override(certs_waffle.AUTO_CERTIFICATE_GENERATION, active=feature_enabled):
+        yield
+
+
+@ddt.ddt
+class CertificatesApiTestCase(TestCase):
+    def setUp(self):
+        super(CertificatesApiTestCase, self).setUp()
+        self.course = CourseOverviewFactory.create(
+            start=datetime(2017, 1, 1, tzinfo=pytz.UTC),
+            end=datetime(2017, 1, 31, tzinfo=pytz.UTC),
+            certificate_available_date=None
+        )
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode='audit',
+        )
+        self.certificate = MockGeneratedCertificate(
+            user=self.user,
+            course_id=self.course.id
+        )
+
+    @ddt.data(True, False)
+    def test_auto_certificate_generation_enabled(self, feature_enabled):
+        with configure_waffle_namespace(feature_enabled):
+            self.assertEqual(feature_enabled, api.auto_certificate_generation_enabled())
+
+    @ddt.data(
+        (True, True, False),  # feature enabled and self-paced should return False
+        (True, False, True),  # feature enabled and instructor-paced should return True
+        (False, True, False),  # feature not enabled and self-paced should return False
+        (False, False, False),  # feature not enabled and instructor-paced should return False
+    )
+    @ddt.unpack
+    def test_can_show_certificate_available_date_field(
+            self, feature_enabled, is_self_paced, expected_value
+    ):
+        self.course.self_paced = is_self_paced
+        with configure_waffle_namespace(feature_enabled):
+            self.assertEqual(expected_value, api.can_show_certificate_available_date_field(self.course))
+
+    @ddt.data(
+        (CourseMode.VERIFIED, CertificateStatuses.downloadable, True),
+        (CourseMode.VERIFIED, CertificateStatuses.notpassing, False),
+        (CourseMode.AUDIT, CertificateStatuses.downloadable, False)
+    )
+    @ddt.unpack
+    def test_is_certificate_valid(self, enrollment_mode, certificate_status, expected_value):
+        self.enrollment.mode = enrollment_mode
+        self.enrollment.save()
+
+        self.certificate.mode = CourseMode.VERIFIED
+        self.certificate.status = certificate_status
+
+        self.assertEqual(expected_value, api.is_certificate_valid(self.certificate))

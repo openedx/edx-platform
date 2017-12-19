@@ -1,0 +1,46 @@
+//************************************************************************//
+// Background property for adding multiple backgrounds using shorthand
+// notation.
+//************************************************************************//
+
+@mixin background($backgrounds...) {
+  $spec-backgrounds: ();
+
+  @each $background in $backgrounds {
+    $spec-background: ();
+    $background-type: type-of($background);
+
+    @if $background-type == string or list {
+      $background-str: if($background-type == list, nth($background, 1), $background);
+
+      $url-str:       str-slice($background-str, 0, 3);
+      $gradient-type: str-slice($background-str, 0, 6);
+
+      @if $url-str == "url" {
+          $spec-background: $background;
+      }
+
+      @else if $gradient-type == "linear" {
+        $gradients: _linear-gradient-parser("#{$background}");
+        $spec-background: map-get($gradients, spec-image);
+      }
+
+      @else if $gradient-type == "radial" {
+        $gradients: _radial-gradient-parser("#{$background}");
+        $spec-background: map-get($gradients, spec-image);
+      }
+
+      @else {
+          $spec-background: $background;
+      }
+    }
+
+    @else {
+        $spec-background: $background;
+    }
+
+    $spec-backgrounds: append($spec-backgrounds,   $spec-background,   comma);
+  }
+
+  background: $spec-backgrounds;
+}

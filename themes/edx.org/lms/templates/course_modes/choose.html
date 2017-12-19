@@ -1,0 +1,276 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+<%block name="bodyclass">register verification-process step-select-track</%block>
+<%block name="pagetitle">
+    ${_("Enroll In {course_name} | Choose Your Track").format(course_name=course_name)}
+</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript">
+        var expandCallback = function(event) {
+            event.preventDefault();
+            $(this).next('.expandable-area').slideToggle();
+            var title = $(this).parent();
+            title.toggleClass('is-expanded');
+            if (title.attr("aria-expanded") === "false") {
+                title.attr("aria-expanded", "true");
+            } else {
+                title.attr("aria-expanded", "false");
+            }
+        };
+
+        $(document).ready(function() {
+            $('.expandable-area').slideUp();
+            $('.is-expandable').addClass('is-ready');
+
+            $('.is-expandable .title-expand').click(expandCallback);
+            $('.is-expandable .title-expand').keypress(function(e) {
+                if (e.which == 13) {  // only activate on pressing enter
+                    expandCallback.call(this, e); // make sure that we bind `this` correctly
+                }
+            });
+
+            $('#contribution-other-amt').focus(function() {
+                $('#contribution-other').attr('checked',true);
+            });
+
+            % if use_ecommerce_payment_flow:
+            $('input[name=verified_mode]').click(function(e){
+                e.preventDefault();
+                window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
+                encodeURIComponent('${sku | n, js_escaped_string}');
+            });
+            $('.v2 button[name=verified_mode]').click(function(e){
+                e.preventDefault();
+                window.location.href = 'https://ecommerce.edx.org/coupons/redeem/?code=EDXTSV35&sku=' +
+                encodeURIComponent('${sku | n, js_escaped_string}');
+            });
+            % endif
+        });
+    </script>
+</%block>
+<%static:webpack entry="Currency">
+    new Currency();
+</%static:webpack>
+
+<%block name="content">
+    % if error:
+        <div class="wrapper-msg wrapper-msg-error">
+            <div class=" msg msg-error">
+                <span class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+                <div class="msg-content">
+                    <h3 class="title">${_("Sorry, there was an error when trying to enroll you")}</h3>
+                    <div class="copy">
+                        <p>${error}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    %endif
+
+    <div id="currency_data" value="${currency_data}"></div>
+    <div class="container">
+        <section class="wrapper">
+            <div class="wrapper-register-choose wrapper-content-main">
+                <article class="register-choose content-main">
+                    <header class="page-header content-main">
+                        <h3 class="title v1">
+                            ${title_content}
+                        </h3>
+                        <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
+                        <h3 class="title v2 hidden">
+                            Next, Select Your Learning Path
+                        </h3>
+                    </header>
+
+                    <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+                        <%
+                        b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}
+                        %>
+                        % if "verified" in modes:
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <div class="register-choice register-choice-certificate v2 hidden">
+                                <h4 class="title">Pursue a Verified Certificate</h4>
+                                <div class="wrapper-copy-inline">
+                                  <div class="wrapper-copy-inline">
+                                    <div class="wrapper-copy">
+                                        Get premium level support throughout the course and commit to completion up front.
+                                    </div>
+                                        <img src="/static/images/cert-verified-thumb.png" class="visual-reference img-certificate" alt="Visual representation of a Certificate"/>
+                                  </div>
+                                </div>
+                                <div class="copy-inline">
+                                  <ul class="list-actions">
+                                    <li class="action action-select">
+                                      <input type="hidden" name="contribution" value="${min_price}" />
+                                      <!-- The class verified_mode should be added to this selector if the experiment is implemented-->
+                                      <div class="upgradev1">
+                                        <input type="submit" name="verified_mode" value="Upgrade to a Certificate ($${min_price} USD)" />
+                                      </div>
+                                      <div class="upgradev2 hidden">
+                                          <button type="submit" name="verified_mode">Upgrade to a Certificate (<del>$${min_price} USD</del>)</button>
+                                          <br>
+                                          <div class="savings-message">Save 5% if you upgrade now! ($${int(min_price * .95)} USD)</div>
+                                      </div>
+                                    </li>
+                                  </ul>
+                                </div>
+                            </div>
+                            <div class="register-choice register-choice-certificate v1">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    % if has_credit_upsell:
+                                    <h4 class="title">${_("Pursue Academic Credit with a Verified Certificate")}</h4>
+
+                                    <div class="copy">
+                                        <p>${_("Become eligible for academic credit and highlight your new skills and knowledge with a verified certificate. Use this valuable credential to qualify for academic credit, advance your career, or strengthen your school applications.")}</p>
+                                        <p>
+                                            <div class="wrapper-copy-inline">
+                                                <div class="copy-inline">
+                                                    <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                    <ul>
+                                                        <li>${Text(_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course")).format(**b_tag_kwargs)}</li>
+                                                        <li>${Text(_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
+                                                        <li>${Text(_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="copy-inline list-actions">
+                                                    <ul class="list-actions">
+                                                        <li class="action action-select">
+                                                            <input type="hidden" name="contribution" value="${min_price}" />
+                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    % else:
+                                    <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+
+                                    <div class="copy">
+                                        <p>${_("Highlight your new knowledge and skills with a verified certificate. Use this valuable credential to improve your job prospects and advance your career, or highlight your certificate in school applications.")}</p>
+                                        <p>
+                                            <div class="wrapper-copy-inline">
+                                                <div class="copy-inline">
+                                                    <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                    <ul>
+                                                        <li>${Text(_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
+                                                        <li>${Text(_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
+                                                        <li>${Text(_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course")).format(**b_tag_kwargs)}</li>
+                                                        <li>${Text(_("{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified certificates to help fund free education for everyone globally")).format(**b_tag_kwargs)}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="copy-inline list-actions">
+                                                    <ul class="list-actions">
+                                                        <li class="action action-select">
+                                                            <input type="hidden" name="contribution" value="${min_price}" />
+                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    % endif
+                                </div>
+                            </div>
+                        % endif
+
+                        % if "honor" in modes:
+                            <span class="deco-divider">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+
+                            <div class="register-choice register-choice-audit">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course")}</h4>
+                                    <div class="copy">
+                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.")}</p>
+                                    </div>
+                                </div>
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
+                                    </li>
+                                </ul>
+                            </div>
+                        % elif "audit" in modes:
+                            <span class="deco-divider v1">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <span class="deco-divider v2 hidden">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <div class="register-choice register-choice-continue v2 hidden">
+                                <h4 class="title">
+                                    I Don't Want to Upgrade or Donate Today
+                                </h4>
+                                <div class="wrapper-copy-inline">
+                                    <div class="wrapper-copy">
+                                        If you do not want to add a certificate or donate to edX's mission today, you can skip this step for now and continue to the course.
+                                    </div>
+                                    <img src="/static/images/edx-home-graphic.png" class="visual-reference img-donate" alt="Visual of two hands forming a heart shape" >
+                                </div>
+                                <div class="copy-inline">
+                                    <ul class="list-actions">
+                                      <li class="action action-select">
+                                        <a class="continue-link" href="/dashboard">Continue to Course</a>
+                                      </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- This div was added as part of the LEARNER-1726 experiment. The v2 class should be removed if the experiment is implemented-->
+                            <div class="register-choice register-choice-v2-donate register-choice-view v2 hidden">
+                              <h4 class="title">Donate to Support our Non-Profit Mission</h4>
+                              <div class="wrapper-copy-inline">
+                                <div class="wrapper-copy">
+                                    Even if you are not interested in pursuing a Verified Certificate, a donation helps edX continue to work towards its non-profit mission of making the world's best education more accessible to learners everywhere.
+                                </div>
+                                <div class="copy-inline">
+                                <ul class="list-actions">
+                                    <a class="donation-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AG9VK2LC29L5Y">Donate and Continue to Course</a>
+                                </ul>
+                              </div>
+                              </div>
+                            </div>
+
+                            <div class="register-choice register-choice-audit v1">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course (No Certificate)")}</h4>
+                                    <div class="copy">
+                                        ## Translators: b_start notes the beginning of a section of text bolded for emphasis, and b_end marks the end of the bolded text.
+                                        <p>${Text(_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.  {b_start}Please note that this track does not offer a certificate for learners who earn a passing grade.{b_end}")).format(**b_tag_kwargs)}</p>
+                                    </div>
+                                </div>
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="audit_mode" value="${_('Audit This Course')}" />
+                                    </li>
+                                </ul>
+                            </div>
+                        % endif
+
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                    </form>
+                </article>
+            </div> <!-- /wrapper-content-main -->
+        </section>
+    </div>
+</%block>

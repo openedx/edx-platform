@@ -1,0 +1,41 @@
+// edX LMS - experiments
+// ====================
+// NOTE: use this area for css for ab tests and other experiments.
+// Please list the ticket number of the experiment
+
+// --------------------
+// LEARNER-3072 Program Purchase on dashboard
+
+/* This css was added as part of the LEARNER-3072 experiment */
+
+.complete-program-dashboard-button {
+  float: right;
+  display: block;
+  box-sizing: border-box;
+  color: rgb(242, 248, 251) !important;
+  cursor: pointer;
+  background: rgb(0, 129, 0) none repeat scroll 0% 0% / auto padding-box border-box !important;
+  font: normal normal 600 normal 15px / normal "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 7px;
+  transition: color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s;
+  text-decoration: none !important;
+  border: none !important;
+  margin-top: 5px;
+}
+
+.complete-program-dashboard-button:hover {
+  background: #009b00 !important;
+}
+
+.complete-program-dashboard-span {
+  display: block;
+  float: right;
+}
+
+.complete-program-dashboard-div {
+  display: none;
+  float: right;
+  width: auto;
+  max-width: 420px;
+  margin: 0 0 10px 0;
+}

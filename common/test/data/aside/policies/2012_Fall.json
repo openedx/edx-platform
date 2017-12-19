@@ -1,0 +1,23 @@
+{
+    "course/2012_Fall": {
+        "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
+        "start": "2015-07-17T12:00",
+        "display_name": "Toy Course",
+        "graded": "true"
+    },
+    "tabs": [
+          {"type": "courseware"},
+          {"type": "course_info", "name": "Course Info"},
+          {"type": "static_tab", "url_slug": "syllabus", "name": "Syllabus"},
+          {"type": "static_tab", "url_slug": "resources", "name": "Resources"},
+          {"type": "discussion", "name": "Discussion"},
+          {"type": "wiki", "name": "Wiki"},
+          {"type": "progress", "name": "Progress"}
+        ],
+    "chapter/Overview": {
+        "display_name": "Overview"
+    },
+    "html/secret:toylab": {
+        "display_name": "Toy lab"
+    }
+}

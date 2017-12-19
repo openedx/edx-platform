@@ -1,0 +1,38 @@
+.cn-container {
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    width: 600px;
+    font-size: 14px;
+    line-height: 150%;
+    border: 2px solid #eeeeee;
+    margin: 0 auto;
+}
+
+.cn-container .cn-body {
+    padding: 20px;
+}
+
+.cn-img-wrapper {
+    padding: 9px 0;
+}
+
+.cn-img-wrapper .cn-img {
+    float: left;
+    width: 80px;
+}
+
+.cn-content-clear {
+    padding: 0px 18px 18px;
+    border-top: 3px solid #1d9fd9;
+}
+
+.cn-content-clear .cn-footer {
+    border-top-width: 6px;
+}
+
+.cn-content p {
+    padding: 5px 0;
+}
+
+.cn-footer-content p {
+    padding: 5px 0;
+}

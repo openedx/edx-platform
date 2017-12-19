@@ -1,0 +1,30 @@
+.container.activation {
+  padding: ($baseline*3) 0 ($baseline*6);
+
+  h1 {
+    margin-bottom: $baseline;
+    padding: ($baseline/2);
+
+    &.invalid {
+      @extend %error-message-colors;
+    }
+
+    &.valid {
+      @extend %success-message-colors;
+    }
+  }
+
+  h1 + hr {
+    margin-bottom: ($baseline*1.5);
+  }
+
+  .message {
+    background: rgb(252,252,252);
+    border: 1px solid rgb(200,200,200);
+    box-shadow: 0 3px 20px 0 $shadow;
+    border-radius: 4px;
+    margin: 0 auto;
+    padding: ($baseline*2);
+    width: flex-grid(6);
+  }
+}

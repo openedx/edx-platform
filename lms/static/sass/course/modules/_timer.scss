@@ -1,0 +1,42 @@
+// LMS -- modules -- student notes
+// ====================
+
+div.timer-main {
+  @extend %ui-depth2;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  border-top: 2px solid $black;
+
+  div#timer_wrapper {
+    position: absolute;
+    top: -3px;
+    right: 10px;
+    background: $black;
+    color: $white;
+    padding: ($baseline/2) $baseline;
+    border-radius: 3px;
+  }
+
+  .timer_return_url {
+    display: block;
+    margin-bottom: ($baseline/4);
+    border-bottom: 1px solid tint($black, 20%);
+    padding-bottom: ($baseline/4);
+    font-size: 13px;
+  }
+
+  .timer_label {
+    color: #b0b0b0;
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  #exam_timer {
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+}

@@ -1,0 +1,24 @@
+# This requirements file is only for python packages that need to be installed
+# for the edx-platform in testing environments. This includes:
+#   * Jenkins
+#   * devstack
+# Please do not use this file for packages that are needed in production
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+# If you have changes you would like to make, please consult with:
+#   * @edx/testeng - to discuss it's impact on test infrastructure
+#   * @edx/devops - to check system requirements
+
+execnet==1.4.1
+py==1.4.34
+pysqlite==2.8.3
+pytest==3.1.3
+pytest-attrib==0.1.3
+pytest-catchlog==1.2.2
+pytest-cov==2.5.1
+pytest-django==3.1.2
+pytest-forked==0.2
+pytest-randomly==1.2.1
+pytest-xdist==1.20.0
+tox==2.8.2
+tox-battery==0.5

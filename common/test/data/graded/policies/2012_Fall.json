@@ -1,0 +1,50 @@
+{
+    "course/2012_Fall": {
+        "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
+        "start": "2010-07-17T12:00",
+        "display_name": "Graded Course",
+        "graded": "true"
+    },
+	
+	
+    "vertical/Homework1": {
+        "display_name": "Homework 1", 
+        "graded": true, 
+        "format": "Homework"
+    },
+	
+	
+    "videosequence/Homework2": {
+        "display_name": "Homework 2", 
+        "graded": true, 
+        "format": "Homework"
+    },
+    
+    "problem/H2P1": {
+        "weight": 4
+    },
+    
+    "videosequence/Homework3": {
+        "display_name": "Homework 3", 
+        "graded": true, 
+        "format": "Homework"
+    },
+
+	
+    "vertical/Homework1": {
+        "display_name": "Homework 1", 
+        "graded": true, 
+        "format": "Homework"
+    },
+	
+    "problem/FinalQuestion": {
+        "display_name": "Final Question", 
+        "graded": true, 
+        "format": "Final"
+    },
+	
+    "chapter/Overview": {
+        "display_name": "Overview"
+    }
+
+}

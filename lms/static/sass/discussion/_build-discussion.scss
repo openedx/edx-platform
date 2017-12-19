@@ -1,0 +1,23 @@
+// ------------------------------
+// Discussions: Shared Build Compile
+
+// About: Sass compile for discussion elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports is compiled in the inline-discussion-*.scss files.
+
+// Set the relative path to the static root
+$static-path: '../..';
+
+// Styles for discussions
+@import "utilities/variables-v1";
+@import "mixins";
+@import 'discussion'; // Process old file after definitions but before everything else, partial is deprecated.
+@import 'discussion-v1'; // Non-Pattern Library styling
+@import "elements/actions";
+@import "elements/editor";
+@import "elements/labels";
+@import "elements/navigation";
+@import "views/home";
+@import "views/thread";
+@import "views/create-edit-post";
+@import "views/response";
+@import 'utilities/developer';
+@import 'utilities/shame';

@@ -1,0 +1,37 @@
+{
+    "course/course": {
+        "discussion_topics": {
+            "General": {
+                "id": "i4x-malikx-cs101-course-2014"
+            }
+        }, 
+        "display_name": "Import testing", 
+        "start": "2030-01-01T00:00:00Z", 
+        "tabs": [
+            {
+                "name": "Courseware", 
+                "type": "courseware"
+            }, 
+            {
+                "name": "Course Info", 
+                "type": "course_info"
+            }, 
+            {
+                "name": "Textbooks", 
+                "type": "textbooks"
+            }, 
+            {
+                "name": "Discussion", 
+                "type": "discussion"
+            }, 
+            {
+                "name": "Wiki", 
+                "type": "wiki"
+            }, 
+            {
+                "name": "Progress", 
+                "type": "progress"
+            }
+        ]
+    }
+}

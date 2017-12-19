@@ -1,0 +1,116 @@
+<div id="wrapper-review" tab-index="0" class="wrapper-view make-payment-step">
+   <div class="review view">
+    <% if (!isActive ) { %>
+        <h2 class="page-title">
+            <%- gettext("Account Not Activated")%>
+        </h2>
+    <% } else if ( !upgrade ) { %>
+      <h2 class="page-title">
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "You are enrolling in: {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
+      </h2>
+    <% } else { %>
+      <h2 class="page-title">
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "Upgrade to a Verified Certificate for {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
+      </h2>
+    <% } %>
+
+    <% if ( !isActive ) { %>
+        <p>
+            <%- gettext("Before you upgrade to a certificate track, you must activate your account.") %>
+            <%- gettext("Check your email for an activation message.") %>
+        </p>
+    <% } else { %>
+
+        <div class="certificate <%- courseModeSlug %>_icon">
+            <div class="purchase">
+              <p class="product-info"><span class="product-name"></span> <%- gettext( "Total" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
+            </div>
+            <p>
+                <% if ( courseModeSlug === 'no-id-professional' || courseModeSlug === 'professional') { %>
+                    <%- StringUtils.interpolate(
+                        gettext( "Professional Certificate for {courseName}"),{  courseName: courseName }
+                     )%>
+                <% } else { %>
+                    <%- StringUtils.interpolate(
+                        gettext( "Verified Certificate for {courseName}"),{  courseName: courseName }
+                     )%>
+                <% } %>
+            </p>
+        </div>
+    <% } %>
+
+
+    <% if ( isActive ) { %>
+      <div class="payment-buttons is-ready center">
+        <input type="hidden" name="contribution" value="<%- minPrice %>" />
+        <input type="hidden" name="sku" value="<%- sku %>" />
+        <div class="pay-options">
+          <%
+          // payment buttons will go here
+          %>
+        </div>
+      </div>
+      <div class="border-gray"></div>
+    <% } %>
+
+   </div>
+
+    <% if ( isActive ) { %>
+        <div class="container">
+            <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
+                <p>
+                    <% if ( verificationDeadline ) { %>
+                      <p
+                        class="localized-datetime"
+                        data-datetime="<%-verificationDeadline%>"
+                        data-string="<%-gettext( "To receive a certificate, you must also verify your identity before {date}." )%>"
+                        data-timezone="<%-userTimezone%>"
+                        data-language="<%-userLanguage%>"
+                      >
+                    <% } else  { %>
+                        <%- gettext( "To receive a certificate, you must also verify your identity." ) %>
+                    <% } %>
+                     <%- gettext("To verify your identity, you need a webcam and a government-issued photo ID.") %>
+                </p>
+                <% if ( requirements['photo-id-required'] ) { %>
+                    <div class="photo-requirement user_icon">
+                        <span class="fa fa-user fa-2x" aria-hidden="true"></span>
+                        <h6>
+                            <%- gettext("Photo ID") %>
+                        </h6>
+                        <p>
+                            <%- gettext("Your ID must be a government-issued photo ID that clearly shows your face.") %>
+                        </p>
+                    </div>
+                 <% } %>
+
+                <% if ( requirements['webcam-required'] ) { %>
+                    <div class="photo-requirement cam_icon">
+                        <span class="fa fa-video-camera fa-2x" aria-hidden="true"></span>
+                        <h6>
+                            <%- gettext("Webcam") %>
+                        </h6>
+                        <p>
+                            <%- gettext("You will use your webcam to take a picture of your face and of your government-issued photo ID.") %>
+                        </p>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+    <% } %>
+  <form id="payment-processor-form"></form>
+</div>

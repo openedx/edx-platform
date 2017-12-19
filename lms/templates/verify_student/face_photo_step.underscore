@@ -1,0 +1,72 @@
+<div id="wrapper-facephoto" class="wrapper-view block-photo face-photo-step">
+
+    <div class="requirements">
+        <h2 class="title"><%- gettext( "What You Need for Verification" ) %></h2>
+        <div class="requirement">
+            <h3 class="title"><%- gettext( "Webcam" ) %></h3>
+            <p class="copy"><%- gettext( "You need a computer that has a webcam. When you receive a browser prompt, make sure that you allow access to the camera." ) %></p>
+        </div>
+        <div class="requirement">
+            <h3 class="title"><%- gettext( "Photo Identification" ) %></h3>
+            <p class="copy"><%- gettext( "You need a driver's license, passport, or other government-issued ID that has your name and photo." ) %></p>
+        </div>
+    </div>
+
+
+  <div class="facephoto view">
+    <h3 class="title"><%- gettext( "Take Your Photo" ) %></h2>
+    <div class="instruction">
+      <p><%=  HtmlUtils.interpolateHtml( gettext( "When your face is in position, use the camera button {icon} below to take your photo." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <div class="wrapper-help">
+        <div class="help help-task photo-tips facetips">
+          <h3 class="title"><%- gettext( "To take a successful photo, make sure that:" ) %></h3>
+
+          <div class="copy">
+            <ul class="list-help">
+              <li class="help-item"><%- gettext( "Your face is well-lit." ) %></li>
+              <li class="help-item"><%- gettext( "Your entire face fits inside the frame." ) %></li>
+              <li class="help-item"><%- gettext( "The photo of your face matches the photo on your ID." ) %></li>
+            </ul>
+
+            <p class="copy-extra"><%=  HtmlUtils.interpolateHtml( gettext( "To use the current photo, select the camera button {icon}. To take another photo, select the retake button {icon}." ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span><span class="sr">icon</span>)</span>') } ) %></p>
+          </div>
+        </div>
+
+        <div class="help help-faq facefaq">
+          <h3 class="sr title"><%- gettext( "Frequently Asked Questions" ) %></h3>
+          <div class="copy">
+            <dl class="list-faq">
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer"><%- gettext( "As part of the verification process, you take a photo of both your face and a government-issued photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID." ) %></dd>
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer"><%- _.sprintf( gettext( "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div id="facecam" class="task cam"></div>
+    </div>
+
+    <% if ( nextStepTitle ) { %>
+    <nav class="nav-wizard" id="face_next_button_nav">
+      <button id="next_step_button" class="next action-primary is-disabled right" aria-disabled="true" title="Next">
+      <span class="sr" id="photo_message"></span>
+        <%- _.sprintf(
+          gettext( "Next: %(nextStepTitle)s" ),
+          { nextStepTitle: nextStepTitle }
+        ) %>
+      </button>
+    </nav>
+
+    <% } %>
+
+  </div>
+</div>

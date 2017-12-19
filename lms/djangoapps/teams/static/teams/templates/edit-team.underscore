@@ -1,0 +1,63 @@
+<form>
+<div class="create-team wrapper-msg is-incontext urgency-low error is-hidden" tabindex="-1">
+    <div class="msg">
+        <div class="msg-content">
+            <h3 class="title">
+                <% if (action === 'create') { %>
+                    <%- gettext("Your team could not be created.") %>
+                <% } else if (action === 'edit') { %>
+                    <%- gettext("Your team could not be updated.") %>
+                <% } %>
+            </h3>
+            <span class="screen-reader-message sr"></span>
+            <div class="copy">
+                <p></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (action === 'create') { %>
+    <div class="form-instructions create-team-instructions">
+        <p class="copy">
+            <%- gettext("Enter information to describe your team. You cannot change these details after you create the team.") %></p>
+    </div>
+<% } %>
+
+<div class="team-edit-fields">
+    <div class="team-required-fields">
+    </div>
+    <div class="vertical-line"></div>
+    <div class="team-optional-fields">
+        <fieldset>
+            <div class="u-field u-field-optional_description">
+                <legend aria-describedby="optional-characteristics-help">
+                    <p class="u-field-title"><%- gettext('Optional Characteristics') %></p>
+                </legend>
+                <span id="optional-characteristics-help" class="u-field-message">
+                    <p class="u-field-message-help"><%- gettext('Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.') %></p>
+                </span>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+<div class="create-team form-actions">
+    <button class="action action-primary">
+        <span aria-hidden="true"><%- primaryButtonTitle %></span>
+        <% if (action === 'create') { %>
+            <span class="sr"><%- gettext("Create team.") %></span>
+        <% } else if (action === 'edit') { %>
+            <span class="sr"><%- gettext("Update team.") %></span>
+        <% } %>
+    </button>
+    <button class="action action-cancel">
+        <span aria-hidden="true"><%- gettext("Cancel") %></span>
+        <% if (action === 'create') { %>
+            <span class="sr"><%- gettext("Cancel team creating.") %></span>
+        <% } else if (action === 'edit') { %>
+            <span class="sr"><%- gettext("Cancel team updating.") %></span>
+        <% } %>
+    </button>
+</div>
+</form>

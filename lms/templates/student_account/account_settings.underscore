@@ -1,0 +1,19 @@
+<main id="main" aria-label="Content" tabindex="-1">
+<div class="account-settings-container">
+    <div class="wrapper-header">
+        <h2 class="header-title"><%- gettext("Account Settings") %></h2>
+        <div class="left list-inline account-nav" role="tablist">
+            <% _.each(accountSettingsTabs, function(tab) { %>
+                <button id="<%- tab.id %>" aria-controls="<%- tab.name %>-tabpanel" tabindex="<%- tab.tabindex %>" aria-selected="<%- tab.selected %>" aria-expanded="<%- tab.expanded %>" data-name="<%- tab.name %>" aria-describedby="header-subtitle-<%- tab.name %>" class="tab account-nav-link <%- tab.class %>" role="tab">
+                    <%- tab.label %>
+                </button>
+            <% }); %>
+        </div>
+    </div>
+    <div class="account-settings-sections">
+        <% _.each(accountSettingsTabs, function(tab) { %>
+            <div id="<%- tab.name %>-tabpanel" class="account-settings-tabpanels <% if (!tab.class) { %> hidden <% } %>" aria-label="<%- tab.label %>" role="tabpanel"></div>
+        <% }); %>
+    </div>
+</div>
+</main>

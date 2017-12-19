@@ -1,0 +1,29 @@
+<section>
+<ol class="sortable-subsection-list">
+  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-0" data-locator="subsection-0-id" style="margin:5px">
+      <ol class="sortable-unit-list" id="subsection-list-0">
+          <li class="courseware-unit unit is-draggable" id="unit-0" data-parent="subsection-0-id" data-locator="zero-unit-id"></li>
+      </ol>
+  </li>
+  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-1" data-locator="subsection-1-id" style="margin:5px">
+      <ol class="sortable-unit-list" id="subsection-list-1">
+          <li class="courseware-unit unit is-draggable" id="unit-1" data-parent="subsection-1-id" data-locator="first-unit-id"></li>
+          <li class="courseware-unit unit is-draggable" id="unit-2" data-parent="subsection-1-id" data-locator="second-unit-id"></li>
+          <li class="courseware-unit unit is-draggable" id="unit-3" data-parent="subsection-1-id" data-locator="third-unit-id"></li>
+      </ol>
+  </li>
+  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-2" data-locator="subsection-2-id" style="margin:5px">
+      <ol class="sortable-unit-list" id="subsection-list-2">
+        <li class="courseware-unit unit is-draggable" id="unit-4" data-parent="subsection-2" data-locator="fourth-unit-id"></li>
+      </ol>
+  </li>
+  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-3" data-locator="subsection-3-id" style="margin:5px">
+      <ol class="sortable-unit-list" id="subsection-list-3"></ol>
+  </li>
+  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-4" data-locator="subsection-4-id" style="margin:5px">
+      <ol class="sortable-unit-list" id="subsection-list-4">
+          <li class="courseware-unit unit is-draggable" id="unit-5" data-parent="subsection-4-id" data-locator="fifth-unit-id"></li>
+      </ol>
+  </li>
+</ol>
+</section>

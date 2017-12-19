@@ -1,0 +1,89 @@
+<% if (parentInfo) { %>
+<li class="outline-item outline-item-<%= xblockType %> <%= includesChildren ? 'is-collapsible' : '' %> is-draggable <%= isCollapsed ? 'is-collapsed' : '' %>"
+    data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+
+    <div class="wrapper-xblock-header">
+        <div class="wrapper-xblock-header-primary">
+            <% if (includesChildren) { %>
+                <h3 class="xblock-title expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %>"
+                    title="<%= interpolate(
+                          gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true
+                    ) %>"
+                >
+                    <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
+            <% } else { %>
+                <h3 class="xblock-title">
+            <% } %>
+
+                <% if (xblockInfo.get('studio_url') && xblockInfo.get('category') !== 'chapter') { %>
+                    <a href="<%= xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
+                <% } else { %>
+                    <span class="wrapper-xblock-field is-editable" data-field="display_name">
+                        <span class="xblock-field-value"><%- xblockInfo.get('display_name') %></span>
+                    </span>
+                <% } %>
+            </h3>
+
+            <div class="item-actions">
+                <ul class="actions-list">
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
+                            <span class="icon fa fa-remove" aria-hidden="true"></span>
+                            <span class="sr"><%= gettext('Delete') %></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="wrapper-xblock-header-secondary">
+            <% if (xblockInfo.get('release_date')) { %>
+                <div class="meta-info">
+                    <span class="icon fa fa-clock-o" aria-hidden="true"></span>
+                    <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
+                </div>
+            <% } %>
+
+
+            <div class="item-actions">
+                <ul class="actions-list">
+                </ul>
+            </div>
+        </div>
+    </div>
+<% } %>
+    <% if (!parentInfo && xblockInfo.get('child_info') && xblockInfo.get('child_info').children.length === 0) { %>
+        <div class="no-content add-xblock-component">
+            <p><%= gettext("You haven't added any content to this course yet.") %>
+                <a href="#" class="button button-new" data-category="<%= childCategory %>"
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                   title="<%= interpolate(
+                         gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
+                   ) %>"
+                >
+                    <span class="icon fa fa-plus" aria-hidden="true"></span><%= addChildLabel %>
+                </a>
+            </p>
+        </div>
+    <% } else { %>
+        <ol class="sortable-list sortable-<%= xblockType %>-list">
+        </ol>
+
+        <% if (childType) { %>
+            <div class="add-xblock-component">
+                <a href="#" class="button button-new" data-category="<%= childCategory %>"
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                   title="<%= interpolate(
+                         gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
+                   ) %>"
+                >
+                    <span class="icon fa fa-plus" aria-hidden="true"></span><%= addChildLabel %>
+                </a>
+            </div>
+        <% } %>
+    <% } %>
+
+<% if (parentInfo) { %>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+</li>
+<% } %>

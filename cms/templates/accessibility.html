@@ -1,0 +1,28 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "accessibility" %></%def>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.markup import HTML, Text
+  from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+%>
+<%block name="title">${_("Studio Accessibility Policy")}</%block>
+<%block name="bodyclass">is-signedin not-signedin view-accessibility</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="content">
+
+<div class="wrapper-content wrapper">
+     <div class="content">
+        <div class="content-primary">
+            <div id="root"></div>
+            <%static:studiofrontend page="AccessibilityPage" lang="en">
+            {}
+            </%static:studiofrontend>
+        </div>
+    </div>
+</div>
+
+</%block>

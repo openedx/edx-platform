@@ -1,0 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+(Not currently used)
+
+${_("We are sorry. Our course staff did not approve your request to change "
+  "your name from {old_name} to {new_name}. If you need further "
+  "assistance, please e-mail the tech support at {email}"
+).format(
+  old_name=old_name,
+  new_name=new_name,
+  email=static.get_tech_support_email_address(),
+)}
