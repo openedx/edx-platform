@@ -11,20 +11,10 @@ import django
 def expected_redirect_url(relative_url, hostname='testserver'):
     """
     Get the expected redirect URL for the current Django version and the
-    given relative URL:
-
-    * Django 1.8 and earlier redirect URLs beginning with a slash to absolute
-      URLs, later versions redirect to relative ones.
-    * Django 1.8 and earlier leave URLs without a leading slash alone, later
-      versions prepend the missing slash.
+    given relative URL.  Django 1.8 and earlier redirect to absolute URLs,
+    later versions redirect to relative ones.
     """
     if django.VERSION < (1, 9):
-        if relative_url.startswith('/'):
-            return 'http://{}{}'.format(hostname, relative_url)
-        else:
-            return relative_url
+        return 'http://{}{}'.format(hostname, relative_url)
     else:
-        if relative_url.startswith('/'):
-            return relative_url
-        else:
-            return '/{}'.format(relative_url)
+        return relative_url
