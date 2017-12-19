@@ -6,42 +6,6 @@ from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from nodebb.models import DiscussionCommunity
 
-from lms.djangoapps.onboarding.models import UserExtendedProfile
-
-
-def get_fields_to_sync_with_nodebb():
-    """
-        Return list of fields to sync with NodeBB profile
-    """
-    field_to_sync_with_nodebb = ["id", "email",  "date_joined", "first_name", "last_name", "city", "country",
-                                 "year_of_birth", "language", "country_of_employment", "city_of_employment",
-                                 "organization"]
-
-    field_to_sync_with_nodebb += [interest_field for interest_field, label in
-                                  UserExtendedProfile.INTERESTS_LABELS.items()]
-    field_to_sync_with_nodebb += [function_field for function_field, label in
-                                  UserExtendedProfile.FUNCTIONS_LABELS.items()]
-
-    return field_to_sync_with_nodebb
-
-from lms.djangoapps.onboarding.models import UserExtendedProfile
-
-
-def get_fields_to_sync_with_nodebb():
-    """
-        Return list of fields to sync with NodeBB profile
-    """
-    field_to_sync_with_nodebb = ["id", "email",  "date_joined", "first_name", "last_name", "city", "country",
-                                 "year_of_birth", "language", "country_of_employment", "city_of_employment",
-                                 "organization"]
-
-    field_to_sync_with_nodebb += [interest_field for interest_field, label in
-                                  UserExtendedProfile.INTERESTS_LABELS.items()]
-    field_to_sync_with_nodebb += [function_field for function_field, label in
-                                  UserExtendedProfile.FUNCTIONS_LABELS.items()]
-
-    return field_to_sync_with_nodebb
-
 
 def get_course_related_tabs(request, course):
     """
