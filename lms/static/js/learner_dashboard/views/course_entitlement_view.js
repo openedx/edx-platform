@@ -62,6 +62,7 @@
                      this.$courseCardMessages = $(options.courseCardMessages); // Additional session messages
                      this.$courseTitleLink = $(options.courseTitleLink); // Title link to course home page
                      this.$courseImageLink = $(options.courseImageLink); // Image link to course home page
+                     this.$policyMsg = $(options.policyMsg); // Message for policy information
 
                      // Bind action elements with associated events to objects outside this view
                      this.$dateDisplayField = this.$parentEl ? this.$parentEl.find(options.dateDisplayField) :
@@ -192,6 +193,7 @@
                      this.$triggerOpenBtn.addClass('hidden');
                      this.$enterCourseBtn.addClass('hidden');
                      this.$courseCardMessages.remove();
+                     this.$policyMsg.remove();
                      this.$('.enroll-btn-initial').focus();
                      HtmlUtils.setHtml(
                         this.$dateDisplayField,
