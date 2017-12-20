@@ -17,7 +17,7 @@ from . import waffle
 
 # pylint: disable=ungrouped-imports
 try:
-    from django.models import BigAutoField  # New in django 1.10
+    from django.models import BigAutoField  # Coming in django 1.10
 except ImportError:
     from openedx.core.djangolib.fields import BigAutoField
 # pylint: enable=ungrouped-imports
@@ -206,13 +206,13 @@ class AggregateCompletionManager(CompletionManager):
                 _("AggregateCompletionManager.submit_completion should "
                   "not be called when the aggregation feature is disabled.")
             )
-        self.validate(user, course_key, block_key)
         if earned > possible:
             raise ValueError(_('Earned cannot be greater than the possible value.'))
         if possible > 0.0:
             percent = earned / possible
         else:
-            percent = 0.0
+            percent = 1.0
+        self.validate(user, course_key, block_key)
 
         obj, is_new = self.update_or_create(
             user=user,
