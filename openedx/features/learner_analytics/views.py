@@ -16,8 +16,8 @@ from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 from xmodule.modulestore.django import modulestore
 from util.views import ensure_valid_course_key
@@ -51,7 +51,8 @@ class LearnerAnalyticsView(View):
             'uses_pattern_library': True,
             'grading_policy': course.grading_policy,
             'assignment_grades': self.get_grade_data(request.user, course_key),
-            'assignment_schedule': self.get_schedule(request, course_key)
+            'assignment_schedule': self.get_schedule(request, course_key),
+            'discussion_info': self.get_discussion_data(request, course_key)
         }
         return render_to_response('learner_analytics/dashboard.html', context)
 
@@ -74,7 +75,7 @@ class LearnerAnalyticsView(View):
             }
         return json.dumps(grades)
 
-    def get_discussion_data(self, user, course_key):
+    def get_discussion_data(self, request, course_key):
         """
         Collects and formats the discussion data from a particular user and course.
 
@@ -82,7 +83,8 @@ class LearnerAnalyticsView(View):
             user: User
             course_key: CourseKey
         """
-        pass
+        discussion_data = create_user_profile_context(request, course_key, request.user.id)
+        return json.dumps(discussion_data)
 
     def get_schedule(self, request, course_key):
         """
