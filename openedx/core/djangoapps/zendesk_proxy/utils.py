@@ -12,7 +12,7 @@ from rest_framework import status
 log = logging.getLogger(__name__)
 
 
-def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=None):
+def create_zendesk_ticket(requester_name, requester_email, subject, body, custom_fields=None, uploads=None, tags=None):
     """
     Create a Zendesk ticket via API.
 
@@ -24,8 +24,9 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
         """Internal helper to standardize error message. This allows for simpler splunk alerts."""
         return 'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
 
-    # Remove duplicates from tags list
-    tags = list(set(tags))
+    if tags:
+        # Remove duplicates from tags list
+        tags = list(set(tags))
 
     data = {
         'ticket': {
@@ -34,7 +35,11 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
                 'email': requester_email
             },
             'subject': subject,
-            'comment': {'body': body},
+            'comment': {
+                'body': body,
+                'uploads': uploads
+            },
+            'custom_fields': custom_fields,
             'tags': tags
         }
     }
