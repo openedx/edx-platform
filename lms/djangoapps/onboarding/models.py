@@ -25,7 +25,7 @@ class SchemaOrNoSchemaURLValidator(URLValidator):
     )
 
 # register User and UserProfile models for django-simple-history module
-register(User)
+register(User, app='lms.djangoapps.onboarding', table_name='auth_historicaluser')
 register(UserProfile, table_name='auth_historicaluserprofile')
 
 
