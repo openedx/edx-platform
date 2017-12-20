@@ -3,7 +3,6 @@ Student Views
 """
 
 import datetime
-import dateutil
 import json
 import logging
 import uuid
@@ -75,7 +74,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_visible_course_runs_for_entitlement
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -703,16 +702,8 @@ def dashboard(request):
     course_entitlement_available_sessions = {}
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
-        # Filter only the course runs that do not have an enrollment_end date set, or have one set in the future
-        course_runs_for_course = get_course_runs_for_course(str(course_entitlement.course_uuid))
-        enrollable_course_runs = []
-
-        for course_run in course_runs_for_course:
-            enrollment_end = course_run.get('enrollment_end')
-            if not enrollment_end or (dateutil.parser.parse(enrollment_end) > datetime.datetime.now(UTC)):
-                enrollable_course_runs.append(course_run)
-
-        course_entitlement_available_sessions[str(course_entitlement.uuid)] = enrollable_course_runs
+        valid_course_runs = get_visible_course_runs_for_entitlement(course_entitlement)
+        course_entitlement_available_sessions[str(course_entitlement.uuid)] = valid_course_runs
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
