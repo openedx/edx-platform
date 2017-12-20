@@ -1,14 +1,13 @@
 """
 Tests for the Paver commands for updating test databases
 """
-import os
 from unittest import TestCase
 
 import boto
 from mock import patch
 
 from common.test.utils import MockS3Mixin
-from pavelib.database import verify_fingerprint_in_bucket
+from pavelib.database import is_fingerprint_in_bucket
 
 
 class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
@@ -19,14 +18,12 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         self.conn.create_bucket('moto_test_bucket')
         self.bucket = self.conn.get_bucket('moto_test_bucket')
 
-    @patch.dict(os.environ, {'DB_CACHE_S3_BUCKET': 'moto_test_bucket'})
     def test_fingerprint_in_bucket(self):
         key = boto.s3.key.Key(bucket=self.bucket, name='testfile.zip')
         key.set_contents_from_string('this is a test')
-        self.assertTrue(verify_fingerprint_in_bucket('testfile'))
+        self.assertTrue(is_fingerprint_in_bucket('testfile', 'moto_test_bucket'))
 
-    @patch.dict(os.environ, {'DB_CACHE_S3_BUCKET': 'moto_test_bucket'})
     def test_fingerprint_not_in_bucket(self):
         key = boto.s3.key.Key(bucket=self.bucket, name='testfile.zip')
         key.set_contents_from_string('this is a test')
-        self.assertFalse(verify_fingerprint_in_bucket('otherfile'))
+        self.assertFalse(is_fingerprint_in_bucket('otherfile', 'moto_test_bucket'))
