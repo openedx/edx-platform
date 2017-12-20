@@ -28,7 +28,6 @@ from lms.djangoapps.experiments.utils import get_experiment_user_metadata_contex
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
-from third_party_auth.decorators import tpa_hint_ends_existing_session
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
@@ -55,7 +54,6 @@ class ChooseModeView(View):
         """
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
-    @method_decorator(tpa_hint_ends_existing_session)
     @method_decorator(login_required)
     @method_decorator(transaction.atomic)
     def get(self, request, course_id, error=None):
@@ -197,7 +195,6 @@ class ChooseModeView(View):
                     pass
         return render_to_response("course_modes/choose.html", context)
 
-    @method_decorator(tpa_hint_ends_existing_session)
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)
     @method_decorator(outer_atomic(read_committed=True))
