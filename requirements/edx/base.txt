@@ -40,7 +40,7 @@ edx-ace==0.1.6
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
 edx-drf-extensions==1.2.3
-edx-i18n-tools==0.3.10
+edx-i18n-tools==0.4.2
 edx-lint==0.5.4
 
 # Pin this to test a fix to pylint-django
