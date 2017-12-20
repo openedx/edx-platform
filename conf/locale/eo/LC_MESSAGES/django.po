@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-07 12:14+0000\n"
-"PO-Revision-Date: 2017-12-07 12:14:22.810167\n"
+"POT-Creation-Date: 2017-12-20 12:00+0000\n"
+"PO-Revision-Date: 2017-12-20 12:01:00.983550\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -377,6 +377,12 @@ msgid ""
 msgstr ""
 "Thé üsér äççöünt ässöçïätéd wïth thïs é-mäïl äddréss çännöt rését thé "
 "pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/forms.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+"Füll Nämé çännöt çöntäïn thé föllöwïng çhäräçtérs: < > Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
@@ -7993,6 +7999,7 @@ msgstr "Téäm Ⱡ'σяєм ι#"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -8794,6 +8801,7 @@ msgstr "çöhörtéd Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "Fïrst Nämé Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -8801,6 +8809,7 @@ msgstr "Fïrst Nämé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "Läst Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -8815,6 +8824,7 @@ msgstr "Çömpäný Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 msgid "Title"
 msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
@@ -10507,6 +10517,53 @@ msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Continue"
 msgstr "Çöntïnüé Ⱡ'σяєм ιρѕυм ∂#"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "Stäté/Prövïnçé/Régïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "Çömpäný Ⱡ'σяєм ιρѕυм #"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "Mäïlïng äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+"Téll üs whý ýöü'ré ïntéréstéd ïn {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr "Pröféssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
+msgstr "Spéçïältý Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr ""
@@ -11117,6 +11174,7 @@ msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -11137,6 +11195,7 @@ msgstr "Wïkï Prévïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "window open"
@@ -12723,12 +12782,6 @@ msgstr ""
 "Thé '{field_name}' fïéld çännöt ßé édïtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-"Füll Nämé çännöt çöntäïn thé föllöwïng çhäräçtérs: < > Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
@@ -12833,47 +12886,6 @@ msgid "Year of birth"
 msgstr "Ýéär öf ßïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr "Pröféssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr "Spéçïältý Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "Mäïlïng äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr ""
-"Téll üs whý ýöü'ré ïntéréstéd ïn {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυ#"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr "Stäté/Prövïnçé/Régïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr "Çömpäný Ⱡ'σяєм ιρѕυм #"
-
-#. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Country or Region of Residence"
@@ -12915,18 +12927,17 @@ msgstr ""
 "Ýöü müst ägréé tö thé {platform_name} {terms_of_service} Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢#"
 
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service"
-msgstr "Révïéw thé Térms öf Sérvïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr ""
-"Ì ägréé tö thé {platform_name} {terms_of_service} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢#"
+"Ì ägréé tö thé {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -14496,6 +14507,8 @@ msgstr "Sävé Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
@@ -15913,6 +15926,10 @@ msgid "No git import logs have been recorded for this course."
 msgstr ""
 "Nö gït ïmpört lögs hävé ßéén réçördéd för thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/text-me-the-app.html
+msgid "Text Me The App"
+msgstr "Téxt Mé Thé Àpp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -18549,6 +18566,10 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr "Çöürsé détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -18576,6 +18597,41 @@ msgstr "Stärtéd - {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
 msgstr "Stärts - {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer select a session, your final day to select a session was "
+"{entitlement_expired_at}."
+msgstr ""
+"Ýöü çän nö löngér séléçt ä séssïön, ýöür fïnäl däý tö séléçt ä séssïön wäs "
+"{entitlement_expired_at}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr ""
+"Ýöü müst séléçt ä séssïön ßý {expiration_date} tö äççéss thé çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session to access the course."
+msgstr ""
+"Ýöü müst séléçt ä séssïön tö äççéss thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Change Session"
+msgstr "Çhängé Séssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can no longer change sessions."
+msgstr ""
+"Ýöü çän nö löngér çhängé séssïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can change sessions until {entitlement_expiration_date}."
+msgstr ""
+"Ýöü çän çhängé séssïöns üntïl {entitlement_expiration_date}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -18611,6 +18667,7 @@ msgid "Course options for"
 msgstr "Çöürsé öptïöns för Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Available Actions"
 msgstr "Àväïläßlé Àçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -18621,6 +18678,21 @@ msgstr "Émäïl Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "Rélätéd Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can contact the account holder to request payment, or you can "
+"unenroll from this course"
+msgstr ""
+"Ýöü çän nö löngér äççéss thïs çöürsé ßéçäüsé päýmént häs nöt ýét ßéén "
+"réçéïvéd. Ýöü çän çöntäçt thé äççöünt höldér tö réqüést päýmént, ör ýöü çän "
+"ünénröll fröm thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -18837,6 +18909,10 @@ msgid ""
 msgstr ""
 "Àn érrör öççürréd wïth thïs tränsäçtïön. För hélp, çöntäçt {support_email}. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+msgid "Course options for {courseName}"
+msgstr "Çöürsé öptïöns för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
 msgid "Consent to share your data"
@@ -22260,6 +22336,24 @@ msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "Prögräm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Get the {platform_name} Mobile App!"
+msgstr "Gét thé {platform_name} Mößïlé Àpp! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "We'll send you a one time SMS with a link to download the app."
+msgstr ""
+"Wé'll sénd ýöü ä öné tïmé SMS wïth ä lïnk tö döwnlöäd thé äpp. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Mobile phone number"
+msgstr "Mößïlé phöné nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Send me a text with the link"
+msgstr "Sénd mé ä téxt wïth thé lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -28286,6 +28380,10 @@ msgid ""
 msgstr ""
 "Wé'vé sént än émäïl méssägé tö {email} wïth ïnstrüçtïöns för äçtïvätïng ýöür"
 " äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/widgets/footer.html
+msgid "Policies"
+msgstr "Pölïçïés Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/widgets/footer.html
 msgid "Accessibility Accommodation Request"
