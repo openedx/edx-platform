@@ -363,7 +363,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         mock_course_runs.return_value = [
             {
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
-                'enrollment_end': self.TOMORROW,
+                'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified'
             }
@@ -391,7 +391,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         mock_course_runs.return_value = [
             {
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
-                'enrollment_end': self.TOMORROW,
+                'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified'
             }
@@ -418,8 +418,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
-                'key': mocked_course_overview.id,
-                'enrollment_end': mocked_course_overview.enrollment_end,
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
                 'type': 'verified'
             }
@@ -436,8 +436,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         mock_course_key.return_value = mocked_course_overview.id
         mock_course_runs.return_value = [
             {
-                'key': mocked_course_overview.id,
-                'enrollment_end': mocked_course_overview.enrollment_end,
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
                 'type': 'verified'
             }
@@ -453,8 +453,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         mock_course_key.return_value = mocked_course_overview.id
         mock_course_runs.return_value = [
             {
-                'key': mocked_course_overview.id,
-                'enrollment_end': mocked_course_overview.enrollment_end,
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': None,
                 'pacing_type': 'self_paced',
                 'type': 'verified'
             }
@@ -483,8 +483,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
-                'key': mocked_course_overview.id,
-                'enrollment_end': mocked_course_overview.enrollment_end,
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
                 'type': 'verified'
             }
@@ -519,8 +519,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
         mock_course_runs.return_value = [
             {
-                'key': mocked_course_overview.id,
-                'enrollment_end': mocked_course_overview.enrollment_end,
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
                 'type': 'verified'
             }
