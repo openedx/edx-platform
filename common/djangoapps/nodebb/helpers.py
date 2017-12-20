@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 
 from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-from nodebb.models import DiscussionCommunity
+from nodebb.models import DiscussionCommunity, TeamGroupChat
 
 
 def get_course_related_tabs(request, course):
@@ -61,3 +61,18 @@ def get_community_url(course_id):
     discussion_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
     if discussion_community:
         return discussion_community.community_url
+
+
+def get_room_id(user_info):
+    """
+    Get room_id for MyTeam of a user
+    """
+    room_info = {}
+
+    for team in user_info['teams']['results']:
+        team = dict(team)
+        if team['membership']:
+            team_group = TeamGroupChat.objects.filter(team__team_id=team['id']).first()
+            room_info.update({team['id']: team_group.room_id})
+
+    return room_info
