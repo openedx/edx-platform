@@ -14,6 +14,7 @@ class CourseEntitlementAdmin(admin.ModelAdmin):
                     'mode',
                     'enrollment_course_run',
                     'order_number')
+    raw_id_fields = ('enrollment_course_run', 'user',)
 
 
 @admin.register(CourseEntitlementPolicy)
