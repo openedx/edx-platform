@@ -311,6 +311,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               courseTitleLink: '${ '#course-card-' + str(course_card_index) + ' .course-title a' | n, js_escaped_string }',
               courseImageLink: '${ '#course-card-' + str(course_card_index) + ' .wrapper-course-image > a' | n, js_escaped_string }',
               dateDisplayField: '${ '#course-card-' + str(course_card_index) + ' .info-date-block' | n, js_escaped_string }',
+              policyMsg: '${ '#course-card-' + str(course_card_index) + ' .info-expires-at' | n, js_escaped_string }',
               enterCourseBtn: '${ '#course-card-' + str(course_card_index) + ' .enter-course' | n, js_escaped_string }',
               availableSessions: '${ entitlement_available_sessions | n, dump_js_escaped_json }',
               entitlementUUID: '${ entitlement.course_uuid | n, js_escaped_string }',
