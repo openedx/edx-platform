@@ -1,7 +1,11 @@
 """
 API function for retrieving course blocks data
 """
+from datetime import datetime
+import json
+from dateutil.parser import parse
 
+from courseware.models import StudentFieldOverride
 from lms.djangoapps.course_blocks.api import COURSE_BLOCK_ACCESS_TRANSFORMERS, get_course_blocks
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
@@ -82,6 +86,8 @@ def get_blocks(
             block_type = blocks.get_xblock_field(block_key, 'category')
             if block_type not in block_types_filter:
                 block_keys_to_remove.append(block_key)
+            else:
+                override_xblock_data(user, blocks, block_key, usage_key, requested_fields or [])
         for block_key in block_keys_to_remove:
             blocks.remove_block(block_key, keep_descendants=True)
 
@@ -99,3 +105,47 @@ def get_blocks(
 
     # return serialized data
     return serializer.data
+
+
+def override_xblock_data(user, blocks, block_key, usage_key, requested_fields=[]):
+    """
+    loads override data for requested_fields
+
+    Arguments:
+        usage_key (UsageKey): Identifies the starting block of interest.
+        user (User): Optional user object for whom the blocks are being
+            retrieved. If None, blocks are returned regardless of access checks.
+        requested_fields (list): Optional list of names of additional fields
+            to return for each block.  Supported fields are listed in
+            transformers.SUPPORTED_FIELDS.
+        blocks (BlockStructureBlockData):  A transformed block structure.
+        block_key (UsageKey) - Usage key of the block whose xBlock
+                field is requested.
+    """
+    block_data = blocks[block_key]
+    query = StudentFieldOverride.objects.filter(
+        course_id=usage_key.course_key,
+        location=block_data.location,
+        student_id=user.id,
+    )
+    overrides = {}
+    for override in query:
+        field = block_data.fields[override.field]
+        if isinstance(field, datetime):
+            value = parse(json.loads(override.value))
+        else:
+            value = field.from_json(json.loads(override.value))
+        overrides[override.field] = value
+
+    for field_name in requested_fields:
+        original_data = blocks.get_xblock_field(block_key, field_name)
+        override_data = original_data
+
+        if field_name in overrides:
+            override_data = overrides[field_name]
+
+        blocks.override_xblock_field(
+            block_key,
+            field_name,
+            override_data
+        )
