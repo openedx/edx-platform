@@ -54,11 +54,6 @@
                             hasMembers: memberships.length >= 1
                         })
                     );
-                    this.discussionView = new TeamDiscussionView({
-                        el: this.$('.discussion-module'),
-                        readOnly: !isMember
-                    });
-                    this.discussionView.render();
 
                     this.renderTeamMembers();
 

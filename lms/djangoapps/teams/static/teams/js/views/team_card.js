@@ -10,7 +10,8 @@
         'teams/js/views/team_utils',
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
-        'text!teams/templates/date.underscore'
+        'text!teams/templates/date.underscore',
+        'text!teams/templates/group.underscore',
     ], function(
         $,
         Backbone,
@@ -21,9 +22,10 @@
         TeamUtils,
         teamMembershipDetailsTemplate,
         teamCountryLanguageTemplate,
-        dateTemplate
+        dateTemplate,
+        groupTemplate
     ) {
-        var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView;
+        var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView, GroupView;
 
         TeamMembershipView = Backbone.View.extend({
             tagName: 'div',
@@ -94,6 +96,24 @@
             }
         });
 
+        // TODO: Move this View out as we are changing edx default files
+        // TODO: [Can't override static files without adding theme name in the url]
+        GroupView = Backbone.View.extend({
+            tagName: 'div',
+            className: 'team-group',
+            template: _.template(groupTemplate),
+
+            initialize: function(options) {
+                this.teamID = options.teamID;
+                this.nodeBBUrl = options.nodeBBUrl;
+                this.roomID = JSON.parse(options.roomID);
+            },
+
+            render: function() {
+                this.$el.html(this.template({roomID: this.roomID, teamID: this.teamID, nodeBBUrl: this.nodeBBUrl}));
+            }
+        });
+
         TeamCardView = CardView.extend({
             initialize: function() {
                 CardView.prototype.initialize.apply(this, arguments);
@@ -105,7 +125,12 @@
                         countries: this.countries,
                         languages: this.languages
                     }),
-                    new TeamActivityView({date: this.model.get('last_activity_at')})
+                    new TeamActivityView({date: this.model.get('last_activity_at')}),
+                    new GroupView({
+                        roomID: this.roomID,
+                        teamID: this.model.id,
+                        nodeBBUrl: this.nodeBBUrl,
+                    }),
                 ];
                 this.model.on('change:membership', function() {
                     this.detailViews[0].memberships = this.model.get('membership');
