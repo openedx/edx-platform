@@ -483,6 +483,64 @@ def _create_discussion_board_context(request, base_context, thread=None):
     return context
 
 
+def create_user_profile_context(request, course_key, user_id):
+    """ Generate a context dictionary for the user profile. """
+    user = cc.User.from_django_user(request.user)
+    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+
+    # If user is not enrolled in the course, do not proceed.
+    django_user = User.objects.get(id=user_id)
+    if not CourseEnrollment.is_enrolled(django_user, course.id):
+        raise Http404
+
+    query_params = {
+        'page': request.GET.get('page', 1),
+        'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
+    }
+
+    group_id = get_group_id_for_comments_service(request, course_key)
+    if group_id is not None:
+        query_params['group_id'] = group_id
+        profiled_user = cc.User(id=user_id, course_id=course_key, group_id=group_id)
+    else:
+        profiled_user = cc.User(id=user_id, course_id=course_key)
+
+    threads, page, num_pages = profiled_user.active_threads(query_params)
+    query_params['page'] = page
+    query_params['num_pages'] = num_pages
+
+    with function_trace("get_metadata_for_threads"):
+        user_info = cc.User.from_django_user(request.user).to_dict()
+        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
+    is_staff = has_permission(request.user, 'openclose_thread', course.id)
+    threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+    with function_trace("add_courseware_context"):
+        add_courseware_context(threads, course, request.user)
+        user_roles = django_user.roles.filter(
+            course_id=course.id
+        ).order_by("name").values_list("name", flat=True).distinct()
+
+        with function_trace("get_cohort_info"):
+            course_discussion_settings = get_course_discussion_settings(course_key)
+            user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
+
+        context = _create_base_discussion_view_context(request, course_key)
+        context.update({
+            'django_user': django_user,
+            'django_user_roles': user_roles,
+            'profiled_user': profiled_user.to_dict(),
+            'threads': threads,
+            'user_group_id': user_group_id,
+            'annotated_content_info': annotated_content_info,
+            'page': query_params['page'],
+            'num_pages': query_params['num_pages'],
+            'sort_preference': user.default_sort_key,
+            'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
+        })
+        return context
+
+
 @require_GET
 @login_required
 @use_bulk_ops
@@ -491,75 +549,22 @@ def user_profile(request, course_key, user_id):
     Renders a response to display the user profile page (shown after clicking
     on a post author's username).
     """
-    user = cc.User.from_django_user(request.user)
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-
     try:
-        # If user is not enrolled in the course, do not proceed.
-        django_user = User.objects.get(id=user_id)
-        if not CourseEnrollment.is_enrolled(django_user, course.id):
-            raise Http404
-
-        query_params = {
-            'page': request.GET.get('page', 1),
-            'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
-        }
-
-        try:
-            group_id = get_group_id_for_comments_service(request, course_key)
-        except ValueError:
-            return HttpResponseServerError("Invalid group_id")
-        if group_id is not None:
-            query_params['group_id'] = group_id
-            profiled_user = cc.User(id=user_id, course_id=course_key, group_id=group_id)
-        else:
-            profiled_user = cc.User(id=user_id, course_id=course_key)
-
-        threads, page, num_pages = profiled_user.active_threads(query_params)
-        query_params['page'] = page
-        query_params['num_pages'] = num_pages
-
-        with function_trace("get_metadata_for_threads"):
-            user_info = cc.User.from_django_user(request.user).to_dict()
-            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
-
-        is_staff = has_permission(request.user, 'openclose_thread', course.id)
-        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-        with function_trace("add_courseware_context"):
-            add_courseware_context(threads, course, request.user)
+        context = create_user_profile_context(request, course_key, user_id)
         if request.is_ajax():
             return utils.JsonResponse({
-                'discussion_data': threads,
-                'page': query_params['page'],
-                'num_pages': query_params['num_pages'],
-                'annotated_content_info': annotated_content_info,
+                'discussion_data': context['threads'],
+                'page': context['page'],
+                'num_pages': context['num_pages'],
+                'annotated_content_info': context['annotated_content_info'],
             })
         else:
-            user_roles = django_user.roles.filter(
-                course_id=course.id
-            ).order_by("name").values_list("name", flat=True).distinct()
-
-            with function_trace("get_cohort_info"):
-                course_discussion_settings = get_course_discussion_settings(course_key)
-                user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
-
-            context = _create_base_discussion_view_context(request, course_key)
-            context.update({
-                'django_user': django_user,
-                'django_user_roles': user_roles,
-                'profiled_user': profiled_user.to_dict(),
-                'threads': threads,
-                'user_group_id': user_group_id,
-                'annotated_content_info': annotated_content_info,
-                'page': query_params['page'],
-                'num_pages': query_params['num_pages'],
-                'sort_preference': user.default_sort_key,
-                'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
-            })
-
+            print context
             return render_to_response('discussion/discussion_profile_page.html', context)
     except User.DoesNotExist:
         raise Http404
+    except ValueError:
+        return HttpResponseServerError("Invalid group_id")
 
 
 @login_required
