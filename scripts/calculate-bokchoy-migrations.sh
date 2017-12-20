@@ -34,6 +34,8 @@ for db in "${database_order[@]}"; do
     echo "Calculating migrations."
 
     output_file="common/test/db_cache/bok_choy_${db}_migrations.yaml"
-    ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file
+    # Redirect stdout to /dev/null because it prints all migrations to both
+    # stdout and the output file.
+    ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file 1>/dev/null
 
 done

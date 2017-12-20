@@ -4,7 +4,6 @@ Tests for the Paver commands for updating test databases
 from unittest import TestCase
 
 import boto
-from mock import patch
 
 from common.test.utils import MockS3Mixin
 from pavelib.database import is_fingerprint_in_bucket
