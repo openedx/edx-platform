@@ -45,10 +45,10 @@ class AssetMetadata(object):
     ASSET_XML_TAG = 'asset'
 
     # Top-level directory name in exported course XML which holds asset metadata.
-    EXPORTED_ASSET_DIR = 'assets'
+    EXPORTED_ASSET_DIR = u'assets'
 
     # Filename of all asset metadata exported as XML.
-    EXPORTED_ASSET_FILENAME = 'assets.xml'
+    EXPORTED_ASSET_FILENAME = u'assets.xml'
 
     @contract(asset_id='AssetKey',
               pathname='basestring|None', internal_name='basestring|None',

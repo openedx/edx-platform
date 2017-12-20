@@ -39,7 +39,7 @@ COURSE_DATA_NAMES = (
     'split_test_module_draft',
 )
 
-EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
+EXPORTED_COURSE_DIR_NAME = u'exported_source_course'
 
 
 @ddt.ddt
