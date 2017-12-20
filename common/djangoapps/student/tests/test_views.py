@@ -19,6 +19,7 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from pyquery import PyQuery as pq
 
+from bulk_email.models import BulkEmailFlag
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -238,6 +239,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     Tests for the student dashboard.
     """
 
+    EMAIL_SETTINGS_ELEMENT_ID = "#actions-item-email-settings-0"
     ENABLED_SIGNALS = ['course_published']
     TOMORROW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
     THREE_YEARS_AGO = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=(365 * 3))
@@ -532,6 +534,33 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertEqual(response.content.count('<li class="course-item">'), 1)
         self.assertIn('You can no longer change sessions.', response.content)
         self.assertIn('Related Programs:', response.content)
+
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch.object(BulkEmailFlag, 'feature_enabled')
+    def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_course_overview):
+        """
+        Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
+        """
+        mock_email_feature.return_value = True
+        mock_course_overview.return_value = CourseOverviewFactory(
+            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+        )
+        course_enrollment = CourseEnrollmentFactory(user=self.user)
+        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        response = self.client.get(self.path)
+        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
+
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch.object(BulkEmailFlag, 'feature_enabled')
+    def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
+        """
+        Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
+        """
+        mock_email_feature.return_value = True
+        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        CourseEntitlementFactory(user=self.user)
+        response = self.client.get(self.path)
+        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
