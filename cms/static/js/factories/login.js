@@ -1,6 +1,6 @@
 define(['jquery.cookie', 'utility', 'common/js/components/utils/view_utils'], function(cookie, utility, ViewUtils) {
     'use strict';
-    return function(homepageURL) {
+    return function LoginFactory(homepageURL) {
         function postJSON(url, data, callback) {
             $.ajax({
                 type: 'POST',

@@ -1,3 +1,4 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page expression_filter="h"/>
 
 <%inherit file="base.html" />
@@ -50,8 +51,9 @@ from django.utils.translation import ugettext as _
 </div>
 </%block>
 
-<%block name="requirejs">
-  require(["js/factories/login"], function(LoginFactory) {
-      LoginFactory("${reverse('homepage')}");
-  });
+<%block name="requirejs_page">
+  <%static:require_page page_name="js/pages/login" class_name="LoginFactory">
+    ## xss-lint: disable=mako-invalid-js-filter, mako-invalid-html-filter
+    "${reverse('homepage') | n, js_escaped_string}"
+  </%static:require_page>
 </%block>
