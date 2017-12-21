@@ -21,6 +21,8 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.features.course_experience import default_course_url_name
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 from util.views import ensure_valid_course_key
 
 
@@ -52,6 +54,7 @@ class LearnerAnalyticsView(View):
             'course_url': course_url,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
+            'is_verified': CourseEnrollment.is_enrolled_as_verified(request.user, course_key),
             'grading_policy': grading_policy,
             'assignment_grades': self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS']),
             'assignment_schedule': self.get_schedule(request, course_key),
@@ -88,7 +91,7 @@ class LearnerAnalyticsView(View):
                         'module_id': unicode(location),
                     })
                 })
-        return json.dumps(grades)
+        return grades
 
     def get_discussion_data(self, request, course_key):
         """
@@ -134,4 +137,4 @@ class LearnerAnalyticsView(View):
             if block.get('graded', False) and block.get('due') is not None:
                 graded_blocks.append(block)
                 block['due'] = block['due'].isoformat()
-        return json.dumps(graded_blocks)
+        return graded_blocks
