@@ -34,9 +34,8 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
 
   setPrice() {
     const l10nCookie = this.countryL10nData;
-    const lmsregex = /(\$)(\d*)( USD)/g;
-    const price = $('input[name="verified_mode"]').filter(':visible')[0];
-    const regexMatch = lmsregex.exec(price.value);
+    const price = $(this.selector).filter(':visible')[0];
+    const regexMatch = this.regex.exec(price.value);
     const dollars = parseFloat(regexMatch[2]);
     const converted = dollars * l10nCookie.rate;
     const string = `${l10nCookie.symbol}${Math.round(converted)} ${l10nCookie.code}`;
@@ -78,8 +77,11 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
     navigator.geolocation.getCurrentPosition(this.getCountryCaller.bind(this));
   }
 
-  constructor(skipInitialize) {
-    if (!skipInitialize) {
+  constructor(options) {
+    this.selector = options.selector || 'input[name="verified_mode"]';
+    this.regex = options.regex || /(\$)(\d*)( USD)/g;
+
+    if (!options.skipInitialize) {
       this.getUserLocation();
     }
   }
