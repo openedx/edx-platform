@@ -212,7 +212,7 @@ class AggregateCompletionManager(CompletionManager):
         if possible > 0.0:
             percent = earned / possible
         else:
-            percent = 0.0
+            percent = 1.0
 
         obj, is_new = self.update_or_create(
             user=user,
