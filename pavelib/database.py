@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import hashlib
 
+import boto
 from paver.easy import sh, needs
 
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -26,6 +27,7 @@ def update_bokchoy_db_cache():
     You can commit the resulting files in common/test/db_cache into
     git to speed up test runs
     """
+    conn = boto.connect_s3()
     bokchoy_db_files = [
         'bok_choy_data_default.json',
         'bok_choy_data_student_module_history.json',
