@@ -1,7 +1,10 @@
 """
 Course Goals Views - includes REST API
 """
+import analytics
+
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import JsonResponse
@@ -105,4 +108,22 @@ def emit_course_goal_event(sender, instance, **kwargs):
         {
             'goal_key': instance.goal_key,
         }
+    )
+    if settings.LMS_SEGMENT_KEY:
+        update_google_analytics(name, instance.user.id)
+
+
+def update_google_analytics(name, user_id):
+    """ Update student course goal for Google Analytics using Segment. """
+    tracking_context = tracker.get_tracker().resolve_context()
+    context = {
+        'ip': tracking_context.get('ip'),
+        'Google Analytics': {
+            'clientId': tracking_context.get('client_id')
+        }
+    }
+    analytics.track(
+        user_id,
+        name,
+        context=context
     )
