@@ -38,9 +38,9 @@ var options = {
         {pattern: 'common/static/edx-ui-toolkit/js/utils/html-utils.js', included: true},
 
         {pattern: 'common/static/js/vendor/jasmine-imagediff.js', included: true},
-        {pattern: 'common/static/common/js/spec_helpers/jasmine-extensions.js', included: true},
-        {pattern: 'common/static/common/js/spec_helpers/jasmine-waituntil.js', included: true},
-        {pattern: 'common/static/common/js/spec_helpers/discussion_spec_helper.js', included: true},
+        {pattern: 'cms/static/common/js/spec_helpers/jasmine-extensions.js', included: true},
+        {pattern: 'cms/static/common/js/spec_helpers/jasmine-waituntil.js', included: true},
+        {pattern: 'cms/static/common/js/spec_helpers/discussion_spec_helper.js', included: true},
         {pattern: 'common/static/common/js/spec/discussion/view/discussion_view_spec_helper.js', included: true}
     ],
 

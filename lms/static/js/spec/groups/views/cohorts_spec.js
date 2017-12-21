@@ -1,10 +1,17 @@
 /* globals _ */
 
-define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers',
-    'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
-    'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
-    'js/groups/views/course_cohort_settings_notification'
+define([
+    'backbone',
+    'jquery',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/js/groups/views/cohorts',
+    'cms/static/js/groups/collections/cohort',
+    'cms/static/js/groups/models/content_group',
+    'cms/static/js/groups/models/course_cohort_settings',
+    'cms/static/js/utils/animation',
+    'cms/static/js/vendor/jquery.qubit',
+    'cms/static/js/groups/views/course_cohort_settings_notification'
 ],
     function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
               CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView) {

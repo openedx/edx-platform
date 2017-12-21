@@ -1,10 +1,15 @@
 define(
     [
-        'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
-        'js/models/uploads', 'js/views/uploads',
-        'js/models/license', 'js/views/license',
-        'js/views/video/transcripts/metadata_videolist',
-        'js/views/video/translations_editor'
+        'cms/static/js/views/baseview',
+        'underscore',
+        'cms/static/js/models/metadata',
+        'cms/static/js/views/abstract_editor',
+        'cms/static/js/models/uploads',
+        'cms/static/js/views/uploads',
+        'cms/static/js/models/license',
+        'cms/static/js/views/license',
+        'cms/static/js/views/video/transcripts/metadata_videolist',
+        'cms/static/js/views/video/translations_editor'
     ],
 function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
          LicenseModel, LicenseView, VideoList, VideoTranslations) {

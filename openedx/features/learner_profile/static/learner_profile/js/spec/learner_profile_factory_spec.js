@@ -1,16 +1,19 @@
 define(
     [
-        'backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/spec/student_account/helpers',
-        'learner_profile/js/spec_helpers/helpers',
-        'js/views/fields',
-        'js/student_account/models/user_account_model',
-        'js/student_account/models/user_preferences_model',
-        'learner_profile/js/views/learner_profile_view',
-        'learner_profile/js/views/learner_profile_fields',
-        'learner_profile/js/learner_profile_factory',
-        'js/views/message_banner'
+        'backbone',
+        'jquery',
+        'underscore',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/spec/student_account/helpers',
+        'cms/static/learner_profile/js/spec_helpers/helpers',
+        'cms/static/js/views/fields',
+        'cms/static/js/student_account/models/user_account_model',
+        'cms/static/js/student_account/models/user_preferences_model',
+        'cms/static/learner_profile/js/views/learner_profile_view',
+        'cms/static/learner_profile/js/views/learner_profile_fields',
+        'cms/static/learner_profile/js/learner_profile_factory',
+        'cms/static/js/views/message_banner'
     ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
              UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {

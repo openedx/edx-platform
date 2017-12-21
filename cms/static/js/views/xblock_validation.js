@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'js/views/baseview', 'gettext'],
+define(['jquery', 'underscore', 'cms/static/js/views/baseview', 'gettext'],
     function($, _, BaseView, gettext) {
         /**
          * View for xblock validation messages as displayed in Studio.

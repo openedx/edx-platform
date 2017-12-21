@@ -22,7 +22,7 @@
  *   primaryActionButtonTitle: A string to be used as title for primary action button.
  *   showEditorModeButtons: Whether to show editor mode button in the modal header.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
+define(['jquery', 'underscore', 'gettext', 'cms/static/js/views/baseview'],
     function($, _, gettext, BaseView) {
         var BaseModal = BaseView.extend({
             events: {

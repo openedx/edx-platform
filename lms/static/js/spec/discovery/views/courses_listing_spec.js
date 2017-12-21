@@ -1,7 +1,12 @@
-define([
-    'jquery', 'backbone', 'common/js/spec_helpers/template_helpers',
-    'js/discovery/models/course_card', 'js/discovery/views/courses_listing'
-], function($, Backbone, TemplateHelpers, CourseCard, CoursesListing) {
+define(
+    [
+        'jquery',
+        'backbone',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/discovery/models/course_card',
+        'cms/static/js/discovery/views/courses_listing'
+    ],
+    function($, Backbone, TemplateHelpers, CourseCard, CoursesListing) {
     'use strict';
 
 

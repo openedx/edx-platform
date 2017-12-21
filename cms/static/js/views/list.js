@@ -14,7 +14,7 @@
  * - restrictEditing (bool) : Boolean flag for hiding edit and remove options, defaults to false.
  */
 define([
-    'js/views/baseview'
+    'cms/static/js/views/baseview'
 ], function(BaseView) {
     'use strict';
     var ListView = BaseView.extend({

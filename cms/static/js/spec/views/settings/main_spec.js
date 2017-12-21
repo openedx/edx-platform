@@ -1,6 +1,9 @@
 define([
-    'jquery', 'js/models/settings/course_details', 'js/views/settings/main',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers'
+    'cms/static/jquery',
+    'cms/static/js/models/settings/course_details',
+    'cms/static/js/views/settings/main',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers'
 ], function($, CourseDetailsModel, MainView, AjaxHelpers, TemplateHelpers) {
     'use strict';
 

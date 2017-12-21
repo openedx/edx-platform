@@ -1,4 +1,4 @@
-define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
+define(['jquery', 'cms/static/js/views/baseview', 'common/static/edx-ui-toolkit/js/utils/html-utils'],
     function($, BaseView, HtmlUtils) {
         return BaseView.extend({
             className: function() {

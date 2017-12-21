@@ -13,9 +13,18 @@
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor',
-    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'gettext',
+        'cms/static/js/views/baseview',
+        'cms/static/common/js/components/utils/view_utils',
+        'cms/static/js/views/utils/xblock_utils',
+        'cms/static/js/views/xblock_string_field_editor',
+        'common/static/edx-ui-toolkit/js/utils/string-utils',
+        'common/static/edx-ui-toolkit/js/utils/html-utils'
+    ],
     function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor, StringUtils, HtmlUtils) {
         'use strict';
         var XBlockOutlineView = BaseView.extend({

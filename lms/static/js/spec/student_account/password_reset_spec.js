@@ -3,10 +3,10 @@
     define([
         'jquery',
         'underscore',
-        'common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/student_account/models/PasswordResetModel',
-        'js/student_account/views/PasswordResetView'
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/student_account/models/PasswordResetModel',
+        'cms/static/js/student_account/views/PasswordResetView'
     ],
         function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
             describe('edx.student.account.PasswordResetView', function() {

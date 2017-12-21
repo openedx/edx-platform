@@ -1,8 +1,13 @@
-define([
-    'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
-    'js/edxnotes/views/page_factory'
-], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
+define(
+    [
+        'jquery',
+        'underscore',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/spec/edxnotes/helpers',
+        'cms/static/js/edxnotes/views/page_factory'
+    ],
+    function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
     'use strict';
     describe('EdxNotes NotesPage', function() {
         var notes = Helpers.getDefaultNotes();

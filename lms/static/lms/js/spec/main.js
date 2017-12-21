@@ -259,7 +259,7 @@
                 exports: 'sinon'
             },
             'jasmine-imagediff': {},
-            'common/js/spec_helpers/jasmine-extensions': {
+            'cms/static/common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
             'common/js/spec_helpers/jasmine-stealth': {
@@ -833,7 +833,7 @@
     }
 
     specHelpers = [
-        'common/js/spec_helpers/jasmine-extensions',
+        'cms/static/common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
         'common/js/spec_helpers/jasmine-waituntil'
     ];

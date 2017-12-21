@@ -1,7 +1,17 @@
-define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers', 'js/spec_helpers/edit_helpers',
-    'js/views/pages/container', 'js/views/pages/paged_container', 'js/models/xblock_info',
-    'js/collections/component_template', 'jquery.simulate'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'underscore.string',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/spec_helpers/edit_helpers',
+        'cms/static/js/views/pages/container',
+        'cms/static/js/views/pages/paged_container',
+        'cms/static/js/models/xblock_info',
+        'cms/static/js/collections/component_template',
+        'jquery.simulate'
+    ],
     function($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage,
               XBlockInfo, ComponentTemplates) {
         'use strict';

@@ -1,4 +1,11 @@
-define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'common/js/components/views/feedback_notification'],
+define(
+    [
+        'cms/static/js/views/baseview',
+        'underscore',
+        'jquery',
+        'cms/static/js/views/edit_chapter',
+        'cms/static/common/js/components/views/feedback_notification'
+    ],
         function(BaseView, _, $, EditChapterView, NotificationView) {
             var EditTextbook = BaseView.extend({
                 initialize: function() {

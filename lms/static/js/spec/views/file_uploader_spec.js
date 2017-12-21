@@ -1,5 +1,13 @@
-define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/template_helpers',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/models/notification', 'string_utils'],
+define(
+    [
+        'backbone',
+        'jquery',
+        'cms/static/js/views/file_uploader',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/models/notification',
+        'string_utils'
+    ],
     function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
         describe('FileUploaderView', function() {
             var verifyTitle, verifyInputLabel, verifyInputTip, verifySubmitButton, verifyExtensions, verifyText,

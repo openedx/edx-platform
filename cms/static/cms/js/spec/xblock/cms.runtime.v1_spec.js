@@ -1,4 +1,9 @@
-define(['js/spec_helpers/edit_helpers', 'js/views/modals/base_modal', 'xblock/cms.runtime.v1'],
+define(
+    [
+        'cms/static/js/spec_helpers/edit_helpers',
+        'cms/static/js/views/modals/base_modal',
+        'cms/static/cms/js/xblock/cms.runtime.v1'
+    ],
     function(EditHelpers, BaseModal) {
         'use strict';
 

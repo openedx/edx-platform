@@ -1,8 +1,15 @@
-define([
-    'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
-    'js/edxnotes/models/note', 'js/edxnotes/views/note_item'
-], function(
+define(
+    [
+        'jquery',
+        'underscore',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/spec/edxnotes/helpers',
+        'logger',
+        'cms/static/js/edxnotes/models/note',
+        'cms/static/js/edxnotes/views/note_item'
+    ],
+    function(
     $, _, AjaxHelpers, TemplateHelpers, Helpers, Logger, NoteModel, NoteItemView
 ) {
     'use strict';

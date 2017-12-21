@@ -22,11 +22,8 @@ var options = {
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'cms/static/cms/**/!(*spec|djangojs).js'},
-
-
-        // I think we just got rid of this altogether?
+        // ormsbee: I think we just got rid of this altogether?
         {pattern: 'cms/static/coffee/src/**/!(*spec).js'},
-
 
         {pattern: 'cms/static/js/**/!(*spec|djangojs).js'}
     ],

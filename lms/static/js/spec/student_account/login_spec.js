@@ -4,11 +4,11 @@
         'jquery',
         'underscore',
         'sinon',
-        'common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/student_account/models/LoginModel',
-        'js/student_account/views/LoginView',
-        'js/student_account/models/PasswordResetModel'
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/student_account/models/LoginModel',
+        'cms/static/js/student_account/views/LoginView',
+        'cms/static/js/student_account/models/PasswordResetModel'
     ],
         function($, _, sinon, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
             describe('edx.student.account.LoginView', function() {

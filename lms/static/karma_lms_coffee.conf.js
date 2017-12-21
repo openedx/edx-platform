@@ -42,7 +42,7 @@ var options = {
         {pattern: 'xmodule_js/src/xmodule.js', included: true},
 
         {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
-        {pattern: 'common/static/common/js/spec_helpers/jasmine-extensions.js', included: true},
+        {pattern: 'cms/static/common/js/spec_helpers/jasmine-extensions.js', included: true},
 
         {pattern: 'lms/js/spec/main_requirejs_coffee.js', included: true}
     ],

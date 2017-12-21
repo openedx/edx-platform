@@ -2,9 +2,14 @@
  * This class defines an edit view for groups within content experiment group configurations.
  * It is expected to be backed by a Group model.
  */
-define([
-    'js/views/baseview', 'underscore', 'underscore.string', 'gettext', 'text!templates/group-edit.underscore'
-],
+define(
+    [
+        'cms/static/js/views/baseview',
+        'underscore',
+        'underscore.string',
+        'gettext',
+        'text!cms/static/templates/group-edit.underscore'
+    ],
 function(BaseView, _, str, gettext, groupEditTemplate) {
     'use strict';
     var ExperimentGroupEditView = BaseView.extend({

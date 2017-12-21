@@ -1,7 +1,11 @@
-define([
-    'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/facet_option',
-    'js/discovery/views/refine_sidebar'
-], function($, TemplateHelpers, FacetOption, RefineSidebar) {
+define(
+    [
+        'jquery',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/discovery/models/facet_option',
+        'cms/static/js/discovery/views/refine_sidebar'
+    ],
+    function($, TemplateHelpers, FacetOption, RefineSidebar) {
     'use strict';
 
     var MEANINGS = {

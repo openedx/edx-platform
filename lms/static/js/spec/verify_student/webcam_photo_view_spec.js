@@ -1,10 +1,10 @@
 define([
     'jquery',
     'backbone',
-    'common/js/spec_helpers/template_helpers',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'js/verify_student/views/webcam_photo_view',
-    'js/verify_student/models/verification_model'
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/js/verify_student/views/webcam_photo_view',
+    'cms/static/js/verify_student/models/verification_model'
 ],
     function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, VerificationModel) {
         'use strict';

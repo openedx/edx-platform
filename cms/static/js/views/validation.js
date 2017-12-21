@@ -1,12 +1,15 @@
-define(['edx-ui-toolkit/js/utils/html-utils',
-    'js/views/baseview',
-    'underscore',
-    'jquery',
-    'gettext',
-    'common/js/components/views/feedback_notification',
-    'common/js/components/views/feedback_alert',
-    'js/views/baseview',
-    'jquery.smoothScroll'],
+define(
+    [
+        'common/static/edx-ui-toolkit/js/utils/html-utils',
+        'cms/static/js/views/baseview',
+        'underscore',
+        'jquery',
+        'gettext',
+        'cms/static/common/js/components/views/feedback_notification',
+        'cms/static/common/js/components/views/feedback_alert',
+        'cms/static/js/views/baseview',
+        'jquery.smoothScroll'
+    ],
     function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         var ValidatingView = BaseView.extend({
     // Intended as an abstract class which catches validation errors on the model and

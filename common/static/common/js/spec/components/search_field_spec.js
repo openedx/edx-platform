@@ -1,8 +1,8 @@
 define([
     'underscore',
     'URI',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'edx-ui-toolkit/js/pagination/paging-collection',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/static/edx-ui-toolkit/js/pagination/paging-collection',
     'common/js/components/views/search_field'
 ], function(_, URI, AjaxHelpers, PagingCollection, SearchFieldView) {
     'use strict';

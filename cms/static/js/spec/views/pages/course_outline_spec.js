@@ -1,6 +1,15 @@
-define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/components/utils/view_utils',
-    'js/views/pages/course_outline', 'js/models/xblock_outline_info', 'js/utils/date_utils',
-    'js/spec_helpers/edit_helpers', 'common/js/spec_helpers/template_helpers', 'js/models/course'],
+define(
+    [
+        'jquery',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/components/utils/view_utils',
+        'cms/static/js/views/pages/course_outline',
+        'cms/static/js/models/xblock_outline_info',
+        'cms/static/js/utils/date_utils',
+        'cms/static/js/spec_helpers/edit_helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/models/course'
+    ],
     function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils,
              EditHelpers, TemplateHelpers, Course) {
         describe('CourseOutlinePage', function() {

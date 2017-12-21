@@ -3,8 +3,12 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/baseview', 'underscore', 'gettext', 'underscore.string',
-    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'
+    'cms/static/js/views/baseview',
+    'underscore',
+    'gettext',
+    'underscore.string',
+    'common/static/edx-ui-toolkit/js/utils/string-utils',
+    'common/static/edx-ui-toolkit/js/utils/html-utils'
 ], function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
 

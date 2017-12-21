@@ -1,7 +1,11 @@
-define([
-    'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/course_card',
-    'js/discovery/views/course_card'
-], function($, TemplateHelpers, CourseCard, CourseCardView) {
+define(
+    [
+        'jquery',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/discovery/models/course_card',
+        'cms/static/js/discovery/views/course_card'
+    ],
+    function($, TemplateHelpers, CourseCard, CourseCardView) {
     'use strict';
 
 

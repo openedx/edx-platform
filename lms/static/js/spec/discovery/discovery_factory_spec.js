@@ -1,7 +1,11 @@
-define([
-    'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
-    'js/discovery/discovery_factory'
-], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
+define(
+    [
+        'jquery',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/discovery/discovery_factory'
+    ],
+    function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
 
 

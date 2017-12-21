@@ -76,7 +76,7 @@ var commonFiles = {
     ],
 
     specFiles: [
-        {pattern: 'common/static/common/js/spec_helpers/**/*.js'}
+        {pattern: 'cms/static/common/js/spec_helpers/**/*.js'}
     ],
 
     fixtureFiles: [

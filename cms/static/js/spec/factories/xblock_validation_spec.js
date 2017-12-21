@@ -1,4 +1,9 @@
-define(['jquery', 'js/factories/xblock_validation', 'common/js/spec_helpers/template_helpers'],
+define(
+    [
+        'jquery',
+        'cms/static/js/factories/xblock_validation',
+        'cms/static/common/js/spec_helpers/template_helpers'
+    ],
     function($, XBlockValidationFactory, TemplateHelpers) {
         describe('XBlockValidationFactory', function() {
             var $messageDiv;

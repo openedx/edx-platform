@@ -1,4 +1,11 @@
-define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification', 'common/js/spec_helpers/template_helpers'],
+define(
+    [
+        'backbone',
+        'jquery',
+        'cms/static/js/models/notification',
+        'cms/static/js/views/notification',
+        'common/js/spec_helpers/template_helpers'
+    ],
     function(Backbone, $, NotificationModel, NotificationView, TemplateHelpers) {
         describe('NotificationView', function() {
             var createNotification, verifyTitle, verifyMessage, verifyDetails, verifyAction, notificationView;

@@ -1,7 +1,11 @@
 define([
-    'jquery', 'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/recent_activity',
-    'js/spec/edxnotes/helpers'
+    'jquery',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/js/edxnotes/collections/notes',
+    'cms/static/js/edxnotes/collections/tabs',
+    'cms/static/js/edxnotes/views/tabs/recent_activity',
+    'cms/static/js/spec/edxnotes/helpers'
 ], function(
     $, TemplateHelpers, AjaxHelpers, NotesCollection, TabsCollection, RecentActivityView, Helpers
 ) {

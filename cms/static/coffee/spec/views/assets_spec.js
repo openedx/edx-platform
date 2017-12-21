@@ -1,4 +1,4 @@
-define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"],
+define(["jquery", "common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "squire"],
 function($, AjaxHelpers, Squire) {
 
     const assetLibraryTpl = readFixtures('asset-library.underscore');

@@ -1,10 +1,22 @@
 define([
-    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/view_helpers', 'js/models/course', 'js/models/group_configuration', 'js/models/group',
-    'js/collections/group_configuration', 'js/collections/group', 'js/views/group_configuration_details',
-    'js/views/group_configurations_list', 'js/views/group_configuration_editor', 'js/views/group_configuration_item',
-    'js/views/experiment_group_edit', 'js/views/partition_group_list', 'js/views/partition_group_details',
-    'js/views/content_group_editor', 'js/views/partition_group_item'
+    'underscore',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/common/js/spec_helpers/view_helpers',
+    'cms/static/js/models/course',
+    'cms/static/js/models/group_configuration',
+    'cms/static/js/models/group',
+    'cms/static/js/collections/group_configuration',
+    'cms/static/js/collections/group',
+    'cms/static/js/views/group_configuration_details',
+    'cms/static/js/views/group_configurations_list',
+    'cms/static/js/views/group_configuration_editor',
+    'cms/static/js/views/group_configuration_item',
+    'cms/static/js/views/experiment_group_edit',
+    'cms/static/js/views/partition_group_list',
+    'cms/static/js/views/partition_group_details',
+    'cms/static/js/views/content_group_editor',
+    'cms/static/js/views/partition_group_item'
 ], function(
     _, AjaxHelpers, TemplateHelpers, ViewHelpers, Course, GroupConfigurationModel, GroupModel,
     GroupConfigurationCollection, GroupCollection, GroupConfigurationDetailsView, GroupConfigurationsListView,

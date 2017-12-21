@@ -3,11 +3,11 @@
     define([
         'jquery',
         'underscore',
-        'common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/student_account/models/RegisterModel',
-        'js/student_account/views/RegisterView',
-        'js/student_account/tos_modal'
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/student_account/models/RegisterModel',
+        'cms/static/js/student_account/views/RegisterView',
+        'cms/static/js/student_account/tos_modal'
     ],
         function($, _, TemplateHelpers, AjaxHelpers, RegisterModel, RegisterView) {
             describe('edx.student.account.RegisterView', function() {

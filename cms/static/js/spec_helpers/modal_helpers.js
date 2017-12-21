@@ -1,7 +1,12 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(['jquery', 'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers'],
+define(
+    [
+        'jquery',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/common/js/spec_helpers/view_helpers'
+    ],
     function($, TemplateHelpers, ViewHelpers) {
         var installModalTemplates, getModalElement, getModalWindow, getModalTitle, isShowingModal,
             hideModalIfShowing, pressModalButton, cancelModal, cancelModalIfShowing;

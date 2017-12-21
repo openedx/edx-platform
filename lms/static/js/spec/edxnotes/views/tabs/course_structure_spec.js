@@ -1,7 +1,11 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
-    'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs/course_structure'
+    'jquery',
+    'underscore',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/js/spec/edxnotes/helpers',
+    'cms/static/js/edxnotes/collections/notes',
+    'cms/static/js/edxnotes/collections/tabs',
+    'cms/static/js/edxnotes/views/tabs/course_structure'
 ], function(
     $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView
 ) {

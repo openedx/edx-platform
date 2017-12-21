@@ -143,13 +143,13 @@
                 exports: 'URI'
             },
             'jasmine-imagediff': {},
-            'common/js/spec_helpers/jasmine-extensions': {
+            'cms/static/common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
-            'common/js/spec_helpers/jasmine-stealth': {
+            'cms/static/common/js/spec_helpers/jasmine-stealth': {
                 deps: ['underscore', 'underscore.string']
             },
-            'common/js/spec_helpers/jasmine-waituntil': {
+            'cms/static/common/js/spec_helpers/jasmine-waituntil': {
                 deps: ['jquery']
             },
             'sinon': {
@@ -176,7 +176,7 @@
     }
 
     specHelpers = [
-        'common/js/spec_helpers/jasmine-extensions',
+        'cms/static/common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
         'common/js/spec_helpers/jasmine-waituntil'
     ];

@@ -1,8 +1,17 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'gettext',
+        'cms/static/js/views/baseview',
+        'cms/static/common/js/components/utils/view_utils',
+        'cms/static/js/views/utils/xblock_utils',
+        'cms/static/js/views/utils/move_xblock_utils',
+        'common/static/edx-ui-toolkit/js/utils/html-utils'
+    ],
     function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils) {
         'use strict';
 

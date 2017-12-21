@@ -1,12 +1,12 @@
 define(['backbone',
     'jquery',
     'underscore',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers',
-    'js/spec/student_account/helpers',
-    'js/views/fields',
-    'js/student_account/models/user_account_model',
-    'js/student_account/views/account_settings_view'
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/js/spec/student_account/helpers',
+    'cms/static/js/views/fields',
+    'cms/static/js/student_account/models/user_account_model',
+    'cms/static/js/student_account/views/account_settings_view'
 ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
               AccountSettingsView) {

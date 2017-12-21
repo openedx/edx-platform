@@ -5,11 +5,21 @@
  * and upon save parent invokes refresh function that fetches updated model and
  * re-renders edited course outline.
  */
-define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
-    'js/views/modals/base_modal', 'date', 'js/views/utils/xblock_utils',
-    'js/utils/date_utils', 'edx-ui-toolkit/js/utils/html-utils',
-    'edx-ui-toolkit/js/utils/string-utils'
-], function(
+define(
+    [
+        'jquery',
+        'backbone',
+        'underscore',
+        'gettext',
+        'cms/static/js/views/baseview',
+        'cms/static/js/views/modals/base_modal',
+        'date',
+        'cms/static/js/views/utils/xblock_utils',
+        'cms/static/js/utils/date_utils',
+        'common/static/edx-ui-toolkit/js/utils/html-utils',
+        'common/static/edx-ui-toolkit/js/utils/string-utils'
+    ],
+    function(
     $, Backbone, _, gettext, BaseView, BaseModal, date, XBlockViewUtils, DateUtils, HtmlUtils, StringUtils
 ) {
     'use strict';

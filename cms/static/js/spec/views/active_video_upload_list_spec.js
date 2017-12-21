@@ -2,11 +2,11 @@
 define(
     [
         'jquery',
-        'js/models/active_video_upload',
-        'js/views/active_video_upload_list',
-        'edx-ui-toolkit/js/utils/string-utils',
-        'common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/models/active_video_upload',
+        'cms/static/js/views/active_video_upload_list',
+        'cms/static/common/static/edx-ui-toolkit/js/utils/string-utils',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'accessibility',
         'mock-ajax'
     ],

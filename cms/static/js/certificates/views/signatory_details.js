@@ -6,12 +6,12 @@ define([
     'underscore.string',
     'backbone',
     'gettext',
-    'js/utils/templates',
-    'common/js/components/utils/view_utils',
-    'js/views/baseview',
-    'js/certificates/views/signatory_editor',
-    'text!templates/signatory-details.underscore',
-    'text!templates/signatory-actions.underscore'
+    'cms/static/js/utils/templates',
+    'cms/static/common/js/components/utils/view_utils',
+    'cms/static/js/views/baseview',
+    'cms/static/js/certificates/views/signatory_editor',
+    'text!cms/static/templates/signatory-details.underscore',
+    'text!cms/static/templates/signatory-actions.underscore'
 ],
 function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
           signatoryDetailsTemplate, signatoryActionsTemplate) {
