@@ -16,8 +16,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 
 from opaque_keys.edx.keys import CourseKey
-from courseware.courses import get_course_with_access
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from lms.djangoapps.course_api.blocks.api import get_blocks
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.views import create_user_profile_context
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.features.course_experience import default_course_url_name
 from util.views import ensure_valid_course_key
 
@@ -88,7 +90,7 @@ class LearnerAnalyticsView(View):
                 })
         return json.dumps(grades)
 
-    def get_discussion_data(self, user, course_key):
+    def get_discussion_data(self, request, course_key):
         """
         Collects and formats the discussion data from a particular user and course.
 
