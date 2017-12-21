@@ -871,8 +871,15 @@ class CourseFields(object):
             "more of the base requirements, such as testing, accessibility, internationalization, and documentation."
         ),
         scope=Scope.settings, default=False
+    )    
+    highlights_enabled_for_messaging = Boolean(
+        display_name=_("Highlights Enabled for Messaging"),
+        help=_(
+            "Enter true or false. If true, any highlights associated with content in the course will be messaged "
+            "to learners at their scheduled time."
+        ),
+        scope=Scope.settings, default=False
     )
-<<<<<<< HEAD
     enable_html_display_name = Boolean(
         display_name=_("Show display name on all HTML components"),
         help=_(
@@ -881,15 +888,6 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         default=ENABLE_HTML_DISPLAY_NAME
-=======
-    highlights_enabled_for_messaging = Boolean(
-        display_name=_("Highlights Enabled for Messaging"),
-        help=_(
-            "Enter true or false. If true, any highlights associated with content in the course will be messaged "
-            "to learners at their scheduled time."
-        ),
-        scope=Scope.settings, default=False
->>>>>>> upstream/master
     )
 
 
