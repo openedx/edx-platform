@@ -27,12 +27,13 @@
       height: $baseline*1.5;
       flex-grow: 1;
       letter-spacing: 0;
+      white-space: nowrap;
       background: theme-color("inverse");
       border-color: theme-color("primary");
       color: theme-color("primary");
       text-shadow: none;
       font-size: $font-size-base;
-      padding: 0;
+      padding: 0 $baseline/4;
       box-shadow: none;
       border-radius: $border-radius-sm;
       transition: all 0.4s ease-out;
