@@ -194,7 +194,6 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     @override_settings(
         XBLOCK_FIELD_DATA_WRAPPERS=[],
         MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[],
-        ENABLE_ENTERPRISE_INTEGRATION=False,
     )
     def test_field_overrides(self, overrides, course_width, enable_ccx, view_as_ccx):
         """

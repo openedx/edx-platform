@@ -211,8 +211,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 143),
-        (ModuleStoreEnum.Type.split, 4, 143),
+        (ModuleStoreEnum.Type.mongo, 10, 142),
+        (ModuleStoreEnum.Type.split, 4, 142),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1214,7 +1214,6 @@ class StartDateTests(ModuleStoreTestCase):
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
-@override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
     Base class for progress page tests.
