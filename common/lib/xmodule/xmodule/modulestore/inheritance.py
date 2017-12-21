@@ -172,6 +172,14 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
+    video_auto_advance = Boolean(
+        display_name=_("Enable video auto-advance"),
+        help=_(
+            "Specify whether to show an auto-advance button in videos. If the student clicks it, when the last video in a unit finishes it will automatically move to the next unit and autoplay the first video."
+        ),
+        scope=Scope.settings,
+        default=False
+    )
     video_bumper = Dict(
         display_name=_("Video Pre-Roll"),
         help=_(

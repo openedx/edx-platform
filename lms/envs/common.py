@@ -163,6 +163,10 @@ FEATURES = {
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
 
+    # Move the student to next page when a video finishes. Set to True to show
+    # an auto-advance button in videos. If False, videos never auto-advance.
+    'ENABLE_AUTOADVANCE_VIDEOS': False,
+
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
