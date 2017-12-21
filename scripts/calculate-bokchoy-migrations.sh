@@ -20,16 +20,18 @@ fi
 
 declare -A databases
 declare -a database_order
-databases=(["default"]="edxtest" ["student_module_history"]="student_module_history_test")
-database_order=("default" "student_module_history")
+# databases=(["default"]="edxtest" ["student_module_history"]="student_module_history_test")
+# database_order=("default" "student_module_history")
+
+
+databases=(["student_module_history"]="calculate_migrations")
+database_order=("student_module_history")
+
 
 for db in "${database_order[@]}"; do
-    echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root
+    echo "DROP DATABASE IF EXISTS calculate_migrations;" | mysql $MYSQL_HOST -u root
+    echo "CREATE DATABASE calculate_migrations;" | mysql $MYSQL_HOST -u root
 
-    # Clear out the test database using the reset_db command which uses "DROP DATABASE" and
-    # "CREATE DATABASE". This will result in an empty database.
-    echo "Clearing out the $db bok_choy MySQL database."
-    ./manage.py lms --settings $SETTINGS reset_db --traceback --router $db
     # Now output all the migrations in the platform to a file.
     echo "Calculating migrations."
 
@@ -39,3 +41,5 @@ for db in "${database_order[@]}"; do
     ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file 1>/dev/null
 
 done
+
+echo "DROP DATABASE IF EXISTS calculate_migrations;" | mysql $MYSQL_HOST -u root
