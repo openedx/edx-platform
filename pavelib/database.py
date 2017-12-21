@@ -209,11 +209,26 @@ def is_fingerprint_in_bucket(fingerprint, bucket_name=CACHE_BUCKET_NAME):
     return key.exists()
 
 
+def get_bokchoy_db_fingerprint_from_file():
+    """
+    Return the value recorded in the fingerprint file.
+    """
+    try:
+        with open(FINGERPRINT_FILEPATH, 'r') as fingerprint_file:
+            cached_fingerprint = fingerprint_file.read().strip()
+    except IOError:
+        return None
+    return cached_fingerprint
+
+
+@needs('pavelib.prereqs.install_prereqs')
 @PassthroughTask
-def get_bokchoy_db_cache_from_s3(fingerprint, bucket_name=CACHE_BUCKET_NAME, path=CACHE_FOLDER):
+@timed
+def get_bokchoy_db_cache_from_s3(bucket_name=CACHE_BUCKET_NAME, path=CACHE_FOLDER):
     """
     Retrieve the zip file with the fingerprint
     """
+    fingerprint = fingerprint_bokchoy_db_files()
     zipfile_name = '{}.tar.gz'.format(fingerprint)
     conn = boto.connect_s3()
     bucket = conn.get_bucket(bucket_name)
@@ -227,28 +242,16 @@ def get_bokchoy_db_cache_from_s3(fingerprint, bucket_name=CACHE_BUCKET_NAME, pat
     zipfile_path = os.path.join(path, zipfile_name)
     key.get_contents_to_filename(zipfile_path)
 
-    extract_bokchoy_db_cache_files()
+    extract_bokchoy_db_cache_files(zipfile_path)
     # TODO remove the tar file
 
 
-def get_bokchoy_db_fingerprint_from_file():
-    """
-    Return the value recorded in the fingerprint file.
-    """
-    try:
-        with open(FINGERPRINT_FILEPATH, 'r') as fingerprint_file:
-            cached_fingerprint = fingerprint_file.read().strip()
-    except IOError:
-        return None
-    return cached_fingerprint
-
-
-def extract_bokchoy_db_cache_files(path=CACHE_FOLDER):
+def extract_bokchoy_db_cache_files(zipfile_path, path=CACHE_FOLDER):
     """
     Extract the files retrieved from S3.
     """
     remove_cached_db_files()
-    with tarfile.open(name=path, mode='r') as tar_file:
+    with tarfile.open(name=zipfile_path, mode='r') as tar_file:
         for name in BOKCHOY_DB_FILES:
             tar_file.extract(name=name, path=path)
     verify_files_exist(BOKCHOY_DB_FILES)
@@ -262,8 +265,8 @@ def upload_db_cache_to_s3():
     Update the S3 bucket with the bokchoy DB cache files
     """
     fingerprint = fingerprint_bokchoy_db_files()
-    zipfile = create_tarfile(fingerprint)
-    upload_to_s3(zipfile)
+    zipfile_name, zipfile_path = create_tarfile(fingerprint)
+    upload_to_s3(zipfile_name, zipfile_path)
 
 
 def create_tarfile(fingerprint, path=CACHE_FOLDER):
@@ -274,12 +277,19 @@ def create_tarfile(fingerprint, path=CACHE_FOLDER):
     zipfile_path = os.path.join(path, zipfile_name)
     with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
         for name in BOKCHOY_DB_FILES:
-            tar_file.add(name)
-    return zipfile_path
+            tar_file.add(os.path.join(path, name))
+    return zipfile_name, zipfile_path
 
 
-def upload_to_s3(zipfile, bucket_name=CACHE_BUCKET_NAME)
+def upload_to_s3(zipfile_name, zipfile_path, bucket_name=CACHE_BUCKET_NAME):
+    msg = "Uploading {} to s3 bucket {}".format(zipfile_name, bucket_name)
+    print (msg)
     conn = boto.connect_s3()
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
-    key.set_contents_from_filename(zipfile)
+    bytes_written = key.set_contents_from_filename(zipfile_path, replace=False)
+    if bytes_written:
+        msg = "Wrote {} bytes to {}.".format(bytes_written, key.name)
+    else:
+        msg = "File {} already existed in bucket {}.".format(key.name, bucket_name)
+    print (msg)

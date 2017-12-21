@@ -33,7 +33,7 @@ for db in "${database_order[@]}"; do
     echo "CREATE DATABASE calculate_migrations;" | mysql $MYSQL_HOST -u root
 
     # Now output all the migrations in the platform to a file.
-    echo "Calculating migrations."
+    echo "Calculating migrations for fingerprinting."
 
     output_file="common/test/db_cache/bok_choy_${db}_migrations.yaml"
     # Redirect stdout to /dev/null because it prints all migrations to both
