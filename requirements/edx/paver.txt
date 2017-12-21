@@ -1,4 +1,5 @@
 # Requirements to run and test Paver
+six<2.0.0,>=1.10.0
 git+https://github.com/jzoldak/paver.git@b72ccd7b638c1e07105d04f670170b3a37095d10#egg=Paver==1.2.4a
 libsass==0.10.0
 markupsafe
