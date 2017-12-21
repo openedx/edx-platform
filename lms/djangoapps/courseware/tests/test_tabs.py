@@ -3,6 +3,7 @@ Test cases for tabs.
 """
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -159,8 +160,9 @@ class TabTestCase(SharedModuleStoreTestCase):
         if for_authenticated_users_only:
             user = self.create_mock_user(is_staff=False, is_enrolled=False)
             self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
+            assert False
         if not for_staff_only and not for_authenticated_users_only and not for_enrolled_users_only:
-            user = self.create_mock_user(is_staff=False, is_enrolled=False)
+            user = AnonymousUser()
             self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
         if for_enrolled_users_only:
             user = self.create_mock_user(is_staff=False, is_enrolled=True)
