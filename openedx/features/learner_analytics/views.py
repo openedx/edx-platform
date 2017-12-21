@@ -53,11 +53,12 @@ class LearnerAnalyticsView(View):
             'course_url': course_url,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
+            'is_self_paced': course.self_paced,
             'is_verified': CourseEnrollment.is_enrolled_as_verified(request.user, course_key),
             'grading_policy': grading_policy,
             'assignment_grades': self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS']),
             'assignment_schedule': self.get_schedule(request, course_key),
-            'discussion_info': self.get_discussion_data(request, course_key)
+            'discussion_info': self.get_discussion_data(request, course_key),
         }
         return render_to_response('learner_analytics/dashboard.html', context)
 
@@ -95,10 +96,17 @@ class LearnerAnalyticsView(View):
             user: User
             course_key: CourseKey
         """
-        profile_context = create_user_profile_context(request, course_key, request.user.id)
+        context = create_user_profile_context(request, course_key, request.user.id)
+        threads = context['threads']
+        profiled_user = context['profiled_user']
+        content_authored = profiled_user['threads_count'] +profiled_user['comments_count']
+        thread_votes = 0
+        for thread in threads:
+            if thread['user_id'] == profiled_user['external_id']:
+                thread_votes += thread['votes']['count']
         discussion_data = {
-            'threads_authored': len(profile_context['threads']),
-            'subscribed_threads': len(profile_context['user_info']['subscribed_thread_ids']),
+            'content_authored': content_authored,
+            'thread_votes': thread_votes,
         }
         return discussion_data
 
@@ -119,9 +127,9 @@ class LearnerAnalyticsView(View):
             requested_fields=['display_name', 'due', 'graded', 'format'],
             block_types_filter=['sequential']
         )
-        graded_blocks = {}
-        for (location, block) in all_blocks['blocks'].iteritems():
+        graded_blocks = []
+        for (_, block) in all_blocks['blocks'].iteritems():
             if block.get('graded', False) and block.get('due') is not None:
-                graded_blocks[location] = block
+                graded_blocks.append(block)
                 block['due'] = block['due'].isoformat()
         return graded_blocks
