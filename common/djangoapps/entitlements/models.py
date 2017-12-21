@@ -54,10 +54,11 @@ class CourseEntitlementPolicy(models.Model):
         # Compute the days left for the regain
         days_since_course_start = (now - course_overview.start).days
         days_since_enrollment = (now - entitlement.enrollment_course_run.created).days
+        days_since_entitlement_created = (now - entitlement.created).days
 
         # We want to return whichever days value is less since it is then the more recent one
         days_until_regain_ends = (self.regain_period.days -  # pylint: disable=no-member
-                                  min(days_since_course_start, days_since_enrollment))
+                                  min(days_since_course_start, days_since_enrollment, days_since_entitlement_created))
 
         # If the base days until expiration is less than the days until the regain period ends, use that instead
         if days_until_expiry < days_until_regain_ends:
