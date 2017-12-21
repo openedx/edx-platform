@@ -1,6 +1,6 @@
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/components/utils/view_utils',
-        'js/views/pages/course_outline', 'js/models/xblock_outline_info', 'js/utils/date_utils',
-        'js/spec_helpers/edit_helpers', 'common/js/spec_helpers/template_helpers', 'js/models/course'],
+    'js/views/pages/course_outline', 'js/models/xblock_outline_info', 'js/utils/date_utils',
+    'js/spec_helpers/edit_helpers', 'common/js/spec_helpers/template_helpers', 'js/models/course'],
     function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils,
              EditHelpers, TemplateHelpers, Course) {
         describe('CourseOutlinePage', function() {
@@ -113,14 +113,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
             createMockIndexJSON = function(option) {
                 if (option) {
                     return JSON.stringify({
-                        'developer_message': 'Course has been successfully reindexed.',
-                        'user_message': 'Course has been successfully reindexed.'
+                        developer_message: 'Course has been successfully reindexed.',
+                        user_message: 'Course has been successfully reindexed.'
                     });
-                }
-                else {
+                } else {
                     return JSON.stringify({
-                        'developer_message': 'Could not reindex course.',
-                        'user_message': 'Could not reindex course.'
+                        developer_message: 'Could not reindex course.',
+                        user_message: 'Could not reindex course.'
                     });
                 }
             };
@@ -281,7 +280,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 ]);
                 mockCourseEntranceExamJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
-                        createMockSubsectionJSON({'is_header_visible': false}, [
+                        createMockSubsectionJSON({is_header_visible: false}, [
                             createMockVerticalJSON()
                         ])
                     ])
@@ -352,13 +351,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     outlinePage.$('.nav-actions .button-new').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        'category': 'chapter',
-                        'display_name': 'Section',
-                        'parent_locator': 'mock-course'
+                        category: 'chapter',
+                        display_name: 'Section',
+                        parent_locator: 'mock-course'
                     });
                     AjaxHelpers.respondWithJson(requests, {
-                        'locator': 'mock-section',
-                        'courseKey': 'slashes:MockCourse'
+                        locator: 'mock-section',
+                        courseKey: 'slashes:MockCourse'
                     });
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     AjaxHelpers.respondWithJson(requests, mockSingleSectionCourseJSON);
@@ -371,13 +370,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     outlinePage.$('.nav-actions .button-new').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        'category': 'chapter',
-                        'display_name': 'Section',
-                        'parent_locator': 'mock-course'
+                        category: 'chapter',
+                        display_name: 'Section',
+                        parent_locator: 'mock-course'
                     });
                     AjaxHelpers.respondWithJson(requests, {
-                        'locator': 'mock-section-2',
-                        'courseKey': 'slashes:MockCourse'
+                        locator: 'mock-section-2',
+                        courseKey: 'slashes:MockCourse'
                     });
                     // Expect the UI to just fetch the new section and repaint it
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section-2');
@@ -502,13 +501,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     $('.no-content .button-new').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        'category': 'chapter',
-                        'display_name': 'Section',
-                        'parent_locator': 'mock-course'
+                        category: 'chapter',
+                        display_name: 'Section',
+                        parent_locator: 'mock-course'
                     });
                     AjaxHelpers.respondWithJson(requests, {
-                        'locator': 'mock-section',
-                        'courseKey': 'slashes:MockCourse'
+                        locator: 'mock-section',
+                        courseKey: 'slashes:MockCourse'
                     });
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     AjaxHelpers.respondWithJson(requests, mockSingleSectionCourseJSON);
@@ -521,9 +520,9 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     $('.no-content .button-new').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        'category': 'chapter',
-                        'display_name': 'Section',
-                        'parent_locator': 'mock-course'
+                        category: 'chapter',
+                        display_name: 'Section',
+                        parent_locator: 'mock-course'
                     });
                     AjaxHelpers.respondWithError(requests);
                     AjaxHelpers.expectNoRequests(requests);
@@ -580,7 +579,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                             expect('.status-highlights-enabled-value.button').toExist();
                             expect('.status-highlights-enabled-value.text').not.toExist();
                         }
-                    }
+                    };
 
                     expectServerHandshake = function() {
                         // POST to update course
@@ -857,13 +856,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     createCourseOutlinePage(this, mockCourseJSON);
                     getItemsOfType('section').find('> .outline-content > .add-subsection .button-new').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        'category': 'sequential',
-                        'display_name': 'Subsection',
-                        'parent_locator': 'mock-section'
+                        category: 'sequential',
+                        display_name: 'Subsection',
+                        parent_locator: 'mock-section'
                     });
                     AjaxHelpers.respondWithJson(requests, {
-                        'locator': 'new-mock-subsection',
-                        'courseKey': 'slashes:MockCourse'
+                        locator: 'new-mock-subsection',
+                        courseKey: 'slashes:MockCourse'
                     });
                     // Note: verification of the server response and the UI's handling of it
                     // is handled in the acceptance tests.
@@ -881,7 +880,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     // This is the response for the change operation.
                     AjaxHelpers.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
-                    AjaxHelpers.respondWithJson(requests, {'display_name': updatedDisplayName});
+                    AjaxHelpers.respondWithJson(requests, {display_name: updatedDisplayName});
                     EditHelpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     sectionModel = outlinePage.model.get('child_info').children[0];
                     expect(sectionModel.get('display_name')).toBe(updatedDisplayName);
@@ -911,8 +910,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     selectBasicSettings();
                     $('.wrapper-modal-window .action-save').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
-                        'metadata': {
-                            'start': '2015-01-02T00:00:00.000Z'
+                        metadata: {
+                            start: '2015-01-02T00:00:00.000Z'
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -963,16 +962,17 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                                     createMockVerticalJSON({has_changes: true})
                                 ])
                             ])
-                        ]), modalWindow;
+                        ]),
+                        modalWindow;
 
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     getItemHeaders('section').first().find('.publish-button').click();
-                    modalWindow = $('.wrapper-modal-window');
-                    expect(modalWindow.find('.outline-unit').length).toBe(3);
-                    expect(_.compact(_.map(modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
+                    $modalWindow = $('.wrapper-modal-window');
+                    expect($modalWindow.find('.outline-unit').length).toBe(3);
+                    expect(_.compact(_.map($modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
                         ['Unit 100', 'Unit 50', 'Unit 1']
                     );
-                    expect(modalWindow.find('.outline-subsection').length).toBe(2);
+                    expect($modalWindow.find('.outline-subsection').length).toBe(2);
                 });
             });
 
@@ -1081,11 +1081,11 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         staff_only_message: true,
                         is_prereq: false,
                         show_correctness: 'never',
-                        'is_time_limited': true,
-                        'is_practice_exam': false,
-                        'is_proctored_exam': false,
-                        'default_time_limit_minutes': 150,
-                        'hide_after_due': true
+                        is_time_limited: true,
+                        is_practice_exam: false,
+                        is_proctored_exam: false,
+                        default_time_limit_minutes: 150,
+                        hide_after_due: true
                     }, [
                         createMockVerticalJSON({
                             has_changes: true,
@@ -1112,13 +1112,13 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     redirectSpy = spyOn(ViewUtils, 'redirect');
                     getItemsOfType('subsection').find('> .outline-content > .add-unit .button-new').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        'category': 'vertical',
-                        'display_name': 'Unit',
-                        'parent_locator': 'mock-subsection'
+                        category: 'vertical',
+                        display_name: 'Unit',
+                        parent_locator: 'mock-subsection'
                     });
                     AjaxHelpers.respondWithJson(requests, {
-                        'locator': 'new-mock-unit',
-                        'courseKey': 'slashes:MockCourse'
+                        locator: 'new-mock-unit',
+                        courseKey: 'slashes:MockCourse'
                     });
                     expect(redirectSpy).toHaveBeenCalledWith('/container/new-mock-unit?action=new');
                 });
@@ -1254,19 +1254,19 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     selectTimedExam('02:30');
                     $('.wrapper-modal-window .action-save').click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
-                        'graderType': 'Lab',
-                        'publish': 'republish',
-                        'isPrereq': false,
-                        'metadata': {
-                            'visible_to_staff_only': null,
-                            'start': '2014-07-09T00:00:00.000Z',
-                            'due': '2014-07-10T00:00:00.000Z',
-                            'exam_review_rules': '',
-                            'is_time_limited': true,
-                            'is_practice_exam': false,
-                            'is_proctored_enabled': false,
-                            'default_time_limit_minutes': 150,
-                            'hide_after_due': true
+                        graderType: 'Lab',
+                        publish: 'republish',
+                        isPrereq: false,
+                        metadata: {
+                            visible_to_staff_only: null,
+                            start: '2014-07-09T00:00:00.000Z',
+                            due: '2014-07-10T00:00:00.000Z',
+                            exam_review_rules: '',
+                            is_time_limited: true,
+                            is_practice_exam: false,
+                            is_proctored_enabled: false,
+                            default_time_limit_minutes: 150,
+                            hide_after_due: true
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -1383,11 +1383,11 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         }, [
                             createMockSubsectionJSON({
                                 has_changes: true,
-                                'is_time_limited': false,
-                                'is_practice_exam': false,
-                                'is_proctored_exam': false,
-                                'default_time_limit_minutes': 150,
-                                'hide_after_due': false
+                                is_time_limited: false,
+                                is_practice_exam: false,
+                                is_proctored_exam: false,
+                                default_time_limit_minutes: 150,
+                                hide_after_due: false
                             }, [
                             ])
                         ])
@@ -1412,11 +1412,11 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         }, [
                             createMockSubsectionJSON({
                                 has_changes: true,
-                                'is_time_limited': true,
-                                'is_practice_exam': false,
-                                'is_proctored_exam': false,
-                                'default_time_limit_minutes': 10,
-                                'hide_after_due': true
+                                is_time_limited: true,
+                                is_practice_exam: false,
+                                is_proctored_exam: false,
+                                default_time_limit_minutes: 10,
+                                hide_after_due: true
                             }, [
                             ])
                         ])
@@ -1441,11 +1441,11 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         }, [
                             createMockSubsectionJSON({
                                 has_changes: true,
-                                'is_time_limited': true,
-                                'is_practice_exam': false,
-                                'is_proctored_exam': false,
-                                'default_time_limit_minutes': 10,
-                                'hide_after_due': false
+                                is_time_limited: true,
+                                is_practice_exam: false,
+                                is_proctored_exam: false,
+                                default_time_limit_minutes: 10,
+                                hide_after_due: false
                             }, [
                             ])
                         ])
@@ -1471,10 +1471,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         }, [
                             createMockSubsectionJSON({
                                 has_changes: true,
-                                'is_time_limited': true,
-                                'is_practice_exam': true,
-                                'is_proctored_exam': true,
-                                'default_time_limit_minutes': 150
+                                is_time_limited: true,
+                                is_practice_exam: true,
+                                is_proctored_exam: true,
+                                default_time_limit_minutes: 150
                             }, [
                             ])
                         ])
@@ -1499,10 +1499,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         }, [
                             createMockSubsectionJSON({
                                 has_changes: true,
-                                'is_time_limited': true,
-                                'is_practice_exam': false,
-                                'is_proctored_exam': true,
-                                'default_time_limit_minutes': 150
+                                is_time_limited: true,
+                                is_practice_exam: false,
+                                is_proctored_exam: true,
+                                default_time_limit_minutes: 150
                             }, [
                             ])
                         ])
@@ -1527,11 +1527,11 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         }, [
                             createMockSubsectionJSON({
                                 has_changes: true,
-                                'is_time_limited': true,
-                                'is_practice_exam': false,
-                                'is_proctored_exam': false,
-                                'default_time_limit_minutes': 150,
-                                'hide_after_due': true
+                                is_time_limited: true,
+                                is_practice_exam: false,
+                                is_proctored_exam: false,
+                                default_time_limit_minutes: 150,
+                                hide_after_due: true
                             }, [
                             ])
                         ])
@@ -1845,16 +1845,17 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                                 ]),
                                 createMockSubsectionJSON({}, [createMockVerticalJSON])
                             ])
-                        ]), modalWindow;
+                        ]),
+                        $modalWindow;
 
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     getItemHeaders('subsection').first().find('.publish-button').click();
-                    modalWindow = $('.wrapper-modal-window');
-                    expect(modalWindow.find('.outline-unit').length).toBe(2);
-                    expect(_.compact(_.map(modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
+                    $modalWindow = $('.wrapper-modal-window');
+                    expect($modalWindow.find('.outline-unit').length).toBe(2);
+                    expect(_.compact(_.map($modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
                         ['Unit 100', 'Unit 50']
                     );
-                    expect(modalWindow.find('.outline-subsection')).not.toExist();
+                    expect($modalWindow.find('.outline-subsection')).not.toExist();
                 });
             });
 

@@ -17,21 +17,23 @@ def derived(*settings):
     Can be called multiple times to add more derived settings.
 
     Args:
-        settings (list): List of setting names to register.
+        settings (str): Setting names to register.
     """
     __DERIVED.extend(settings)
 
 
-def derived_dict_entry(setting_dict, key):
+def derived_collection_entry(collection_name, *accessors):
     """
-    Registers a setting which is a dictionary and needs a derived value for a particular key.
+    Registers a setting which is a dictionary or list and needs a derived value for a particular entry.
     Can be called multiple times to add more derived settings.
 
     Args:
-        setting_dict (str): Name of setting which contains a dictionary.
-        key (str): Name of key in the setting dictionary which will be derived.
+        collection_name (str): Name of setting which contains a dictionary or list.
+        accessors (int|str): Sequence of dictionary keys and list indices in the collection (and
+            collections within it) leading to the value which will be derived.
+            For example: 0, 'DIRS'.
     """
-    __DERIVED.append((setting_dict, key))
+    __DERIVED.append((collection_name, accessors))
 
 
 def derive_settings(module_name):
@@ -52,13 +54,16 @@ def derive_settings(module_name):
         elif isinstance(derived, tuple):
             # If a tuple, two elements are expected - else ignore.
             if len(derived) == 2:
-                # Both elements are expected to be strings.
-                # The first string is the attribute which is expected to be a dictionary.
-                # The second string is a key in that dictionary containing a derived setting.
-                setting = getattr(module, derived[0])[derived[1]]
+                # The first element is the name of the attribute which is expected to be a dictionary or list.
+                # The second element is a list of string keys in that dictionary leading to a derived setting.
+                collection = getattr(module, derived[0])
+                accessors = derived[1]
+                for accessor in accessors[:-1]:
+                    collection = collection[accessor]
+                setting = collection[accessors[-1]]
                 if callable(setting):
                     setting_val = setting(module)
-                    getattr(module, derived[0]).update({derived[1]: setting_val})
+                    collection[accessors[-1]] = setting_val
 
 
 def clear_for_tests():

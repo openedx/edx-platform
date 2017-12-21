@@ -6,8 +6,7 @@ from logging import getLogger
 
 import six
 from celery import task
-from celery_utils.logged_task import LoggedTask
-from celery_utils.persist_on_failure import PersistOnFailureTask
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from courseware.model_data import get_score
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -46,14 +45,7 @@ RETRY_DELAY_SECONDS = 30
 SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
 
 
-class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-method
-    """
-    Include persistence features, as well as logging of task invocation.
-    """
-    abstract = True
-
-
-@task(base=_BaseTask, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY)
 def compute_all_grades_for_course(**kwargs):
     """
     Compute grades for all students in the specified course.
@@ -77,7 +69,7 @@ def compute_all_grades_for_course(**kwargs):
 
 @task(
     bind=True,
-    base=_BaseTask,
+    base=LoggedPersistOnFailureTask,
     default_retry_delay=RETRY_DELAY_SECONDS,
     max_retries=1,
     time_limit=COURSE_GRADE_TIMEOUT_SECONDS
@@ -105,7 +97,7 @@ def compute_grades_for_course_v2(self, **kwargs):
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
-@task(base=_BaseTask)
+@task(base=LoggedPersistOnFailureTask)
 def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pylint: disable=unused-argument
     """
     Compute and save grades for a set of students in the specified course.
@@ -124,7 +116,7 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
 
 @task(
     bind=True,
-    base=_BaseTask,
+    base=LoggedPersistOnFailureTask,
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
     default_retry_delay=RETRY_DELAY_SECONDS,

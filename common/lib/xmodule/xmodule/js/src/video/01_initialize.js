@@ -325,7 +325,7 @@ function(VideoPlayer, i18n, moment, _) {
             .find('.spinner')
             .attr({
                 'aria-hidden': 'true',
-                'tabindex': -1
+                tabindex: -1
             });
     }
 
@@ -367,33 +367,33 @@ function(VideoPlayer, i18n, moment, _) {
                 // Compatibility keys used to change names of some parameters in
                 // the final configuration.
             compatKeys = {
-                'start': 'startTime',
-                'end': 'endTime'
+                start: 'startTime',
+                end: 'endTime'
             },
                 // Conversions used to pre-process some configuration data.
             conversions = {
-                'showCaptions': isBoolean,
-                'autoplay': isBoolean,
-                'autohideHtml5': isBoolean,
-                'savedVideoPosition': function(value) {
+                showCaptions: isBoolean,
+                autoplay: isBoolean,
+                autohideHtml5: isBoolean,
+                savedVideoPosition: function(value) {
                     return storage.getItem('savedVideoPosition', true) ||
                             Number(value) ||
                             0;
                 },
-                'speed': function(value) {
+                speed: function(value) {
                     return storage.getItem('speed', true) || value;
                 },
-                'generalSpeed': function(value) {
+                generalSpeed: function(value) {
                     return storage.getItem('general_speed') ||
                             value ||
                             '1.0';
                 },
-                'transcriptLanguage': function(value) {
+                transcriptLanguage: function(value) {
                     return storage.getItem('language') ||
                             value ||
                             'en';
                 },
-                'ytTestTimeout': function(value) {
+                ytTestTimeout: function(value) {
                     value = parseInt(value, 10);
 
                     if (!isFinite(value)) {
@@ -402,7 +402,7 @@ function(VideoPlayer, i18n, moment, _) {
 
                     return value;
                 },
-                'startTime': function(value) {
+                startTime: function(value) {
                     value = parseInt(value, 10);
                     if (!isFinite(value) || value < 0) {
                         return 0;
@@ -410,7 +410,7 @@ function(VideoPlayer, i18n, moment, _) {
 
                     return value;
                 },
-                'endTime': function(value) {
+                endTime: function(value) {
                     value = parseInt(value, 10);
 
                     if (!isFinite(value) || value === 0) {
@@ -689,10 +689,10 @@ function(VideoPlayer, i18n, moment, _) {
         // Youtube Flash =  [0.75, 1, 1.25, 1.5]
         // Youtube HTML5 =  [0.25, 0.5, 1, 1.5, 2]
         var map = {
-            '0.25': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+            0.25: '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
             '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
-            '0.75': '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
-            '1.25': '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
+            0.75: '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
+            1.25: '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
             '2.0': '1.50'   // Youtube HTML5 -> HTML5 or Youtube Flash
         };
 

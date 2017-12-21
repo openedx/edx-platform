@@ -1,3 +1,4 @@
+{% autoescape off %}
 {% load i18n %}
 
 {% blocktrans trimmed %}
@@ -13,4 +14,5 @@ We want to let you know what you can look forward to in week {{ week_num }}:
 With self-paced courses, you learn on your own schedule. We encourage you to spend time with the course each week.
 Your focused attention will pay off in the end!
 {% endblocktrans %}
-{% include "schedules/edx_ace/common/upsell_cta.txt"%}
+{% include "ace_common/edx_ace/common/upsell_cta.txt"%}
+{% endautoescape %}

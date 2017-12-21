@@ -20,6 +20,7 @@ module.exports = {
         AssetsPage: './node_modules/@edx/studio-frontend/src/index.jsx',
         Import: './cms/static/js/features/import/factories/import.js',
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
+        AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
@@ -34,7 +35,10 @@ module.exports = {
         Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
         Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
         LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
-        WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js'
+        WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
+
+        // Common
+        ReactRenderer: './common/static/js/src/ReactRenderer.jsx'
     },
 
     output: {

@@ -234,6 +234,37 @@ define([
 
             expect(view.$('.course-title-link').length).toEqual(0);
         });
+
+        it('should show an unfulfilled user entitlement allows you to select a session', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, false);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You must select a session by');
+        });
+
+        it('should show a fulfilled expired user entitlement does not allow the changing of sessions', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expired_at: '2017-12-06 01:06:12',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, true);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You can no longer change sessions.');
+        });
+
+        it('should show a fulfilled user entitlement allows the changing of sessions', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, true);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You can change sessions until');
+        });
     });
 }
 );

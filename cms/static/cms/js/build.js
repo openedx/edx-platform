@@ -100,7 +100,7 @@
          * inlined in the build config.
          */
         shim: {
-            'xmodule': {
+            xmodule: {
                 deps: [
                     'jquery', 'underscore', 'codemirror', 'tinymce',
                     'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',

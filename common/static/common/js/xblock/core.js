@@ -66,7 +66,7 @@
                 Block.prototype = initFn.prototype;
 
                 return new Block();
-            })();
+            }());
             block.runtime = runtime;
         } else {
             block = {};

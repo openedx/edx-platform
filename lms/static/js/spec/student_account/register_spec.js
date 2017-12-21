@@ -213,7 +213,12 @@
                             }
                         ]
                     };
-                var createRegisterView = function(that) {
+                var createRegisterView = function(that, formFields) {
+                    var fields = formFields;
+                    if (typeof fields === 'undefined') {
+                        fields = FORM_DESCRIPTION.fields;
+                    }
+
                 // Initialize the register model
                     model = new RegisterModel({}, {
                         url: FORM_DESCRIPTION.submit_url,
@@ -222,7 +227,7 @@
 
                 // Initialize the register view
                     view = new RegisterView({
-                        fields: FORM_DESCRIPTION.fields,
+                        fields: fields,
                         model: model,
                         thirdPartyAuth: THIRD_PARTY_AUTH,
                         platformName: PLATFORM_NAME
@@ -278,6 +283,8 @@
                 var submitForm = function(validationSuccess) {
                 // Create a fake click event
                     var clickEvent = $.Event('click');
+
+                    $('#toggle_optional_fields').click();
 
                 // Simulate manual entry of registration form data
                     fillData();
@@ -481,6 +488,17 @@
                     expect(view.$submitButton).toHaveAttr('disabled');
                 });
 
+                it('hides optional fields by default', function() {
+                    createRegisterView(this);
+                    expect(view.$('.optional-fields')).toHaveClass('hidden');
+                });
+
+                it('displays optional fields when checkbox is selected', function() {
+                    createRegisterView(this);
+                    $('#toggle_optional_fields').click();
+                    expect(view.$('.optional-fields')).not.toHaveClass('hidden');
+                });
+
                 it('displays a modal with the terms of service', function() {
                     var $modal,
                         $content;
@@ -523,6 +541,27 @@
 
                 // The iframe has been deleted
                     expect($content.find('iframe').length).toEqual(0);
+                });
+
+                it('displays optional fields toggle', function() {
+                    createRegisterView(this);
+                    expect(view.$('.checkbox-optional_fields_toggle')).toBeVisible();
+                });
+
+                it('hides optional fields toggle when there are no visible optional fields', function() {
+                    createRegisterView(this, [
+                        {
+                            placeholder: '',
+                            name: 'hidden_optional',
+                            label: 'Hidden Optional',
+                            defaultValue: '',
+                            type: 'hidden',
+                            required: false,
+                            instructions: 'Used for testing hidden input fields that are optional.',
+                            restrictions: {}
+                        }
+                    ]);
+                    expect(view.$('.checkbox-optional_fields_toggle')).toHaveClass('hidden');
                 });
             });
         });

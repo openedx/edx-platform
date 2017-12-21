@@ -12,6 +12,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
     get_themes, Theme, get_theme_base_dir
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
+from request_cache.middleware import RequestCache
 
 
 class TestHelpers(TestCase):
@@ -188,6 +189,8 @@ class TestHelpers(TestCase):
                 with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
                     mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
                     self.assertEqual(theming_helpers.get_template_path("about.html"), "about.html")
+
+        RequestCache.clear_request_cache()
 
         # if the current site does not have associated SiteTheme then get_template_path should return microsite override
         with patch(

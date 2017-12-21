@@ -18,9 +18,9 @@ define([
                         label: 'Course',
                         name: 'course',
                         options: [
-                                {'name': 'Verified with Audit', 'value': 'course-v1:HCFA+VA101+2015'},
-                                {'name': 'Something Else', 'value': 'course-v1:SomethingX+SE101+215'},
-                                {'name': 'Test Course', 'value': 'course-v1:TestX+T101+2015'}
+                                {name: 'Verified with Audit', value: 'course-v1:HCFA+VA101+2015'},
+                                {name: 'Something Else', value: 'course-v1:SomethingX+SE101+215'},
+                                {name: 'Test Course', value: 'course-v1:TestX+T101+2015'}
                         ],
                         placeholder: '',
                         required: true,
@@ -32,11 +32,11 @@ define([
                         label: 'Annual Income',
                         name: 'income',
                         options: [
-                                {'name': 'Less than $5,000', 'value': 'Less than $5,000'},
-                                {'name': '$5,000 - $10,000', 'value': '$5,000 - $10,000'},
-                                {'name': '$10,000 - $15,000', 'value': '$10,000 - $15,000'},
-                                {'name': '$15,000 - $20,000', 'value': '$15,000 - $20,000'},
-                                {'name': '$20,000 - $25,000', 'value': '$20,000 - $25,000'}
+                                {name: 'Less than $5,000', value: 'Less than $5,000'},
+                                {name: '$5,000 - $10,000', value: '$5,000 - $10,000'},
+                                {name: '$10,000 - $15,000', value: '$10,000 - $15,000'},
+                                {name: '$15,000 - $20,000', value: '$15,000 - $20,000'},
+                                {name: '$20,000 - $25,000', value: '$20,000 - $25,000'}
                         ],
                         placeholder: '',
                         required: true,

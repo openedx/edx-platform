@@ -58,7 +58,13 @@ def get_library_creator_status(user):
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         return get_course_creator_status(user) == 'granted'
     else:
-        return True
+        # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+        disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
+        disable_course_creation = settings.FEATURES.get('DISABLE_COURSE_CREATION', False)
+        if disable_library_creation is not None:
+            return not disable_library_creation
+        else:
+            return not disable_course_creation
 
 
 @login_required
@@ -72,21 +78,20 @@ def library_handler(request, library_key_string=None):
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
 
-    if not get_library_creator_status(request.user):
-        if not request.user.is_staff:
+    if request.method == 'POST':
+        if not get_library_creator_status(request.user):
             return HttpResponseForbidden()
 
-    if library_key_string is not None and request.method == 'POST':
-        return HttpResponseNotAllowed(("POST",))
+        if library_key_string is not None:
+            return HttpResponseNotAllowed(("POST",))
 
-    if request.method == 'POST':
         return _create_library(request)
 
-    # request method is get, since only GET and POST are allowed by @require_http_methods(('GET', 'POST'))
-    if library_key_string:
-        return _display_library(library_key_string, request)
+    else:
+        if library_key_string:
+            return _display_library(library_key_string, request)
 
-    return _list_libraries(request)
+        return _list_libraries(request)
 
 
 def _display_library(library_key_string, request):

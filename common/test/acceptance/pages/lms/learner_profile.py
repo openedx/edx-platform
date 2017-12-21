@@ -144,8 +144,9 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
         if privacy != self.privacy:
             query = self.q(css=PROFILE_VISIBILITY_INPUT)
-            select_option_by_value(query, privacy, focus_out=True)
+            select_option_by_value(query, privacy)
             EmptyPromise(lambda: privacy == self.privacy, 'Privacy is set to {}'.format(privacy)).fulfill()
+            self.q(css='.btn-change-privacy').first.click()
             self.wait_for_ajax()
 
             if privacy == 'all_users':

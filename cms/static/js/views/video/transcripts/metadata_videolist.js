@@ -20,9 +20,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
         // Pre-defined dict of placeholders: "videoType - placeholder" pairs.
         placeholders: {
-            'webm': '.webm',
-            'mp4': 'http://somesite.com/video.mp4',
-            'youtube': 'http://youtube.com/'
+            webm: '.webm',
+            mp4: 'http://somesite.com/video.mp4',
+            youtube: 'http://youtube.com/'
         },
 
         initialize: function(options) {

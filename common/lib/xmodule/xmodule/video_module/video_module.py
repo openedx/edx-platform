@@ -27,6 +27,7 @@ from opaque_keys.edx.locator import AssetLocator
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -44,9 +45,11 @@ from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
     get_video_ids_info,
-    is_val_transcript_feature_enabled_for_course,
     Transcript,
     VideoTranscriptsMixin,
+)
+from .transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
@@ -95,7 +98,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-@XBlock.wants('settings')
+@XBlock.wants('settings', 'completion')
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule, LicenseMixin):
     """
     XML source example:
@@ -108,6 +111,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
         </video>
     """
+    has_custom_completion = True
+    completion_mode = XBlockCompletionMode.COMPLETABLE
+
     video_time = 0
     icon_class = 'video'
 
@@ -148,9 +154,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             resource_string(module, 'js/src/video/09_events_plugin.js'),
             resource_string(module, 'js/src/video/09_events_bumper_plugin.js'),
             resource_string(module, 'js/src/video/09_poster.js'),
+            resource_string(module, 'js/src/video/09_completion.js'),
             resource_string(module, 'js/src/video/095_video_context_menu.js'),
             resource_string(module, 'js/src/video/10_commands.js'),
-            resource_string(module, 'js/src/video/10_main.js')
+            resource_string(module, 'js/src/video/10_main.js'),
         ]
     }
     css = {'scss': [
@@ -325,6 +332,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 edx_video_id=self.edx_video_id.strip()
             )
 
+        completion_service = self.runtime.service(self, 'completion')
+        if completion_service:
+            completion_enabled = completion_service.completion_tracking_enabled()
+        else:
+            completion_enabled = False
+
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -343,6 +356,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'savedVideoPosition': self.saved_video_position.total_seconds(),
             'start': self.start_time.total_seconds(),
             'end': self.end_time.total_seconds(),
+            'completionEnabled': completion_enabled,
+            'completionPercentage': settings.COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
             'transcriptLanguage': transcript_language,
             'transcriptLanguages': sorted_languages,
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
@@ -356,18 +371,19 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
                 self, 'transcript', 'available_translations'
             ).rstrip('/?'),
+            'publishCompletionUrl': self.runtime.handler_url(self, 'publish_completion', '').rstrip('?'),
 
-            ## For now, the option "data-autohide-html5" is hard coded. This option
-            ## either enables or disables autohiding of controls and captions on mouse
-            ## inactivity. If set to true, controls and captions will autohide for
-            ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
-            ## whole video. When the mouse moves (or a key is pressed while any part of
-            ## the video player is focused), the captions and controls will be shown
-            ## once again.
-            ##
-            ## There is no option in the "Advanced Editor" to set this option. However,
-            ## this option will have an effect if changed to "True". The code on
-            ## front-end exists.
+            # For now, the option "data-autohide-html5" is hard coded. This option
+            # either enables or disables autohiding of controls and captions on mouse
+            # inactivity. If set to true, controls and captions will autohide for
+            # HTML5 sources (non-YouTube) after a period of mouse inactivity over the
+            # whole video. When the mouse moves (or a key is pressed while any part of
+            # the video player is focused), the captions and controls will be shown
+            # once again.
+            #
+            # There is no option in the "Advanced Editor" to set this option. However,
+            # this option will have an effect if changed to "True". The code on
+            # front-end exists.
             'autohideHtml5': False,
 
             # This is the server's guess at whether youtube is available for
@@ -397,8 +413,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return self.system.render_template('video.html', context)
 
 
-@XBlock.wants("request_cache")
-@XBlock.wants("settings")
+@XBlock.wants("request_cache", "settings", "completion")
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
                       TabsEditingDescriptor, EmptyDataRawDescriptor, LicenseMixin):
     """
@@ -406,6 +421,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     """
     module_class = VideoModule
     transcript = module_attr('transcript')
+    publish_completion = module_attr('publish_completion')
 
     show_in_read_only_mode = True
 
@@ -977,6 +993,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         encoded_videos = {}
         val_video_data = {}
+        all_sources = self.html5_sources or []
+
+        # `source` is a deprecated field, but we include it for backwards compatibility.
+        if self.source:
+            all_sources.append(self.source)
 
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
@@ -1008,10 +1029,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         # Fall back to other video URLs in the video module if not found in VAL
         if not encoded_videos:
-            video_url = self.html5_sources[0] if self.html5_sources else self.source
-            if video_url:
+            if all_sources:
                 encoded_videos["fallback"] = {
-                    "url": video_url,
+                    "url": all_sources[0],
                     "file_size": 0,  # File size is unknown for fallback URLs
                 }
 
@@ -1036,4 +1056,5 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "duration": val_video_data.get('duration', None),
             "transcripts": transcripts,
             "encoded_videos": encoded_videos,
+            "all_sources": all_sources,
         }

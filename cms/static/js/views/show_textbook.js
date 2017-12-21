@@ -1,5 +1,5 @@
 define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
-        'common/js/components/views/feedback_prompt'],
+    'common/js/components/views/feedback_prompt'],
         function(BaseView, _, gettext, NotificationView, PromptView) {
             var ShowTextbook = BaseView.extend({
                 initialize: function() {

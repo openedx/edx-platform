@@ -33,12 +33,14 @@ from xmodule.video_module.transcripts_utils import (
     get_video_transcript_content,
     generate_subs_from_source,
     get_transcripts_from_youtube,
-    is_val_transcript_feature_enabled_for_course,
     manage_video_subtitles_save,
     remove_subs_from_store,
     Transcript,
     TranscriptsRequestValidationException,
     youtube_video_transcript_name,
+)
+from xmodule.video_module.transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
 )
 
 __all__ = [

@@ -9,7 +9,7 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
-        'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
+    'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
         XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
@@ -69,8 +69,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 var locator = this.model.get('id');
                 if (isCollapsed) {
                     this.expandedLocators.remove(locator);
-                }
-                else {
+                } else {
                     this.expandedLocators.add(locator);
                 }
                 this.refresh();
@@ -239,8 +238,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                         refresh: this.refreshWithCollapsedState.bind(this),
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
-                }
-                else if ($(element).hasClass('outline-subsection')) {
+                } else if ($(element).hasClass('outline-subsection')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-subsection',
                         handleClass: '.subsection-drag-handle',
@@ -249,8 +247,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                         refresh: this.refreshWithCollapsedState.bind(this),
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
-                }
-                else if ($(element).hasClass('outline-unit')) {
+                } else if ($(element).hasClass('outline-unit')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-unit',
                         handleClass: '.unit-drag-handle',

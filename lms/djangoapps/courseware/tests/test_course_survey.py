@@ -5,7 +5,6 @@ Python tests for the Survey workflows
 from collections import OrderedDict
 from copy import deepcopy
 
-import pytest
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
@@ -18,7 +17,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file

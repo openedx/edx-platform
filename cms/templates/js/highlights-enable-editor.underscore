@@ -1,6 +1,6 @@
 <p>
 <%- gettext(
-    'When you enable weekly course highlight messages, learners ' +
+    'When you enable weekly highlight emails, learners ' +
     'automatically receive weekly email messages for each section that ' +
     'has highlights. You cannot disable highlights after you start ' +
     'sending them.'
@@ -10,7 +10,7 @@
 <% // xss-lint: disable=underscore-not-escaped %>
 <%= edx.HtmlUtils.interpolateHtml(
     gettext(
-        'Are you sure you want to enable weekly course highlight messages? '
+        'Are you sure you want to enable weekly highlight emails? '
         + '{linkStart}Learn more.{linkEnd}'
     ),
     {

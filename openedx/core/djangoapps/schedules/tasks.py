@@ -2,8 +2,7 @@ import datetime
 import logging
 
 import analytics
-from celery.task import task, Task
-from crum import CurrentRequestUserMiddleware
+from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -11,6 +10,8 @@ from django.core.exceptions import ValidationError
 
 from django.db.utils import DatabaseError
 
+from celery_utils.logged_task import LoggedTask
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
@@ -20,7 +21,6 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
-from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 LOG = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ UPGRADE_REMINDER_LOG_PREFIX = 'Upgrade Reminder'
 COURSE_UPDATE_LOG_PREFIX = 'Course Update'
 
 
-@task(bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
 def update_course_schedules(self, **kwargs):
     course_key = CourseKey.from_string(kwargs['course_id'])
     new_start_date = deserialize(kwargs['new_start_date_str'])
@@ -55,7 +55,11 @@ def update_course_schedules(self, **kwargs):
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
-class ScheduleMessageBaseTask(Task):
+class ScheduleMessageBaseTask(LoggedTask):
+    """
+    Base class for top-level Schedule tasks that create subtasks
+    for each Bin.
+    """
     ignore_result = True
     routing_key = ROUTING_KEY
     num_bins = resolvers.DEFAULT_NUM_BINS
@@ -66,18 +70,28 @@ class ScheduleMessageBaseTask(Task):
 
     @classmethod
     def log_debug(cls, message, *args, **kwargs):
+        """
+        Wrapper around LOG.debug that prefixes the message.
+        """
         LOG.debug(cls.log_prefix + ': ' + message, *args, **kwargs)
+
+    @classmethod
+    def log_info(cls, message, *args, **kwargs):
+        """
+        Wrapper around LOG.info that prefixes the message.
+        """
+        LOG.info(cls.log_prefix + ': ' + message, *args, **kwargs)
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_debug('Message queuing disabled for site %s', site.domain)
+            cls.log_info('Message queuing disabled for site %s', site.domain)
             return
 
         target_date = current_date + datetime.timedelta(days=day_offset)
-        cls.log_debug('Target date = %s', target_date.isoformat())
+        cls.log_info('Target date = %s', target_date.isoformat())
         for bin in range(cls.num_bins):
             task_args = (
                 site.id,
@@ -86,8 +100,8 @@ class ScheduleMessageBaseTask(Task):
                 bin,
                 override_recipient_email,
             )
-            cls.log_debug('Launching task with args = %r', task_args)
-            cls.apply_async(
+            cls.log_info('Launching task with args = %r', task_args)
+            cls().apply_async(
                 task_args,
                 retry=False,
             )
@@ -101,13 +115,9 @@ class ScheduleMessageBaseTask(Task):
     def run(
         self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
     ):
-        msg_type = self.make_message_type(day_offset)
         site = Site.objects.select_related('configuration').get(id=site_id)
-        middleware_classes = [
-            CurrentRequestUserMiddleware,
-            CurrentSiteThemeMiddleware,
-        ]
-        with emulate_http_request(site=site, middleware_classes=middleware_classes):
+        with emulate_http_request(site=site):
+            msg_type = self.make_message_type(day_offset)
             _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
             return self.resolver(
                 self.async_send_task,
@@ -122,7 +132,7 @@ class ScheduleMessageBaseTask(Task):
         raise NotImplementedError
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
 def _recurring_nudge_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -132,7 +142,7 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
     )
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
 def _upgrade_reminder_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -142,7 +152,7 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     )
 
 
-@task(ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
 def _course_update_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -191,11 +201,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
 
         user = User.objects.get(username=msg.recipient.username)
-        middleware_classes = [
-            CurrentRequestUserMiddleware,
-            CurrentSiteThemeMiddleware,
-        ]
-        with emulate_http_request(site=site, user=user, middleware_classes=middleware_classes):
+        with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
             LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
             ace.send(msg)
@@ -228,7 +234,7 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:
-        LOG.debug('%s: Message delivery disabled for site %s', log_prefix, site.domain)
+        LOG.info('%s: Message delivery disabled for site %s', log_prefix, site.domain)
 
 
 def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):

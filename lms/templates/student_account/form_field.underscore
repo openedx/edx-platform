@@ -102,7 +102,7 @@
         />
         <% if ( type === 'checkbox' ) { %>
             <label for="<%- form %>-<%- name %>">
-                <span class="label-text"><%- label %></span>
+                <span class="label-text"><%= HtmlUtils.HTML(label) %></span>
                 <% if ( required && type !== 'hidden' ) { %>
                     <span id="<%- form %>-<%- name %>-required-label"
                         class="label-required <% if ( !requiredStr ) { %>hidden<% } %>">

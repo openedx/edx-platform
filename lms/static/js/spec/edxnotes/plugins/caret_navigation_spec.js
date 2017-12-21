@@ -74,7 +74,7 @@ define([
             };
 
             beforeEach(function() {
-                this.element = $('<span />', {'class': 'annotator-hl'}).appendTo(this.annotator.element);
+                this.element = $('<span />', {class: 'annotator-hl'}).appendTo(this.annotator.element);
 
                 this.annotation = {
                     text: 'test',

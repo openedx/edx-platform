@@ -3,10 +3,10 @@ define(['backbone', 'js/utils/module'], function(Backbone, ModuleUtils) {
         urlRoot: ModuleUtils.urlRoot,
 
         defaults: {
-            'id': null,
-            'data': null,
-            'metadata': null,
-            'children': null
+            id: null,
+            data: null,
+            metadata: null,
+            children: null
         }
     });
     return ModuleInfo;

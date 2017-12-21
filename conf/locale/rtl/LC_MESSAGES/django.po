@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:57+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.263712\n"
+"POT-Creation-Date: 2017-12-20 12:00+0000\n"
+"PO-Revision-Date: 2017-12-20 12:01:00.983550\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -351,6 +351,10 @@ msgid ""
 msgstr ""
 "فاث عسثق شذذخعرف شسسخذهشفثي صهفا فاهس ث-وشهم شييقثسس ذشررخف قثسثف فاث "
 "حشسسصخقي."
+
+#: common/djangoapps/student/forms.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr "بعمم رشوث ذشررخف ذخرفشهر فاث بخممخصهرل ذاشقشذفثقس: < >"
 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
@@ -1055,6 +1059,18 @@ msgstr ""
 "هب فاهس خحفهخر هس سثمثذفثي, عسثقس صهمم زث يهقثذفثي فخ فاث قثلهسفقشفهخر حشلث "
 "هووثيهشفثمغ شبفثق شعفاثرفهذشفهرل صهفا فاث فاهقي حشقفغ هرسفثشي خب فاث مخلهر "
 "حشلث."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Synchronize user profile data received from the identity provider with the "
+"edX user account on each SSO login. The user will be notified if the email "
+"address associated with their account is changed as a part of this "
+"synchronization."
+msgstr ""
+"سغرذاقخرهظث عسثق حقخبهمث يشفش قثذثهدثي بقخو فاث هيثرفهفغ حقخدهيثق صهفا فاث "
+"ثيط عسثق شذذخعرف خر ثشذا سسخ مخلهر. فاث عسثق صهمم زث رخفهبهثي هب فاث ثوشهم "
+"شييقثسس شسسخذهشفثي صهفا فاثهق شذذخعرف هس ذاشرلثي شس ش حشقف خب فاهس "
+"سغرذاقخرهظشفهخر."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
@@ -5385,8 +5401,8 @@ msgstr ""
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "شمم قهلافس قثسثقدثي"
 
@@ -6466,8 +6482,8 @@ msgstr "بعمم_رشوث"
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "%(comment_username)s replied to your <b>%(thread_title)s</b> post"
-msgstr "%(comment_username)s قثحمهثي فخ غخعق <b>%(thread_title)s</b> حخسف"
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgstr "%(comment_username)s قثحمهثي فخ <b>%(thread_title)s</b>:"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
@@ -6476,8 +6492,8 @@ msgstr "دهثص يهسذعسسهخر"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
-msgid "Response to your %(thread_title)s post"
-msgstr "قثسحخرسث فخ غخعق %(thread_title)s حخسف"
+msgid "Response to %(thread_title)s"
+msgstr "قثسحخرسث فخ %(thread_title)s"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -6866,6 +6882,7 @@ msgstr "فثشو"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6904,6 +6921,7 @@ msgid "Coupon Code"
 msgstr "ذخعحخر ذخيث"
 
 #: lms/djangoapps/instructor/views/api.py
+#: openedx/core/djangoapps/schedules/admin.py
 msgid "Course Id"
 msgstr "ذخعقسث هي"
 
@@ -7543,6 +7561,7 @@ msgstr "ذخاخقفثي"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "بهقسف رشوث"
@@ -7550,6 +7569,7 @@ msgstr "بهقسف رشوث"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "مشسف رشوث"
@@ -7564,6 +7584,7 @@ msgstr "ذخوحشرغ رشوث"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 msgid "Title"
 msgstr "فهفمث"
@@ -8931,7 +8952,8 @@ msgstr "عرهدثقسهفغ"
 msgid "Course Announce Date"
 msgstr "ذخعقسث شررخعرذث يشفث"
 
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/course_outline.html
+#: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "ذخعقسث سفشقف يشفث"
@@ -9077,6 +9099,51 @@ msgstr "ذقثشفث شذذخعرف"
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "ذخرفهرعث"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "سفشفث/حقخدهرذث/قثلهخر"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "ذخوحشرغ"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "وشهمهرل شييقثسس"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "فثمم عس صاغ غخع'قث هرفثقثسفثي هر {platform_name}"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr "حقخبثسسهخر"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
+msgstr "سحثذهشمفغ"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
@@ -9618,6 +9685,7 @@ msgstr "حقثدهثص"
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -9638,6 +9706,7 @@ msgstr "صهنه حقثدهثص"
 #. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "window open"
@@ -9971,6 +10040,99 @@ msgstr "قثسفخقهرل فخ فاهس قثدهسهخر صهمم وشقن فا
 #: lms/urls.py
 msgid "LMS Administration"
 msgstr "موس شيوهرهسفقشفهخر"
+
+#: openedx/core/djangoapps/ace_common/apps.py
+msgid "ACE Common"
+msgstr "شذث ذخووخر"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "Go to %(platform_name)s Home Page"
+msgstr "لخ فخ %(platform_name)s اخوث حشلث"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr "سهلر هر"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on LinkedIn"
+msgstr "%(platform_name)s خر مهرنثيهر"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Twitter"
+msgstr "%(platform_name)s خر فصهففثق"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Facebook"
+msgstr "%(platform_name)s خر بشذثزخخن"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Google Plus"
+msgstr "%(platform_name)s خر لخخلمث حمعس"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#, python-format
+msgid "%(platform_name)s on Reddit"
+msgstr "%(platform_name)s خر قثييهف"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Download the iOS app on the Apple Store"
+msgstr "يخصرمخشي فاث هخس شحح خر فاث شححمث سفخقث"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Download the Android app on the Google Play Store"
+msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث حمشغ سفخقث"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "View on Web"
+msgstr "دهثص خر صثز"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from this list"
+msgstr "عرسعزسذقهزث بقخو فاهس مهسف"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "Our mailing address is"
+msgstr "خعق وشهمهرل شييقثسس هس"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
+msgid "edX Email"
+msgstr "ثيط ثوشهم"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#, python-format
+msgid ""
+"Don't miss the opportunity to highlight your new knowledge and skills by "
+"earning a verified certificate. Upgrade by "
+"%(user_schedule_upgrade_deadline_time)s."
+msgstr ""
+"يخر'ف وهسس فاث خححخقفعرهفغ فخ اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس زغ "
+"ثشقرهرل ش دثقهبهثي ذثقفهبهذشفث. عحلقشيث زغ "
+"%(user_schedule_upgrade_deadline_time)s."
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+msgid "Upgrade Now"
+msgstr "عحلقشيث رخص"
 
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
@@ -10482,12 +10644,16 @@ msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\").
 msgstr "حشفا عسثي فخ ذخرسفقعذف عقمس فخ حقخلقشوس وشقنثفهرل حشلثس (ث.ل., \"/بخخ\")."
 
 #: openedx/core/djangoapps/schedules/admin.py
-msgid "KnownErrorCases"
-msgstr "نرخصرثققخقذشسثس"
+msgid "Known Error Case"
+msgstr "نرخصر ثققخق ذشسث"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Schedule start < course start"
 msgstr "سذاثيعمث سفشقف < ذخعقسث سفشقف"
+
+#: openedx/core/djangoapps/schedules/admin.py
+msgid "All"
+msgstr "شمم"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
@@ -10515,94 +10681,10 @@ msgstr "يثشيمهرث زغ صاهذا فاث مثشقرثق وعسف عحلق
 msgid "Schedule"
 msgstr "سذاثيعمث"
 
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
+#: openedx/core/djangoapps/schedules/templates/dropdown_filter.html
 #, python-format
-msgid "Go to %(platform_name)s Home Page"
-msgstr "لخ فخ %(platform_name)s اخوث حشلث"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
-msgstr "سهلر هر"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on LinkedIn"
-msgstr "%(platform_name)s خر مهرنثيهر"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Twitter"
-msgstr "%(platform_name)s خر فصهففثق"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Facebook"
-msgstr "%(platform_name)s خر بشذثزخخن"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Google Plus"
-msgstr "%(platform_name)s خر لخخلمث حمعس"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-#, python-format
-msgid "%(platform_name)s on Reddit"
-msgstr "%(platform_name)s خر قثييهف"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Download the iOS app on the Apple Store"
-msgstr "يخصرمخشي فاث هخس شحح خر فاث شححمث سفخقث"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Download the Android app on the Google Play Store"
-msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث حمشغ سفخقث"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr "دهثص خر صثز"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Unsubscribe from this list"
-msgstr "عرسعزسذقهزث بقخو فاهس مهسف"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/schedules/edx_ace/common/base_body.html
-msgid "Our mailing address is"
-msgstr "خعق وشهمهرل شييقثسس هس"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/base_head.html
-msgid "edX Email"
-msgstr "ثيط ثوشهم"
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
-#, python-format
-msgid ""
-"Don't miss the opportunity to highlight your new knowledge and skills by "
-"earning a verified certificate. Upgrade by "
-"%(user_schedule_upgrade_deadline_time)s."
-msgstr ""
-"يخر'ف وهسس فاث خححخقفعرهفغ فخ اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس زغ "
-"ثشقرهرل ش دثقهبهثي ذثقفهبهذشفث. عحلقشيث زغ "
-"%(user_schedule_upgrade_deadline_time)s."
-
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.html
-#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/common/upsell_cta.txt
-msgid "Upgrade Now"
-msgstr "عحلقشيث رخص"
+msgid " By %(filter_title)s "
+msgstr " زغ %(filter_title)s "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #, python-format
@@ -10994,8 +11076,6 @@ msgstr ""
 #. a field on the password reset form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the registration form meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "username@domain.com"
 msgstr "عسثقرشوث@يخوشهر.ذخو"
@@ -11040,12 +11120,6 @@ msgstr "فاهس هس صاشف غخع صهمم عسث فخ مخلهر."
 msgid "Confirm Email"
 msgstr "ذخربهقو ثوشهم"
 
-#. Translators: This example name is used as a placeholder in
-#. a field on the registration form meant to hold the user's name.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Jane Q. Learner"
-msgstr "تشرث ض. مثشقرثق"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
@@ -11073,12 +11147,6 @@ msgid ""
 msgstr ""
 "فاث رشوث فاشف صهمم هيثرفهبغ غخع هر غخعق ذخعقسثس. هف ذشررخف زث ذاشرلثي مشفثق."
 
-#. Translators: This example username is used as a placeholder in
-#. a field on the registration form meant to hold the user's username.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Jane_Q_Learner"
-msgstr "تشرث_ض_مثشقرثق"
-
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
 #: openedx/core/djangoapps/user_api/api.py
@@ -11093,45 +11161,6 @@ msgid "Year of birth"
 msgstr "غثشق خب زهقفا"
 
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr "حقخبثسسهخر"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr "سحثذهشمفغ"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "وشهمهرل شييقثسس"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr "فثمم عس صاغ غخع'قث هرفثقثسفثي هر {platform_name}"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr "سفشفث/حقخدهرذث/قثلهخر"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr "ذخوحشرغ"
-
-#. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Country or Region of Residence"
@@ -11144,10 +11173,6 @@ msgstr "ذخعرفقغ خق قثلهخر خب قثسهيثرذث"
 msgid "The country or region where you live."
 msgstr "فاث ذخعرفقغ خق قثلهخر صاثقث غخع مهدث."
 
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Honor Code"
-msgstr "قثدهثص فاث اخرخق ذخيث"
-
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -11155,17 +11180,13 @@ msgid "Terms of Service and Honor Code"
 msgstr "فثقوس خب سثقدهذث شري اخرخق ذخيث"
 
 #: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service and Honor Code"
-msgstr "قثدهثص فاث فثقوس خب سثقدهذث شري اخرخق ذخيث"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
-msgstr "ه شلقثث فخ فاث {platform_name} {terms_of_service}"
+msgid ""
+"I agree to the {platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+msgstr ""
+"ه شلقثث فخ فاث {platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
@@ -11176,9 +11197,16 @@ msgstr "ه شلقثث فخ فاث {platform_name} {terms_of_service}"
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr "غخع وعسف شلقثث فخ فاث {platform_name} {terms_of_service}"
 
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service"
-msgstr "قثدهثص فاث فثقوس خب سثقدهذث"
+#, python-brace-format
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
+msgstr ""
+"ه شلقثث فخ فاث {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -12186,11 +12214,6 @@ msgstr "ذخعقسث رعوزثق"
 msgid "Course Outline"
 msgstr "ذخعقسث خعفمهرث"
 
-#: cms/templates/course_outline.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Start Date:"
-msgstr "ذخعقسث سفشقف يشفث:"
-
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "ثققخق:"
@@ -12437,6 +12460,30 @@ msgstr "شييهفهخرشم هربخ:"
 msgid "Feedback from user"
 msgstr "بثثيزشذن بقخو عسثق"
 
+#: common/templates/emails/sync_learner_profile_data_email_change_body.txt
+msgid ""
+"The email associated with your {platform_name} account has changed from "
+"{old_email} to {new_email}."
+msgstr ""
+"فاث ثوشهم شسسخذهشفثي صهفا غخعق {platform_name} شذذخعرف اشس ذاشرلثي بقخو "
+"{old_email} فخ {new_email}."
+
+#: common/templates/emails/sync_learner_profile_data_email_change_body.txt
+msgid "No action is needed on your part."
+msgstr "رخ شذفهخر هس رثثيثي خر غخعق حشقف."
+
+#: common/templates/emails/sync_learner_profile_data_email_change_body.txt
+msgid ""
+"If this change is not correct, contact {link_start}{platform_name} "
+"Support{link_end} or your administrator."
+msgstr ""
+"هب فاهس ذاشرلث هس رخف ذخققثذف, ذخرفشذف {link_start}{platform_name} "
+"سعححخقف{link_end} خق غخعق شيوهرهسفقشفخق."
+
+#: common/templates/emails/sync_learner_profile_data_email_change_subject.txt
+msgid "Your {platform_name} account email has been updated"
+msgstr "غخعق {platform_name} شذذخعرف ثوشهم اشس زثثر عحيشفثي"
+
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
 msgstr "شيي ش حخسف"
@@ -12575,6 +12622,8 @@ msgstr "سشدث سثففهرلس"
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
@@ -13809,6 +13858,10 @@ msgstr "رخ لهف هوحخقف مخلس اشدث زثثر قثذخقيثي."
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded for this course."
 msgstr "رخ لهف هوحخقف مخلس اشدث زثثر قثذخقيثي بخق فاهس ذخعقسث."
+
+#: lms/templates/text-me-the-app.html
+msgid "Text Me The App"
+msgstr "فثطف وث فاث شحح"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -15726,8 +15779,28 @@ msgid "Updates to Discussion Posts You Follow"
 msgstr "عحيشفثس فخ يهسذعسسهخر حخسفس غخع بخممخص"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Purchase the Program"
-msgstr "حعقذاشسث فاث حقخلقشو"
+msgid "Purchase the Program ("
+msgstr "حعقذاشسث فاث حقخلقشو ("
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Original Price"
+msgstr "خقهلهرشم حقهذث"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${oldPrice}"
+msgstr "${oldPrice}"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "Discounted Price"
+msgstr "يهسذخعرفثي حقهذث"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "${newPrice}"
+msgstr "${newPrice}"
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{currency})"
+msgstr "{currency})"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Start Learning"
@@ -15798,18 +15871,6 @@ msgstr "{number_of_courses} ذخعقسثس هر حقخلقشو"
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
 msgstr "حقهذث (عسي)"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Original Price"
-msgstr "خقهلهرشم حقهذث"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "${oldPrice}"
-msgstr "${oldPrice}"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Discounted Price"
-msgstr "يهسذخعرفثي حقهذث"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${newPrice}{htmlEnd} for entire program"
@@ -16178,6 +16239,10 @@ msgstr ""
 "{cert_name_short}. شر اخرخق ذخيث {cert_name_short} اشس زثثر لقشرفثي هرسفثشي."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr "ذخعقسث يثفشهمس"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} اخوث حشلث"
 
@@ -16204,6 +16269,34 @@ msgstr "سفشقفثي - {date}"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
 msgstr "سفشقفس - {date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer select a session, your final day to select a session was "
+"{entitlement_expired_at}."
+msgstr ""
+"غخع ذشر رخ مخرلثق سثمثذف ش سثسسهخر, غخعق بهرشم يشغ فخ سثمثذف ش سثسسهخر صشس "
+"{entitlement_expired_at}."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr "غخع وعسف سثمثذف ش سثسسهخر زغ {expiration_date} فخ شذذثسس فاث ذخعقسث."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session to access the course."
+msgstr "غخع وعسف سثمثذف ش سثسسهخر فخ شذذثسس فاث ذخعقسث."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Change Session"
+msgstr "ذاشرلث سثسسهخر"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can no longer change sessions."
+msgstr "غخع ذشر رخ مخرلثق ذاشرلث سثسسهخرس."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can change sessions until {entitlement_expiration_date}."
+msgstr "غخع ذشر ذاشرلث سثسسهخرس عرفهم {entitlement_expiration_date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -16235,6 +16328,7 @@ msgid "Course options for"
 msgstr "ذخعقسث خحفهخرس بخق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Available Actions"
 msgstr "شدشهمشزمث شذفهخرس"
 
@@ -16245,6 +16339,16 @@ msgstr "ثوشهم سثففهرلس"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "قثمشفثي حقخلقشوس"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can contact the account holder to request payment, or you can "
+"unenroll from this course"
+msgstr ""
+"غخع ذشر رخ مخرلثق شذذثسس فاهس ذخعقسث زثذشعسث حشغوثرف اشس رخف غثف زثثر "
+"قثذثهدثي. غخع ذشر ذخرفشذف فاث شذذخعرف اخميثق فخ قثضعثسف حشغوثرف, خق غخع ذشر "
+"عرثرقخمم بقخو فاهس ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -16424,6 +16528,10 @@ msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
 "شر ثققخق خذذعققثي صهفا فاهس فقشرسشذفهخر. بخق اثمح, ذخرفشذف {support_email}."
+
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+msgid "Course options for {courseName}"
+msgstr "ذخعقسث خحفهخرس بخق {courseName}"
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
 msgid "Consent to share your data"
@@ -17813,6 +17921,10 @@ msgstr "ذخعقسث رشوث:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
 msgstr "ذخعقسث يهسحمشغ رشوث:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Start Date:"
+msgstr "ذخعقسث سفشقف يشفث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
@@ -19336,6 +19448,22 @@ msgstr "وغ ذخعقسثس"
 msgid "Program Details"
 msgstr "حقخلقشو يثفشهمس"
 
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Get the {platform_name} Mobile App!"
+msgstr "لثف فاث {platform_name} وخزهمث شحح!"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "We'll send you a one time SMS with a link to download the app."
+msgstr "صث'مم سثري غخع ش خرث فهوث سوس صهفا ش مهرن فخ يخصرمخشي فاث شحح."
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Mobile phone number"
+msgstr "وخزهمث حاخرث رعوزثق"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Send me a text with the link"
+msgstr "سثري وث ش فثطف صهفا فاث مهرن"
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "ذاشرلث حقثبثققثي مشرلعشلث"
@@ -20198,8 +20326,8 @@ msgid "Student Support: Certificates"
 msgstr "سفعيثرف سعححخقف: ذثقفهبهذشفثس"
 
 #: lms/templates/support/contact_us.html
-msgid "{platform_name} Support: Contact Us"
-msgstr "{platform_name} سعححخقف: ذخرفشذف عس"
+msgid "Contact {platform_name} Support"
+msgstr "ذخرفشذف {platform_name} سعححخقف"
 
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
@@ -20498,10 +20626,6 @@ msgstr "سخوث قهلافس قثسثقدثي"
 msgid "Important Course Dates"
 msgstr "هوحخقفشرف ذخعقسث يشفثس"
 
-#: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Today is {date}"
-msgstr "فخيشغ هس {date}"
-
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Show/Hide"
 msgstr "ساخص/اهيث"
@@ -20550,13 +20674,13 @@ msgstr "ثيهف غخعق ذخعقسث لخشم:"
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "This is your last visited course section."
-msgstr "فاهس هس غخعق مشسف دهسهفثي ذخعقسث سثذفهخر."
-
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
+
+#: openedx/features/course_experience/templates/course_experience/dates-summary.html
+msgid "Today is {date}"
+msgstr "فخيشغ هس {date}"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
@@ -20930,6 +21054,10 @@ msgstr ""
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
 msgstr "هب فاث حقخزمثو حثقسهسفس, حمثشسث ثوشهم عس شف {email_link}."
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
+msgstr "سفعيهخ شذذثسسهزهمهفغ حخمهذغ"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
@@ -21577,9 +21705,9 @@ msgstr "دهثص مهدث"
 msgid "Edit Start Date"
 msgstr "ثيهف سفشقف يشفث"
 
-#: cms/templates/course_outline.html
-msgid "Course Pacing:"
-msgstr "ذخعقسث حشذهرل:"
+#: cms/templates/course_outline.html cms/templates/settings.html
+msgid "Course Pacing"
+msgstr "ذخعقسث حشذهرل"
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
@@ -22730,16 +22858,42 @@ msgid "What content is imported?"
 msgstr "صاشف ذخرفثرف هس هوحخقفثي?"
 
 #: cms/templates/import.html
+msgid "The following content is imported."
+msgstr "فاث بخممخصهرل ذخرفثرف هس هوحخقفثي."
+
+#: cms/templates/import.html
+msgid "Course content and structure"
+msgstr "ذخعقسث ذخرفثرف شري سفقعذفعقث"
+
+#: cms/templates/import.html
+msgid "Course dates"
+msgstr "ذخعقسث يشفثس"
+
+#: cms/templates/import.html
+msgid "Grading policy"
+msgstr "لقشيهرل حخمهذغ"
+
+#: cms/templates/import.html
+msgid "Any group configurations"
+msgstr "شرغ لقخعح ذخربهلعقشفهخرس"
+
+#: cms/templates/import.html
+msgid "Settings on the Advanced Settings page"
+msgstr "سثففهرلس خر فاث شيدشرذثي سثففهرلس حشلث"
+
+#: cms/templates/import.html
+msgid "The following content is not imported."
+msgstr "فاث بخممخصهرل ذخرفثرف هس رخف هوحخقفثي."
+
+#: cms/templates/import.html
 msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are imported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, remains the same as it was in the existing course."
+"Learner-specific content, such as learner grades and discussion forum data"
 msgstr ""
-"خرمغ فاث ذخعقسث ذخرفثرف شري سفقعذفعقث (هرذمعيهرل سثذفهخرس, سعزسثذفهخرس, شري "
-"عرهفس) شقث هوحخقفثي. خفاثق يشفش, هرذمعيهرل سفعيثرف يشفش, لقشيهرل "
-"هربخقوشفهخر, يهسذعسسهخر بخقعو يشفش, ذخعقسث سثففهرلس, شري ذخعقسث فثشو "
-"هربخقوشفهخر, قثوشهرس فاث سشوث شس هف صشس هر فاث ثطهسفهرل ذخعقسث."
+"مثشقرثق-سحثذهبهذ ذخرفثرف, سعذا شس مثشقرثق لقشيثس شري يهسذعسسهخر بخقعو يشفش"
+
+#: cms/templates/import.html
+msgid "The course team"
+msgstr "فاث ذخعقسث فثشو"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
@@ -23920,10 +24074,6 @@ msgstr ""
 "ثطشو. "
 
 #: cms/templates/settings.html
-msgid "Course Pacing"
-msgstr "ذخعقسث حشذهرل"
-
-#: cms/templates/settings.html
 msgid "Set the pacing for this course"
 msgstr "سثف فاث حشذهرل بخق فاهس ذخعقسث"
 
@@ -24436,6 +24586,14 @@ msgid ""
 msgstr ""
 "صث'دث سثرف شر ثوشهم وثسسشلث فخ {email} صهفا هرسفقعذفهخرس بخق شذفهدشفهرل غخعق"
 " شذذخعرف."
+
+#: cms/templates/widgets/footer.html
+msgid "Policies"
+msgstr "حخمهذهثس"
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
+msgstr "شذذثسسهزهمهفغ شذذخووخيشفهخر قثضعثسف"
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.

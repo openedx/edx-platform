@@ -1,3 +1,4 @@
+{% autoescape off %}
 {% load i18n %}
 {% load ace %}
 {% if course_ids|length > 1 %}
@@ -13,4 +14,5 @@
     {% endblocktrans %}
     {% trans "Keep learning" %} <{% with_link_tracking course_url %}>
 {% endif %}
-{% include "schedules/edx_ace/common/upsell_cta.txt"%}
+{% include "ace_common/edx_ace/common/upsell_cta.txt"%}
+{% endautoescape %}

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:50+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.276963\n"
+"POT-Creation-Date: 2017-12-20 11:54+0000\n"
+"PO-Revision-Date: 2017-12-20 12:01:00.998184\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -521,6 +521,7 @@ msgstr ""
 msgid "This image file must be larger than {image_min_size}."
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/videos.py
 #: cms/djangoapps/contentstore/views/videos.py
 msgid ""
 "There is a problem with this image file. Try to upload a different file."

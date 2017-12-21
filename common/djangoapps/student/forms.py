@@ -128,6 +128,16 @@ def validate_username(username):
     validator(username)
 
 
+def validate_name(name):
+    """
+    Verifies a Full_Name is valid, raises a ValidationError otherwise.
+    Args:
+        name (unicode): The name to validate.
+    """
+    if accounts_settings.api.contains_html(name):
+        raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
+
+
 class UsernameField(forms.CharField):
     """
     A CharField that validates usernames based on the `ENABLE_UNICODE_USERNAME` feature.
@@ -192,7 +202,8 @@ class AccountCreationForm(forms.Form):
         error_messages={
             "required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
-        }
+        },
+        validators=[validate_name]
     )
 
     def __init__(

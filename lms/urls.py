@@ -72,7 +72,7 @@ urlpatterns = [
     # Static template view endpoints like blog, faq, etc.
     url(r'', include('static_template_view.urls')),
 
-    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
+    url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
 
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
@@ -99,6 +99,9 @@ urlpatterns = [
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
+
+    # Completion API
+    url(r'^api/completion/', include('completion.api.urls', namespace='completion_api')),
 
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
@@ -141,6 +144,9 @@ urlpatterns = [
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
+
+    # Zendesk API proxy endpoint
+    url(r'^zendesk_proxy/', include('openedx.core.djangoapps.zendesk_proxy.urls')),
 ]
 
 # TODO: This needs to move to a separate urls.py once the student_account and
@@ -634,7 +640,7 @@ urlpatterns += [
 
     # Student Notes
     url(
-        r'^courses/{}/edxnotes'.format(
+        r'^courses/{}/edxnotes/'.format(
             settings.COURSE_ID_PATTERN,
         ),
         include('edxnotes.urls'),
@@ -686,7 +692,7 @@ if settings.FEATURES['ENABLE_TEAMS']:
             include('lms.djangoapps.teams.api_urls')
         ),
         url(
-            r'^courses/{}/teams'.format(
+            r'^courses/{}/teams/'.format(
                 settings.COURSE_ID_PATTERN,
             ),
             include('lms.djangoapps.teams.urls'),
@@ -1071,4 +1077,10 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             courseware_views.financial_assistance_request,
             name='submit_financial_assistance_request'
         )
+    ]
+
+# Branch.io Text Me The App
+if settings.BRANCH_IO_KEY:
+    urlpatterns += [
+        url(r'^text-me-the-app', 'student.views.text_me_the_app', name='text_me_the_app'),
     ]

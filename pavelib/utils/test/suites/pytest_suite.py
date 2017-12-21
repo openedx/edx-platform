@@ -28,10 +28,8 @@ class PytestSuite(TestSuite):
         django_version = kwargs.get('django_version', None)
         if django_version is None:
             self.django_toxenv = None
-        elif django_version == '1.11':
-            self.django_toxenv = 'py27-django111'
         else:
-            self.django_toxenv = 'py27-django18'
+            self.django_toxenv = 'py27-django{}'.format(django_version.replace('.', ''))
         self.disable_capture = kwargs.get('disable_capture', None)
         self.report_dir = Env.REPORT_DIR / self.root
 
@@ -134,8 +132,12 @@ class SystemTestSuite(PytestSuite):
         if self.django_toxenv:
             cmd = ['tox', '-e', self.django_toxenv, '--']
         else:
-            cmd = ['pytest']
+            cmd = []
         cmd.extend([
+            'python',
+            '-Wd',
+            '-m',
+            'pytest',
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
             "--junitxml={}".format(self.xunit_report),
         ])
@@ -223,11 +225,15 @@ class LibTestSuite(PytestSuite):
         if self.django_toxenv:
             cmd = ['tox', '-e', self.django_toxenv, '--']
         else:
-            cmd = ['pytest']
+            cmd = []
         cmd.extend([
-            "-p",
-            "no:randomly",
-            "--junitxml={}".format(self.xunit_report),
+            'python',
+            '-Wd',
+            '-m',
+            'pytest',
+            '-p',
+            'no:randomly',
+            '--junitxml={}'.format(self.xunit_report),
         ])
         cmd.extend(self.passthrough_options + self.test_options_flags)
         if self.verbosity < 1:

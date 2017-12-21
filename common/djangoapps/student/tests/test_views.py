@@ -11,6 +11,7 @@ import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
+from django.test.utils import override_settings
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -18,12 +19,18 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from pyquery import PyQuery as pq
 
+from bulk_email.models import BulkEmailFlag
+from entitlements.tests.factories import CourseEntitlementFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
+from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -232,8 +239,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     Tests for the student dashboard.
     """
 
+    EMAIL_SETTINGS_ELEMENT_ID = "#actions-item-email-settings-0"
     ENABLED_SIGNALS = ['course_published']
     TOMORROW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+    THREE_YEARS_FROM_NOW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=(365 * 3))
+    THREE_YEARS_AGO = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=(365 * 3))
     MOCK_SETTINGS = {
         'FEATURES': {
             'DISABLE_START_DATES': False,
@@ -335,3 +345,234 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('<div class="prerequisites">', response.content)
+
+    @patch('openedx.core.djangoapps.programs.utils.get_programs')
+    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch.object(CourseOverview, 'get_from_id')
+    def test_unfulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
+        """
+        When a learner has an unfulfilled entitlement, their course dashboard should have:
+            - a hidden 'View Course' button
+            - the text 'In order to view the course you must select a session:'
+            - an unhidden course-entitlement-selection-container
+            - a related programs message
+        """
+        program = ProgramFactory()
+        CourseEntitlementFactory(user=self.user, course_uuid=program['courses'][0]['uuid'])
+        mock_get_programs.return_value = [program]
+        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_runs.return_value = [
+            {
+                'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+                'enrollment_end': str(self.TOMORROW),
+                'pacing_type': 'instructor_paced',
+                'type': 'verified'
+            }
+        ]
+        response = self.client.get(self.path)
+        self.assertIn('class="enter-course hidden"', response.content)
+        self.assertIn('You must select a session to access the course.', response.content)
+        self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
+        self.assertIn('Related Programs:', response.content)
+
+    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch.object(CourseOverview, 'get_from_id')
+    def test_unfulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs):
+        """
+        When a learner has an unfulfilled, expired entitlement, a card should NOT appear on the dashboard.
+        This use case represents either an entitlement that the user waited too long to fulfill, or an entitlement
+        for which they received a refund.
+        """
+        CourseEntitlementFactory(
+            user=self.user,
+            created=self.THREE_YEARS_AGO,
+            expired_at=datetime.datetime.now()
+        )
+        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_runs.return_value = [
+            {
+                'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+                'enrollment_end': str(self.TOMORROW),
+                'pacing_type': 'instructor_paced',
+                'type': 'verified'
+            }
+        ]
+        response = self.client.get(self.path)
+        self.assertEqual(response.content.count('<li class="course-item">'), 0)
+
+    @patch('entitlements.api.v1.views.get_course_runs_for_course')
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch('opaque_keys.edx.keys.CourseKey.from_string')
+    def test_sessions_for_entitlement_course_runs(self, mock_course_key, mock_course_overview, mock_course_runs):
+        """
+        When a learner has a fulfilled entitlement for a course run in the past, there should be no availableSession
+        data passed to the JS view. When a learner has a fulfilled entitlement for a course run enrollment ending in the
+        future, there should not be an empty availableSession variable. When a learner has a fulfilled entitlement
+        for a course that doesn't have an enrollment ending, there should not be an empty availableSession variable.
+
+        NOTE: We commented out the assertions to move this to the catalog utils test suite.
+        """
+        # noAvailableSessions = "availableSessions: '[]'"
+
+        # Test an enrollment end in the past
+        mocked_course_overview = CourseOverviewFactory.create(
+            start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
+        )
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        mock_course_runs.return_value = [
+            {
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        # response = self.client.get(self.path)
+        # self.assertIn(noAvailableSessions, response.content)
+
+        # Test an enrollment end in the future sets an availableSession
+        mocked_course_overview.enrollment_end = self.TOMORROW
+        mocked_course_overview.save()
+
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        mock_course_runs.return_value = [
+            {
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        # response = self.client.get(self.path)
+        # self.assertNotIn(noAvailableSessions, response.content)
+
+        # Test an enrollment end that doesn't exist sets an availableSession
+        mocked_course_overview.enrollment_end = None
+        mocked_course_overview.save()
+
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        mock_course_runs.return_value = [
+            {
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': None,
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        # response = self.client.get(self.path)
+        # self.assertNotIn(noAvailableSessions, response.content)
+
+    @patch('openedx.core.djangoapps.programs.utils.get_programs')
+    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch('opaque_keys.edx.keys.CourseKey.from_string')
+    def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
+        """
+        When a learner has a fulfilled entitlement, their course dashboard should have:
+            - exactly one course item, meaning it:
+                - has an entitlement card
+                - does NOT have a course card referencing the selected session
+            - an unhidden Change or Leave Session button
+            - a related programs message
+        """
+        mocked_course_overview = CourseOverviewFactory(
+            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+        )
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        mock_course_runs.return_value = [
+            {
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        program = ProgramFactory()
+        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['uuid'] = entitlement.course_uuid
+        mock_get_programs.return_value = [program]
+        response = self.client.get(self.path)
+        self.assertEqual(response.content.count('<li class="course-item">'), 1)
+        self.assertIn('<button class="change-session btn-link "', response.content)
+        self.assertIn('Related Programs:', response.content)
+
+    @patch('openedx.core.djangoapps.programs.utils.get_programs')
+    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch('opaque_keys.edx.keys.CourseKey.from_string')
+    def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
+        """
+        When a learner has a fulfilled entitlement that is expired, their course dashboard should have:
+            - exactly one course item, meaning it:
+                - has an entitlement card
+            - Message that the learner can no longer change sessions
+            - a related programs message
+        """
+        mocked_course_overview = CourseOverviewFactory(
+            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+        )
+        mock_course_overview.return_value = mocked_course_overview
+        mock_course_key.return_value = mocked_course_overview.id
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
+        mock_course_runs.return_value = [
+            {
+                'key': str(mocked_course_overview.id),
+                'enrollment_end': str(mocked_course_overview.enrollment_end),
+                'pacing_type': 'self_paced',
+                'type': 'verified'
+            }
+        ]
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
+        program = ProgramFactory()
+        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['uuid'] = entitlement.course_uuid
+        mock_get_programs.return_value = [program]
+        response = self.client.get(self.path)
+        self.assertEqual(response.content.count('<li class="course-item">'), 1)
+        self.assertIn('You can no longer change sessions.', response.content)
+        self.assertIn('Related Programs:', response.content)
+
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch.object(BulkEmailFlag, 'feature_enabled')
+    def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_course_overview):
+        """
+        Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
+        """
+        mock_email_feature.return_value = True
+        mock_course_overview.return_value = CourseOverviewFactory(
+            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+        )
+        course_enrollment = CourseEnrollmentFactory(user=self.user)
+        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        response = self.client.get(self.path)
+        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
+
+    @patch.object(CourseOverview, 'get_from_id')
+    @patch.object(BulkEmailFlag, 'feature_enabled')
+    def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
+        """
+        Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
+        """
+        mock_email_feature.return_value = True
+        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        CourseEntitlementFactory(user=self.user)
+        response = self.client.get(self.path)
+        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@override_settings(BRANCH_IO_KEY='test_key')
+class TextMeTheAppViewTests(UrlResetMixin, TestCase):
+    """ Tests for the TextMeTheAppView. """
+
+    def test_text_me_the_app(self):
+        response = self.client.get(reverse('text_me_the_app'))
+        self.assertContains(response, 'Send me a text with the link')

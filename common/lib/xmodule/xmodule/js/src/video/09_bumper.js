@@ -95,8 +95,8 @@
                 var events = ['ended', 'error'].join(' ');
                 this.element.off(events, this.showMainVideoHandler);
                 this.element.off({
-                    'timeupdate': this.skipByDuration,
-                    'initialize': this.destroyAndResolve
+                    timeupdate: this.skipByDuration,
+                    initialize: this.destroyAndResolve
                 });
                 this.element.removeClass('is-bumper');
                 if (_.isFunction(this.state.videoPlayer.destroy)) {

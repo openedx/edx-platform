@@ -84,14 +84,13 @@ class TestVideoYouTube(TestVideo):
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
                 'ytKey': None,
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -165,14 +164,13 @@ class TestVideoNonYouTube(TestVideo):
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
                 'ytKey': None,
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -223,15 +221,23 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'ytApiUrl': 'https://www.youtube.com/iframe_api',
             'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
             'ytKey': None,
-            'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
             'autohideHtml5': False,
             'recordedYoutubeIsAvailable': True,
+            'completionEnabled': False,
+            'completionPercentage': 0.95,
+            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
         })
+
+    def get_handler_url(self, handler, suffix):
+        """
+        Return the URL for the specified handler on the block represented by
+        self.item_descriptor.
+        """
+        return self.item_descriptor.xmodule_runtime.handler_url(
+            self.item_descriptor, handler, suffix
+        ).rstrip('/?')
 
     def test_get_html_track(self):
         SOURCE_XML = """
@@ -318,20 +324,15 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
             self.initialize_module(data=DATA)
-            track_url = self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'download'
-            ).rstrip('/?')
+            track_url = self.get_handler_url('transcript', 'download')
 
             context = self.item_descriptor.render(STUDENT_VIEW).content
             metadata.update({
                 'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": u'Українська'},
                 'transcriptLanguage': u'en' if not data['transcripts'] or data.get('sub') else u'uk',
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sub': data['sub'],
             })
@@ -441,12 +442,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
@@ -581,12 +579,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
-            'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'sources': data['result']['sources'],
         })
@@ -742,12 +737,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # expected_context, expected context to be returned by get_html
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
-            'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'sources': data['result']['sources'],
         })
@@ -854,12 +846,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             context = self.item_descriptor.render('student_view').content
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
@@ -1366,6 +1355,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                     "fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0},
                     "youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}
                 },
+                "all_sources": [self.TEST_SOURCE_URL],
             }
         )
 
@@ -1380,6 +1370,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "duration": None,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
                 "encoded_videos": {"youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}},
+                "all_sources": [],
             }
         )
 
@@ -1397,6 +1388,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "only_on_web": False,
                 "duration": self.TEST_DURATION,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+                'all_sources': [self.TEST_SOURCE_URL],
             }
         )
 
@@ -1467,7 +1459,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
@@ -1481,7 +1473,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
     @patch(
-        'xmodule.video_module.transcripts_utils.VideoTranscriptEnabledFlag.feature_enabled',
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
         Mock(return_value=False),
     )
     @patch(
@@ -1771,14 +1763,13 @@ class TestVideoWithBumper(TestVideo):
                 'transcriptLanguage': 'en',
                 'transcriptLanguages': {'en': 'English'},
                 'transcriptTranslationUrl': video_utils.set_query_parameter(
-                    self.item_descriptor.xmodule_runtime.handler_url(
-                        self.item_descriptor, 'transcript', 'translation/__lang__'
-                    ).rstrip('/?'), 'is_bumper', 1
+                    self.get_handler_url('transcript', 'translation/__lang__'), 'is_bumper', 1
                 ),
                 'transcriptAvailableTranslationsUrl': video_utils.set_query_parameter(
-                    self.item_descriptor.xmodule_runtime.handler_url(
-                        self.item_descriptor, 'transcript', 'available_translations'
-                    ).rstrip('/?'), 'is_bumper', 1
+                    self.get_handler_url('transcript', 'available_translations'), 'is_bumper', 1
+                ),
+                "publishCompletionUrl": video_utils.set_query_parameter(
+                    self.get_handler_url('publish_completion', ''), 'is_bumper', 1
                 ),
             })),
             'cdn_eval': False,
@@ -1808,14 +1799,13 @@ class TestVideoWithBumper(TestVideo):
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
                 'ytKey': None,
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             })),
             'track': None,
             'transcript_download_format': u'srt',

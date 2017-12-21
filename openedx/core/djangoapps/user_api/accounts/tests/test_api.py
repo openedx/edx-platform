@@ -179,22 +179,25 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
+
         naughty_update = {
             "username": "not_allowed",
             "gender": "undecided",
-            "email": "not an email address"
+            "email": "not an email address",
+            "name": "<p style=\"font-size:300px; color:green;\"></br>Name<input type=\"text\"></br>Content spoof"
         }
 
         with self.assertRaises(AccountValidationError) as context_manager:
             update_account_settings(self.user, naughty_update)
         field_errors = context_manager.exception.field_errors
-        self.assertEqual(3, len(field_errors))
+        self.assertEqual(4, len(field_errors))
         self.assertEqual("This field is not editable via this API", field_errors["username"]["developer_message"])
         self.assertIn(
             "Value \'undecided\' is not valid for field \'gender\'",
             field_errors["gender"]["developer_message"]
         )
         self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
+        self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
@@ -315,6 +318,7 @@ class AccountSettingsOnCreationTest(TestCase):
             'language_proficiencies': [],
             'account_privacy': PRIVATE_VISIBILITY,
             'accomplishments_shared': False,
+            'extended_profile': [],
         })
 
 
@@ -409,7 +413,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         activate_account(u'invalid')
 
     @skip_unless_lms
-    @pytest.mark.django111_expected_failure
     def test_request_password_change(self):
         # Create and activate an account
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -428,7 +431,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertIsNot(result, None)
 
     @skip_unless_lms
-    @pytest.mark.django111_expected_failure
     def test_request_password_change_invalid_user(self):
         with self.assertRaises(UserNotFound):
             request_password_change(self.EMAIL, self.IS_SECURE)

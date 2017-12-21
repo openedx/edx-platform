@@ -4,9 +4,9 @@ These views will NOT be shown on production: trying to access them will result
 in a 404 error.
 """
 from django.http import HttpResponseNotFound
+from django.template import TemplateDoesNotExist
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_response
-from mako.exceptions import TopLevelLookupException
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 
 
@@ -51,5 +51,5 @@ def show_reference_template(request, template):
             PageLevelMessages.register_error_message(request, _('This is a test error'))
 
         return render_to_response(template, context)
-    except TopLevelLookupException:
+    except TemplateDoesNotExist:
         return HttpResponseNotFound('Missing template {template}'.format(template=template))

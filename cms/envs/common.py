@@ -45,6 +45,9 @@ import imp
 import os
 import sys
 from datetime import timedelta
+
+import django
+
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
@@ -119,7 +122,7 @@ from lms.envs.common import (
     VIDEO_TRANSCRIPTS_SETTINGS,
 
     # Methods to derive settings
-    _make_main_mako_templates,
+    _make_mako_template_dirs,
     _make_locale_paths,
 
     # Set to show or hide display name in HTML components
@@ -130,14 +133,13 @@ from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
-import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
 )
 from openedx.core.lib.license import LicenseMixin
-from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 
 ############################ FEATURE CONFIGURATION #############################
@@ -316,11 +318,9 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
-# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
-MAKO_TEMPLATES = {}
-MAIN_MAKO_TEMPLATES_BASE = [
+MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
@@ -330,19 +330,26 @@ MAIN_MAKO_TEMPLATES_BASE = [
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
-MAKO_TEMPLATES['lms.main'] = lms.envs.common.MAIN_MAKO_TEMPLATES_BASE
 
-MAKO_TEMPLATES['main'] = _make_main_mako_templates
-derived_dict_entry('MAKO_TEMPLATES', 'main')
+CONTEXT_PROCESSORS = (
+    'django.template.context_processors.request',
+    'django.template.context_processors.static',
+    'django.contrib.messages.context_processors.messages',
+    'django.template.context_processors.i18n',
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.template.context_processors.csrf',
+    'help_tokens.context_processor',
+)
 
 # Django templating
 TEMPLATES = [
     {
+        'NAME': 'django',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': MAIN_MAKO_TEMPLATES_BASE,
+        'DIRS': _make_mako_template_dirs,
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
@@ -352,21 +359,36 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ),
-            'context_processors': (
-                'django.template.context_processors.request',
-                'django.template.context_processors.static',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',
-                'django.contrib.auth.context_processors.auth',  # this is required for admin
-                'django.template.context_processors.csrf',
-                'dealer.contrib.django.staff.context_processor',  # access git revision
-                'help_tokens.context_processor',
-            ),
+            'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
             'debug': False
         }
-    }
+    },
+    {
+        'NAME': 'mako',
+        'BACKEND': 'edxmako.backend.Mako',
+        'APP_DIRS': False,
+        'DIRS': _make_mako_template_dirs,
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            'debug': False,
+        }
+    },
+    {
+        # This separate copy of the Mako backend is used to render previews using the LMS templates
+        'NAME': 'preview',
+        'BACKEND': 'edxmako.backend.Mako',
+        'APP_DIRS': False,
+        'DIRS': lms.envs.common.MAKO_TEMPLATE_DIRS_BASE,
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            'debug': False,
+            'namespace': 'lms.main',
+        }
+    },
 ]
+derived_collection_entry('TEMPLATES', 0, 'DIRS')
+derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 ##############################################################################
@@ -418,6 +440,13 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
+if django.VERSION < (1, 9):
+    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
+else:
+    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
+
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
     'request_cache.middleware.RequestCache',
@@ -427,7 +456,7 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    _csrf_middleware,
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # Instead of SessionMiddleware, we use a more secure version
@@ -586,19 +615,12 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = []
 MANAGERS = ADMINS
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
-STATIC_URL = '/static/' + EDX_PLATFORM_REVISION + "/"
-STATIC_ROOT = ENV_ROOT / "staticfiles" / EDX_PLATFORM_REVISION
+STATIC_URL = '/static/studio/'
+STATIC_ROOT = ENV_ROOT / "staticfiles" / 'studio'
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
@@ -813,6 +835,7 @@ STATICFILES_IGNORE_PATTERNS = (
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
 ################################# DJANGO-REQUIRE ###############################
+
 
 # The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
 REQUIRE_BASE_URL = "./"
@@ -1103,11 +1126,15 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.waffle_utils',
 
     # Dynamic schedules
+    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # Entitlements, used in openedx tests
+    'entitlements',
 ]
 
 
@@ -1200,7 +1227,6 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 # The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
 # that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = (
-    ('mentoring', None),
     ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('edx_sga', None),
 
@@ -1465,3 +1491,18 @@ VIDEO_IMAGE_MIN_HEIGHT = 360
 VIDEO_IMAGE_ASPECT_RATIO = 16 / 9.0
 VIDEO_IMAGE_ASPECT_RATIO_TEXT = '16:9'
 VIDEO_IMAGE_ASPECT_RATIO_ERROR_MARGIN = 0.1
+
+
+###################### ZENDESK ######################
+ZENDESK_URL = None
+ZENDESK_USER = None
+ZENDESK_API_KEY = None
+ZENDESK_OAUTH_ACCESS_TOKEN = None
+ZENDESK_CUSTOM_FIELDS = {}
+
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95

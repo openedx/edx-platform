@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import FileUpload from './file_upload';
 import ShowErrors from './errors_list';
 import LoggedInUser from './logged_in_user';
 import LoggedOutUser from './logged_out_user';
@@ -32,7 +31,7 @@ class RenderForm extends React.Component {
   }
 
   submitForm() {
-    const url = `${this.props.context.zendeskApiHost}/api/v2/tickets.json`,
+    const url = this.props.context.zendeskProxyUrl,
       $userInfo = $('.user-info'),
       request = new XMLHttpRequest(),
       $course = $('#course'),
@@ -40,37 +39,33 @@ class RenderForm extends React.Component {
         subject: $('#subject').val(),
         comment: {
           body: $('#message').val(),
-          uploads: $.map($('.uploaded-files button'), n => n.id),
         },
         tags: this.props.context.zendeskTags,
       };
 
     let course;
 
-    if ($userInfo.length) {
-      data.requester = $userInfo.data('email');
-      course = $course.find(':selected').text();
-      if (!course.length) {
-        course = $course.val();
-      }
-    } else {
-      data.requester = $('#email').val();
+    data.requester = {
+      email: $userInfo.data('email'),
+      name: $userInfo.data('username')
+    };
+
+    course = $course.find(':selected').val();
+    if (!course) {
       course = $course.val();
     }
 
     data.custom_fields = [{
-      id: this.props.context.customFields.course,
+      id: this.props.context.customFields.course_id,
       value: course,
     }];
 
     if (this.validateData(data)) {
       request.open('POST', url, true);
-      request.setRequestHeader('Authorization', `Bearer ${this.props.context.accessToken}`);
-      request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+      request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
 
-      request.send(JSON.stringify({
-        ticket: data,
-      }));
+      request.send(JSON.stringify(data));
 
       request.onreadystatechange = function success() {
         if (request.readyState === 4 && request.status === 201) {
@@ -87,16 +82,7 @@ class RenderForm extends React.Component {
   }
 
   validateData(data) {
-    const errors = [],
-      regex = /^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-
-    if (!data.requester) {
-      errors.push(gettext('Enter a valid email address.'));
-      $('#email').closest('.form-group').addClass('has-error');
-    } else if (!regex.test(data.requester)) {
-      errors.push(gettext('Enter a valid email address.'));
-      $('#email').closest('.form-group').addClass('has-error');
-    }
+    const errors = [];
     if (!data.subject) {
       errors.push(gettext('Enter a subject for your support request.'));
       $('#subject').closest('.form-group').addClass('has-error');
@@ -128,11 +114,16 @@ class RenderForm extends React.Component {
   renderSupportForm() {
     let userElement;
     if (this.props.context.user) {
-      userElement = <LoggedInUser userInformation={this.props.context.user} />;
+      userElement = (<LoggedInUser
+        userInformation={this.props.context.user}
+        zendeskProxyUrl={this.props.context.zendeskProxyUrl}
+        setErrorState={this.setErrorState}
+        submitForm={this.submitForm}
+      />);
     } else {
       userElement = (<LoggedOutUser
         platformName={this.props.context.platformName}
-        loginUrl={this.props.context.loginQuery}
+        loginQuery={this.props.context.loginQuery}
       />);
     }
 
@@ -151,7 +142,7 @@ class RenderForm extends React.Component {
 
         <div className="row">
           <div className="col-sm-12">
-            <p>{gettext('Your question might have already been answered.')}</p>
+            <p>{gettext('Find answers to the top questions asked by learners.')}</p>
           </div>
         </div>
 
@@ -165,47 +156,6 @@ class RenderForm extends React.Component {
         </div>
 
         {userElement}
-
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="form-group">
-              <label htmlFor="subject">{gettext('Subject')}</label>
-              <input type="text" className="form-control" id="subject" />
-            </div>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="form-group">
-              <label htmlFor="message">{gettext('Details')}</label>
-              <p
-                className="message-desc"
-              >{gettext('The more you tell us, the more quickly and helpfully we can respond!')}</p>
-              <textarea
-                aria-describedby="message"
-                className="form-control"
-                rows="7"
-                id="message"
-              />
-            </div>
-          </div>
-        </div>
-
-        <FileUpload
-          setErrorState={this.setErrorState}
-          zendeskApiHost={this.props.context.zendeskApiHost}
-          accessToken={this.props.context.accessToken}
-        />
-
-        <div className="row">
-          <div className="col-sm-12">
-            <button
-              className="btn btn-primary btn-submit"
-              onClick={this.submitForm}
-            >{gettext('Submit')}</button>
-          </div>
-        </div>
       </div>
     );
   }

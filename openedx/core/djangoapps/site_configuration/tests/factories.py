@@ -16,7 +16,7 @@ class SiteFactory(DjangoModelFactory):
         model = Site
         django_get_or_create = ('domain',)
 
-    domain = Sequence('testserver.fake.{}'.format)
+    domain = Sequence('{}.testserver.fake'.format)
     name = SelfAttribute('domain')
 
 

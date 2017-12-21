@@ -3,7 +3,6 @@ Tests for branding page
 """
 import datetime
 
-import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
@@ -157,7 +156,6 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
@@ -208,7 +206,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertNotIn('Search for a course', response.content)
 
         # check the /courses view
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is not present
@@ -232,7 +230,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertIn('Search for a course', response.content)
 
         # check the /courses view
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is present
@@ -255,7 +253,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
         # check the /courses view
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
@@ -281,7 +279,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
         # check the /courses view as well
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
@@ -293,7 +291,6 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
@@ -301,7 +298,7 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     def test_get_programs_with_type_called(self):
         views = [
             (reverse('root'), 'student.views.get_programs_with_type'),
-            (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type'),
+            (reverse('courses'), 'courseware.views.views.get_programs_with_type'),
         ]
         for url, dotted_path in views:
             with patch(dotted_path) as mock_get_programs_with_type:

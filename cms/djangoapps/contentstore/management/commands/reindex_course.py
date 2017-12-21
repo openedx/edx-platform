@@ -26,7 +26,6 @@ class Command(BaseCommand):
         ./manage.py reindex_course --setup - reindexes all courses for devstack setup
     """
     help = dedent(__doc__)
-    can_import_settings = True
     CONFIRMATION_PROMPT = u"Re-indexing all courses might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):

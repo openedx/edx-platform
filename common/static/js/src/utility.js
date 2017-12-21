@@ -7,15 +7,13 @@ window.isExternal = function(url) {
     // if the protocol in the url does not match the protocol in the window's location, this url is considered external
     if (typeof match[1] === 'string' &&
             match[1].length > 0 &&
-            match[1].toLowerCase() !== location.protocol)
-        return true;
+            match[1].toLowerCase() !== location.protocol) { return true; }
     // match[2] matches the host if one exists in the url
     // if the host in the url does not match the host of the window location, this url is considered external
     if (typeof match[2] === 'string' &&
             match[2].length > 0 &&
             // this regex removes the port number if it patches the current location's protocol
-            match[2].replace(new RegExp(':(' + {'http:': 80, 'https:': 443}[location.protocol] + ')?$'), '') !== location.host)
-        return true;
+            match[2].replace(new RegExp(':(' + {'http:': 80, 'https:': 443}[location.protocol] + ')?$'), '') !== location.host) { return true; }
     return false;
 };
 
@@ -28,8 +26,7 @@ window.rewriteStaticLinks = function(content, from, to) {
     function replacer(match) {
         if (match === from) {
             return to;
-        }
-        else {
+        } else {
             return match;
         }
     }

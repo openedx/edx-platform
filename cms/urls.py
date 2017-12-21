@@ -46,7 +46,7 @@ urlpatterns = [
     # noop to squelch ajax errors
     url(r'^event$', contentstore.views.event, name='event'),
     url(r'^xmodule/', include('pipeline_js.urls')),
-    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
+    url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
@@ -152,6 +152,8 @@ urlpatterns = [
         name='group_configurations_detail_handler'),
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
+    url(r'^accessibility$', contentstore.views.accessibility, name='accessibility'),
+    url(r'^zendesk_proxy/', include('openedx.core.djangoapps.zendesk_proxy.urls')),
 ]
 
 JS_INFO_DICT = {

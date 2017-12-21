@@ -1,3 +1,4 @@
+/* globals _ */
 (function(require, $) {
     'use strict';
     // In the case when the Video constructor will be called before RequireJS finishes loading all of the Video
@@ -15,9 +16,9 @@
             // If mock function was called with second parameter set to truthy value, we invoke the real `window.Video`
             // on all the stored elements so far.
             if (processTempCallStack) {
-                $.each(tempCallStack, function(index, element) {
+                $.each(tempCallStack, function(index, el) {
                     // By now, `window.Video` is the real constructor.
-                    window.Video(element);
+                    window.Video(el);
                 });
 
                 return;
@@ -54,6 +55,7 @@
             'video/09_events_plugin.js',
             'video/09_events_bumper_plugin.js',
             'video/09_poster.js',
+            'video/09_completion.js',
             'video/10_commands.js',
             'video/095_video_context_menu.js'
         ],
@@ -61,8 +63,8 @@
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoCaption,
             VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl, VideoBumper,
-            VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster, VideoCommands,
-            VideoContextMenu
+            VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
+            VideoCompletionHandler, VideoCommands, VideoContextMenu
         ) {
             var youtubeXhr = null,
                 oldVideo = window.Video;
@@ -75,9 +77,10 @@
                     mainVideoModules = [FocusGrabber, VideoControl, VideoPlayPlaceholder,
                         VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl, VideoVolumeControl,
                         VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands, VideoContextMenu,
-                        VideoSaveStatePlugin, VideoEventsPlugin],
+                        VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler],
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
-                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin, VideoEventsBumperPlugin],
+                        VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin,
+                        VideoEventsBumperPlugin, VideoCompletionHandler],
                     state = {
                         el: el,
                         id: id,
@@ -104,10 +107,10 @@
                     return bumperState;
                 };
 
-                var player = function(state) {
+                var player = function(innerState) {
                     return function() {
-                        _.extend(state.metadata, {autoplay: true, focusFirstControl: true});
-                        initialize(state, element);
+                        _.extend(innerState.metadata, {autoplay: true, focusFirstControl: true});
+                        initialize(innerState, element);
                     };
                 };
 
@@ -120,7 +123,8 @@
                     new VideoPoster(el, {
                         poster: el.data('poster'),
                         onClick: _.once(function() {
-                            var mainVideoPlayer = player(state), bumper, bumperState;
+                            var mainVideoPlayer = player(state);
+                            var bumper, bumperState;
                             if (storage.getItem('isBumperShown')) {
                                 mainVideoPlayer();
                             } else {

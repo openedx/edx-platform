@@ -1,0 +1,16 @@
+<div class="verification-modal" role="dialog" aria-labelledby="enrollment-verification-title">
+    <p id="enrollment-verification-title">
+        <div class="popover-title">
+            <%- confirmationMsgTitle %>
+        </div>
+        <%- confirmationMsgBody %>
+    </p>
+    <div class="action-items">
+        <button type="button" class="popover-dismiss final-confirmation-btn">
+             <%- gettext('Cancel') %>
+        </button>
+        <button type="button" class="enroll-btn final-confirmation-btn">
+             <%- gettext('OK') %>
+        </button>
+     </div>
+ </div>

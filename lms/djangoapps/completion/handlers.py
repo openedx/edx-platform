@@ -7,8 +7,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from xblock.completable import XBlockCompletionMode
+from xblock.core import XBlock
 
 from .models import BlockCompletion
 from . import waffle
@@ -21,9 +23,14 @@ def scorable_block_completion(sender, **kwargs):  # pylint: disable=unused-argum
     """
     if not waffle.waffle().is_enabled(waffle.ENABLE_COMPLETION_TRACKING):
         return
-    user = User.objects.get(id=kwargs['user_id'])
     course_key = CourseKey.from_string(kwargs['course_id'])
     block_key = UsageKey.from_string(kwargs['usage_id'])
+    block_cls = XBlock.load_class(block_key.block_type)
+    if getattr(block_cls, 'completion_mode', XBlockCompletionMode.COMPLETABLE) != XBlockCompletionMode.COMPLETABLE:
+        return
+    if getattr(block_cls, 'has_custom_completion', False):
+        return
+    user = User.objects.get(id=kwargs['user_id'])
     if kwargs.get('score_deleted'):
         completion = 0.0
     else:

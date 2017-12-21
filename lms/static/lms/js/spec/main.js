@@ -74,6 +74,7 @@
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
+            'bootstrap': 'common/js/vendor/bootstrap.bundle',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
 
             // Manually specify LMS files that are not converted to RequireJS
@@ -185,6 +186,9 @@
             'backbone': {
                 deps: ['underscore', 'jquery'],
                 exports: 'Backbone'
+            },
+            'bootstrap': {
+                deps: ['jquery']
             },
             'backbone.associations': {
                 deps: ['backbone'],
@@ -760,8 +764,10 @@
         'js/spec/learner_dashboard/program_details_view_spec.js',
         'js/spec/learner_dashboard/program_details_sidebar_view_spec.js',
         'js/spec/learner_dashboard/unenroll_view_spec.js',
+        'js/spec/learner_dashboard/entitlement_unenrollment_view_spec.js',
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
+        'js/spec/learner_dashboard/course_entitlement_view_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',

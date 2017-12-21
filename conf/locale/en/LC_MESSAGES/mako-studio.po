@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-11-23 10:34+0000\n"
-"PO-Revision-Date: 2017-11-23 10:57:57.682203\n"
+"POT-Creation-Date: 2017-12-20 11:54+0000\n"
+"PO-Revision-Date: 2017-12-20 12:01:01.389310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -49,6 +49,10 @@ msgstr ""
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
+msgstr ""
+
+#: cms/templates/accessibility.html
+msgid "Studio Accessibility Policy"
 msgstr ""
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
@@ -667,8 +671,8 @@ msgstr ""
 msgid "Edit Start Date"
 msgstr ""
 
-#: cms/templates/course_outline.html
-msgid "Course Pacing:"
+#: cms/templates/course_outline.html cms/templates/settings.html
+msgid "Course Pacing"
 msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/settings.html
@@ -1646,11 +1650,40 @@ msgid "What content is imported?"
 msgstr ""
 
 #: cms/templates/import.html
+msgid "The following content is imported."
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Course content and structure"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Course dates"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Grading policy"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Any group configurations"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Settings on the Advanced Settings page"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "The following content is not imported."
+msgstr ""
+
+#: cms/templates/import.html
 msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are imported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, remains the same as it was in the existing course."
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "The course team"
 msgstr ""
 
 #: cms/templates/import.html
@@ -2715,10 +2748,6 @@ msgid ""
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Course Pacing"
-msgstr ""
-
-#: cms/templates/settings.html
 msgid "Set the pacing for this course"
 msgstr ""
 
@@ -3168,6 +3197,14 @@ msgstr ""
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "Policies"
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX

@@ -1,7 +1,7 @@
 (function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
-            'js/models/notification', 'js/views/notification'],
+        'js/models/notification', 'js/views/notification'],
         function($, _, Backbone, gettext, HtmlUtils) {
             var CohortFormView = Backbone.View.extend({
                 events: {
@@ -51,8 +51,8 @@
                 },
 
                 onRadioButtonChange: function(event) {
-                    var target = $(event.currentTarget),
-                        groupsEnabled = target.val() === 'yes';
+                    var $target = $(event.currentTarget),
+                        groupsEnabled = $target.val() === 'yes';
                     if (!groupsEnabled) {
                         // If the user has chosen 'no', then clear the selection by setting
                         // it to the first option which represents no selection.

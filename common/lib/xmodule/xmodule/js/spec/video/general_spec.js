@@ -172,8 +172,8 @@
             function itFabrique(itDescription, data, expectData) {
                 it(itDescription, function() {
                     state = jasmine.initializePlayer('video.html', {
-                        'start': data.start,
-                        'end': data.end
+                        start: data.start,
+                        end: data.end
                     });
 
                     expect(state.config.startTime).toBe(expectData.start);
@@ -207,8 +207,7 @@
 
             it(
                 'check for YT availability is performed only once',
-                function()
-            {
+                function() {
                     var numAjaxCalls = 0;
 
                 // Total ajax calls made.

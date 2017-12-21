@@ -17,11 +17,10 @@ from django_comment_common.signals import comment_created
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
-from lms.djangoapps.discussion.config.waffle import waffle, FORUM_RESPONSE_NOTIFICATIONS, SEND_NOTIFICATIONS_FOR_COURSE
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.schedules.template_context import get_base_template_context
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -166,7 +165,6 @@ class TaskTestCase(ModuleStoreTestCase):
         self.permalink_patcher.stop()
 
     @ddt.data(True, False)
-    @override_waffle_flag(SEND_NOTIFICATIONS_FOR_COURSE, True)
     def test_send_discussion_email_notification(self, user_subscribed):
         if user_subscribed:
             non_matching_id = 'not-a-match'
@@ -188,9 +186,8 @@ class TaskTestCase(ModuleStoreTestCase):
         site_config = SiteConfigurationFactory.create(site=site)
         site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
         site_config.save()
-        with waffle().override(FORUM_RESPONSE_NOTIFICATIONS):
-            with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
-                comment_created.send(sender=None, user=user, post=comment)
+        with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
+            comment_created.send(sender=None, user=user, post=comment)
 
         if user_subscribed:
             expected_message_context = get_base_template_context(site)
@@ -222,12 +219,8 @@ class TaskTestCase(ModuleStoreTestCase):
 
     def _assert_rendered_email(self, message):
         # check that we can actually render the message
-        middleware_classes = [
-            CurrentRequestUserMiddleware,
-            CurrentSiteThemeMiddleware,
-        ]
         with emulate_http_request(
-            site=message.context['site'], user=self.thread_author, middleware_classes=middleware_classes
+            site=message.context['site'], user=self.thread_author
         ):
             rendered_email = EmailRenderer().render(message)
             self.assertTrue(self.comment['body'] in rendered_email.body_html)
@@ -236,7 +229,6 @@ class TaskTestCase(ModuleStoreTestCase):
             self.assertTrue(self.mock_permalink in rendered_email.body_html)
             self.assertTrue(message.context['site'].domain in rendered_email.body_html)
 
-    @override_waffle_flag(SEND_NOTIFICATIONS_FOR_COURSE, True)
     def run_should_not_send_email_test(self, comment_dict):
         self.mock_request.side_effect = make_mock_responder(
             subscribed_thread_ids=[self.discussion_id],
@@ -245,8 +237,7 @@ class TaskTestCase(ModuleStoreTestCase):
         )
         user = mock.Mock()
         comment = cc.Comment.find(id=comment_dict['id']).retrieve()
-        with waffle().override(FORUM_RESPONSE_NOTIFICATIONS):
-            comment_created.send(sender=None, user=user, post=comment)
+        comment_created.send(sender=None, user=user, post=comment)
 
         actual_result = _should_send_message({
             'thread_author_id': self.thread_author.id,

@@ -24,7 +24,7 @@ from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFact
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin
+from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 
@@ -75,7 +75,7 @@ ExperienceTest = namedtuple('ExperienceTest', 'experience offset email_sent')
 
 @ddt.ddt
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase):
+class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     __test__ = False
 
@@ -85,7 +85,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
     consolidates_emails_for_learner = False
 
     def setUp(self):
-        super(ScheduleSendEmailTestBase, self).setUp()
+        super(ScheduleSendEmailTestMixin, self).setUp()
 
         site = SiteFactory.create()
         self.site_config = SiteConfigurationFactory.create(site=site)
@@ -131,6 +131,15 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             )
             self._courses_with_verified_modes.add(course_id)
         return schedule
+
+    def _update_schedule_config(self, schedule_config_kwargs):
+        """
+        Updates the schedule config model by making sure the new entry
+        has a later timestamp.
+        """
+        later_time = datetime.datetime.now(pytz.UTC) + datetime.timedelta(minutes=1)
+        with freeze_time(later_time):
+            ScheduleConfigFactory.create(**schedule_config_kwargs)
 
     def test_command_task_binding(self):
         self.assertEqual(self.command.async_send_task, self.task)
@@ -191,7 +200,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
                         is_first_match = False
 
                 with self.assertNumQueries(expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.task.apply(kwargs=dict(
+                    self.task().apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=target_day_str, day_offset=offset, bin_num=b,
                     ))
 
@@ -211,15 +220,15 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             course_id=CourseKey.from_string('edX/toy/Not_2012_Fall'),
             user=UserFactory.create(),
         )
-        schedule = self._schedule_factory(enrollment=enrollment)
+        self._schedule_factory(enrollment=enrollment)
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            for b in range(self.task.num_bins):
-                self.task.apply(kwargs=dict(
+            for bin_num in range(self.task().num_bins):
+                self.task().apply(kwargs=dict(
                     site_id=self.site_config.site.id,
                     target_day_str=serialize(target_day),
                     day_offset=offset,
-                    bin_num=b,
+                    bin_num=bin_num,
                 ))
 
         # There is no database constraint that enforces that enrollment.course_id points
@@ -239,9 +248,9 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             'site': self.site_config.site,
             self.deliver_config: is_enabled,
         }
-        mock_message.from_string.return_value.recipient.username = user.username
-        ScheduleConfigFactory.create(**schedule_config_kwargs)
+        self._update_schedule_config(schedule_config_kwargs)
 
+        mock_message.from_string.return_value.recipient.username = user.username
         mock_msg = Mock()
         self.deliver_task(self.site_config.site.id, mock_msg)
         if is_enabled:
@@ -255,7 +264,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
             'site': self.site_config.site,
             self.enqueue_config: is_enabled,
         }
-        ScheduleConfigFactory.create(**schedule_config_kwargs)
+        self._update_schedule_config(schedule_config_kwargs)
 
         current_datetime = datetime.datetime(2017, 8, 1, tzinfo=pytz.UTC)
         with patch.object(self.task, 'apply_async') as mock_apply_async:
@@ -299,7 +308,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
         )
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
             ))
 
@@ -319,7 +328,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
         )
 
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0,
             ))
 
@@ -345,7 +354,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
         expected_query_count = NUM_QUERIES_FIRST_MATCH + additional_course_queries
         with self.assertNumQueries(expected_query_count, table_blacklist=WAFFLE_TABLES):
             with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-                self.task.apply(kwargs=dict(
+                self.task().apply(kwargs=dict(
                     site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                     bin_num=self._calculate_bin_for_user(user),
                 ))
@@ -393,7 +402,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
                     num_expected_queries += 1
 
                 with self.assertNumQueries(num_expected_queries, table_blacklist=WAFFLE_TABLES):
-                    self.task.apply(kwargs=dict(
+                    self.task().apply(kwargs=dict(
                         site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                         bin_num=self._calculate_bin_for_user(user),
                     ))
@@ -427,7 +436,7 @@ class ScheduleSendEmailTestBase(FilteredQueryCountMixin, CacheIsolationTestCase)
         schedule = self._schedule_factory(**kwargs)
 
         with patch.object(tasks, 'ace') as mock_ace:
-            self.task.apply(kwargs=dict(
+            self.task().apply(kwargs=dict(
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))

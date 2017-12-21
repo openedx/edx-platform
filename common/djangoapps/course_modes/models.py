@@ -136,10 +136,10 @@ class CourseMode(models.Model):
 
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
-    VERIFIED = "verified"
-    AUDIT = "audit"
-    NO_ID_PROFESSIONAL_MODE = "no-id-professional"
-    CREDIT_MODE = "credit"
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -810,7 +810,8 @@ class CourseModesArchive(models.Model):
     min_price = models.IntegerField(default=0)
 
     # the suggested prices for this mode
-    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+                                        validators=[validate_comma_separated_integer_list])
 
     # the currency these prices are in, using lower case ISO currency codes
     currency = models.CharField(default="usd", max_length=8)

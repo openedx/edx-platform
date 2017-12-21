@@ -1,6 +1,6 @@
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/previous_video_upload_list',
-     'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
+        'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers) {
         'use strict';
         describe('PreviousVideoUploadListView', function() {

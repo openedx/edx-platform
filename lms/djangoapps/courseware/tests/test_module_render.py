@@ -692,7 +692,6 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
-    @pytest.mark.django111_expected_failure
     def test_xblock_view_handler(self):
         args = [
             'edX/toy/2012_Fall',
@@ -826,7 +825,6 @@ class TestTOC(ModuleStoreTestCase):
 @attr(shard=1)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-@pytest.mark.django111_expected_failure
 class TestProctoringRendering(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
@@ -1242,7 +1240,6 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
     Tests to verify that standard modifications to the output of XModule/XBlock
@@ -1407,7 +1404,6 @@ class XBlockWithJsonInitData(XBlock):
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class JsonInitDataTest(ModuleStoreTestCase):
     """Tests for JSON data injected into the JS init function."""
 
@@ -1492,7 +1488,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class MongoViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mongo backed course."""
 
@@ -1522,7 +1517,6 @@ class MongoViewInStudioTest(ViewInStudioTest):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class MixedViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
 
@@ -1557,7 +1551,6 @@ class DetachedXBlock(XBlock):
 @attr(shard=1)
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
 @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
-@pytest.mark.django111_expected_failure
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
 
@@ -1905,7 +1898,6 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestXmoduleRuntimeEvent(TestSubmittingProblems):
     """
     Inherit from TestSubmittingProblems to get functionality that set up a course and problems structure
@@ -1975,7 +1967,6 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class TestRebindModule(TestSubmittingProblems):
     """
     Tests to verify the functionality of rebinding a module.

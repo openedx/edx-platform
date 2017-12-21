@@ -11,6 +11,7 @@ import os
 import sys
 from collections import defaultdict
 
+import django
 from docopt import docopt
 from path import Path as path
 
@@ -187,7 +188,23 @@ def main():
     Usage: static_content.py <output_root>
     """
     from django.conf import settings
-    settings.configure()
+    # Install only the apps whose models are imported when this runs
+    installed_apps = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'config_models',
+        'openedx.core.djangoapps.video_config',
+        'openedx.core.djangoapps.video_pipeline',
+    )
+    try:
+        import edxval
+        installed_apps += ('edxval',)
+    except ImportError:
+        pass
+    settings.configure(
+        INSTALLED_APPS=installed_apps,
+    )
+    django.setup()
 
     args = docopt(main.__doc__)
     root = path(args['<output_root>'])

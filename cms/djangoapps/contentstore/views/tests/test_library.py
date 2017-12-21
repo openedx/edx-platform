@@ -28,6 +28,7 @@ def make_url_for_lib(key):
 
 
 @ddt.ddt
+@mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': False})
 class UnitTestLibraries(CourseTestCase):
     """
     Unit tests for library views
@@ -62,6 +63,47 @@ class UnitTestLibraries(CourseTestCase):
     def test_library_creator_status_with_no_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), True)
+
+    @ddt.data(
+        (False, False, True),
+        (False, True, False),
+        (True, False, True),
+        (True, True, False),
+        (True, None, False),
+        (False, None, True)
+    )
+    @ddt.unpack
+    def test_library_creator_status_settings(self, disable_course, disable_library, expected_status):
+        """
+        Ensure that the setting DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION as expected.
+        """
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        with mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True):
+            with mock.patch.dict(
+                "django.conf.settings.FEATURES",
+                {
+                    "DISABLE_COURSE_CREATION": disable_course,
+                    "DISABLE_LIBRARY_CREATION": disable_library
+                }
+            ):
+                self.assertEqual(get_library_creator_status(nostaff_user), expected_status)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
+        """
+        Ensure that `DISABLE_COURSE_CREATION` feature works with libraries as well.
+        """
+        nostaff_client, nostaff_user = self.create_non_staff_authed_user_client()
+        self.assertFalse(get_library_creator_status(nostaff_user))
+
+        # To be explicit, this user can GET, but not POST
+        get_response = nostaff_client.get_json(LIBRARY_REST_URL)
+        post_response = nostaff_client.ajax_post(LIBRARY_REST_URL, {
+            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+        })
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(post_response.status_code, 403)
 
     @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):

@@ -20,7 +20,7 @@ define([
             var $escapableFixture = $('<input>', {id: escapableFixtureID, placeholder: 'userman'});
             var esclocationName = 'P2:problem_1';
             var escapableId = 'result_' + esclocationName;
-            var escapableResultArea = $('<div>', {id: escapableId});
+            var $escapableResultArea = $('<div>', {id: escapableId});
 
             describe('getURL ', function() {
                 it('defines url to courseware ajax entry point', function() {
@@ -75,7 +75,7 @@ define([
             });
             describe('doInstructorDashAction success', function() {
                 it('adds a success message to the results element after using an action', function() {
-                    $('body').append(escapableResultArea);
+                    $('body').append($escapableResultArea);
                     var requests = AjaxHelpers.requests(this);
                     var action = {
                         locationName: esclocationName,
@@ -89,7 +89,7 @@ define([
             });
             describe('doInstructorDashAction error', function() {
                 it('adds a failure message to the results element after using an action', function() {
-                    $('body').append(escapableResultArea);
+                    $('body').append($escapableResultArea);
                     var requests = AjaxHelpers.requests(this);
                     var action = {
                         locationName: esclocationName,

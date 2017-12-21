@@ -50,5 +50,5 @@
         };
 
         return v1;
-    })(XBlock.Runtime.v1);
+    }(XBlock.Runtime.v1));
 }).call(this, URI);

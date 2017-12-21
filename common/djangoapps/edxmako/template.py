@@ -13,47 +13,89 @@
 #   limitations under the License.
 
 from django.conf import settings
+from django.template import Context, engines
 from mako.template import Template as MakoTemplate
+from six import text_type
 
-import edxmako
-from edxmako.request_context import get_template_request_context
-from edxmako.shortcuts import marketing_link
+from . import Engines, LOOKUP
+from .request_context import get_template_request_context
+from .shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
+
+KEY_CSRF_TOKENS = ('csrf_token', 'csrf')
 
 
-# TODO: We should make this a Django Template subclass that simply has the MakoTemplate inside of it? (Intead of inheriting from MakoTemplate)
-
-
-class Template(MakoTemplate):
+class Template(object):
     """
-    This bridges the gap between a Mako template and a djano template. It can
-    be rendered like it is a django template because the arguments are transformed
+    This bridges the gap between a Mako template and a Django template. It can
+    be rendered like it is a Django template because the arguments are transformed
     in a way that MakoTemplate can understand.
     """
 
     def __init__(self, *args, **kwargs):
         """Overrides base __init__ to provide django variable overrides"""
-        if not kwargs.get('no_django', False):
-            kwargs['lookup'] = edxmako.LOOKUP['main']
-        super(Template, self).__init__(*args, **kwargs)
+        self.engine = kwargs.pop('engine', engines[Engines.MAKO])
+        if len(args) and isinstance(args[0], MakoTemplate):
+            self.mako_template = args[0]
+        else:
+            kwargs['lookup'] = LOOKUP['main']
+            self.mako_template = MakoTemplate(*args, **kwargs)
 
-    def render(self, context_instance):
+    def render(self, context=None, request=None):
         """
         This takes a render call with a context (from Django) and translates
         it to a render call on the mako template.
         """
-        # collapse context_instance to a single dictionary for mako
-        context_dictionary = {}
+        context_object = self._get_context_object(request)
+        context_dictionary = self._get_context_processors_output_dict(context_object)
 
-        # In various testing contexts, there might not be a current request context.
-        request_context = get_template_request_context()
-        if request_context:
-            for item in request_context:
-                context_dictionary.update(item)
-        for item in context_instance:
-            context_dictionary.update(item)
+        if isinstance(context, Context):
+            context_dictionary.update(context.flatten())
+        elif context is not None:
+            context_dictionary.update(context)
+
+        self._add_core_context(context_dictionary)
+        self._evaluate_lazy_csrf_tokens(context_dictionary)
+
+        return self.mako_template.render_unicode(**context_dictionary)
+
+    @staticmethod
+    def _get_context_object(request):
+        """
+        Get a Django RequestContext or Context, as appropriate for the situation.
+        In some tests, there might not be a current request.
+        """
+        request_context = get_template_request_context(request)
+        if request_context is not None:
+            return request_context
+        else:
+            return Context({})
+
+    def _get_context_processors_output_dict(self, context_object):
+        """
+        Run the context processors for the given context and get the output as a new dictionary.
+        """
+        with context_object.bind_template(self):
+            return context_object.flatten()
+
+    @staticmethod
+    def _add_core_context(context_dictionary):
+        """
+        Add to the given dictionary context variables which should always be
+        present, even when context processors aren't run during tests.  Using
+        a context processor should almost always be preferred to adding more
+        variables here.
+        """
         context_dictionary['settings'] = settings
         context_dictionary['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
-        context_dictionary['django_context'] = context_instance
         context_dictionary['marketing_link'] = marketing_link
+        context_dictionary['is_any_marketing_link_set'] = is_any_marketing_link_set
+        context_dictionary['is_marketing_link_set'] = is_marketing_link_set
 
-        return super(Template, self).render_unicode(**context_dictionary)
+    @staticmethod
+    def _evaluate_lazy_csrf_tokens(context_dictionary):
+        """
+        Evaluate any lazily-evaluated CSRF tokens in the given context.
+        """
+        for key in KEY_CSRF_TOKENS:
+            if key in context_dictionary:
+                context_dictionary[key] = text_type(context_dictionary[key])

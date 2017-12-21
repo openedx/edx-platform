@@ -83,6 +83,6 @@
             };
 
             return ResponseCommentShowView;
-        })(DiscussionContentShowView);
+        }(DiscussionContentShowView));
     }
 }).call(window);

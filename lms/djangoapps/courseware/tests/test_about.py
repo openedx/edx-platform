@@ -3,7 +3,6 @@ Test the about xblock
 """
 import datetime
 
-import pytest
 import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -39,7 +38,6 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
@@ -194,7 +192,6 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
@@ -243,7 +240,6 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -291,7 +287,6 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -339,7 +334,6 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
 
 @attr(shard=1)
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
-@pytest.mark.django111_expected_failure
 class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
@@ -380,7 +374,6 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -426,7 +419,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 @attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-@pytest.mark.django111_expected_failure
 class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test class runs through a suite of verifications regarding

@@ -33,7 +33,7 @@ import imp
 import sys
 import os
 
-import dealer.git
+import django
 from path import Path as path
 from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
@@ -43,7 +43,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
 )
-from openedx.core.lib.derived import derived, derived_dict_entry
+from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -535,11 +535,9 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
-# TODO: Move the Mako templating into a different engine in TEMPLATES below.
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
-MAKO_TEMPLATES = {}
-MAIN_MAKO_TEMPLATES_BASE = [
+MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
@@ -547,27 +545,59 @@ MAIN_MAKO_TEMPLATES_BASE = [
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
+    OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
 ]
 
 
-def _make_main_mako_templates(settings):
+def _make_mako_template_dirs(settings):
     """
-    Derives the final MAKO_TEMPLATES['main'] setting from other settings.
+    Derives the final Mako template directories list from other settings.
     """
     if settings.ENABLE_COMPREHENSIVE_THEMING:
         themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
-        for theme in get_themes_unchecked(themes_dirs, PROJECT_ROOT):
-            if theme.themes_base_dir not in settings.MAIN_MAKO_TEMPLATES_BASE:
-                settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, theme.themes_base_dir)
+        for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
+            if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
+                settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
     if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
-        settings.MAIN_MAKO_TEMPLATES_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
-    return settings.MAIN_MAKO_TEMPLATES_BASE
-MAKO_TEMPLATES['main'] = _make_main_mako_templates
-derived_dict_entry('MAKO_TEMPLATES', 'main')
+        settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
+    return settings.MAKO_TEMPLATE_DIRS_BASE
+
+
+CONTEXT_PROCESSORS = [
+    'django.template.context_processors.request',
+    'django.template.context_processors.static',
+    'django.contrib.messages.context_processors.messages',
+    'django.template.context_processors.i18n',
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.template.context_processors.csrf',
+
+    # Added for django-wiki
+    'django.template.context_processors.media',
+    'django.template.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'sekizai.context_processors.sekizai',
+
+    # Hack to get required link URLs to password reset templates
+    'edxmako.shortcuts.marketing_link_context_processor',
+
+    # Shoppingcart processor (detects if request.user has a cart)
+    'shoppingcart.context_processor.user_has_cart_context_processor',
+
+    # Timezone processor (sends language and time_zone preference)
+    'courseware.context_processor.user_timezone_locale_prefs',
+
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.footer_context_processor',
+
+    # Online contextual help
+    'help_tokens.context_processor',
+    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
+]
 
 # Django templating
 TEMPLATES = [
     {
+        'NAME': 'django',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
@@ -588,41 +618,27 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.template.context_processors.static',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',
-                'django.contrib.auth.context_processors.auth',  # this is required for admin
-                'django.template.context_processors.csrf',
-
-                # Added for django-wiki
-                'django.template.context_processors.media',
-                'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages',
-                'sekizai.context_processors.sekizai',
-
-                # Hack to get required link URLs to password reset templates
-                'edxmako.shortcuts.marketing_link_context_processor',
-
-                # Shoppingcart processor (detects if request.user has a cart)
-                'shoppingcart.context_processor.user_has_cart_context_processor',
-
-                # Timezone processor (sends language and time_zone preference)
-                'courseware.context_processor.user_timezone_locale_prefs',
-
-                # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.footer_context_processor',
-
-                # Online contextual help
-                'help_tokens.context_processor',
-                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
-            ],
+            'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
             'debug': False
         }
-    }
+    },
+    {
+        'NAME': 'mako',
+        'BACKEND': 'edxmako.backend.Mako',
+        # Don't look for template source files inside installed applications.
+        'APP_DIRS': False,
+        # Instead, look for template source files in these dirs.
+        'DIRS': _make_mako_template_dirs,
+        # Options specific to this backend.
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+            # Change 'debug' in your environment settings files - not here.
+            'debug': False,
+        }
+    },
 ]
+derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
 
@@ -634,8 +650,10 @@ def _add_microsite_dirs_to_default_template_engine(settings):
     if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
         DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
     return DEFAULT_TEMPLATE_ENGINE_DIRS
+
+
 DEFAULT_TEMPLATE_ENGINE['DIRS'] = _add_microsite_dirs_to_default_template_engine
-derived_dict_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
+derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 
@@ -791,6 +809,9 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
+
+######################## BRANCH.IO ###########################
+BRANCH_IO_KEY = None
 
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
@@ -1209,6 +1230,13 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
+if django.VERSION < (1, 9):
+    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
+else:
+    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
+
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
@@ -1250,7 +1278,7 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    _csrf_middleware,
 
     'splash.middleware.SplashMiddleware',
 
@@ -1656,6 +1684,18 @@ PIPELINE_CSS = {
             'css/lms-learner-dashboard-rtl.css',
         ],
         'output_filename': 'css/lms-learner-dashboard-rtl.css',
+    },
+    'style-mobile': {
+        'source_filenames': [
+            'css/lms-mobile.css',
+        ],
+        'output_filename': 'css/lms-mobile.css',
+    },
+    'style-mobile-rtl': {
+        'source_filenames': [
+            'css/lms-mobile-rtl.css',
+        ],
+        'output_filename': 'css/lms-mobile-rtl.css',
     },
 }
 
@@ -2301,6 +2341,7 @@ INSTALLED_APPS = [
     'database_fixups',
 
     'openedx.core.djangoapps.waffle_utils',
+    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # Course Goals
@@ -2313,7 +2354,7 @@ INSTALLED_APPS = [
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.course_search',
-    'openedx.features.enterprise_support',
+    'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
 
     'experiments',
@@ -2375,6 +2416,9 @@ STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 SUPPORT_SITE_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
+
+# Days before the expired date that we warn the user
+ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
 
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
@@ -2882,7 +2926,6 @@ ALL_LANGUAGES = [
 # The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
 # that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = [
-    ('mentoring', None),
     ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('edx_sga', None),
 
@@ -2907,6 +2950,7 @@ OPTIONAL_APPS = [
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
+    ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
 
     # Required by the Enterprise App
@@ -2941,6 +2985,10 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ### Analytics Dashboard (Insights) settings
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
+
+### Analytics API
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "http://localhost:18100"
 
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
@@ -3054,6 +3102,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "requires_parental_consent",
         "account_privacy",
         "accomplishments_shared",
+        "extended_profile",
     ]
 }
 
@@ -3368,6 +3417,12 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'year_of_birth',
     'mailing_address',
 }
+ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
+    'username',
+    'name',
+    'email',
+    'country',
+]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
 
@@ -3403,11 +3458,11 @@ ACE_CHANNEL_SAILTHRU_API_SECRET = None
 
 ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95

@@ -6,7 +6,8 @@
 }((function() {
     return this;
 }()), function(window, jasmine, _) {
-    var fake, clearSpies, spyOnConstructor, unfakes = [];
+    var fake, clearSpies, spyOnConstructor,
+        unfakes = [];
 
     clearSpies = function() {
         _.each(unfakes, function(u) {
@@ -33,7 +34,7 @@
             }
 
             return _Class;
-        })();
+        }());
 
         if (!methodsToSpy) {
             methodsToSpy = [];

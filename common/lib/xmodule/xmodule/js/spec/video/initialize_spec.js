@@ -17,9 +17,9 @@ function(Initialize) {
             beforeEach(function() {
                 state.config = {};
                 state.config.transcriptLanguages = {
-                    'de': 'German',
-                    'en': 'English',
-                    'uk': 'Ukrainian'
+                    de: 'German',
+                    en: 'English',
+                    uk: 'Ukrainian'
                 };
             });
 
@@ -47,8 +47,8 @@ function(Initialize) {
 
                 state.lang = 'zh';
                 state.config.transcriptLanguages = {
-                    'de': 'German',
-                    'uk': 'Ukrainian'
+                    de: 'German',
+                    uk: 'Ukrainian'
                 };
                 expected = Initialize.prototype.getCurrentLanguage.call(state);
                 expect(expected).toBe('uk');
@@ -69,10 +69,10 @@ function(Initialize) {
                 state = {
                     speed: '1.50',
                     metadata: {
-                        'testId': {
+                        testId: {
                             duration: 'PT6M40S'
                         },
-                        'videoId': {
+                        videoId: {
                             duration: 'PT1M40S'
                         }
                     },
@@ -182,8 +182,8 @@ function(Initialize) {
 
                 it('check mapping', function() {
                     var map = {
-                        '0.75': '0.50',
-                        '1.25': '1.50'
+                        0.75: '0.50',
+                        1.25: '1.50'
                     };
 
                     $.each(map, function(key, expected) {
@@ -223,7 +223,7 @@ function(Initialize) {
 
                 it('check mapping', function() {
                     var map = {
-                        '0.25': '0.75',
+                        0.25: '0.75',
                         '0.50': '0.75',
                         '2.0': '1.50'
                     };

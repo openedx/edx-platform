@@ -7,7 +7,6 @@ from collections import OrderedDict
 from urllib import urlencode
 from uuid import uuid4
 
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
@@ -243,7 +242,6 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
     Tests for the certificates web/html views
@@ -658,7 +656,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_view_for_non_viewable_certificate(self):
+    def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
         """
         Tests that Certificate HTML Web View returns "Cannot Find Certificate" if certificate is not viewable yet.
         """

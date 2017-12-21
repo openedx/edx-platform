@@ -4,7 +4,7 @@ Unit tests for sending course email
 """
 import json
 import os
-from unittest import skip, skipIf
+from unittest import skipIf
 
 import ddt
 from django.conf import settings
@@ -267,20 +267,10 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
         self.assertEquals(mail.outbox[0].subject, 'test subject for myself')
-        """
-        TODO - uncomment this assertion and delete the following alternate once django-ses is fixed. EDUCATOR-1773
         self.assertEquals(
             mail.outbox[0].from_email,
             u'"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
                 course_display_name=self.course.display_name,
-                course_name=self.course.id.course
-            )
-        )
-        """  # pylint: disable=pointless-string-statement
-        self.assertEquals(
-            mail.outbox[0].from_email,
-            u'"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
-                course_display_name=self.course.number,
                 course_name=self.course.id.course
             )
         )
@@ -509,7 +499,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-    @skip("Unicode course names are broken, see EDUCATOR-1773 for details. Un-skip after django-ses is fixed.")
     @override_settings(BULK_EMAIL_DEFAULT_FROM_EMAIL="no-reply@courseupdates.edx.org")
     def test_long_course_display_name(self):
         """

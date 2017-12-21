@@ -16,6 +16,7 @@ from nose.plugins.attrib import attr
 from pytz import utc
 
 from course_modes.models import CourseMode
+from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -23,6 +24,7 @@ from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
+    EntitlementFactory,
     ProgramFactory,
     SeatFactory,
     generate_course_run_key
@@ -63,7 +65,12 @@ class TestProgramProgressMeter(TestCase):
     def _create_enrollments(self, *course_run_ids):
         """Variadic helper used to create course run enrollments."""
         for course_run_id in course_run_ids:
-            CourseEnrollmentFactory(user=self.user, course_id=course_run_id, mode='verified')
+            CourseEnrollmentFactory(user=self.user, course_id=course_run_id, mode=CourseMode.VERIFIED)
+
+    def _create_entitlements(self, *course_uuids):
+        """ Variadic helper used to create course entitlements. """
+        for course_uuid in course_uuids:
+            CourseEntitlementFactory(user=self.user, course_uuid=course_uuid)
 
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
@@ -91,8 +98,8 @@ class TestProgramProgressMeter(TestCase):
 
         return result
 
-    def test_no_enrollments(self, mock_get_programs):
-        """Verify behavior when programs exist, but no relevant enrollments do."""
+    def test_no_enrollments_or_entitlements(self, mock_get_programs):
+        """Verify behavior when programs exist, but no relevant enrollments or entitlements do."""
         data = [ProgramFactory()]
         mock_get_programs.return_value = data
 
@@ -102,7 +109,7 @@ class TestProgramProgressMeter(TestCase):
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-    def test_no_programs(self, mock_get_programs):
+    def test_enrollments_but_no_programs(self, mock_get_programs):
         """Verify behavior when enrollments exist, but no matching programs do."""
         mock_get_programs.return_value = []
 
@@ -114,7 +121,16 @@ class TestProgramProgressMeter(TestCase):
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-    def test_single_program_engagement(self, mock_get_programs):
+    def test_entitlements_but_no_programs(self, mock_get_programs):
+        """ Verify engaged_programs is empty when entitlements exist, but no matching programs do. """
+        mock_get_programs.return_value = []
+
+        self._create_entitlements(uuid.uuid4())
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self.assertEqual(meter.engaged_programs, [])
+
+    def test_single_program_enrollment(self, mock_get_programs):
         """
         Verify that correct program is returned when the user is enrolled in a
         course run appearing in one program.
@@ -143,6 +159,25 @@ class TestProgramProgressMeter(TestCase):
             ProgressFactory(uuid=program['uuid'], in_progress=1, grades={course_run_key: 0.0})
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_single_program_entitlement(self, mock_get_programs):
+        """
+        Verify that the correct program is returned when the user holds an entitlement
+        to a course appearing in one program.
+        """
+        course_uuid = uuid.uuid4()
+        data = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(course_uuid))]),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        self._create_entitlements(course_uuid)
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._attach_detail_url(data)
+        program = data[0]
+        self.assertEqual(meter.engaged_programs, [program])
 
     def test_course_progress(self, mock_get_programs):
         """
@@ -225,22 +260,22 @@ class TestProgramProgressMeter(TestCase):
         course_run_key = generate_course_run_key()
         now = datetime.datetime.now(utc)
         upgrade_deadline = None if not offset else str(now + datetime.timedelta(days=offset))
-        required_seat = SeatFactory(type='verified', upgrade_deadline=upgrade_deadline)
-        enrolled_seat = SeatFactory(type='audit')
+        required_seat = SeatFactory(type=CourseMode.VERIFIED, upgrade_deadline=upgrade_deadline)
+        enrolled_seat = SeatFactory(type=CourseMode.AUDIT)
         seats = [required_seat, enrolled_seat]
 
         data = [
             ProgramFactory(
                 courses=[
                     CourseFactory(course_runs=[
-                        CourseRunFactory(key=course_run_key, type='verified', seats=seats),
+                        CourseRunFactory(key=course_run_key, type=CourseMode.VERIFIED, seats=seats),
                     ]),
                 ]
             )
         ]
         mock_get_programs.return_value = data
 
-        CourseEnrollmentFactory(user=self.user, course_id=course_run_key, mode='audit')
+        CourseEnrollmentFactory(user=self.user, course_id=course_run_key, mode=CourseMode.AUDIT)
 
         meter = ProgramProgressMeter(self.site, self.user)
 
@@ -257,7 +292,7 @@ class TestProgramProgressMeter(TestCase):
 
         self.assertEqual(meter.progress(count_only=True), expected)
 
-    def test_mutiple_program_engagement(self, mock_get_programs):
+    def test_mutiple_program_enrollment(self, mock_get_programs):
         """
         Verify that correct programs are returned in the correct order when the
         user is enrolled in course runs appearing in programs.
@@ -300,6 +335,28 @@ class TestProgramProgressMeter(TestCase):
             *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_multiple_program_entitlement(self, mock_get_programs):
+        """
+        Verify that the correct programs are returned in the correct order
+        when the user holds entitlements to courses appearing in those programs.
+        """
+        newer_course_uuid, older_course_uuid = (uuid.uuid4() for __ in range(2))
+        data = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(older_course_uuid)), ]),
+            ProgramFactory(courses=[CourseFactory(uuid=str(newer_course_uuid)), ]),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        # The creation time of the entitlements matters to the test. We want
+        # the newer_course_uuid to represent the newest entitlement.
+        self._create_entitlements(older_course_uuid, newer_course_uuid)
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._attach_detail_url(data)
+        programs = data[:2]
+        self.assertEqual(meter.engaged_programs, programs)
 
     def test_shared_enrollment_engagement(self, mock_get_programs):
         """
@@ -351,6 +408,34 @@ class TestProgramProgressMeter(TestCase):
             *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_shared_entitlement_engagement(self, mock_get_programs):
+        """
+        Verify that correct programs are returned when the user holds an entitlement
+        to a single course appearing in multiple programs.
+        """
+        shared_course_uuid, solo_course_uuid = (uuid.uuid4() for __ in range(2))
+
+        batch = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(shared_course_uuid)), ])
+            for __ in range(2)
+        ]
+
+        joint_programs = sorted(batch, key=lambda program: program['title'])
+        data = joint_programs + [
+            ProgramFactory(courses=[CourseFactory(uuid=str(solo_course_uuid)), ]),
+            ProgramFactory(),
+        ]
+
+        mock_get_programs.return_value = data
+
+        # Entitlement for the shared course created last (most recently).
+        self._create_entitlements(shared_course_uuid, solo_course_uuid)
+        meter = ProgramProgressMeter(self.site, self.user)
+
+        self._attach_detail_url(data)
+        programs = data[:3]
+        self.assertEqual(meter.engaged_programs, programs)
 
     @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
     def test_simulate_progress(self, mock_completed_course_runs, mock_get_programs):
@@ -537,7 +622,9 @@ class TestProgramProgressMeter(TestCase):
         Verify that the method can find course run certificates when not mocked out.
         """
         mock_get_certificates_for_user.return_value = [
-            self._make_certificate_result(status='downloadable', type='verified', course_key='downloadable-course'),
+            self._make_certificate_result(
+                status='downloadable', type=CourseMode.VERIFIED, course_key='downloadable-course'
+            ),
             self._make_certificate_result(status='generating', type='honor', course_key='generating-course'),
             self._make_certificate_result(status='unknown', course_key='unknown-course'),
         ]
@@ -546,7 +633,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(
             meter.completed_course_runs,
             [
-                {'course_run_id': 'downloadable-course', 'type': 'verified'},
+                {'course_run_id': 'downloadable-course', 'type': CourseMode.VERIFIED},
                 {'course_run_id': 'generating-course', 'type': 'honor'},
             ]
         )
@@ -558,9 +645,10 @@ class TestProgramProgressMeter(TestCase):
         Verify that 'no-id-professional' certificates are treated as if they were
         'professional' certificates when determining program completion.
         """
-        # Create serialized course runs like the ones we expect to receive from
-        # the discovery service's API. These runs are of type 'professional'.
-        course_runs = CourseRunFactory.create_batch(2, type='professional')
+        # Create serialized course runs like the ones we expect to receive from the discovery service's API.
+        # These runs are of type 'professional' because there is no seat type for no-id-professional;
+        # it uses professional as the seat type instead.
+        course_runs = CourseRunFactory.create_batch(2, type=CourseMode.PROFESSIONAL)
         program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
         mock_get_programs.return_value = [program]
 
@@ -571,7 +659,9 @@ class TestProgramProgressMeter(TestCase):
         # Grant a 'no-id-professional' certificate for one of the course runs,
         # thereby completing the program.
         mock_get_certificates_for_user.return_value = [
-            self._make_certificate_result(status='downloadable', type='no-id-professional', course_key=course_runs[0]['key'])
+            self._make_certificate_result(
+                status='downloadable', type=CourseMode.NO_ID_PROFESSIONAL_MODE, course_key=course_runs[0]['key']
+            )
         ]
 
         # Verify that the program is complete.
@@ -592,7 +682,7 @@ class TestProgramProgressMeter(TestCase):
         mock_get_programs.return_value = [program]
         self._create_enrollments(course_run_key)
         meter = ProgramProgressMeter(self.site, self.user)
-        mock_completed_course_runs.return_value = [{'course_run_id': course_run_key, 'type': 'verified'}]
+        mock_completed_course_runs.return_value = [{'course_run_id': course_run_key, 'type': CourseMode.VERIFIED}]
         self.assertEqual(meter._is_course_complete(course), True)
 
     def test_course_grade_results(self, mock_get_programs):
@@ -628,7 +718,7 @@ class TestProgramProgressMeter(TestCase):
             self.assertEqual(meter.progress(count_only=False), expected)
 
 
-def _create_course(self, course_price, course_run_count=1):
+def _create_course(self, course_price, course_run_count=1, make_entitlement=False):
     """
     Creates the course in mongo and update it with the instructor data.
     Also creates catalog course with respect to course run.
@@ -646,8 +736,9 @@ def _create_course(self, course_price, course_run_count=1):
 
         run = CourseRunFactory(key=unicode(course.id), seats=[SeatFactory(price=course_price)])
         course_runs.append(run)
+    entitlements = [EntitlementFactory()] if make_entitlement else []
 
-    return CourseFactory(course_runs=course_runs)
+    return CourseFactory(course_runs=course_runs, entitlements=entitlements)
 
 
 @ddt.ddt
@@ -879,12 +970,12 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
         course1 = _create_course(self, self.course_price)
         course2 = _create_course(self, self.course_price)
-        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='verified')
-        CourseEnrollmentFactory(user=self.user, course_id=course2['course_runs'][0]['key'], mode='audit')
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.VERIFIED)
+        CourseEnrollmentFactory(user=self.user, course_id=course2['course_runs'][0]['key'], mode=CourseMode.AUDIT)
         program2 = ProgramFactory(
             courses=[course1, course2],
             is_program_eligible_for_one_click_purchase=True,
-            applicable_seat_types=['verified'],
+            applicable_seat_types=[CourseMode.VERIFIED],
         )
         data = ProgramDataExtender(program2, self.user).extend()
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
@@ -897,12 +988,12 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         """
         course1 = _create_course(self, self.course_price, course_run_count=2)
         course2 = _create_course(self, self.course_price)
-        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='verified')
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.VERIFIED)
         course1['course_runs'][0]['status'] = 'unpublished'
         program2 = ProgramFactory(
             courses=[course1, course2],
             is_program_eligible_for_one_click_purchase=True,
-            applicable_seat_types=['verified'],
+            applicable_seat_types=[CourseMode.VERIFIED],
         )
         data = ProgramDataExtender(program2, self.user).extend()
         self.assertEqual(len(data['skus']), 1)
@@ -915,12 +1006,13 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         This test is primarily for the case of no-id-professional enrollment modes
         """
         course1 = _create_course(self, self.course_price)
-        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode='no-id-professional')
+        CourseEnrollmentFactory(
+            user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.NO_ID_PROFESSIONAL_MODE
+        )
         program2 = ProgramFactory(
             courses=[course1],
             is_program_eligible_for_one_click_purchase=True,
-            applicable_seat_types=['professional'],  # There is no seat type for no-id-professional, it
-                                                     # instead uses professional
+            applicable_seat_types=[CourseMode.PROFESSIONAL]
         )
         data = ProgramDataExtender(program2, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
@@ -938,7 +1030,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
             key=str(ModuleStoreCourseFactory().id),
             status='published'
         )
-        course = CourseFactory(course_runs=[course_run_1, course_run_2])
+        course = CourseFactory(course_runs=[course_run_1, course_run_2], entitlements=[])
         program = ProgramFactory(
             courses=[
                 CourseFactory(course_runs=[
@@ -956,7 +1048,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
                 ])
             ],
             is_program_eligible_for_one_click_purchase=True,
-            applicable_seat_types=['verified']
+            applicable_seat_types=[CourseMode.VERIFIED]
         )
         data = ProgramDataExtender(program, self.user).extend()
 
@@ -966,6 +1058,147 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         data = ProgramDataExtender(program, self.user).extend()
 
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+
+    def test_learner_eligibility_for_one_click_purchase_entitlement_products(self):
+        """
+        Learner should be eligible for one click purchase if:
+            - program is eligible for one click purchase
+            - There are remaining unpurchased courses with entitlement products
+        """
+        course1 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        expected_skus = set([course1['entitlements'][0]['sku'], course2['entitlements'][0]['sku']])
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(set(data['skus']), expected_skus)
+
+    def test_learner_eligibility_for_one_click_purchase_ineligible_program(self):
+        """
+        Learner should not be eligible for one click purchase if the program is not eligible for one click purchase
+        """
+        course1 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=False,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(data['skus'], [])
+
+    def test_learner_eligibility_for_one_click_purchase_user_entitlements(self):
+        """
+        Learner should be eligibile for one click purchase if they hold an entitlement in one or more courses
+        in the program and there are remaining unpurchased courses in the program with entitlement products.
+        """
+        course1 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        CourseEntitlementFactory(user=self.user, course_uuid=course1['uuid'], mode=CourseMode.VERIFIED)
+        expected_skus = set([course2['entitlements'][0]['sku']])
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(set(data['skus']), expected_skus)
+
+    def test_all_courses_owned(self):
+        """
+        Learner should not be eligible for one click purchase if they hold entitlements in all courses in the program.
+        """
+        course1 = _create_course(self, self.course_price, make_entitlement=True)
+        course2 = _create_course(self, self.course_price)
+        CourseEntitlementFactory(user=self.user, course_uuid=course1['uuid'], mode=CourseMode.VERIFIED)
+        CourseEntitlementFactory(user=self.user, course_uuid=course2['uuid'], mode=CourseMode.VERIFIED)
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(data['skus'], [])
+
+    def test_entitlement_product_wrong_mode(self):
+        """
+        Learner should not be eligible for one click purchase if the only entitlement product
+        for a course in the program is not in an applicable mode, and that course has multiple course runs.
+        """
+        course1 = _create_course(self, self.course_price)
+        course2 = _create_course(self, self.course_price, course_run_count=2)
+        course2['entitlements'].append(EntitlementFactory(mode=CourseMode.PROFESSIONAL))
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(data['skus'], [])
+
+    def test_second_entitlement_product_wrong_mode(self):
+        """
+        Learner should be eligible for one click purchase if a course has multiple entitlement products
+        and at least one of them is in an applicable mode, even if one is not in an applicable mode.
+        """
+        course1 = _create_course(self, self.course_price)
+        course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        # The above statement makes a verfied entitlement for the course, which is an applicable seat type
+        # and the statement below makes a professional entitlement for the same course, which is not applicable
+        course2['entitlements'].append(EntitlementFactory(mode=CourseMode.PROFESSIONAL))
+        expected_skus = set([course1['course_runs'][0]['seats'][0]['sku'], course2['entitlements'][0]['sku']])
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(set(data['skus']), expected_skus)
+
+    def test_entitlement_product_and_user_enrollment(self):
+        """
+        Learner should be eligible for one click purchase if they hold an enrollment
+        but not an entitlement in a course for which there exists an entitlement product.
+        """
+        course1 = _create_course(self, self.course_price, make_entitlement=True)
+        course2 = _create_course(self, self.course_price)
+        expected_skus = set([course2['course_runs'][0]['seats'][0]['sku']])
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.VERIFIED)
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(set(data['skus']), expected_skus)
+
+    def test_user_enrollment_with_other_course_entitlement_product(self):
+        """
+        Learner should be eligible for one click purchase if they hold an enrollment in one course of the program
+        and there is an entitlement product for another course in the program.
+        """
+        course1 = _create_course(self, self.course_price, course_run_count=2)
+        course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
+        CourseEnrollmentFactory(user=self.user, course_id=course1['course_runs'][0]['key'], mode=CourseMode.VERIFIED)
+        expected_skus = set([course2['entitlements'][0]['sku']])
+        program = ProgramFactory(
+            courses=[course1, course2],
+            is_program_eligible_for_one_click_purchase=True,
+            applicable_seat_types=[CourseMode.VERIFIED, CourseMode.PROFESSIONAL],
+        )
+        data = ProgramDataExtender(program, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+        self.assertEqual(set(data['skus']), expected_skus)
 
 
 @skip_unless_lms
@@ -1095,7 +1328,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.number_of_courses = 2
         self.program = ProgramFactory(
             courses=[_create_course(self, self.course_price) for __ in range(self.number_of_courses)],
-            applicable_seat_types=['verified']
+            applicable_seat_types=[CourseMode.VERIFIED]
         )
 
     def _prepare_program_for_discounted_price_calculation_endpoint(self):
@@ -1212,8 +1445,9 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             body=json.dumps(mock_discount_data),
             content_type='application/json'
         )
+        user = AnonymousUserFactory()
 
-        data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
+        data = ProgramMarketingDataExtender(self.program, user).extend()
         self._update_discount_data(mock_discount_data)
 
         self.assertEqual(

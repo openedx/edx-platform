@@ -2,7 +2,7 @@
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-        'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu'],
+    'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu'],
     function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu) {
         var AddXBlockComponent = BaseView.extend({
             events: {
@@ -57,14 +57,14 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
 
             createNewComponent: function(event) {
                 var self = this,
-                    element = $(event.currentTarget),
-                    saveData = element.data(),
+                    $element = $(event.currentTarget),
+                    saveData = $element.data(),
                     oldOffset = ViewUtils.getScrollOffset(this.$el);
                 event.preventDefault();
                 this.closeNewComponent(event);
                 ViewUtils.runOperationShowingMessage(
                     gettext('Adding'),
-                    _.bind(this.options.createComponent, this, saveData, element)
+                    _.bind(this.options.createComponent, this, saveData, $element)
                 ).always(function() {
                     // Restore the scroll position of the buttons so that the new
                     // component appears above them.

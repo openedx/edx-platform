@@ -9,10 +9,10 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         var team_member_fixture = readFixtures('team-member.underscore');
 
         function setRole(email, role) {
-            var user_li = $('li.user-item[data-email="' + email + '"]');
-            var role_action = $('li.action-role a.make-' + role, user_li);
-            expect(role_action).toBeVisible();
-            role_action.click();
+            var $user_li = $('li.user-item[data-email="' + email + '"]');
+            var $role_action = $('li.action-role a.make-' + role, $user_li);
+            expect($role_action).toBeVisible();
+            $role_action.click();
         }
 
         function getUrl(email) {
@@ -56,7 +56,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 $('.user-email-input').val(email);
                 $('.form-create.create-user .action-primary').click();
                 AjaxHelpers.expectJsonRequest(requests, 'POST', getUrl(email), {role: 'library_user'});
-                AjaxHelpers.respondWithJson(requests, {'result': 'ok'});
+                AjaxHelpers.respondWithJson(requests, {result: 'ok'});
                 expect(reloadSpy).toHaveBeenCalled();
             });
 
@@ -66,7 +66,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole('staff@example.com', 'staff');
                 AjaxHelpers.expectJsonRequest(requests, 'POST', getUrl(email), {role: 'staff'});
-                AjaxHelpers.respondWithJson(requests, {'result': 'ok'});
+                AjaxHelpers.respondWithJson(requests, {result: 'ok'});
                 expect(reloadSpy).toHaveBeenCalled();
             });
 
@@ -109,7 +109,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ViewHelpers.confirmPrompt(promptSpy);
                 ViewHelpers.verifyPromptHidden(promptSpy);
                 AjaxHelpers.expectJsonRequest(requests, 'DELETE', getUrl(email), {role: null});
-                AjaxHelpers.respondWithJson(requests, {'result': 'ok'});
+                AjaxHelpers.respondWithJson(requests, {result: 'ok'});
                 expect(reloadSpy).toHaveBeenCalled();
             });
         });

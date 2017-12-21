@@ -37,7 +37,7 @@ module.exports = Merge.smart(commonConfig, {
                         options: {
                             sourceMap: true,
                             modules: true,
-                            localIdentName: '[path][name]__[local]--[hash:base64:5]'
+                            localIdentName: '[name]__[local]'
                         }
                     },
                     {
@@ -54,5 +54,8 @@ module.exports = Merge.smart(commonConfig, {
                 ]
             }
         ]
+    },
+    watchOptions: {
+        ignored: [/node_modules/, /\.git/]
     }
 });

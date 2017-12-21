@@ -34,7 +34,7 @@ import courseware.views.views as views
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates import api as certs_api
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
+from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist
 from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -210,7 +210,6 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
     Tests for query count.
@@ -253,7 +252,6 @@ class IndexQueryTestCase(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
@@ -1117,7 +1115,6 @@ class TestProgressDueDate(BaseDueDateTests):
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-@pytest.mark.django111_expected_failure
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
@@ -1190,7 +1187,6 @@ class StartDateTests(ModuleStoreTestCase):
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
-    @pytest.mark.django111_expected_failure
     def test_format_localized_in_studio_course(self):
         course = self.set_up_course()
         response = self.get_about_response(course.id)
@@ -1469,13 +1465,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(35 if self_paced else 34, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(36 if self_paced else 35, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 41, 27),
-        (True, 34, 23)
+        (False, 42, 28),
+        (True, 35, 24)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1565,6 +1561,49 @@ class ProgressPageTests(ProgressPageBaseTests):
             course_grade.passed = True
             course_grade.summary = {
                 'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
+            }
+
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"View Certificate")
+            self.assert_invalidate_certificate(generated_certificate)
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_page_with_whitelisted_certificate_with_html_view(self):
+        """
+        Verify that for white listed user the view certificate is
+        appearing on dashboard
+        """
+        generated_certificate = self.generate_certificate(
+            "http://www.example.com/certificate.pdf", "honor"
+        )
+
+        # Course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'dummy',
+                'description': 'dummy description',
+                'course_title': 'dummy title',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        CertificateWhitelist.objects.create(
+            user=self.user,
+            course_id=self.course.id,
+            whitelist=True
+        )
+
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = False
+            course_grade.summary = {
+                'grade': 'Fail', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
             }
 
             resp = self._get_progress_page()
@@ -2198,7 +2237,6 @@ class ViewCheckerBlock(XBlock):
 
 @attr(shard=1)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
@@ -2536,7 +2574,6 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.

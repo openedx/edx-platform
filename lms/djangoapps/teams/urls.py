@@ -8,5 +8,5 @@ from django.contrib.auth.decorators import login_required
 from .views import TeamsDashboardView
 
 urlpatterns = [
-    url(r"^/$", login_required(TeamsDashboardView.as_view()), name="teams_dashboard")
+    url(r"^$", login_required(TeamsDashboardView.as_view()), name="teams_dashboard")
 ]

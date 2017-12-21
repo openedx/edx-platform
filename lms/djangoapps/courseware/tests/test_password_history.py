@@ -6,7 +6,6 @@ from datetime import timedelta
 from uuid import uuid4
 
 import ddt
-import pytest
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
@@ -24,7 +23,6 @@ from student.models import PasswordHistory
 @attr(shard=1)
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class TestPasswordHistory(LoginEnrollmentTestCase):
     """
     Go through some of the PasswordHistory use cases

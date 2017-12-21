@@ -356,11 +356,15 @@
         background-color: palette(primary, dark);
         height: 37px;
         width: 128px;
-        border-radius: 0;
         padding: 0;
         margin-bottom: 5px;
         margin-top: 7px;
         font-size: 0.9375em;
+
+        &:hover {
+          color: palette(primary, dark);
+          background-color: theme-color("inverse");
+        }
 
         /* IE11 CSS styles */
         @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -393,14 +397,7 @@
     }
 
     .run-select {
-      @include margin-right(10px);
-
-      width: 95%;
-
-      @media (min-width: $bp-screen-sm) {
-        width: 300px;
-      }
-
+      width: 100%;
       height: 34px;
       padding: 0;
     }
@@ -437,7 +434,6 @@
   .program-course-card {
     width: 100%;
     padding: 15px;
-    margin-bottom: 10px;
 
     @media (min-width: $bp-screen-md) {
       height: auto;
@@ -445,11 +441,16 @@
 
     .section {
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
 
       @media (min-width: $bp-screen-md) {
         flex-wrap: wrap;
       }
+    }
+
+    .section:not(:last-child) {
+      margin-bottom: $baseline/2;
     }
 
     .section:not(:first-child) {
@@ -461,13 +462,18 @@
 
       .course-title {
         font-size: 1em;
-        color: palette(primary, base);
         font-weight: 600;
-        text-decoration: underline;
         margin: 0;
+
+        .course-title-link,
+        .course-title-link:visited{
+          color: palette(primary, base);
+          text-decoration: underline;
+        }
       }
 
-      .run-period {
+      .run-period,
+      .info-expires-at {
         color: palette(grayscale, base);
         font-size: 0.9375em;
       }
@@ -497,13 +503,12 @@
         vertical-align: top;
         padding: 0 10px 0 0;
         float: left;
-        width: calc(100% - 205px);
       }
     }
 
     .course-actions {
       @media (min-width: $bp-screen-md) {
-        width: 200px;
+        width: 100%;
         text-align: right;
         float: right;
       }

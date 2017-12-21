@@ -40,7 +40,7 @@ from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
-from openedx.core.djangoapps.lang_pref.api import released_languages
+from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
@@ -350,7 +350,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
                 verify_uuid=unicode(uuid4().hex),
                 modified_date=modified_date
             )
-    else:
+    elif certificates_viewable_for_course(course):
         # certificate is being viewed by learner or public
         try:
             user_certificate = GeneratedCertificate.eligible_certificates.get(
@@ -516,13 +516,6 @@ def render_html_view(request, user_id, course_id):
         log.info(error_str, course_id, user_id, str(exception))
         return _render_invalid_certificate(course_id, platform_name, configuration)
 
-    if not certificates_viewable_for_course(course):
-        log.info(
-            "Invalid cert: Certificate for %s is not viewable yet.",
-            course_id,
-        )
-        return _render_invalid_certificate(course_id, platform_name, configuration)
-
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course
     if not course.cert_html_view_enabled:
         log.info(
@@ -656,7 +649,7 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
     Return the custom certificate template, if any, that should be rendered for the provided course/mode/language
     combination, along with the language that should be used to render that template.
     """
-    closest_released_language = _get_closest_released_language(course_language) if course_language else None
+    closest_released_language = get_closest_released_language(course_language) if course_language else None
     template = get_certificate_template(course_id, course_mode, closest_released_language)
 
     if template and template.language:
@@ -665,24 +658,6 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
         return (template, settings.LANGUAGE_CODE)
     else:
         return (None, None)
-
-
-def _get_closest_released_language(target):
-    """
-    Return the language code that most closely matches the target and is fully supported by the LMS, or None
-    if there are no fully supported languages that match the target.
-    """
-    match = None
-    languages = released_languages()
-
-    for language in languages:
-        if language.code == target:
-            match = language.code
-            break
-        elif (match is None) and (language.code[:2] == target[:2]):
-            match = language.code
-
-    return match
 
 
 def _render_invalid_certificate(course_id, platform_name, configuration):

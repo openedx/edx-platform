@@ -50,8 +50,8 @@
             $(document).off('keyup', this.videoFullScreen.exitHandler);
             this.videoFullScreen.fullScreenEl.remove();
             this.el.off({
-                'fullscreen': this.videoFullScreen.onFullscreenChange,
-                'destroy': this.videoFullScreen.destroy
+                fullscreen: this.videoFullScreen.onFullscreenChange,
+                destroy: this.videoFullScreen.destroy
             });
             if (this.isFullScreen) {
                 this.videoFullScreen.exit();
@@ -78,8 +78,8 @@
         function _bindHandlers(state) {
             state.videoFullScreen.fullScreenEl.on('click', state.videoFullScreen.toggleHandler);
             state.el.on({
-                'fullscreen': state.videoFullScreen.onFullscreenChange,
-                'destroy': state.videoFullScreen.destroy
+                fullscreen: state.videoFullScreen.onFullscreenChange,
+                destroy: state.videoFullScreen.destroy
             });
             $(document).on('keyup', state.videoFullScreen.exitHandler);
         }
@@ -142,8 +142,8 @@
             this.el.trigger('fullscreen', [this.isFullScreen]);
 
             $(closedCaptionsEl).css({
-                'top': '70%',
-                'left': '5%'
+                top: '70%',
+                left: '5%'
             });
         }
 
@@ -164,8 +164,8 @@
             this.el.trigger('fullscreen', [this.isFullScreen]);
 
             $(closedCaptionsEl).css({
-                'top': '70%',
-                'left': '5%'
+                top: '70%',
+                left: '5%'
             });
         }
 

@@ -19,7 +19,7 @@ from openedx.core.djangoapps.schedules.content_highlights import get_week_highli
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
-from openedx.core.djangoapps.schedules.template_context import get_base_template_context
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.course_experience import course_home_url_name
 
@@ -136,13 +136,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
 
-        LOG.debug('Query = %r', schedules.query.sql_with_params())
+        LOG.info('Query = %r', schedules.query.sql_with_params())
 
         with function_trace('schedule_query_set_evaluation'):
             # This will run the query and cache all of the results in memory.
             num_schedules = len(schedules)
 
-        LOG.debug('Number of schedules = %d', num_schedules)
+        LOG.info('Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
         set_custom_metric('num_schedules', num_schedules)
@@ -195,7 +195,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             except InvalidContextError:
                 continue
 
-            yield (user, first_schedule.enrollment.course.language, template_context)
+            yield (user, first_schedule.enrollment.course.closest_released_language, template_context)
 
     def get_template_context(self, user, user_schedules):
         """
@@ -317,7 +317,7 @@ def _get_upsell_information_for_schedule(user, schedule):
             enrollment.dynamic_upgrade_deadline,
             get_format(
                 'DATE_FORMAT',
-                lang=course.language,
+                lang=course.closest_released_language,
                 use_l10n=True
             )
         )
@@ -356,7 +356,11 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             try:
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
-                continue
+                LOG.exception(
+                    'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
+                        user, week_num, enrollment.course_id
+                    )
+                )
 
             template_context.update({
                 'course_name': schedule.enrollment.course.display_name,
@@ -370,7 +374,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             })
             template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-            yield (user, schedule.enrollment.course.language, template_context)
+            yield (user, schedule.enrollment.course.closest_released_language, template_context)
 
 
 def _get_trackable_course_home_url(course_id):

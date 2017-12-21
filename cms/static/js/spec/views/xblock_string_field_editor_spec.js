@@ -1,5 +1,5 @@
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
-        'js/spec_helpers/edit_helpers', 'js/models/xblock_info', 'js/views/xblock_string_field_editor'],
+    'js/spec_helpers/edit_helpers', 'js/models/xblock_info', 'js/views/xblock_string_field_editor'],
        function($, AjaxHelpers, TemplateHelpers, EditHelpers, XBlockInfo, XBlockStringFieldEditor) {
            describe('XBlockStringFieldEditorView', function() {
                var initialDisplayName, updatedDisplayName, getXBlockInfo, getFieldEditorView;

@@ -44,4 +44,4 @@ var edx = edx || {};
             });
         });
     });
-})(jQuery, window.analytics);
+}(jQuery, window.analytics));

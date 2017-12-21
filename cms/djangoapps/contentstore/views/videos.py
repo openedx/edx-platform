@@ -213,6 +213,8 @@ def validate_video_image(image_file):
             image_file_width, image_file_height = get_image_dimensions(image_file)
         except TypeError:
             return _('There is a problem with this image file. Try to upload a different file.')
+        if image_file_width is None or image_file_height is None:
+            return _('There is a problem with this image file. Try to upload a different file.')
         image_file_aspect_ratio = abs(image_file_width / float(image_file_height) - settings.VIDEO_IMAGE_ASPECT_RATIO)
         if image_file_width < settings.VIDEO_IMAGE_MIN_WIDTH or image_file_height < settings.VIDEO_IMAGE_MIN_HEIGHT:
             error = _('Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
@@ -672,7 +674,6 @@ def videos_post(course, request):
         return JsonResponse({'error': error}, status=400)
 
     bucket = storage_service_bucket()
-    course_video_upload_token = course.video_upload_pipeline['course_video_upload_token']
     req_files = data['files']
     resp_files = []
 
@@ -689,10 +690,15 @@ def videos_post(course, request):
         key = storage_service_key(bucket, file_name=edx_video_id)
 
         metadata_list = [
-            ('course_video_upload_token', course_video_upload_token),
             ('client_video_id', file_name),
             ('course_key', unicode(course.id)),
         ]
+
+        # Only include `course_video_upload_token` if its set, as it won't be required if video uploads
+        # are enabled by default.
+        course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
+        if course_video_upload_token:
+            metadata_list.append(('course_video_upload_token', course_video_upload_token))
 
         is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
         if is_video_transcript_enabled:

@@ -163,11 +163,31 @@
                 display: inline-block;
               }
 
-              .info-date-block {
-                @extend %t-title7;
-
-                color: $gray; // WCAG 2.0 AA compliant
+              .info-date-block-container {
                 display: block;
+
+                .info-date-block{
+                  @extend %t-title7;
+
+                  color: $gray; // WCAG 2.0 AA compliant
+
+                  .fa-close {
+                    color: theme-color("error");
+                  }
+
+                  .fa-check {
+                    color: theme-color("success");
+                  }
+                }
+
+                .change-session {
+                  @extend %t-title7;
+                  @include margin(0, 0, 0, $baseline/4);
+
+                  padding: 0;
+                  border: none;
+                  letter-spacing: normal;
+                }
               }
             }
 
@@ -329,7 +349,8 @@
                   .action {
                     @include margin-right(0);
 
-                    &:hover, &:focus {
+                    &:hover,
+                    &:focus {
                       border: 1px solid transparent;
                     }
                   }
@@ -341,7 +362,7 @@
           .course-status {
             background: $yellow;
             border: 1px solid $border-color-2;
-            box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
+            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             margin-top: 17px;
 
             @include margin-right(flex-gutter());
@@ -633,18 +654,20 @@
     .message-copy .copy {
       @extend %t-copy-sub1;
 
-      margin: 2px 0 0 0;
+      margin: 2px 0 0;
     }
 
     // CASE: expandable
     &.is-expandable {
       .wrapper-tip {
-        .message-title, .message-copy {
+        .message-title,
+        .message-copy {
           margin-bottom: 0;
           display: inline-block;
         }
 
-        .message-title .value, .message-copy {
+        .message-title .value,
+        .message-copy {
           @include transition(color $tmg-f2 ease-in-out 0s);
         }
 
@@ -652,7 +675,9 @@
         &:hover {
           cursor: pointer;
 
-          .message-title .value, .message-copy, .ui-toggle-expansion {
+          .message-title .value,
+          .message-copy,
+          .ui-toggle-expansion {
             color: $link-color;
           }
         }
@@ -789,7 +814,7 @@
       .action-view-consent {
         @extend %btn-pl-white-base;
         @include float(right);
-              
+
         &.archived {
           @extend %btn-pl-default-base;
         }
@@ -947,18 +972,16 @@
 
           .action-certificate .btn {
             @extend %btn-inherited-primary;
-
             @include box-sizing(border-box);
 
+            padding: 7px $baseline*0.75;
             float: none;
             border-radius: 3px;
             display: block;
-
-                    @include padding(7px, ($baseline*0.75), 7px, ($baseline*0.75));
-
             text-align: center;
 
-            a:link, a:visited {
+            a:link,
+            a:visited {
               color: #fff;
             }
           }
@@ -1001,7 +1024,7 @@
       .verification-cta {
         width: flex-grid(4, 12);
 
-        @include float(left);
+        @include float(right);
 
         position: relative;
 
@@ -1021,6 +1044,7 @@
       .related-programs-preface {
         @include float(left);
 
+        margin: 0 $baseline/2;
         font-weight: bold;
       }
 
@@ -1323,11 +1347,11 @@ p.course-block {
   padding: 6px 32px 7px;
   text-align: center;
   margin-top: 16px;
-  opacity:0.5;
-  background:#808080;
-  border:0;
+  opacity: 0.5;
+  background: #808080;
+  border: 0;
   color: theme-color("inverse");
-  box-shadow:none;
+  box-shadow: none;
 
   &.archived {
     @include button(simple, $button-archive-color);
@@ -1510,6 +1534,12 @@ a.fade-cover {
 
 #unenroll-modal {
   margin-top: -60px;
+
+  .modal-form-error {
+    background: tint($red, 95%);
+    margin-left: $baseline;
+    margin-right: $baseline;
+  }
 }
 
 .reasons_survey {
@@ -1557,5 +1587,4 @@ a.fade-cover {
     color: theme-color("inverse");
     text-decoration: none;
   }
-
 }
