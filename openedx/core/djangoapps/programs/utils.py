@@ -24,7 +24,7 @@ from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.catalog.utils import get_programs, get_fulfillable_course_runs_for_entitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
@@ -230,6 +230,7 @@ class ProgramProgressMeter(object):
                 elif self._is_course_enrolled(course) or active_entitlement:
                     # Show all currently enrolled courses and active entitlements as in progress
                     if active_entitlement:
+                        course['course_runs'] = get_fulfillable_course_runs_for_entitlement(active_entitlement, course['course_runs'])
                         course['user_entitlement'] = active_entitlement.to_dict()
                         course['enroll_url'] = reverse(
                             'entitlements_api:v1:enrollments',
