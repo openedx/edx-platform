@@ -85,7 +85,7 @@ class LearnerAnalyticsView(View):
                         'module_id': unicode(location),
                     })
                 })
-        return json.dumps(grades)
+        return grades
 
     def get_discussion_data(self, request, course_key):
         """
@@ -124,4 +124,4 @@ class LearnerAnalyticsView(View):
             if block.get('graded', False) and block.get('due') is not None:
                 graded_blocks[location] = block
                 block['due'] = block['due'].isoformat()
-        return json.dumps(graded_blocks)
+        return graded_blocks
