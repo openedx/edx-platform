@@ -83,7 +83,7 @@ def course_wiki_redirect(request, course_id, wiki_path=""):  # pylint: disable=u
         urlpath = URLPath.create_article(
             root,
             course_slug,
-            title=course_slug,
+            title=course.display_name_with_default,
             content=content,
             user_message=_("Course page automatically created."),
             user=None,
