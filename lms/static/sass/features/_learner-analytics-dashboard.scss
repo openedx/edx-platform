@@ -1,18 +1,54 @@
 $slices: #386F77, #1ABC9C, #92C9D3, #397D1C, #A39D3D, #0E5AAA;
+$border-color: #4A4A4A;
+$table-border: rgba(155, 155, 155, 0.2);
+$font-color: #636C72;
+$heading-color: #292B2C;
+$grouping-background: #f5f5f5;
+$grouping-border: #D8D8D8;
+
 .content-wrapper {
   .page-content.learner-analytics-dashboard-wrapper {
     flex-direction: column;
+    background: #fff;
   }
 }
 
 .learner-analytics-dashboard {
+  .analytics-group {
+    background: $grouping-background;
+    border: 1px solid $grouping-border;
+    padding: 20px;
+    margin: 20px 0 40px;
+
+    &:last-of-type {
+      margin-bottom: 20px;
+    }
+
+    .group-heading {
+      color: $heading-color;
+      font-size: 1.5em;
+    }
+
+    .section-heading {
+      color: $heading-color;
+      font: {
+        size: 1em;
+        weight: bold;
+      }
+    }
+  }
+
   .grading-weight-wrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    border-bottom: 1px solid $border-color;
 
     .chart-wrapper {
       width: 90px;
       height: 90px;
+      margin-bottom: 20px;
 
       .slice-1 {
         fill: nth($slices, 1);
@@ -39,20 +75,24 @@ $slices: #386F77, #1ABC9C, #92C9D3, #397D1C, #A39D3D, #0E5AAA;
     .legend-list {
       list-style: none;
       padding: 0;
-      margin: 20px;
-      width: 250px;
+      margin: 0 0 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
 
     .legend-item {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       margin-bottom: 10px;
+      font-size: 0.875em;
 
       .color-swatch {
-        width: 45px;
-        height: 45px;
-        border-radius: 25%;
-        margin-right: 20px;
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+        margin-right: 10px;
 
         &.swatch-1 {
           background-color: nth($slices, 1);
@@ -74,8 +114,102 @@ $slices: #386F77, #1ABC9C, #92C9D3, #397D1C, #A39D3D, #0E5AAA;
         }
       }
 
+      .label,
+      .percentage {
+        color: $font-color;
+      }
+
+      .label {
+        margin-right: 30px;
+      }
+
       .percentage {
         margin-left: auto;
+      }
+    }
+  }
+
+  .graded-assessments-wrapper {
+    .grade-table {
+      width: 100%;
+      margin-bottom: 30px;
+      font-size: 0.875em;
+
+      th {
+        font-weight: bold;
+
+        &:nth-of-type(3) {
+          width: 80px;
+        }
+      }
+
+      th,
+      td {
+        border: none;
+        color: $font-color;
+
+        &:nth-of-type(2),
+        &:nth-of-type(3) {
+          text-align: right;
+        }
+
+        &:nth-of-type(3) {
+          background: rgba(255, 193, 7, 0.15);
+          color: #000;
+          font-weight: bold;
+        }
+      }
+    }
+
+    .footnote {
+      font-size: 0.875em;
+      color: $font-color;
+    }
+
+    .table-head {
+      border-bottom: 2px solid $table-border;
+    }
+
+    .type-group {
+      border-bottom: 1px solid $table-border;
+
+      &:last-of-type {
+        border-bottom-width: 2px;
+      }
+    }
+  }
+
+  @include media-breakpoint-up(sm) { .analytics-group.sidebar{border-color: red;} }
+  @include media-breakpoint-up(md) { .analytics-group.sidebar{border-color: blue;} }
+  @include media-breakpoint-up(lg) { .analytics-group.sidebar{border-color: green;} }
+  @include media-breakpoint-up(xl) { .analytics-group.sidebar{border-color: black;} }
+
+  @include media-breakpoint-up(md) {
+    .analytics-group {
+      &:first-of-type {
+        background: {
+          image: url('#{$static-path}/images/learner_analytics_dashboard/analytics-grading.png');
+          repeat: no-repeat;
+          position: top right;
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-up(xl) {
+    .learner-analytics-wrapper {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      .main-block {
+        width: calc(100% - 390px);
+      }
+
+      .sidebar {
+        width: 360px;
+        margin-left: 30px;
       }
     }
   }

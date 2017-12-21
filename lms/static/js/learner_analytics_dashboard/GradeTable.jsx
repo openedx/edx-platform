@@ -10,7 +10,6 @@ const exGrades = [
   {  
     "assignment_type":"Homework",
     "total_possible":5.0,
-    "total_earned":4.0
   },
   {  
     "assignment_type":"Homework",
@@ -24,7 +23,7 @@ class GradeTable extends React.Component {
     super(props);
   }
   
-  getTableGroup(type) {
+  getTableGroup(type, groupIndex) {
     const {data} = this.props;
     const groupData = data.filter(value => {
       if (value['assignment_type'] === type) {
@@ -33,32 +32,33 @@ class GradeTable extends React.Component {
     });
     const multipleAssessments = groupData.length > 1;
 
-    const rows = groupData.map(({assignment_type, total_possible, total_earned}, index) => {
+    const rows = groupData.map(({assignment_type, total_possible, total_earned, passing_grade}, index) => {
       const label = multipleAssessments ? `${assignment_type} ${index + 1}` : assignment_type; 
       return (
         <tr key={index}>
           <td>{label}</td>
-          <td>{total_possible}/{total_possible}</td>
-          <td>{total_earned}/{total_possible}</td>
+          <td>{passing_grade}/{total_possible}</td>
+          <td>{total_earned <= 0 ? '-' : total_earned}/{total_possible}</td>
        </tr>
       );
     });
 
-    return <tbody>{rows}</tbody>;
+    return <tbody className="type-group"
+                  key={groupIndex}>{rows}</tbody>;
   }
   
   render() {
     const {assignmentTypes} = this.props;
     return (
-      <table className="table">
+      <table className="table grade-table">
         <thead className="table-head">
           <tr>
             <th>Assessment</th>
-            <th>You</th>
             <th>Passing</th>
+            <th>You</th>
           </tr>
         </thead>
-        {assignmentTypes.map(type => this.getTableGroup(type))}
+        {assignmentTypes.map((type, index) => this.getTableGroup(type, index))}
        </table>
     )
   }

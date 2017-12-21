@@ -19,24 +19,6 @@ console.log('props: ', props);
     }
   }).sort((a, b) => a.value < b.value);
 
-  const exGrades = [  
-    {  
-      "assignment_type":"Exam",
-      "total_possible":6.0,
-      "total_earned":3.0
-    },
-    {  
-      "assignment_type":"Homework",
-      "total_possible":5.0,
-      "total_earned":4.0
-    },
-    {  
-      "assignment_type":"Homework",
-      "total_possible":11.0,
-      "total_earned":0.0
-    }
-  ];
-
   // Get a list of assignment types minus duplicates
   const assignmentTypes = [...new Set(gradeBreakdown.map(value => value['label']))];
 
@@ -63,34 +45,36 @@ console.log('props: ', props);
 
   return (
     <div className="learner-analytics-wrapper">
-      <div className="analytics-group">
-        <h2>Grading</h2>
-        <h3>Weight</h3>
-        <div className="grading-weight-wrapper">
-          <div className="chart-wrapper">
-            <CircleChart
-              slices={gradeBreakdown}
-              centerHole={true}
-              sliceBorder={{
-                  strokeColor: '#fff',
-                  strokeWidth: 1
-              }}
-            />
+      <div className="main-block">
+        <div className="analytics-group">
+          <h2 className="group-heading">Grading</h2>
+          <h3 className="section-heading">Weight</h3>
+          <div className="grading-weight-wrapper">
+            <div className="chart-wrapper">
+              <CircleChart
+                slices={gradeBreakdown}
+                centerHole={true}
+                sliceBorder={{
+                    strokeColor: '#f5f5f5',
+                    strokeWidth: 2
+                }}
+              />
+            </div>
+            <CircleChartLegend data={gradeBreakdown} />
           </div>
-          <CircleChartLegend data={gradeBreakdown} />
-        </div>
 
-        <h3>Graded Assessments</h3>
-        <div className="graded-assessments-wrapper">
-          <GradeTable assignmentTypes={assignmentTypes} data={exGrades} />
-          <p className="footnote">*Calculated based on current average</p>
+          <h3 className="section-heading">Graded Assessments</h3>
+          <div className="graded-assessments-wrapper">
+            <GradeTable assignmentTypes={assignmentTypes} data={JSON.parse(grades)} />
+            <p className="footnote">*Calculated based on current average</p>
+          </div>
+        </div>
+        <div className="analytics-group">
+          <h2 className="group-heading">Discussions</h2>
         </div>
       </div>
-      <div className="discussions-group">
-        <h2>Discussions</h2>
-      </div>
-      <div className="timing-group">
-        <h2>Timing</h2>
+      <div className="analytics-group sidebar">
+        <h2 className="group-heading">Timing</h2>
       </div>
     </div>
   );
