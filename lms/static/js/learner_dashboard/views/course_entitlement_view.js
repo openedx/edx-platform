@@ -192,7 +192,9 @@
                      // Reset the card contents to the unenrolled state
                      this.$triggerOpenBtn.addClass('hidden');
                      this.$enterCourseBtn.addClass('hidden');
-                     this.$courseCardMessages.remove();
+                     // Remove all message except for related programs, which should always be shown
+                     // (Even other messages might need to be shown again in future: LEARNER-3523.)
+                     this.$courseCardMessages.filter(':not(.message-related-programs)').remove();
                      this.$policyMsg.remove();
                      this.$('.enroll-btn-initial').focus();
                      HtmlUtils.setHtml(
