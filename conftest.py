@@ -14,5 +14,5 @@ from cms.conftest import _django_clear_site_cache, pytest_configure  # pylint: d
 def no_webpack_loader(monkeypatch):
     monkeypatch.setattr(
         "webpack_loader.templatetags.webpack_loader.render_bundle",
-        lambda x: ''
+        lambda entry, extension=None, config='DEFAULT', attrs='': ''
     )

@@ -1133,6 +1133,9 @@ INSTALLED_APPS = [
 
     # Entitlements, used in openedx tests
     'entitlements',
+
+    # Asset management for mako templates
+    'pipeline_mako',
 ]
 
 
