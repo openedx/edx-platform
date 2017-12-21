@@ -1024,7 +1024,7 @@
       .verification-cta {
         width: flex-grid(4, 12);
 
-        @include float(left);
+        @include float(right);
 
         position: relative;
 

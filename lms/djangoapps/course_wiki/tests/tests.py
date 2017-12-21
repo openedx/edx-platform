@@ -104,6 +104,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.assertEquals(resp.status_code, 200)
 
         self.has_course_navigator(resp)
+        self.assertContains(resp, '<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
 
     def has_course_navigator(self, resp):
         """

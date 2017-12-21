@@ -262,11 +262,13 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
 
     These are the only sessions that can be selected for an entitlement.
     """
+
     enrollable_sessions = []
 
     # Only show published course runs that can still be enrolled and upgraded
     now = datetime.datetime.now(UTC)
     for course_run in course_runs:
+
         # Only courses that have not ended will be displayed
         run_start = course_run.get('start')
         run_end = course_run.get('end')

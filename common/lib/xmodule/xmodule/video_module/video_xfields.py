@@ -148,6 +148,15 @@ class VideoFields(object):
         scope=Scope.preferences,
         default=1.0
     )
+    auto_advance = Boolean(
+        help=_("Specify whether to advance automatically to the next unit when the video ends."),
+        scope=Scope.preferences,
+        # The default is True because this field only has an effect when auto-advance controls are enabled
+        # (globally enabled through feature flag and locally enabled through course setting); in that case
+        # it's good to start auto-advancing and let the student disable it, instead of the other way around
+        # (requiring the user to enable it). When auto-advance controls are hidden, this field won't be used.
+        default=True,
+    )
     youtube_is_available = Boolean(
         help=_("Specify whether YouTube is available for the user."),
         scope=Scope.user_info,

@@ -175,6 +175,21 @@ class TestModels(TestCase):
         assert expired_at_datetime
         assert entitlement.expired_at
 
+        # Verify that an entitlement that has just been created, but the user has been enrolled in the course for
+        # greater than 14 days, and the course started more than 14 days ago is not expired
+        entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
+        entitlement.created = datetime.utcnow().replace(tzinfo=pytz.UTC)
+        self.enrollment.created = past_datetime
+        self.course.start = past_datetime
+        entitlement.save()
+        self.enrollment.save()
+        self.course.save()
+        assert entitlement.enrollment_course_run
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime is None
+        assert entitlement.expired_at is None
+
         # Verify a date 451 days in the past (1 days after the policy expiration)
         # That is enrolled and started in within the regain period is still expired
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
