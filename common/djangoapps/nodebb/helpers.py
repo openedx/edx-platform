@@ -73,6 +73,7 @@ def get_room_id(user_info):
         team = dict(team)
         if team['membership']:
             team_group = TeamGroupChat.objects.filter(team__team_id=team['id']).first()
-            room_info.update({team['id']: team_group.room_id})
+            if team_group:
+                room_info.update({team['id']: team_group.room_id})
 
     return room_info
