@@ -19,6 +19,23 @@ footer#footer-edx-v3 {
   padding: $baseline*0.75 0;
   border-top: 1px solid $courseware-button-border-color;
 
+  .first-div-border {
+    @include border-left(1px solid $courseware-button-border-color);
+  }
+
+  .second-div-border {
+    @include border-left(1px solid $courseware-button-border-color);
+  }
+
+  .third-div-border {
+    @include border-left(1px solid $courseware-button-border-color);
+  }
+
+  .fourth-div-border {
+    @include border-left(1px solid $courseware-button-border-color);
+  }
+
+
   .main-row {
     display: -webkit-box;
     display: -webkit-flex;
@@ -50,6 +67,10 @@ footer#footer-edx-v3 {
     padding: 0 $baseline*0.75;
   }
 
+  ul.clear-margins li {
+    padding-bottom: 5px;
+  }
+
   .row.small-screen {
     display: none;
   }
@@ -58,16 +79,22 @@ footer#footer-edx-v3 {
     display: flex;
   }
 
-  ul li h3 {
+  h2.heading {
     font-weight: 600;
     padding: $baseline*0.25 0;
     color: $lighter-base-font-color;
+
+    @include margin-left(8px);
   }
 
-  .widget_nav_menu ul {
+  ul.clear-margins {
     list-style: outside none none;
-    padding-left: 0;
-    margin-bottom: $baseline*0.75;
+    padding-bottom: $baseline*0.75;
+    margin-top: $baseline*0.75;
+
+    @include margin-left(8px);
+
+    border-bottom: 1px solid $courseware-button-border-color;
   }
 
   .footer-language-selector {
@@ -80,31 +107,24 @@ footer#footer-edx-v3 {
     display: inline-flex;
   }
 
-  .clear-margins {
-    margin-top: $baseline*0.75;
-    border-bottom: 1px solid $courseware-button-border-color;
-  }
-
   .social {
     margin-top: $baseline*1.5;
     height: auto;
+
+    @include margin-left($baseline*0.25);
   }
 
   ul.social li {
-    display: table-cell;
-    width: 1%;
+    display: inline-flex;
+
+    @include margin-right(10px);
   }
 
   .edx-footer-logo {
     display: inline-flex;
+
+    @include margin-left(5px);
   }
-
-  .border-left {
-    @include border-left( 1px solid $courseware-button-border-color);
-
-    border-bottom: none;
-  }
-
 
   // To match the Pattern Library
   -webkit-font-smoothing: antialiased;
@@ -125,8 +145,9 @@ footer#footer-edx-v3 {
   .copyright {
     margin-top: 30px;
 
+    @include margin-left(8px);
     @include font-size(16);
-    @include line-height(24);
+    @include line-height(24px);
   }
 
   .site-nav,
@@ -242,16 +263,13 @@ footer#footer-edx-v3 {
   }
 
   a.social-links {
-    @include margin(0, -7, 10, 0);
-    @include font-size(45);
-    @include line-height(28);
+    @include font-size(30);
+    @include line-height(1);
 
-    line-height: 1;
     position: relative;
     display: inline;
     background: none;
     text-align: left;
-    padding: $baseline*0.35;
 
     &:first-of-type {
       @include margin-left(0);
@@ -308,28 +326,35 @@ footer#footer-edx-v3 {
       padding: 0;
     }
 
-    .edx-footer-logo {
-      @include padding-left($baseline);
-    }
 
-    div.col-xl-4.col-lg-4.col-md-9.ml-md-auto.col-sm-6.flex-column.border-left {
-      @include border-left(1px solid $courseware-button-border-color);
-    }
-
-    div.col-xl-6 div.col-xl-4 div div {
-      border-bottom: 1px solid $courseware-button-border-color;
-    }
-
-    div.col-xl-6 div.col-xl-4:nth-child(3) div div {
-      border: none;
-    }
-
-    .remove-border-left {
+    .first-div-border {
       @include border-left(none);
     }
 
-    .remove-bottom-border {
+    .first-div-border div div {
+      border-bottom: 1px solid $courseware-button-border-color;
+
+      @include margin-left(7px);
+    }
+
+    .second-div-border div div {
+      border-bottom: 1px solid $courseware-button-border-color;
+
+      @include margin-left(7px);
+    }
+
+    .third-div-border div div {
       border-bottom: none;
+
+      @include margin-left(7px);
+    }
+
+    .second-div-border {
+      @include border-left(none);
+    }
+
+    .third-div-border {
+      @include border-left(none);
     }
 
     .site-details {
@@ -360,7 +385,7 @@ footer#footer-edx-v3 {
     }
 
     a.social-links {
-      @include font-size(50);
+      @include font-size(35);
 
       margin-top: 5px;
 
@@ -373,7 +398,7 @@ footer#footer-edx-v3 {
     }
 
 
-    .col-sm-7 .footer-language-selector {
+    .footer-language-selector {
       display: inline-block;
       float: none;
     }
@@ -385,20 +410,40 @@ footer#footer-edx-v3 {
   }
 
   @include media-breakpoint-up(md) {
-    .no-left-border {
-      @include border-left(none);
+    .edx-footer-logo {
+      display: inline-flex;
+
+      @include margin-left(20px);
+
+      margin-top: 5px;
     }
 
-    div.col-xl-6 div.col-xl-4 div div {
+    .first-div-border {
+      @include border-left(none);
+
       border-bottom: none;
     }
 
-    div.border-left:nth-child(1) {
-      border: none;
+    .first-div-border div div {
+      border-bottom: none;
     }
 
-    div.col-xl-4.col-lg-4.col-md-9.ml-md-auto.col-sm-6.flex-column.border-left {
-      border: none;
+    .second-div-border div div {
+      border-bottom: none;
+    }
+
+    .second-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+
+      border-bottom: none;
+    }
+
+    .third-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .fourth-div-border {
+      @include border-left(none);
     }
 
     padding: $baseline $baseline*0.5;
@@ -433,18 +478,10 @@ footer#footer-edx-v3 {
       @include font-size(40);
     }
 
-    .col-xl-10 div.row div:nth-child(2) div.row:nth-child(1) {
-      @include border-left(1px solid $courseware-button-border-color);
-    }
-
-    .col-xl-10 div.row div:nth-child(3) div.row:nth-child(1) {
-      @include border-left(1px solid $courseware-button-border-color);
-    }
-
     .social {
       display: inline-flex;
       vertical-align: middle;
-      margin-top: $baseline*1.5;
+      margin-top: 18px;
     }
 
     .app-links {
@@ -455,19 +492,19 @@ footer#footer-edx-v3 {
       vertical-align: middle;
     }
 
-    .widget_nav_menu ul li {
+    ul.clear-margins li {
       @include font-size(16);
     }
 
-    ul li h3 {
+    h2.heading {
       font-weight: 700;
     }
 
-    .footer-language-selector {
+    .col-md-3 .footer-language-selector {
       float: none;
       display: block;
 
-      @include margin-left($baseline*1.5);
+      @include margin-left($baseline);
     }
 
     ul.social li {
@@ -479,20 +516,34 @@ footer#footer-edx-v3 {
   @include media-breakpoint-up(lg) {
     padding: $baseline $baseline*0.5;
 
-    .edx-footer-logo {
+    .margin {
       @include margin-left($baseline);
+    }
+
+    .first-div-border {
+      @include border-left(none);
+    }
+
+    .second-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .third-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .fourth-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+
+    .col-xl-2 .edx-footer-logo {
+      @include margin-left($baseline);
+      @include padding(0, 0, $baseline, $baseline);
     }
 
     div.col-xl-6 div.col-xl-4 div div {
       border-bottom: none;
-    }
-
-    .col-xl-10 div.row div div.row {
-      @include border-left(1px solid $courseware-button-border-color);
-    }
-
-    div.col-xl-4.col-lg-4.col-md-9.ml-md-auto.col-sm-6.flex-column.border-left {
-      @include border-left(1px solid $courseware-button-border-color);
     }
 
     .col-xl-10 div.row div:nth-child(1) div.row:nth-child(1) {
@@ -511,8 +562,8 @@ footer#footer-edx-v3 {
       @include span-columns(4);
     }
 
-    div.border-left:nth-child(1) {
-      border: none;
+    .app-links {
+      @include margin-left(0);
     }
 
     .social-media-links,
@@ -548,19 +599,18 @@ footer#footer-edx-v3 {
       vertical-align: middle;
     }
 
-    .widget_nav_menu ul li {
+    ul.clear-margins li {
       @include font-size(16);
 
       padding-bottom: $baseline*0.25;
     }
 
-    ul li h3 {
+    h2.heading {
       font-weight: 700;
       padding-bottom: $baseline*0.5;
     }
 
-    .footer-language-selector {
-      float: none;
+    .col-xl-2 .footer-language-selector {
       display: inline-block;
     }
 
@@ -570,16 +620,32 @@ footer#footer-edx-v3 {
   }
 
   @include media-breakpoint-up(xl) {
-    div.border-left:nth-child(1) {
+    .margin {
+      @include margin-left(0);
+    }
+
+    .first-div-border {
       @include border-left(1px solid $courseware-button-border-color);
     }
 
-    div.col-xl-6 div.col-xl-4 div div {
-      border-bottom: none;
+    .second-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .third-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .fourth-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
     }
 
     .footer-logo {
       @include span-columns(2);
+    }
+
+    .app-links {
+      @include margin-left(0);
     }
 
     .site-details {
@@ -590,12 +656,12 @@ footer#footer-edx-v3 {
       @include span-columns(3);
     }
 
-    .widget_nav_menu ul li {
+    ul.clear-margins li {
       @include font-size(16);
     }
 
-    .edx-footer-logo {
-      @include margin-left(0);
+    .col-xl-2 .edx-footer-logo {
+      @include padding_left(0);
     }
 
     .social-media-links {
@@ -609,8 +675,6 @@ footer#footer-edx-v3 {
 
     .col-xl-10 div.row div div.row {
       height: 100%;
-
-      @include border-left( 1px solid $courseware-button-border-color);
     }
 
     .clear-margins {
@@ -623,12 +687,13 @@ footer#footer-edx-v3 {
 
     .footer-language-selector {
       margin: 20px 0;
+      padding: 0;
       float: none;
     }
   }
 
   .footer-language-selector {
-    margin: 20px 0;
+    margin: 10px 0;
 
     label[for=footer-language-select] {
       display: inline-block;

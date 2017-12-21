@@ -273,6 +273,7 @@ def _footer_more_info_links():
         ("terms_of_service_and_honor_code", marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code")),
         ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
         ("accessibility_policy", marketing_link("ACCESSIBILITY"), _("Accessibility Policy")),
+        ("trademarks", marketing_link("TRADEMARKS"), _("Trademarks")),
         ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
     ]
 
