@@ -3,8 +3,8 @@
         <div class="course-content">
             <div class="course-details">
                 <h5 class="course-title">
-                    <% if ( (marketing_url || course_url) &&  !is_unfulfilled_entitlement) { %>
-                        <a href="<%- marketing_url || course_url %>" class="course-title-link">
+                    <% if (course_title_link) { %>
+                        <a href="<%- course_title_link %>" class="course-title-link">
                             <%- title %>
                         </a>
                     <% } else { %>
