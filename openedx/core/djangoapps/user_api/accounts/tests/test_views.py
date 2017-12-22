@@ -116,7 +116,7 @@ class UserAPITestCase(APITestCase):
         legacy_profile.gender = "f"
         legacy_profile.bio = "Tired mother of twins"
         legacy_profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOADED_AT
-        legacy_profile.language_proficiencies.add(LanguageProficiency(code='en'))
+        legacy_profile.language_proficiencies.create(code='en')
         legacy_profile.save()
 
     def _verify_profile_image_data(self, data, has_profile_image):
