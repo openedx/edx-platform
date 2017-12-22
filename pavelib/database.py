@@ -100,14 +100,15 @@ def fingerprint_bokchoy_db_files():
     loading the schema and data.
     """
     calculate_bokchoy_migrations()
-    # We don't need to reverify that the MIGRATION_OUTPUT_FILES exist
-    # because we just did that in calculate_bokchoy_migrations().
-    verify_files_exist(BOKCHOY_DB_FILES)
+    msg = "Verifying that all files needed to compute the fingerprint exist."
+    print(msg)
+    verify_files_exist(ALL_DB_FILES)
 
     file_paths = [
         os.path.join(CACHE_FOLDER, db_file) for db_file in ALL_DB_FILES
     ]
-
+    msg = "Computing the fingerprint."
+    print(msg)
     fingerprint = compute_fingerprint(file_paths)
     print("The fingerprint for bokchoy db files is: {}".format(fingerprint))
     return fingerprint
@@ -224,12 +225,24 @@ def get_bokchoy_db_fingerprint_from_file():
 @needs('pavelib.prereqs.install_prereqs')
 @PassthroughTask
 @timed
-def get_bokchoy_db_cache_from_s3(bucket_name=CACHE_BUCKET_NAME, path=CACHE_FOLDER):
+def refresh_bokchoy_db_cache_from_s3(bucket_name=CACHE_BUCKET_NAME, path=CACHE_FOLDER):
     """
-    Retrieve the zip file with the fingerprint
+    If the cache files for the current fingerprint exist
+    in s3 then replace what you have on disk with those.
+    If no copy exists on s3 then continue without error.
     """
     fingerprint = fingerprint_bokchoy_db_files()
-    zipfile_name = '{}.tar.gz'.format(fingerprint)
+    if is_fingerprint_in_bucket(fingerprint, bucket_name):
+        zipfile_name = '{}.tar.gz'.format(fingerprint)
+        get_file_from_s3(bucket_name, zipfile_name, path)
+
+        zipfile_path = os.path.join(path, zipfile_name)
+        extract_bokchoy_db_cache_files(zipfile_path)
+        os.remove(zipfile_path)
+
+
+def get_file_from_s3(bucket_name, zipfile_name, path):
+    print ("Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
     conn = boto.connect_s3()
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
@@ -242,18 +255,15 @@ def get_bokchoy_db_cache_from_s3(bucket_name=CACHE_BUCKET_NAME, path=CACHE_FOLDE
     zipfile_path = os.path.join(path, zipfile_name)
     key.get_contents_to_filename(zipfile_path)
 
-    extract_bokchoy_db_cache_files(zipfile_path)
-    # TODO remove the tar file
-
 
 def extract_bokchoy_db_cache_files(zipfile_path, path=CACHE_FOLDER):
     """
     Extract the files retrieved from S3.
     """
-    remove_cached_db_files()
+    print ("Extracting db cache files.")
     with tarfile.open(name=zipfile_path, mode='r') as tar_file:
-        for name in BOKCHOY_DB_FILES:
-            tar_file.extract(name=name, path=path)
+        for file_name in BOKCHOY_DB_FILES:
+            tar_file.extract(file_name, path=path)
     verify_files_exist(BOKCHOY_DB_FILES)
 
 
@@ -277,7 +287,7 @@ def create_tarfile(fingerprint, path=CACHE_FOLDER):
     zipfile_path = os.path.join(path, zipfile_name)
     with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
         for name in BOKCHOY_DB_FILES:
-            tar_file.add(os.path.join(path, name))
+            tar_file.add(os.path.join(path, name), arcname=name)
     return zipfile_name, zipfile_path
 
 
