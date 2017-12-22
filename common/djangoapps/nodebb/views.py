@@ -28,6 +28,7 @@ def nodebb_forum_discussion(request, course_id):
     course_community = DiscussionCommunity.objects.filter(course_id=course_key).order_by("-created").first()
     current_course = modulestore.get_course(course_key)
     course_tabs = get_course_related_tabs(request, current_course)
+    custom_community_link = request.GET.get('topic_url')
 
     progress = get_all_course_progress(request.user, current_course)
 
@@ -41,7 +42,8 @@ def nodebb_forum_discussion(request, course_id):
         "course_display_name": current_course.display_name,
         "course_tabs": course_tabs,
         "course_id": course_id,
-        "community_url": course_community.community_url if course_community else ""
+        "community_url": course_community.community_url if course_community else "",
+        "custom_community_link": custom_community_link
     }
 
     return render(request, 'discussion_nodebb/discussion_board.html', context)

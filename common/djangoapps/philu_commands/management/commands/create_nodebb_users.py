@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 
 from common.lib.nodebb_client.client import NodeBBClient
 from nodebb.signals.handlers import create_user_on_nodebb
-from lms.djangoapps.onboarding_survey.models import ExtendedProfile
+from lms.djangoapps.onboarding.models import UserExtendedProfile
 from philu_commands.models import CreationFailedUsers
 
 log = getLogger(__name__)
@@ -74,20 +74,20 @@ def activate_user(instance, **kwargs):
 
 class Command(BaseCommand):
     help = """
-    This command creates users in nodeBB according to all ExtendedProfile instances in edx-platform.
+    This command creates users in nodeBB according to all UserExtendedProfile instances in edx-platform.
 
     After creating the users, it also activates them if they are active in edx-platform.
     example:
         manage.py ... create_nodebb_users
     """
     def handle(self, *args, **options):
-        user_extended_profiles = ExtendedProfile.objects.all()
+        user_extended_profiles = UserExtendedProfile.objects.all()
 
         for extended_profile in user_extended_profiles:
-            is_created = create_user(sender=ExtendedProfile, instance=extended_profile)
+            is_created = create_user(sender=UserExtendedProfile, instance=extended_profile)
             is_activated = False
             if is_created:
-                is_activated = activate_user(sender=ExtendedProfile, instance=extended_profile.user)
+                is_activated = activate_user(sender=UserExtendedProfile, instance=extended_profile.user)
 
             # If user creation or activation(or both) is failed then we make sure to record the instance
             # in the database for future reference.
