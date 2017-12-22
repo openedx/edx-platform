@@ -22,7 +22,6 @@ define(
                         model: model,
                         transcriptAvailableLanguages: options.transcriptAvailableLanguages,
                         videoSupportedFileFormats: options.videoSupportedFileFormats,
-                        videoTranscriptSettings: options.videoTranscriptSettings,
                         isVideoTranscriptEnabled: options.isVideoTranscriptEnabled
                     });
                 });

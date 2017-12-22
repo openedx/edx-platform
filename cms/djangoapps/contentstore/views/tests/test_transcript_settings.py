@@ -1,12 +1,15 @@
+# -*- coding: utf-8 -*-
 import ddt
 import json
-from mock import Mock, patch
+from io import BytesIO
+from mock import Mock, patch, ANY
 
 from django.test.testcases import TestCase
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
+from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 
 
 @ddt.ddt
@@ -277,3 +280,153 @@ class TranscriptDownloadTest(CourseTestCase):
         # Assert the response
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error'], expected_error_message)
+
+
+@ddt.ddt
+@patch(
+    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
+    Mock(return_value=True)
+)
+class TranscriptUploadTest(CourseTestCase):
+    """
+    Tests for transcript upload handler.
+    """
+    VIEW_NAME = 'transcript_upload_handler'
+
+    def get_url_for_course_key(self, course_id):
+        return reverse_course_url(self.VIEW_NAME, course_id)
+
+    def test_302_with_anonymous_user(self):
+        """
+        Verify that redirection happens in case of unauthorized request.
+        """
+        self.client.logout()
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        response = self.client.post(transcript_upload_url, content_type='application/json')
+        self.assertEqual(response.status_code, 302)
+
+    def test_405_with_not_allowed_request_method(self):
+        """
+        Verify that 405 is returned in case of not-allowed request methods.
+        Allowed request methods include POST.
+        """
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        response = self.client.get(transcript_upload_url, content_type='application/json')
+        self.assertEqual(response.status_code, 405)
+
+    def test_404_with_feature_disabled(self):
+        """
+        Verify that 404 is returned if the corresponding feature is disabled.
+        """
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        with patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled') as feature:
+            feature.return_value = False
+            response = self.client.post(transcript_upload_url, content_type='application/json')
+            self.assertEqual(response.status_code, 404)
+
+    @patch('contentstore.views.transcript_settings.create_or_update_video_transcript')
+    def test_transcript_upload_handler(self, mock_create_or_update_video_transcript):
+        """
+        Tests that transcript upload handler works as expected.
+        """
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        transcript_file_stream = BytesIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
+        # Make request to transcript upload handler
+        response = self.client.post(
+            transcript_upload_url,
+            {
+                'edx_video_id': '123',
+                'language_code': 'en',
+                'file': transcript_file_stream,
+            },
+            format='multipart'
+        )
+
+        self.assertEqual(response.status_code, 201)
+        mock_create_or_update_video_transcript.assert_called_with(
+            video_id='123',
+            language_code='en',
+            file_name='subs.sjson',
+            file_format='sjson',
+            provider='Custom',
+            file_data=ANY,
+        )
+
+    @ddt.data(
+        (
+            {
+                'edx_video_id': '123',
+                'language_code': 'en',
+            },
+            u'A transcript file is required.'
+        ),
+        (
+            {
+                'language_code': u'en',
+                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+            },
+            u'Following parameters are required: edx_video_id.'
+        ),
+        (
+            {
+                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+            },
+            u'Following parameters are required: edx_video_id, language_code.'
+        )
+    )
+    @ddt.unpack
+    def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
+        """
+        Tests the transcript upload handler when the required attributes are missing.
+        """
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        # Make request to transcript upload handler
+        response = self.client.post(transcript_upload_url, request_payload, format='multipart')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content)['error'], expected_error_message)
+
+    def test_transcript_upload_handler_with_image(self):
+        """
+        Tests the transcript upload handler with an image file.
+        """
+        with make_image_file() as image_file:
+            transcript_upload_url = self.get_url_for_course_key(self.course.id)
+            # Make request to transcript upload handler
+            response = self.client.post(
+                transcript_upload_url,
+                {
+                    'edx_video_id': '123',
+                    'language_code': 'en',
+                    'file': image_file,
+                },
+                format='multipart'
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+                json.loads(response.content)['error'],
+                u'There is a problem with this transcript file. Try to upload a different file.'
+            )
+
+    def test_transcript_upload_handler_with_invalid_transcript(self):
+        """
+        Tests the transcript upload handler with an invalid transcript file.
+        """
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        transcript_file_stream = BytesIO('An invalid transcript SubRip file content')
+        # Make request to transcript upload handler
+        response = self.client.post(
+            transcript_upload_url,
+            {
+                'edx_video_id': '123',
+                'language_code': 'en',
+                'file': transcript_file_stream,
+            },
+            format='multipart'
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content)['error'],
+            u'There is a problem with this transcript file. Try to upload a different file.'
+        )
