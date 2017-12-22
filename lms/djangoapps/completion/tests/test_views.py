@@ -50,6 +50,7 @@ class CompletionViewTestCase(CompletionWaffleTestMixin, SharedModuleStoreTestCas
 
     Ensure that it handles authorization as well.
     """
+    maxDiff  =  None
 
     @classmethod
     def setUpClass(cls):
