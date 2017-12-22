@@ -33,6 +33,7 @@ from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
 from onboarding import forms
 from lms.djangoapps.onboarding.models import UserExtendedProfile
+from nodebb.helpers import update_nodebb_for_user_status
 
 log = logging.getLogger("edx.onboarding")
 
@@ -141,6 +142,7 @@ def interests(request):
             return redirect(reverse('organization'))
 
         if are_forms_complete:
+            update_nodebb_for_user_status(request.user.username)
             return redirect(reverse('recommendations'))
 
         return redirect(reverse('interests'))
@@ -271,6 +273,7 @@ def org_detail_survey(request):
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
             if are_forms_complete:
+                update_nodebb_for_user_status(request.user.username)
                 return redirect(reverse('oef_instructions'))
 
             return redirect(reverse('org_detail_survey'))
