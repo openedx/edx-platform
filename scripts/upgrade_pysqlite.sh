@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# First, check to see if the pysqlite version has already been upgraded. If so, no installation is needed.
+# The pip-installed version of pysqlite has a sqlite_version of "3.11.0".
+sqlite_version=`python -c "from pysqlite2._sqlite import sqlite_version; print sqlite_version"`
+if [ $sqlite_version = "3.14.1" ]; then
+    exit 0
+fi
+
 # Upgrade the version of pysqlite/sqlite to avoid crashes during testing.
 # Ideally, this code would just install a pre-built wheel - change it to this
 # once edX has its own artifact server.
