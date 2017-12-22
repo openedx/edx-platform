@@ -41,6 +41,7 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_learner_data
 from student.cookies import set_experiments_is_enterprise_cookie
+from openedx.features.enterprise_support.utils import update_third_party_auth_context_for_enterprise
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import register_user as old_register_view
@@ -387,6 +388,8 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                 # msg may or may not be translated. Try translating [again] in case we are able to:
                 context['errorMessage'] = _(unicode(msg))  # pylint: disable=translation-of-non-string
                 break
+
+        context = update_third_party_auth_context_for_enterprise(context, enterprise_customer)
 
     return context
 

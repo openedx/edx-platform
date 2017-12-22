@@ -12,13 +12,17 @@ import pytest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
 from http.cookies import SimpleCookie
@@ -33,6 +37,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
+from lms.djangoapps.student_account.views import login_and_registration_form
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -40,6 +45,7 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
@@ -452,6 +458,111 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             expected_ec
         )
 
+    def _configure_testshib_provider(self, provider_name, idp_slug):
+        """
+        Enable and configure the TestShib SAML IdP as a third_party_auth provider.
+        """
+        kwargs = {}
+        kwargs.setdefault('name', provider_name)
+        kwargs.setdefault('enabled', True)
+        kwargs.setdefault('visible', True)
+        kwargs.setdefault('idp_slug', idp_slug)
+        kwargs.setdefault('entity_id', 'https://idp.testshib.org/idp/shibboleth')
+        kwargs.setdefault('metadata_source', 'https://mock.testshib.org/metadata/testshib-providers.xml')
+        kwargs.setdefault('icon_class', 'fa-university')
+        kwargs.setdefault('attr_email', 'dummy-email-attr')
+        kwargs.setdefault('max_session_length', None)
+        self.configure_saml_provider(**kwargs)
+
+    @mock.patch('django.conf.settings.MESSAGE_STORAGE', 'django.contrib.messages.storage.cookie.CookieStorage')
+    @mock.patch('lms.djangoapps.student_account.views.enterprise_customer_for_request')
+    @ddt.data(
+        (
+            'signin_user',
+            'tpa-saml',
+            'TestShib',
+            {
+                'name': 'FakeName',
+                'logo': 'https://host.com/logo.jpg',
+                'welcome_msg': 'No message'
+            }
+        )
+    )
+    @ddt.unpack
+    def test_saml_auth_with_error(
+            self,
+            url_name,
+            current_backend,
+            current_provider,
+            expected_enterprise_customer_mock_attrs,
+            enterprise_customer_mock,
+    ):
+        params = []
+        request = RequestFactory().get(reverse(url_name), params, HTTP_ACCEPT='text/html')
+        SessionMiddleware().process_request(request)
+        request.user = AnonymousUser()
+
+        self.enable_saml()
+        dummy_idp = 'testshib'
+        self._configure_testshib_provider(current_provider, dummy_idp)
+        expected_ec = mock.MagicMock(
+            branding_configuration=mock.MagicMock(
+                logo=mock.MagicMock(
+                    url=expected_enterprise_customer_mock_attrs['logo']
+                ),
+                welcome_message=expected_enterprise_customer_mock_attrs['welcome_msg']
+            )
+        )
+        expected_ec.name = expected_enterprise_customer_mock_attrs['name']
+        enterprise_customer_data = {
+            'uuid': '72416e52-8c77-4860-9584-15e5b06220fb',
+            'name': 'Dummy Enterprise',
+            'identity_provider': dummy_idp,
+        }
+        enterprise_customer_mock.return_value = enterprise_customer_data
+        dummy_error_message = 'Authentication failed: SAML login failed ' \
+                              '["invalid_response"] [SAML Response must contain 1 assertion]'
+
+        # Add error message for error in auth pipeline
+        MessageMiddleware().process_request(request)
+        messages.error(request, dummy_error_message, extra_tags='social-auth')
+
+        # Simulate a running pipeline
+        pipeline_response = {
+            'response': {
+                'idp_name': dummy_idp
+            }
+        }
+        pipeline_target = 'student_account.views.third_party_auth.pipeline'
+        with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
+            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+                response = login_and_registration_form(request)
+
+        expected_error_message = Text(_(
+            u'We are sorry, you are not authorized to access {platform_name} via this channel. '
+            u'Please contact your {enterprise} administrator in order to access {platform_name} '
+            u'or contact {edx_support_link}.{line_break}'
+            u'{line_break}'
+            u'Error Details:{line_break}{error_message}')
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            enterprise=enterprise_customer_data['name'],
+            error_message=dummy_error_message,
+            edx_support_link=HTML(
+                '<a href="{edx_support_url}">{support_url_name}</a>'
+            ).format(
+                edx_support_url=settings.SUPPORT_SITE_LINK,
+                support_url_name=_('edX Support'),
+            ),
+            line_break=HTML('<br/>')
+        )
+        self._assert_saml_auth_data_with_error(
+            response,
+            current_backend,
+            current_provider,
+            expected_error_message
+        )
+
     def test_hinted_login(self):
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
@@ -650,7 +761,32 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         expected_data = '"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
+        self.assertContains(response, expected_data)
 
+    def _assert_saml_auth_data_with_error(
+            self, response, current_backend, current_provider, expected_error_message
+    ):
+        """
+        Verify that third party auth info is rendered correctly in a DOM data attribute.
+        """
+        finish_auth_url = None
+        if current_backend:
+            finish_auth_url = reverse('social:complete', kwargs={'backend': current_backend}) + '?'
+
+        auth_info = {
+            'currentProvider': current_provider,
+            'providers': [],
+            'secondaryProviders': [],
+            'finishAuthUrl': finish_auth_url,
+            'errorMessage': expected_error_message,
+            'registerFormSubmitButtonText': 'Create Account',
+            'syncLearnerProfileData': False,
+        }
+        auth_info = dump_js_escaped_json(auth_info)
+
+        expected_data = '"third_party_auth": {auth_info}'.format(
+            auth_info=auth_info
+        )
         self.assertContains(response, expected_data)
 
     def _third_party_login_url(self, backend_name, auth_entry, login_params):
