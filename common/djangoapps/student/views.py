@@ -74,7 +74,11 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_visible_course_runs_for_entitlement
+from openedx.core.djangoapps.catalog.utils import (
+    get_programs_with_type,
+    get_fulfillable_course_runs_for_entitlement,
+    get_course_runs_for_course
+)
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -702,7 +706,10 @@ def dashboard(request):
     course_entitlement_available_sessions = {}
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
-        valid_course_runs = get_visible_course_runs_for_entitlement(course_entitlement)
+        valid_course_runs = get_fulfillable_course_runs_for_entitlement(
+            course_entitlement,
+            get_course_runs_for_course(course_entitlement.course_uuid)
+        )
         course_entitlement_available_sessions[str(course_entitlement.uuid)] = valid_course_runs
 
     # Record how many courses there are so that we can get a better
