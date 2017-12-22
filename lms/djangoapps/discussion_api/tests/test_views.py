@@ -1421,6 +1421,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         super(CommentViewSetPartialUpdateTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.register_get_user_response(self.user)
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})

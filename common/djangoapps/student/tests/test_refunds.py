@@ -14,9 +14,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
-from edx_rest_api_client.exceptions import SlumberBaseException
 from mock import patch
-from slumber.exceptions import HttpClientError, HttpServerError
 
 from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
@@ -195,17 +193,3 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         resp = self.client.post(reverse('student.views.dashboard', args=[]))
         self.assertEqual(resp.status_code, 200)
-
-    @ddt.data(HttpServerError, HttpClientError, SlumberBaseException)
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
-    def test_refund_cutoff_date_with_api_error(self, exception):
-        """ Verify that dashboard will not throw internal server error if HttpClientError
-        raised while getting order detail for ecommerce.
-        """
-        # importing this after overriding value of ECOMMERCE_API_URL
-        from lms.djangoapps.commerce.tests.mocks import mock_order_endpoint
-
-        self.client.login(username=self.user.username, password=self.USER_PASSWORD)
-        with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=exception, reset_on_exit=False):
-            response = self.client.post(reverse('student.views.dashboard', args=[]))
-            self.assertEqual(response.status_code, 200)
