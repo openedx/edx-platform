@@ -1,8 +1,18 @@
-define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers', 'js/spec_helpers/edit_helpers',
-    'common/js/components/views/feedback_prompt', 'js/views/pages/container',
-    'js/views/pages/container_subviews', 'js/models/xblock_info', 'js/views/utils/xblock_utils',
-    'js/models/course'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'underscore.string',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/spec_helpers/edit_helpers',
+        'cms/static/common/js/components/views/feedback_prompt',
+        'cms/static/js/views/pages/container',
+        'cms/static/js/views/pages/container_subviews',
+        'cms/static/js/models/xblock_info',
+        'cms/static/js/views/utils/xblock_utils',
+        'cms/static/js/models/course'
+    ],
     function($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils, Course) {
         var VisibilityState = XBlockUtils.VisibilityState;

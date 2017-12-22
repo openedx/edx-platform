@@ -2,9 +2,9 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers',
-    'js/verify_student/views/make_payment_step_view'
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/js/verify_student/views/make_payment_step_view'
 ],
     function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         'use strict';

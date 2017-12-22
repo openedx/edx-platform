@@ -5,12 +5,12 @@ define([
     'underscore',
     'underscore.string',
     'gettext',
-    'js/views/baseview',
-    'js/certificates/models/signatory',
-    'js/certificates/views/signatory_details',
-    'common/js/components/utils/view_utils',
+    'cms/static/js/views/baseview',
+    'cms/static/js/certificates/models/signatory',
+    'cms/static/js/certificates/views/signatory_details',
+    'cms/static/common/js/components/utils/view_utils',
     'jquery.smoothScroll',
-    'text!templates/certificate-details.underscore'
+    'text!cms/static/templates/certificate-details.underscore'
 ],
 function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils, smoothScroll,
          certificateDetailsTemplate) {

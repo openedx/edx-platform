@@ -62,25 +62,25 @@ webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
     libraryFiles: [
-        {pattern: 'common/js/vendor/**/*.js'},
-        {pattern: 'edx-pattern-library/js/**/*.js'},
-        {pattern: 'edx-ui-toolkit/js/**/*.js'},
-        {pattern: 'xmodule_js/common_static/coffee/src/**/!(*spec).js'},
-        {pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/src/**/*.js'}
+        {pattern: 'common/static/common/js/vendor/**/*.js'},
+        {pattern: 'common/static/edx-pattern-library/js/**/*.js'},
+        {pattern: 'common/static/edx-ui-toolkit/js/**/*.js'},
+        {pattern: 'common/static/coffee/src/**/!(*spec).js'},
+        {pattern: 'common/static/common/js/**/!(*spec).js'},
+        {pattern: 'common/static/js/**/!(*spec).js'},
+        {pattern: 'common/lib/xmodule/xmodule/js/src/**/*.js'}
     ],
 
     sourceFiles: [
-        {pattern: 'common/js/!(spec_helpers)/**/!(*spec).js'}
+        {pattern: 'common/static/common/js/!(spec_helpers)/**/!(*spec).js'}
     ],
 
     specFiles: [
-        {pattern: 'common/js/spec_helpers/**/*.js'}
+        {pattern: 'cms/static/common/js/spec_helpers/**/*.js'}
     ],
 
     fixtureFiles: [
-        {pattern: 'common/templates/**/*.underscore'}
+        {pattern: 'common/static/common/templates/**/*.underscore'}
     ]
 };
 
@@ -187,12 +187,12 @@ function junitSettings(config) {
  */
 // I'd like to fix the no-shadow violation on the next line, but it would break this shared conf's API.
 function defaultNormalizeFunc(appRoot, pattern) {  // eslint-disable-line no-shadow
-    if (pattern.match(/^common\/js/)) {
-        pattern = path.join(appRoot, '/common/static/' + pattern);
-    } else if (pattern.match(/^xmodule_js\/common_static/)) {
-        pattern = path.join(appRoot, '/common/static/' +
-            pattern.replace(/^xmodule_js\/common_static\//, ''));
-    }
+//   if (pattern.match(/^common\/js/)) {
+//       pattern = path.join(appRoot, '/common/static/' + pattern);
+//   } else if (pattern.match(/^xmodule_js\/common_static/)) {
+//       pattern = path.join(appRoot, '/common/static/' +
+//           pattern.replace(/^xmodule_js\/common_static\//, ''));
+//   }
     return pattern;
 }
 
@@ -290,7 +290,7 @@ function getBaseConfig(config, useRequireJs) {
 
     return {
         // base path that will be used to resolve all patterns (eg. files, exclude)
-        basePath: '',
+        basePath: appRoot,
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -436,7 +436,7 @@ function configure(config, options) {
     );
 
     if (useRequireJs) {
-        files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
+        files.unshift({pattern: 'common/static/common/js/utils/require-serial.js', included: true});
     }
 
     // Karma sets included=true by default.

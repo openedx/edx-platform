@@ -1,4 +1,4 @@
-define(['js/views/baseview'],
+define(['cms/static/js/views/baseview'],
     function(BaseView) {
         return BaseView.extend({
             tagName: 'li',

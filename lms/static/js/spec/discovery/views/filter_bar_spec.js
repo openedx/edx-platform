@@ -1,7 +1,11 @@
-define([
-    'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/collections/filters',
-    'js/discovery/views/filter_bar'
-], function($, TemplateHelpers, Filters, FilterBar) {
+define(
+    [
+        'jquery',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/discovery/collections/filters',
+        'cms/static/js/discovery/views/filter_bar'
+    ],
+    function($, TemplateHelpers, Filters, FilterBar) {
     'use strict';
 
     describe('discovery.views.FilterBar', function() {

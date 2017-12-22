@@ -1,8 +1,15 @@
 define(
-    ['underscore', 'gettext', 'moment', 'js/utils/date_utils', 'js/views/baseview',
-        'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils',
-        'edx-ui-toolkit/js/utils/string-utils', 'text!templates/video-thumbnail.underscore',
-        'text!templates/video-thumbnail-error.underscore'],
+    [
+        'underscore',
+        'gettext',
+        'moment',
+        'cms/static/js/utils/date_utils',
+        'cms/static/js/views/baseview',
+        'cms/static/common/js/components/utils/view_utils',
+        'common/static/edx-ui-toolkit/js/utils/html-utils',
+        'common/static/edx-ui-toolkit/js/utils/string-utils',
+        'text!cms/static/templates/video-thumbnail.underscore',
+        'text!cms/static/templates/video-thumbnail-error.underscore'],
     function(_, gettext, moment, DateUtils, BaseView, ViewUtils, HtmlUtils, StringUtils, VideoThumbnailTemplate,
                 VideoThumbnailErrorTemplate) {
         'use strict';

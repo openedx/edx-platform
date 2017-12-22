@@ -12,7 +12,7 @@
  *   to the DOM.
  */
 define([
-    'js/views/baseview', 'jquery', 'gettext', 'common/js/components/utils/view_utils'
+    'cms/static/js/views/baseview', 'jquery', 'gettext', 'cms/static/common/js/components/utils/view_utils'
 ], function(
     BaseView, $, gettext, ViewUtils
 ) {

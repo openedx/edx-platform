@@ -1,9 +1,19 @@
 /**
  * Provides helper methods for invoking Studio editors in Jasmine tests.
  */
-define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers', 'js/spec_helpers/modal_helpers', 'js/views/modals/edit_xblock',
-    'js/collections/component_template', 'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/spec_helpers/modal_helpers',
+        'cms/static/js/views/modals/edit_xblock',
+        'cms/static/js/collections/component_template',
+        'xmodule',
+        'cms/static/cms/js/main',
+        'cms/static/xblock/cms.runtime.v1'
+    ],
     function($, _, AjaxHelpers, TemplateHelpers, modal_helpers, EditXBlockModal, ComponentTemplates) {
         var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
             mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;

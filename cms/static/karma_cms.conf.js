@@ -14,32 +14,34 @@ var options = {
     libraryFiles: [],
 
     libraryFilesToInclude: [
-        {pattern: 'common/js/vendor/jquery.js', included: true},
-        {pattern: 'common/js/vendor/jquery-migrate.js', included: true}
+        {pattern: 'common/static/common/js/vendor/jquery.js', included: true},
+        {pattern: 'common/static/common/js/vendor/jquery-migrate.js', included: true}
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        {pattern: 'cms/**/!(*spec|djangojs).js'},
-        {pattern: 'coffee/src/**/!(*spec).js'},
-        {pattern: 'js/**/!(*spec|djangojs).js'}
+        {pattern: 'cms/static/cms/**/!(*spec|djangojs).js'},
+        // ormsbee: I think we just got rid of this altogether?
+        {pattern: 'cms/static/coffee/src/**/!(*spec).js'},
+
+        {pattern: 'cms/static/js/**/!(*spec|djangojs).js'}
     ],
 
     specFiles: [
-        {pattern: 'cms/**/*spec.js'},
-        {pattern: 'coffee/spec/**/*spec.js'},
-        {pattern: 'js/certificates/spec/**/*spec.js'},
-        {pattern: 'js/spec/**/*spec.js'}
+        {pattern: 'cms/static/cms/**/*spec.js'},
+        {pattern: 'cms/static/coffee/spec/**/*spec.js'},
+        {pattern: 'cms/static/js/certificates/spec/**/*spec.js'},
+        {pattern: 'cms/static/js/spec/**/*spec.js'}
     ],
 
     fixtureFiles: [
-        {pattern: 'coffee/fixtures/**/*.underscore'},
-        {pattern: 'templates/**/*.underscore'}
+        {pattern: 'cms/static/coffee/fixtures/**/*.underscore'},
+        {pattern: 'cms/static/templates/**/*.underscore'}
     ],
 
     runFiles: [
-        {pattern: 'cms/js/spec/main.js', included: true}
+        {pattern: 'cms/static/cms/js/spec/main.js', included: true}
     ]
 };
 

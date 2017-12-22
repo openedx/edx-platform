@@ -1,7 +1,11 @@
-define([
-    'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list'
-], function($, TemplateHelpers, TabsCollection, TabsListView) {
+define(
+    [
+        'jquery',
+        'common/js/spec_helpers/template_helpers',
+        'cms/static/js/edxnotes/collections/tabs',
+        'cms/static/js/edxnotes/views/tabs_list'
+    ],
+    function($, TemplateHelpers, TabsCollection, TabsListView) {
     'use strict';
     describe('EdxNotes TabItemView', function() {
         beforeEach(function() {

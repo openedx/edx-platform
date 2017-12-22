@@ -1,5 +1,6 @@
 define(
-    ['underscore', 'js/models/active_video_upload', 'js/views/baseview', 'common/js/components/views/feedback_prompt'],
+    ['underscore', 'cms/static/js/models/active_video_upload',
+     'cms/static/js/views/baseview', 'cms/static/common/js/components/views/feedback_prompt'],
     function(_, ActiveVideoUpload, BaseView, PromptView) {
         'use strict';
 

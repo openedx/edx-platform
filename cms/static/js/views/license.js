@@ -1,7 +1,7 @@
 define([
-    'js/views/baseview',
+    'cms/static/js/views/baseview',
     'underscore',
-    'text!templates/license-selector.underscore'
+    'text!cms/static/templates/license-selector.underscore'
 ], function(BaseView, _, licenseSelectorTemplate) {
     var defaultLicenseInfo = {
         'all-rights-reserved': {

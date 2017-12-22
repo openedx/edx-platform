@@ -1,4 +1,5 @@
-define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/template_helpers'],
+define(['cms/static/js/views/license', 'cms/static/js/models/license',
+            'cms/static/common/js/spec_helpers/template_helpers'],
              function(LicenseView, LicenseModel, TemplateHelpers) {
                  describe('License view', function() {
                      beforeEach(function() {

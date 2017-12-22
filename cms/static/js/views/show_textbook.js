@@ -1,5 +1,11 @@
-define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
-    'common/js/components/views/feedback_prompt'],
+define(
+    [
+        'cms/static/js/views/baseview',
+        'underscore',
+        'gettext',
+        'cms/static/common/js/components/views/feedback_notification',
+        'cms/static/common/js/components/views/feedback_prompt'
+    ],
         function(BaseView, _, gettext, NotificationView, PromptView) {
             var ShowTextbook = BaseView.extend({
                 initialize: function() {

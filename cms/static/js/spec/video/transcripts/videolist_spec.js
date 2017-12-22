@@ -1,7 +1,7 @@
 define(
     [
         'jquery', 'underscore',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',

@@ -1,5 +1,5 @@
 
-define(['js/views/baseview', 'underscore'], function(BaseView, _) {
+define(['cms/static/js/views/baseview', 'underscore'], function(BaseView, _) {
     var AbstractEditor = BaseView.extend({
 
         // Model is MetadataModel

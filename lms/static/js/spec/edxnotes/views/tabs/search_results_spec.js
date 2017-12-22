@@ -1,8 +1,12 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'logger', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/search_results',
-    'js/spec/edxnotes/helpers'
+    'jquery',
+    'underscore',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'logger',
+    'cms/static/js/edxnotes/collections/tabs',
+    'cms/static/js/edxnotes/views/tabs/search_results',
+    'cms/static/js/spec/edxnotes/helpers'
 ], function(
     $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView, Helpers
 ) {

@@ -3,7 +3,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(["js/models/section", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) =>
+define(["js/models/section", "common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) =>
     describe("Section", function() {
         describe("basic", function() {
             beforeEach(function() {

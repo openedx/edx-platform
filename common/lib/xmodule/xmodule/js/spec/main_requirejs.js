@@ -32,10 +32,10 @@
     requirejs.config({
         baseUrl: '/base/',
         paths: {
-            moment: 'common_static/common/js/vendor/moment-with-locales',
-            draggabilly: 'common_static/js/vendor/draggabilly',
-            'edx-ui-toolkit': 'common_static/edx-ui-toolkit',
-            hls: 'common_static/common/js/vendor/hls'
+            'moment': 'common/static/common/js/vendor/moment-with-locales',
+            'draggabilly': 'common/static/js/vendor/draggabilly',
+            'edx-ui-toolkit': 'common/static/edx-ui-toolkit',
+            'hls': 'common/static/common/js/vendor/hls'
         },
         shim: {
             moment: {

@@ -5,10 +5,10 @@
 define([
     'underscore',
     'gettext',
-    'js/views/baseview',
-    'common/js/components/utils/view_utils',
-    'common/js/components/views/feedback_notification',
-    'text!templates/certificate-web-preview.underscore'
+    'cms/static/js/views/baseview',
+    'cms/static/common/js/components/utils/view_utils',
+    'cms/static/common/js/components/views/feedback_notification',
+    'text!cms/static/templates/certificate-web-preview.underscore'
 ],
 function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate) {
     'use strict';

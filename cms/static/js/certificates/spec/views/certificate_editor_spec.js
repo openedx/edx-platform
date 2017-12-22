@@ -2,17 +2,17 @@
 
 define([
     'underscore',
-    'js/models/course',
-    'js/certificates/models/certificate',
-    'js/certificates/models/signatory',
-    'js/certificates/collections/certificates',
-    'js/certificates/views/certificate_editor',
-    'common/js/components/views/feedback_notification',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/view_helpers',
-    'js/spec_helpers/validation_helpers',
-    'js/certificates/spec/custom_matchers'
+    'cms/static/js/models/course',
+    'cms/static/js/certificates/models/certificate',
+    'cms/static/js/certificates/models/signatory',
+    'cms/static/js/certificates/collections/certificates',
+    'cms/static/js/certificates/views/certificate_editor',
+    'cms/static/common/js/components/views/feedback_notification',
+    'cms/static/common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/common/js/spec_helpers/view_helpers',
+    'cms/static/js/spec_helpers/validation_helpers',
+    'cms/static/js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, CertificateEditorView,
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {

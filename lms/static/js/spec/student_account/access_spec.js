@@ -4,13 +4,13 @@
         'jquery',
         'underscore',
         'backbone',
-        'common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/student_account/views/AccessView',
-        'js/student_account/views/FormView',
-        'js/student_account/enrollment',
-        'js/student_account/shoppingcart',
-        'js/student_account/emailoptin'
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/js/student_account/views/AccessView',
+        'cms/static/js/student_account/views/FormView',
+        'cms/static/js/student_account/enrollment',
+        'cms/static/js/student_account/shoppingcart',
+        'cms/static/js/student_account/emailoptin'
     ],
         function($, _, Backbone, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface,
                  ShoppingCartInterface) {

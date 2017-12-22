@@ -1,7 +1,11 @@
-define([
-    'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/filter',
-    'js/discovery/views/filter_label'
-], function($, TemplateHelpers, Filter, FilterLabel) {
+define(
+    [
+        'jquery',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/discovery/models/filter',
+        'cms/static/js/discovery/views/filter_label'
+    ],
+    function($, TemplateHelpers, Filter, FilterLabel) {
     'use strict';
 
     describe('discovery.views.FilterLabel', function() {

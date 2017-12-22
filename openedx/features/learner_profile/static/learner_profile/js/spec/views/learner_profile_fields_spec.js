@@ -3,12 +3,12 @@ define(
         'backbone',
         'jquery',
         'underscore',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/spec/student_account/helpers',
-        'js/student_account/models/user_account_model',
-        'learner_profile/js/views/learner_profile_fields',
-        'js/views/message_banner'
+        'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/spec/student_account/helpers',
+        'cms/static/js/student_account/models/user_account_model',
+        'cms/static/learner_profile/js/views/learner_profile_fields',
+        'cms/static/js/views/message_banner'
     ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
              MessageBannerView) {

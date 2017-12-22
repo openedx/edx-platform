@@ -32,8 +32,8 @@
     requirejs.config({
         baseUrl: '/base/',
         paths: {
-            moment: 'xmodule_js/common_static/common/js/vendor/moment-with-locales',
-            draggabilly: 'xmodule_js/common_static/js/vendor/draggabilly',
+            moment: 'common/js/vendor/moment-with-locales',
+            draggabilly: 'js/vendor/draggabilly',
             'edx-ui-toolkit': 'edx-ui-toolkit',
             hls: 'common/js/vendor/hls'
         },

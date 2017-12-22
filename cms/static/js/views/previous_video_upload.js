@@ -1,8 +1,16 @@
 define(
-    ['underscore', 'gettext', 'js/utils/date_utils', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
-        'common/js/components/views/feedback_notification', 'js/views/video_thumbnail',
-        'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils',
-        'text!templates/previous-video-upload.underscore'],
+    [
+        'underscore',
+        'gettext',
+        'cms/static/js/utils/date_utils',
+        'cms/static/js/views/baseview',
+        'cms/static/common/js/components/views/feedback_prompt',
+        'cms/static/common/js/components/views/feedback_notification',
+        'cms/static/js/views/video_thumbnail',
+        'cms/static/common/js/components/utils/view_utils',
+        'common/static/edx-ui-toolkit/js/utils/html-utils',
+        'text!cms/static/templates/previous-video-upload.underscore'
+    ],
     function(_, gettext, DateUtils, BaseView, PromptView, NotificationView, VideoThumbnailView, ViewUtils, HtmlUtils,
              previousVideoUploadTemplate) {
         'use strict';

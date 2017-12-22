@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_binding', 'sinon'],
+define(['jquery', 'underscore', 'cms/static/js/views/baseview', 'cms/static/js/utils/handle_iframe_binding', 'sinon'],
     function($, _, BaseView, IframeBinding, sinon) {
         describe('BaseView', function() {
             var baseViewPrototype;

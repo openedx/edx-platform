@@ -1,4 +1,9 @@
-define(['js/views/baseview', 'js/views/course_info_update', 'js/views/course_info_handout'],
+define(
+    [
+        'cms/static/js/views/baseview',
+        'cms/static/js/views/course_info_update',
+        'cms/static/js/views/course_info_handout'
+    ],
     function(BaseView, CourseInfoUpdateView, CourseInfoHandoutView) {
 /*  this view should own everything on the page which has controls effecting its operation
    generate other views for the individual editors.

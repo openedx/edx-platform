@@ -1,7 +1,11 @@
-define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers',
-    'js/discussions_management/views/discussions', 'js/discussions_management/models/course_discussions_detail',
-    'js/discussions_management/models/course_discussions_settings'
+define([
+    'backbone',
+    'jquery',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/js/discussions_management/views/discussions',
+    'cms/static/js/discussions_management/models/course_discussions_detail',
+    'cms/static/js/discussions_management/models/course_discussions_settings'
 ],
     function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscussionTopicDetailsModel,
              CourseDiscussionsSettingsModel) {

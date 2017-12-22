@@ -6,7 +6,7 @@ define([
     'backbone-relational',
     'backbone.associations',
     'gettext',
-    'cms/js/main',
+    'cms/static/cms/js/main',
     'js/certificates/models/signatory',
     'js/certificates/collections/signatories'
 ],

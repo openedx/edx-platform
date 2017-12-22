@@ -2,8 +2,8 @@ define([
     'jquery',
     'backbone',
     'underscore',
-    'edx-ui-toolkit/js/pagination/paging-collection',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/static/edx-ui-toolkit/js/pagination/paging-collection',
+    'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/components/views/paginated_view'
 ], function($, Backbone, _, PagingCollection, AjaxHelpers, PaginatedView) {
     'use strict';

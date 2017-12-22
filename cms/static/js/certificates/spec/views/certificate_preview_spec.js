@@ -3,11 +3,11 @@
 define([
     'underscore',
     'jquery',
-    'js/models/course',
-    'js/certificates/views/certificate_preview',
-    'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/view_helpers',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+    'cms/static/js/models/course',
+    'cms/static/js/certificates/views/certificate_preview',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/common/js/spec_helpers/view_helpers',
+    'cms/static/common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ],
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {
     'use strict';

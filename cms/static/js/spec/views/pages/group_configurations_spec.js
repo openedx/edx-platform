@@ -1,8 +1,13 @@
-define([
-    'jquery', 'underscore', 'js/views/pages/group_configurations',
-    'js/models/group_configuration', 'js/collections/group_configuration',
-    'common/js/spec_helpers/template_helpers'
-], function($, _, GroupConfigurationsPage, GroupConfigurationModel, GroupConfigurationCollection, TemplateHelpers) {
+define(
+    [
+        'jquery',
+        'underscore',
+        'cms/static/js/views/pages/group_configurations',
+        'cms/static/js/models/group_configuration',
+        'cms/static/js/collections/group_configuration',
+        'cms/static/common/js/spec_helpers/template_helpers'
+    ],
+    function($, _, GroupConfigurationsPage, GroupConfigurationModel, GroupConfigurationCollection, TemplateHelpers) {
     'use strict';
     describe('GroupConfigurationsPage', function() {
         var mockGroupConfigurationsPage = readFixtures(

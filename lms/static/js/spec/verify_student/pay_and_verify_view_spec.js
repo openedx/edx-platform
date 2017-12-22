@@ -1,4 +1,9 @@
-define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/views/pay_and_verify_view'],
+define(
+    [
+        'jquery',
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/verify_student/views/pay_and_verify_view'
+    ],
     function($, TemplateHelpers, PayAndVerifyView) {
         'use strict';
 

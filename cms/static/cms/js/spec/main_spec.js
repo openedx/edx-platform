@@ -2,7 +2,7 @@
 
 (function(sandbox) {
     'use strict';
-    require(['jquery', 'backbone', 'cms/js/main', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery.cookie'],
+    require(['jquery', 'backbone', 'cms/static/cms/js/main', 'common/static/edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery.cookie'],
             function($, Backbone, main, AjaxHelpers) {
                 describe('CMS', function() {
                     it('should initialize URL', function() {

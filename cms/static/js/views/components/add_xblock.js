@@ -1,8 +1,16 @@
 /**
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'gettext',
+        'cms/static/js/views/baseview',
+        'cms/static/common/js/components/utils/view_utils',
+        'cms/static/js/views/components/add_xblock_button',
+        'cms/static/js/views/components/add_xblock_menu'
+    ],
     function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu) {
         var AddXBlockComponent = BaseView.extend({
             events: {

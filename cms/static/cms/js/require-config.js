@@ -303,7 +303,7 @@
                 exports: 'XBlock',
                 deps: ['xblock/core']
             },
-            'cms/js/main': {
+            'cms/static/cms/js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'js/src/logger': {

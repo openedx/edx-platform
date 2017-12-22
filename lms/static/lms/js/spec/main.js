@@ -11,62 +11,62 @@
         baseUrl: '/base/',
 
         paths: {
-            'gettext': 'xmodule_js/common_static/js/test/i18n',
-            'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
+            'gettext': 'js/test/i18n',
+            'codemirror': 'js/vendor/CodeMirror/codemirror',
             jquery: 'common/js/vendor/jquery',
             'jquery-migrate': 'common/js/vendor/jquery-migrate',
-            'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
-            'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
-            'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
-            'jquery.form': 'xmodule_js/common_static/js/vendor/jquery.form',
-            'jquery.markitup': 'xmodule_js/common_static/js/vendor/markitup/jquery.markitup',
-            'jquery.leanModal': 'xmodule_js/common_static/js/vendor/jquery.leanModal',
-            'jquery.ajaxQueue': 'xmodule_js/common_static/js/vendor/jquery.ajaxQueue',
+            'jquery.ui': 'js/vendor/jquery-ui.min',
+            'jquery.eventDrag': 'js/vendor/jquery.event.drag-2.2',
+            'jquery.flot': 'js/vendor/flot/jquery.flot.min',
+            'jquery.form': 'js/vendor/jquery.form',
+            'jquery.markitup': 'js/vendor/markitup/jquery.markitup',
+            'jquery.leanModal': 'js/vendor/jquery.leanModal',
+            'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.ajax-retry': 'js/vendor/jquery.ajax-retry',
-            'jquery.smoothScroll': 'xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min',
+            'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
             'jquery.scrollTo': 'common/js/vendor/jquery.scrollTo',
-            'jquery.timepicker': 'xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker',
-            'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
-            'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
-            'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
-            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
-            'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
-            'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
-            'jquery.timeago': 'xmodule_js/common_static/js/vendor/jquery.timeago',
-            'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
-            'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
-            'date': 'xmodule_js/common_static/js/vendor/date',
+            'jquery.timepicker': 'js/vendor/timepicker/jquery.timepicker',
+            'jquery.cookie': 'js/vendor/jquery.cookie',
+            'jquery.qtip': 'js/vendor/jquery.qtip.min',
+            'jquery.fileupload': 'js/vendor/jQuery-File-Upload/js/jquery.fileupload',
+            'jquery.iframe-transport': 'js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
+            'jquery.inputnumber': 'js/vendor/html5-input-polyfills/number-polyfill',
+            'jquery.immediateDescendents': 'coffee/src/jquery.immediateDescendents',
+            'jquery.simulate': 'js/vendor/jquery.simulate',
+            'jquery.timeago': 'js/vendor/jquery.timeago',
+            'jquery.url': 'js/vendor/url.min',
+            'datepair': 'js/vendor/timepicker/datepair',
+            'date': 'js/vendor/date',
             moment: 'common/js/vendor/moment-with-locales',
             'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
-            'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
+            'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'common/js/vendor/backbone',
-            'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
+            'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'backbone-super': 'js/vendor/backbone-super',
-            'URI': 'xmodule_js/common_static/js/vendor/URI.min',
-            'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
-            'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
+            'URI': 'js/vendor/URI.min',
+            'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
+            'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce',
             'xmodule': 'xmodule_js/src/xmodule',
-            'utility': 'xmodule_js/common_static/js/src/utility',
-            'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
+            'utility': 'js/src/utility',
+            'accessibility': 'js/src/accessibility_tools',
             'sinon': 'common/js/vendor/sinon',
             'squire': 'common/js/vendor/Squire',
-            'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
-            'domReady': 'xmodule_js/common_static/js/vendor/domReady',
+            'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
+            'domReady': 'js/vendor/domReady',
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
-            'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'coffee/src/ajax_prefix': 'coffee/src/ajax_prefix',
             'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
-            'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
+            'js/test/add_ajax_prefix': 'js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
             'xblock': 'common/js/xblock',
             'capa/display': 'xmodule_js/src/capa/display',
             'sequence/display': 'xmodule_js/src/sequence/display',
-            'string_utils': 'xmodule_js/common_static/js/src/string_utils',
-            'logger': 'xmodule_js/common_static/js/src/logger',
+            'string_utils': 'js/src/string_utils',
+            'logger': 'js/src/logger',
             'Markdown.Converter': 'js/Markdown.Converter',
             'Markdown.Editor': 'js/Markdown.Editor',
             'Markdown.Sanitizer': 'js/Markdown.Sanitizer',
@@ -75,7 +75,7 @@
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
             'bootstrap': 'common/js/vendor/bootstrap.bundle',
-            'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
+            'draggabilly': 'js/vendor/draggabilly',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -93,12 +93,12 @@
             'js/views/message_banner': 'js/views/message_banner',
 
             // edxnotes
-            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
+            'annotator_1.2.9': 'js/vendor/edxnotes/annotator-full.min',
 
             // Common edx utils
             'common/js/utils/edx.utils.validate': 'common/js/utils/edx.utils.validate',
-            'slick.core': 'xmodule_js/common_static/js/vendor/slick.core',
-            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid'
+            'slick.core': 'js/vendor/slick.core',
+            'slick.grid': 'js/vendor/slick.grid'
         },
         shim: {
             'gettext': {
@@ -259,7 +259,7 @@
                 exports: 'sinon'
             },
             'jasmine-imagediff': {},
-            'common/js/spec_helpers/jasmine-extensions': {
+            'cms/static/common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
             'common/js/spec_helpers/jasmine-stealth': {
@@ -280,7 +280,7 @@
                 exports: 'LmsRuntime.v1',
                 deps: ['xblock/runtime.v1']
             },
-            'xmodule_js/common_static/js/test/add_ajax_prefix': {
+            'js/test/add_ajax_prefix': {
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
@@ -610,7 +610,7 @@
                 ],
                 exports: 'DiscussionThreadProfileView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_show_view': {
+            'common/js/discussion/views/discussion_thread_show_view': {
                 deps: [
                     'common/js/discussion/utils',
                     'common/js/discussion/views/discussion_content_view'
@@ -834,7 +834,7 @@
     }
 
     specHelpers = [
-        'common/js/spec_helpers/jasmine-extensions',
+        'cms/static/common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
         'common/js/spec_helpers/jasmine-waituntil'
     ];

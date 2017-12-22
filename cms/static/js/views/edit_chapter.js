@@ -1,7 +1,16 @@
 /* global course */
 
-define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
-    'js/views/baseview', 'js/models/uploads', 'js/views/uploads', 'text!templates/edit-chapter.underscore'],
+define(
+    [
+        'underscore',
+        'jquery',
+        'gettext',
+        'common/static/edx-ui-toolkit/js/utils/html-utils',
+        'cms/static/js/views/baseview',
+        'cms/static/js/models/uploads',
+        'cms/static/js/views/uploads',
+        'text!cms/static/templates/edit-chapter.underscore'
+    ],
     function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, editChapterTemplate) {
         'use strict';
 

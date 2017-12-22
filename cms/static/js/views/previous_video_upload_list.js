@@ -1,5 +1,11 @@
 define(
-    ['jquery', 'underscore', 'backbone', 'js/views/baseview', 'js/views/previous_video_upload'],
+    [
+        'jquery',
+        'underscore',
+        'backbone',
+        'cms/static/js/views/baseview',
+        'cms/static/js/views/previous_video_upload'
+    ],
     function($, _, Backbone, BaseView, PreviousVideoUploadView) {
         'use strict';
         var PreviousVideoUploadListView = BaseView.extend({

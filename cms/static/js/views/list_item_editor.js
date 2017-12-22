@@ -10,7 +10,10 @@
  *   saved by this view.  Note this may be a parent model.
  */
 define([
-    'js/views/baseview', 'common/js/components/utils/view_utils', 'underscore', 'gettext'
+    'cms/static/js/views/baseview',
+    'cms/static/common/js/components/utils/view_utils',
+    'underscore',
+    'gettext'
 ], function(BaseView, ViewUtils, _, gettext) {
     'use strict';
 

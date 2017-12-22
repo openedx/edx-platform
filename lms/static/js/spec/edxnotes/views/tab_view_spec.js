@@ -1,11 +1,11 @@
 define([
     'jquery',
     'backbone',
-    'edx-ui-toolkit/js/utils/html-utils',
-    'common/js/spec_helpers/template_helpers',
-    'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list',
-    'js/edxnotes/views/tab_view'
+    'common/static/edx-ui-toolkit/js/utils/html-utils',
+    'cms/static/common/js/spec_helpers/template_helpers',
+    'cms/static/js/edxnotes/collections/tabs',
+    'cms/static/js/edxnotes/views/tabs_list',
+    'cms/static/js/edxnotes/views/tab_view'
 ], function($, Backbone, HtmlUtils, TemplateHelpers, TabsCollection, TabsListView, TabView) {
     'use strict';
     describe('EdxNotes TabView', function() {

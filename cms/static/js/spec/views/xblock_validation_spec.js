@@ -1,4 +1,10 @@
-define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', 'common/js/spec_helpers/template_helpers'],
+define(
+    [
+        'jquery',
+        'cms/static/js/models/xblock_validation',
+        'cms/static/js/views/xblock_validation',
+        'cms/static/common/js/spec_helpers/template_helpers'
+    ],
     function($, XBlockValidationModel, XBlockValidationView, TemplateHelpers) {
         beforeEach(function() {
             TemplateHelpers.installTemplate('xblock-validation-messages');

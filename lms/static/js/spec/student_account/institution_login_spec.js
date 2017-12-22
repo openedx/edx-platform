@@ -3,8 +3,8 @@
     define([
         'jquery',
         'underscore',
-        'common/js/spec_helpers/template_helpers',
-        'js/student_account/views/InstitutionLoginView'
+        'cms/static/common/js/spec_helpers/template_helpers',
+        'cms/static/js/student_account/views/InstitutionLoginView'
     ],
         function($, _, TemplateHelpers, InstitutionLoginView) {
             describe('edx.student.account.InstitutionLoginView', function() {

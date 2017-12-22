@@ -1,4 +1,11 @@
-define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/baseview', 'xblock/runtime.v1'],
+define(
+    [
+        'jquery',
+        'underscore',
+        'cms/static/common/js/components/utils/view_utils',
+        'cms/static/js/views/baseview',
+        'xblock/runtime.v1'
+    ],
     function($, _, ViewUtils, BaseView, XBlock) {
         'use strict';
 
