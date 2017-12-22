@@ -458,7 +458,14 @@
     }
 
     .course-details {
-      float: left;
+      width: 100%;
+      float: none;
+
+      @media (min-width: $bp-screen-md) {
+        display: table-cell;
+        vertical-align: top;
+        float: left;
+      }
 
       .course-title {
         font-size: 1em;
@@ -491,18 +498,6 @@
 
       .course-content {
         overflow: hidden;
-      }
-    }
-
-    .course-details {
-      width: 100%;
-      float: none;
-
-      @media (min-width: $bp-screen-md) {
-        display: table-cell;
-        vertical-align: top;
-        padding: 0 10px 0 0;
-        float: left;
       }
     }
 
