@@ -114,13 +114,13 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
     }
 
     registration_fields = context['data']['registration_form_desc']['fields']
-    context['data']['registration_form_desc']['fields'] = reorder_registration_form_fields(registration_fields)
+    registration_fields = context['data']['registration_form_desc']['fields'] = reorder_registration_form_fields(registration_fields)
 
     if org_name and admin_email:
         org_name = base64.b64decode(org_name)
         admin_email = base64.b64decode(admin_email)
 
-        email_field = registration_fields[3]
+        email_field = registration_fields[2]
         org_field = registration_fields[7]
         is_poc_field = registration_fields[8]
         email_field['defaultValue'] = admin_email
