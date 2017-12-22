@@ -45,13 +45,12 @@ COURSE_PARAMS = {
 ALL_PARAMS = dict(LTI_DEFAULT_PARAMS.items() + COURSE_PARAMS.items())
 
 
-def build_launch_request(authenticated=True):
+def build_launch_request():
     """
     Helper method to create a new request object for the LTI launch.
     """
     request = RequestFactory().post('/')
     request.user = UserFactory.create()
-    request.user.is_authenticated = MagicMock(return_value=authenticated)
     request.session = {}
     request.POST.update(LTI_DEFAULT_PARAMS)
     return request

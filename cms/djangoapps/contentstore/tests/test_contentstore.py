@@ -23,6 +23,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from path import Path as path
+from six import text_type
 from waffle.testutils import override_switch
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
@@ -117,7 +118,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         Asset name in XML: "/invalid\\displayname/subs-esLhHcdKGWvKs.srt"
         """
         content_store = contentstore()
-        expected_displayname = '_invalid_displayname_subs-esLhHcdKGWvKs.srt'
+        expected_displayname = u'_invalid_displayname_subs-esLhHcdKGWvKs.srt'
 
         import_course_from_xml(
             self.store,
@@ -156,10 +157,10 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # Test course export does not fail
         root_dir = path(mkdtemp_clean())
         print 'Exporting to tempdir = {0}'.format(root_dir)
-        export_course_to_xml(self.store, content_store, course.id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, course.id, root_dir, u'test_export')
 
-        filesystem = OSFS(root_dir / 'test_export/static')
-        exported_static_files = filesystem.listdir()
+        filesystem = OSFS(text_type(root_dir / 'test_export/static'))
+        exported_static_files = filesystem.listdir(u'/')
 
         # Verify that asset have been overwritten during export.
         self.assertEqual(len(exported_static_files), 1)
@@ -236,18 +237,18 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         self.assertIsNotNone(course_updates)
 
         # check that course which is imported has files 'updates.html' and 'updates.items.json'
-        filesystem = OSFS(data_dir + '/course_info_updates/info')
-        self.assertTrue(filesystem.exists('updates.html'))
-        self.assertTrue(filesystem.exists('updates.items.json'))
+        filesystem = OSFS(text_type(data_dir + '/course_info_updates/info'))
+        self.assertTrue(filesystem.exists(u'updates.html'))
+        self.assertTrue(filesystem.exists(u'updates.items.json'))
 
         # verify that course info update module has same data content as in data file from which it is imported
         # check 'data' field content
-        with filesystem.open('updates.html', 'r') as course_policy:
+        with filesystem.open(u'updates.html', 'r') as course_policy:
             on_disk = course_policy.read()
             self.assertEqual(course_updates.data, on_disk)
 
         # check 'items' field content
-        with filesystem.open('updates.items.json', 'r') as course_policy:
+        with filesystem.open(u'updates.items.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertEqual(course_updates.items, on_disk)
 
@@ -255,19 +256,19 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # with same content as in course 'info' directory
         root_dir = path(mkdtemp_clean())
         print 'Exporting to tempdir = {0}'.format(root_dir)
-        export_course_to_xml(self.store, content_store, course.id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, course.id, root_dir, u'test_export')
 
         # check that exported course has files 'updates.html' and 'updates.items.json'
-        filesystem = OSFS(root_dir / 'test_export/info')
-        self.assertTrue(filesystem.exists('updates.html'))
-        self.assertTrue(filesystem.exists('updates.items.json'))
+        filesystem = OSFS(text_type(root_dir / 'test_export/info'))
+        self.assertTrue(filesystem.exists(u'updates.html'))
+        self.assertTrue(filesystem.exists(u'updates.items.json'))
 
         # verify that exported course has same data content as in course_info_update module
-        with filesystem.open('updates.html', 'r') as grading_policy:
+        with filesystem.open(u'updates.html', 'r') as grading_policy:
             on_disk = grading_policy.read()
             self.assertEqual(on_disk, course_updates.data)
 
-        with filesystem.open('updates.items.json', 'r') as grading_policy:
+        with filesystem.open(u'updates.items.json', 'r') as grading_policy:
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course_updates.items)
 
@@ -315,39 +316,39 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        export_course_to_xml(self.store, content_store, course_id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_export')
 
         # check for static tabs
-        self.verify_content_existence(self.store, root_dir, course_id, 'tabs', 'static_tab', '.html')
+        self.verify_content_existence(self.store, root_dir, course_id, u'tabs', 'static_tab', '.html')
 
         # check for about content
-        self.verify_content_existence(self.store, root_dir, course_id, 'about', 'about', '.html')
+        self.verify_content_existence(self.store, root_dir, course_id, u'about', 'about', '.html')
 
         # assert that there is an html and video directory in drafts:
         draft_dir = OSFS(root_dir / 'test_export/drafts')
-        self.assertTrue(draft_dir.exists('html'))
-        self.assertTrue(draft_dir.exists('video'))
+        self.assertTrue(draft_dir.exists(u'html'))
+        self.assertTrue(draft_dir.exists(u'video'))
         # and assert that they contain the created modules
-        self.assertIn(self.DRAFT_HTML + ".xml", draft_dir.listdir('html'))
-        self.assertIn(self.DRAFT_VIDEO + ".xml", draft_dir.listdir('video'))
+        self.assertIn(self.DRAFT_HTML + ".xml", draft_dir.listdir(u'html'))
+        self.assertIn(self.DRAFT_VIDEO + ".xml", draft_dir.listdir(u'video'))
         # and assert the child of the orphaned draft wasn't exported
-        self.assertNotIn(self.ORPHAN_DRAFT_HTML + ".xml", draft_dir.listdir('html'))
+        self.assertNotIn(self.ORPHAN_DRAFT_HTML + ".xml", draft_dir.listdir(u'html'))
 
         # check for grading_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
-        self.assertTrue(filesystem.exists('grading_policy.json'))
+        self.assertTrue(filesystem.exists(u'grading_policy.json'))
 
         course = self.store.get_course(course_id)
         # compare what's on disk compared to what we have in our course
-        with filesystem.open('grading_policy.json', 'r') as grading_policy:
+        with filesystem.open(u'grading_policy.json', 'r') as grading_policy:
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
         # check for policy.json
-        self.assertTrue(filesystem.exists('policy.json'))
+        self.assertTrue(filesystem.exists(u'policy.json'))
 
         # compare what's on disk to what we have in the course module
-        with filesystem.open('policy.json', 'r') as course_policy:
+        with filesystem.open(u'policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/2012_Fall', on_disk)
             self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
@@ -417,7 +418,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        export_course_to_xml(self.store, content_store, course_id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_export')
 
         shutil.rmtree(root_dir)
 
@@ -443,7 +444,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        export_course_to_xml(self.store, content_store, course_id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_export')
 
         shutil.rmtree(root_dir)
 
@@ -496,7 +497,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         # Export the course
         root_dir = path(mkdtemp_clean())
-        export_course_to_xml(self.store, content_store, course_id, root_dir, 'test_roundtrip')
+        export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_roundtrip')
 
         # Reimport and get the video back
         import_course_from_xml(self.store, self.user.id, root_dir)
@@ -517,7 +518,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         # Export the course
         root_dir = path(mkdtemp_clean())
-        export_course_to_xml(self.store, content_store, course_id, root_dir, 'test_roundtrip')
+        export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_roundtrip')
 
         # Reimport and get the video back
         import_course_from_xml(self.store, self.user.id, root_dir, create_if_not_present=True)
@@ -541,7 +542,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         root_dir = path(mkdtemp_clean())
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
-        export_course_to_xml(self.store, None, course_id, root_dir, 'test_export_no_content_store')
+        export_course_to_xml(self.store, None, course_id, root_dir, u'test_export_no_content_store')
 
         # Delete the course from module store and reimport it
 
@@ -596,7 +597,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
             content_store,
             course_id,
             root_dir,
-            'test_no_xml_attributes'
+            u'test_no_xml_attributes'
         )
 
 
@@ -695,7 +696,7 @@ class MiscCourseTests(ContentStoreTestCase):
     def test_export_on_invalid_displayname(self, invalid_displayname):
         """ Tests that assets with invalid 'displayname' does not cause export to fail """
         content_store = contentstore()
-        exported_asset_name = '_Fake_asset_displayname'
+        exported_asset_name = u'_Fake_asset_displayname'
 
         # Create an asset with slash `invalid_displayname` '
         asset_key = self.course.id.make_asset_key('asset', "fake_asset.txt")
@@ -713,10 +714,10 @@ class MiscCourseTests(ContentStoreTestCase):
         # Now export the course to a tempdir and test that it contains assets. The export should pass
         root_dir = path(mkdtemp_clean())
         print 'Exporting to tempdir = {0}'.format(root_dir)
-        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, u'test_export')
 
         filesystem = OSFS(root_dir / 'test_export/static')
-        exported_static_files = filesystem.listdir()
+        exported_static_files = filesystem.listdir(u'/')
 
         # Verify that only single asset has been exported with the expected asset name.
         self.assertTrue(filesystem.exists(exported_asset_name))
@@ -737,13 +738,13 @@ class MiscCourseTests(ContentStoreTestCase):
         # Make an existing unit a draft
         self.store.convert_to_draft(self.problem.location, self.user.id)
         root_dir = path(mkdtemp_clean())
-        export_course_to_xml(self.store, None, self.course.id, root_dir, 'test_export')
+        export_course_to_xml(self.store, None, self.course.id, root_dir, u'test_export')
 
         # Verify that problem is exported in the drafts. This is expected because we are
         # mocking get_item to for drafts. Expect no draft is exported.
         # Specifically get_item is used in `xmodule.modulestore.xml_exporter._export_drafts`
         export_draft_dir = OSFS(root_dir / 'test_export/drafts')
-        self.assertEqual(len(export_draft_dir.listdir()), 0)
+        self.assertEqual(len(export_draft_dir.listdir(u'/')), 0)
 
         # Remove tempdir
         shutil.rmtree(root_dir)
@@ -751,7 +752,7 @@ class MiscCourseTests(ContentStoreTestCase):
     def test_assets_overwrite(self):
         """ Tests that assets will similar 'displayname' will be overwritten during export """
         content_store = contentstore()
-        asset_displayname = 'Fake_asset.txt'
+        asset_displayname = u'Fake_asset.txt'
 
         # Create two assets with similar 'displayname'
         for i in range(2):
@@ -773,11 +774,11 @@ class MiscCourseTests(ContentStoreTestCase):
         # Now export the course to a tempdir and test that it contains assets.
         root_dir = path(mkdtemp_clean())
         print 'Exporting to tempdir = {0}'.format(root_dir)
-        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_export')
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, u'test_export')
 
         # Verify that asset have been overwritten during export.
         filesystem = OSFS(root_dir / 'test_export/static')
-        exported_static_files = filesystem.listdir()
+        exported_static_files = filesystem.listdir(u'/')
         self.assertTrue(filesystem.exists(asset_displayname))
         self.assertEqual(len(exported_static_files), 1)
 
@@ -2109,7 +2110,7 @@ class ContentLicenseTest(ContentStoreTestCase):
         root_dir = path(mkdtemp_clean())
         self.course.license = "creative-commons: BY SA"
         self.store.update_item(self.course, None)
-        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, u'test_license')
         fname = "{block}.xml".format(block=self.course.scope_ids.usage_id.block_id)
         run_file_path = root_dir / "test_license" / "course" / fname
         run_xml = etree.parse(run_file_path.open())
@@ -2122,7 +2123,7 @@ class ContentLicenseTest(ContentStoreTestCase):
             parent_location=self.course.location, category='video',
             license="all-rights-reserved"
         )
-        export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
+        export_course_to_xml(self.store, content_store, self.course.id, root_dir, u'test_license')
         fname = "{block}.xml".format(block=video_descriptor.scope_ids.usage_id.block_id)
         video_file_path = root_dir / "test_license" / "video" / fname
         video_xml = etree.parse(video_file_path.open())
