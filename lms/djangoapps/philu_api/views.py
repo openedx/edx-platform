@@ -5,6 +5,7 @@ import logging
 
 from datetime import datetime
 from django.http import JsonResponse
+from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
 from student.models import User
@@ -86,3 +87,9 @@ class UpdateCommunityProfile(APIView):
         except Exception as ex:
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
 
+def get_user_chat(request):
+    return JsonResponse({
+        "token": settings.NODEBB_MASTER_TOKEN,
+        "endpoint": settings.NODEBB_ENDPOINT,
+        "user": request.user.username,
+    })
