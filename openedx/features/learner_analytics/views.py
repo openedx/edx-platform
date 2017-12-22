@@ -54,6 +54,7 @@ class LearnerAnalyticsView(View):
             'course_url': course_url,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
+            'is_self_paced': course.self_paced,
             'is_verified': CourseEnrollment.is_enrolled_as_verified(request.user, course_key),
             'grading_policy': grading_policy,
             'assignment_grades': self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS']),
