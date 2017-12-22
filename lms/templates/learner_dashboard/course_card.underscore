@@ -18,7 +18,7 @@
                     <% if (dateString && !is_unfulfilled_entitlement) { %>
                         <span class="run-period"><%- dateString %></span>
                         <% if (user_entitlement && !user_entitlement.expired_at && !is_unfulfilled_entitlement) { %>
-                            <button class="change-session btn-link" aria-controls="change-session-<%-user_entitlement.uuid%>"> <%- gettext('Change or Leave Session')%></button>
+                            <button class="change-session btn-link"> <%- gettext('Change or Leave Session')%></button>
                         <% } %>
                     <% } %>
                 </div>
