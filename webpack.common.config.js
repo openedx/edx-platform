@@ -11,8 +11,20 @@ var namespacedRequireFiles = [
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback_notification.js'),
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback_prompt.js'),
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback.js'),
+    path.resolve(__dirname, 'common/static/common/js/components/views/paging_footer.js'),
+    path.resolve(__dirname, 'cms/static/js/views/paging.js'),
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js')
 ];
+
+// These files are used by RequireJS as well, so we can't remove
+// the instances of "text!some/file.underscore" (which webpack currently
+// processes twice). So instead we have webpack dynamically remove the `text!` prefix
+// until we can remove RequireJS from the system.
+var filesWithTextBangUnderscore = [
+    path.resolve(__dirname, 'cms/static/js/views/assets.js'),
+    path.resolve(__dirname, 'cms/static/js/views/paging_header.js'),
+    path.resolve(__dirname, 'common/static/common/js/components/views/paging_footer.js')
+]
 
 var defineHeader = /\(function ?\(define(, require)?\) ?\{/;
 var defineFooter = /\}\)\.call\(this, define \|\| RequireJS\.define(, require \|\| RequireJS\.require)?\);/;
@@ -25,6 +37,7 @@ module.exports = {
         Import: './cms/static/js/features/import/factories/import.js',
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
         'js/pages/login': './cms/static/js/pages/login.js',
+        'js/pages/asset_index': './cms/static/js/pages/asset_index.js',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
@@ -115,10 +128,25 @@ module.exports = {
                 )
             },
             {
+                test: filesWithTextBangUnderscore,
+                loader: StringReplace.replace(
+                    ['babel-loader'],
+                    {
+                        replacements: [
+                            {
+                                pattern: /text!(.*\.underscore)/,
+                                replacement: function(match, p1) { return p1; }
+                            }
+                        ]
+                    }
+                )
+            },
+            {
                 test: /\.(js|jsx)$/,
                 exclude: [
                     /node_modules/,
-                    namespacedRequireFiles
+                    namespacedRequireFiles,
+                    filesWithTextBangUnderscore
                 ],
                 use: 'babel-loader'
             },
@@ -174,7 +202,8 @@ module.exports = {
             'node_modules',
             'common/static/js/vendor/',
             'cms/static',
-            'common/static/js/src'
+            'common/static/js/src',
+            'common/static/js/vendor/jQuery-File-Upload/js/'
         ]
     },
 
