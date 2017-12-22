@@ -245,19 +245,30 @@ def get_course_runs_for_course(course_uuid):
 
 def get_visible_course_runs_for_entitlement(entitlement):
     """
-    We only want to show courses for a particular entitlement that:
+    Returns only the course runs that the user can currently enroll in.
+    """
+    sessions_for_course = get_course_runs_for_course(entitlement.course_uuid)
+    return get_fulfillable_course_runs_for_entitlement(entitlement, sessions_for_course)
+
+
+def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
+    """
+    Takes a list of course runs and returns only the course runs that:
 
     1) Are currently running or in the future
     2) A user can enroll in
     3) A user can upgrade in
     4) Are published
+
+    These are the only sessions that can be selected for an entitlement.
     """
-    sessions_for_course = get_course_runs_for_course(entitlement.course_uuid)
+
     enrollable_sessions = []
 
     # Only show published course runs that can still be enrolled and upgraded
     now = datetime.datetime.now(UTC)
-    for course_run in sessions_for_course:
+    for course_run in course_runs:
+
         # Only courses that have not ended will be displayed
         run_start = course_run.get('start')
         run_end = course_run.get('end')
