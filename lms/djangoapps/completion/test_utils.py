@@ -20,3 +20,8 @@ class CompletionWaffleTestMixin(object):
         _waffle_overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, override)
         _waffle_overrider.__enter__()
         self.addCleanup(_waffle_overrider.__exit__, None, None, None)
+
+    def override_aggregation_switch(self, override):
+        _waffle_overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_AGGREGATION, override)
+        _waffle_overrider.__enter__()
+        self.addCleanup(_waffle_overrider.__exit__, None, None, None)

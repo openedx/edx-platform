@@ -173,7 +173,7 @@ if settings.FEATURES['ENABLE_OPENBADGES']:
         url(r'^api/badges/v1/', include('badges.api.urls', app_name='badges', namespace='badges_api')),
     ]
 
-js_info_dict = {
+js_info_dict  =  {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
     'packages': ('openassessment',),
@@ -858,6 +858,11 @@ urlpatterns += [
 # Course goals
 urlpatterns += [
     url(r'^api/course_goals/', include('lms.djangoapps.course_goals.urls', namespace='course_goals_api')),
+]
+
+# Completion
+urlpatterns += [
+    url(r'^api/completion/', include('lms.djangoapps.completion.urls')),
 ]
 
 # Embargo
