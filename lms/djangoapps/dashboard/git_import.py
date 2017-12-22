@@ -22,6 +22,7 @@ from dashboard.models import CourseImportLog
 log = logging.getLogger(__name__)
 
 DEFAULT_GIT_REPO_DIR = '/edx/var/app/edxapp/course_repos'
+DEFAULT_COURSE_CODE_LIB_FILENAME = 'python_lib.zip'
 
 
 class GitImportError(Exception):
@@ -184,6 +185,8 @@ def add_repo(repo, rdir_in, branch=None):
 
     git_repo_dir = getattr(settings, 'GIT_REPO_DIR', DEFAULT_GIT_REPO_DIR)
     git_import_static = getattr(settings, 'GIT_IMPORT_STATIC', True)
+    git_import_code_lib = getattr(settings, 'GIT_IMPORT_CODE_LIB', True)
+    course_code_lib_filename = getattr(settings, 'COURSE_CODE_LIB_FILENAME', DEFAULT_COURSE_CODE_LIB_FILENAME)
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {
@@ -271,8 +274,11 @@ def add_repo(repo, rdir_in, branch=None):
         loggers.append(logger)
 
     try:
-        management.call_command('import', git_repo_dir, rdir,
-                                nostatic=not git_import_static)
+        management.call_command(
+            'import', git_repo_dir, rdir,
+            nostatic=not git_import_static, nocodelib=not git_import_code_lib,
+            code_lib_filename=course_code_lib_filename
+        )
     except CommandError:
         raise GitImportErrorXmlImportFailed()
     except NotImplementedError:

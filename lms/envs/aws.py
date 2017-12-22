@@ -371,6 +371,8 @@ BADGR_TIMEOUT = ENV_TOKENS.get('BADGR_TIMEOUT', BADGR_TIMEOUT)
 # git repo loading  environment
 GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
 GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
+GIT_IMPORT_CODE_LIB = ENV_TOKENS.get('GIT_IMPORT_CODE_LIB', True)
+COURSE_CODE_LIB_FILENAME = ENV_TOKENS.get('COURSE_CODE_LIB_FILENAME', 'python_lib.zip')
 
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)

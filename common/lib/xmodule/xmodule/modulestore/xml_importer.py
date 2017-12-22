@@ -54,96 +54,104 @@ from xmodule.util.misc import escape_invalid_characters
 
 log = logging.getLogger(__name__)
 
+DEFAULT_STATIC_CONTENT_SUBDIR = 'static'
 
-def import_static_content(
-        course_data_path, static_content_store,
-        target_id, subpath='static', verbose=False):
 
-    remap_dict = {}
+class StaticContentImporter:
+    def __init__(self, static_content_store, course_data_path, target_id):
+        self.static_content_store = static_content_store
+        self.target_id = target_id
+        self.course_data_path = course_data_path
+        try:
+            with open(course_data_path / 'policies/assets.json') as f:
+                self.policy = json.load(f)
+        except (IOError, ValueError) as err:
+            # xml backed courses won't have this file, only exported courses;
+            # so, its absence is not really an exception.
+            self.policy = {}
 
-    # now import all static assets
-    static_dir = course_data_path / subpath
-    try:
-        with open(course_data_path / 'policies/assets.json') as f:
-            policy = json.load(f)
-    except (IOError, ValueError) as err:
-        # xml backed courses won't have this file, only exported courses;
-        # so, its absence is not really an exception.
-        policy = {}
+        mimetypes.add_type('application/octet-stream', '.sjson')
+        mimetypes.add_type('application/octet-stream', '.srt')
+        self.mimetypes_list = mimetypes.types_map.values()
 
-    verbose = True
+    def import_static_content_directory(self, content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR, verbose=False):
+        remap_dict = {}
 
-    mimetypes.add_type('application/octet-stream', '.sjson')
-    mimetypes.add_type('application/octet-stream', '.srt')
-    mimetypes_list = mimetypes.types_map.values()
+        static_dir = self.course_data_path / content_subdir
+        for dirname, _, filenames in os.walk(static_dir):
+            for filename in filenames:
 
-    for dirname, _, filenames in os.walk(static_dir):
-        for filename in filenames:
+                file_path = os.path.join(dirname, filename)
 
-            content_path = os.path.join(dirname, filename)
-
-            if re.match(ASSET_IGNORE_REGEX, filename):
-                if verbose:
-                    log.debug('skipping static content %s...', content_path)
-                continue
-
-            if verbose:
-                log.debug('importing static content %s...', content_path)
-
-            try:
-                with open(content_path, 'rb') as f:
-                    data = f.read()
-            except IOError:
-                if filename.startswith('._'):
-                    # OS X "companion files". See
-                    # http://www.diigo.com/annotated/0c936fda5da4aa1159c189cea227e174
+                if re.match(ASSET_IGNORE_REGEX, filename):
+                    if verbose:
+                        log.debug('skipping static content %s...', file_path)
                     continue
-                # Not a 'hidden file', then re-raise exception
-                raise
 
-            # strip away leading path from the name
-            fullname_with_subpath = content_path.replace(static_dir, '')
-            if fullname_with_subpath.startswith('/'):
-                fullname_with_subpath = fullname_with_subpath[1:]
-            asset_key = StaticContent.compute_location(target_id, fullname_with_subpath)
+                if verbose:
+                    log.debug('importing static content %s...', file_path)
 
-            policy_ele = policy.get(asset_key.path, {})
+                imported_file_attrs = self.import_static_file(file_path, base_dir=static_dir)
 
-            # During export display name is used to create files, strip away slashes from name
-            displayname = escape_invalid_characters(
-                name=policy_ele.get('displayname', filename),
-                invalid_char_list=['/', '\\']
-            )
-            locked = policy_ele.get('locked', False)
-            mime_type = policy_ele.get('contentType')
+                if imported_file_attrs:
+                    # store the remapping information which will be needed
+                    # to subsitute in the module data
+                    remap_dict[imported_file_attrs[0]] = imported_file_attrs[1]
 
-            # Check extracted contentType in list of all valid mimetypes
-            if not mime_type or mime_type not in mimetypes_list:
-                mime_type = mimetypes.guess_type(filename)[0]   # Assign guessed mimetype
-            content = StaticContent(
-                asset_key, displayname, mime_type, data,
-                import_path=fullname_with_subpath, locked=locked
-            )
+        return remap_dict
 
-            # first let's save a thumbnail so we can get back a thumbnail location
-            thumbnail_content, thumbnail_location = static_content_store.generate_thumbnail(content)
+    def import_static_file(self, full_file_path, base_dir):
+        filename = os.path.basename(full_file_path)
+        try:
+            with open(full_file_path, 'rb') as f:
+                data = f.read()
+        except IOError:
+            # OS X "companion files". See
+            # http://www.diigo.com/annotated/0c936fda5da4aa1159c189cea227e174
+            if filename.startswith('._'):
+                return None
+            # Not a 'hidden file', then re-raise exception
+            raise
 
-            if thumbnail_content is not None:
-                content.thumbnail_location = thumbnail_location
+        # strip away leading path from the name
+        file_subpath = full_file_path.replace(base_dir, '')
+        if file_subpath.startswith('/'):
+            file_subpath = file_subpath[1:]
+        asset_key = StaticContent.compute_location(self.target_id, file_subpath)
 
-            # then commit the content
-            try:
-                static_content_store.save(content)
-            except Exception as err:
-                log.exception(u'Error importing {0}, error={1}'.format(
-                    fullname_with_subpath, err
-                ))
+        policy_ele = self.policy.get(asset_key.path, {})
 
-            # store the remapping information which will be needed
-            # to subsitute in the module data
-            remap_dict[fullname_with_subpath] = asset_key
+        # During export display name is used to create files, strip away slashes from name
+        displayname = escape_invalid_characters(
+            name=policy_ele.get('displayname', filename),
+            invalid_char_list=['/', '\\']
+        )
+        locked = policy_ele.get('locked', False)
+        mime_type = policy_ele.get('contentType')
 
-    return remap_dict
+        # Check extracted contentType in list of all valid mimetypes
+        if not mime_type or mime_type not in self.mimetypes_list:
+            mime_type = mimetypes.guess_type(filename)[0]  # Assign guessed mimetype
+        content = StaticContent(
+            asset_key, displayname, mime_type, data,
+            import_path=file_subpath, locked=locked
+        )
+
+        # first let's save a thumbnail so we can get back a thumbnail location
+        thumbnail_content, thumbnail_location = self.static_content_store.generate_thumbnail(content)
+
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_location
+
+        # then commit the content
+        try:
+            self.static_content_store.save(content)
+        except Exception as err:
+            log.exception(u'Error importing {0}, error={1}'.format(
+                file_subpath, err
+            ))
+
+        return file_subpath, asset_key
 
 
 class ImportManager(object):
@@ -186,8 +194,10 @@ class ImportManager(object):
             default_class='xmodule.raw_module.RawDescriptor',
             load_error_modules=True, static_content_store=None,
             target_id=None, verbose=False,
-            do_import_static=True, create_if_not_present=False,
-            raise_on_failure=False
+            do_import_static=True, do_import_code_lib=True,
+            create_if_not_present=False, raise_on_failure=False,
+            static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
+            python_lib_filename='python_lib.zip',
     ):
         self.store = store
         self.user_id = user_id
@@ -197,7 +207,10 @@ class ImportManager(object):
         self.static_content_store = static_content_store
         self.target_id = target_id
         self.verbose = verbose
+        self.static_content_subdir = static_content_subdir
+        self.python_lib_filename = python_lib_filename
         self.do_import_static = do_import_static
+        self.do_import_code_lib = do_import_code_lib
         self.create_if_not_present = create_if_not_present
         self.raise_on_failure = raise_on_failure
         self.xml_module_store = self.store_class(
@@ -224,18 +237,35 @@ class ImportManager(object):
         """
         Import all static items into the content store.
         """
-        if self.static_content_store is not None and self.do_import_static:
-            # first pass to find everything in /static/
-            import_static_content(
-                data_path, self.static_content_store,
-                dest_id, subpath='static', verbose=self.verbose
-            )
-
-        elif self.verbose and not self.do_import_static:
+        static_content_importer = StaticContentImporter(
+            self.static_content_store,
+            course_data_path=data_path,
+            target_id=dest_id
+        )
+        if self.verbose and not self.do_import_static:
             log.debug(
                 "Skipping import of static content, "
                 "since do_import_static=%s", self.do_import_static
             )
+            if self.do_import_code_lib:
+                log.debug(
+                    "Importing code library anyway "
+                    "since do_import_code_lib=%s", self.do_import_code_lib
+                )
+
+        if self.static_content_store is not None:
+            if self.do_import_static:
+                # first pass to find everything in the static content directory
+                static_content_importer.import_static_content_directory(
+                    content_subdir=self.static_content_subdir, verbose=self.verbose
+                )
+            elif self.do_import_code_lib and self.python_lib_filename:
+                python_lib_dir_path = data_path / self.static_content_subdir
+                python_lib_full_path = python_lib_dir_path / self.python_lib_filename
+                if os.path.isfile(python_lib_full_path):
+                    static_content_importer.import_static_file(
+                        python_lib_full_path, base_dir=python_lib_dir_path
+                    )
 
         # no matter what do_import_static is, import "static_import" directory
 
@@ -249,9 +279,8 @@ class ImportManager(object):
 
         simport = 'static_import'
         if os.path.exists(data_path / simport):
-            import_static_content(
-                data_path, self.static_content_store,
-                dest_id, subpath=simport, verbose=self.verbose
+            static_content_importer.import_static_content_directory(
+                content_subdir=simport, verbose=self.verbose
             )
 
     def import_asset_metadata(self, data_dir, course_id):

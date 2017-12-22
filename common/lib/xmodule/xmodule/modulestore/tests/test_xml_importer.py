@@ -9,11 +9,17 @@ from xmodule.x_module import XModuleMixin
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
+from xmodule.modulestore.xml_importer import (
+    StaticContentImporter,
+    _update_and_import_module,
+    _update_module_location
+)
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from opaque_keys.edx.keys import CourseKey
 from xmodule.tests import DATA_DIR
+import os
 from uuid import uuid4
+from path import Path as path
 import unittest
 import importlib
 
@@ -333,3 +339,50 @@ class UpdateLocationTest(ModuleStoreNoSettings):
         # Expect these fields pass "is_set_on" test
         for field in self.CONTENT_FIELDS + self.SETTINGS_FIELDS + self.CHILDREN_FIELDS:
             self.assertTrue(new_version.fields[field].is_set_on(new_version))
+
+
+class StaticContentImporterTest(unittest.TestCase):
+    def setUp(self):
+        self.course_data_path = path('/path')
+        self.mocked_content_store = mock.Mock()
+        self.static_content_importer = StaticContentImporter(
+            static_content_store=self.mocked_content_store,
+            course_data_path=self.course_data_path,
+            target_id=CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        )
+
+    def test_import_static_content_directory(self):
+        static_content_dir = 'static'
+        expected_base_dir = path(self.course_data_path / static_content_dir)
+        mocked_os_walk_yield = [
+            ('static', None, ['file1.txt', 'file2.txt']),
+            ('static/inner', None, ['file1.txt']),
+        ]
+        with mock.patch(
+            'xmodule.modulestore.xml_importer.os.walk',
+            return_value=mocked_os_walk_yield
+        ), mock.patch.object(
+            self.static_content_importer, 'import_static_file'
+        ) as patched_import_static_file:
+            self.static_content_importer.import_static_content_directory('static')
+            patched_import_static_file.assert_any_call(
+                'static/file1.txt', base_dir=expected_base_dir
+            )
+            patched_import_static_file.assert_any_call(
+                'static/file2.txt', base_dir=expected_base_dir
+            )
+            patched_import_static_file.assert_any_call(
+                'static/inner/file1.txt', base_dir=expected_base_dir
+            )
+
+    def test_import_static_file(self):
+        base_dir = path('/path/to/dir')
+        full_file_path = os.path.join(base_dir, 'static/some_file.txt')
+        self.mocked_content_store.generate_thumbnail.return_value = (None, None)
+        with mock.patch("__builtin__.open", mock.mock_open(read_data="data")) as mock_file:
+            self.static_content_importer.import_static_file(
+                full_file_path=full_file_path,
+                base_dir=base_dir
+            )
+            mock_file.assert_called_with(full_file_path, 'rb')
+            self.mocked_content_store.assert_called_once()
