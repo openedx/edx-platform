@@ -70,3 +70,5 @@ export PAVER_TIMER_LOG="test_root/log/timing.paver.$TIMESTAMP.log"
 export ANSIBLE_TIMER_LOG="test_root/log/timing.ansible.$TIMESTAMP.log"
 
 echo "This node is `curl http://169.254.169.254/latest/meta-data/hostname`"
+
+pip install --upgrade --force-reinstall git+https://github.com/jzoldak/paver.git@b72ccd7b638c1e07105d04f670170b3a37095d10#egg=Paver==1.2.4a
