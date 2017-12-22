@@ -2,6 +2,7 @@
 """ Tests for transcripts_utils. """
 import copy
 import ddt
+import json
 import textwrap
 import unittest
 from uuid import uuid4
@@ -610,28 +611,53 @@ class TestTranscript(unittest.TestCase):
         self.txt_transcript = u"Elephant's Dream\nAt the left we can see..."
 
     def test_convert_srt_to_txt(self):
+        """
+        Tests that the srt transcript is successfully converted into txt format.
+        """
         expected = self.txt_transcript
         actual = transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'txt')
         self.assertEqual(actual, expected)
 
     def test_convert_srt_to_srt(self):
+        """
+        Tests that srt to srt conversion works as expected.
+        """
         expected = self.srt_transcript
         actual = transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'srt')
         self.assertEqual(actual, expected)
 
     def test_convert_sjson_to_txt(self):
+        """
+        Tests that the sjson transcript is successfully converted into txt format.
+        """
         expected = self.txt_transcript
         actual = transcripts_utils.Transcript.convert(self.sjson_transcript, 'sjson', 'txt')
         self.assertEqual(actual, expected)
 
     def test_convert_sjson_to_srt(self):
+        """
+        Tests that the sjson transcript is successfully converted into srt format.
+        """
         expected = self.srt_transcript
         actual = transcripts_utils.Transcript.convert(self.sjson_transcript, 'sjson', 'srt')
         self.assertEqual(actual, expected)
 
     def test_convert_srt_to_sjson(self):
-        with self.assertRaises(NotImplementedError):
-            transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'sjson')
+        """
+        Tests that the srt transcript is successfully converted into sjson format.
+        """
+        expected = json.loads(self.sjson_transcript)
+        actual = transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'sjson')
+        self.assertDictEqual(actual, expected)
+
+    def test_convert_invalid_srt_to_sjson(self):
+        """
+        Tests that TranscriptsGenerationException was raises on trying
+        to convert invalid srt transcript to sjson.
+        """
+        invalid_srt_transcript = 'invalid SubRip file content'
+        with self.assertRaises(transcripts_utils.TranscriptsGenerationException):
+            transcripts_utils.Transcript.convert(invalid_srt_transcript, 'srt', 'sjson')
 
     def test_dummy_non_existent_transcript(self):
         """
