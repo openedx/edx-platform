@@ -8,7 +8,6 @@ from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import UserExtendedProfile
 from nodebb.models import DiscussionCommunity, TeamGroupChat
-from lms.djangoapps.onboarding_survey.signals import save_interests
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile
