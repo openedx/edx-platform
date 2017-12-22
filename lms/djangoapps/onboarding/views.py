@@ -3,6 +3,7 @@ Views for on-boarding app.
 """
 import json
 import logging
+from datetime import datetime
 import base64
 
 import os
@@ -251,12 +252,18 @@ def org_detail_survey(request):
     latest_survey = OrganizationMetric.objects.filter(org=user_extended_profile.organization,
                                                       user=request.user).last()
 
+    initial = {
+        'can_provide_info': '1' if latest_survey else '0',
+        'actual_data': '1' if latest_survey and latest_survey.actual_data else '0',
+        "effective_date": datetime.strftime(latest_survey.effective_date, '%d/%m/%Y') if latest_survey else ""
+    }
+
     if request.method == 'POST':
 
         if latest_survey:
-            form = forms.OrganizationMetricModelForm(request.POST, instance=latest_survey)
+            form = forms.OrganizationMetricModelForm(request.POST, instance=latest_survey, initial=initial)
         else:
-            form = forms.OrganizationMetricModelForm(request.POST)
+            form = forms.OrganizationMetricModelForm(request.POST, initial=initial)
 
         if form.is_valid():
             form.save(request)
@@ -270,10 +277,7 @@ def org_detail_survey(request):
 
     else:
         if latest_survey:
-            form = forms.OrganizationMetricModelForm(instance=latest_survey, initial={
-                'can_provide_info': '1' if latest_survey else '0',
-                'actual_data': '1' if latest_survey.actual_data else '0',
-            })
+            form = forms.OrganizationMetricModelForm(instance=latest_survey, initial=initial)
         else:
             form = forms.OrganizationMetricModelForm()
 
