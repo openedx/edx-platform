@@ -43,8 +43,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file(
-            'test_include.xml',
-            '<test>Test include</test>'
+            u'test_include.xml',
+            u'<test>Test include</test>'
         )
 
         # Generate some XML with an <include>

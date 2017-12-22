@@ -34,8 +34,8 @@ new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('XBlock', XBlock)
 
-LIBRARY_ROOT = 'library.xml'
-COURSE_ROOT = 'course.xml'
+LIBRARY_ROOT = u'library.xml'
+COURSE_ROOT = u'course.xml'
 
 # List of names of computed fields on xmodules that are of type usage keys.
 # This list can be used to determine which fields need to be stripped of
