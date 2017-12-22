@@ -56,13 +56,12 @@ branches:
   - oxa/master.fic
   - oxa/release.fic
   - oxa/dev.fic
-  - oxa/dev.fic_new
-  - oxa/dev.fic_ci
+  - oxa/ci
 
 before_install:
   # Login and fetch container from Azure container registry
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-  - docker pull btelnes/devstack
+  - travis_wait docker pull btelnes/devstack
 
 install:
   - docker run -d --name devstack --add-host "localhost preview.localhost":127.0.0.1 --security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e TEST_SUITE="$TEST_SUITE" -e SHARD="$SHARD" -e CODE_COV_TOKEN="$CODE_COV_TOKEN" -t btelnes/devstack
