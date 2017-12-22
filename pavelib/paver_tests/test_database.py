@@ -1,18 +1,18 @@
 """
-Tests for the Paver commands for updating test databases
+Tests for the Paver commands for updating test databases and its utility methods
 """
 from unittest import TestCase
 
 import boto
 
 from common.test.utils import MockS3Mixin
-from pavelib.database import is_fingerprint_in_bucket
+from pavelib.utils.db_utils import is_fingerprint_in_bucket
 
 
-class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
-    """Tests for the Database cache file manipulation."""
+class TestPaverDbUtils(MockS3Mixin, TestCase):
+    """ Tests for paver bokchoy database utils """
     def setUp(self):
-        super(TestPaverDatabaseTasks, self).setUp()
+        super(TestPaverDbUtils, self).setUp()
         conn = boto.connect_s3()
         conn.create_bucket('moto_test_bucket')
         self.bucket = conn.get_bucket('moto_test_bucket')
