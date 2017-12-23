@@ -39,6 +39,7 @@ def get_auth_footer(is_secure=True):
         "copyright": _auth_footer_copyright(),
         "social_links": _auth_footer_social_links(),
         "navigation_links": _auth_footer_navigation_links(),
+        "courses_communities_links": _auth_footer_courses_communities_links(),
         "legal_links": _auth_footer_legal_links(),
     }
 
@@ -140,12 +141,28 @@ def _auth_footer_navigation_links():
             "url": link_url,
         }
         for link_name, link_url, link_title in [
-            ("about", marketing_link("ABOUT"), _("About Philanthropy University")),
+            ("about", marketing_link("ABOUT"), _("About Philanthropy University"))
+        ]
+        if link_url and link_url != "#"
+    ]
+
+
+def _auth_footer_courses_communities_links():
+    """Return the navigation links to display in the footer. """
+    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    return [
+        {
+            "name": link_name,
+            "title": link_title,
+            "url": link_url,
+        }
+        for link_name, link_url, link_title in [
             ("explore_course", "/courses", _("Explore our Courses")),
             ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities")),
         ]
         if link_url and link_url != "#"
     ]
+
 
 
 def _footer_navigation_links():
