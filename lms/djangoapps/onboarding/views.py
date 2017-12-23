@@ -323,10 +323,9 @@ def update_account_settings(request):
 
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
-            form_instance = form.save(commit=False)
-            if form_instance.is_poc:
-                form_instance.org_admin_email = ""
-            form_instance.save()
+            user_extended_profile = form.save(user=user_extended_profile.user, commit=False)
+            user_extended_profile.save()
+            user_extended_profile.organization.save()
 
     else:
         form = forms.UpdateRegModelForm(
@@ -357,9 +356,11 @@ def get_user_organizations(request):
 
         if request.user.is_authenticated():
             user_extended_profile = request.user.extended_profile
+            organization = user_extended_profile.organization
             final_result['user_org_info'] = {
-                'org': user_extended_profile.organization.label,
-                'admin_email': user_extended_profile.org_admin_email
+                'org': organization.label,
+                'admin_email': organization.admin.email if organization.admin else
+                organization.unclaimed_org_admin_email
             }
 
     return JsonResponse(final_result)
@@ -420,6 +421,7 @@ def admin_activation(request, org_id, activation_key):
 
         if request.method == "POST":
             hash_key_obj.organization.admin = user_extended_profile.user
+            hash_key_obj.oraganization.unclaimed_org_admin_email = ""
             hash_key_obj.organization.save()
             activation_status = 1
 
