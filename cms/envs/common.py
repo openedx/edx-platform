@@ -298,6 +298,7 @@ SOCIAL_SHARING_SETTINGS = {
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
+NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 COMMON_ROOT = REPO_ROOT / "common"
 OPENEDX_ROOT = REPO_ROOT / "openedx"
 CMS_ROOT = REPO_ROOT / "cms"
@@ -623,6 +624,7 @@ STATIC_ROOT = ENV_ROOT / "staticfiles" / 'studio'
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    NODE_MODULES_ROOT / "@edx",
 
     # This is how you would use the textbook images locally
     # ("book", ENV_ROOT / "book_images"),

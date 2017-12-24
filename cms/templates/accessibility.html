@@ -9,6 +9,9 @@
 %>
 <%block name="title">${_("Studio Accessibility Policy")}</%block>
 <%block name="bodyclass">is-signedin not-signedin view-accessibility</%block>
+<%block name="header_extras">
+  <link rel="stylesheet" type="text/css" href="${static.url('studio-frontend/dist/studio-frontend.min.css')}" />
+</%block>
 
 <%namespace name='static' file='static_content.html'/>
 

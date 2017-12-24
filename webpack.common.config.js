@@ -20,7 +20,7 @@ module.exports = {
         AssetsPage: './node_modules/@edx/studio-frontend/src/index.jsx',
         Import: './cms/static/js/features/import/factories/import.js',
         StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
-        AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
+        AccessibilityPage: './node_modules/@edx/studio-frontend/dist/accessibilityPolicy.min.js',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
