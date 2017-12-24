@@ -226,7 +226,7 @@
         }
     });
 
-    jasmine.getFixtures().fixturesPath += 'coffee/fixtures';
+    jasmine.getFixtures().fixturesPath = '/base/templates';
 
     testFiles = [
         'cms/js/spec/main_spec',

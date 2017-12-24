@@ -182,7 +182,7 @@
         }
     });
 
-    jasmine.getFixtures().fixturesPath += 'coffee/fixtures';
+    jasmine.getFixtures().fixturesPath = '/base/templates';
 
     testFiles = [
         'coffee/spec/views/assets_spec',
