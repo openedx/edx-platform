@@ -76,7 +76,7 @@ module.exports = {
             // common/djangoapps/pipeline_mako/templates/static_content.html
             name: 'commons',
             filename: 'commons.js',
-            minChunks: 2
+            minChunks: 3
         })
     ],
 
