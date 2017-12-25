@@ -45,10 +45,11 @@ import calendar
 
       $('#register-form').on('submit', function() {
         toggleSubmitButton(false);
+        setTimeout(function() { toggleSubmitButton(true); }, 5000);
       });
 
       $('#register-form').on('ajax:error', function() {
-        toggleSubmitButton(true);
+        setTimeout(function() { toggleSubmitButton(true); }, 5000);
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
@@ -64,7 +65,7 @@ import calendar
       });
 
       $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
-        toggleSubmitButton(true);
+        setTimeout(function() { toggleSubmitButton(true); }, 5000);
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
@@ -85,6 +86,7 @@ import calendar
         $submitButton.
           removeClass('is-disabled').
           attr('aria-disabled', false).
+          prop('disabled', false).
           removeProp('disabled').
           html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
       }

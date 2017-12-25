@@ -46,10 +46,11 @@ from third_party_auth import provider, pipeline
 
       $('#login-form').on('submit', function() {
         toggleSubmitButton(false);
+        setTimeout(function() { toggleSubmitButton(true); }, 3000);
       });
 
       $('#login-form').on('ajax:error', function(event, request, status_string) {
-        toggleSubmitButton(true);
+        setTimeout(function() { toggleSubmitButton(true); }, 3000);
 
         if (request.status === 403) {
           $('.message.submission-error').removeClass('is-shown');
@@ -81,7 +82,7 @@ from third_party_auth import provider, pipeline
           } // else we just remain on this page, which is fine since this particular path implies a login failure
             // that has been generated via packet tampering (json.redirect has been messed with).
         } else {
-          toggleSubmitButton(true);
+          setTimeout(function() { toggleSubmitButton(true); }, 3000);
           $('.message.submission-error').addClass('is-shown').focus();
           $('.message.submission-error .message-copy').html(json.value);
         }
@@ -100,6 +101,7 @@ from third_party_auth import provider, pipeline
         $submitButton.
           removeClass('is-disabled').
           attr('aria-disabled', false).
+          prop('disabled', false).
           removeProp('disabled').
           html("${_('Log into My {platform_name} Account').format(platform_name=platform_name)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
       }
