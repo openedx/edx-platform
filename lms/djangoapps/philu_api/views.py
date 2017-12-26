@@ -8,9 +8,11 @@ from django.http import JsonResponse
 from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
+
+from lms.djangoapps.onboarding.forms import RegModelForm
 from student.models import User
 
-from lms.djangoapps.onboarding_survey.models import Organization, ExtendedProfile
+from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
 from lms.djangoapps.philu_api.helpers import get_encoded_token
 
 log = logging.getLogger("edx.philu_api")
@@ -50,7 +52,7 @@ class UpdateCommunityProfile(APIView):
                 organization, is_created = Organization.objects.get_or_create(name=organization)
 
                 if organization != extended_profile.organization:
-                    is_poc_value, is_poc_label = ExtendedProfile.POC_CHOICES[0]
+                    is_poc_value, is_poc_label = RegModelForm.POC_CHOICES[0]
                     extended_profile.org_admin_email = ""
                     extended_profile.is_poc = is_poc_value
                     extended_profile.organization = organization

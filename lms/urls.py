@@ -31,7 +31,7 @@ urlpatterns = (
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
 
-    url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
+    url(r'^onboarding/', include('lms.djangoapps.onboarding.urls')),
     url(r'^oef/', include('lms.djangoapps.oef.urls')),
     url(r'', include('edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
@@ -126,9 +126,11 @@ urlpatterns += (
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
-        url(r'^login$', 'student_account.views.login_and_registration_form',
+        url(r'^login$', 'philu_overrides.views.login_and_registration_form',
             {'initial_mode': 'login'}, name="signin_user"),
-        url(r'^register$', 'student_account.views.login_and_registration_form',
+        url(r'^register$', 'philu_overrides.views.login_and_registration_form',
+            {'initial_mode': 'register'}, name="register_user"),
+        url(r'^register/(?P<org_name>[^/]*)/(?P<admin_email>[^/]*)/$', 'philu_overrides.views.login_and_registration_form',
             {'initial_mode': 'register'}, name="register_user"),
     )
 else:

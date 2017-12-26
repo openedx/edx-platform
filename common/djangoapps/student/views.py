@@ -662,11 +662,11 @@ def dashboard(request):
 
     # Show different dashboard messages in case of admin OR regular user
     message = ""
-    first_name = user.extended_profile.first_name
+    first_name = user.first_name
     if not user.is_active:
-        if user.extended_profile.is_poc:
+        if user.extended_profile.is_organization_admin:
             msg = ("Success! You are registered as the Admin for %s, %s"
-             % (user.extended_profile.organization.name, first_name))
+             % (user.extended_profile.organization.label, first_name))
         else:
             msg = "Success! You are registered, %s" % (first_name)
         message = render_to_string(
@@ -788,7 +788,7 @@ def dashboard(request):
         redirect_message = ''
 
     context = {
-        'is_poc': user.extended_profile.is_poc,
+        'is_poc': user.extended_profile.is_organization_admin,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
@@ -2071,7 +2071,6 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
-    is_poc = request.GET.get('is_poc', False)
     course_id = request.GET.get('course_id', None)
     redirect_to = request.GET.get('redirect_to', None)
     active_status = request.GET.get('is_active')
