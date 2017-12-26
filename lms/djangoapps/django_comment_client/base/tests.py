@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for django comment client views."""
 import json
 import logging
@@ -16,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
-from django_comment_client.utils import is_commentable_cohorted
+from django_comment_client.utils import is_commentable_divided
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 )
@@ -227,7 +228,7 @@ class CreateCohortedThreadTestCase(CohortedTestCase):
         self._assert_mock_request_called_without_group_id(mock_request)
 
     def test_moderator_none_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, expected_status_code=400)
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, expected_status_code=500)
         self.assertFalse(mock_request.called)
 
     def test_moderator_with_own_group_id(self, mock_request):
@@ -240,7 +241,7 @@ class CreateCohortedThreadTestCase(CohortedTestCase):
 
     def test_moderator_with_invalid_group_id(self, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, invalid_id, expected_status_code=400)
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, invalid_id, expected_status_code=500)
         self.assertFalse(mock_request.called)
 
 
@@ -638,7 +639,7 @@ class ViewsTestCase(
         }
         self.store.update_item(self.course, self.student.id)
 
-        assert_true(is_commentable_cohorted(self.course.id, commentable_id))
+        assert_true(is_commentable_divided(self.course.id, commentable_id))
 
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {

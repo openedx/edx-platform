@@ -76,7 +76,7 @@ class CompletionViewTestCase(SharedModuleStoreTestCase):
             course_id=self.course.id,
             content_id=UsageKey.from_string('i4x://edX/toy/video/sample_video').map_into_course(self.course.id),
         )
-        models.StudentProgress.objects.create(
+        models.StudentProgress.objects.get_or_create(
             user=self.test_user,
             course_id=self.course.id,
             completions=1,

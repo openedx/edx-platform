@@ -11,7 +11,7 @@ import django.test
 import mock
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.siLTIProviderConfigLTIProviderConfigtes.models import Site
+from django.contrib.sites.models import Site
 from mako.template import Template
 from provider import constants
 from provider.oauth2.models import Client as OAuth2Client

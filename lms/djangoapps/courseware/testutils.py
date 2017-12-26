@@ -176,10 +176,11 @@ class RenderXBlockTestMixin(object):
                     self.assertContains(response, chrome_element)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 7),
+        (ModuleStoreEnum.Type.mongo, 6),
         (ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
+    @patch.dict("django.conf.settings.FEATURES", {"ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE": True})
     def test_success_enrolled_staff(self, default_store, mongo_calls):
         with self.store.default_store(default_store):
             if default_store is ModuleStoreEnum.Type.mongo:
@@ -195,7 +196,6 @@ class RenderXBlockTestMixin(object):
             #   (4) get_parent when loading HTML block
             #   (5) edx_notes descriptor call to get_course
             #   (6) get_course in handle_progress_event
-            #   (7) get_item in handle_cmc_post_save_signal
             # Split:
             #   (1) course_index - bulk_operation call
             #   (2) structure - get_course_with_access

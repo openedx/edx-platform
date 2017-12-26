@@ -71,7 +71,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         # Create a scheduled discussion xblock with legacy category name
         ItemFactory.create(
             parent=parent,
-            category='discussion-forum',
+            category='discussion',
             display_name='scheduled',
             start=self.future,
         )

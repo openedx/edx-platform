@@ -9,7 +9,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
 
-from django_comment_client.forum.views import get_threads
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
@@ -18,7 +17,6 @@ from django_comment_client.tests.group_id import (
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import (
-    CohortedContentTestCase,
     CohortedTestCase,
     ForumsEnableMixin,
     config_course_discussions,
@@ -481,7 +479,6 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
                 group_id=self.student_cohort.id,
                 group_name=self.student_cohort.name,
                 is_commentable_divided=True,
-                include_children=False,
             )
         )
 
@@ -593,8 +590,8 @@ class SingleThreadAccessTestCase(CohortedTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
-    cs_endpoint = "/threads"
+class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
+    cs_endpoint = "/threads/dummy_thread_id"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
         mock_request.side_effect = make_mock_request_impl(

@@ -79,8 +79,6 @@ FEATURES['EMBARGO'] = True
 FEATURES['API'] = True
 FEATURES['ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE'] = False
 
-FEATURES['ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE'] = False
-
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 # Enable the milestones app in tests to be consistent with it being enabled in production

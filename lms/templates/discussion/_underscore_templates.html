@@ -1,0 +1,41 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%! from openedx.core.djangolib.js_utils import js_escaped_string %>
+
+<script type="text/javascript">
+  window.PLATFORM_NAME = "${settings.PLATFORM_NAME | n, js_escaped_string}";
+  % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL', False):
+    window.ENABLE_DISCUSSION_HOME_PANEL = true;
+  % else:
+    window.ENABLE_DISCUSSION_HOME_PANEL = false;
+  % endif
+</script>
+
+<%
+template_names = [
+    'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show', 'thread-response-edit',
+    'response-comment-show', 'response-comment-edit', 'thread-list-item', 'search-alert',
+    'new-post', 'new-post-menu-entry', 'new-post-menu-category', 'new-post-alert', 'topic', 'post-user-display',
+    'inline-discussion', 'pagination', 'profile-thread', 'customwmd-prompt', 'nav-loading', 'thread-type'
+]
+
+## same, but without trailing "-template" in script ID - these templates does not contain any free variables
+template_names_no_suffix = [
+  'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote', 'forum-action-report',
+  'forum-action-pin', 'forum-action-close', 'forum-action-edit', 'forum-action-delete', 'forum-actions',
+  'alert-popup', 'nav-load-more-link'
+]
+%>
+
+% for template_name in template_names:
+<script aria-hidden="true" type="text/template" id="${template_name}-template">
+    <%static:include path="common/templates/discussion/${template_name}.underscore" />
+</script>
+% endfor
+
+
+% for template_name in template_names_no_suffix:
+<script aria-hidden="true" type="text/template" id="${template_name}">
+    <%static:include path="common/templates/discussion/${template_name}.underscore" />
+</script>
+% endfor

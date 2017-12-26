@@ -11,7 +11,6 @@ from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRo
 from student.tests.factories import AdminFactory
 from student.auth import user_has_role, add_users, remove_users, has_studio_write_access, has_studio_read_access
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.access import has_access
 
 
 class CreatorGroupTest(TestCase):
@@ -206,10 +205,6 @@ class CourseGroupTest(TestCase):
         add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
         self.assertTrue(user_has_role(self.assistant, CourseAssistantRole(self.course_key)))
 
-        # Add another user to the TA role
-        self.assertFalse(has_access(self.assistant, CourseAssistantRole(self.course_key)))
-        add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
-        self.assertTrue(has_access(self.assistant, CourseAssistantRole(self.course_key)))
 
     def test_add_user_to_course_group_permission_denied(self):
         """
@@ -240,12 +235,6 @@ class CourseGroupTest(TestCase):
 
         remove_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
         self.assertFalse(user_has_role(self.assistant, CourseAssistantRole(self.course_key)))
-
-        add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
-        self.assertTrue(has_access(self.assistant, CourseAssistantRole(self.course_key)))
-
-        remove_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
-        self.assertFalse(has_access(self.assistant, CourseAssistantRole(self.course_key)))
 
         remove_users(self.creator, CourseInstructorRole(self.course_key), self.creator)
         self.assertFalse(user_has_role(self.creator, CourseInstructorRole(self.course_key)))

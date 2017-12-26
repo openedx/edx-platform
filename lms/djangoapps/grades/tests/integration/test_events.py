@@ -3,6 +3,8 @@ Test grading events across apps.
 """
 # pylint: disable=protected-access
 
+import os
+from unittest import skipIf
 from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory

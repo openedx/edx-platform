@@ -710,7 +710,7 @@ def course_about(request, course_id):
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-            return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
+            return redirect(reverse(course_home_url_name(course.id), args=[unicode(course.id)]))
 
         registered = registered_for_course(course, request.user)
 

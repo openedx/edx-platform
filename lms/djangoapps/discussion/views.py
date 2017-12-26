@@ -150,7 +150,10 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
 
     #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
-    is_cohorted = is_course_cohorted(course.id)
+    if discussion_id:
+        is_cohorted = is_commentable_divided(course.id, discussion_id)
+    else:
+        is_cohorted = is_course_cohorted(course.id)
 
     if has_permission(request.user, "see_all_cohorts", course.id):
         group_id = request.GET.get('group_id')
@@ -161,7 +164,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         if not group_id:
             default_query_params['exclude_groups'] = True
 
-    if group_id and is_cohorted:
+    if group_id:
         group_id = int(group_id)
         try:
             CourseUserGroup.objects.get(course_id=course.id, id=group_id)
@@ -191,6 +194,9 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
             )
         )
     )
+
+    if not is_cohorted:
+        query_params.pop('group_id', None)
 
     paginated_results = cc.Thread.search(query_params)
     threads = paginated_results.collection

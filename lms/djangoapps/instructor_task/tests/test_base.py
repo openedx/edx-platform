@@ -15,8 +15,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
@@ -109,11 +107,6 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     """
     course = None
     current_user = None
-
-    def setUp(self):
-        super(InstructorTaskCourseTestCase, self).setUp()
-        SignalHandler.course_published.connect(listen_for_course_publish)
-        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
 
     def initialize_course(self, course_factory_kwargs=None):
         """

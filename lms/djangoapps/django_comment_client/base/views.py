@@ -240,7 +240,6 @@ def create_thread(request, course_id, commentable_id):
     """
     Given a course and commentble ID, create the thread
     """
-
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
