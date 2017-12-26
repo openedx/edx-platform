@@ -564,7 +564,7 @@ class RegModelForm(forms.ModelForm):
             prev_org = extended_profile.organization
 
         if user and is_poc == '1':
-            organization_to_assign.unclaimed_org_admin_email = ""
+            organization_to_assign.unclaimed_org_admin_email = None
             organization_to_assign.admin = user
 
         if prev_org:

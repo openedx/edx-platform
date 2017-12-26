@@ -175,6 +175,8 @@ def organization(request):
 
     initial = {
         'country': COUNTRIES.get(_organization.country),
+        'is_org_url_exist': '1' if _organization.url else '0',
+        'partner_networks': _organization.organization_partners.values_list('partner__code', flat=True),
     }
 
     if request.method == 'POST':
@@ -393,6 +395,7 @@ def recommendations(request):
 
     return render_to_response('onboarding/recommendations.html', context)
 
+
 @csrf_exempt
 def admin_activation(request, org_id, activation_key):
     """
@@ -421,7 +424,7 @@ def admin_activation(request, org_id, activation_key):
 
         if request.method == "POST":
             hash_key_obj.organization.admin = user_extended_profile.user
-            hash_key_obj.oraganization.unclaimed_org_admin_email = ""
+            hash_key_obj.oraganization.unclaimed_org_admin_email = None
             hash_key_obj.organization.save()
             activation_status = 1
 
