@@ -234,7 +234,7 @@ def reorder_registration_form_fields(fields):
 
     for idx, field in enumerate(fields):
         order = required_order.get(field['name'])
-        if order:
+        if order >= 0:
             field['order'] = order
         else:
             field['order'] = idx
