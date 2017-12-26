@@ -273,7 +273,7 @@ def org_detail_survey(request):
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
             if are_forms_complete:
-                return redirect(reverse('oef_instructions'))
+                return redirect(reverse('oef_survey'))
 
             return redirect(reverse('org_detail_survey'))
 
