@@ -219,27 +219,23 @@ def get_country_iso(c_name):
 
 
 def reorder_registration_form_fields(fields):
+    required_order = {
+        'first_name': 0,
+        'last_name': 1,
+        'username': 2,
+        'email': 3,
+        'password': 4,
+        'confirm_password': 5,
+        'is_currently_employed': 6,
+        'organization_name': 7,
+        'is_poc': 8,
+        'org_admin_email': 9
+    }
+
     for idx, field in enumerate(fields):
-        if field['name'] == 'first_name':
-            field['order'] = 0
-        elif field['name'] == 'last_name':
-            field['order'] = 1
-        elif field['name'] == 'username':
-            field['order'] = 2
-        elif field['name'] == 'email':
-            field['order'] = 3
-        elif field['name'] == 'password':
-            field['order'] = 4
-        elif field['name'] == 'confirm_password':
-            field['order'] = 5
-        elif field['name'] == 'is_currently_employed':
-            field['order'] = 6
-        elif field['name'] == 'organization_name':
-            field['order'] = 7
-        elif field['name'] == 'is_poc':
-            field['order'] = 8
-        elif field['name'] == 'org_admin_email':
-            field['order'] = 9
+        order = required_order.get(field['name'])
+        if order:
+            field['order'] = order
         else:
             field['order'] = idx
 
