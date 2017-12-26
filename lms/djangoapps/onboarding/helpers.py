@@ -1,5 +1,7 @@
+import operator
 from datetime import date
 
+import collections
 
 COUNTRIES = {
                 'AD': 'Andorra',
@@ -230,11 +232,12 @@ def reorder_registration_form_fields(fields):
         'org_admin_email': 9
     }
 
-    ordered_list = []
-    for field in fields:
-        if field['name'] in required_order:
-            ordered_list.insert(required_order[field['name']], field)
+    for idx, field in enumerate(fields):
+        order = required_order.get(field['name'])
+        if order >= 0:
+            field['order'] = order
         else:
-            ordered_list.append(field)
+            field['order'] = idx
 
-    return ordered_list
+    required_order = sorted(fields, key=lambda k: k['order'])
+    return required_order

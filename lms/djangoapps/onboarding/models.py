@@ -150,6 +150,7 @@ class Organization(TimeStampedModel):
     def __str__(self):
         return self.label
 
+
 class OrganizationPartner(models.Model):
     """
     The model to save the organization partners.

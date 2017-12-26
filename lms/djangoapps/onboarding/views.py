@@ -175,6 +175,8 @@ def organization(request):
 
     initial = {
         'country': COUNTRIES.get(_organization.country),
+        'is_org_url_exist': '1' if _organization.url else '0',
+        'partner_networks': _organization.organization_partners.values_list('partner__code', flat=True),
     }
 
     if request.method == 'POST':
@@ -323,10 +325,9 @@ def update_account_settings(request):
 
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
-            form_instance = form.save(commit=False)
-            if form_instance.is_poc:
-                form_instance.org_admin_email = ""
-            form_instance.save()
+            user_extended_profile = form.save(user=user_extended_profile.user, commit=False)
+            user_extended_profile.save()
+            user_extended_profile.organization.save()
 
     else:
         form = forms.UpdateRegModelForm(
@@ -357,9 +358,11 @@ def get_user_organizations(request):
 
         if request.user.is_authenticated():
             user_extended_profile = request.user.extended_profile
+            organization = user_extended_profile.organization
             final_result['user_org_info'] = {
-                'org': user_extended_profile.organization.label,
-                'admin_email': user_extended_profile.org_admin_email
+                'org': organization.label,
+                'admin_email': organization.admin.email if organization.admin else
+                organization.unclaimed_org_admin_email
             }
 
     return JsonResponse(final_result)
@@ -392,6 +395,7 @@ def recommendations(request):
 
     return render_to_response('onboarding/recommendations.html', context)
 
+
 @csrf_exempt
 def admin_activation(request, org_id, activation_key):
     """
@@ -420,6 +424,7 @@ def admin_activation(request, org_id, activation_key):
 
         if request.method == "POST":
             hash_key_obj.organization.admin = user_extended_profile.user
+            hash_key_obj.oraganization.unclaimed_org_admin_email = None
             hash_key_obj.organization.save()
             activation_status = 1
 

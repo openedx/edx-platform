@@ -305,7 +305,7 @@ class OrganizationInfoForm(forms.ModelForm):
     OPERATION_LEVEL_CHOICES = NO_SELECT_CHOICE + [(ol.code, ol.label) for ol in OperationLevel.objects.all()]
     FOCUS_AREA_CHOICES = NO_SELECT_CHOICE + [(fa.code, fa.label) for fa in FocusArea.objects.all()]
     TOTAL_EMPLOYEES_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label) for ep in TotalEmployee.objects.all()]
-    PARTNER_NETWORK_CHOICES = NO_SELECT_CHOICE + [(pn.code, pn.label) for pn in PartnerNetwork.objects.all()]
+    PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all()]
 
     is_org_url_exist = forms.ChoiceField(label="Does your organization have a website?",
                                          choices=((1, "Yes"), (0, "No")),
@@ -505,7 +505,6 @@ class RegModelForm(forms.ModelForm):
         super(RegModelForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].initial = 'First Name'
         self.fields['last_name'].initial = 'Last Name'
-        self.fields['org_admin_email'].initial = 'Organization Admin Email'
 
         self.fields['first_name'].error_messages = {
             'required': 'Please enter your First Name.',
@@ -558,18 +557,18 @@ class RegModelForm(forms.ModelForm):
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
 
-        organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+        organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name.strip())
         extended_profile, is_profile_created = UserExtendedProfile.objects.get_or_create(user=user)
 
         if not is_profile_created:
             prev_org = extended_profile.organization
 
         if user and is_poc == '1':
+            organization_to_assign.unclaimed_org_admin_email = None
             organization_to_assign.admin = user
-            organization_to_assign.save()
 
         if prev_org:
-            if organization_to_assign.lable != prev_org.label:
+            if organization_to_assign.label != prev_org.label:
                 prev_org.admin = None
                 prev_org.save()
 
@@ -577,12 +576,13 @@ class RegModelForm(forms.ModelForm):
         user.first_name = first_name
         user.last_name = last_name
 
-        if org_admin_email:
+        if not is_poc == '1' and org_admin_email:
             try:
 
                 hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
                 org_id = extended_profile.organization_id
                 org_name = extended_profile.organization.label
+                organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
                 send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
             except User.DoesNotExist:
@@ -593,6 +593,7 @@ class RegModelForm(forms.ModelForm):
 
         if commit:
             extended_profile.save()
+            organization_to_assign.save()
 
         return extended_profile
 
@@ -616,7 +617,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
                                              'required': 'Please select an option for Are you able to provide '
                                                          'information',
                                          })
-    effective_date = forms.DateField(input_formats=['%d/%m/%Y'])
+    effective_date = forms.DateField(input_formats=['%d/%m/%Y'], required=False)
     registration_number = forms.CharField(max_length=30, required=False)
 
     def __init__(self,  *args, **kwargs):
