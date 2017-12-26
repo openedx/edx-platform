@@ -866,10 +866,10 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         MessageMiddleware().process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
-    @mock.patch('student_account.views.get_enterprise_learner_data')
-    def test_context(self, mock_get_enterprise_learner_data):
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+    def test_context(self, mock_get_enterprise_customer_for_learner):
         self.request.site = SiteFactory.create()
-        mock_get_enterprise_learner_data.return_value = []
+        mock_get_enterprise_customer_for_learner.return_value = {}
         context = account_settings_context(self.request)
 
         user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
@@ -899,19 +899,17 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
             context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
         )
 
-    @mock.patch('student_account.views.get_enterprise_learner_data')
-    @mock.patch('student_account.views.third_party_auth.provider.Registry.get')
+    @mock.patch('student_account.views.get_enterprise_customer_for_learner')
+    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_context_for_enterprise_learner(
-            self, mock_get_auth_provider, mock_get_enterprise_learner_data
+            self, mock_get_auth_provider, mock_get_enterprise_customer_for_learner
     ):
         dummy_enterprise_customer = {
             'uuid': 'real-ent-uuid',
             'name': 'Dummy Enterprise',
             'identity_provider': 'saml-ubc'
         }
-        mock_get_enterprise_learner_data.return_value = [
-            {'enterprise_customer': dummy_enterprise_customer}
-        ]
+        mock_get_enterprise_customer_for_learner.return_value = dummy_enterprise_customer
         self.request.site = SiteFactory.create()
         mock_get_auth_provider.return_value.sync_learner_profile_data = True
         context = account_settings_context(self.request)

@@ -485,6 +485,20 @@ def get_enterprise_learner_data(site, user):
         return enterprise_learner_data['results']
 
 
+def get_enterprise_customer_for_learner(site, user):
+    """
+    Return enterprise customer to whom given learner belongs.
+    """
+    if not enterprise_enabled():
+        return {}
+
+    enterprise_learner_data = get_enterprise_learner_data(site, user)
+    if enterprise_learner_data:
+        return enterprise_learner_data[0]['enterprise_customer']
+
+    return {}
+
+
 def get_dashboard_consent_notification(request, user, course_enrollments):
     """
     If relevant to the request at hand, create a banner on the dashboard indicating consent failed.
