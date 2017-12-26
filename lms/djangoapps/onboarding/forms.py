@@ -48,14 +48,14 @@ class UserInfoModelForm(forms.ModelForm):
     'UserInfoSurvey' model
     """
     GENDER_CHOICES = (
-        ('m', ugettext_noop('Male')),
         ('f', ugettext_noop('Female')),
+        ('m', ugettext_noop('Male')),
         # Translators: 'Other' refers to the student's gender
         ('o', ugettext_noop("I'd rather not say")),
         ('nl', ugettext_noop('Not listed')),
     )
 
-    NO_SELECT_CHOICE = [('', '- Select -')]
+    NO_SELECT_CHOICE = [('', ugettext_noop('- Select -'))]
 
     LEVEL_OF_EDUCAION_CHOICES = NO_SELECT_CHOICE  + [(el.code, el.label) for el in EducationLevel.objects.all()]
     ENLISHP_ROFICIENCY_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label) for ep in EnglishProficiency.objects.all()]
@@ -65,47 +65,47 @@ class UserInfoModelForm(forms.ModelForm):
         label="Year of Birth",
         label_suffix="*",
         validators=[
-            MinValueValidator(1900, message='Ensure year of birth is greater than or equal to 1900'),
+            MinValueValidator(1900, message=ugettext_noop('Ensure year of birth is greater than or equal to 1900')),
             MaxValueValidator(
-                datetime.now().year, message='Ensure year of birth is less than or equal to {}'.format(
+                datetime.now().year, message=ugettext_noop('Ensure year of birth is less than or equal to {}'.format(
                     datetime.now().year
-                )
+                ))
             )
         ],
         error_messages={
-            'required': EMPTY_FIELD_ERROR.format("Year of birth"),
+            'required': EMPTY_FIELD_ERROR.format(ugettext_noop("Year of birth")),
         }
     )
-    gender = forms.ChoiceField(label='Gender', required=False, label_suffix="*", choices=GENDER_CHOICES,
+    gender = forms.ChoiceField(label=ugettext_noop('Gender'), required=False, label_suffix="*", choices=GENDER_CHOICES,
                                widget=forms.RadioSelect)
 
-    language = forms.CharField(label="Native Language", label_suffix="*", required=True,
-                               error_messages={"required": EMPTY_FIELD_ERROR.format('Language')})
+    language = forms.CharField(label=ugettext_noop('Native Language'), label_suffix="*", required=True,
+                               error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format('Language'))})
     country = forms.CharField(label="Country of Residence", label_suffix="*",
-                              error_messages={"required": EMPTY_FIELD_ERROR.format("Country of Residence")
+                              error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
     })
-    city = forms.CharField(label="City of Residence", required=False)
-    is_emp_location_different = forms.BooleanField(label='Check here if your country and/or city of employment is '
-                                                         'different from your country and/or city of residence.',
+    city = forms.CharField(label=ugettext_noop('City of Residence'), required=False)
+    is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of employment is '
+                                                         'different from your country and/or city of residence.'),
                                                    required=False)
-    level_of_education = forms.ChoiceField(label="Level of Education", label_suffix="*",
+    level_of_education = forms.ChoiceField(label=ugettext_noop('Level of Education'), label_suffix="*",
                                            choices=LEVEL_OF_EDUCAION_CHOICES,
                                            error_messages={
-                                                'required': NO_OPTION_SELECT_ERROR.format(
-                                                    'Level of Education'),
+                                                'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                                    'Level of Education')),
                                            })
-    english_proficiency = forms.ChoiceField(label="English Language Proficiency", label_suffix="*",
+    english_proficiency = forms.ChoiceField(label=ugettext_noop('English Language Proficiency'), label_suffix="*",
                                             choices=ENLISHP_ROFICIENCY_CHOICES,
                                             error_messages={
-                                                 'required': NO_OPTION_SELECT_ERROR.format(
-                                                     'English Language Proficiency'),
+                                                 'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                                     'English Language Proficiency')),
                                             })
-    role_in_org = forms.ChoiceField(label="Role in the Organization",
+    role_in_org = forms.ChoiceField(label=ugettext_noop('Role in the Organization'),
                                     label_suffix="*",
                                     choices=ROLE_IN_ORG_CHOICES,
                                     error_messages={
-                                         'required': NO_OPTION_SELECT_ERROR.format(
-                                             'Role in the Organization'),
+                                         'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                             'Role in the Organization')),
                                     })
 
     def __init__(self,  *args, **kwargs):
@@ -117,7 +117,7 @@ class UserInfoModelForm(forms.ModelForm):
         focus_area_choices = ((field_name, label) for field_name, label in
                                 UserExtendedProfile.FUNCTIONS_LABELS.items())
         self.fields['function_areas'] = forms.ChoiceField(choices=focus_area_choices,
-            label='Department of Function (Check all that apply.)',
+            label=ugettext_noop('Department of Function (Check all that apply.)'),
             widget=forms.CheckboxSelectMultiple)
 
     def clean(self):
@@ -144,19 +144,20 @@ class UserInfoModelForm(forms.ModelForm):
         if country in all_countries:
             return country
 
-        raise forms.ValidationError('Please select country of residence.')
+        raise forms.ValidationError(ugettext_noop('Please select country of residence.'))
 
     def clean_country_of_employment(self):
         all_countries = COUNTRIES.values()
         is_emp_location_different = self.cleaned_data['is_emp_location_different']
-        country = self.cleaned_data['country']
+        country = self.cleaned_data.get('country')
         country_of_employment = self.cleaned_data['country_of_employment']
 
         if is_emp_location_different and (not country_of_employment or not country_of_employment in all_countries):
             raise forms.ValidationError('Please select country of employment.')
 
         if is_emp_location_different and country == country_of_employment:
-            raise forms.ValidationError('Country of Residence should be different from Country of Employment.')
+            raise forms.ValidationError(ugettext_noop('Country of Residence should be different from Country of '
+                                                      'Employment.'))
 
         return country_of_employment
 
@@ -167,7 +168,7 @@ class UserInfoModelForm(forms.ModelForm):
         if submitted_language in all_languages:
             return submitted_language
 
-        raise forms.ValidationError('Please select language.')
+        raise forms.ValidationError(ugettext_noop('Please select language.'))
 
     class Meta:
         """
@@ -181,17 +182,17 @@ class UserInfoModelForm(forms.ModelForm):
         ]
 
         labels = {
-            'is_emp_location_different': 'Check here if your country and/or city of employment is different'
-                                         ' from your country and/or city of residence.',
-            'start_month_year': "Start Month and Year*",
-            'country_of_employment': 'Country of Employment*',
-            'city_of_employment': 'City of Employment',
-            'role_in_org': 'Role in Organization*',
+            'is_emp_location_different': ugettext_noop('Check here if your country and/or city of employment is different'
+                                         ' from your country and/or city of residence.'),
+            'start_month_year': ugettext_noop('Start Month and Year*'),
+            'country_of_employment': ugettext_noop('Country of Employment*'),
+            'city_of_employment': ugettext_noop('City of Employment'),
+            'role_in_org': ugettext_noop('Role in Organization*'),
         }
         widgets = {
             'year_of_birth': forms.TextInput,
             'country': forms.TextInput,
-            'not_listed_gender': forms.TextInput(attrs={'placeholder': 'Identify your gender here'}),
+            'not_listed_gender': forms.TextInput(attrs={'placeholder': ugettext_noop('Identify your gender here')}),
             'city': forms.TextInput,
             'language': forms.TextInput,
             'country_of_employment': forms.TextInput,
@@ -201,10 +202,10 @@ class UserInfoModelForm(forms.ModelForm):
 
         error_messages = {
             "hours_per_week": {
-                'required': EMPTY_FIELD_ERROR.format('Typical Number of Hours Worked per Week')
+                'required': EMPTY_FIELD_ERROR.format(ugettext_noop('Typical Number of Hours Worked per Week'))
             },
             'start_month_year': {
-                'required': EMPTY_FIELD_ERROR.format('Start Month and Year'),
+                'required': EMPTY_FIELD_ERROR.format(ugettext_noop('Start Month and Year')),
             }
         }
 
@@ -262,24 +263,24 @@ class InterestsForm(forms.Form):
         super(InterestsForm, self).__init__( *args, **kwargs)
         interest_choices = ((field_name, label) for field_name, label in UserExtendedProfile.INTERESTS_LABELS.items())
         self.fields['interests'] = forms.ChoiceField(
-            label='Which of these areas of organizational effectiveness are you most interested '
-                  'to learn more about?',
-            label_suffix="(Check all that apply.)",
+            label=ugettext_noop('Which of these areas of organizational effectiveness are you most interested '
+                  'to learn more about?'),
+            label_suffix=ugettext_noop('(Check all that apply.)'),
             choices=interest_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
         interested_learners_choices = ((field_name, label)
                                 for field_name, label in UserExtendedProfile.INTERESTED_LEARNERS_LABELS.items())
         self.fields['interested_learners'] = forms.ChoiceField(
-            label='Which type of other Philanthropy University learners are interesting to you?',
-            label_suffix="(Check all that apply.)",
+            label=ugettext_noop('Which type of other Philanthropy University learners are interesting to you?'),
+            label_suffix=ugettext_noop('(Check all that apply.)'),
             choices=interested_learners_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
         personal_goal_choices = ((field_name, label) for field_name, label in UserExtendedProfile.GOALS_LABELS.items())
         self.fields['personal_goals'] = forms.ChoiceField(
-            label='What is your most important personal goals in joining Philanthropy University?',
-            label_suffix="(Check all that apply.)",
+            label=ugettext_noop('What is your most important personal goals in joining Philanthropy University?'),
+            label_suffix=ugettext_noop('(Check all that apply.)'),
             choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
@@ -307,51 +308,51 @@ class OrganizationInfoForm(forms.ModelForm):
     TOTAL_EMPLOYEES_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label) for ep in TotalEmployee.objects.all()]
     PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all()]
 
-    is_org_url_exist = forms.ChoiceField(label="Does your organization have a website?",
-                                         choices=((1, "Yes"), (0, "No")),
+    is_org_url_exist = forms.ChoiceField(label=ugettext_noop('Does your organization have a website?'),
+                                         choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
                                          widget=forms.RadioSelect,
                                          initial=1,
                                          error_messages={
-                                            'required': 'Please select an option for "Does your organization have a'
-                                                        ' webpage?"',
+                                            'required': ugettext_noop('Please select an option for "Does your organization have a'
+                                                        ' webpage?"'),
                                          })
 
-    org_type = forms.ChoiceField(label="Organization Type", label_suffix="*",
+    org_type = forms.ChoiceField(label=ugettext_noop('Organization Type'), label_suffix="*",
                                  choices=ORG_TYPE_CHOICES,
                                  error_messages={
-                                     'required': NO_OPTION_SELECT_ERROR.format(
-                                         'Organization Type'),
+                                     'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                         'Organization Type')),
                                  })
 
-    level_of_operation = forms.ChoiceField(label="Level of Operation", label_suffix="*",
+    level_of_operation = forms.ChoiceField(label=ugettext_noop('Level of Operation'), label_suffix="*",
                                            choices=OPERATION_LEVEL_CHOICES,
                                            error_messages={
-                                               'required': NO_OPTION_SELECT_ERROR.format(
-                                                   'Level of Operation'),
+                                               'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                                   'Level of Operation')),
                                            })
 
-    focus_area = forms.ChoiceField(label="Primary Focus Area", label_suffix="*",
+    focus_area = forms.ChoiceField(label=ugettext_noop('Primary Focus Area'), label_suffix="*",
                                    choices=FOCUS_AREA_CHOICES,
                                    error_messages={
-                                       'required': NO_OPTION_SELECT_ERROR.format(
-                                           'Primary Focus Areas'),
+                                       'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                           'Primary Focus Areas')),
                                    })
 
-    total_employees = forms.ChoiceField(label="Total Employees", label_suffix="*",
+    total_employees = forms.ChoiceField(label=ugettext_noop('Total Employees'), label_suffix="*",
                                         choices=TOTAL_EMPLOYEES_CHOICES,
                                         error_messages={
-                                            'required': NO_OPTION_SELECT_ERROR.format('Total Employees'),
+                                            'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format('Total Employees')),
                                         })
 
-    partner_networks = forms.ChoiceField(label="Is your organization currently working with any of the Philanthropy "
-                                               "University's partners? ",
-                                         label_suffix="(Check all that apply.)",
+    partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of the Philanthropy "
+                                               "University's partners? "),
+                                         label_suffix=ugettext_noop("(Check all that apply.)"),
                                          choices=PARTNER_NETWORK_CHOICES,
                                          widget=forms.CheckboxSelectMultiple,
                                          required=False,
                                          error_messages={
-                                             'required': NO_OPTION_SELECT_ERROR.format("Partner's"),
+                                             'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format("Partner's")),
                                          })
 
     def __init__(self,  *args, **kwargs):
@@ -376,23 +377,23 @@ class OrganizationInfoForm(forms.ModelForm):
         }
 
         labels = {
-            'country': "Country of Organization Headquarters*",
-            'city': "City of Organization Headquarters",
-            'founding_year': "Founding Year*",
-            'is_org_url_exist': "Does your organization have a webpage?",
-            'url': "Website Address*",
-            'alternate_admin_email': 'Please provide the email address for an alternative Administrator contact at '
-                                     'your organization if we are unable to reach you.',
+            'country': ugettext_noop('Country of Organization Headquarters*'),
+            'city': ugettext_noop('City of Organization Headquarters'),
+            'founding_year': ugettext_noop('Founding Year*'),
+            'is_org_url_exist': ugettext_noop('Does your organization have a webpage?'),
+            'url': ugettext_noop('Website Address*'),
+            'alternate_admin_email': ugettext_noop('Please provide the email address for an alternative Administrator contact at '
+                                     'your organization if we are unable to reach you.'),
         }
 
         required_error = 'Please select an option for {}'
 
         error_messages = {
             'founding_year': {
-                'required': required_error.format('Founding Year'),
+                'required': ugettext_noop(required_error.format('Founding Year')),
             },
             'country': {
-                'required': EMPTY_FIELD_ERROR.format('Country of Organization Headquarters'),
+                'required': ugettext_noop(EMPTY_FIELD_ERROR.format('Country of Organization Headquarters')),
             }
         }
 
@@ -403,14 +404,14 @@ class OrganizationInfoForm(forms.ModelForm):
         if country in all_countries:
             return country
 
-        raise forms.ValidationError('Please select country of Organization Headquarters.')
+        raise forms.ValidationError(ugettext_noop('Please select country of Organization Headquarters.'))
 
     def clean_url(self):
         is_org_url_exist = int(self.data.get('is_org_url_exist')) if self.data.get('is_org_url_exist') else None
         organization_website = self.cleaned_data['url']
 
         if is_org_url_exist and not organization_website:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format('Organization Website'))
+            raise forms.ValidationError(EMPTY_FIELD_ERROR.format(ugettext_noop('Organization Website')))
 
         return organization_website
 
@@ -429,7 +430,7 @@ class OrganizationInfoForm(forms.ModelForm):
             if len("{}".format(year)) < 4 or year < 0 or len("{}".format(year)) > 4:
                 self.add_error(
                     'founding_year',
-                    "You entered an invalid year format. Please enter a valid year with 4 digits."
+                    ugettext_noop('You entered an invalid year format. Please enter a valid year with 4 digits.')
                 )
 
     def save(self, request, commit=True):
@@ -451,75 +452,79 @@ class RegModelForm(forms.ModelForm):
     """
 
     IS_POC_CHOICES = (
-        (1, 'Yes'),
-        (0, 'No')
+        (1, ugettext_noop('Yes')),
+        (0, ugettext_noop('No'))
     )
 
     first_name = forms.CharField(
-        label='First Name',
+        label=ugettext_noop('First Name'),
         widget=forms.TextInput(
-            attrs={'placeholder': 'First Name'}
+            attrs={'placeholder': ugettext_noop('First Name')}
         )
     )
 
     last_name = forms.CharField(
-        label='Last Name',
+        label=ugettext_noop('Last Name'),
         widget=forms.TextInput(
-            attrs={'placeholder': 'Last Name'}
+            attrs={'placeholder': ugettext_noop('Last Name')}
         )
     )
 
     organization_name = forms.CharField(
         max_length=255,
-        label='Organization Name',
+        label=ugettext_noop('Organization Name'),
+        label_suffix="*",
+        help_text=ugettext_noop("You can choose an organization from the auto-suggestion list of add a new one by "
+                                "entering the name and clicking the OK button."),
         required=False,
         widget=forms.TextInput(
-            attrs={'placeholder': 'Organization Name'}
+            attrs={'placeholder': ugettext_noop('Organization Name')}
         ),
-        initial='Organization Name'
+        initial=ugettext_noop('Organization Name')
     )
 
     confirm_password = forms.CharField(
-        label='Confirm Password',
-        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password'}),
-        initial='Confirm Password'
+        label=ugettext_noop('Confirm Password'),
+        widget=forms.PasswordInput(attrs={'placeholder': ugettext_noop('Confirm Password')}),
+        initial=ugettext_noop('Confirm Password')
     )
 
     is_currently_employed = forms.BooleanField(
         initial=False,
         required=False,
-        label="Check here if you are currently unemployed or otherwise not affiliated with an organization."
+        label=ugettext_noop('Check here if you are currently unemployed or otherwise not affiliated with an organization.')
     )
 
-    is_poc = forms.ChoiceField(label='Are you the Admin of your organization?',
+    is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our website?'),
+                               label_suffix="*",
                                choices=IS_POC_CHOICES,
                                widget=forms.RadioSelect)
 
     org_admin_email = forms.CharField(
-        label='If you know who should be the Admin for [Organization name],'
-              ' please provide their email address and we will invite them to sign up.*',
+        label=ugettext_noop('If you know who should be the Admin for [Organization name],'
+              ' please provide their email address and we will invite them to sign up.*'),
         required=False,
-        widget=forms.EmailInput(attrs=({'placeholder': 'Organization Admin Email'})))
+        widget=forms.EmailInput(attrs=({'placeholder': ugettext_noop('Organization Admin Email')})))
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
-        self.fields['first_name'].initial = 'First Name'
-        self.fields['last_name'].initial = 'Last Name'
+        self.fields['first_name'].initial = ugettext_noop('First Name')
+        self.fields['last_name'].initial = ugettext_noop('Last Name')
 
         self.fields['first_name'].error_messages = {
-            'required': 'Please enter your First Name.',
+            'required': ugettext_noop('Please enter your First Name.'),
         }
 
         self.fields['last_name'].error_messages = {
-            'required': 'Please enter your Last Name.',
+            'required': ugettext_noop('Please enter your Last Name.'),
         }
 
         self.fields['organization_name'].error_messages = {
-            'required': 'Please select your Organization.',
+            'required': ugettext_noop('Please select your Organization.'),
         }
 
         self.fields['confirm_password'].error_messages = {
-            'required': 'Please enter your Confirm Password.',
+            'required': ugettext_noop('Please enter your Confirm Password.'),
         }
 
     class Meta:
@@ -544,7 +549,7 @@ class RegModelForm(forms.ModelForm):
         organization_name = self.cleaned_data['organization_name']
 
         if not self.data.get('is_currently_employed') and not organization_name:
-            raise forms.ValidationError("Please enter organization name")
+            raise forms.ValidationError(ugettext_noop('Please enter organization name'))
 
         return organization_name
 
@@ -608,14 +613,14 @@ class UpdateRegModelForm(RegModelForm):
 
 
 class OrganizationMetricModelForm(forms.ModelForm):
-    can_provide_info = forms.ChoiceField(label="Are you able to provide information requested bellow?",
-                                         choices=((1, "Yes"), (0, "No")),
+    can_provide_info = forms.ChoiceField(label=ugettext_noop('Are you able to provide information requested bellow?'),
+                                         choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
                                          widget=forms.RadioSelect,
                                          initial=1,
                                          error_messages={
-                                             'required': 'Please select an option for Are you able to provide '
-                                                         'information',
+                                             'required': ugettext_noop('Please select an option for Are you able to '
+                                                                       'provide information'),
                                          })
     effective_date = forms.DateField(input_formats=['%d/%m/%Y'], required=False)
     registration_number = forms.CharField(max_length=30, required=False)
@@ -649,22 +654,22 @@ class OrganizationMetricModelForm(forms.ModelForm):
         }
 
         labels = {
-            'actual_data': 'Is the information you will provide on this page estimated or actual?*',
-            'effective_date': 'End date of lat Fiscal Year*',
-            'total_clients': 'Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*',
-            'total_employees': 'Total Employees at the end of Last Fiscal Year*',
-            'local_currency': 'Local Currency Code*',
-            'total_revenue': 'Total Annual Revenue for Last Fiscal Year* (Local Currency)*',
-            'total_donations': 'Total Donations and Grants Received Last Fiscal Year (Local Currency)*',
-            'total_expenses': 'Total Annual Expenses for Last Fiscal Year (Local Currency)*',
-            'total_program_expenses': 'Total Annual Program Expenses for Last Fiscal Year (Local Currency)*',
-            'registration_number': "Organization's Publicly Available Registration or Tax Identification Number "
-                                   "(If Applicable)" ,
+            'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
+            'effective_date': ugettext_noop('End date of lat Fiscal Year*'),
+            'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'),
+            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year*'),
+            'local_currency': ugettext_noop('Local Currency Code*'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)*'),
+            'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)*'),
+            'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)*'),
+            'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year (Local Currency)*'),
+            'registration_number': ugettext_noop("Organization's Publicly Available Registration or Tax Identification Number "
+                                                 "(If Applicable)") ,
         }
 
         help_texts = {
-            'effective_date': "If the data you are providing below is for the last 12 months,"
-                              " please enter today's date."
+            'effective_date': ugettext_noop("If the data you are providing below is for the last 12 months,"
+                                            " please enter today's date.")
         }
 
     def clean_actual_data(self):
@@ -672,7 +677,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         info_accuracy = self.cleaned_data['actual_data']
 
         if can_provide_info and info_accuracy not in [True, False]:
-            raise forms.ValidationError("Please select an option for Estimated or Actual Information")
+            raise forms.ValidationError(ugettext_noop("Please select an option for Estimated or Actual Information"))
 
         return info_accuracy
 
@@ -681,7 +686,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         last_fiscal_year_end_date = self.cleaned_data['effective_date']
 
         if can_provide_info and not last_fiscal_year_end_date:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year"))
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
 
         return last_fiscal_year_end_date
 
@@ -690,7 +695,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         total_clients = self.cleaned_data['total_clients']
 
         if can_provide_info and not total_clients:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format("Total Client"))
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Client")))
 
         return total_clients
 
@@ -699,7 +704,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         total_employees = self.cleaned_data['total_employees']
 
         if can_provide_info and not total_employees:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format("Total Employees"))
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Employees")))
 
         return total_employees
 
@@ -709,7 +714,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         currency_input = self.cleaned_data['local_currency']
 
         if can_provide_info and not currency_input in all_currency_codes:
-            raise forms.ValidationError('Please select currency code.')
+            raise forms.ValidationError(ugettext_noop('Please select currency code.'))
 
         return currency_input
 
@@ -718,7 +723,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         total_revenue = self.cleaned_data['total_revenue']
 
         if can_provide_info and not total_revenue:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format("Total Revenue"))
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Revenue")))
 
         return total_revenue
 
@@ -727,7 +732,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         total_expenses = self.cleaned_data['total_expenses']
 
         if can_provide_info and not total_expenses:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format("Total Expenses"))
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Expenses")))
 
         return total_expenses
 
@@ -736,7 +741,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
         total_program_expenses = self.cleaned_data['total_program_expenses']
 
         if can_provide_info and not total_program_expenses:
-            raise forms.ValidationError(EMPTY_FIELD_ERROR.format("Total Program Expense"))
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Program Expense")))
 
         return total_program_expenses
 
