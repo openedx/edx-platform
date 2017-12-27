@@ -11,7 +11,6 @@ from urllib import quote, urlencode
 from uuid import uuid4
 
 import ddt
-import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, reverse_lazy
@@ -62,6 +61,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.tests.util import expected_redirect_url
 from student.models import CourseEnrollment
 from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
@@ -115,7 +115,6 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
-    @pytest.mark.django111_expected_failure
     def test_jumpto_from_section(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -132,9 +131,8 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(section.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
-    @pytest.mark.django111_expected_failure
     def test_jumpto_from_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -156,7 +154,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module1.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
         expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
             course_id=unicode(course.id),
@@ -170,9 +168,8 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
-    @pytest.mark.django111_expected_failure
     def test_jumpto_from_nested_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -199,7 +196,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
         location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)

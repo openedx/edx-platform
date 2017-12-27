@@ -2678,7 +2678,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             problem key that the get_problem_responses endpoint can
             work with.
             """
-            mock_problem_key = Mock(return_value=u'')
+            mock_problem_key = NonCallableMock(return_value=u'')
             mock_problem_key.course_key = self.course.id
             with patch.object(UsageKey, 'from_string') as patched_method:
                 patched_method.return_value = mock_problem_key
