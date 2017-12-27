@@ -492,6 +492,17 @@ class CourseOverview(TimeStampedModel):
         """
         return json.loads(self._pre_requisite_courses_json)
 
+    @pre_requisite_courses.setter
+    def pre_requisite_courses(self, value):
+        """
+        Django requires there be a setter for this, but it is not
+        necessary for the way we currently use it. Due to the way
+        CourseOverviews are constructed raising errors here will
+        cause a lot of issues. These should not be mutable after
+        construction, so for now we just eat this.
+        """
+        pass
+
     @classmethod
     def update_select_courses(cls, course_keys, force_update=False):
         """
