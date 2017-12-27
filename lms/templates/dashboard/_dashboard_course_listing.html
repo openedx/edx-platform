@@ -61,8 +61,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       >
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
   <% course_target = reverse(course_home_url_name(course_overview.id), args=[unicode(course_overview.id)]) %>
-  <section class="details" aria-labelledby="details-heading-${course_overview.number}">
-      <h2 class="hd hd-2 sr" id="details-heading-${course_overview.number}">${_('Course details')}</h2>
+  <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
+      <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link and not is_unfulfilled_entitlement:
         % if not is_course_blocked:
@@ -148,7 +148,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % endif
                 % if entitlement:
                     % if not entitlement_expired_at:
-                        <button class="change-session btn-link ${'hidden' if is_unfulfilled_entitlement else ''}" aria-controls="change-session-${str(entitlement.uuid)}">${_('Change or Leave Session')}</button>
+                        <button class="change-session btn-link ${'hidden' if is_unfulfilled_entitlement else ''}">${_('Change or Leave Session')}</button>
                     % endif
                 % endif
             </span>
