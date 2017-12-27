@@ -112,7 +112,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         # that gets the current user's info
         mock_from_django_user.return_value = Mock()
 
-        url = reverse('discussion.views.user_profile',
+        url = reverse('user_profile',
                       kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
@@ -129,7 +129,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         # that gets the current user's info
         mock_from_django_user.return_value = Mock()
 
-        url = reverse('discussion.views.followed_threads',
+        url = reverse('followed_threads',
                       kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
@@ -882,7 +882,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("discussion.views.forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
             data=request_data,
             **headers
         )
@@ -1335,7 +1335,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
 
         self.client.get(
             reverse(
-                "discussion.views.single_thread",
+                "single_thread",
                 kwargs={
                     "course_id": self.course.id.to_deprecated_string(),
                     "discussion_id": "dummy_discussion_id",
@@ -1352,7 +1352,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
 
         self.client.get(
             reverse(
-                "discussion.views.forum_form_discussion",
+                "forum_form_discussion",
                 kwargs={"course_id": self.course.id.to_deprecated_string()}
             ),
         )
@@ -1446,7 +1446,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         """
         mock_user.return_value.to_dict.return_value = {}
         reverse_url = "%s%s" % (reverse(
-            "discussion.views.forum_form_discussion",
+            "forum_form_discussion",
             kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
@@ -1465,7 +1465,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_from_django_user.return_value.to_dict.return_value = {}
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
-        url = reverse('discussion.views.user_profile',
+        url = reverse('user_profile',
                       kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
@@ -1663,9 +1663,9 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)
 
         for url in (
-                reverse('discussion.views.forum_form_discussion',
+                reverse('forum_form_discussion',
                         kwargs=dict(course_id=course_id)),
-                reverse('discussion.views.single_thread',
+                reverse('single_thread',
                         kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
         ):
             self.verify_consent_required(self.client, url)
