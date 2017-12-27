@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-20 12:00+0000\n"
-"PO-Revision-Date: 2017-12-20 12:01:00.983550\n"
+"POT-Creation-Date: 2017-12-27 11:16+0000\n"
+"PO-Revision-Date: 2017-12-27 11:16:56.708469\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -946,13 +946,6 @@ msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
-msgstr ""
-
-#: common/djangoapps/third_party_auth/models.py
-msgid ""
-"Whether to drop an existing session when accessing a view decorated with "
-"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
-"URL query parameter mapping to this provider is included in the request."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -3730,6 +3723,17 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video auto-advance"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify whether to show an auto-advance button in videos. If the student "
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
 msgstr ""
 
@@ -4264,6 +4268,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "The default speed for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether to advance automatically to the next unit when the video "
+"ends."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -5138,6 +5148,34 @@ msgstr ""
 msgid ""
 "If your course does not appear on your dashboard, contact "
 "{payment_support_link}."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid ""
+"BlockCompletion.objects.submit_batch_completion should not be called when "
+"the feature is disabled."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Key '{key}' not found."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "Invalid course key: {}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "User is not enrolled in course."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Block with key: '{key}' is not in course {course}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "ok"
 msgstr ""
 
 #: lms/djangoapps/completion/models.py
@@ -8137,6 +8175,21 @@ msgstr ""
 msgid "You do not have permission to view this page."
 msgstr ""
 
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your {enterprise} administrator in order to access "
+"{platform_name} or contact {edx_support_link}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
+msgstr ""
+
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+msgid "edX Support"
+msgstr ""
+
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
 msgstr ""
@@ -8167,6 +8220,13 @@ msgstr ""
 #: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Company"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
@@ -14629,12 +14689,6 @@ msgid "Starts - {date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer select a session, your final day to select a session was "
-"{entitlement_expired_at}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 
@@ -14643,7 +14697,7 @@ msgid "You must select a session to access the course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Change Session"
+msgid "Change or Leave Session"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -14689,11 +14743,28 @@ msgid "Available Actions"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Buy all remaining courses in this program and save 10%"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade All Remaining Courses ("
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{\"{0:.2f}\".format(a)}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid " ${price:.2f} {currency} ) "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html

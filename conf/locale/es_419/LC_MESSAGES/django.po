@@ -393,7 +393,7 @@ msgstr "Precio"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Upgrade Deadline"
-msgstr "Fecha límite para el upgrade"
+msgstr "Fecha límite para cambiar a la opción de Certificado Verificado"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -2597,8 +2597,7 @@ msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
 "remaining."
 msgstr ""
-"Debe esperar por lo menos {wait_secs} segundos entre envíos. Quedan "
-"{remaining_secs} segundos."
+"Debe esperar por lo menos {wait_secs} entre envíos. Quedan {remaining_secs}."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -6223,11 +6222,11 @@ msgstr "Estamos trabajando para generar los certificados de los cursos."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
-msgstr "Cambiarse a la ruta de certificados verificados"
+msgstr "Cambiar a la opción con Certificado Verificado"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
-msgstr "Fecha límite para cambiar a la ruta de certificado verificado."
+msgstr "Fecha límite para cambiar a la opción con Certificado Verificado."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6242,7 +6241,7 @@ msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
 msgstr ""
-"Usted todavía es elegible para ascender a la opción de Certificado "
+"Usted todavía es elegible para cambiar a la opción de Certificado "
 "Verificado. Utilice esta opción para destacar sus conocimientos y "
 "habilidades obtenidas en el curso."
 
@@ -6262,13 +6261,13 @@ msgid ""
 " Certificate."
 msgstr ""
 "No lo olvides, te quedan {time_remaining_string} para poder cambiar a la "
-"opción con certificado verificado."
+"opción con Certificado Verificado."
 
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid "Don't forget to upgrade to a verified certificate by {localized_date}."
 msgstr ""
-"No olvides cambiar a la opción con certificado verificado antes del "
+"No olvides cambiar a la opción con Certificado Verificado antes del "
 "{localized_date}."
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -6287,7 +6286,7 @@ msgstr ""
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid "Upgrade ({upgrade_price})"
-msgstr "Cambia a la opción con certificado verificado ({upgrade_price})"
+msgstr "Cambia a la opción con Certificado Verificado ({upgrade_price})"
 
 #: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
@@ -6350,8 +6349,8 @@ msgstr ""
 #: lms/djangoapps/courseware/models.py
 msgid "Disable the dynamic upgrade deadline for this course run."
 msgstr ""
-"Inhabilitar la fecha límite dinámica para cambiar a la ruta con certificado "
-"verificado para esta sesión del curso."
+"Inhabilitar la fecha límite dinámica para cambiar a la ruta con Certificado "
+"Verificado para esta sesión del curso."
 
 #: lms/djangoapps/courseware/models.py
 msgid "Disable the dynamic upgrade deadline for this organization."
@@ -10559,7 +10558,7 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
 msgid "Upgrade Now"
-msgstr "Cambia ahora a la opción con certificado verificado"
+msgstr "Cambia ahora a la opción con Certificado Verificado"
 
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
@@ -11291,8 +11290,8 @@ msgstr ""
 "¡Esperamos que te esté gustando aprender con nosotros en %(platform_name)s! "
 "El Certificado Verificado te permite resaltar tus nuevos conocimientos y "
 "habilidades. Los certificados de %(platform_name)s son oficiales y fáciles "
-"de compartir en las redes sociales. Cambia a la opción con certificado "
-"verificado antes del %(user_schedule_upgrade_deadline_time)s."
+"de compartir en las redes sociales. Cambia a la opción con Certificado "
+"Verificado antes del %(user_schedule_upgrade_deadline_time)s."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.txt
@@ -11306,12 +11305,12 @@ msgstr ""
 "¡Esperamos que te esté gustando aprender en %(first_course_name)s! El "
 "Certificado Verificado te permite resaltar tus nuevos conocimientos y "
 "habilidades. Los certificados de %(platform_name)s son oficiales y fáciles "
-"de compartir en las redes sociales. Cambia a la opción con certificado "
-"verificado antes del %(user_schedule_upgrade_deadline_time)s."
+"de compartir en las redes sociales. Cambia a la opción con Certificado "
+"Verificado antes del %(user_schedule_upgrade_deadline_time)s."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "Upgrade now"
-msgstr "Cambia ahora a la opción con certificado verificado"
+msgstr "Cambia ahora a la opción con Certificado Verificado"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #, python-format
@@ -11345,12 +11344,12 @@ msgstr ""
 #, python-format
 msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
 msgstr ""
-"Cambia a la opción con certificado verificado antes del "
+"Cambia a la opción con Certificado Verificado antes del "
 "<strong>%(user_schedule_upgrade_deadline_time)s</strong>."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"
-msgstr "Puedes optar por la ruta con certificado verificado en estos cursos:"
+msgstr "Puedes optar a la opción con Certificado Verificado en estos cursos:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "Example of a verified certificate"
@@ -11358,7 +11357,7 @@ msgstr "Ejemplo de un Certificado Verificado"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.txt
 msgid "Upgrade now at"
-msgstr "Cambia ahora a la opción con certificado verificado"
+msgstr "Cambia ahora a la opción con Certificado Verificado"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/subject.txt
 #, python-format
@@ -11371,7 +11370,7 @@ msgstr ""
 #, python-format
 msgid "Upgrade to earn a verified certificate in %(first_course_name)s"
 msgstr ""
-"Cambia a la opción para obtener un certificado verificado en "
+"Cambia a la opción para obtener un Certificado Verificado en "
 "%(first_course_name)s"
 
 #: openedx/core/djangoapps/self_paced/models.py

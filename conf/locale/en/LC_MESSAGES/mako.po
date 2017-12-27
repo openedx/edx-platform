@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-20 11:54+0000\n"
-"PO-Revision-Date: 2017-12-20 12:01:01.206039\n"
+"POT-Creation-Date: 2017-12-27 11:10+0000\n"
+"PO-Revision-Date: 2017-12-27 11:16:56.884173\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4101,12 +4101,6 @@ msgid "Starts - {date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer select a session, your final day to select a session was "
-"{entitlement_expired_at}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 
@@ -4115,7 +4109,7 @@ msgid "You must select a session to access the course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Change Session"
+msgid "Change or Leave Session"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -4164,11 +4158,28 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Buy all remaining courses in this program and save 10%"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade All Remaining Courses ("
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{\"{0:.2f}\".format(a)}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid " ${price:.2f} {currency} ) "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html

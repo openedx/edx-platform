@@ -115,6 +115,7 @@
 # wzhd <transifex@wzhd.org>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # xianwei yang <yetie.net@gmail.com>, 2014
+# yan lee <lce789@qq.com>, 2017
 # Zhen Wang <wangzhen.able@gmail.com>, 2016
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
