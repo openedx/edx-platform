@@ -13,6 +13,7 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 from unittest import skip
 
+from openedx.tests.util import expected_redirect_url
 from third_party_auth.saml import log as saml_log, SapSuccessFactorsIdentityProvider
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
@@ -135,7 +136,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         try_login_response = self.client.get(testshib_login_url)
         # The user should be redirected to back to the login page:
         self.assertEqual(try_login_response.status_code, 302)
-        self.assertEqual(try_login_response['Location'], self.url_prefix + self.login_page_url)
+        self.assertEqual(try_login_response['Location'], expected_redirect_url(self.login_page_url, hostname=self.hostname))
         # When loading the login page, the user will see an error message:
         response = self.client.get(self.login_page_url)
         self.assertEqual(response.status_code, 200)
