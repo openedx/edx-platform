@@ -146,21 +146,6 @@ class UserInfoModelForm(forms.ModelForm):
 
         raise forms.ValidationError(ugettext_noop('Please select country of residence.'))
 
-    def clean_country_of_employment(self):
-        all_countries = COUNTRIES.values()
-        is_emp_location_different = self.cleaned_data['is_emp_location_different']
-        country = self.cleaned_data.get('country')
-        country_of_employment = self.cleaned_data['country_of_employment']
-
-        if is_emp_location_different and (not country_of_employment or not country_of_employment in all_countries):
-            raise forms.ValidationError('Please select country of employment.')
-
-        if is_emp_location_different and country == country_of_employment:
-            raise forms.ValidationError(ugettext_noop('Country of Residence should be different from Country of '
-                                                      'Employment.'))
-
-        return country_of_employment
-
     def clean_language(self):
         all_languages = get_onboarding_autosuggesion_data('world_languages.json')
         submitted_language = self.cleaned_data['language']
@@ -185,7 +170,7 @@ class UserInfoModelForm(forms.ModelForm):
             'is_emp_location_different': ugettext_noop('Check here if your country and/or city of employment is different'
                                          ' from your country and/or city of residence.'),
             'start_month_year': ugettext_noop('Start Month and Year*'),
-            'country_of_employment': ugettext_noop('Country of Employment*'),
+            'country_of_employment': ugettext_noop('Country of Employment'),
             'city_of_employment': ugettext_noop('City of Employment'),
             'role_in_org': ugettext_noop('Role in Organization*'),
         }
@@ -492,10 +477,12 @@ class RegModelForm(forms.ModelForm):
     is_currently_employed = forms.BooleanField(
         initial=False,
         required=False,
-        label=ugettext_noop('Check here if you are currently unemployed or otherwise not affiliated with an organization.')
-    )
+        label=ugettext_noop('Check here if you are currently unemployed or otherwise not affiliated with an '
+                            'organization.')
+        )
 
-    is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our website?'),
+    is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our '
+                                                   'website?'),
                                label_suffix="*",
                                choices=IS_POC_CHOICES,
                                widget=forms.RadioSelect)
@@ -534,6 +521,11 @@ class RegModelForm(forms.ModelForm):
             'confirm_password', 'first_name', 'last_name',
             'organization_name', 'is_currently_employed', 'is_poc', 'org_admin_email',
         )
+
+        labels = {
+            'username': 'Public Username*',
+            'email': 'E-mail Address*'
+        }
 
         widgets = {
             'first_name': forms.TextInput(attrs={'placeholder': 'First Name'}),
@@ -617,7 +609,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
                                          widget=forms.RadioSelect,
-                                         initial=1,
+                                         initial=0,
                                          error_messages={
                                              'required': ugettext_noop('Please select an option for Are you able to '
                                                                        'provide information'),

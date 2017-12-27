@@ -99,7 +99,8 @@ def user_info(request):
         'form': form,
         'is_under_age': is_under_age,
         'is_poc': user_extended_profile.is_organization_admin,
-        'is_first_user': user_extended_profile.organization.is_first_signup_in_org(),
+        'is_first_user': user_extended_profile.organization.is_first_signup_in_org() \
+        if user_extended_profile.organization else False,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY
     })
 
@@ -120,7 +121,8 @@ def interests(request):
     """
     user_extended_profile = request.user.extended_profile
     are_forms_complete = not(bool(user_extended_profile.unattended_surveys()))
-    is_first_signup_in_org = user_extended_profile.organization.is_first_signup_in_org()
+    is_first_signup_in_org = user_extended_profile.organization.is_first_signup_in_org() \
+        if user_extended_profile.organization else False
 
     initial = {
         "interests": user_extended_profile.get_user_selected_interests(_type="fields"),
@@ -197,9 +199,11 @@ def organization(request):
 
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
+    organization = user_extended_profile.organization
     context.update(user_extended_profile.unattended_surveys())
     context['is_poc'] = user_extended_profile.is_organization_admin
-    context['is_first_user'] = user_extended_profile.organization.is_first_signup_in_org()
+    context['is_first_user'] = organization.is_first_signup_in_org() if user_extended_profile.organization else False
+    context['org_admin_id'] =  organization.admin_id if user_extended_profile.organization else None
     context['organization_name'] = _organization.label
     context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
 
@@ -286,7 +290,8 @@ def org_detail_survey(request):
     context = {'form': form, 'are_forms_complete': are_forms_complete}
     context.update(user_extended_profile.unattended_surveys())
     context['is_poc'] = user_extended_profile.is_organization_admin
-    context['is_first_user'] = user_extended_profile.organization.is_first_signup_in_org()
+    context['is_first_user'] = user_extended_profile.organization.is_first_signup_in_org() \
+        if user_extended_profile.organization else False
     context['organization_name'] = user_extended_profile.organization.label
     return render(request, 'onboarding/organization_detail_survey.html', context)
 
@@ -334,7 +339,7 @@ def update_account_settings(request):
             instance=user_extended_profile,
             initial={
                 'organization_name': user_extended_profile.organization.label,
-                'is_poc': 1 if user_extended_profile.is_organization_admin else 0
+                'is_poc': "1" if user_extended_profile.is_organization_admin else "0"
             }
         )
 
