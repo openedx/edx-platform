@@ -667,6 +667,16 @@ class OrderItem(TimeStampedModel):
         """ Return the total cost of this OrderItem """
         return self.qty * self.unit_cost
 
+    @line_cost.setter
+    def line_cost(self, value):
+        """
+        Django requires there be a setter for this, but it is not
+        necessary for the way we currently use it. Raising errors
+        here will cause a lot of issues and these should not be
+        mutable after construction, so for now we just eat this.
+        """
+        pass
+
     @classmethod
     def add_to_order(cls, order, *args, **kwargs):
         """
