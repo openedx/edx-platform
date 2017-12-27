@@ -8,6 +8,7 @@ import unittest
 from importlib import import_module
 from urllib import urlencode
 
+import django
 import pytest
 from ddt import ddt, data
 from django.conf import settings
@@ -21,6 +22,8 @@ from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
+from openedx.core.djangoapps.user_api import accounts as accounts_settings
+from openedx.tests.util import expected_redirect_url
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -357,15 +360,19 @@ class ShibSPTest(CacheIsolationTestCase):
 
         # check that the created user profile has the right name, either taken from shib or user input
         profile = UserProfile.objects.get(user=user)
-        sn_empty = not identity.get('sn')
-        given_name_empty = not identity.get('givenName')
+        external_name = self.client.session['ExternalAuthMap'].external_name
         displayname_empty = not identity.get('displayName')
 
         if displayname_empty:
-            if sn_empty and given_name_empty:
+            if len(external_name.strip()) < accounts_settings.NAME_MIN_LENGTH:
                 self.assertEqual(profile.name, postvars['name'])
             else:
-                self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
+                expected_name = external_name
+                # TODO: Remove Django 1.11 upgrade shim
+                # SHIM: form character fields strip leading and trailing whitespace by default in Django 1.9+
+                if django.VERSION >= (1, 9):
+                    expected_name = expected_name.strip()
+                self.assertEqual(profile.name, expected_name)
                 self.assertNotIn(u';', profile.name)
         else:
             self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
@@ -576,7 +583,8 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
         response = self.client.get(**request_kwargs)
         # successful login is a redirect to the URL that handles auto-enrollment
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/account/finish_auth?{}'.format(urlencode(params)))
+        self.assertEqual(response['location'],
+                         expected_redirect_url('/account/finish_auth?{}'.format(urlencode(params))))
 
 
 class ShibUtilFnTest(TestCase):

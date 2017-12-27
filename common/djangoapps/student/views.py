@@ -89,6 +89,7 @@ from openedx.core.djangoapps.programs.utils import (
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, WaffleFlag
 from openedx.core.djangolib.markup import HTML
@@ -1965,7 +1966,7 @@ def create_account_with_params(request, params):
             params["email"] = eamap.external_email
         except ValidationError:
             pass
-        if eamap.external_name.strip() != '':
+        if len(eamap.external_name.strip()) >= accounts_settings.NAME_MIN_LENGTH:
             params["name"] = eamap.external_name
         params["password"] = eamap.internal_password
         log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
