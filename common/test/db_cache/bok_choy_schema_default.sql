@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1053 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1056 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2084,7 +2084,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=350 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=351 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2095,7 +2095,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=382 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=386 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2592,6 +2592,7 @@ CREATE TABLE `enterprise_enterprisecustomercatalog` (
   `content_filter` longtext,
   `title` varchar(20) NOT NULL,
   `enabled_course_modes` longtext NOT NULL,
+  `publish_audit_enrollment_urls` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `D6b10b4c766f4d007227cae59564ac44` (`enterprise_customer_id`),
   CONSTRAINT `D6b10b4c766f4d007227cae59564ac44` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -2749,6 +2750,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomercatalog` (
   `title` varchar(20) NOT NULL,
   `enabled_course_modes` longtext NOT NULL,
   `history_change_reason` varchar(100),
+  `publish_audit_enrollment_urls` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_1f0d4124b2b4b2d8_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomercatalog_ef7c876f` (`uuid`),
@@ -2820,11 +2822,29 @@ CREATE TABLE `entitlements_courseentitlement` (
   `order_number` varchar(128) DEFAULT NULL,
   `enrollment_course_run_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
+  `_policy_id` int(11),
   PRIMARY KEY (`id`),
+  UNIQUE KEY `entitlements_courseentitlement_uuid_a690dd005d0695b_uniq` (`uuid`),
   KEY `entitlements_courseentit_user_id_a8df050144d72f8_fk_auth_user_id` (`user_id`),
   KEY `fda6bce9129c5afc395658f36b9d444e` (`enrollment_course_run_id`),
+  KEY `entitlements_courseentitlement_36cddc86` (`_policy_id`),
+  CONSTRAINT `D2cebc0610e28b9b3a821c839e2fe01c` FOREIGN KEY (`_policy_id`) REFERENCES `entitlements_courseentitlementpolicy` (`id`),
   CONSTRAINT `entitlements_courseentit_user_id_a8df050144d72f8_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `fda6bce9129c5afc395658f36b9d444e` FOREIGN KEY (`enrollment_course_run_id`) REFERENCES `student_courseenrollment` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `entitlements_courseentitlementpolicy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `entitlements_courseentitlementpolicy` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `expiration_period` bigint(20) NOT NULL,
+  `refund_period` bigint(20) NOT NULL,
+  `regain_period` bigint(20) NOT NULL,
+  `site_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `entitlements_courseen_site_id_5256b0e7f6e039cc_fk_django_site_id` (`site_id`),
+  CONSTRAINT `entitlements_courseen_site_id_5256b0e7f6e039cc_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `experiments_experimentdata`;
