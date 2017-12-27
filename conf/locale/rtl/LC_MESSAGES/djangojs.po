@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-20 11:54+0000\n"
-"PO-Revision-Date: 2017-12-20 12:01:01.334152\n"
+"POT-Creation-Date: 2017-12-27 11:10+0000\n"
+"PO-Revision-Date: 2017-12-27 11:16:56.988248\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1857,6 +1857,11 @@ msgstr "بهمم زقخصسثق"
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
 msgstr "سحثثي"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
+msgid "Auto-advance"
+msgstr "شعفخ-شيدشرذث"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -4692,7 +4697,6 @@ msgid "There was an error. Please reload the page and try again."
 msgstr "فاثقث صشس شر ثققخق. حمثشسث قثمخشي فاث حشلث شري فقغ شلشهر."
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_card.underscore
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
 msgstr "ذاشرلث سثسسهخر"
@@ -8619,12 +8623,8 @@ msgid "Certificate Purchased"
 msgstr "ذثقفهبهذشفث حعقذاشسثي"
 
 #: lms/templates/learner_dashboard/course_card.underscore
-msgid ""
-"You can no longer select a session. Your final day to select a session was "
-"{expiration_date}."
-msgstr ""
-"غخع ذشر رخ مخرلثق سثمثذف ش سثسسهخر. غخعق بهرشم يشغ فخ سثمثذف ش سثسسهخر صشس "
-"{expiration_date}."
+msgid "Change or Leave Session"
+msgstr "ذاشرلث خق مثشدث سثسسهخر"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You must select a session by {expiration_date} to access the course."
@@ -8659,9 +8659,8 @@ msgid "View Course"
 msgstr "دهثص ذخعقسث"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Choose a course run:"
-msgstr "ذاخخسث ش ذخعقسث قعر:"
+msgid "Select a session:"
+msgstr "سثمثذف ش سثسسهخر:"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -8682,6 +8681,10 @@ msgstr "ثرقخمموثرف خحثرس خر"
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
 msgstr "رخف ذعققثرفمغ شدشهمشزمث"
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "More sessions coming soon."
+msgstr "وخقث سثسسهخرس ذخوهرل سخخر."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change to a different session or leave the current session."
@@ -9888,6 +9891,10 @@ msgstr "ذخوحمثفثي شف"
 #, python-format
 msgid " %(username)s "
 msgstr " %(username)s "
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose a course run:"
+msgstr "ذاخخسث ش ذخعقسث قعر:"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-20 12:00+0000\n"
-"PO-Revision-Date: 2017-12-20 12:01:00.983550\n"
+"POT-Creation-Date: 2017-12-27 11:16+0000\n"
+"PO-Revision-Date: 2017-12-27 11:16:56.708469\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1027,16 +1027,6 @@ msgstr ""
 "هب فاهس خحفهخر هس رخف سثمثذفثي, عسثقس صهمم رخف زث حقثسثرفثي صهفا فاث "
 "حقخدهيثق شس شر خحفهخر فخ شعفاثرفهذشفث صهفا خر فاث مخلهر سذقثثر, زعف وشرعشم "
 "شعفاثرفهذشفهخر عسهرل فاث ذخققثذف مهرن هس سفهمم حخسسهزمث."
-
-#: common/djangoapps/third_party_auth/models.py
-msgid ""
-"Whether to drop an existing session when accessing a view decorated with "
-"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
-"URL query parameter mapping to this provider is included in the request."
-msgstr ""
-"صاثفاثق فخ يقخح شر ثطهسفهرل سثسسهخر صاثر شذذثسسهرل ش دهثص يثذخقشفثي صهفا "
-"فاهقي_حشقفغ_شعفا.يثذخقشفخقس.فحش_اهرف_ثريس_ثطهسفهرل_سثسسهخر صاثر ش فحش_اهرف "
-"عقم ضعثقغ حشقشوثفثق وشححهرل فخ فاهس حقخدهيثق هس هرذمعيثي هر فاث قثضعثسف."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -4142,6 +4132,20 @@ msgstr ""
 "ثرفثق فقعث خق بشمسث. هب فقعث, دهيثخ ذشذاهرل صهمم زث عسثي بخق افوم5 دهيثخس."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video auto-advance"
+msgstr "ثرشزمث دهيثخ شعفخ-شيدشرذث"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify whether to show an auto-advance button in videos. If the student "
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
+msgstr ""
+"سحثذهبغ صاثفاثق فخ ساخص شر شعفخ-شيدشرذث زعففخر هر دهيثخس. هب فاث سفعيثرف "
+"ذمهذنس هف, صاثر فاث مشسف دهيثخ هر ش عرهف بهرهساثس هف صهمم شعفخوشفهذشممغ وخدث"
+" فخ فاث رثطف عرهف شري شعفخحمشغ فاث بهقسف دهيثخ."
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
 msgstr "دهيثخ حقث-قخمم"
 
@@ -4765,6 +4769,14 @@ msgstr "فاث مشسف سحثثي فاشف فاث عسثق سحثذهبهثي �
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "The default speed for the video."
 msgstr "فاث يثبشعمف سحثثي بخق فاث دهيثخ."
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether to advance automatically to the next unit when the video "
+"ends."
+msgstr ""
+"سحثذهبغ صاثفاثق فخ شيدشرذث شعفخوشفهذشممغ فخ فاث رثطف عرهف صاثر فاث دهيثخ "
+"ثريس."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
@@ -5721,6 +5733,36 @@ msgid ""
 msgstr ""
 "هب غخعق ذخعقسث يخثس رخف شححثشق خر غخعق يشسازخشقي, ذخرفشذف "
 "{payment_support_link}."
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid ""
+"BlockCompletion.objects.submit_batch_completion should not be called when "
+"the feature is disabled."
+msgstr ""
+"زمخذنذخوحمثفهخر.خزتثذفس.سعزوهف_زشفذا_ذخوحمثفهخر ساخعمي رخف زث ذشممثي صاثر "
+"فاث بثشفعقث هس يهسشزمثي."
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Key '{key}' not found."
+msgstr "نثغ '{key}' رخف بخعري."
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "Invalid course key: {}"
+msgstr "هردشمهي ذخعقسث نثغ: {}"
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "User is not enrolled in course."
+msgstr "عسثق هس رخف ثرقخممثي هر ذخعقسث."
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Block with key: '{key}' is not in course {course}"
+msgstr "زمخذن صهفا نثغ: '{key}' هس رخف هر ذخعقسث {course}"
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "ok"
+msgstr "خن"
 
 #: lms/djangoapps/completion/models.py
 #, python-brace-format
@@ -9083,6 +9125,25 @@ msgstr "سعذذثسس"
 msgid "You do not have permission to view this page."
 msgstr "غخع يخ رخف اشدث حثقوهسسهخر فخ دهثص فاهس حشلث."
 
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your {enterprise} administrator in order to access "
+"{platform_name} or contact {edx_support_link}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
+msgstr ""
+"صث شقث سخققغ, غخع شقث رخف شعفاخقهظثي فخ شذذثسس {platform_name} دهش فاهس "
+"ذاشررثم. حمثشسث ذخرفشذف غخعق {enterprise} شيوهرهسفقشفخق هر خقيثق فخ شذذثسس "
+"{platform_name} خق ذخرفشذف {edx_support_link}.{line_break}{line_break}ثققخق "
+"يثفشهمس:{line_break}{error_message}"
+
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+msgid "edX Support"
+msgstr "ثيط سعححخقف"
+
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
 msgstr "سخوث ثققخق خذذعقثي يعقهرل حشسسصخقي ذاشرلث. حمثشسث فقغ شلشهر"
@@ -9114,6 +9175,13 @@ msgstr "سفشفث/حقخدهرذث/قثلهخر"
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Company"
 msgstr "ذخوحشرغ"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
+msgstr "تخز فهفمث"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
@@ -16271,14 +16339,6 @@ msgid "Starts - {date}"
 msgstr "سفشقفس - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer select a session, your final day to select a session was "
-"{entitlement_expired_at}."
-msgstr ""
-"غخع ذشر رخ مخرلثق سثمثذف ش سثسسهخر, غخعق بهرشم يشغ فخ سثمثذف ش سثسسهخر صشس "
-"{entitlement_expired_at}."
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr "غخع وعسف سثمثذف ش سثسسهخر زغ {expiration_date} فخ شذذثسس فاث ذخعقسث."
 
@@ -16287,8 +16347,8 @@ msgid "You must select a session to access the course."
 msgstr "غخع وعسف سثمثذف ش سثسسهخر فخ شذذثسس فاث ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Change Session"
-msgstr "ذاشرلث سثسسهخر"
+msgid "Change or Leave Session"
+msgstr "ذاشرلث خق مثشدث سثسسهخر"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can no longer change sessions."
@@ -16333,12 +16393,29 @@ msgid "Available Actions"
 msgstr "شدشهمشزمث شذفهخرس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr "ثوشهم سثففهرلس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "قثمشفثي حقخلقشوس"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Buy all remaining courses in this program and save 10%"
+msgstr "زعغ شمم قثوشهرهرل ذخعقسثس هر فاهس حقخلقشو شري سشدث 10%"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade All Remaining Courses ("
+msgstr "عحلقشيث شمم قثوشهرهرل ذخعقسثس ("
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{\"{0:.2f}\".format(a)}"
+msgstr "{\"{0:.2f}\".بخقوشف(ش)}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid " ${price:.2f} {currency} ) "
+msgstr " ${price:.2f} {currency} ) "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""

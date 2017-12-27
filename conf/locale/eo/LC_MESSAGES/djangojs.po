@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-20 11:54+0000\n"
-"PO-Revision-Date: 2017-12-20 12:01:01.334152\n"
+"POT-Creation-Date: 2017-12-27 11:10+0000\n"
+"PO-Revision-Date: 2017-12-27 11:16:56.988248\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1923,6 +1923,11 @@ msgstr "Fïll ßröwsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
 msgstr "Spééd Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
+msgid "Auto-advance"
+msgstr "Àütö-ädvänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -5244,7 +5249,6 @@ msgstr ""
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_card.underscore
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
 msgstr "Çhängé Séssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -9563,12 +9567,8 @@ msgid "Certificate Purchased"
 msgstr "Çértïfïçäté Pürçhäséd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/course_card.underscore
-msgid ""
-"You can no longer select a session. Your final day to select a session was "
-"{expiration_date}."
-msgstr ""
-"Ýöü çän nö löngér séléçt ä séssïön. Ýöür fïnäl däý tö séléçt ä séssïön wäs "
-"{expiration_date}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+msgid "Change or Leave Session"
+msgstr "Çhängé ör Léävé Séssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You must select a session by {expiration_date} to access the course."
@@ -9608,9 +9608,8 @@ msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Choose a course run:"
-msgstr "Çhöösé ä çöürsé rün: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Select a session:"
+msgstr "Séléçt ä séssïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -9631,6 +9630,10 @@ msgstr "Énröllmént Öpéns ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
 msgstr "Nöt Çürréntlý Àväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "More sessions coming soon."
+msgstr "Möré séssïöns çömïng söön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change to a different session or leave the current session."
@@ -10995,6 +10998,10 @@ msgstr "Çömplétéd Àt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #, python-format
 msgid " %(username)s "
 msgstr " %(username)s  Ⱡ'σяєм ιρѕ#"
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose a course run:"
+msgstr "Çhöösé ä çöürsé rün: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

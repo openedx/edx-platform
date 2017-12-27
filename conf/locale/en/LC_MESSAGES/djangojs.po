@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-20 11:54+0000\n"
-"PO-Revision-Date: 2017-12-20 12:01:01.334152\n"
+"POT-Creation-Date: 2017-12-27 11:10+0000\n"
+"PO-Revision-Date: 2017-12-27 11:16:56.988248\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1824,6 +1824,11 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
+msgid "Auto-advance"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
@@ -4459,7 +4464,6 @@ msgid "There was an error. Please reload the page and try again."
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_card.underscore
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
 msgstr ""
@@ -8185,9 +8189,7 @@ msgid "Certificate Purchased"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_card.underscore
-msgid ""
-"You can no longer select a session. Your final day to select a session was "
-"{expiration_date}."
+msgid "Change or Leave Session"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_card.underscore
@@ -8223,8 +8225,7 @@ msgid "View Course"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Choose a course run:"
+msgid "Select a session:"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -8245,6 +8246,10 @@ msgstr ""
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "More sessions coming soon."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
@@ -9367,6 +9372,10 @@ msgstr ""
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #, python-format
 msgid " %(username)s "
+msgstr ""
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose a course run:"
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
