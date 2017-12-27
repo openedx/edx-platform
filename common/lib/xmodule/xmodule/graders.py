@@ -376,7 +376,7 @@ class AssignmentFormatGrader(CourseGrader):
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)
                     possible = random.randint(earned, 15)
-                    section_name = "Generated"
+                    section_name = _("Generated")
 
                 else:
                     earned = scores[i].graded_total.earned
@@ -395,11 +395,11 @@ class AssignmentFormatGrader(CourseGrader):
                 )
             else:
                 percentage = 0.0
-                summary = u"{section_type} {index} Unreleased - 0% (?/?)".format(
+                # Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been released for viewing.
+                summary = _(u"{section_type} {index} Unreleased - 0% (?/?)").format(
                     index=i + self.starting_index,
                     section_type=self.section_type
                 )
-
             short_label = u"{short_label} {index:02d}".format(
                 index=i + self.starting_index,
                 short_label=self.short_label
@@ -412,7 +412,7 @@ class AssignmentFormatGrader(CourseGrader):
 
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {
-                'detail': u"The lowest {drop_count} {section_type} scores are dropped.".format(
+                'detail': _(u"The lowest {drop_count} {section_type} scores are dropped.").format(
                     drop_count=self.drop_count,
                     section_type=self.section_type
                 )
@@ -429,11 +429,13 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
-            total_detail = u"{section_type} Average = {percent:.0%}".format(
+            # Translators: "Homework Average = 0%"
+            total_detail = _(u"{section_type} Average = {percent:.0%}").format(
                 percent=total_percent,
                 section_type=self.section_type
             )
-            total_label = u"{short_label} Avg".format(short_label=self.short_label)
+            # Translators: Avg is short for Average
+            total_label = _(u"{short_label} Avg").format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []
