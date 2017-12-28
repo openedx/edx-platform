@@ -40,6 +40,9 @@ for i in "$@"; do
         -r|--rebuild_cache)
             REBUILD_CACHE=true
             ;;
+        -m|--migrations)
+            APPLY_MIGRATIONS=true
+            ;;
     esac
 done
 
@@ -108,7 +111,7 @@ if [[ $REBUILD_CACHE ]]; then
     for db in "${database_order[@]}"; do
         rebuild_cache_for_db
     done
-else
+elif [[ $APPLY_MIGRATIONS ]]; then
     for db in "${database_order[@]}"; do
         run_migrations
     done

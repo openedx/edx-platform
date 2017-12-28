@@ -136,7 +136,7 @@ def reset_test_database():
     """
     Reset the database used by the bokchoy tests.
     """
-    sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
+    sh("{}/scripts/reset-test-db.sh --migrations".format(Env.REPO_ROOT))
 
 
 @task
