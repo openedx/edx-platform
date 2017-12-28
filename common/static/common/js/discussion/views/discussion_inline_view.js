@@ -26,7 +26,7 @@
             var match;
             this.$el = options.el;
             this.readOnly = options.readOnly;
-            this.showByDefault = options.showByDefault || false;
+            this.showByDefault = options.showByDefault || true;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.listenTo(this.model, 'change', this.render);
             this.escKey = 27;
