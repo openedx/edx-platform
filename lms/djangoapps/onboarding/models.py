@@ -83,7 +83,7 @@ class PartnerNetwork(models.Model):
     is_partner_affiliated = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.label
 
 
 class Currency(models.Model):

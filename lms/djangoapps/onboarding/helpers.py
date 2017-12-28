@@ -218,6 +218,11 @@ def get_country_iso(c_name):
     return _iso
 
 
+def get_sorted_choices_from_dict(_dict):
+    sorted_dict = sorted(_dict.items(), key=lambda x:x[1])
+    return ((field_name, label) for field_name, label in sorted_dict)
+
+
 def reorder_registration_form_fields(fields):
     required_order = {
         'first_name': 0,

@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
-from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso
+from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
     Organization,
@@ -57,9 +57,12 @@ class UserInfoModelForm(forms.ModelForm):
 
     NO_SELECT_CHOICE = [('', ugettext_noop('- Select -'))]
 
-    LEVEL_OF_EDUCAION_CHOICES = NO_SELECT_CHOICE  + [(el.code, el.label) for el in EducationLevel.objects.all()]
-    ENLISHP_ROFICIENCY_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label) for ep in EnglishProficiency.objects.all()]
-    ROLE_IN_ORG_CHOICES = NO_SELECT_CHOICE + [(r.code, r.label) for r in RoleInsideOrg.objects.all()]
+    LEVEL_OF_EDUCAION_CHOICES = NO_SELECT_CHOICE  + [(el.code, el.label)
+                                                     for el in EducationLevel.objects.all().order_by("label")]
+    ENLISHP_ROFICIENCY_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label)
+                                                     for ep in EnglishProficiency.objects.all().order_by("label")]
+    ROLE_IN_ORG_CHOICES = NO_SELECT_CHOICE + [(r.code, r.label)
+                                              for r in RoleInsideOrg.objects.all().order_by("label")]
 
     year_of_birth = forms.IntegerField(
         label="Year of Birth",
@@ -246,23 +249,23 @@ class InterestsForm(forms.Form):
 
     def __init__(self,  *args, **kwargs):
         super(InterestsForm, self).__init__( *args, **kwargs)
-        interest_choices = ((field_name, label) for field_name, label in UserExtendedProfile.INTERESTS_LABELS.items())
+
+        interest_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTS_LABELS)
         self.fields['interests'] = forms.ChoiceField(
             label=ugettext_noop('Which of these areas of organizational effectiveness are you most interested '
-                  'to learn more about?'),
+                                'to learn more about?'),
             label_suffix=ugettext_noop('(Check all that apply.)'),
             choices=interest_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
-        interested_learners_choices = ((field_name, label)
-                                for field_name, label in UserExtendedProfile.INTERESTED_LEARNERS_LABELS.items())
+        interested_learners_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTED_LEARNERS_LABELS)
         self.fields['interested_learners'] = forms.ChoiceField(
             label=ugettext_noop('Which type of other Philanthropy University learners are interesting to you?'),
             label_suffix=ugettext_noop('(Check all that apply.)'),
             choices=interested_learners_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
-        personal_goal_choices = ((field_name, label) for field_name, label in UserExtendedProfile.GOALS_LABELS.items())
+        personal_goal_choices = get_sorted_choices_from_dict(UserExtendedProfile.GOALS_LABELS)
         self.fields['personal_goals'] = forms.ChoiceField(
             label=ugettext_noop('What is your most important personal goals in joining Philanthropy University?'),
             label_suffix=ugettext_noop('(Check all that apply.)'),
@@ -287,11 +290,13 @@ class OrganizationInfoForm(forms.ModelForm):
 
     NO_SELECT_CHOICE = [('', '- Select -')]
 
-    ORG_TYPE_CHOICES = NO_SELECT_CHOICE + [(os.code, os.label) for os in OrgSector.objects.all()]
-    OPERATION_LEVEL_CHOICES = NO_SELECT_CHOICE + [(ol.code, ol.label) for ol in OperationLevel.objects.all()]
-    FOCUS_AREA_CHOICES = NO_SELECT_CHOICE + [(fa.code, fa.label) for fa in FocusArea.objects.all()]
-    TOTAL_EMPLOYEES_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label) for ep in TotalEmployee.objects.all()]
-    PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all()]
+    ORG_TYPE_CHOICES = NO_SELECT_CHOICE + [(os.code, os.label) for os in OrgSector.objects.all().order_by('label')]
+    OPERATION_LEVEL_CHOICES = NO_SELECT_CHOICE + [(ol.code, ol.label)
+                                                  for ol in OperationLevel.objects.all().order_by('label')]
+    FOCUS_AREA_CHOICES = NO_SELECT_CHOICE + [(fa.code, fa.label) for fa in FocusArea.objects.all().order_by('label')]
+    TOTAL_EMPLOYEES_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label)
+                                                  for ep in TotalEmployee.objects.all().order_by('label')]
+    PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all().order_by('label')]
 
     is_org_url_exist = forms.ChoiceField(label=ugettext_noop('Does your organization have a website?'),
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
@@ -330,9 +335,16 @@ class OrganizationInfoForm(forms.ModelForm):
                                             'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format('Total Employees')),
                                         })
 
-    partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of the Philanthropy "
-                                               "University's partners? "),
+    partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of the "
+                                                             "Philanthropy University's partners?"),
                                          label_suffix=ugettext_noop("(Check all that apply.)"),
+                                         help_text=ugettext_noop("Philanthropy University works in partnership with a "
+                                                                 "number of international NGOs to improve the "
+                                                                 "effectiveness of local organizations they fund and/or"
+                                                                 " partner with to deliver programs. If you were asked "
+                                                                 "to join Philanthropy University by one of your "
+                                                                 "partners or funders and that organization appears in "
+                                                                 "this list, please select it."),
                                          choices=PARTNER_NETWORK_CHOICES,
                                          widget=forms.CheckboxSelectMultiple,
                                          required=False,
@@ -350,8 +362,8 @@ class OrganizationInfoForm(forms.ModelForm):
         The meta class used to customize the default behaviour of form fields
         """
         model = Organization
-        fields = ['country', 'city', 'is_org_url_exist', 'url', 'founding_year', 'org_type', 'level_of_operation',
-                  'focus_area', 'total_employees', 'alternate_admin_email', 'partner_networks']
+        fields = ['country', 'city', 'is_org_url_exist', 'url', 'founding_year', 'registration_number', 'focus_area',
+                  'org_type', 'level_of_operation', 'total_employees', 'alternate_admin_email', 'partner_networks']
 
         widgets = {
             'country': forms.TextInput,
@@ -359,6 +371,7 @@ class OrganizationInfoForm(forms.ModelForm):
             'url': forms.TextInput,
             'founding_year': forms.NumberInput,
             'alternate_admin_email': forms.TextInput,
+            'registration_number': forms.TextInput
         }
 
         labels = {
@@ -367,8 +380,9 @@ class OrganizationInfoForm(forms.ModelForm):
             'founding_year': ugettext_noop('Founding Year*'),
             'is_org_url_exist': ugettext_noop('Does your organization have a webpage?'),
             'url': ugettext_noop('Website Address*'),
-            'alternate_admin_email': ugettext_noop('Please provide the email address for an alternative Administrator contact at '
-                                     'your organization if we are unable to reach you.'),
+            'alternate_admin_email': ugettext_noop('Please provide the email address for an alternative Administrator '
+                                                   'contact at your organization if we are unable to reach you.'),
+            'registration_number': ugettext_noop("Organization’s registration or tax identification number"),
         }
 
         required_error = 'Please select an option for {}'
@@ -615,7 +629,6 @@ class OrganizationMetricModelForm(forms.ModelForm):
                                                                        'provide information'),
                                          })
     effective_date = forms.DateField(input_formats=['%d/%m/%Y'], required=False)
-    registration_number = forms.CharField(max_length=30, required=False)
 
     def __init__(self,  *args, **kwargs):
         super(OrganizationMetricModelForm, self).__init__(*args, **kwargs)
@@ -627,7 +640,7 @@ class OrganizationMetricModelForm(forms.ModelForm):
 
         fields = [
             'can_provide_info', 'actual_data', 'effective_date', 'total_clients', 'total_employees', 'local_currency',
-            'total_revenue', 'total_donations', 'total_expenses', 'total_program_expenses', 'registration_number'
+            'total_revenue', 'total_donations', 'total_expenses', 'total_program_expenses'
         ]
 
         widgets = {
@@ -637,12 +650,10 @@ class OrganizationMetricModelForm(forms.ModelForm):
             'total_clients': forms.NumberInput,
             'total_employees': forms.NumberInput,
             'local_currency': forms.TextInput,
-
             'total_revenue': forms.NumberInput,
             'total_donations': forms.NumberInput,
             'total_expenses': forms.NumberInput,
             'total_program_expenses': forms.NumberInput,
-            'registration_number': forms.TextInput
         }
 
         labels = {
@@ -654,9 +665,8 @@ class OrganizationMetricModelForm(forms.ModelForm):
             'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)*'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)*'),
             'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)*'),
-            'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year (Local Currency)*'),
-            'registration_number': ugettext_noop("Organization's Publicly Available Registration or Tax Identification Number "
-                                                 "(If Applicable)") ,
+            'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
+                                                    '(Local Currency)*'),
         }
 
         help_texts = {
@@ -749,9 +759,6 @@ class OrganizationMetricModelForm(forms.ModelForm):
                 alphabetic_code=self.cleaned_data['local_currency']).first().alphabetic_code
 
             org_detail.save()
-            if self.data['registration_number']:
-                user_extended_profile.organization.registration_number = self.data['registration_number']
-                user_extended_profile.organization.save()
 
         user_extended_profile.is_organization_metrics_submitted = True
         user_extended_profile.save()
