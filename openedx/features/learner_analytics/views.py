@@ -59,6 +59,10 @@ class LearnerAnalyticsView(View):
 
         grading_policy = course.grading_policy
 
+        (grade_data, answered_percent) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
+        schedule_data = self.get_schedule(request, course_key)
+        (grade_data, schedule_data) = self.verify_assignment_orders(grade_data, schedule_data)
+
         # Render the course bookmarks page
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -69,8 +73,9 @@ class LearnerAnalyticsView(View):
             'is_self_paced': course.self_paced,
             'is_verified': CourseEnrollment.is_enrolled_as_verified(request.user, course_key),
             'grading_policy': grading_policy,
-            'assignment_grades': self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS']),
-            'assignment_schedule': self.get_schedule(request, course_key),
+            'assignment_grades': grade_data,
+            'answered_percent': answered_percent,
+            'assignment_schedule': schedule_data,
             'discussion_info': self.get_discussion_data(request, course_key),
             'weekly_active_users': self.get_weekly_course_activities(course_key),
             'week_streak': self.consecutive_weeks_of_course_activity_for_user(
@@ -90,21 +95,48 @@ class LearnerAnalyticsView(View):
         """
         course_grade = CourseGradeFactory().read(user, course_key=course_key)
         grades = []
+        total_earned = 0
+        total_possible = 0
+        answered_percent = None
         for (location, subsection_grade) in course_grade.subsection_grades.iteritems():
             if subsection_grade.format is not None:
                 possible = subsection_grade.graded_total.possible
+                earned = subsection_grade.graded_total.earned
                 passing_grade = math.ceil(possible * grade_cutoffs['Pass'])
                 grades.append({
                     'assignment_type': subsection_grade.format,
-                    'total_earned': subsection_grade.graded_total.earned,
+                    'total_earned': earned,
                     'total_possible': possible,
                     'passing_grade': passing_grade,
+                    'location': unicode(location),
                     'assigment_url': reverse('jump_to_id', kwargs={
                         'course_id': unicode(course_key),
                         'module_id': unicode(location),
                     })
                 })
-        return grades
+                if earned > 0:
+                    total_earned += earned
+                    total_possible += possible
+
+        if total_possible > 0:
+            answered_percent = float(total_earned) / total_possible
+        return (grades, answered_percent)
+
+    def verify_assignment_orders(self, grade_data, schedule_data):
+        """
+        Verify that the assignments in grade_data and schedule_data are in the same order.
+        """
+        schedule_dict = {assignment['location']: assignment for assignment in schedule_data}
+
+        sorted_schedule_data = []
+        sorted_grade_data = []
+        for grade in grade_data:
+            assignment = schedule_dict.get(grade['location'])
+            if assignment:
+                sorted_grade_data.append(grade)
+                sorted_schedule_data.append(assignment)
+
+        return sorted_grade_data, sorted_schedule_data
 
     def get_discussion_data(self, request, course_key):
         """
@@ -146,10 +178,12 @@ class LearnerAnalyticsView(View):
             block_types_filter=['sequential']
         )
         graded_blocks = []
-        for (_, block) in all_blocks['blocks'].iteritems():
+        for (location, block) in all_blocks['blocks'].iteritems():
             if block.get('graded', False) and block.get('due') is not None:
                 graded_blocks.append(block)
                 block['due'] = block['due'].isoformat()
+                block['location'] = unicode(location)
+
         return graded_blocks
 
     def get_weekly_course_activities(self, course_key):
@@ -196,7 +230,7 @@ class LearnerAnalyticsView(View):
             url = '{base_url}/engagement_timelines/{username}?course_id={course_key}'\
                 .format(base_url=settings.ANALYTICS_API_URL,
                         username=username,
-                        course_key=urllib.quote_plus(course_key))
+                        course_key=urllib.quote_plus(unicode(course_key)))
             headers = {'Authorization': 'Token {token}'.format(token=settings.ANALYTICS_API_KEY)}
             response = requests.get(url=url, headers=headers)
             data = response.json()
