@@ -42,7 +42,8 @@
             ${transcript_credentials | n, dump_js_escaped_json},
             ${video_transcript_settings | n, dump_js_escaped_json},
             ${is_video_transcript_enabled | n, dump_js_escaped_json},
-            ${video_image_settings | n, dump_js_escaped_json}
+            ${video_image_settings | n, dump_js_escaped_json},
+            ${transcript_available_languages | n, dump_js_escaped_json}
         );
     });
 </%block>
