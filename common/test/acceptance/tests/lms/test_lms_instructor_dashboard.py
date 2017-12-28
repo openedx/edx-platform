@@ -18,6 +18,7 @@ from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.instructor_dashboard import (
     EntranceExamAdmin,
     InstructorDashboardPage,
+    StudentAdminPage,
     StudentSpecificAdmin
 )
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
@@ -36,7 +37,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
     """
     Mixin class for testing the instructor dashboard.
     """
-    def log_in_as_instructor(self, course_access_roles=None):
+    def log_in_as_instructor(self, global_staff=True, course_access_roles=None):
         """
         Login with an instructor account.
 
@@ -49,7 +50,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         """
         course_access_roles = course_access_roles or []
         auto_auth_page = AutoAuthPage(
-            self.browser, course_id=self.course_id, staff=True, course_access_roles=course_access_roles
+            self.browser, course_id=self.course_id, staff=global_staff, course_access_roles=course_access_roles
         )
         auto_auth_page.visit()
         user_info = auto_auth_page.user_info
@@ -1381,3 +1382,20 @@ class StudentAdminTest(BaseInstructorDashboardTest):
         alert = get_modal_alert(student_admin_section.browser)
         alert.dismiss()
         self.assertFalse(self.instructor_dashboard_page.is_rescore_unsupported_message_visible())
+
+    def test_task_list_visibility(self):
+        """
+        Test that instructor task list is visible on student admin section
+        to users who have access to instructor tab/dashboard
+        """
+        # first check for global staff users
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentAdminPage)
+        self.assertTrue(student_admin_section.running_tasks_section.visible)
+
+        # logout global-staff user and check for users with staff access to course
+        LogoutPage(self.browser).visit()
+        # having staff access to course is compulsory to access instructor dashboard
+        self.log_in_as_instructor(False, ['staff'])
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentAdminPage)
+        self.assertTrue(student_admin_section.running_tasks_section.visible)
