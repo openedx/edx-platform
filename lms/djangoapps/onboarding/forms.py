@@ -382,7 +382,7 @@ class OrganizationInfoForm(forms.ModelForm):
             'url': ugettext_noop('Website Address*'),
             'alternate_admin_email': ugettext_noop('Please provide the email address for an alternative Administrator '
                                                    'contact at your organization if we are unable to reach you.'),
-            'registration_number': ugettext_noop("Organization’s registration or tax identification number"),
+            'registration_number': ugettext_noop("Organization's registration or tax identification number"),
         }
 
         required_error = 'Please select an option for {}'
