@@ -19,7 +19,7 @@ from django.core.urlresolvers import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import MagicMock, patch
+from mock import Mock, MagicMock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
@@ -912,6 +912,7 @@ class CertificateItemTest(ModuleStoreTestCase):
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
+    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_refund_cert_callback_no_expiration(self, cutoff_date):
         # When there is no expiration date on a verified mode, the user can always get a refund
@@ -950,6 +951,7 @@ class CertificateItemTest(ModuleStoreTestCase):
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
+    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_refund_cert_callback_before_expiration(self, cutoff_date):
         # If the expiration date has not yet passed on a verified mode, the user can be refunded
