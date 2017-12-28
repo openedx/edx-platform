@@ -22,9 +22,11 @@ define(
                     ur: 'Urdu'
                 },
                 TRANSCRIPT_DOWNLOAD_FILE_FORMAT = 'srt',
+                TRANSCRIPT_DOWNLOAD_URL = 'abc.com/transcript_download/course_id',
                 videoSupportedFileFormats = ['.mov', '.mp4'],
                 videoTranscriptSettings = {
-                    trancript_download_file_format: TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                    trancript_download_file_format: TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
+                    transcript_download_handler_url: TRANSCRIPT_DOWNLOAD_URL
                 },
                 videoListView;
 
@@ -33,7 +35,10 @@ define(
                     uploadTranscriptActionEl = $transcriptActionsEl.find('.upload-transcript-button');
 
                 expect(downloadTranscriptActionEl.html().trim(), 'Download');
-                expect(downloadTranscriptActionEl.attr('href'), '#');
+                expect(
+                    downloadTranscriptActionEl.attr('href'),
+                    TRANSCRIPT_DOWNLOAD_URL + '?edx_video_id=' + edxVideoID + '&language_code=' + transcriptLanguage
+                );
 
                 expect(uploadTranscriptActionEl.html().trim(), 'Upload');
                 expect(uploadTranscriptActionEl.data('edx-video-id'), edxVideoID);
