@@ -140,14 +140,10 @@ class Migration(migrations.Migration):
     def insert_partner_networks(apps, schema_editor):
         _levels = {
             "ACUMEN": "+Acumen",
-            "EAHP": "East Africa Health Platform",
-            "FHI": "FHI 360",
+            "FHI": "FHI 360/ FHI Foundation",
+            "GG": "Global Giving",
             "MC": "Mercy Corps",
             "WAFGAW": "With and For Girls Award Winner",
-            "CAFSA": "Charities Aid Foundation South Africa",
-            "EACSOF": "East African Civil Society Organizations Forum",
-            "GG": "Global Giving",
-            "SIAN": "Starts Impact Awards Network",
             "WAFGN": "With and For Girls Network"
         }
         PartnerNetwork = apps.get_model('onboarding', 'PartnerNetwork')

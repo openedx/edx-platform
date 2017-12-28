@@ -83,7 +83,7 @@ class PartnerNetwork(models.Model):
     is_partner_affiliated = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.label
 
 
 class Currency(models.Model):
@@ -403,7 +403,7 @@ class UserExtendedProfile(TimeStampedModel):
 
     def surveys_to_attend(self):
         surveys_to_attend = self.SURVEYS_LIST
-        if not (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+        if not (self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org())):
             surveys_to_attend = self.SURVEYS_LIST[:2]
 
         return surveys_to_attend
@@ -411,7 +411,7 @@ class UserExtendedProfile(TimeStampedModel):
     def attended_surveys(self):
         """Return list of user's attended on-boarding surveys"""
 
-        if not (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+        if not (self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org())):
             attended_list = self.get_normal_user_attend_surveys()
         else:
             attended_list = self.get_admin_or_first_user_attend_surveys()
@@ -430,7 +430,10 @@ class UserExtendedProfile(TimeStampedModel):
 
     @property
     def is_organization_admin(self):
-        return self.user == self.organization.admin
+        if self.organization:
+            return self.user == self.organization.admin
+
+        return False
 
 
 class OrganizationMetric(TimeStampedModel):
