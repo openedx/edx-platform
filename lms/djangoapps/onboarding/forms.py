@@ -48,8 +48,8 @@ class UserInfoModelForm(forms.ModelForm):
     'UserInfoSurvey' model
     """
     GENDER_CHOICES = (
-        ('f', ugettext_noop('Female')),
         ('m', ugettext_noop('Male')),
+        ('f', ugettext_noop('Female')),
         # Translators: 'Other' refers to the student's gender
         ('o', ugettext_noop("I'd rather not say")),
         ('nl', ugettext_noop('Not listed')),
