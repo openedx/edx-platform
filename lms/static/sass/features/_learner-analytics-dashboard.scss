@@ -1,10 +1,12 @@
-$slices: #386F77, #1ABC9C, #92C9D3, #397D1C, #A39D3D, #0E5AAA;
+$mint-green: #92C9D3;
+$slices: #386F77, #1ABC9C, $mint-green, #397D1C, #A39D3D, #0E5AAA;
 $border-color: #4A4A4A;
 $table-border: rgba(155, 155, 155, 0.2);
 $font-color: #636C72;
 $heading-color: #292B2C;
 $grouping-background: #f5f5f5;
 $grouping-border: #D8D8D8;
+$trophy-gold: #F39C12;
 
 .content-wrapper {
   .page-content.learner-analytics-dashboard-wrapper {
@@ -179,6 +181,110 @@ $grouping-border: #D8D8D8;
     }
   }
 
+  .due-dates {
+    border-bottom: 1px solid $table-border;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+
+    .date-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .date-item {
+        display: flex;
+        justify-content: space-between;
+        color: $font-color;
+      }
+    }
+  }
+
+  .week-streak-wrapper {
+    color: $font-color;
+
+    .streak-icon-wrapper {
+      margin-bottom: 10px;
+    }
+
+    .fa-trophy {
+      color: $trophy-gold;
+      font-size: 21px;
+      margin-right: 5px;
+    }
+
+    .section-heading {
+      margin-bottom: 0;
+    }
+  }
+
+  .active-users-wrapper {
+    .fa-user {
+      border: 2px solid $mint-green;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      text-align: center;
+      position: relative;
+
+      &:after {
+        content: '';
+        height: 2px;
+        width: 12px;
+        position: absolute;
+        background-color: $mint-green;
+        left: 6px;
+        bottom: 0;
+      }
+    }
+
+
+    .label {
+      color: $font-color;
+    }
+  }
+
+  .discussions-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    .group-heading {
+      width: 100%;
+    }
+
+    .comparison-charts {
+
+    }
+
+    .post-counts {
+      border-top: 1px solid $table-border;
+    }
+  }
+
+  .count-icon {
+    color: $mint-green;
+    font-size: 24px;
+  }
+
+  .user-count {
+    font-size: 1.5em;
+    margin-left: 10px;
+  }
+
+  .count-chart {
+    .chart-bar {
+      height: 10px;
+      border-radius: 2px;
+      background: $mint-green;
+    }
+
+    &:first-of-type {
+      .chart-bar {
+        background: $trophy-gold;
+      }
+    }
+  }
+
   @include media-breakpoint-up(sm) { .analytics-group.sidebar{border-color: red;} }
   @include media-breakpoint-up(md) { .analytics-group.sidebar{border-color: blue;} }
   @include media-breakpoint-up(lg) { .analytics-group.sidebar{border-color: green;} }
@@ -192,6 +298,23 @@ $grouping-border: #D8D8D8;
           repeat: no-repeat;
           position: top right;
         }
+      }
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    .discussions-wrapper {
+      flex-direction: row;
+
+      .comparison-charts {
+        border-right: 1px solid $table-border;
+        width: 50%;
+      }
+
+      .post-counts {
+        border: none;
+        width: 50%;
+        padding-left: 20px;
       }
     }
   }
