@@ -34,6 +34,7 @@ from edxval.api import (
     get_available_transcript_languages
 )
 from opaque_keys.edx.keys import CourseKey
+from xmodule.video_module.transcripts_utils import Transcript
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
@@ -72,9 +73,6 @@ VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
 
 # maximum time for video to remain in upload state
 MAX_UPLOAD_HOURS = 24
-
-# Transcript download format
-TRANSCRIPT_DOWNLOAD_FILE_FORMAT = 'srt'
 
 
 class TranscriptProvider(object):
@@ -645,8 +643,12 @@ def videos_index_html(course):
                 'transcript_download_handler',
                 unicode(course.id)
             ),
+            'transcript_upload_handler_url': reverse_course_url(
+                'transcript_upload_handler',
+                unicode(course.id)
+            ),
             'transcription_plans': get_3rd_party_transcription_plans(),
-            'trancript_download_file_format': TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+            'trancript_download_file_format': Transcript.SRT
         }
         context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
         # Cached state for transcript providers' credentials (org-specific)

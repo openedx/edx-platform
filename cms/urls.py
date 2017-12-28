@@ -144,6 +144,8 @@ urlpatterns = [
         contentstore.views.transcript_credentials_handler, name='transcript_credentials_handler'),
     url(r'^transcript_download/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.transcript_download_handler, name='transcript_download_handler'),
+    url(r'^transcript_upload/{}$'.format(settings.COURSE_KEY_PATTERN),
+        contentstore.views.transcript_upload_handler, name='transcript_upload_handler'),
     url(r'^video_encodings_download/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.video_encodings_download, name='video_encodings_download'),
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN),
