@@ -89,8 +89,9 @@ def update_local_bokchoy_db_from_s3():
         if not is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
             upload_db_cache_to_s3(fingerprint, BOKCHOY_DB_FILES, CACHE_BUCKET_NAME)
         else:
-            "{} {}. {}".format(
+            msg = "{} {}. {}".format(
                 "Found a matching fingerprint in bucket ",
                 CACHE_BUCKET_NAME,
                 "Not pushing to s3"
             )
+            print(msg)
