@@ -8,7 +8,7 @@
       @extend %t-copy;
 
       vertical-align: bottom;
-      margin-right: ($baseline/5);
+      @include margin-right($baseline/45);
     }
   }
 
@@ -33,12 +33,30 @@
     }
   }
 
-  .show-video-transcripts-wrapper.hidden {
+  .hidden {
     display: none;
   }
 
   .show-video-transcript-content {
     margin-top: ($baseline/2);
+
+    .transcript-upload-status-container {
+
+      .video-transcript-detail-status, .more-details-action {
+        @include font-size(12);
+        @include line-height(12);
+        @include margin-left($baseline/4);
+      }
+    }
+
+    .transcript-upload-status-container.error {
+      color: $color-error;
+    }
+
+    .transcript-upload-status-container.success {
+      color: $color-ready;
+    }
+
     .transcript-language-menu {
       display: block;
       width: 200px;

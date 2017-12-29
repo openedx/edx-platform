@@ -13,14 +13,19 @@
 <% }%>
 <div class='show-video-transcripts-wrapper hidden'>
 <% _.each(transcripts, function(transcriptLanguageText, transcriptLanguageCode){ %>
-    <div id='show-video-transcript-content-<%- transcriptLanguageCode %>' class='show-video-transcript-content'>
-        <strong class='transcript-title'><%- StringUtils.interpolate(gettext('{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}'), {transcriptClientTitle: transcriptClientTitle, transcriptLanguageCode: transcriptLanguageCode, fileExtension: transcriptDownloadFileFormat}) %></strong>
-        <select id='transcript-language-<%- transcriptLanguageCode %>' class='transcript-language-menu'>
+    <% selectedLanguageCodes = _.keys(_.omit(transcripts, transcriptLanguageCode)); %>
+    <div class='show-video-transcript-content' data-edx-video-id="<%- edxVideoID %>" data-language-code="<%- transcriptLanguageCode %>">
+        <div class='transcript-upload-status-container'></div>
+        <strong class='transcript-title'><%- StringUtils.interpolate(gettext('{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}'), {transcriptClientTitle: transcriptClientTitle, transcriptLanguageCode: transcriptLanguageCode, fileExtension: transcriptFileFormat}) %></strong>
+        <select class='transcript-language-menu'>
             <option value=''>Select Language</option>
             <% _.each(transcriptAvailableLanguages, function(availableLanguage){ %>
-                <option value='<%- availableLanguage[1] %>' <%- transcriptLanguageCode === availableLanguage[1] ? 'selected': '' %>><%- availableLanguage[0] %></option>
+                <% if (!_.contains(selectedLanguageCodes, availableLanguage[1])) { %>
+                    <option value='<%- availableLanguage[1] %>' <%- transcriptLanguageCode === availableLanguage[1] ? 'selected': '' %>><%- availableLanguage[0] %></option>
+                <% } %>
             <% }) %>
         </select>
+        <input class="upload-transcript-input hidden" type="file" name="file" accept=".<%- transcriptFileFormat %>"/>
         <div class='transcript-actions'>
             <a
                 class="button-link download-transcript-button"
@@ -36,9 +41,7 @@
                 <%- gettext('Download') %>
             </a>
             <span class='transcript-actions-separator'> | </span>
-            <button class="button-link upload-transcript-button" data-edx-video-id="<%- edxVideoID %>" data-language-code="<%- transcriptLanguageCode %>">
-                <%- gettext('Upload') %>
-            </button>
+            <button class="button-link upload-transcript-button"><%- gettext('Upload') %></button>
         </div>
     </div>
 <% }) %>
