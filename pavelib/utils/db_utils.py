@@ -12,7 +12,7 @@ from pavelib.prereqs import compute_fingerprint
 from pavelib.utils.envs import Env
 
 CACHE_FOLDER = 'common/test/db_cache'
-FINGERPRINT_FILEPATH = '{}/{}/bokchoy_migrations.sha1'.format(Env.REPO_ROOT, CACHE_FOLDER)
+FINGERPRINT_FILEPATH = '{}/{}/bok_choy_migrations.sha1'.format(Env.REPO_ROOT, CACHE_FOLDER)
 
 
 def remove_files_from_folder(files, folder):
@@ -30,15 +30,14 @@ def remove_files_from_folder(files, folder):
             continue
 
 
-def apply_migrations(db_cache_files, update_cache_files=True):
+def reset_test_db(db_cache_files, update_cache_files=True):
     """
-    Apply migrations to the test database.
+    Reset the bokchoy test db for a new test run
 
     The called script will flush your db (or create it if it doesn't yet
     exist), load in the db cache files files if they exist on disk,
-    apply migrations, and then optionally write up-to-date cache files.
+    and optionally apply migrations and write up-to-date cache files.
     """
-    print ("Applying migrations.")
     cmd = '{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT)
     if update_cache_files:
         cmd = '{} --rebuild_cache'.format(cmd)

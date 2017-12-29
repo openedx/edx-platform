@@ -7,7 +7,7 @@ import os
 from paver.easy import needs
 
 from pavelib.utils.db_utils import (
-    remove_files_from_folder, apply_migrations, compute_fingerprint_and_write_to_disk,
+    remove_files_from_folder, reset_test_db, compute_fingerprint_and_write_to_disk,
     fingerprint_bokchoy_db_files, does_fingerprint_on_disk_match, is_fingerprint_in_bucket,
     get_file_from_s3, extract_files_from_zip, create_tarfile_from_db_cache, upload_to_s3
 )
@@ -49,7 +49,7 @@ def update_bokchoy_db_cache():
     """
     print('Removing cached db files for bokchoy tests')
     remove_files_from_folder(BOKCHOY_DB_FILES, CACHE_FOLDER)
-    apply_migrations(BOKCHOY_DB_FILES, update_cache_files=True)
+    reset_test_db(BOKCHOY_DB_FILES, update_cache_files=True)
     compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
 
 
@@ -71,14 +71,12 @@ def update_local_bokchoy_db_from_s3():
         print ("DB cache files match the current migrations.")
         # TODO: we don't really need to apply migrations, just to
         # load the db cache files into the database.
-        apply_migrations(BOKCHOY_DB_FILES, update_cache_files=False)
+        reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
 
     elif is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
         print ("Found updated bokchoy db files at S3.")
         refresh_bokchoy_db_cache_from_s3(fingerprint=fingerprint)
-        # TODO: we don't really need to apply migrations, just to
-        # load the db cache files into the database.
-        apply_migrations(BOKCHOY_DB_FILES, update_cache_files=False)
+        reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
         # Write the new fingerprint to disk so that it reflects the
         # current state of the system.
         compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
@@ -90,7 +88,7 @@ def update_local_bokchoy_db_from_s3():
             "and running migrations."
         )
         print (msg)
-        apply_migrations(BOKCHOY_DB_FILES, update_cache_files=True)
+        reset_test_db(BOKCHOY_DB_FILES, update_cache_files=True)
         # Write the new fingerprint to disk so that it reflects the
         # current state of the system.
         # E.g. you could have added a new migration in your PR.
