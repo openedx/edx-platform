@@ -108,8 +108,4 @@ if [[ $REBUILD_CACHE ]]; then
     for db in "${database_order[@]}"; do
         rebuild_cache_for_db
     done
-else
-    for db in "${database_order[@]}"; do
-        run_migrations
-    done
 fi
