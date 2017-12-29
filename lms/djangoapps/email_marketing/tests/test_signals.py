@@ -195,6 +195,22 @@ class EmailMarketingTests(TestCase):
         self.assertEquals(userparms['vars']['activated'], 1)
         self.assertEquals(userparms['lists']['new list'], 1)
 
+    @patch('email_marketing.tasks.get_email_cookies_via_sailthru.delay')
+    def test_drop_cookie_task_error(self, mock_task):
+        """
+        test that task error is handled 
+        """
+        mock_task.side_effect = Exception
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            add_email_marketing_cookies(None, response=None, user=self.user)
+            logger.check(
+                (LOGGER_NAME, 'ERROR',
+                 'Exception Connecting to celery task: {exception}'.format(
+                     exception=Exception
+                 )
+                 )
+            )
+
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.SailthruClient.api_get')
