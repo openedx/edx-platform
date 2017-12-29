@@ -8,10 +8,15 @@ import os
 from unittest import TestCase
 
 import boto
-from mock import patch
+from mock import patch, call
 
 from common.test.utils import MockS3Mixin
-from pavelib.utils.db_utils import is_fingerprint_in_bucket, extract_files_from_zip
+from pavelib.utils.envs import Env
+from pavelib.utils.db_utils import (
+    is_fingerprint_in_bucket, extract_files_from_zip,
+)
+from pavelib.utils import db_utils
+from pavelib import database
 
 
 class TestPaverDbS3Utils(MockS3Mixin, TestCase):
@@ -59,3 +64,141 @@ class TestPaverDbUtils(TestCase):
         with open(extracted_file, 'r') as test_file:
             data = test_file.read()
         assert data == 'Test file content'
+
+
+def _write_temporary_db_cache_files(path, files):
+    """
+    create some temporary files to act as the local db cache files so that
+    we can compute a fingerprint
+    """
+    for index, filename in enumerate(files):
+        filepath = os.path.join(path, filename)
+        with open(filepath, 'w') as cache_file:
+            cache_file.write(str(index))
+
+
+class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
+    """
+    Tests for the high level database tasks
+    """
+
+    def setUp(self):
+        super(TestPaverDatabaseTasks, self).setUp()
+        conn = boto.connect_s3()
+        conn.create_bucket('moto_test_bucket')
+        self.bucket = conn.get_bucket('moto_test_bucket')
+
+    @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
+    @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
+    @patch.object(db_utils, 'sh')
+    def test_load_data_from_local_cache(self, _mock_sh):
+        """
+        Assuming that the computed db cache file fingerprint is the same as
+        the stored fingerprint, verify that we make a call to load data into
+        the database without running migrations
+        """
+        self.addCleanup(shutil.rmtree, db_utils.CACHE_FOLDER)
+        self.addCleanup(os.remove, db_utils.FINGERPRINT_FILEPATH)
+        _write_temporary_db_cache_files(db_utils.CACHE_FOLDER, database.ALL_DB_FILES)
+        # write the local fingerprint file with the same value than the
+        # computed fingerprint
+        expected_fingerprint = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d'
+        with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
+            fingerprint_file.write(expected_fingerprint)
+
+        database.update_local_bokchoy_db_from_s3()
+        calls = [
+            call('{}/scripts/calculate-bokchoy-migrations.sh'.format(Env.REPO_ROOT)),
+            call('{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT))
+        ]
+        _mock_sh.assert_has_calls(calls)
+
+    @patch.object(database, 'CACHE_BUCKET_NAME', 'moto_test_bucket')
+    @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
+    @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
+    @patch.object(db_utils, 'sh')
+    def test_load_data_from_s3_fingerprint(self, _mock_sh):
+        """
+        Assuming that the computed db cache file fingerprint is different
+        than the stored fingerprint AND there is a matching fingerprint file
+        in s3, verify that we make a call to load data into the database
+        without running migrations
+        """
+        self.addCleanup(shutil.rmtree, db_utils.CACHE_FOLDER)
+        self.addCleanup(os.remove, db_utils.FINGERPRINT_FILEPATH)
+        _write_temporary_db_cache_files(db_utils.CACHE_FOLDER, database.ALL_DB_FILES)
+
+        # zip the temporary files and push them to a moto s3 bucket
+        expected_fingerprint = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d'
+        zipfile_name = '{}.tar.gz'.format(expected_fingerprint)
+        zipfile_path = os.path.join(db_utils.CACHE_FOLDER, zipfile_name)
+        with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
+            for name in database.ALL_DB_FILES:
+                tar_file.add(os.path.join(db_utils.CACHE_FOLDER, name), arcname=name)
+        key = boto.s3.key.Key(bucket=self.bucket, name=zipfile_name)
+        key.set_contents_from_filename(zipfile_path, replace=False)
+
+        # write the local fingerprint file with a different value than
+        # the computed fingerprint
+        local_fingerprint = '123456789'
+        with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
+            fingerprint_file.write(local_fingerprint)
+
+        database.update_local_bokchoy_db_from_s3()
+        calls = [
+            call('{}/scripts/calculate-bokchoy-migrations.sh'.format(Env.REPO_ROOT)),
+            call('{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT))
+        ]
+        _mock_sh.assert_has_calls(calls)
+
+    @patch.object(database, 'CACHE_BUCKET_NAME', 'moto_test_bucket')
+    @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
+    @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
+    @patch.object(db_utils, 'sh')
+    def test_load_data_and_run_migrations(self, _mock_sh):
+        """
+        Assuming that the computed db cache file fingerprint is different
+        than the stored fingerprint AND there is NO matching fingerprint file
+        in s3, verify that we make a call to load data into the database, run
+        migrations and update the local db cache files
+        """
+        self.addCleanup(shutil.rmtree, db_utils.CACHE_FOLDER)
+        self.addCleanup(os.remove, db_utils.FINGERPRINT_FILEPATH)
+        _write_temporary_db_cache_files(db_utils.CACHE_FOLDER, database.ALL_DB_FILES)
+
+        # write the local fingerprint file with a different value than
+        # the computed fingerprint
+        local_fingerprint = '123456789'
+        with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
+            fingerprint_file.write(local_fingerprint)
+
+        database.update_local_bokchoy_db_from_s3()
+        calls = [
+            call('{}/scripts/calculate-bokchoy-migrations.sh'.format(Env.REPO_ROOT)),
+            call('{}/scripts/reset-test-db.sh --rebuild_cache'.format(Env.REPO_ROOT))
+        ]
+        _mock_sh.assert_has_calls(calls)
+
+    @patch.object(database, 'CACHE_BUCKET_NAME', 'moto_test_bucket')
+    @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
+    @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
+    @patch.object(db_utils, 'sh')
+    def test_updated_db_cache_pushed_to_s3(self, _mock_sh):
+        """
+        Assuming that the computed db cache file fingerprint is different
+        than the stored fingerprint AND there is NO matching fingerprint file
+        in s3, verify that an updated fingeprint file is pushed to s3
+        """
+        self.addCleanup(shutil.rmtree, db_utils.CACHE_FOLDER)
+        self.addCleanup(os.remove, db_utils.FINGERPRINT_FILEPATH)
+        _write_temporary_db_cache_files(db_utils.CACHE_FOLDER, database.ALL_DB_FILES)
+
+        # write the local fingerprint file with a different value than
+        # the computed fingerprint
+        local_fingerprint = '123456789'
+        with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
+            fingerprint_file.write(local_fingerprint)
+
+        database.update_local_bokchoy_db_from_s3()
+        key_name = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d.tar.gz'
+        self.assertTrue(self.bucket.get_key(key_name))
