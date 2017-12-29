@@ -174,6 +174,22 @@ def extract_files_from_zip(files, zipfile_path, to_path):
     verify_files_exist(files)
 
 
+def refresh_bokchoy_db_cache_from_s3(fingerprint, bucket_name, bokchoy_db_files):
+    """
+    If the cache files for the current fingerprint exist
+    in s3 then replace what you have on disk with those.
+    If no copy exists on s3 then continue without error.
+    """
+    path = CACHE_FOLDER
+    if is_fingerprint_in_bucket(fingerprint, bucket_name):
+        zipfile_name = '{}.tar.gz'.format(fingerprint)
+        get_file_from_s3(bucket_name, zipfile_name, path)
+        zipfile_path = os.path.join(path, zipfile_name)
+        print ("Extracting db cache files.")
+        extract_files_from_zip(bokchoy_db_files, zipfile_path, path)
+        os.remove(zipfile_path)
+
+
 def create_tarfile_from_db_cache(fingerprint, files, path):
     """
     Create a tar.gz file with the current bokchoy DB cache files.
@@ -200,3 +216,13 @@ def upload_to_s3(file_name, file_path, bucket_name):
     else:
         msg = "File {} already existed in bucket {}.".format(key.name, bucket_name)
     print (msg)
+
+
+def upload_db_cache_to_s3(fingerprint, bokchoy_db_files, bucket_name):
+    """
+    Update the S3 bucket with the bokchoy DB cache files.
+    """
+    zipfile_name, zipfile_path = create_tarfile_from_db_cache(
+        fingerprint, bokchoy_db_files, CACHE_FOLDER
+    )
+    upload_to_s3(zipfile_name, zipfile_path, bucket_name)
