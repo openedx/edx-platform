@@ -289,12 +289,20 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     def test_get_json_transcripts(self, is_video_transcript_enabled, expected_video_keys, uploaded_transcripts,
                                   expected_transcripts, video_transcript_feature):
         """
-        Test that transcripts are attached based on video transcript feature enablement.
+        Test that transcripts are attached based on whether the video transcript feature is enabled.
         """
         video_transcript_feature.return_value = is_video_transcript_enabled
 
         for transcript in uploaded_transcripts:
-            create_or_update_video_transcript(**transcript)
+            create_or_update_video_transcript(
+                transcript['video_id'],
+                transcript['language_code'],
+                metadata={
+                    'file_name': transcript['file_name'],
+                    'file_format': transcript['file_format'],
+                    'provider': transcript['provider']
+                }
+            )
 
         response = self.client.get_json(self.url)
         self.assertEqual(response.status_code, 200)

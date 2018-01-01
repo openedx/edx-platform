@@ -77,10 +77,11 @@ MAX_UPLOAD_HOURS = 24
 
 class TranscriptProvider(object):
     """
-    3rd Party Transcription Provider Enumeration
+    Transcription Provider Enumeration
     """
     CIELO24 = 'Cielo24'
     THREE_PLAY_MEDIA = '3PlayMedia'
+    CUSTOM = 'Custom'
 
 
 class StatusDisplayStrings(object):

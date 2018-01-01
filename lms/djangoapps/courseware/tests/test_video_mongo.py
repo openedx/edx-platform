@@ -1563,9 +1563,11 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         create_or_update_video_transcript(
             video_id=self.descriptor.edx_video_id,
             language_code='ar',
-            file_name='ext101.srt',
-            file_format='srt',
-            provider='Cielo24',
+            metadata={
+                'provider': 'Cielo24',
+                'file_name': 'ext101.srt',
+                'file_format': 'srt'
+            }
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=None)
@@ -1591,9 +1593,11 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         create_or_update_video_transcript(
             video_id=external_video_id,
             language_code='ar',
-            file_name='ext101.srt',
-            file_format='srt',
-            provider='Cielo24',
+            metadata={
+                'provider': 'Cielo24',
+                'file_name': 'ext101.srt',
+                'file_format': 'srt'
+            }
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=None)

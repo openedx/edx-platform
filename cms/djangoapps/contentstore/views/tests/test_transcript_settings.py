@@ -325,6 +325,7 @@ class TranscriptUploadTest(CourseTestCase):
             self.assertEqual(response.status_code, 404)
 
     @patch('contentstore.views.transcript_settings.create_or_update_video_transcript')
+    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
     def test_transcript_upload_handler(self, mock_create_or_update_video_transcript):
         """
         Tests that transcript upload handler works as expected.
@@ -337,6 +338,7 @@ class TranscriptUploadTest(CourseTestCase):
             {
                 'edx_video_id': '123',
                 'language_code': 'en',
+                'new_language_code': 'es',
                 'file': transcript_file_stream,
             },
             format='multipart'
@@ -346,9 +348,11 @@ class TranscriptUploadTest(CourseTestCase):
         mock_create_or_update_video_transcript.assert_called_with(
             video_id='123',
             language_code='en',
-            file_name='subs.sjson',
-            file_format='sjson',
-            provider='Custom',
+            metadata={
+                'language_code': u'es',
+                'file_format': 'sjson',
+                'provider': 'Custom'
+            },
             file_data=ANY,
         )
 
@@ -357,6 +361,7 @@ class TranscriptUploadTest(CourseTestCase):
             {
                 'edx_video_id': '123',
                 'language_code': 'en',
+                'new_language_code': 'en',
             },
             u'A transcript file is required.'
         ),
@@ -365,16 +370,25 @@ class TranscriptUploadTest(CourseTestCase):
                 'language_code': u'en',
                 'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
+            u'Following parameters are required: edx_video_id, new_language_code.'
+        ),
+        (
+            {
+                'language_code': u'en',
+                'new_language_code': u'en',
+                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+            },
             u'Following parameters are required: edx_video_id.'
         ),
         (
             {
                 'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'Following parameters are required: edx_video_id, language_code.'
+            u'Following parameters are required: edx_video_id, language_code, new_language_code.'
         )
     )
     @ddt.unpack
+    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
     def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
         """
         Tests the transcript upload handler when the required attributes are missing.
@@ -385,6 +399,27 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error'], expected_error_message)
 
+    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en', 'es']))
+    def test_transcript_upload_handler_existing_transcript(self):
+        """
+        Tests that upload handler do not update transcript's language if a transcript
+        with the same language already present for an edx_video_id.
+        """
+        transcript_upload_url = self.get_url_for_course_key(self.course.id)
+        # Make request to transcript upload handler
+        request_payload = {
+            'edx_video_id': '1234',
+            'language_code': 'en',
+            'new_language_code': 'es'
+        }
+        response = self.client.post(transcript_upload_url, request_payload, format='multipart')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content)['error'],
+            u'Transcript with "es" language code is already present.'
+        )
+
+    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
     def test_transcript_upload_handler_with_image(self):
         """
         Tests the transcript upload handler with an image file.
@@ -397,6 +432,7 @@ class TranscriptUploadTest(CourseTestCase):
                 {
                     'edx_video_id': '123',
                     'language_code': 'en',
+                    'new_language_code': 'es',
                     'file': image_file,
                 },
                 format='multipart'
@@ -408,6 +444,7 @@ class TranscriptUploadTest(CourseTestCase):
                 u'There is a problem with this transcript file. Try to upload a different file.'
             )
 
+    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
     def test_transcript_upload_handler_with_invalid_transcript(self):
         """
         Tests the transcript upload handler with an invalid transcript file.
@@ -420,6 +457,7 @@ class TranscriptUploadTest(CourseTestCase):
             {
                 'edx_video_id': '123',
                 'language_code': 'en',
+                'new_language_code': 'es',
                 'file': transcript_file_stream,
             },
             format='multipart'

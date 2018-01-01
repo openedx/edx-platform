@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST, require_GET
 from edxval.api import (
     create_or_update_video_transcript,
+    get_available_transcript_languages,
     get_3rd_party_transcription_plans,
     get_video_transcript_data,
     update_transcript_credentials_state_for_org,
@@ -179,10 +180,17 @@ def validate_transcript_upload_data(data, files):
     """
     error = None
     # Validate the must have attributes - this error is unlikely to be faced by common users.
-    must_have_attrs = ['edx_video_id', 'language_code']
+    must_have_attrs = ['edx_video_id', 'language_code', 'new_language_code']
     missing = [attr for attr in must_have_attrs if attr not in data]
     if missing:
         error = _(u'Following parameters are required: {missing}.').format(missing=', '.join(missing))
+    elif (
+        data['language_code'] != data['new_language_code'] and
+        data['new_language_code'] in get_available_transcript_languages([data['edx_video_id']])
+    ):
+        error = _(u'Transcript with "{language_code}" language code is already present.'.format(
+            language_code=data['new_language_code']
+        ))
     elif 'file' not in files:
         error = _(u'A transcript file is required.')
 
@@ -218,6 +226,7 @@ def transcript_upload_handler(request, course_key_string):
     else:
         edx_video_id = request.POST['edx_video_id']
         language_code = request.POST['language_code']
+        new_language_code = request.POST['new_language_code']
         transcript_file = request.FILES['file']
         try:
             # Convert SRT transcript into an SJSON format
@@ -230,9 +239,11 @@ def transcript_upload_handler(request, course_key_string):
             create_or_update_video_transcript(
                 video_id=edx_video_id,
                 language_code=language_code,
-                file_name='subs.sjson',
-                file_format=Transcript.SJSON,
-                provider='Custom',
+                metadata={
+                    'provider': TranscriptProvider.CUSTOM,
+                    'file_format': Transcript.SJSON,
+                    'language_code': new_language_code
+                },
                 file_data=ContentFile(json.dumps(sjson_subs)),
             )
             response = JsonResponse(status=201)
