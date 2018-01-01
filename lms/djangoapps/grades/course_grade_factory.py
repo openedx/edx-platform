@@ -1,3 +1,6 @@
+"""
+Course Grade Factory Class
+"""
 from collections import namedtuple
 from logging import getLogger
 
@@ -152,7 +155,7 @@ class CourseGradeFactory(object):
             course_data,
             persistent_grade.percent_grade,
             persistent_grade.letter_grade,
-            persistent_grade.passed_timestamp is not None,
+            persistent_grade.letter_grade is not u''
         )
 
     @staticmethod
