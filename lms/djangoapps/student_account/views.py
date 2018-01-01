@@ -39,9 +39,13 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
-from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_learner_data
+from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_customer_for_learner
 from student.cookies import set_experiments_is_enterprise_cookie
-from openedx.features.enterprise_support.utils import update_third_party_auth_context_for_enterprise
+from openedx.features.enterprise_support.utils import (
+    handle_enterprise_cookies_for_logistration,
+    update_logistration_context_for_enterprise,
+    update_account_settings_context_for_enterprise,
+)
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import register_user as old_register_view
@@ -160,20 +164,11 @@ def login_and_registration_form(request, initial_mode="login"):
         ),
     }
 
-    context = update_context_for_enterprise(request, context)
+    enterprise_customer = enterprise_customer_for_request(request)
+    update_logistration_context_for_enterprise(request, context, enterprise_customer)
 
     response = render_to_response('student_account/login_and_register.html', context)
-
-    # This cookie can be used for tests or minor features,
-    # but should not be used for payment related or other critical work
-    # since users can edit their cookies
-    set_experiments_is_enterprise_cookie(request, response, context['enable_enterprise_sidebar'])
-
-    # Remove enterprise cookie so that subsequent requests show default login page.
-    response.delete_cookie(
-        configuration_helpers.get_value("ENTERPRISE_CUSTOMER_COOKIE_NAME", settings.ENTERPRISE_CUSTOMER_COOKIE_NAME),
-        domain=configuration_helpers.get_value("BASE_COOKIE_DOMAIN", settings.BASE_COOKIE_DOMAIN),
-    )
+    handle_enterprise_cookies_for_logistration(request, response, context)
 
     return response
 
@@ -232,85 +227,6 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
-def update_context_for_enterprise(request, context):
-    """
-    Take the processed context produced by the view, determine if it's relevant
-    to a particular Enterprise Customer, and update it to include that customer's
-    enterprise metadata.
-    """
-
-    context = context.copy()
-
-    sidebar_context = enterprise_sidebar_context(request)
-
-    if sidebar_context:
-        context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
-            context['data']['registration_form_desc']
-        )
-        context.update(sidebar_context)
-        context['enable_enterprise_sidebar'] = True
-        context['data']['hide_auth_warnings'] = True
-    else:
-        context['enable_enterprise_sidebar'] = False
-
-    return context
-
-
-def enterprise_fields_only(fields):
-    """
-    Take the received field definition, and exclude those fields that we don't want
-    to require if the user is going to be a member of an Enterprise Customer.
-    """
-    enterprise_exclusions = configuration_helpers.get_value(
-        'ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS',
-        settings.ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS
-    )
-    return [field for field in fields['fields'] if field['name'] not in enterprise_exclusions]
-
-
-def enterprise_sidebar_context(request):
-    """
-    Given the current request, render the HTML of a sidebar for the current
-    logistration view that depicts Enterprise-related information.
-    """
-    enterprise_customer = enterprise_customer_for_request(request)
-
-    if not enterprise_customer:
-        return {}
-
-    platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-
-    branding_configuration = enterprise_customer.get('branding_configuration', {})
-    logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
-
-    branded_welcome_template = configuration_helpers.get_value(
-        'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
-        settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-    )
-
-    branded_welcome_string = branded_welcome_template.format(
-        start_bold=u'<b>',
-        end_bold=u'</b>',
-        enterprise_name=enterprise_customer['name'],
-        platform_name=platform_name
-    )
-
-    platform_welcome_template = configuration_helpers.get_value(
-        'ENTERPRISE_PLATFORM_WELCOME_TEMPLATE',
-        settings.ENTERPRISE_PLATFORM_WELCOME_TEMPLATE
-    )
-    platform_welcome_string = platform_welcome_template.format(platform_name=platform_name)
-
-    context = {
-        'enterprise_name': enterprise_customer['name'],
-        'enterprise_logo_url': logo_url,
-        'enterprise_branded_welcome_string': branded_welcome_string,
-        'platform_welcome_string': platform_welcome_string,
-    }
-
-    return context
-
-
 def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     """Context for third party auth providers and the currently running pipeline.
 
@@ -337,26 +253,24 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     }
 
     if third_party_auth.is_enabled():
-        enterprise_customer = enterprise_customer_for_request(request)
-        if not enterprise_customer:
-            for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
-                info = {
-                    "id": enabled.provider_id,
-                    "name": enabled.name,
-                    "iconClass": enabled.icon_class or None,
-                    "iconImage": enabled.icon_image.url if enabled.icon_image else None,
-                    "loginUrl": pipeline.get_login_url(
-                        enabled.provider_id,
-                        pipeline.AUTH_ENTRY_LOGIN,
-                        redirect_url=redirect_to,
-                    ),
-                    "registerUrl": pipeline.get_login_url(
-                        enabled.provider_id,
-                        pipeline.AUTH_ENTRY_REGISTER,
-                        redirect_url=redirect_to,
-                    ),
-                }
-                context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
+        for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
+            info = {
+                "id": enabled.provider_id,
+                "name": enabled.name,
+                "iconClass": enabled.icon_class or None,
+                "iconImage": enabled.icon_image.url if enabled.icon_image else None,
+                "loginUrl": pipeline.get_login_url(
+                    enabled.provider_id,
+                    pipeline.AUTH_ENTRY_LOGIN,
+                    redirect_url=redirect_to,
+                ),
+                "registerUrl": pipeline.get_login_url(
+                    enabled.provider_id,
+                    pipeline.AUTH_ENTRY_REGISTER,
+                    redirect_url=redirect_to,
+                ),
+            }
+            context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
 
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
@@ -368,19 +282,8 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                 context["syncLearnerProfileData"] = current_provider.sync_learner_profile_data
 
                 if current_provider.skip_registration_form:
-                    # For enterprise (and later for everyone), we need to get explicit consent to the
-                    # Terms of service instead of auto submitting the registration form outright.
-                    if not enterprise_customer:
-                        # As a reliable way of "skipping" the registration form, we just submit it automatically
-                        context["autoSubmitRegForm"] = True
-                    else:
-                        context["autoRegisterWelcomeMessage"] = (
-                            'Thank you for joining {}. '
-                            'Just a couple steps before you start learning!'
-                        ).format(
-                            configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-                        )
-                        context["registerFormSubmitButtonText"] = _("Continue")
+                    # As a reliable way of "skipping" the registration form, we just submit it automatically
+                    context["autoSubmitRegForm"] = True
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
@@ -388,8 +291,6 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                 # msg may or may not be translated. Try translating [again] in case we are able to:
                 context['errorMessage'] = _(unicode(msg))  # pylint: disable=translation-of-non-string
                 break
-
-        context = update_third_party_auth_context_for_enterprise(context, enterprise_customer)
 
     return context
 
@@ -638,21 +539,8 @@ def account_settings_context(request):
         'extended_profile_fields': _get_extended_profile_fields(),
     }
 
-    enterprise_customer_name = None
-    sync_learner_profile_data = False
-    enterprise_learner_data = get_enterprise_learner_data(site=request.site, user=request.user)
-    if enterprise_learner_data:
-        enterprise_customer_name = enterprise_learner_data[0]['enterprise_customer']['name']
-        enterprise_idp = enterprise_learner_data[0]['enterprise_customer']['identity_provider']
-        identity_provider = third_party_auth.provider.Registry.get(provider_id=enterprise_idp)
-        sync_learner_profile_data = identity_provider.sync_learner_profile_data if identity_provider else False
-
-    context['sync_learner_profile_data'] = sync_learner_profile_data
-    context['edx_support_url'] = configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
-    context['enterprise_name'] = enterprise_customer_name
-    context['enterprise_readonly_account_fields'] = {
-        'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS
-    }
+    enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)
+    update_account_settings_context_for_enterprise(context, enterprise_customer)
 
     if third_party_auth.is_enabled():
         # If the account on the third party provider is already connected with another edX account,
