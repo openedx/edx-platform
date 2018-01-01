@@ -55,11 +55,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
 
-    def setUp(self):
-        super(CourseOverviewTestCase, self).setUp()
-        SignalHandler.course_published.connect(listen_for_course_publish)
-        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
-
     def check_course_overview_against_course(self, course):
         """
         Compares a CourseOverview object against its corresponding

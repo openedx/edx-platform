@@ -31,7 +31,7 @@ class CompletionViewMixin(object):
     Common functionality for completion views.
     """
 
-    _allowed_requested_fields = AGGREGATE_CATEGORIES | {'mean'}
+    _allowed_requested_fields = (AGGREGATE_CATEGORIES - {'course'}) | {'mean'}
 
     authentication_classes = (
         authentication.OAuth2AuthenticationAllowInactiveUser,
@@ -167,9 +167,9 @@ class CompletionListView(CompletionViewMixin, APIView):
 
         requested_fields (optional):
             A comma separated list of extra data to be returned.  This can be
-            one of the block types specified in `AGGREGATE_CATEGORIES`, or any of
-            the other optional fields specified above.  If any invalid fields
-            are requested, a 400 error will be returned.
+            one of the block types specified in `AGGREGATE_CATEGORIES` (except
+            `course`), or any of the other optional fields specified above.
+            If any invalid fields are requested, a 400 error will be returned.
 
     **Returns**
 
