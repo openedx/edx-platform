@@ -118,6 +118,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         )
         self._assert_view_at_position(html, expected_position=1)
         self.assertIn(unicode(self.sequence_3_1.location), html)
+        self.assertIn("'gate_content': False", html)
         self.assertIn("'next_url': 'NextSequential'", html)
         self.assertIn("'prev_url': 'PrevSequential'", html)
 
@@ -178,3 +179,98 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             )
             self.assertIn("hidden_content.html", html)
             self.assertIn(progress_url, html)
+
+    def _assert_gated(self, html, sequence):
+        """
+        Assert sequence content is gated
+        """
+        self.assertIn("seq_module.html", html)
+        self.assertIn("'banner_text': None", html)
+        self.assertIn("'items': []", html)
+        self.assertIn("'gate_content': True", html)
+        self.assertIn("'prereq_url': 'PrereqUrl'", html)
+        self.assertIn("'prereq_section_name': 'PrereqSectionName'", html)
+        self.assertIn("'gated_section_name': u'{}'".format(unicode(sequence.display_name)), html)
+        self.assertIn("'next_url': 'NextSequential'", html)
+        self.assertIn("'prev_url': 'PrevSequential'", html)
+
+    def _assert_prereq(self, html, sequence):
+        """
+        Assert sequence is a prerequiste with unfulfilled gates
+        """
+        self.assertIn("seq_module.html", html)
+        self.assertIn(
+            "'banner_text': 'This section is a prerequiste. "
+            "You must complete this section in order to unlock additional content.'",
+            html
+        )
+        self.assertIn("'gate_content': False", html)
+        self.assertIn(unicode(sequence.location), html)
+        self.assertIn("'prereq_url': None", html)
+        self.assertIn("'prereq_section_name': None", html)
+        self.assertIn("'next_url': 'NextSequential'", html)
+        self.assertIn("'prev_url': 'PrevSequential'", html)
+
+
+    def _assert_ungated(self, html, sequence):
+        """
+        Assert sequence is not gated
+        """
+        self.assertIn("seq_module.html", html)
+        self.assertIn("'banner_text': None", html)
+        self.assertIn("'gate_content': False", html)
+        self.assertIn(unicode(sequence.location), html)
+        self.assertIn("'prereq_url': None", html)
+        self.assertIn("'prereq_section_name': None", html)
+        self.assertIn("'next_url': 'NextSequential'", html)
+        self.assertIn("'prev_url': 'PrevSequential'", html)
+
+    def test_gated_content(self):
+        """
+        Test when sequence is both a prerequiste for a sequence
+        and gated on another prerequiste sequence
+        """
+        # setup seq_1_2 as a gate and gated
+        gating_mock_1_2 = Mock()
+        gating_mock_1_2.return_value.is_gate_fulfilled.return_value = False
+        gating_mock_1_2.return_value.is_prereq_required.return_value = True
+        gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [
+            False,
+            {'url': 'PrereqUrl', 'display_name': 'PrereqSectionName'}
+        ]
+        self.sequence_1_2.xmodule_runtime._services['gating'] = gating_mock_1_2 # pylint: disable=protected-access
+        self.sequence_1_2.display_name = 'sequence_1_2'
+
+        html = self._get_rendered_student_view(
+            self.sequence_1_2,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+        )
+
+        # expect content to be gated, with no banner
+        self._assert_gated(html, self.sequence_1_2)
+
+        # change seq_1_2 to be ungated, but still a gate (prequiste)
+        gating_mock_1_2.return_value.is_gate_fulfilled.return_value = False
+        gating_mock_1_2.return_value.is_prereq_required.return_value = True
+        gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [True, {}]
+
+        html = self._get_rendered_student_view(
+            self.sequence_1_2,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+        )
+
+        # assert that content and preq banner is shown
+        self._assert_prereq(html, self.sequence_1_2)
+
+        # change seq_1_2 to have no unfulfilled gates
+        gating_mock_1_2.return_value.is_gate_fulfilled.return_value = True
+        gating_mock_1_2.return_value.is_prereq_required.return_value = True
+        gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [True, {}]
+
+        html = self._get_rendered_student_view(
+            self.sequence_1_2,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+        )
+
+        # assert content shown as normal
+        self._assert_ungated(html, self.sequence_1_2)

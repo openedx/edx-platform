@@ -303,7 +303,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         fragment = Fragment()
         params = {
-            'items': self._render_student_view_for_items(context, display_items, fragment) if prereq_met else {},
+            'items': self._render_student_view_for_items(context, display_items, fragment) if prereq_met else [],
             'element_id': self.location.html_id(),
             'item_id': self.location.to_deprecated_string(),
             'position': self.position,
@@ -373,7 +373,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if gating_service:
             return gating_service.compute_is_prereq_met(self.location, self.runtime.user_id, recalc_on_unmet)
 
-        return False, {}
+        return True, {}
 
     def _update_position(self, context, number_of_display_items):
         """

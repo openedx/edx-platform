@@ -2,9 +2,10 @@
 Tests for the gating API
 """
 
-from mock import patch
+from mock import patch, Mock
 from nose.plugins.attrib import attr
 from ddt import ddt, data
+from lms.djangoapps.gating import api as lms_gating_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from milestones import api as milestones_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
@@ -175,3 +176,77 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         milestones_api.add_user_milestone({'id': student.id}, milestone)  # pylint: disable=no-member
 
         self.assertEqual(gating_api.get_gated_content(self.course, student), [])
+
+
+    def test_is_gate_fulfilled(self):
+        """
+        Test if prereq section has any unfulfilled milestones
+        """
+        student = UserFactory(is_staff=False)
+        gating_api.add_prerequisite(self.course.id, self.seq1.location)
+        gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, 100)
+        milestone = milestones_api.add_milestone(self.generic_milestone)
+        milestones_api.add_course_content_milestone(self.course.id, self.seq1.location, 'fulfills', milestone)
+
+        self.assertFalse(gating_api.is_gate_fulfilled(self.course.id, self.seq1.location, student.id))
+
+        # complete the prerequiste to unlock the gated content
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block.
+        with patch.object(gating_api, '_get_subsection_percentage') as mock_grade:
+            mock_grade.return_value = 75
+            lms_gating_api.evaluate_prerequisite(
+                self.course,
+                Mock(location=self.seq1.location),
+                student,
+            )
+
+        self.assertFalse(gating_api.is_gate_fulfilled(self.course.id, self.seq1.location, student.id))
+
+        with patch.object(gating_api, '_get_subsection_percentage') as mock_grade:
+            mock_grade.return_value = 100
+            lms_gating_api.evaluate_prerequisite(
+                self.course,
+                Mock(location=self.seq1.location),
+                student,
+            )
+
+        self.assertTrue(gating_api.is_gate_fulfilled(self.course.id, self.seq1.location, student.id))
+
+    def test_compute_is_prereq_met(self):
+        """
+        Test if prereq has been met and force recompute
+        """
+        student = UserFactory(is_staff=False)
+        gating_api.add_prerequisite(self.course.id, self.seq1.location)
+        gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, 100)
+
+        # complete the prerequiste to unlock the gated content
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block.
+        with patch.object(gating_api, '_get_subsection_percentage') as mock_grade:
+            mock_grade.return_value = 75
+            # don't force recompute
+            prereq_met, prereq_meta_info = gating_api.compute_is_prereq_met(self.seq2.location, student.id, False)
+            self.assertFalse(prereq_met)
+            self.assertIsNone(prereq_meta_info['url'])
+            self.assertIsNone(prereq_meta_info['display_name'])
+
+            # force recompute
+            prereq_met, prereq_meta_info = gating_api.compute_is_prereq_met(self.seq2.location, student.id, True)
+            self.assertFalse(prereq_met)
+            self.assertIsNotNone(prereq_meta_info['url'])
+            self.assertIsNotNone(prereq_meta_info['display_name'])
+
+            # change to passing grade
+            mock_grade.return_value = 100
+
+            # don't force recompute
+            prereq_met, prereq_meta_info = gating_api.compute_is_prereq_met(self.seq2.location, student.id, False)
+            self.assertFalse(prereq_met)
+            self.assertIsNone(prereq_meta_info['url'])
+            self.assertIsNone(prereq_meta_info['display_name'])
+
+            # force recompute
+            prereq_met, prereq_meta_info = gating_api.compute_is_prereq_met(self.seq2.location, student.id, True)
+            self.assertTrue(prereq_met)
+            self.assertIsNotNone(prereq_meta_info['url'])
+            self.assertIsNotNone(prereq_meta_info['display_name'])
