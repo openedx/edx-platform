@@ -14,8 +14,10 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from student.models import UserProfile
 
 LOG = logging.getLogger(__name__)
 
@@ -107,6 +109,15 @@ class Command(BaseCommand):
                     result.append(os.path.join(root, name))
         return result
 
+    def _enable_commerce_configuration(self):
+        """
+        Enable the commerce configuration.
+        """
+        CommerceConfiguration.objects.get_or_create(
+            enabled=True,
+            checkout_on_ecommerce_service=True
+        )
+
     def _get_sites_data(self):
         """
         Reads the json files from theme directory and returns the site data in JSON format.
@@ -140,21 +151,28 @@ class Command(BaseCommand):
         """
         Creates the service user for ecommerce and discovery.
         """
-        return User.objects.get_or_create(
-            username=username,
+        service_user, _ = User.objects.get_or_create(username=username)
+        service_user.is_active = True
+        service_user.is_staff = True
+        service_user.is_superuser = True
+        service_user.save()
+
+        # Without User profile we cannot publish the course from ecommerce to LMS.
+        UserProfile.objects.get_or_create(
+            user=service_user,
             defaults={
-                "is_staff": True,
-                "is_superuser": True
+                "name": username
             }
         )
+        return service_user
 
     def handle(self, *args, **options):
 
         self.theme_path = options['theme_path']
         self.dns_name = options['dns_name']
 
-        self.discovery_user, _ = self.get_or_create_service_user("lms_catalog_service_user")
-        self.ecommerce_user, _ = self.get_or_create_service_user("ecommerce_worker")
+        self.discovery_user = self.get_or_create_service_user("lms_catalog_service_user")
+        self.ecommerce_user = self.get_or_create_service_user("ecommerce_worker")
 
         all_sites = self._get_sites_data()
 
@@ -173,3 +191,5 @@ class Command(BaseCommand):
 
             LOG.info("Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(ecommerce_url, site_name, is_discovery=False)
+
+        self._enable_commerce_configuration()
