@@ -936,6 +936,7 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
+    'lms.djangoapps.onboarding',
 
     # Microsite configuration application
     'microsite_configuration',
@@ -963,6 +964,10 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # Course teams
+    # Nodebb app has dependency on this app that's why we are adding it here
+    'lms.djangoapps.teams',
 
     # NodeBB app
     'nodebb',

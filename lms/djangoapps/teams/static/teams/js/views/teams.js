@@ -23,6 +23,9 @@
                     router: options.router,
                     maxTeamSize: this.context.maxTeamSize,
                     srInfo: this.srInfo,
+                    // TODO: Move below 2 line out as we are changing edx default files
+                    roomID: this.context.roomID,
+                    nodeBBUrl: this.context.nodeBBUrl,
                     countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),
                     languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages)
                 });

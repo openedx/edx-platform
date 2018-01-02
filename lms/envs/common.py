@@ -1219,7 +1219,7 @@ MIDDLEWARE_CLASSES = (
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
-    'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
+    'lms.djangoapps.onboarding.middleware.RedirectMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -2200,7 +2200,7 @@ INSTALLED_APPS = (
     # Unusual migrations
     'database_fixups',
 
-    'lms.djangoapps.onboarding_survey',
+    'lms.djangoapps.onboarding',
 
 
     # OEF survey
@@ -2264,7 +2264,7 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy',
     'PRESS': 'press',
     'BLOG': 'blog',
-    'DONATE': 'donate',
+
     'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
@@ -2293,12 +2293,10 @@ SOCIAL_SHARING_SETTINGS = {
 # The names list controls the order of social media
 # links in the footer.
 SOCIAL_MEDIA_FOOTER_NAMES = [
+    "linkedin",
     "facebook",
     "twitter",
     "youtube",
-    "linkedin",
-    "google_plus",
-    "reddit",
 ]
 
 # JWT Settings
@@ -2324,11 +2322,18 @@ SOCIAL_MEDIA_FOOTER_URLS = {}
 # The display dictionary defines the title
 # and icon class for each social media link.
 SOCIAL_MEDIA_FOOTER_DISPLAY = {
+    "linkedin": {
+        # Translators: This is the website name of www.linkedin.com.  Please
+        # translate this the way that LinkedIn advertises in your language.
+        "title": _("LinkedIn"),
+        "icon": "fa-linkedin",
+        "action": _("Follow {platform_name} on LinkedIn")
+    },
     "facebook": {
         # Translators: This is the website name of www.facebook.com.  Please
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
-        "icon": "fa-facebook-square",
+        "icon": "fa-facebook",
         "action": _("Like {platform_name} on Facebook")
     },
     "twitter": {
@@ -2337,51 +2342,6 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         "title": _("Twitter"),
         "icon": "fa-twitter",
         "action": _("Follow {platform_name} on Twitter")
-    },
-    "linkedin": {
-        # Translators: This is the website name of www.linkedin.com.  Please
-        # translate this the way that LinkedIn advertises in your language.
-        "title": _("LinkedIn"),
-        "icon": "fa-linkedin-square",
-        "action": _("Follow {platform_name} on LinkedIn")
-    },
-    "google_plus": {
-        # Translators: This is the website name of plus.google.com.  Please
-        # translate this the way that Google+ advertises in your language.
-        "title": _("Google+"),
-        "icon": "fa-google-plus-square",
-        "action": _("Follow {platform_name} on Google+")
-    },
-    "tumblr": {
-        # Translators: This is the website name of www.tumblr.com.  Please
-        # translate this the way that Tumblr advertises in your language.
-        "title": _("Tumblr"),
-        "icon": "fa-tumblr"
-    },
-    "meetup": {
-        # Translators: This is the website name of www.meetup.com.  Please
-        # translate this the way that MeetUp advertises in your language.
-        "title": _("Meetup"),
-        "icon": "fa-calendar"
-    },
-    "reddit": {
-        # Translators: This is the website name of www.reddit.com.  Please
-        # translate this the way that Reddit advertises in your language.
-        "title": _("Reddit"),
-        "icon": "fa-reddit",
-        "action": _("Subscribe to the {platform_name} subreddit"),
-    },
-    "vk": {
-        # Translators: This is the website name of https://vk.com.  Please
-        # translate this the way that VK advertises in your language.
-        "title": _("VK"),
-        "icon": "fa-vk"
-    },
-    "weibo": {
-        # Translators: This is the website name of http://www.weibo.com.  Please
-        # translate this the way that Weibo advertises in your language.
-        "title": _("Weibo"),
-        "icon": "fa-weibo"
     },
     "youtube": {
         # Translators: This is the website name of www.youtube.com.  Please
@@ -3028,7 +2988,7 @@ MAX_BOOKMARKS_PER_COURSE = 100
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = 'onboarding_survey.forms.RegModelForm'
+REGISTRATION_EXTENSION_FORM = 'onboarding.forms.RegModelForm'
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [

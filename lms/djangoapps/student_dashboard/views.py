@@ -7,8 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
-from lms.djangoapps.onboarding_survey.models import InterestsSurvey
 from xmodule.modulestore.django import modulestore
+from student.models import CourseEnrollment
 
 
 def get_recommended_courses(user):
@@ -18,13 +18,13 @@ def get_recommended_courses(user):
     recommended_courses = []
     all_courses = get_courses(user)
     try:
-        user_interests = InterestsSurvey.objects.get(user=user).capacity_areas.all().values_list('label', flat=True)
+        user_interests = user.extended_profile.get_user_selected_interests()
         for course in all_courses:
             try:
                 tags = CustomSettings.objects.filter(id=course.id).first().tags
                 tags = tags.split('|')
                 tags = [tag.strip() for tag in tags]
-                if set(user_interests) & set(tags):
+                if set(user_interests) & set(tags) and not CourseEnrollment.is_enrolled(user, course.id):
                     recommended_courses.append(course)
             except AttributeError:
                 pass
@@ -55,11 +55,10 @@ def get_recommended_xmodule_courses(user):
     """
     recommended_courses = []
     all_courses = get_courses(user)
-    user_interests = InterestsSurvey.objects.get(user=user)
+    user_interests = user.extended_profile.get_user_selected_interests()
     if not user_interests:
         return []
 
-    user_interests = user_interests.capacity_areas.all().values_list('label', flat=True)
     for course in all_courses:
         settings = CustomSettings.objects.filter(id=course.id).first()
         if not settings:
@@ -72,7 +71,7 @@ def get_recommended_xmodule_courses(user):
         tags = tags.split('|')
         tags = [tag.strip() for tag in tags]
         matched_interests = set(user_interests) & set(tags)
-        if matched_interests:
+        if matched_interests and not CourseEnrollment.is_enrolled(user, course.id):
             detailed_course = modulestore().get_course(course.id)
             detailed_course.short_description = course.short_description
             detailed_course.interests = '/ '.join(list(matched_interests))
