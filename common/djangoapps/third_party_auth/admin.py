@@ -5,6 +5,7 @@ Admin site configuration for third party authentication
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 
 from third_party_auth.provider import Registry
 
@@ -19,6 +20,7 @@ from .models import (
     SAMLProviderData
 )
 from .tasks import fetch_saml_metadata
+from openedx.core.djangolib.markup import HTML
 
 
 class OAuth2ProviderConfigForm(forms.ModelForm):
@@ -52,9 +54,25 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'site', 'backend_name', 'entity_id', 'metadata_source',
-            'has_data', 'mode', 'change_date', 'changed_by', 'edit_link',
+            'name_with_update_link', 'enabled', 'site', 'backend_name', 'entity_id', 'metadata_source',
+            'has_data', 'mode', 'change_date', 'changed_by',
         )
+
+    list_display_links = None
+
+    def name_with_update_link(self, instance):
+        """
+        Record name with link for the change view.
+        """
+        if not instance.is_active:
+            return instance.name
+
+        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
+        update_url += '?source={}'.format(instance.pk)
+        return HTML(u'<a href="{}">{}</a>').format(update_url, instance.name)
+
+    name_with_update_link.allow_tags = True
+    name_with_update_link.short_description = u'Name'
 
     def has_data(self, inst):
         """ Do we have cached metadata for this SAML provider? """
