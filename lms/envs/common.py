@@ -2872,6 +2872,9 @@ FIELD_OVERRIDE_PROVIDERS = ()
 # require student context.
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
 
+# IMAGE CONFIG
+IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+
 # PROFILE IMAGE CONFIG
 # WARNING: Certain django storage backends do not support atomic
 # file overwrites (including the default, OverwriteStorage) - instead
@@ -2902,13 +2905,15 @@ PROFILE_IMAGE_SIZES_MAP = {
     'small': 30
 }
 
-# ORGANIZATION LOGO CONFIG
+# ORGANIZATION IMAGES CONFIG
 # WARNING: Certain django storage backends do not support atomic
 # file overwrites (including the default, OverwriteStorage) - instead
 # there are separate calls to delete and then write a new file in the
 # storage backend.  This introduces the risk of a race condition
-# occurring when a user uploads a new logo image to replace an
+# occurring when a user uploads a new image to replace an
 # earlier one (the file will temporarily be deleted).
+ORGANIZATION_THEME_IMAGE_SECRET_KEY = 'placeholder secret key'
+
 ORGANIZATION_LOGO_IMAGE_BACKEND = {
     'class': 'storages.backends.overwrite.OverwriteStorage',
     'options': {
@@ -2921,9 +2926,8 @@ ORGANIZATION_LOGO_IMAGE_BACKEND = {
 # profile images.  Once it has been set, changing it will make the
 # platform unaware of current image URLs, resulting in reverting all
 # users' profile images to the default placeholder image.
-ORGANIZATION_LOGO_IMAGE_SECRET_KEY = 'placeholder secret key'
 ORGANIZATION_LOGO_IMAGE_DEFAULT_FILENAME = 'images/organization-logo/default'
-ORGANIZATION_LOGO_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+ORGANIZATION_LOGO_IMAGE_KEY_PREFIX = 'logo'
 
 # logo image for organization in mobile apps
 ORGANIZATION_LOGO_IMAGE_SIZES_MAP = {
@@ -2932,6 +2936,21 @@ ORGANIZATION_LOGO_IMAGE_SIZES_MAP = {
     'medium': '250x70',
     'small': '187x52',
     'x-small': '125x35',
+}
+
+ORGANIZATION_HEADER_BG_IMAGE_KEY_PREFIX = 'header_bg'
+# header background image for organization in mobile apps
+ORGANIZATION_HEADER_BG_IMAGE_SIZES_MAP = {
+    'ipad_01': '1668x128',
+    'ipad_02': '2048x128',
+    'ipad_03': '1536x128',
+    'iphone_01': '750x128',
+    'iphone_plus_01': '1242x192',
+    'mdpi': '375x200',
+    'hdpi': '562x300',
+    'xhdpi': '750x400',
+    'xxhdpi': '1125x600',
+    'xxxhdpi': '1500x800',
 }
 
 # Sets the maximum number of courses listed on the homepage
