@@ -91,6 +91,8 @@ class UpdateCommunityProfile(APIView):
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
 
 def get_user_chat(request):
+    """ Get recent chats of the user from NodeBB """
+
     chat_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/chats'
     username = request.user.username
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
