@@ -6,6 +6,8 @@ from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 
+from entitlements.models import CourseEntitlement
+
 
 LOGGER = get_task_logger(__name__)
 # Under cms the following setting is not defined, leading to errors during tests.
@@ -18,7 +20,7 @@ MAX_RETRIES = 11
 
 
 @task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
-def expire_old_entitlements(self, entitlements, logid='...'):
+def expire_old_entitlements(self, start, end, logid='...'):
     """
     This task is designed to be called to process a bundle of entitlements
     that might be expired and confirm if we can do so. This is useful when
@@ -28,14 +30,19 @@ def expire_old_entitlements(self, entitlements, logid='...'):
     run this task every now and then to clear the backlog.)
 
     Args:
-        entitlements (list): An iterable set of CourseEntitlements to check
+        start (int): The beginning id in the database to examine
+        end (int): The id in the database to stop examining at (i.e. range is exclusive)
         logid (str): A string to identify this task in the logs
 
     Returns:
         None
 
     """
-    LOGGER.info('Running task expire_old_entitlements [%s]', logid)
+    LOGGER.info('Running task expire_old_entitlements %d:%d [%s]', start, end, logid)
+
+    # This query could be optimized to return a more narrow set, but at a
+    # complexity cost. See bug LEARNER-3451 about improving it.
+    entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True, id__gte=start, id__lt=end)
 
     countdown = 2 ** self.request.retries
 
@@ -53,4 +60,4 @@ def expire_old_entitlements(self, entitlements, logid='...'):
         # The call above is idempotent, so retry at will
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
-    LOGGER.info('Successfully completed the task expire_old_entitlements [%s]', logid)
+    LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)
