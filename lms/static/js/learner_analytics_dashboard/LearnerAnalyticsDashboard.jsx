@@ -6,6 +6,35 @@ import ReactDOM from 'react-dom';
 import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
 import GradeTable from './GradeTable';
+import DueDates from './DueDates';
+
+function arrayToObject(array) {
+  return array.reduce((accumulator, obj) => {
+    const key = Object.keys(obj)[0];
+    accumulator[key] = obj[key];
+    return accumulator;
+  }, {})
+}
+
+function countByType(type, assignments) {
+  let count = 0;
+  assignments.map((value) => {
+    if (value === type) {
+      count += 1;
+    }
+  })
+  return count;
+}
+
+function getAssignmentCounts(types, assignments) {
+  const countsArray = types.map((type) => {
+    return {
+      [type]: countByType(type, assignments)
+    }
+  });
+
+  return arrayToObject(countsArray);
+}
 
 export function LearnerAnalyticsDashboard(props) {
 console.log('props: ', props);
@@ -17,11 +46,17 @@ console.log('props: ', props);
       label: type,
       sliceIndex: index + 1
     }
-  }).sort((a, b) => a.value < b.value);
+  }); //.sort((a, b) => a.value < b.value);
 
   // Get a list of assignment types minus duplicates
-  const assignmentTypes = [...new Set(gradeBreakdown.map(value => value['label']))];
-
+  const assignments = gradeBreakdown.map(value => value['label']);
+  const assignmentTypes = [...new Set(assignments)];
+  const assignmentCounts = getAssignmentCounts(assignmentTypes, assignments);
+  const assignmentCountz = {
+    Homework: 2,
+    Exam: 1
+  };
+console.log('counts: ', assignmentCounts);
   const tableData = [
     {
       label: 'Problem Set 1',
@@ -40,6 +75,21 @@ console.log('props: ', props);
       user: '0',
       passing: '40',
       total: '50'
+    }
+  ];
+
+  const dates = [
+    {
+      format: 'Homework',
+      due: '2018-02-01T00:00:00+00:00'
+    },
+    {
+      format: 'Homework',
+      due: '2017-12-29T01:30:00+00:00'
+    },
+    {
+      format: 'Exam',
+      due: '2018-05-27T01:30:00+00:00'
     }
   ];
 
@@ -65,7 +115,7 @@ console.log('props: ', props);
 
           <h3 className="section-heading">Graded Assessments</h3>
           <div className="graded-assessments-wrapper">
-            <GradeTable assignmentTypes={assignmentTypes} data={JSON.parse(grades)} />
+            <GradeTable assignmentTypes={assignmentTypes} grades={grades} />
             <p className="footnote">*Calculated based on current average</p>
           </div>
         </div>
@@ -75,6 +125,8 @@ console.log('props: ', props);
       </div>
       <div className="analytics-group sidebar">
         <h2 className="group-heading">Timing</h2>
+        <h3 className="section-heading">Course due dates</h3>
+        <DueDates dates={dates} assignmentCounts={assignmentCounts} />
       </div>
     </div>
   );
