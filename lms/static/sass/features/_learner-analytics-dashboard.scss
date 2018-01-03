@@ -179,6 +179,20 @@ $grouping-border: #D8D8D8;
     }
   }
 
+  .due-dates {
+    .date-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .date-item {
+        display: flex;
+        justify-content: space-between;
+        color: $font-color;
+      }
+    }
+  }
+
   @include media-breakpoint-up(sm) { .analytics-group.sidebar{border-color: red;} }
   @include media-breakpoint-up(md) { .analytics-group.sidebar{border-color: blue;} }
   @include media-breakpoint-up(lg) { .analytics-group.sidebar{border-color: green;} }
