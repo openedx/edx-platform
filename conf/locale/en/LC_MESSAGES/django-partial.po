@@ -1,20 +1,20 @@
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
-# 
+# EdX Team <info@edx.org>, 2018.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-27 11:10+0000\n"
-"PO-Revision-Date: 2017-12-27 11:16:56.618759\n"
+"POT-Creation-Date: 2018-01-03 14:20+0000\n"
+"PO-Revision-Date: 2018-01-03 14:20:59.188452\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
@@ -2424,13 +2424,13 @@ msgstr ""
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -8072,10 +8072,6 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
-#: lms/djangoapps/student_account/views.py
-msgid "Continue"
-msgstr ""
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -10185,6 +10181,17 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"Thank you for joining {platform_name}. Just a couple steps before you start "
+"learning!"
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+msgid "Continue"
 msgstr ""
 
 #: openedx/features/learner_profile/views/learner_profile.py
