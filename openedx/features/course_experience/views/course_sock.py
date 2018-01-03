@@ -2,7 +2,6 @@
 Fragment for rendering the course's sock and associated toggle button.
 """
 from django.template.loader import render_to_string
-from django.utils.translation import get_language
 from web_fragments.fragment import Fragment
 
 from course_modes.models import get_cosmetic_verified_display_price
@@ -26,7 +25,7 @@ class CourseSockFragmentView(EdxFragmentView):
     @staticmethod
     def get_verification_context(request, course):
         enrollment = CourseEnrollment.get_enrollment(request.user, course.id)
-        show_course_sock = verified_upgrade_link_is_valid(enrollment) and get_language() == 'en'
+        show_course_sock = verified_upgrade_link_is_valid(enrollment)
         if show_course_sock:
             upgrade_url = verified_upgrade_deadline_link(request.user, course=course)
             course_price = get_cosmetic_verified_display_price(course)
