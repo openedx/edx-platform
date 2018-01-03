@@ -28,8 +28,6 @@ pull_translations:
 	i18n_tool extract
 	i18n_tool dummy
 	i18n_tool generate
-	python manage.py lms --settings='devstack' compilejsi18n
-	python manage.py cms --settings='devstack' compilejsi18n
 	i18n_tool generate --strict
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
