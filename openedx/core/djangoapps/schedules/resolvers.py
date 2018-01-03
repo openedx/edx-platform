@@ -356,7 +356,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             try:
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
-                LOG.exception(
+                LOG.warning(
                     'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
                         user, week_num, enrollment.course_id
                     )
