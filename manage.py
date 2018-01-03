@@ -82,8 +82,8 @@ def parse_args():
     edx_args, django_args = parser.parse_known_args()
 
     if edx_args.help:
-        print "edX:"
-        print edx_args.help_string
+        print("edX:")
+        print(edx_args.help_string)
 
     return edx_args, django_args
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         contracts.disable_all()
 
     if edx_args.help:
-        print "Django:"
+        print("Django:")
         # This will trigger django-admin.py to print out its help
         django_args.append('--help')
 
