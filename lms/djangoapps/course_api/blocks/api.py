@@ -1,7 +1,9 @@
 """
 API function for retrieving course blocks data
 """
+from django.conf import settings
 
+from lms.djangoapps.course_api.blocks.transformers.load_override_data import OverrideDataTransformer
 from lms.djangoapps.course_blocks.api import COURSE_BLOCK_ACCESS_TRANSFORMERS, get_course_blocks
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
@@ -10,6 +12,17 @@ from .serializers import BlockDictSerializer, BlockSerializer
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
+
+
+INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = 'courseware.student_field_overrides.IndividualStudentOverrideProvider'
+
+
+def has_individual_student_override_provider():
+    """
+    check if FIELD_OVERRIDE_PROVIDERS has class
+    `courseware.student_field_overrides.IndividualStudentOverrideProvider`
+    """
+    return INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER in settings.FIELD_OVERRIDE_PROVIDERS
 
 
 def get_blocks(
@@ -64,6 +77,10 @@ def get_blocks(
             include_special_exams=include_special_exams,
             include_gated_sections=include_gated_sections)]
         transformers += [HiddenContentTransformer()]
+
+        if has_individual_student_override_provider():
+            transformers += [OverrideDataTransformer(user)]
+
     transformers += [
         BlocksAPITransformer(
             block_counts,
