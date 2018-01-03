@@ -1,14 +1,14 @@
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-27 11:10+0000\n"
-"PO-Revision-Date: 2017-12-27 11:16:56.618759\n"
+"POT-Creation-Date: 2018-01-03 14:47+0000\n"
+"PO-Revision-Date: 2018-01-03 14:53:33.502454\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -8072,10 +8072,6 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
-#: lms/djangoapps/student_account/views.py
-msgid "Continue"
-msgstr ""
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -10185,6 +10181,17 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"Thank you for joining {platform_name}. Just a couple steps before you start "
+"learning!"
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+msgid "Continue"
 msgstr ""
 
 #: openedx/features/learner_profile/views/learner_profile.py
