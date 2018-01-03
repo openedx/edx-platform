@@ -12,7 +12,7 @@ describe('Currency factory', () => {
   beforeEach(() => {
     loadFixtures('course_experience/fixtures/course-currency-fragment.html');
     currency = new Currency({
-        skipInitialize: true
+      skipInitialize: true,
     });
     canadaPosition = {
       coords: {
