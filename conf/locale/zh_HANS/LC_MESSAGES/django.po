@@ -17,7 +17,7 @@
 # Christina Guo <csu2008guoting@163.com>, 2016
 # ckyOL, 2015
 # focusheart <focusheart@gmail.com>, 2014
-# focusheart <focusheart@gmail.com>, 2014
+# focusheart <focusheart@gmail.com>, 2014,2017
 # focusheart <focusheart@gmail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
@@ -149,7 +149,7 @@
 # Yufei Xue <cmouse@163.com>, 2013
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
-# focusheart <focusheart@gmail.com>, 2014
+# focusheart <focusheart@gmail.com>, 2014,2017
 # Hanwei <chuxiking@163.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # HAO WU <u5135571@anu.edu.au>, 2014

@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-27 11:16+0000\n"
-"PO-Revision-Date: 2017-12-27 11:16:56.708469\n"
+"POT-Creation-Date: 2018-01-03 14:53+0000\n"
+"PO-Revision-Date: 2018-01-03 14:53:33.593885\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -9156,11 +9156,6 @@ msgstr "رخ ثوشهم شييقثسس حقخدهيثي."
 msgid "Create Account"
 msgstr "ذقثشفث شذذخعرف"
 
-#: lms/djangoapps/student_account/views.py
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Continue"
-msgstr "ذخرفهرعث"
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -11510,6 +11505,20 @@ msgstr ""
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
 msgstr "ثرقخمموثرف هر {course_name} صشس رخف ذخوحمثفث."
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"Thank you for joining {platform_name}. Just a couple steps before you start "
+"learning!"
+msgstr ""
+"فاشرن غخع بخق تخهرهرل {platform_name}. تعسف ش ذخعحمث سفثحس زثبخقث غخع سفشقف "
+"مثشقرهرل!"
+
+#: openedx/features/enterprise_support/utils.py
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Continue"
+msgstr "ذخرفهرعث"
 
 #: openedx/features/learner_profile/views/learner_profile.py
 #, python-brace-format
