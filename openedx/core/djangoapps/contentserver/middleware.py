@@ -250,14 +250,24 @@ class StaticContentServer(object):
         """
         Determines whether or not the user for this request is authorized to view the given asset.
         """
+        log.info(
+            'content %s has lock status %r', getattr(content, "displayname", None), self.is_content_locked(content)
+        )
         if not self.is_content_locked(content):
             return True
 
         if not hasattr(request, "user") or not request.user.is_authenticated():
+            log.info(
+                'content %s cannot be displayed as user is not authenticated', getattr(content, "displayname", None)
+            )
             return False
 
         if not request.user.is_staff:
             deprecated = getattr(location, 'deprecated', False)
+            log.info(
+                'content %s location has deprecated status  %r', getattr(content, "displayname", None),
+                self.is_content_locked(content), getattr(location, 'deprecated', False)
+            )
             if deprecated and not CourseEnrollment.is_enrolled_by_partial(request.user, location.course_key):
                 return False
             if not deprecated and not CourseEnrollment.is_enrolled(request.user, location.course_key):
