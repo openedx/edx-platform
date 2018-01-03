@@ -57,7 +57,7 @@
         <div class="content-primary">
             % if waffle_flag_enabled:
                 <%static:studiofrontend page="AssetsPage" lang="en">
-                    {   
+                    {
                         "course": {
                             "id": "${context_course.id | n, js_escaped_string}",
                             "name": "${context_course.display_name_with_default | n, js_escaped_string}",
@@ -69,6 +69,9 @@
                         },
                         "help_tokens": {
                             "files": "${get_online_help_info(online_help_token())['doc_url'] | n, js_escaped_string}"
+                        },
+                        "upload_settings": {
+                            "max_file_size_in_mbs": ${max_file_size_in_mbs|n, dump_js_escaped_json}
                         }
                     }
                 </%static:studiofrontend>
