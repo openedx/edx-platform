@@ -3,8 +3,12 @@ import collections
 from django.core.urlresolvers import reverse
 
 from courseware.tabs import get_course_tab_list
+from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from nodebb.models import DiscussionCommunity, TeamGroupChat
+
+from logging import getLogger
+log = getLogger(__name__)
 
 
 def get_course_related_tabs(request, course):
@@ -77,3 +81,14 @@ def get_room_id(user_info):
                 room_info.update({team['id']: team_group.room_id})
 
     return room_info
+
+
+def update_nodebb_for_user_status(username):
+    """
+    Call nodebb client to update NodeBB for survey status update
+    """
+    status_code, response_body = NodeBBClient().users.update_onboarding_surveys_status(username)
+    if status_code != 200:
+        log.error('Surveys completion status sending failed')
+    else:
+        log.info('Surveys completion status sent for %s' % username)

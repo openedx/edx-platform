@@ -33,3 +33,9 @@ class ForumUser(User):
         """
         kwargs['kwargs']['username'] = username
         return self.client.post('/api/v2/users/update', **kwargs['kwargs'])
+
+    def update_onboarding_surveys_status(self, username):
+        """
+        Update NodeBB when user successfully completed all required onboarding surveys
+        """
+        return self.client.get('/api/v2/users/update-visibility-status?username=%s' % username)
