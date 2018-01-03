@@ -179,7 +179,6 @@ def organization(request):
 
     initial = {
         'country': COUNTRIES.get(_organization.country),
-        'url': _organization.url if _organization.url else "https://",
         'is_org_url_exist': '1' if _organization.url else '0',
         'partner_networks': _organization.organization_partners.values_list('partner__code', flat=True),
     }
