@@ -88,8 +88,9 @@ class UserInfoModelForm(forms.ModelForm):
                               error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
     })
     city = forms.CharField(label=ugettext_noop('City of Residence'), required=False)
-    is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of employment is '
-                                                         'different from your country and/or city of residence.'),
+    is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of '
+                                                                       'employment is different from your country '
+                                                                       'and/or city of residence.'),
                                                    required=False)
     level_of_education = forms.ChoiceField(label=ugettext_noop('Level of Education'), label_suffix="*",
                                            choices=LEVEL_OF_EDUCAION_CHOICES,
