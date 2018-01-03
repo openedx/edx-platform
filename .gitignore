@@ -35,6 +35,7 @@ codekit-config.json
 /other.xml
 /packages.xml
 /web-browsers.xml
+.vscode
 
 ### NFS artifacts
 .nfs*

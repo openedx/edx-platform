@@ -2,9 +2,11 @@
 restAPI Views
 """
 import logging
+import requests
 
 from datetime import datetime
 from django.http import JsonResponse
+from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
 
@@ -88,3 +90,13 @@ class UpdateCommunityProfile(APIView):
         except Exception as ex:
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
 
+def get_user_chat(request):
+    """ Get recent chats of the user from NodeBB """
+
+    chat_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/chats'
+    username = request.user.username
+    headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
+    response = requests.post(chat_endpoint,
+        data={'_uid': 1, 'username': username},
+        headers=headers)
+    return JsonResponse(response.json())
