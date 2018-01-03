@@ -161,6 +161,22 @@ def courses(request):
     if request.user.is_authenticated():
         add_tag_to_enrolled_courses(request.user, courses_list)
 
+    for course in  courses_list:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(
+                course.id.to_deprecated_string())
+        with modulestore().bulk_operations(course_key):
+            if has_access(request.user, 'load', course):
+                first_chapter_url, first_section = get_course_related_keys(
+                    request, get_course_by_id(course_key, 0))
+                course_target = reverse('courseware_section', args=[
+                    course.id.to_deprecated_string(),
+                    first_chapter_url,
+                    first_section
+                    ])
+                course.course_target = course_target
+            else:
+                course.course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+
     return render_to_response(
         "courseware/courses.html",
         {
