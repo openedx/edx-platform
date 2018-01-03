@@ -159,8 +159,8 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_add_entitlement_inactive_audit_enrollment(self, mock_get_course_runs):
         """
-        Verify that if an entitlement is added for a user, if the user has one upgradeable enrollment
-        that enrollment is upgraded to the mode of the entitlement and linked to the entitlement.
+        Verify that if an entitlement is added for a user, if the user has an inactive audit enrollment
+        that enrollment is NOT upgraded to the mode of the entitlement and linked to the entitlement.
         """
         course_uuid = uuid.uuid4()
         entitlement_data = self._get_data_set(self.user, str(course_uuid))
