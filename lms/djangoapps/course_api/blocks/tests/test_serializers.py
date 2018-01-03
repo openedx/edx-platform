@@ -3,7 +3,7 @@ Tests for Course Blocks serializers
 """
 from mock import MagicMock
 
-from lms.djangoapps.course_blocks.api import COURSE_BLOCK_ACCESS_TRANSFORMERS, get_course_blocks
+from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
@@ -41,7 +41,9 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             block_types_to_count=['video'],
             requested_student_view_data=['video'],
         )
-        self.transformers = BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS + [blocks_api_transformer])
+        self.transformers = BlockStructureTransformers(
+            get_course_block_access_transformers() + [blocks_api_transformer]
+        )
         self.block_structure = get_course_blocks(
             self.user,
             self.course.location,
