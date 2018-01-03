@@ -38,7 +38,6 @@ from path import Path as path
 from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
-from .discussionsettings import *
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
