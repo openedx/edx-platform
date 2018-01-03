@@ -1,5 +1,7 @@
+import operator
 from datetime import date
 
+import collections
 
 COUNTRIES = {
                 'AD': 'Andorra',
@@ -216,6 +218,11 @@ def get_country_iso(c_name):
     return _iso
 
 
+def get_sorted_choices_from_dict(_dict):
+    sorted_dict = sorted(_dict.items(), key=lambda x:x[1])
+    return ((field_name, label) for field_name, label in sorted_dict)
+
+
 def reorder_registration_form_fields(fields):
     required_order = {
         'first_name': 0,
@@ -230,11 +237,12 @@ def reorder_registration_form_fields(fields):
         'org_admin_email': 9
     }
 
-    ordered_list = []
-    for field in fields:
-        if field['name'] in required_order:
-            ordered_list.insert(required_order[field['name']], field)
+    for idx, field in enumerate(fields):
+        order = required_order.get(field['name'])
+        if order >= 0:
+            field['order'] = order
         else:
-            ordered_list.append(field)
+            field['order'] = idx
 
-    return ordered_list
+    required_order = sorted(fields, key=lambda k: k['order'])
+    return required_order

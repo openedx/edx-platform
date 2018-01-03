@@ -30,6 +30,17 @@ log = logging.getLogger(__name__)
 User = get_user_model()  # pylint:disable=invalid-name
 
 
+def get_form_field_by_name(fields, name):
+    """
+    Get field object from list of form fields
+    """
+    for f in fields:
+        if f['name'] == name:
+            return f
+
+    return None
+
+
 @require_http_methods(['GET'])
 @ensure_csrf_cookie
 @xframe_allow_whitelisted
@@ -114,15 +125,15 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
     }
 
     registration_fields = context['data']['registration_form_desc']['fields']
-    context['data']['registration_form_desc']['fields'] = reorder_registration_form_fields(registration_fields)
+    registration_fields = context['data']['registration_form_desc']['fields'] = reorder_registration_form_fields(registration_fields)
 
     if org_name and admin_email:
         org_name = base64.b64decode(org_name)
         admin_email = base64.b64decode(admin_email)
 
-        email_field = registration_fields[3]
-        org_field = registration_fields[7]
-        is_poc_field = registration_fields[8]
+        email_field = get_form_field_by_name(registration_fields, 'email')
+        org_field = get_form_field_by_name(registration_fields, 'organization_name')
+        is_poc_field = get_form_field_by_name(registration_fields, 'is_poc')
         email_field['defaultValue'] = admin_email
         org_field['defaultValue'] = org_name
         is_poc_field['defaultValue'] = "1"

@@ -23,12 +23,19 @@ def nodebb_forum_discussion(request, course_id):
     # To avoid circuler dependencies
     from xmodule.modulestore.django import modulestore
     modulestore = modulestore()
+    is_community_topic_link = False
 
     course_key = CourseKey.from_string(course_id)
     course_community = DiscussionCommunity.objects.filter(course_id=course_key).order_by("-created").first()
     current_course = modulestore.get_course(course_key)
     course_tabs = get_course_related_tabs(request, current_course)
     custom_community_link = request.GET.get('topic_url')
+    if custom_community_link:
+        if "topic/" in custom_community_link:
+            is_community_topic_link = True
+            custom_community_link = custom_community_link.split("topic/")[1]
+        else:
+            custom_community_link = custom_community_link.split("category/")[1]
 
     progress = get_all_course_progress(request.user, current_course)
 
@@ -43,7 +50,8 @@ def nodebb_forum_discussion(request, course_id):
         "course_tabs": course_tabs,
         "course_id": course_id,
         "community_url": course_community.community_url if course_community else "",
-        "custom_community_link": custom_community_link
+        "custom_community_link": custom_community_link,
+        "is_community_topic_link": is_community_topic_link
     }
 
     return render(request, 'discussion_nodebb/discussion_board.html', context)
