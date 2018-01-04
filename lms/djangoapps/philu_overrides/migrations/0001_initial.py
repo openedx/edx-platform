@@ -17,6 +17,8 @@ class Migration(migrations.Migration):
             cursor.execute(query)
             query = 'ALTER TABLE %s ADD end_date DATETIME NULL' % t
             cursor.execute(query)
+            query = 'ALTER TABLE %s ADD history_change_reason VARCHAR(100) NULL' % t
+            cursor.execute(query)
 
     operations = [
         migrations.RunPython(add_history_columns),
