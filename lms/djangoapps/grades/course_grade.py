@@ -278,7 +278,7 @@ class CourseGrade(CourseGradeBase):
 
     def _get_subsection_grade(self, subsection, force_update_subsections=False):
         if self.force_update_subsections:
-            return self._subsection_grade_factory.update(subsection, force_update_subsections)
+            return self._subsection_grade_factory.update(subsection, force_update_subsections=force_update_subsections)
         else:
             # Pass read_only here so the subsection grades can be persisted in bulk at the end.
             return self._subsection_grade_factory.create(subsection, read_only=True)
