@@ -250,7 +250,7 @@ class StaticContentServer(object):
         """
         Determines whether or not the user for this request is authorized to view the given asset.
         """
-        if str(location.course_key) == 'course-v1:RiceX+BIOC300.2x+1T2017':
+        if location.course_key and str(location.course_key) == 'course-v1:RiceX+BIOC300.2x+1T2017':
             log.info(
                 'course %s content %s has lock status %r',
                 str(location.course_key),
@@ -261,7 +261,7 @@ class StaticContentServer(object):
             return True
 
         if not hasattr(request, "user") or not request.user.is_authenticated():
-            if str(location.course_key) == 'course-v1:RiceX+BIOC300.2x+1T2017':
+            if location.course_key and str(location.course_key) == 'course-v1:RiceX+BIOC300.2x+1T2017':
                 log.info(
                     ' course %s content %s cannot be displayed as user is not authenticated',
                     str(location.course_key),
@@ -271,7 +271,7 @@ class StaticContentServer(object):
 
         if not request.user.is_staff:
             deprecated = getattr(location, 'deprecated', False)
-            if str(location.course_key) == 'course-v1:RiceX+BIOC300.2x+1T2017':
+            if location.course_key and str(location.course_key) == 'course-v1:RiceX+BIOC300.2x+1T2017':
                 log.info(
                     'course %s content %s location has deprecated status  %r',
                     str(location.course_key),
