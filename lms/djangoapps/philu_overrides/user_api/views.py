@@ -73,7 +73,7 @@ def _do_create_account_custom(form, custom_form=None):
     try:
         with transaction.atomic():
             user.save()
-            custom_model = custom_form.save(user=user, commit=True)
+            custom_model = custom_form.save(user=user, commit=False)
 
         # Fix: recall user.save to avoid transaction management related exception, if we call user.save under atomic block
         # (in custom_from.save )a random transaction exception generated
