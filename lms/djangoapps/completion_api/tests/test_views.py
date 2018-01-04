@@ -312,6 +312,7 @@ class CompletionBlockUpdateViewTestCase(SharedModuleStoreTestCase):
     """
 
     usage_key = 'i4x://edX/toy/video/sample_video'
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):
