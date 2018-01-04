@@ -12,6 +12,7 @@ from copy import deepcopy
 from functools import partial
 from logging import getLogger
 
+from django.conf import settings
 from openedx.core.lib.graph_traversals import traverse_topologically, traverse_post_order
 
 from .exceptions import TransformerException
@@ -312,7 +313,17 @@ class FieldData(object):
         if self._is_own_field(field_name):
             return super(FieldData, self).__delattr__(field_name)
         else:
-            delattr(self.fields, field_name)
+            # pylint: disable=fixme
+            # FIXME: Bug with Course Blocks API and student_view_data fixed by
+            #  https://github.com/edx/edx-platform/pull/15905/commits/ae15e69a0ad52fec2f146176e418eb2e37f0ecb2
+            # Will be brought in once McKinsey's apps have been updated.
+            # For now, only deployed where DEBUG=True, so QA can test.
+            # See lms/djangoapps/course_api/blocks/transformers/tests/test_student_view.py
+            #   TestStudentViewTransformer.test_transform for affected test.
+            if settings.DEBUG:
+                del self.fields[field_name]
+            else:
+                delattr(self.fields, field_name)
 
     def _is_own_field(self, field_name):
         """
