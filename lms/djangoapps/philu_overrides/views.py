@@ -9,13 +9,19 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
-
+from common.djangoapps.student.views import get_course_related_keys
+from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id
+from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.django import modulestore
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
@@ -24,6 +30,7 @@ from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
 import third_party_auth
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.enterprise_helpers import set_enterprise_branding_filter_param
+from util.cache import cache_if_anonymous
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -141,3 +148,57 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
         context['fields_to_disable'] = json.dumps([email_field['name'], org_field['name'], is_poc_field['name']])
 
     return render_to_response('student_account/login_and_register.html', context)
+
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def courses(request):
+    """
+    Render "find courses" page.  The course selection work is done in courseware.courses.
+    """
+    courses_list = []
+    programs_list = []
+    course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
+    if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+        courses_list = get_courses(request.user)
+
+        if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
+                                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+            courses_list = sort_by_start_date(courses_list)
+        else:
+            courses_list = sort_by_announcement(courses_list)
+
+    # Getting all the programs from course-catalog service. The programs_list is being added to the context but it's
+    # not being used currently in courseware/courses.html. To use this list, you need to create a custom theme that
+    # overrides courses.html. The modifications to courses.html to display the programs will be done after the support
+    # for edx-pattern-library is added.
+    if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
+                                       settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
+        programs_list = get_programs_data(request.user)
+
+    if request.user.is_authenticated():
+        add_tag_to_enrolled_courses(request.user, courses_list)
+
+    for course in  courses_list:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(
+                course.id.to_deprecated_string())
+        with modulestore().bulk_operations(course_key):
+            if has_access(request.user, 'load', course):
+                first_chapter_url, first_section = get_course_related_keys(
+                    request, get_course_by_id(course_key, 0))
+                course_target = reverse('courseware_section', args=[
+                    course.id.to_deprecated_string(),
+                    first_chapter_url,
+                    first_section
+                    ])
+                course.course_target = course_target
+            else:
+                course.course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+
+    return render_to_response(
+        "courseware/courses.html",
+        {
+            'courses': courses_list,
+            'course_discovery_meanings': course_discovery_meanings,
+            'programs_list': programs_list
+        }
+    )

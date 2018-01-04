@@ -87,4 +87,3 @@ class UpdateCommunityProfile(APIView):
             return JsonResponse({"message": "user info updated successfully"}, status=status.HTTP_200_OK)
         except Exception as ex:
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
-

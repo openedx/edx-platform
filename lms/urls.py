@@ -27,7 +27,6 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
 urlpatterns = (
     '',
-
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
 
@@ -281,7 +280,7 @@ urlpatterns += (
     # TODO: These views need to be updated before they work
     url(r'^calculate$', 'util.views.calculate'),
 
-    url(r'^courses/?$', 'branding.views.courses', name="courses"),
+    url(r'^courses/?$', 'lms.djangoapps.philu_overrides.views.courses', name="courses"),
 
     #About the course
     url(
