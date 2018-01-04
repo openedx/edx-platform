@@ -237,4 +237,10 @@ class MigrationTests(TestCase):
         out = StringIO()
         call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()
-        self.assertIn('No changes detected', output)
+        # Temporarily disable this check so we can remove
+        # the ProviderConfig.drop_existing_session field.
+        # We will restore this check once the code referencing
+        # this field has been deleted/released and a migration
+        # for field removal has been added.
+        if 'Remove field' not in output:
+            self.assertIn('No changes detected', output)
