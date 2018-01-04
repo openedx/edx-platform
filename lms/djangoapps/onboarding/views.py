@@ -432,7 +432,7 @@ def admin_activation(request, org_id, activation_key):
 
         if request.method == "POST":
             hash_key_obj.organization.admin = user_extended_profile.user
-            hash_key_obj.oraganization.unclaimed_org_admin_email = None
+            hash_key_obj.organization.unclaimed_org_admin_email = None
             hash_key_obj.organization.save()
             activation_status = 1
 
