@@ -604,7 +604,6 @@ class RegModelForm(forms.ModelForm):
 
         if commit:
             extended_profile.save()
-            organization_to_assign.save()
 
         return extended_profile
 

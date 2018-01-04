@@ -73,10 +73,11 @@ def _do_create_account_custom(form, custom_form=None):
     try:
         with transaction.atomic():
             user.save()
-            custom_model = custom_form.save(user=user, commit=False)
+            custom_model = custom_form.save(user=user, commit=True)
 
         # Fix: recall user.save to avoid transaction management related exception, if we call user.save under atomic block
         # (in custom_from.save )a random transaction exception generated
+        custom_model.organization.save()
         user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
