@@ -33,6 +33,7 @@ from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
 from onboarding import forms
 from lms.djangoapps.onboarding.models import UserExtendedProfile
+from nodebb.helpers import update_nodebb_for_user_status
 
 log = logging.getLogger("edx.onboarding")
 
@@ -143,6 +144,7 @@ def interests(request):
             return redirect(reverse('organization'))
 
         if are_forms_complete:
+            update_nodebb_for_user_status(request.user.username)
             return redirect(reverse('recommendations'))
 
         return redirect(reverse('interests'))
@@ -177,7 +179,6 @@ def organization(request):
 
     initial = {
         'country': COUNTRIES.get(_organization.country),
-        'url': _organization.url if _organization.url else "https://",
         'is_org_url_exist': '1' if _organization.url else '0',
         'partner_networks': _organization.organization_partners.values_list('partner__code', flat=True),
     }
@@ -278,6 +279,7 @@ def org_detail_survey(request):
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
             if are_forms_complete:
+                update_nodebb_for_user_status(request.user.username)
                 return redirect(reverse('oef_survey'))
 
             return redirect(reverse('org_detail_survey'))
@@ -430,7 +432,7 @@ def admin_activation(request, org_id, activation_key):
 
         if request.method == "POST":
             hash_key_obj.organization.admin = user_extended_profile.user
-            hash_key_obj.oraganization.unclaimed_org_admin_email = None
+            hash_key_obj.organization.unclaimed_org_admin_email = None
             hash_key_obj.organization.save()
             activation_status = 1
 

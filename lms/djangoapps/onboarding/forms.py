@@ -88,8 +88,9 @@ class UserInfoModelForm(forms.ModelForm):
                               error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
     })
     city = forms.CharField(label=ugettext_noop('City of Residence'), required=False)
-    is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of employment is '
-                                                         'different from your country and/or city of residence.'),
+    is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of '
+                                                                       'employment is different from your country '
+                                                                       'and/or city of residence.'),
                                                    required=False)
     level_of_education = forms.ChoiceField(label=ugettext_noop('Level of Education'), label_suffix="*",
                                            choices=LEVEL_OF_EDUCAION_CHOICES,
@@ -253,22 +254,21 @@ class InterestsForm(forms.Form):
         interest_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTS_LABELS)
         self.fields['interests'] = forms.ChoiceField(
             label=ugettext_noop('Which of these areas of organizational effectiveness are you most interested '
-                                'to learn more about?'),
-            label_suffix=ugettext_noop('(Check all that apply.)'),
+                                'to learn more about? (Check all that apply.)'),
             choices=interest_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
         interested_learners_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTED_LEARNERS_LABELS)
         self.fields['interested_learners'] = forms.ChoiceField(
-            label=ugettext_noop('Which type of other Philanthropy University learners are interesting to you?'),
-            label_suffix=ugettext_noop('(Check all that apply.)'),
+            label=ugettext_noop('Which type of other Philanthropy University learners are interesting to you? '
+                                '(Check all that apply.)'),
             choices=interested_learners_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
         personal_goal_choices = get_sorted_choices_from_dict(UserExtendedProfile.GOALS_LABELS)
         self.fields['personal_goals'] = forms.ChoiceField(
-            label=ugettext_noop('What is your most important personal goals in joining Philanthropy University?'),
-            label_suffix=ugettext_noop('(Check all that apply.)'),
+            label=ugettext_noop('What is your most important personal goals in joining Philanthropy University? '
+                                '(Check all that apply.)'),
             choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
@@ -604,7 +604,6 @@ class RegModelForm(forms.ModelForm):
 
         if commit:
             extended_profile.save()
-            organization_to_assign.save()
 
         return extended_profile
 

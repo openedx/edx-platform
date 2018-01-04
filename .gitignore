@@ -35,6 +35,7 @@ codekit-config.json
 /other.xml
 /packages.xml
 /web-browsers.xml
+.vscode
 
 ### NFS artifacts
 .nfs*
@@ -125,3 +126,4 @@ lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
+.vscode/
