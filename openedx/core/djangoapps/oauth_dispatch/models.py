@@ -38,13 +38,6 @@ class RestrictedApplication(models.Model):
     # able retrieve datasets that the OAuth2 Application is allowed to retrieve.
     _org_associations = models.TextField(null=True)
 
-    # a space separated list of users that this application is associated with
-    # this field will be used to implement appropriate data filtering
-    # so that clients of a specific OAuth2 Application will only be
-    # able retrieve datasets that the OAuth2 Application is allowed to retrieve.
-    # OPTIONAL field if no filtering on users required
-    _allowed_users = models.TextField(null=True, blank=True)
-
     def __unicode__(self):
         """
         Return a unicode representation of this object
@@ -138,34 +131,6 @@ class RestrictedApplication(models.Model):
         """
 
         return org in self.org_associations
-
-    @property
-    def allowed_users(self):
-        """
-        Translate space delimited string to a list
-        """
-        return self._get_list_from_delimited_string(self._allowed_users)
-
-    @allowed_users.setter
-    def allowed_users(self, value):
-        """
-        Convert list to separated string
-        """
-        self._allowed_users = _DEFAULT_SEPARATOR.join(value)
-
-    def has_user(self, user):
-        """
-        Returns in the RestrictedApplication has the requested users
-        """
-
-        return user in self.allowed_users
-
-    def has_users(self):
-        """
-        Returns True if users are specified in RestrictedApplication
-
-        """
-        return bool(self._get_list_from_delimited_string(self._allowed_users))
 
     @classmethod
     def set_access_token_as_expired(cls, access_token):

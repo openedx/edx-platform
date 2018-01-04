@@ -78,16 +78,6 @@ class OAuth2RestrictedApplicatonPermission(TokenHasScope):
             # yet for RestrictedApplications to call
             return False
 
-        # get allowed user for the restricted application
-        restricted_users = restrictied_application.allowed_users
-        # if there are allowed user configured
-        # validate if requested user is part allowed users list
-        if restricted_users and request.user.username not in restricted_users:
-            # allowed users has been declared in the restricted application
-            # request user is not part of the allowed user list
-            # if user is part of the allowed user list, continue and validate permission
-            return False
-
         # now call into DOT permissions check which will inspect the view for a
         # 'required_scopes' attribute and continue with the any additional
         # permissions listed on the API endpoint
