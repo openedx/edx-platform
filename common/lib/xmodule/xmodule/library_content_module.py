@@ -3,9 +3,11 @@
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
 import json
+import logging
 import random
 from copy import copy
 from gettext import ngettext
+from uuid import uuid4
 
 from lazy import lazy
 from lxml import etree
@@ -27,6 +29,8 @@ from .xml_module import XmlDescriptor
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
+
+logger = logging.getLogger(__name__)
 
 ANY_CAPA_TYPE_VALUE = 'any'
 
@@ -149,9 +153,16 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'added' (set) of newly added (block_type, block_id) tuples
         """
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
-
+        log_id = uuid4()
+        logger.info(
+            "EDUCATOR-1290: LibraryContentModule.make_selection executing. selected: {0} | log ID: {1}".format(
+                selected,
+                log_id
+            )
+        )
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
+
         # Remove any selected blocks that are no longer valid:
         invalid_block_keys = (selected - valid_block_keys)
         if invalid_block_keys:
@@ -176,7 +187,17 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             else:
                 raise NotImplementedError("Unsupported mode.")
             selected |= added_block_keys
-
+        logger.info(
+            "EDUCATOR-1290: LibraryContentModule.make_selection executed. "
+            "valid_block_keys: {0} | selected: {1} | invalid: {2} | overlimit: {3} | added: {4} | log ID: {5}".format(
+                valid_block_keys,
+                selected,
+                invalid_block_keys,
+                overlimit_block_keys,
+                added_block_keys,
+                log_id
+            )
+        )
         return {
             'selected': selected,
             'invalid': invalid_block_keys,
