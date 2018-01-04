@@ -441,8 +441,8 @@ class OrganizationMetric(TimeStampedModel):
     Model to save organization metrics
     """
     ACTUAL_DATA_CHOICES = (
-        (1, "Actual - My answers come directly from my organization's official documentation"),
-        (0, "Estimated - My answers are my best guesses based on my knowledge of the organization")
+        (0, "Estimated - My answers are my best guesses based on my knowledge of the organization"),
+        (1, "Actual - My answers come directly from my organization's official documentation")
     )
 
     org = models.ForeignKey(Organization, related_name="organization_metrics")

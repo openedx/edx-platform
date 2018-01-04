@@ -40,7 +40,19 @@ def get_onboarding_autosuggesion_data(file_name):
     return data
 
 
-class UserInfoModelForm(forms.ModelForm):
+class BaseOnboardingModelForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', kwargs.get('label_suffix', '').replace(":", ""))
+        super(BaseOnboardingModelForm, self).__init__(*args, **kwargs)
+
+
+class BaseOnboardingForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', kwargs.get('label_suffix', '').replace(":", ""))
+        super(BaseOnboardingForm, self).__init__(*args, **kwargs)
+
+
+class UserInfoModelForm(BaseOnboardingModelForm):
     """
     Model from to be used in the first step of survey.
 
@@ -240,7 +252,7 @@ class RadioSelectNotNull(forms.RadioSelect):
         return self.renderer(name, str_value, final_attrs, choices)
 
 
-class InterestsForm(forms.Form):
+class InterestsForm(BaseOnboardingForm):
     """
     Model from to be used in the second step of survey.
 
@@ -280,7 +292,7 @@ class InterestsForm(forms.Form):
         user_exended_profile.save()
 
 
-class OrganizationInfoForm(forms.ModelForm):
+class OrganizationInfoForm(BaseOnboardingModelForm):
     """
     Model from to be used in the third step of survey.
 
@@ -336,8 +348,8 @@ class OrganizationInfoForm(forms.ModelForm):
                                         })
 
     partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of the "
-                                                             "Philanthropy University's partners?"),
-                                         label_suffix=ugettext_noop("(Check all that apply.)"),
+                                                             "Philanthropy University's partners? "
+                                                             "(Check all that apply.)"),
                                          help_text=ugettext_noop("Philanthropy University works in partnership with a "
                                                                  "number of international NGOs to improve the "
                                                                  "effectiveness of local organizations they fund and/or"
@@ -484,8 +496,7 @@ class RegModelForm(forms.ModelForm):
 
     confirm_password = forms.CharField(
         label=ugettext_noop('Confirm Password'),
-        widget=forms.PasswordInput(attrs={'placeholder': ugettext_noop('Confirm Password')}),
-        initial=ugettext_noop('Confirm Password')
+        widget=forms.PasswordInput
     )
 
     is_currently_employed = forms.BooleanField(
@@ -505,7 +516,7 @@ class RegModelForm(forms.ModelForm):
         label=ugettext_noop('If you know who should be the Admin for [Organization name],'
               ' please provide their email address and we will invite them to sign up.*'),
         required=False,
-        widget=forms.EmailInput(attrs=({'placeholder': ugettext_noop('Organization Admin Email')})))
+        widget=forms.EmailInput)
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
@@ -538,7 +549,7 @@ class RegModelForm(forms.ModelForm):
 
         labels = {
             'username': 'Public Username*',
-            'email': 'E-mail Address*'
+
         }
 
         widgets = {
@@ -617,7 +628,7 @@ class UpdateRegModelForm(RegModelForm):
         self.fields.pop('confirm_password')
 
 
-class OrganizationMetricModelForm(forms.ModelForm):
+class OrganizationMetricModelForm(BaseOnboardingModelForm):
     can_provide_info = forms.ChoiceField(label=ugettext_noop('Are you able to provide information requested bellow?'),
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
@@ -627,7 +638,10 @@ class OrganizationMetricModelForm(forms.ModelForm):
                                              'required': ugettext_noop('Please select an option for Are you able to '
                                                                        'provide information'),
                                          })
-    effective_date = forms.DateField(input_formats=['%d/%m/%Y'], required=False)
+    effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
+                                     required=False,
+                                     label=ugettext_noop('End date of lat Fiscal Year'),
+                                     label_suffix='*')
 
     def __init__(self,  *args, **kwargs):
         super(OrganizationMetricModelForm, self).__init__(*args, **kwargs)
@@ -657,7 +671,6 @@ class OrganizationMetricModelForm(forms.ModelForm):
 
         labels = {
             'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
-            'effective_date': ugettext_noop('End date of lat Fiscal Year*'),
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'),
             'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year*'),
             'local_currency': ugettext_noop('Local Currency Code*'),
