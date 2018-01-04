@@ -25,6 +25,7 @@ if settings.ROOT_URLCONF == 'lms.urls':
     from entitlements.tests.factories import CourseEntitlementFactory
     from entitlements.models import CourseEntitlement
     from entitlements.api.v1.serializers import CourseEntitlementSerializer
+    from entitlements.signals import REFUND_ENTITLEMENT
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -344,8 +345,6 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     def setUp(self):
         super(EntitlementEnrollmentViewSetTest, self).setUp()
         self.user = UserFactory()
-        UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
-
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
         self.course2 = CourseFactory.create(org='edX', number='DemoX2', display_name='Demo_Course 2')
@@ -505,8 +504,8 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert response.data['message'] == expected_message  # pylint: disable=no-member
         assert not CourseEnrollment.is_enrolled(self.user, fake_course_key)
 
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
-    @patch('entitlements.api.v1.views.get_course_runs_for_course')
+    @patch('lms.djangoapps.commerce.signals.refund_entitlement', return_value=[1])
+    @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_can_revoke_and_refund(self, mock_get_course_runs, mock_refund_entitlement):
         course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
@@ -531,24 +530,28 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
 
         # Unenroll with Revoke for refund
-        revoke_url = url + '?is_refund=true'
-        response = self.client.delete(
-            revoke_url,
-            content_type='application/json',
-        )
-        assert response.status_code == 204
+        with patch('lms.djangoapps.commerce.signals.handle_refund_entitlement') as mock_refund_handler:
+            REFUND_ENTITLEMENT.connect(mock_refund_handler)
 
-        course_entitlement.refresh_from_db()
-        assert mock_refund_entitlement.is_called
-        assert (CourseEntitlementSerializer(mock_refund_entitlement.call_args[1]['course_entitlement']).data ==
-                CourseEntitlementSerializer(course_entitlement).data)
-        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert course_entitlement.enrollment_course_run is None
-        assert course_entitlement.expired_at is not None
+            # pre_db_changes_entitlement = course_entitlement
+            revoke_url = url + '?is_refund=true'
+            response = self.client.delete(
+                revoke_url,
+                content_type='application/json',
+            )
+            assert response.status_code == 204
+
+            course_entitlement.refresh_from_db()
+            assert mock_refund_handler.called
+            assert (CourseEntitlementSerializer(mock_refund_handler.call_args[1]['course_entitlement']).data ==
+                    CourseEntitlementSerializer(course_entitlement).data)
+            assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
+            assert course_entitlement.enrollment_course_run is None
+            assert course_entitlement.expired_at is not None
 
     @patch('entitlements.api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
-    @patch('entitlements.api.v1.views.get_course_runs_for_course')
+    @patch('lms.djangoapps.commerce.signals.refund_entitlement', return_value=[1])
+    @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_can_revoke_and_no_refund_available(
             self,
             mock_get_course_runs,
@@ -578,59 +581,18 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
 
         # Unenroll with Revoke for refund
-        revoke_url = url + '?is_refund=true'
-        response = self.client.delete(
-            revoke_url,
-            content_type='application/json',
-        )
-        assert response.status_code == 400
+        with patch('lms.djangoapps.commerce.signals.handle_refund_entitlement') as mock_refund_handler:
+            REFUND_ENTITLEMENT.connect(mock_refund_handler)
 
-        course_entitlement.refresh_from_db()
-        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert course_entitlement.enrollment_course_run is not None
-        assert course_entitlement.expired_at is None
+            revoke_url = url + '?is_refund=true'
+            response = self.client.delete(
+                revoke_url,
+                content_type='application/json',
+            )
+            assert response.status_code == 400
 
-    @patch('entitlements.api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=False)
-    @patch("entitlements.api.v1.views.get_course_runs_for_course")
-    def test_user_is_not_unenrolled_on_failed_refund(
-            self,
-            mock_get_course_runs,
-            mock_refund_entitlement,
-            mock_is_refundable
-    ):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user)
-        mock_get_course_runs.return_value = self.return_values
-
-        url = reverse(
-            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
-            args=[str(course_entitlement.uuid)]
-        )
-        assert course_entitlement.enrollment_course_run is None
-
-        # Enroll the User
-        data = {
-            'course_run_id': str(self.course.id)
-        }
-        response = self.client.post(
-            url,
-            data=json.dumps(data),
-            content_type='application/json',
-        )
-        course_entitlement.refresh_from_db()
-
-        assert response.status_code == 201
-        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
-
-        # Unenroll with Revoke for refund
-        revoke_url = url + '?is_refund=true'
-        response = self.client.delete(
-            revoke_url,
-            content_type='application/json',
-        )
-        assert response.status_code == 500
-
-        course_entitlement.refresh_from_db()
-        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert course_entitlement.enrollment_course_run is not None
-        assert course_entitlement.expired_at is None
+            course_entitlement.refresh_from_db()
+            assert not mock_refund_handler.called
+            assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+            assert course_entitlement.enrollment_course_run is not None
+            assert course_entitlement.expired_at is None
