@@ -192,7 +192,7 @@ def courses(request):
                     ])
                 course.course_target = course_target
             else:
-                course.course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+                course.course_target = '/courses/' + course.id.to_deprecated_string()
 
     return render_to_response(
         "courseware/courses.html",
