@@ -100,3 +100,14 @@ def get_user_chat(request):
         data={'_uid': 1, 'username': username},
         headers=headers)
     return JsonResponse(response.json())
+
+def mark_user_chat_read(request):
+    """ Mark all chats of the user as read """
+
+    chat_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/chats'
+    username = request.user.username
+    headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
+    response = requests.patch(chat_endpoint,
+        data={'_uid': 1, 'username': username},
+        headers=headers)
+    return JsonResponse(response.json())
