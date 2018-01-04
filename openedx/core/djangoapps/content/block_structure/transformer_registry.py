@@ -5,7 +5,7 @@ PluginManager.
 from base64 import b64encode
 from hashlib import sha1
 
-from openedx.core.lib.api.plugins import PluginManager
+from openedx.core.lib.plugins import PluginManager
 from openedx.core.lib.cache_utils import memoized
 
 
