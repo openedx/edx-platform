@@ -2223,6 +2223,7 @@ INSTALLED_APPS = (
 
     #third party surveys
     'lms.djangoapps.third_party_surveys',
+
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',
 
