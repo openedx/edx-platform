@@ -8,6 +8,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from six import text_type
 %>
 
 <%
@@ -46,10 +47,10 @@ from django.utils.translation import ugettext as _
       % if allows_login:
         % if restrict_enroll_for_course:
           <div class="mobile-nav-item hidden-mobile nav-item">
-            <a class="register-btn btn" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+            <a class="register-btn btn" href="${reverse('course-specific-register', args=[text_type(course.id)])}">${_("Register")}</a>
           </div>
           <div class="mobile-nav-item hidden-mobile nav-item">
-            <a class="sign-in-btn btn" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+            <a class="sign-in-btn btn" href="${reverse('course-specific-login', args=[text_type(course.id)])}${login_query()}">${_("Sign in")}</a>
           </div>
         % else:
           % if allow_public_account_creation:

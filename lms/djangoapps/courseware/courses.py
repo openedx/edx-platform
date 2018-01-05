@@ -32,6 +32,7 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from path import Path as path
+from six import text_type
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered
@@ -294,7 +295,7 @@ def get_course_about_section(request, course, section_key):
         except ItemNotFoundError:
             log.warning(
                 u"Missing about section %s in course %s",
-                section_key, course.location.to_deprecated_string()
+                section_key, text_type(course.location)
             )
             return None
 
@@ -422,7 +423,7 @@ def get_course_syllabus_section(course, section_key):
         except ResourceNotFound:
             log.exception(
                 u"Missing syllabus section %s in course %s",
-                section_key, course.location.to_deprecated_string()
+                section_key, text_type(course.location)
             )
             return "! Syllabus missing !"
 

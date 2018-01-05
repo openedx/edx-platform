@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from pytz import UTC
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import i4xEncoder
+from six import text_type
 
 from courseware import courses
 from courseware.access import has_access
@@ -653,7 +654,7 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
 
 def permalink(content):
     if isinstance(content['course_id'], CourseKey):
-        course_id = content['course_id'].to_deprecated_string()
+        course_id = text_type(content['course_id'])
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
@@ -701,10 +702,10 @@ def add_courseware_context(content_list, course, user, id_map=None):
     for content in content_list:
         commentable_id = content['commentable_id']
         if commentable_id in id_map:
-            location = id_map[commentable_id]["location"].to_deprecated_string()
+            location = text_type(id_map[commentable_id]["location"])
             title = id_map[commentable_id]["title"]
 
-            url = reverse('jump_to', kwargs={"course_id": course.id.to_deprecated_string(),
+            url = reverse('jump_to', kwargs={"course_id": text_type(course.id),
                           "location": location})
 
             content.update({"courseware_url": url, "courseware_title": title})

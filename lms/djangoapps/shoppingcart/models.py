@@ -29,6 +29,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
@@ -1836,7 +1837,7 @@ class CourseRegCodeItemAnnotation(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+        return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class PaidCourseRegistrationAnnotation(models.Model):
@@ -1854,7 +1855,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+        return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class CertificateItem(OrderItem):

@@ -20,6 +20,7 @@ from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
+from six import text_type
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -430,9 +431,9 @@ def get_module_system_for_user(
         relative_xqueue_callback_url = reverse(
             'xqueue_callback',
             kwargs=dict(
-                course_id=course_id.to_deprecated_string(),
+                course_id=text_type(course_id),
                 userid=str(user.id),
-                mod_id=descriptor.location.to_deprecated_string(),
+                mod_id=text_type(descriptor.location),
                 dispatch=dispatch
             ),
         )
@@ -637,8 +638,8 @@ def get_module_system_for_user(
         block_wrappers.append(partial(
             wrap_xblock,
             'LmsRuntime',
-            extra_data={'course-id': course_id.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+            extra_data={'course-id': text_type(course_id)},
+            usage_id_serializer=lambda usage_id: quote_slashes(text_type(usage_id)),
             request_token=request_token,
         ))
 
@@ -666,7 +667,7 @@ def get_module_system_for_user(
     block_wrappers.append(partial(
         replace_jump_to_id_urls,
         course_id,
-        reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''}),
+        reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''}),
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
@@ -733,7 +734,7 @@ def get_module_system_for_user(
         replace_jump_to_id_urls=partial(
             static_replace.replace_jump_to_id_urls,
             course_id=course_id,
-            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''})
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
         publish=publish,

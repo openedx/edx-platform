@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
+from six import text_type
 
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
@@ -126,8 +127,8 @@ def get_lms_link_for_item(location, preview=False):
 
     return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_key=location.course_key.to_deprecated_string(),
-        location=location.to_deprecated_string(),
+        course_key=text_type(location.course_key),
+        location=text_type(location),
     )
 
 

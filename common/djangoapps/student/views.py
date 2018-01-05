@@ -45,6 +45,7 @@ from provider.oauth2.models import Client
 from pytz import UTC
 from ratelimitbackend.exceptions import RateLimitException
 from requests import HTTPError
+from six import text_type
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
@@ -609,7 +610,7 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
                 track.views.server_track(
                     request,
                     "change-email1-settings",
-                    {"receive_emails": "no", "course": course_key.to_deprecated_string()},
+                    {"receive_emails": "no", "course": text_type(course_key)},
                     page='dashboard',
                 )
                 break

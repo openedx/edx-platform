@@ -11,6 +11,7 @@ from datetime import datetime
 from lxml import etree
 from pkg_resources import resource_string
 from pytz import UTC
+from six import text_type
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
@@ -311,7 +312,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         params = {
             'items': self._render_student_view_for_items(context, display_items, fragment),
             'element_id': self.location.html_id(),
-            'item_id': self.location.to_deprecated_string(),
+            'item_id': text_type(self.location),
             'position': self.position,
             'tag': self.location.category,
             'ajax_url': self.system.ajax_url,
@@ -391,7 +392,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'content': rendered_item.content,
                 'page_title': getattr(item, 'tooltip_title', ''),
                 'type': item_type,
-                'id': usage_id.to_deprecated_string(),
+                'id': text_type(usage_id),
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
             }

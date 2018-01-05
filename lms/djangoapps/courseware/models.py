@@ -22,6 +22,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
+from six import text_type
 
 import coursewarehistoryextended
 from openedx.core.djangoapps.xmodule_django.models import BlockTypeKeyField, CourseKeyField, LocationKeyField
@@ -339,7 +340,7 @@ class OfflineComputedGradeLog(models.Model):
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):
-        return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member
+        return "[OCGLog] %s: %s" % (text_type(self.course_id), self.created)  # pylint: disable=no-member
 
 
 class StudentFieldOverride(TimeStampedModel):
