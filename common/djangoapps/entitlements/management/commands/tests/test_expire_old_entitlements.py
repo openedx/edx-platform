@@ -10,7 +10,7 @@ from entitlements.tests.factories import CourseEntitlementFactory
 
 
 @skip_unless_lms
-@mock.patch('entitlements.tasks.v1.tasks.expire_old_entitlements.delay')
+@mock.patch('entitlements.tasks.expire_old_entitlements.delay')
 class TestExpireOldEntitlementsCommand(TestCase):
     """
     Test expire_old_entitlement management command.

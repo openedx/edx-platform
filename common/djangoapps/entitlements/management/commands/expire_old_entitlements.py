@@ -7,7 +7,7 @@ import logging
 from django.core.management import BaseCommand
 
 from entitlements.models import CourseEntitlement
-from entitlements.tasks.v1.tasks import expire_old_entitlements
+from entitlements.tasks import expire_old_entitlements
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

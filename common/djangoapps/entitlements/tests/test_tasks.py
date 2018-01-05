@@ -8,8 +8,8 @@ import pytz
 
 from django.test import TestCase
 
+from entitlements import tasks
 from entitlements.models import CourseEntitlementPolicy
-from entitlements.tasks.v1 import tasks
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
