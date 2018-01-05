@@ -55,8 +55,8 @@ def update_bokchoy_db_cache():
 @task
 @timed
 @cmdopts([
-    ("rewrite_fingerprint", None, "Optional flag that will write the new sha1 fingerprint to disk"),
-    ])
+    ("rewrite_fingerprint", None, "Optional flag that will write the new sha1 fingerprint to disk")
+])
 def update_local_bokchoy_db_from_s3(options):
     """
     Prepare the local MYSQL test database for running bokchoy tests. Since
