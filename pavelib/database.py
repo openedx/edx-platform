@@ -3,7 +3,7 @@ Tasks for controlling the databases used in tests
 """
 from __future__ import print_function
 
-from paver.easy import needs, task
+from paver.easy import cmdopts, needs, task
 
 from pavelib.utils.db_utils import (
     remove_files_from_folder, reset_test_db, compute_fingerprint_and_write_to_disk,
