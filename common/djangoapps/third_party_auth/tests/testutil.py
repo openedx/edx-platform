@@ -187,8 +187,9 @@ class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
         super(TestCase, self).setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
-        self.client.defaults['SERVER_NAME'] = 'example.none'
-        self.url_prefix = 'http://example.none'
+        self.hostname = 'example.none'
+        self.client.defaults['SERVER_NAME'] = self.hostname
+        self.url_prefix = 'http://{}'.format(self.hostname)
 
 
 class SAMLTestCase(TestCase):

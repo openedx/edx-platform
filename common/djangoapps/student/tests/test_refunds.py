@@ -147,12 +147,12 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
 
         self.enrollment.course_overview.start = course_start
-        self.enrollment.attributes.add(CourseEnrollmentAttribute(
+        self.enrollment.attributes.create(
             enrollment=self.enrollment,
             namespace='order',
             name='order_number',
             value=self.ORDER_NUMBER
-        ))
+        )
 
         with patch('student.models.EnrollmentRefundConfiguration.current') as config:
             instance = config.return_value
@@ -183,12 +183,12 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         # creating multiple attributes for same order.
         for attribute_count in range(2):  # pylint: disable=unused-variable
-            self.enrollment.attributes.add(CourseEnrollmentAttribute(
+            self.enrollment.attributes.create(
                 enrollment=self.enrollment,
                 namespace='order',
                 name='order_number',
                 value=self.ORDER_NUMBER
-            ))
+            )
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         resp = self.client.post(reverse('student.views.dashboard', args=[]))
