@@ -18,6 +18,7 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
     def test_ensure_csrf_cookie_cross_domain(self):
         request = mock.Mock()
         request.META = {}
+        request.COOKIES = {}
         wrapped_view = ensure_csrf_cookie_cross_domain(fake_view)
         response = wrapped_view(request)
         response_meta = json.loads(response.content)

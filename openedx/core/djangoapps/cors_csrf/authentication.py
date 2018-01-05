@@ -8,7 +8,8 @@ from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_
 
 
 class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication):
-    """Session authentication that skips the referer check over secure connections.
+    """
+    Session authentication that skips the referer check over secure connections.
 
     Django Rest Framework's `SessionAuthentication` class calls Django's
     CSRF middleware implementation directly, which bypasses the middleware
@@ -21,11 +22,12 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
 
     Since this subclass overrides only the `enforce_csrf()` method,
     it can be mixed in with other `SessionAuthentication` subclasses.
-
     """
 
     def enforce_csrf(self, request):
-        """Skip the referer check if the cross-domain request is allowed. """
+        """
+        Skip the referer check if the cross-domain request is allowed.
+        """
         if is_cross_domain_request_allowed(request):
             with skip_cross_domain_referer_check(request):
                 return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)

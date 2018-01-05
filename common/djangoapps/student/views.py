@@ -1576,6 +1576,32 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user_found_by_email_lookup)
 
+        # TODO: Remove Django 1.11 upgrade shim
+        # SHIM: In Django 1.10+ the user will not authenticate if it is not active (after the initial account creation,
+        # see NEW_USER_AUTH_BACKEND for how we handle that). This code is duplicated below for the < 1.10 case where
+        # the user is successfully authenticated, but not active. To remove this shim, remove the version check here
+        # and the duplicated code at the end of this function.
+        #
+        # Note that this will be triggered for ALL inactive users, regardless of whether the password is correct. In
+        # either case they need to activate before continuing so password status is moot.
+        if django.VERSION >= (1, 10) and user_found_by_email_lookup and not user_found_by_email_lookup.is_active:
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.warning(
+                    u"Login failed - Account not active for user.id: {0}, resending activation".format(
+                        user_found_by_email_lookup.id)
+                )
+            else:
+                AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(
+                    user_found_by_email_lookup.username)
+                )
+
+            reactivation_email_for_user(user_found_by_email_lookup)
+
+            return JsonResponse({
+                "success": False,
+                "value": _generate_not_activated_message(user_found_by_email_lookup),
+            })  # TODO: this should be status code 400  # pylint: disable=fixme
+
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
@@ -1654,17 +1680,20 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         # detect that the user is logged in.
         return set_logged_in_cookies(request, response, user)
 
-    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
-    else:
-        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
+    # TODO: Remove Django 1.11 upgrade shim
+    # SHIM: See above SHIM for details and removal instructions.
+    if django.VERSION < (1, 10):
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
+        else:
+            AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
-    reactivation_email_for_user(user)
+        reactivation_email_for_user(user)
 
-    return JsonResponse({
-        "success": False,
-        "value": _generate_not_activated_message(user),
-    })  # TODO: this should be status code 400  # pylint: disable=fixme
+        return JsonResponse({
+            "success": False,
+            "value": _generate_not_activated_message(user),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
 @csrf_exempt
