@@ -195,6 +195,7 @@
               @include margin-right($baseline);
 
               margin-top: $baseline;
+              display: inline-flex;
             }
 
 
