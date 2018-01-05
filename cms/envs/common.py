@@ -1331,7 +1331,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
         'text/csv',
         'text/pdf',
         'text/x-sh',
-        '\application/pdf\""',
+        '\"application/pdf\"',
     ],
     "Audio": ['audio/mpeg', 'audio/mp3', 'audio/x-wav', 'audio/ogg', 'audio/wav', 'audio/aac', 'audio/x-m4a',
               'audio/mp4', 'audio/x-ms-wma', ],
