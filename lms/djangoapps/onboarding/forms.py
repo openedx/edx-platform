@@ -570,6 +570,17 @@ class RegModelForm(forms.ModelForm):
 
         return organization_name
 
+    def clean_org_admin_email(self):
+        org_admin_email = self.cleaned_data['org_admin_email']
+
+        already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
+            suggested_admin_email=org_admin_email).first()
+        if already_suggested_as_admin:
+            raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of some other organiztaion'
+                                                      % org_admin_email))
+
+        return org_admin_email
+
     def save(self, user=None, commit=True):
         prev_org = None
 
@@ -607,8 +618,7 @@ class RegModelForm(forms.ModelForm):
                 organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
                 send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
-            except User.DoesNotExist:
-                pass
+
             except Exception as ex:
                 log.info(ex.args)
                 pass
