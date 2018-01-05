@@ -6,7 +6,9 @@ from __future__ import print_function
 
 import argparse
 import glob
+import json
 import os
+import os.path
 import traceback
 from datetime import datetime
 from functools import wraps
@@ -776,6 +778,55 @@ def execute_compile_sass(args):
         )
 
 
+def get_webpack_config(settings):
+    """
+    Return configuration values needed to call Webpack.
+
+    Will return a dict with the following keys:
+
+    * static_root_lms
+    * static_root_cms
+    * config_path
+    * node_env
+
+    This isn't as robust as calling get_django_settings, but it's a *lot*
+    faster, and we're going to remove a lot of this stuff from paver/Django
+    in a while...
+    """
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+
+    # Default config_root is the parent directory of edx-platform
+    default_config_root = os.path.realpath(os.path.join(current_dir, "..", ".."))
+    config_root = os.environ.get('CONFIG_ROOT', default_config_root)
+    lms_config_path = os.path.join(config_root, "lms.env.json")
+
+    if os.path.exists(lms_config_path):
+        with open(lms_config_path) as lms_config_file:
+            lms_config = json.load(lms_config_file)
+        static_root_lms = lms_config['STATIC_ROOT_BASE']
+    else:
+        static_root_lms = os.path.realpath(os.path.join(current_dir, "..", "staticfiles"))
+        print(
+            "No lms.env.json config found for {} -- defaulting to {} for STATIC_ROOT"
+            .format(settings, static_root_lms)
+        )
+
+    static_root_cms = os.path.join(static_root_lms, 'studio')
+    if settings == Env.DEVSTACK_SETTINGS:
+        config_path = 'webpack.dev.config.js'
+        node_env = 'development'
+    else:
+        config_path = 'webpack.prod.config.js'
+        node_env = 'production'
+
+    return dict(
+        config_path=config_path,
+        node_env=node_env,
+        static_root_cms=static_root_cms,
+        static_root_lms=static_root_lms
+    )
+
+
 @task
 @cmdopts([
     ('settings=', 's', "Django settings (defaults to devstack)"),
@@ -787,19 +838,15 @@ def webpack(options):
     Run a Webpack build.
     """
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
-    static_root_lms = Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
-    static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
-    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+    webpack_config = get_webpack_config(settings)
     environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
-        node_env="production" if settings != Env.DEVSTACK_SETTINGS else "development",
-        static_root_lms=static_root_lms,
-        static_root_cms=static_root_cms
+        **webpack_config
     )
     sh(
         cmd(
             '{environment} $(npm bin)/webpack --config={config_path}'.format(
                 environment=environment,
-                config_path=config_path
+                config_path=webpack_config['config_path']
             )
         )
     )
@@ -812,13 +859,14 @@ def execute_webpack_watch(settings=None):
     # We only want Webpack to re-run on changes to its own entry points,
     # not all JS files, so we use its own watcher instead of subclassing
     # from Watchdog like the other watchers do.
+    webpack_config = get_webpack_config(settings or Env.DEVSTACK_SETTINGS)
     run_background_process(
         'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
             options='--watch --config={config_path}'.format(
-                config_path=Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+                config_path=webpack_config['config_path']
             ),
-            static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
+            static_root_lms=webpack_config['static_root_lms'],
+            static_root_cms=webpack_config['static_root_cms'],
         )
     )
 

@@ -856,6 +856,7 @@ REQUIRE_DEBUG = False
 
 ########################## DJANGO WEBPACK LOADER ##############################
 
+# Note: if you make changes here, also make them in pavelib/assets.py
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
