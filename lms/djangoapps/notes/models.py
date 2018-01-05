@@ -22,6 +22,7 @@ class Note(models.Model):
     tags = models.TextField(default="")  # comma-separated string
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
+    dummyField = models.TextField(default="")
 
     class Meta:
         app_label = 'notes'

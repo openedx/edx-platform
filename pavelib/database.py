@@ -2,16 +2,14 @@
 Tasks for controlling the databases used in tests
 """
 from __future__ import print_function
-import os
 
-from paver.easy import needs
+from paver.easy import needs, task
 
 from pavelib.utils.db_utils import (
     remove_files_from_folder, reset_test_db, compute_fingerprint_and_write_to_disk,
     fingerprint_bokchoy_db_files, does_fingerprint_on_disk_match, is_fingerprint_in_bucket,
-    get_file_from_s3, extract_files_from_zip, create_tarfile_from_db_cache, upload_to_s3
+    refresh_bokchoy_db_cache_from_s3, upload_db_cache_to_s3
 )
-from pavelib.utils.passthrough_opts import PassthroughTask
 from pavelib.utils.timer import timed
 
 # Bokchoy db schema and data fixtures
@@ -36,7 +34,7 @@ CACHE_FOLDER = 'common/test/db_cache'
 
 
 @needs('pavelib.prereqs.install_prereqs')
-@PassthroughTask
+@task
 @timed
 def update_bokchoy_db_cache():
     """
@@ -54,7 +52,7 @@ def update_bokchoy_db_cache():
 
 
 @needs('pavelib.prereqs.install_prereqs')
-@PassthroughTask
+@task
 @timed
 def update_local_bokchoy_db_from_s3():
     """
@@ -63,23 +61,19 @@ def update_local_bokchoy_db_from_s3():
       with all the migrations
     * If not then check if there is a copy up at s3
     * If so then download then extract it
-    * Otherwise apply migrations as usual
+    * Otherwise apply migrations as usual and push the new cache
+      files to s3
     """
     fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
 
     if does_fingerprint_on_disk_match(fingerprint):
         print ("DB cache files match the current migrations.")
-        # TODO: we don't really need to apply migrations, just to
-        # load the db cache files into the database.
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
 
     elif is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
         print ("Found updated bokchoy db files at S3.")
-        refresh_bokchoy_db_cache_from_s3(fingerprint=fingerprint)
+        refresh_bokchoy_db_cache_from_s3(fingerprint, CACHE_BUCKET_NAME, BOKCHOY_DB_FILES)
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
-        # Write the new fingerprint to disk so that it reflects the
-        # current state of the system.
-        compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
 
     else:
         msg = "{} {} {}".format(
@@ -89,45 +83,15 @@ def update_local_bokchoy_db_from_s3():
         )
         print (msg)
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=True)
-        # Write the new fingerprint to disk so that it reflects the
-        # current state of the system.
-        # E.g. you could have added a new migration in your PR.
-        compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
-
-
-@needs('pavelib.prereqs.install_prereqs')
-@PassthroughTask
-@timed
-def refresh_bokchoy_db_cache_from_s3(fingerprint=None):
-    """
-    If the cache files for the current fingerprint exist
-    in s3 then replace what you have on disk with those.
-    If no copy exists on s3 then continue without error.
-    """
-    if not fingerprint:
-        fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
-
-    bucket_name = CACHE_BUCKET_NAME
-    path = CACHE_FOLDER
-    if is_fingerprint_in_bucket(fingerprint, bucket_name):
-        zipfile_name = '{}.tar.gz'.format(fingerprint)
-        get_file_from_s3(bucket_name, zipfile_name, path)
-
-        zipfile_path = os.path.join(path, zipfile_name)
-        print ("Extracting db cache files.")
-        extract_files_from_zip(BOKCHOY_DB_FILES, zipfile_path, path)
-        os.remove(zipfile_path)
-
-
-@needs('pavelib.prereqs.install_prereqs')
-@PassthroughTask
-@timed
-def upload_db_cache_to_s3():
-    """
-    Update the S3 bucket with the bokchoy DB cache files.
-    """
-    fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
-    zipfile_name, zipfile_path = create_tarfile_from_db_cache(
-        fingerprint, BOKCHOY_DB_FILES, CACHE_FOLDER
-    )
-    upload_to_s3(zipfile_name, zipfile_path, CACHE_BUCKET_NAME)
+        # Check one last time to see if the fingerprint is present in
+        # the s3 bucket. This could occur because the bokchoy job is
+        # sharded and running the same task in parallel
+        if not is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
+            upload_db_cache_to_s3(fingerprint, BOKCHOY_DB_FILES, CACHE_BUCKET_NAME)
+        else:
+            msg = "{} {}. {}".format(
+                "Found a matching fingerprint in bucket ",
+                CACHE_BUCKET_NAME,
+                "Not pushing to s3"
+            )
+            print(msg)
