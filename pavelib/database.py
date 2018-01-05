@@ -3,7 +3,7 @@ Tasks for controlling the databases used in tests
 """
 from __future__ import print_function
 
-from paver.easy import needs, task
+from paver.easy import cmdopts, needs, task
 
 from pavelib.utils.db_utils import (
     remove_files_from_folder, reset_test_db, compute_fingerprint_and_write_to_disk,
@@ -54,7 +54,10 @@ def update_bokchoy_db_cache():
 @needs('pavelib.prereqs.install_prereqs')
 @task
 @timed
-def update_local_bokchoy_db_from_s3():
+@cmdopts([
+    ("rewrite_fingerprint", None, "Optional flag that will write the new sha1 fingerprint to disk")
+])
+def update_local_bokchoy_db_from_s3(options):
     """
     Prepare the local MYSQL test database for running bokchoy tests. Since
     most pull requests do not introduce migrations, this task provides
@@ -86,8 +89,9 @@ def update_local_bokchoy_db_from_s3():
     fingerprint contains the db cache files AFTER applying migrations
     """
     fingerprint = fingerprint_bokchoy_db_files(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
+    fingerprints_match = does_fingerprint_on_disk_match(fingerprint)
 
-    if does_fingerprint_on_disk_match(fingerprint):
+    if fingerprints_match:
         print ("DB cache files match the current migrations.")
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
 
@@ -116,3 +120,10 @@ def update_local_bokchoy_db_from_s3():
                 "Not pushing to s3"
             )
             print(msg)
+
+    rewrite_fingerprint = getattr(options, 'rewrite_fingerprint', False)
+    # If the rewrite_fingerprint flag is set, and the fingerpint has changed,
+    # write it to disk.
+    if not fingerprints_match and rewrite_fingerprint:
+        print("Updating fingerprint and writing to disk.")
+        compute_fingerprint_and_write_to_disk(MIGRATION_OUTPUT_FILES, ALL_DB_FILES)
