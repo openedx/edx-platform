@@ -8,6 +8,7 @@ import os
 import re
 
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
+from pylint import epylint as lint
 
 from openedx.core.djangolib.markup import HTML
 
@@ -57,19 +58,13 @@ def find_fixme(options):
 
         apps_list = ' '.join(top_python_dirs(system))
 
-        cmd = (
-            "pylint --disable all --enable=fixme "
-            "--output-format=parseable {apps} "
-            "> {report_dir}/pylint_fixme.report".format(
-                apps=apps_list,
-                report_dir=report_dir
-            )
-        )
+        fixme_report_name = "{}/pylint_fixme.report".format(report_dir)
+        pylint_options = "--enable=fixme --output-format=parseable {}".format(apps_list)
 
-        sh(cmd, ignore_error=True)
+        with open(fixme_report_name, "w") as fixme_report:
+            lint.py_run(pylint_options, return_std=False, stdout=fixme_report, stderr=None)
 
-        num_fixme += _count_pylint_violations(
-            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
+        num_fixme += _count_pylint_violations(fixme_report_name)
 
     print "Number of pylint fixmes: " + str(num_fixme)
 
