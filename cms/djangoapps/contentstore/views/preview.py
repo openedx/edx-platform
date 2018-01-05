@@ -148,7 +148,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return result
 
 
-def get_available_xblock_services(request=None, field_data=None):
+def get_available_xblock_services(request=None, field_data=None, course_id=None):
     """
     Returns a dict of available services for xBlocks
     """
@@ -158,6 +158,8 @@ def get_available_xblock_services(request=None, field_data=None):
         "settings": SettingsService(),
         "courseware_parent_info": CoursewareParentInfoService(),
     }
+    if course_id:
+        services['partitions'] = StudioPartitionService(course_id=course_id)
     if request:
         services['user'] = DjangoXBlockUserService(request.user)
     if field_data:
@@ -212,7 +214,7 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
 
-    services = get_available_xblock_services(request, field_data)
+    services = get_available_xblock_services(request, field_data, course_id)
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
