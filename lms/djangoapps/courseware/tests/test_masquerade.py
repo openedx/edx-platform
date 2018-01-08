@@ -22,6 +22,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
@@ -372,6 +373,51 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         # Verify the student state did not change.
         self.login_student()
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+    @patch.dict('django.conf.settings.FEATURES', {
+        'DISABLE_START_DATES': False,
+        'ENABLE_UNICODE_USERNAME': True
+    })
+    def test_masquerade_as_specific_student_with_special_char_uname(self):
+        """
+        Test masquerading as a specific user with special character in username.
+
+        We answer the problem in our test course as the student and as staff user, and we use the
+        progress as a proxy to determine who's state we currently see.
+        """
+        # Answer correctly as the student, and check progress.
+        student = UserFactory.create(username='foo@bar')
+        CourseEnrollment.enroll(student, self.course.id)
+        self.logout()
+        self.login(student.email, 'test')
+
+        self.submit_answer('Correct', 'Correct')
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Log in as staff, and check the problem is unanswered.
+        self.login_staff()
+        self.assertEqual(self.get_progress_detail(), u'0/2')
+
+        # Masquerade as the student, and check we can see the student state.
+        self.update_masquerade(role='student', user_name=student.username)
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Temporarily override the student state.
+        self.submit_answer('Correct', 'Incorrect')
+        self.assertEqual(self.get_progress_detail(), u'1/2')
+
+        # Reload the page and check we see the student state again.
+        self.get_courseware_page()
+        self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Become the staff user again, and check the problem is still unanswered.
+        self.update_masquerade(role='staff')
+        self.assertEqual(self.get_progress_detail(), u'0/2')
+
+        # Verify the student state did not change.
+        self.logout()
+        self.login(student.email, 'test')
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
     def test_masquerading_with_language_preference(self):

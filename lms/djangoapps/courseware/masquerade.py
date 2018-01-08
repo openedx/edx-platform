@@ -71,27 +71,36 @@ def handle_ajax(request, course_key_string):
     group_id = request_json.get('group_id', None)
     user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
     user_name = request_json.get('user_name', None)
+    # The 'user_name' param is actually a string representing either the username or the user's
+    # email address. 'found_user_name' represents the actual username property for a User.
+    found_user_name = None
+    # This view should return an error if no 'user_name' was provided, but many different test cases
+    # rely on the view still working if 'user_name' is blank or None.
     if user_name:
         users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)
-        try:
-            if '@' in user_name:
-                user_name = users_in_course.get(email=user_name).username
-            else:
-                users_in_course.get(username=user_name)
-        except User.DoesNotExist:
+        user = None
+        if '@' in user_name:
+            user = users_in_course.filter(email=user_name).first()
+        # A username can have an '@' symbol in it, so if no user was found with an email that
+        # matches the 'user_name' string, we still want to check if it matches a username property.
+        if not user:
+            user = users_in_course.filter(username=user_name).first()
+        if user:
+            found_user_name = user.username
+        if not found_user_name:
             return JsonResponse({
                 'success': False,
                 'error': _(
-                    'There is no user with the username or email address {user_name} '
+                    'There is no user with the username or email address "{user_identifier}" '
                     'enrolled in this course.'
-                ).format(user_name=user_name)
+                ).format(user_identifier=user_name)
             })
     masquerade_settings[course_key] = CourseMasquerade(
         course_key,
         role=role,
         user_partition_id=user_partition_id,
         group_id=group_id,
-        user_name=user_name,
+        user_name=found_user_name,
     )
     request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
     return JsonResponse({'success': True})
