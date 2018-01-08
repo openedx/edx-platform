@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -18,6 +18,7 @@ from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.tabs import EnrolledTab
 from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.features.course_experience import default_course_url_name
@@ -25,8 +26,41 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from util.views import ensure_valid_course_key
 
+from . import ENABLE_DASHBOARD_TAB
+
+log = logging.getLogger(__name__)
+
+
+class LearnerAnalyticsTab(EnrolledTab):
+    """
+    Tab for displaying the dashboard in the course.
+    """
+    type = "learner_analytics"
+    title = ugettext_noop("Insights")
+    view_name = 'openedx.learner_analytics.dashboard'
+    is_dynamic = True
+
+    @classmethod
+    def is_enabled(cls, course, user=None):
+        """Returns true if the teams feature is enabled in the course.
+
+        Args:
+            course (CourseDescriptor): the course using the feature
+            user (User): the user interacting with the course
+        """
+        if not super(LearnerAnalyticsTab, cls).is_enabled(course, user=user):
+            return False
+        return (ENABLE_DASHBOARD_TAB.is_enabled(course.id) and
+                CourseEnrollment.is_enrolled_as_verified(user, course.id))
+
 
 class LearnerAnalyticsView(View):
+    """
+    Displays the Learner Analytics Dashboard.
+    """
+    def __init__(self):
+        View.__init__(self)
+        self.analytics_client = Client(base_url=settings.ANALYTICS_API_URL, auth_token=settings.ANALYTICS_API_KEY)
 
     @method_decorator(login_required)
     @method_decorator(ensure_csrf_cookie)
