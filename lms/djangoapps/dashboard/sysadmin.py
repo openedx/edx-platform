@@ -28,6 +28,7 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
+from six import text_type
 
 import dashboard.git_import as git_import
 import track.views
@@ -265,7 +266,7 @@ class Users(SysadminDashboardView):
         self.msg += u'<ol>'
         for course in self.get_courses():
             self.msg += u'<li>{0} ({1})</li>'.format(
-                escape(course.id.to_deprecated_string()), course.location.to_deprecated_string())
+                escape(text_type(course.id)), text_type(course.location))
         self.msg += u'</ol>'
 
     def get(self, request):
@@ -427,7 +428,7 @@ class Courses(SysadminDashboardView):
 
         for course in self.get_courses():
             gdir = course.id.course
-            data.append([course.display_name, course.id.to_deprecated_string()]
+            data.append([course.display_name, text_type(course.id)]
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'),
@@ -495,7 +496,7 @@ class Courses(SysadminDashboardView):
                 # don't delete user permission groups, though
                 self.msg += \
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), course.location.to_deprecated_string(), course.id.to_deprecated_string(), course.display_name)
+                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
             'datatable': self.make_datatable(),
@@ -653,7 +654,7 @@ class GitLogs(TemplateView):
         mdb.disconnect()
         context = {
             'logs': logs,
-            'course_id': course_id.to_deprecated_string() if course_id else None,
+            'course_id': text_type(course_id) if course_id else None,
             'error_msg': error_msg,
             'page_size': page_size
         }

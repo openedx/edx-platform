@@ -2,6 +2,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
+from six import text_type
 %>
 
 ## The JS for this is defined in xqa_interface.html
@@ -99,7 +100,7 @@ ${block_content}
 
     <div class="staff_info" style="display:block">
       is_released = ${is_released}
-      location = ${location.to_deprecated_string() | h}
+      location = ${text_type(location) | h}
 
       <table summary="${_('Module Fields')}">
         <tr><th>${_('Module Fields')}</th></tr>

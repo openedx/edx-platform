@@ -34,6 +34,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from markupsafe import escape
+from six import text_type
 
 import dogstats_wrapper as dog_stats_api
 from bulk_email.models import CourseEmail, Optout
@@ -97,7 +98,7 @@ def _get_course_email_context(course):
     """
     Returns context arguments to apply to all emails, independent of recipient.
     """
-    course_id = course.id.to_deprecated_string()
+    course_id = text_type(course.id)
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
     course_root = reverse('course_root', kwargs={'course_id': course_id})

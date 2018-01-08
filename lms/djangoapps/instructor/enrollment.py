@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.utils.translation import override as override_language
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -262,8 +263,8 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     if delete_module and not submission_cleared:
         sub_api.reset_score(
             user_id,
-            course_id.to_deprecated_string(),
-            module_state_key.to_deprecated_string(),
+            text_type(course_id),
+            text_type(module_state_key),
         )
 
     module_to_reset = StudentModule.objects.get(
@@ -352,7 +353,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     """
 
     protocol = 'https' if secure else 'http'
-    course_key = course_key or course.id.to_deprecated_string()
+    course_key = course_key or text_type(course.id)
     display_name = display_name or course.display_name_with_default_escaped
 
     stripped_site_name = configuration_helpers.get_value(

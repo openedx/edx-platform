@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
+from six import text_type
 
 import xmodule.graders as xmgraders
 from certificates.models import CertificateStatuses, GeneratedCertificate
@@ -168,7 +169,7 @@ def sale_record_features(course_id, features):
             course_reg_dict = dict((feature, None)
                                    for feature in course_reg_features)
 
-        course_reg_dict['course_id'] = course_id.to_deprecated_string()
+        course_reg_dict['course_id'] = text_type(course_id)
         course_reg_dict.update({'codes': ", ".join(codes)})
         sale_dict.update(dict(course_reg_dict.items()))
 
@@ -401,7 +402,7 @@ def coupon_codes_features(features, coupons_list, course_id):
         # They have not been redeemed yet
 
         coupon_dict['expiration_date'] = coupon.display_expiry_date
-        coupon_dict['course_id'] = coupon_dict['course_id'].to_deprecated_string()
+        coupon_dict['course_id'] = text_type(coupon_dict['course_id'])
         return coupon_dict
     return [extract_coupon(coupon, features) for coupon in coupons_list]
 
@@ -489,7 +490,7 @@ def course_registration_features(features, registration_codes, csv_type):
             except ObjectDoesNotExist:
                 pass
 
-        course_registration_dict['course_id'] = course_registration_dict['course_id'].to_deprecated_string()
+        course_registration_dict['course_id'] = text_type(course_registration_dict['course_id'])
         return course_registration_dict
     return [extract_course_registration(code, features, csv_type) for code in registration_codes]
 
@@ -517,7 +518,7 @@ def dump_grading_context(course):
             subgrader.index = 1
             graders[subgrader.type] = subgrader
     msg += hbar
-    msg += "Listing grading context for course %s\n" % course.id.to_deprecated_string()
+    msg += "Listing grading context for course %s\n" % text_type(course.id)
 
     gcontext = grading_context_for_course(course)
     msg += "graded sections:\n"

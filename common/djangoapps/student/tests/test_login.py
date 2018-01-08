@@ -14,6 +14,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
+from six import text_type
 from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
@@ -498,7 +499,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Tests the redirects when visiting course-specific URL with @login_required.
         Should vary by course depending on its enrollment_domain
         """
-        TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=invalid-name
+        TARGET_URL = reverse('courseware', args=[text_type(self.course.id)])            # pylint: disable=invalid-name
         noshib_response = self.client.get(TARGET_URL, follow=True, HTTP_ACCEPT="text/html")
         self.assertEqual(noshib_response.redirect_chain[-1],
                          (expected_redirect_url('/login?next={url}'.format(url=TARGET_URL)), 302))
@@ -506,7 +507,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
-        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id.to_deprecated_string()])  # pylint: disable=invalid-name
+        TARGET_URL_SHIB = reverse('courseware', args=[text_type(self.shib_course.id)])  # pylint: disable=invalid-name
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,

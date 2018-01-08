@@ -6,6 +6,7 @@ import os
 import os.path
 
 import fs.osfs
+import six
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
@@ -84,8 +85,17 @@ def mock_capa_module():
     """
     capa response types needs just two things from the capa_module: location and track_function.
     """
+    def mock_location_text(self):
+        """
+        Mock implementation of __unicode__ or __str__ for the module's location.
+        """
+        return u'i4x://Foo/bar/mock/abc'
+
     capa_module = Mock()
-    capa_module.location.to_deprecated_string.return_value = 'i4x://Foo/bar/mock/abc'
+    if six.PY2:
+        capa_module.location.__unicode__ = mock_location_text
+    else:
+        capa_module.location.__str__ = mock_location_text
     # The following comes into existence by virtue of being called
     # capa_module.runtime.track_function
     return capa_module

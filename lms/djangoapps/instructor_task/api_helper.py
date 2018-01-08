@@ -12,6 +12,7 @@ from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+from six import text_type
 
 from courseware.courses import get_problems_in_section
 from courseware.module_render import get_xqueue_callback_url_prefix
@@ -380,11 +381,11 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
 
     assert isinstance(usage_key, UsageKey)
     if student is not None:
-        task_input = {'problem_url': usage_key.to_deprecated_string(), 'student': student.username}
-        task_key_stub = "{student}_{problem}".format(student=student.id, problem=usage_key.to_deprecated_string())
+        task_input = {'problem_url': text_type(usage_key), 'student': student.username}
+        task_key_stub = "{student}_{problem}".format(student=student.id, problem=text_type(usage_key))
     else:
-        task_input = {'problem_url': usage_key.to_deprecated_string()}
-        task_key_stub = "_{problem}".format(problem=usage_key.to_deprecated_string())
+        task_input = {'problem_url': text_type(usage_key)}
+        task_key_stub = "_{problem}".format(problem=text_type(usage_key))
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
@@ -402,11 +403,11 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: 
     """
     assert isinstance(usage_key, UsageKey)
     if student is not None:
-        task_input = {'entrance_exam_url': unicode(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=unicode(usage_key))
+        task_input = {'entrance_exam_url': text_type(usage_key), 'student': student.username}
+        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=text_type(usage_key))
     else:
-        task_input = {'entrance_exam_url': unicode(usage_key)}
-        task_key_stub = "_{entranceexam}".format(entranceexam=unicode(usage_key))
+        task_input = {'entrance_exam_url': text_type(usage_key)}
+        task_key_stub = "_{entranceexam}".format(entranceexam=text_type(usage_key))
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()

@@ -43,6 +43,7 @@ from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 
 import dogstats_wrapper as dog_stats_api
@@ -1219,7 +1220,7 @@ class CourseEnrollment(models.Model):
             assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
-                'course_id': self.course_id.to_deprecated_string(),
+                'course_id': text_type(self.course_id),
                 'mode': self.mode,
             }
 
@@ -1230,7 +1231,7 @@ class CourseEnrollment(models.Model):
                     tracking_context = tracker.get_tracker().resolve_context()
                     analytics.track(self.user_id, event_name, {
                         'category': 'conversion',
-                        'label': self.course_id.to_deprecated_string(),
+                        'label': text_type(self.course_id),
                         'org': self.course_id.org,
                         'course': self.course_id.course,
                         'run': self.course_id.run,
@@ -1303,14 +1304,14 @@ class CourseEnrollment(models.Model):
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
                     user.username,
-                    course_key.to_deprecated_string()
+                    text_type(course_key)
                 )
                 raise EnrollmentClosedError
 
             if cls.objects.is_course_full(course):
                 log.warning(
                     u"Course %s has reached its maximum enrollment of %d learners. User %s failed to enroll.",
-                    course_key.to_deprecated_string(),
+                    text_type(course_key),
                     course.max_student_enrollments_allowed,
                     user.username,
                 )
@@ -1319,7 +1320,7 @@ class CourseEnrollment(models.Model):
             log.warning(
                 u"User %s attempted to enroll in %s, but they were already enrolled",
                 user.username,
-                course_key.to_deprecated_string()
+                text_type(course_key)
             )
             if check_access:
                 raise AlreadyEnrolledError

@@ -8,6 +8,7 @@ import logging
 from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
+from six import text_type
 
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.fields import ReferenceList, Scope, String
@@ -338,12 +339,12 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
 
         if self.show_tag_list:
             show_str = u'<{tag_name} sources="{sources}" />'.format(
-                tag_name='show', sources=';'.join(location.to_deprecated_string() for location in self.show_tag_list))
+                tag_name='show', sources=';'.join(text_type(location) for location in self.show_tag_list))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = map(lambda loc: loc.to_deprecated_string(), self.sources_list)
+        stringified_sources_list = map(lambda loc: text_type(loc), self.sources_list)
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message
