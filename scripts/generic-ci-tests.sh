@@ -100,28 +100,8 @@ function run_paver_quality {
 case "$TEST_SUITE" in
 
     "quality")
-        echo "Finding fixme's and storing report..."
-        run_paver_quality find_fixme || EXIT=1
-        echo "Finding pep8 violations and storing report..."
-        run_paver_quality run_pep8 || EXIT=1
         echo "Finding pylint violations and storing in report..."
         run_paver_quality run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
-
-        mkdir -p reports
-
-        echo "Finding ESLint violations and storing report..."
-        run_paver_quality run_eslint -l $ESLINT_THRESHOLD || EXIT=1
-        echo "Finding Stylelint violations and storing report..."
-        run_paver_quality run_stylelint -l $STYLELINT_THRESHOLD || EXIT=1
-        echo "Running code complexity report (python)."
-        run_paver_quality run_complexity || echo "Unable to calculate code complexity. Ignoring error."
-        echo "Running xss linter report."
-        run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || EXIT=1
-        echo "Running safe commit linter report."
-        run_paver_quality run_xsscommitlint || EXIT=1
-        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        echo "Running diff quality."
-        run_paver_quality run_quality -p 100 -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
@@ -129,99 +109,4 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit")
-        case "$SHARD" in
-            "all")
-                $TOX paver test_system -s lms --disable_capture $PAVER_ARGS $PARALLEL 2> lms-tests.log
-                ;;
-            [1-3])
-                $TOX paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" $PAVER_ARGS $PARALLEL 2> lms-tests.$SHARD.log
-                ;;
-            4|"noshard")
-                $TOX paver test_system -s lms --disable_capture --eval-attr='not shard' $PAVER_ARGS $PARALLEL 2> lms-tests.4.log
-                ;;
-            *)
-                # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
-                # backwards compatibility feature. If a new shard (e.g., shard n) is introduced in the build
-                # system, but the tests are called with the old code, then builds will not fail because the
-                # code is out of date. Instead, there will be an instantly-passing shard.
-                mkdir -p reports/lms
-                emptyxunit "lms/nosetests"
-                ;;
-        esac
-        ;;
-
-    "cms-unit")
-        $TOX paver test_system -s cms --disable_capture $PAVER_ARGS 2> cms-tests.log
-        ;;
-
-    "commonlib-unit")
-        $TOX paver test_lib --disable_capture $PAVER_ARGS 2> common-tests.log
-        ;;
-
-    "js-unit")
-        $TOX paver test_js --coverage
-        $TOX paver diff_coverage
-        ;;
-
-    "commonlib-js-unit")
-        $TOX paver test_js --coverage --skip-clean || { EXIT=1; }
-        paver test_lib --skip-clean $PAVER_ARGS || { EXIT=1; }
-
-        # This is to ensure that the build status of the shard is properly set.
-        # Because we are running two paver commands in a row, we need to capture
-        # their return codes in order to exit with a non-zero code if either of
-        # them fail. We put the || clause there because otherwise, when a paver
-        # command fails, this entire script will exit, and not run the second
-        # paver command in this case statement. So instead of exiting, the value
-        # of a variable named EXIT will be set to 1 if either of the paver
-        # commands fail. We then use this variable's value as our exit code.
-        # Note that by default the value of this variable EXIT is not set, so if
-        # neither command fails then the exit command resolves to simply exit
-        # which is considered successful.
-        exit $EXIT
-        ;;
-
-    "lms-acceptance")
-        $TOX paver test_acceptance -s lms -vvv --with-xunit
-        ;;
-
-    "cms-acceptance")
-        $TOX paver test_acceptance -s cms -vvv --with-xunit
-        ;;
-
-    "bok-choy")
-
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
-
-        case "$SHARD" in
-
-            "all")
-                $TOX paver test_bokchoy $PAVER_ARGS
-                ;;
-
-            [1-9]|10)
-                $TOX paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
-                ;;
-
-            11|"noshard")
-                $TOX paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
-                ;;
-
-            # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 10) in the multi-config project and expand this file
-            # with an additional case condition, old branches without that commit
-            # would not execute any tests on the worker assigned to that shard
-            # and thus their build would fail.
-            # This way they will just report 1 test executed and passed.
-            *)
-                # Need to create an empty test result so the post-build
-                # action doesn't fail the build.
-                # May be unnecessary if we changed the "Skip if there are no test files"
-                # option to True in the jenkins job definitions.
-                mkdir -p reports/bok_choy
-                emptyxunit "bok_choy/xunit"
-                ;;
-        esac
-        ;;
 esac
