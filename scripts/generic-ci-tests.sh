@@ -100,8 +100,8 @@ function run_paver_quality {
 case "$TEST_SUITE" in
 
     "quality")
-        echo "Finding fixme's and storing report..."
-        run_paver_quality find_fixme || EXIT=1
+        # echo "Finding fixme's and storing report..."
+        # run_paver_quality find_fixme || EXIT=1
 
         # echo "Finding pep8 violations and storing report..."
         # run_paver_quality run_pep8 || EXIT=1
