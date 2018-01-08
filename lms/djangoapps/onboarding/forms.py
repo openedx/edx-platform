@@ -520,8 +520,6 @@ class RegModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
-        self.fields['first_name'].initial = ugettext_noop('First Name')
-        self.fields['last_name'].initial = ugettext_noop('Last Name')
 
         self.fields['first_name'].error_messages = {
             'required': ugettext_noop('Please enter your First Name.'),
@@ -582,46 +580,38 @@ class RegModelForm(forms.ModelForm):
         return org_admin_email
 
     def save(self, user=None, commit=True):
-        prev_org = None
-
-        organization_name = self.cleaned_data['organization_name']
+        organization_name = self.cleaned_data.get('organization_name', '').strip()
         is_poc = self.cleaned_data['is_poc']
         org_admin_email = self.cleaned_data['org_admin_email']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
 
-        organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name.strip())
-        extended_profile, is_profile_created = UserExtendedProfile.objects.get_or_create(user=user)
+        extended_profile = UserExtendedProfile.objects.create(user=user)
 
-        if not is_profile_created:
-            prev_org = extended_profile.organization
+        if organization_name:
+            organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            extended_profile.organization = organization_to_assign
+            if is_created:
+                if user and is_poc == '1':
+                    organization_to_assign.unclaimed_org_admin_email = None
+                    organization_to_assign.admin = user
 
-        if user and is_poc == '1':
-            organization_to_assign.unclaimed_org_admin_email = None
-            organization_to_assign.admin = user
+                if not is_poc == '1' and org_admin_email:
+                    try:
 
-        if prev_org:
-            if organization_to_assign.label != prev_org.label:
-                prev_org.admin = None
-                prev_org.save()
+                        hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
+                        org_id = extended_profile.organization_id
+                        org_name = extended_profile.organization.label
+                        organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
-        extended_profile.organization = organization_to_assign
+                        send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+
+                    except Exception as ex:
+                        log.info(ex.args)
+                        pass
+
         user.first_name = first_name
         user.last_name = last_name
-
-        if not is_poc == '1' and org_admin_email:
-            try:
-
-                hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
-                org_id = extended_profile.organization_id
-                org_name = extended_profile.organization.label
-                organization_to_assign.unclaimed_org_admin_email = org_admin_email
-
-                send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
-
-            except Exception as ex:
-                log.info(ex.args)
-                pass
 
         if commit:
             extended_profile.save()
@@ -636,6 +626,50 @@ class UpdateRegModelForm(RegModelForm):
     def __init__(self, *args, **kwargs):
         super(UpdateRegModelForm, self).__init__(*args, **kwargs)
         self.fields.pop('confirm_password')
+
+    def save(self, user=None, commit=True):
+        organization_name = self.cleaned_data.get('organization_name', '').strip()
+        is_poc = self.cleaned_data['is_poc']
+        org_admin_email = self.cleaned_data['org_admin_email']
+        first_name = self.cleaned_data['first_name']
+        last_name = self.cleaned_data['last_name']
+
+        extended_profile = UserExtendedProfile.objects.get(user=user)
+        prev_org = extended_profile.organization
+
+        if organization_name:
+            organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            extended_profile.organization = organization_to_assign
+
+            if user and is_poc == '1':
+                organization_to_assign.unclaimed_org_admin_email = None
+                organization_to_assign.admin = user
+
+            if not is_poc == '1' and org_admin_email:
+                try:
+
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
+                    org_id = extended_profile.organization_id
+                    org_name = extended_profile.organization.label
+                    organization_to_assign.unclaimed_org_admin_email = org_admin_email
+
+                    send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+
+                except Exception as ex:
+                    log.info(ex.args)
+                    pass
+
+            if prev_org:
+                if organization_to_assign.label != prev_org.label:
+                    prev_org.admin = None
+
+        user.first_name = first_name
+        user.last_name = last_name
+
+        if commit:
+            extended_profile.save()
+
+        return extended_profile, prev_org
 
 
 class OrganizationMetricModelForm(BaseOnboardingModelForm):

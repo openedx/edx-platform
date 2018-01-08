@@ -330,16 +330,23 @@ def update_account_settings(request):
 
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
-            user_extended_profile = form.save(user=user_extended_profile.user, commit=False)
+            user_extended_profile, prev_org = form.save(user=user_extended_profile.user, commit=False)
+
             user_extended_profile.save()
-            user_extended_profile.organization.save()
+            if prev_org:
+                prev_org.save()
+
+            if user_extended_profile.organization:
+                user_extended_profile.organization.save()
 
     else:
         form = forms.UpdateRegModelForm(
             instance=user_extended_profile,
             initial={
-                'organization_name': user_extended_profile.organization.label,
-                'is_poc': "1" if user_extended_profile.is_organization_admin else "0"
+                'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
+                'is_poc': "1" if user_extended_profile.is_organization_admin else "0",
+                'first_name': user_extended_profile.user.first_name,
+                'last_name': user_extended_profile.user.last_name
             }
         )
 
@@ -355,19 +362,27 @@ def get_user_organizations(request):
     Get organizations
     """
     final_result = {}
+    org_label = ''
+    admin_email = ''
+
     if request.is_ajax():
         query = request.GET.get('term', '')
         all_organizations = Organization.objects.filter(label__istartswith=query)
+
         for organization in all_organizations:
             final_result[organization.label] = True if organization.admin else False
 
         if request.user.is_authenticated():
             user_extended_profile = request.user.extended_profile
             organization = user_extended_profile.organization
+
+            if organization:
+                org_label = organization.label
+                admin_email = organization.admin.email if organization.admin else organization.unclaimed_org_admin_email
+
             final_result['user_org_info'] = {
-                'org': organization.label,
-                'admin_email': organization.admin.email if organization.admin else
-                organization.unclaimed_org_admin_email
+                'org': org_label,
+                'admin_email': admin_email
             }
 
     return JsonResponse(final_result)
