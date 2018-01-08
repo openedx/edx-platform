@@ -26,6 +26,11 @@ function countByType(type, assignments) {
   return count;
 }
 
+function getActiveUserString(count) {
+  const users = (count === 1) ? 'User' : 'Users';
+  return `${users} active in this course right now`;
+}
+
 function getAssignmentCounts(types, assignments) {
   const countsArray = types.map((type) => {
     return {
@@ -49,9 +54,10 @@ function getStreakString(count) {
 
 export function LearnerAnalyticsDashboard(props) {
 console.log('props: ', props);
-  const {grading_policy, grades, schedule} = props;
-  const week_streak = 7;
-
+  const {grading_policy, grades, schedule, week_streak, weekly_active_users} = props;
+  // temp. for local dev
+  // const week_streak = 3;
+  // const weekly_active_users = 83400;
   const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
     return {
       value: weight,
@@ -119,10 +125,17 @@ console.log('props: ', props);
         <h2 className="group-heading">Timing</h2>
         <h3 className="section-heading">Course due dates</h3>
         <DueDates dates={schedule} assignmentCounts={assignmentCounts} />
-        <div className="week-streak-wrapper">
-          <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>
-          <h3 className="section-heading">Week streak</h3>
-          <p>{getStreakString(week_streak)}</p>
+        {week_streak > 0 && 
+          <div className="week-streak-wrapper">
+            <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>
+            <h3 className="section-heading">Week streak</h3>
+            <p>{getStreakString(week_streak)}</p>
+          </div>
+        }
+        <div className="active-users-wrapper">
+          <span className="fa fa-user" aria-hidden="true"></span>
+          <span className="user-count">{weekly_active_users.toLocaleString('en', {useGrouping:true})}</span>
+          <p className="label">{getActiveUserString(weekly_active_users)}</p>
         </div>
       </div>
     </div>
