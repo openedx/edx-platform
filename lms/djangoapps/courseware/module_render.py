@@ -554,12 +554,18 @@ def get_module_system_for_user(
             if requested_user_id != user.id:
                 log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
                 return
-            BlockCompletion.objects.submit_completion(
-                user=user,
-                course_key=course_id,
-                block_key=block.scope_ids.usage_id,
-                completion=1.0,
-            )
+
+            # If blocks explicitly declare support for the new completion API,
+            # we expect them to emit 'completion' events,
+            # and we ignore the deprecated 'progress' events
+            # in order to avoid duplicate work and possibly conflicting semantics.
+            if not getattr(block, 'has_custom_completion', False):
+                BlockCompletion.objects.submit_completion(
+                    user=user,
+                    course_key=course_id,
+                    block_key=block.scope_ids.usage_id,
+                    completion=1.0,
+                )
 
     def rebind_noauth_module_to_user(module, real_user):
         """
