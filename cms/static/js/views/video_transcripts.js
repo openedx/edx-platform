@@ -84,6 +84,20 @@ define(
             },
 
             /*
+            Returns transcript download link.
+            */
+            getTranscriptDownloadLink: function(edxVideoID, transcriptLanguageCode, transcriptDownloadHandlerUrl) {
+                return StringUtils.interpolate(
+                    '{transcriptDownloadHandlerUrl}?edx_video_id={edxVideoID}&language_code={transcriptLanguageCode}',
+                    {
+                        transcriptDownloadHandlerUrl: transcriptDownloadHandlerUrl,
+                        edxVideoID: edxVideoID,
+                        transcriptLanguageCode: transcriptLanguageCode
+                    }
+                );
+            },
+
+            /*
             Toggles Show/Hide transcript button and transcripts container.
             */
             toggleShowTranscripts: function() {
@@ -169,6 +183,15 @@ define(
                     $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 $transcriptContainer.attr('data-language-code', newLanguageCode);
+                $transcriptContainer.find('.download-transcript-button').attr(
+                    'href',
+                    this.getTranscriptDownloadLink(
+                        this.edxVideoID,
+                        newLanguageCode,
+                        this.videoTranscriptSettings.transcript_download_handler_url
+                    )
+                );
+
                 HtmlUtils.setHtml(
                     $transcriptContainer.find('.transcript-title'),
                     StringUtils.interpolate(gettext('{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}'),
@@ -256,6 +279,7 @@ define(
                         edxVideoID: this.edxVideoID,
                         transcriptClientTitle: this.getTranscriptClientTitle(),
                         transcriptFileFormat: this.videoTranscriptSettings.trancript_download_file_format,
+                        getTranscriptDownloadLink: this.getTranscriptDownloadLink,
                         transcriptDownloadHandlerUrl: this.videoTranscriptSettings.transcript_download_handler_url
                     })
                 );
