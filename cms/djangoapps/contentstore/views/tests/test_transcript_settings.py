@@ -258,15 +258,15 @@ class TranscriptDownloadTest(CourseTestCase):
     @ddt.data(
         (
             {},
-            u'Following parameters are required: edx_video_id, language_code.'
+            u'The following parameters are required: edx_video_id, language_code.'
         ),
         (
             {'edx_video_id': '123'},
-            u'Following parameters are required: language_code.'
+            u'The following parameters are required: language_code.'
         ),
         (
             {'language_code': 'en'},
-            u'Following parameters are required: edx_video_id.'
+            u'The following parameters are required: edx_video_id.'
         ),
     )
     @ddt.unpack
@@ -370,7 +370,7 @@ class TranscriptUploadTest(CourseTestCase):
                 'language_code': u'en',
                 'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'Following parameters are required: edx_video_id, new_language_code.'
+            u'The following parameters are required: edx_video_id, new_language_code.'
         ),
         (
             {
@@ -378,13 +378,13 @@ class TranscriptUploadTest(CourseTestCase):
                 'new_language_code': u'en',
                 'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'Following parameters are required: edx_video_id.'
+            u'The following parameters are required: edx_video_id.'
         ),
         (
             {
                 'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'Following parameters are required: edx_video_id, language_code, new_language_code.'
+            u'The following parameters are required: edx_video_id, language_code, new_language_code.'
         )
     )
     @ddt.unpack
@@ -416,7 +416,7 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error'],
-            u'Transcript with "es" language code is already present.'
+            u'A transcript with the "es" language code already exists.'
         )
 
     @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))

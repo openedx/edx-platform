@@ -143,7 +143,7 @@ def transcript_download_handler(request, course_key_string):
     missing = [attr for attr in ['edx_video_id', 'language_code'] if attr not in request.GET]
     if missing:
         return JsonResponse(
-            {'error': _(u'Following parameters are required: {missing}.').format(missing=', '.join(missing))},
+            {'error': _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))},
             status=400
         )
 
@@ -183,12 +183,12 @@ def validate_transcript_upload_data(data, files):
     must_have_attrs = ['edx_video_id', 'language_code', 'new_language_code']
     missing = [attr for attr in must_have_attrs if attr not in data]
     if missing:
-        error = _(u'Following parameters are required: {missing}.').format(missing=', '.join(missing))
+        error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
     elif (
         data['language_code'] != data['new_language_code'] and
         data['new_language_code'] in get_available_transcript_languages([data['edx_video_id']])
     ):
-        error = _(u'Transcript with "{language_code}" language code is already present.'.format(
+        error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
             language_code=data['new_language_code']
         ))
     elif 'file' not in files:
