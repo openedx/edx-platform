@@ -70,11 +70,6 @@ console.log('props: ', props);
   const assignments = gradeBreakdown.map(value => value['label']);
   const assignmentTypes = [...new Set(assignments)];
   const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
-  const assignmentCountz = {
-    Homework: 2,
-    Exam: 1
-  };
-console.log('counts: ', assignmentCounts);
   const tableData = [
     {
       label: 'Problem Set 1',
@@ -95,21 +90,6 @@ console.log('counts: ', assignmentCounts);
       total: '50'
     }
   ];
-
-  // const dates = [
-  //   {
-  //     format: 'Homework',
-  //     due: '2018-02-01T00:00:00+00:00'
-  //   },
-  //   {
-  //     format: 'Homework',
-  //     due: '2017-12-29T01:30:00+00:00'
-  //   },
-  //   {
-  //     format: 'Exam',
-  //     due: '2018-05-27T01:30:00+00:00'
-  //   }
-  // ];
 
   return (
     <div className="learner-analytics-wrapper">

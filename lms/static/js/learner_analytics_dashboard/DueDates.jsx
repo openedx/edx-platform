@@ -8,8 +8,6 @@ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 class DueDates extends React.Component {
   constructor(props) {
     super(props);
-
-    console.log('props: ', props);
   }
 
   getDate(str) {
@@ -27,12 +25,15 @@ class DueDates extends React.Component {
     if (assignmentCounts[type] < 2 ) {
       return type;
     } else {
-      return `${type} with a number`;
+      this.renderLabels[type] += 1;
+      return type + ' ' + this.renderLabels[type];
     }
   }
   
   getList() {
-    const {dates} = this.props;
+    const {dates, assignmentCounts} = this.props;
+    this.renderLabels = this.initLabelTracker(assignmentCounts);
+ 
     return dates.sort((a, b) => new Date(a.due) > new Date(b.due))
                 .map(({ format, due }, index) => {
                   return (
@@ -42,6 +43,15 @@ class DueDates extends React.Component {
                     </li>
                   );
                 });
+  }
+
+  initLabelTracker(list) {
+    let labels = Object.keys(list);
+
+    return labels.reduce((accumulator, key) => {
+      accumulator[key] = 0;
+      return accumulator;
+    }, {}) 
   }
 
   renderList() {
