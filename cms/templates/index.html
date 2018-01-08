@@ -324,7 +324,18 @@ from openedx.core.djangolib.js_utils import (
       % endif
 
       %if len(courses) > 0 or optimization_enabled:
-      <div class="courses courses-tab react-course-listing active"></div>
+      <div class="courses courses-tab react-course-listing active">
+        ${static.renderReact(
+          component="CourseOrLibraryListing",
+          id="react-course-listing",
+          props={
+            'items': sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''),
+            'linkClass': 'course-link',
+            'idBase': 'course',
+            'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
+          }
+        )}
+      </div>
 
       %else:
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
@@ -442,11 +453,33 @@ from openedx.core.djangolib.js_utils import (
       % endif
 
       %if archived_courses:
-      <div class="archived-courses react-archived-course-listing archived-courses-tab"></div>
+      <div class="archived-courses react-archived-course-listing archived-courses-tab">
+        ${static.renderReact(
+          component="CourseOrLibraryListing",
+          id="react-archived-course-listing",
+          props={
+            'items': sorted(archived_courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''),
+            'linkClass': 'course-link',
+            'idBase': 'archived',
+            'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
+          }
+        )}
+      </div>
       %endif
 
       %if len(libraries) > 0 or optimization_enabled:
-      <div class="libraries react-library-listing libraries-tab"></div>
+      <div class="libraries react-library-listing libraries-tab">
+        ${static.renderReact(
+          component="CourseOrLibraryListing",
+          id="react-library-listing",
+          props={
+            'items': sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''),
+            'linkClass': 'library-link',
+            'idBase': 'library',
+            'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
+          }
+        )}
+      </div>
 
       %else:
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
@@ -552,22 +585,4 @@ from openedx.core.djangolib.js_utils import (
 
   %endif
 </div>
-
-<%static:webpack entry="StudioIndex">
-    var enableReruns = ${allow_course_reruns and rerun_creator_status and course_creator_status=='granted' | n, dump_js_escaped_json};
-    new StudioCourseIndex(
-        ".react-course-listing",
-        ${sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else '') | n, dump_js_escaped_json},
-        enableReruns
-    );
-    new StudioArchivedIndex(
-        ".react-archived-course-listing",
-        ${sorted(archived_courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else '') | n, dump_js_escaped_json},
-        enableReruns
-    );
-    new StudioLibraryIndex(
-        ".react-library-listing",
-        ${sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else '') | n, dump_js_escaped_json}
-    );
-</%static:webpack>
 </%block>
