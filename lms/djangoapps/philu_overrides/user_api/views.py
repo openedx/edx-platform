@@ -77,7 +77,9 @@ def _do_create_account_custom(form, custom_form=None):
 
         # Fix: recall user.save to avoid transaction management related exception, if we call user.save under atomic block
         # (in custom_from.save )a random transaction exception generated
-        custom_model.organization.save()
+        if custom_model.organization:
+            custom_model.organization.save()
+
         user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error

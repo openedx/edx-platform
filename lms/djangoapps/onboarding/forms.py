@@ -40,7 +40,19 @@ def get_onboarding_autosuggesion_data(file_name):
     return data
 
 
-class UserInfoModelForm(forms.ModelForm):
+class BaseOnboardingModelForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', kwargs.get('label_suffix', '').replace(":", ""))
+        super(BaseOnboardingModelForm, self).__init__(*args, **kwargs)
+
+
+class BaseOnboardingForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', kwargs.get('label_suffix', '').replace(":", ""))
+        super(BaseOnboardingForm, self).__init__(*args, **kwargs)
+
+
+class UserInfoModelForm(BaseOnboardingModelForm):
     """
     Model from to be used in the first step of survey.
 
@@ -240,7 +252,7 @@ class RadioSelectNotNull(forms.RadioSelect):
         return self.renderer(name, str_value, final_attrs, choices)
 
 
-class InterestsForm(forms.Form):
+class InterestsForm(BaseOnboardingForm):
     """
     Model from to be used in the second step of survey.
 
@@ -280,7 +292,7 @@ class InterestsForm(forms.Form):
         user_exended_profile.save()
 
 
-class OrganizationInfoForm(forms.ModelForm):
+class OrganizationInfoForm(BaseOnboardingModelForm):
     """
     Model from to be used in the third step of survey.
 
@@ -336,8 +348,8 @@ class OrganizationInfoForm(forms.ModelForm):
                                         })
 
     partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of the "
-                                                             "Philanthropy University's partners?"),
-                                         label_suffix=ugettext_noop("(Check all that apply.)"),
+                                                             "Philanthropy University's partners? "
+                                                             "(Check all that apply.)"),
                                          help_text=ugettext_noop("Philanthropy University works in partnership with a "
                                                                  "number of international NGOs to improve the "
                                                                  "effectiveness of local organizations they fund and/or"
@@ -484,8 +496,7 @@ class RegModelForm(forms.ModelForm):
 
     confirm_password = forms.CharField(
         label=ugettext_noop('Confirm Password'),
-        widget=forms.PasswordInput(attrs={'placeholder': ugettext_noop('Confirm Password')}),
-        initial=ugettext_noop('Confirm Password')
+        widget=forms.PasswordInput
     )
 
     is_currently_employed = forms.BooleanField(
@@ -505,12 +516,10 @@ class RegModelForm(forms.ModelForm):
         label=ugettext_noop('If you know who should be the Admin for [Organization name],'
               ' please provide their email address and we will invite them to sign up.*'),
         required=False,
-        widget=forms.EmailInput(attrs=({'placeholder': ugettext_noop('Organization Admin Email')})))
+        widget=forms.EmailInput)
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
-        self.fields['first_name'].initial = ugettext_noop('First Name')
-        self.fields['last_name'].initial = ugettext_noop('Last Name')
 
         self.fields['first_name'].error_messages = {
             'required': ugettext_noop('Please enter your First Name.'),
@@ -538,7 +547,7 @@ class RegModelForm(forms.ModelForm):
 
         labels = {
             'username': 'Public Username*',
-            'email': 'E-mail Address*'
+
         }
 
         widgets = {
@@ -559,48 +568,50 @@ class RegModelForm(forms.ModelForm):
 
         return organization_name
 
-    def save(self, user=None, commit=True):
-        prev_org = None
+    def clean_org_admin_email(self):
+        org_admin_email = self.cleaned_data['org_admin_email']
 
-        organization_name = self.cleaned_data['organization_name']
+        already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
+            suggested_admin_email=org_admin_email).first()
+        if already_suggested_as_admin:
+            raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of some other organiztaion'
+                                                      % org_admin_email))
+
+        return org_admin_email
+
+    def save(self, user=None, commit=True):
+        organization_name = self.cleaned_data.get('organization_name', '').strip()
         is_poc = self.cleaned_data['is_poc']
         org_admin_email = self.cleaned_data['org_admin_email']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
 
-        organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name.strip())
-        extended_profile, is_profile_created = UserExtendedProfile.objects.get_or_create(user=user)
+        extended_profile = UserExtendedProfile.objects.create(user=user)
 
-        if not is_profile_created:
-            prev_org = extended_profile.organization
+        if organization_name:
+            organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            extended_profile.organization = organization_to_assign
+            if is_created:
+                if user and is_poc == '1':
+                    organization_to_assign.unclaimed_org_admin_email = None
+                    organization_to_assign.admin = user
 
-        if user and is_poc == '1':
-            organization_to_assign.unclaimed_org_admin_email = None
-            organization_to_assign.admin = user
+                if not is_poc == '1' and org_admin_email:
+                    try:
 
-        if prev_org:
-            if organization_to_assign.label != prev_org.label:
-                prev_org.admin = None
-                prev_org.save()
+                        hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
+                        org_id = extended_profile.organization_id
+                        org_name = extended_profile.organization.label
+                        organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
-        extended_profile.organization = organization_to_assign
+                        send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+
+                    except Exception as ex:
+                        log.info(ex.args)
+                        pass
+
         user.first_name = first_name
         user.last_name = last_name
-
-        if not is_poc == '1' and org_admin_email:
-            try:
-
-                hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
-                org_id = extended_profile.organization_id
-                org_name = extended_profile.organization.label
-                organization_to_assign.unclaimed_org_admin_email = org_admin_email
-
-                send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
-            except User.DoesNotExist:
-                pass
-            except Exception as ex:
-                log.info(ex.args)
-                pass
 
         if commit:
             extended_profile.save()
@@ -616,8 +627,52 @@ class UpdateRegModelForm(RegModelForm):
         super(UpdateRegModelForm, self).__init__(*args, **kwargs)
         self.fields.pop('confirm_password')
 
+    def save(self, user=None, commit=True):
+        organization_name = self.cleaned_data.get('organization_name', '').strip()
+        is_poc = self.cleaned_data['is_poc']
+        org_admin_email = self.cleaned_data['org_admin_email']
+        first_name = self.cleaned_data['first_name']
+        last_name = self.cleaned_data['last_name']
 
-class OrganizationMetricModelForm(forms.ModelForm):
+        extended_profile = UserExtendedProfile.objects.get(user=user)
+        prev_org = extended_profile.organization
+
+        if organization_name:
+            organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            extended_profile.organization = organization_to_assign
+
+            if user and is_poc == '1':
+                organization_to_assign.unclaimed_org_admin_email = None
+                organization_to_assign.admin = user
+
+            if not is_poc == '1' and org_admin_email:
+                try:
+
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
+                    org_id = extended_profile.organization_id
+                    org_name = extended_profile.organization.label
+                    organization_to_assign.unclaimed_org_admin_email = org_admin_email
+
+                    send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+
+                except Exception as ex:
+                    log.info(ex.args)
+                    pass
+
+            if prev_org:
+                if organization_to_assign.label != prev_org.label:
+                    prev_org.admin = None
+
+        user.first_name = first_name
+        user.last_name = last_name
+
+        if commit:
+            extended_profile.save()
+
+        return extended_profile, prev_org
+
+
+class OrganizationMetricModelForm(BaseOnboardingModelForm):
     can_provide_info = forms.ChoiceField(label=ugettext_noop('Are you able to provide information requested bellow?'),
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
@@ -627,7 +682,10 @@ class OrganizationMetricModelForm(forms.ModelForm):
                                              'required': ugettext_noop('Please select an option for Are you able to '
                                                                        'provide information'),
                                          })
-    effective_date = forms.DateField(input_formats=['%d/%m/%Y'], required=False)
+    effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
+                                     required=False,
+                                     label=ugettext_noop('End date of lat Fiscal Year'),
+                                     label_suffix='*')
 
     def __init__(self,  *args, **kwargs):
         super(OrganizationMetricModelForm, self).__init__(*args, **kwargs)
@@ -657,7 +715,6 @@ class OrganizationMetricModelForm(forms.ModelForm):
 
         labels = {
             'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
-            'effective_date': ugettext_noop('End date of lat Fiscal Year*'),
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'),
             'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year*'),
             'local_currency': ugettext_noop('Local Currency Code*'),
