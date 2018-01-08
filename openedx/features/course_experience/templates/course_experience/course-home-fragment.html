@@ -114,8 +114,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                 </div>
             % endif
             % if upgrade_url and upgrade_price:
-                <div class="section section-upgrade">
+                <div class="section section-upgrade course-home-sidebar-upgrade">
                     <h3 class="hd hd-6">${_("Pursue a verified certificate")}</h3>
+                        <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                         <div class="upgrade-container">
                             <p>
                                 <a class="btn-brand btn-upgrade"
@@ -127,7 +128,6 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                             </p>
                     <p><button class="btn-link btn-small promo-learn-more">${_('Learn More')}</button></p>
                         </div>
-                        <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                 </div>
             % endif
             % if dates_fragment:
