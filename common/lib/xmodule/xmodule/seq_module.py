@@ -158,7 +158,7 @@ class ProctoringFields(object):
 
 @XBlock.wants('proctoring')
 @XBlock.wants('verification')
-@XBlock.wants('milestones')
+@XBlock.wants('gating')
 @XBlock.wants('credit')
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
@@ -230,8 +230,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             banner_text, special_html = special_html_view
             if special_html and not masquerading_as_specific_student:
                 return Fragment(special_html)
-        else:
-            banner_text = self._gated_content_staff_banner()
         return self._student_view(context, banner_text)
 
     def _special_exam_student_view(self):
@@ -269,20 +267,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             return banner_text, hidden_content_html
 
-    def _gated_content_staff_banner(self):
-        """
-        Checks whether the content is gated for learners. If so,
-        returns a banner_text depending on whether user is staff.
-        """
-        milestones_service = self.runtime.service(self, 'milestones')
-        if milestones_service:
-            content_milestones = milestones_service.get_course_content_milestones(
-                self.course_id, self.location, 'requires'
-            )
-            banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
-            if content_milestones and self.runtime.user_is_staff:
-                return banner_text
-
     def _can_user_view_content(self, course):
         """
         Returns whether the runtime user can view the content
@@ -306,10 +290,20 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         display_items = self.get_display_items()
         self._update_position(context, len(display_items))
+        prereq_met = True
+
+        if self._is_prereq_required():
+            if self.runtime.user_is_staff:
+                banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+            else:
+                # check if prerequiste has been met
+                prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
+        if prereq_met and not self._is_gate_fulfilled():
+            banner_text = _('This section is a prerequiste. You must complete this section in order to unlock additional content.')
 
         fragment = Fragment()
         params = {
-            'items': self._render_student_view_for_items(context, display_items, fragment),
+            'items': self._render_student_view_for_items(context, display_items, fragment) if prereq_met else [],
             'element_id': self.location.html_id(),
             'item_id': self.location.to_deprecated_string(),
             'position': self.position,
@@ -319,6 +313,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
             'disable_navigation': not self.is_user_authenticated(context),
+            'gate_content': not prereq_met,
+            'prereq_url': prereq_meta_info['url'] if not prereq_met else None,
+            'prereq_section_name': prereq_meta_info['display_name'] if not prereq_met else None,
+            'gated_section_name': self.display_name
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
@@ -326,6 +324,56 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         self._capture_current_unit_metrics(display_items)
 
         return fragment
+
+    def _is_gate_fulfilled(self):
+        """
+        Determines if this section is a prereq and has any unfulfilled milestones.
+
+        Returns:
+            True if section has no unfufilled milestones or is not a prerequiste.
+            False otherwise
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            fulfilled = gating_service.is_gate_fulfilled(
+                self.course_id, self.location, self.runtime.user_id
+            )
+            return fulfilled
+
+        return True
+
+    def _is_prereq_required(self):
+        """
+        Checks whether a prerequiste is required for this Section
+
+        Returns:
+            milestone if a prereq is required, False otherwise
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            milestone = gating_service.is_prereq_required(
+                self.course_id, self.location, 'requires'
+            )
+            return milestone
+
+        return False
+
+    def _compute_is_prereq_met(self, recalc_on_unmet):
+        """
+        Evaluate if the user has completed the prerequiste
+
+        Arguments:
+            recalc_on_unmet: Recalculate the subsection grade if prereq has not yet been met
+
+        Returns:
+            tuple: True|False,
+            prereq_meta_info = { 'url': prereq_url, 'display_name': prereq_name}
+        """
+        gating_service = self.runtime.service(self, 'gating')
+        if gating_service:
+            return gating_service.compute_is_prereq_met(self.location, self.runtime.user_id, recalc_on_unmet)
+
+        return True, {}
 
     def _update_position(self, context, number_of_display_items):
         """

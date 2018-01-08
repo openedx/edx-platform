@@ -367,6 +367,9 @@ def get_course_content_milestones(course_id, content_id, relationship, user_id=N
             user={"id": user_id}
         )
 
+    if content_id is None:
+        return request_cache_dict[user_id][relationship]
+
     return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == unicode(content_id)]
 
 

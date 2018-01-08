@@ -23,6 +23,13 @@
     </button>
     <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
       <ol id="sequence-list" role="tablist">
+        % if gate_content:
+        <li>
+          <button class="active nav-item tab" aria-hidden="true" disabled>
+            <span class="icon fa fa-lock" aria-hidden="true"></span>
+          </button>
+        </li> 
+        % else:
         % for idx, item in enumerate(items):
         <li role="presentation">
           <button class="seq_${item['type']} inactive nav-item tab"
@@ -44,10 +51,14 @@
           </button>
         </li>
         % endfor
+        % endif
       </ol>
     </nav>
   </div>
 
+  % if gate_content:
+    <%include file="_gated_content.html" args="prereq_url=prereq_url, prereq_section_name=prereq_section_name, gated_section_name=gated_section_name"/>
+  % else:
   <div class="sr-is-focusable" tabindex="-1"></div>
 
   % for idx, item in enumerate(items):
@@ -59,6 +70,7 @@
   </div>
   % endfor
   <div id="seq_content" role="tabpanel"></div>
+  % endif
 
   <nav class="sequence-bottom" aria-label="${_('Section')}">
     <button class="sequence-nav-button button-previous">
