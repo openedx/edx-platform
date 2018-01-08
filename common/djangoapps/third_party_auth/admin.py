@@ -54,7 +54,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name_with_update_link', 'enabled', 'site', 'backend_name', 'entity_id', 'metadata_source',
+            'name_with_update_link', 'enabled', 'site', 'entity_id', 'metadata_source',
             'has_data', 'mode', 'change_date', 'changed_by',
         )
 
