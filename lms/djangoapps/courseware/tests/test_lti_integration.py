@@ -173,7 +173,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
     def expected_handler_url(self, handler):
         """convenience method to get the reversed handler urls"""
         return "https://{}{}".format(settings.SITE_NAME, reverse(
-            'courseware.module_render.handle_xblock_callback_noauth',
+            'xblock_handler_noauth',
             args=[
                 self.course.id.to_deprecated_string(),
                 quote_slashes(unicode(self.lti_published.scope_ids.usage_id.to_deprecated_string()).encode('utf-8')),
