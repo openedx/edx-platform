@@ -35,7 +35,7 @@ for db in "${database_order[@]}"; do
     output_file="common/test/db_cache/bok_choy_${db}_migrations.yaml"
     # Redirect stdout to /dev/null because the script will print
     # out all migrations to both stdout and the output file.
-    ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file 1>/dev/null
+    ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file
 done
 
 echo "DROP DATABASE IF EXISTS calculate_migrations;" | mysql $MYSQL_HOST -u root
