@@ -36,9 +36,21 @@ function getAssignmentCounts(types, assignments) {
   return arrayToObject(countsArray);
 }
 
+function getStreakIcons(count) {
+  return Array.apply(null, { length: count }).map((e, i) => (
+    <span className="fa fa-trophy" aria-hidden="true" key={i}></span>
+  ));
+}
+
+function getStreakString(count) {
+  const unit = (count ===1) ? 'week' : 'weeks';
+  return `Logged in ${count} ${unit} in a row`;
+}
+
 export function LearnerAnalyticsDashboard(props) {
 console.log('props: ', props);
   const {grading_policy, grades, schedule} = props;
+  const week_streak = 7;
 
   const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
     return {
@@ -107,6 +119,11 @@ console.log('props: ', props);
         <h2 className="group-heading">Timing</h2>
         <h3 className="section-heading">Course due dates</h3>
         <DueDates dates={schedule} assignmentCounts={assignmentCounts} />
+        <div className="week-streak-wrapper">
+          <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>
+          <h3 className="section-heading">Week streak</h3>
+          <p>{getStreakString(week_streak)}</p>
+        </div>
       </div>
     </div>
   );
