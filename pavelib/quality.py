@@ -3,6 +3,7 @@
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
+from datetime import datetime
 import json
 import os
 import re
@@ -99,15 +100,22 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
 
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
-            sh(
-                "pylint {flags} --output-format=parseable {apps} "
-                "> {report_dir}/pylint.report".format(
-                    flags=" ".join(flags),
-                    apps=apps_list,
-                    report_dir=report_dir
-                ),
-                ignore_error=True,
-            )
+            if os.path.isfile(system_report):
+                os.remove(system_report)
+            for app in apps_list:
+                start = datetime.utcnow()
+                sh(
+                    "pylint {flags} --output-format=parseable --score=n --persistent=no {apps} "
+                    ">> {report}".format(
+                        flags=" ".join(flags),
+                        apps=app,
+                        report=system_report
+                    ),
+                    ignore_error=True,
+                )
+                duration = (datetime.utcnow() - start).total_seconds()
+                with open(system_report, "a") as report_file:
+                    report_file.write("== {} {} seconds processing time ==\n\n".format(app, duration))
 
         num_violations += _count_pylint_violations(system_report)
         with open(system_report) as report_contents:
