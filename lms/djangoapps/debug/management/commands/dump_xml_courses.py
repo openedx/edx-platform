@@ -14,6 +14,7 @@ import json
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from path import Path as path
+from six import text_type
 
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -42,7 +43,7 @@ class Command(BaseCommand):
         for course_id, course_modules in xml_module_store.modules.iteritems():
             course_path = course_id.replace('/', '_')
             for location, descriptor in course_modules.iteritems():
-                location_path = location.to_deprecated_string().replace('/', '_')
+                location_path = text_type(location).replace('/', '_')
                 data = {}
                 for field_name, field in descriptor.fields.iteritems():
                     try:

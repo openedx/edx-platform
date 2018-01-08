@@ -8,7 +8,7 @@ structure:
     '_id': <location.as_dict>,
     'metadata': <dict containing all Scope.settings fields>
     'definition': <dict containing all Scope.content fields>
-    'definition.children': <list of all child location.to_deprecated_string()s>
+    'definition.children': <list of all child text_type(location)s>
 }
 """
 

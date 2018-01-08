@@ -19,6 +19,7 @@ from pytz import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
+from six import text_type
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
@@ -270,7 +271,7 @@ def grade_histogram(module_id):
         WHERE courseware_studentmodule.module_id=%s
         GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(query, [module_id.to_deprecated_string()])
+    cursor.execute(query, [text_type(module_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -305,7 +306,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
 
         if is_studio_course:
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            edit_link = "//" + settings.CMS_BASE + '/container/' + unicode(block.location)
+            edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
 
             # return edit link in rendered HTML for display
             return wrap_fragment(

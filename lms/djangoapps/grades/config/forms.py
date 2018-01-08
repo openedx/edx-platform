@@ -6,6 +6,7 @@ import logging
 from django import forms
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
 from lms.djangoapps.grades.config.models import CoursePersistentGradesFlag
 from xmodule.modulestore.django import modulestore
@@ -30,7 +31,7 @@ class CoursePersistentGradesAdminForm(forms.ModelForm):
             raise forms.ValidationError(msg)
 
         if not modulestore().has_course(course_key):
-            msg = u'Course not found. Entered course id was: "{0}". '.format(course_key.to_deprecated_string())
+            msg = u'Course not found. Entered course id was: "{0}". '.format(text_type(course_key))
             raise forms.ValidationError(msg)
 
         return course_key

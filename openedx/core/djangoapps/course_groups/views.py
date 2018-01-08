@@ -16,6 +16,7 @@ from django.utils.translation import ugettext
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
@@ -377,6 +378,6 @@ def debug_cohort_mgmt(request, course_key_string):
 
     context = {'cohorts_url': reverse(
         'cohorts',
-        kwargs={'course_key': course_key.to_deprecated_string()}
+        kwargs={'course_key': text_type(course_key)}
     )}
     return render_to_response('/course_groups/debug.html', context)

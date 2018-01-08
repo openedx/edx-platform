@@ -16,6 +16,7 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from pytz import common_timezones_set, UTC
+from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
@@ -198,7 +199,7 @@ class RoleTestCase(UserApiTestCase):
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={
             "page_size": 3,
-            "course_id": self.course_id.to_deprecated_string(),
+            "course_id": text_type(self.course_id),
         })
         self.assertEqual(first_page["count"], 5)
         first_page_next_uri = first_page["next"]

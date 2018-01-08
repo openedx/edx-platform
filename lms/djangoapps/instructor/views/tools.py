@@ -9,6 +9,7 @@ from django.http import HttpResponseBadRequest
 from pytz import UTC
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+from six import text_type
 
 from courseware.field_overrides import disable_overrides
 from courseware.models import StudentFieldOverride
@@ -106,7 +107,7 @@ def find_unit(course, url):
         """
         Find node in course tree for url.
         """
-        if node.location.to_deprecated_string() == url:
+        if text_type(node.location) == url:
             return node
         for child in node.get_children():
             found = find(child, url)
@@ -150,7 +151,7 @@ def title_or_url(node):
     """
     title = getattr(node, 'display_name', None)
     if not title:
-        title = node.location.to_deprecated_string()
+        title = text_type(node.location)
     return title
 
 

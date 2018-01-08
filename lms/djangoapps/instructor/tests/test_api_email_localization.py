@@ -7,6 +7,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -45,7 +46,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         """
         Update the current student enrollment status.
         """
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         args = {'identifiers': student_email, 'email_students': 'true', 'action': action, 'reason': 'testing'}
         response = self.client.post(url, args)
         return response
@@ -81,7 +82,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         self.check_outbox_is_french()
 
     def test_set_beta_role(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
         self.client.post(url, {'identifiers': self.student.email, 'action': 'add', 'email_students': 'true'})
 
         self.check_outbox_is_french()

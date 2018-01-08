@@ -23,6 +23,7 @@ from freezegun import freeze_time
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from six import text_type
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
@@ -198,7 +199,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.client.login(username=self.user.username, password="password")
 
     def test_add_course_to_cart_anon(self):
-        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('add_course_to_cart', args=[text_type(self.course_key)]))
         self.assertEqual(resp.status_code, 403)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
@@ -260,7 +261,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         # add first course to user cart
         resp = self.client.post(
-            reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()])
+            reverse('add_course_to_cart', args=[text_type(self.course_key)])
         )
         self.assertEqual(resp.status_code, 200)
         # add and apply the coupon code to course in the cart
@@ -273,7 +274,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         #now add the second course to cart, the coupon code should be
         # applied when adding the second course to the cart
         resp = self.client.post(
-            reverse('add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()])
+            reverse('add_course_to_cart', args=[text_type(self.testing_course.id)])
         )
         self.assertEqual(resp.status_code, 200)
         #now check the user cart and see that the discount has been applied on both the courses
@@ -286,9 +287,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('add_course_to_cart', args=[text_type(self.course_key)]))
         self.assertEqual(resp.status_code, 400)
-        self.assertIn('The course {0} is already in your cart.'.format(self.course_key.to_deprecated_string()), resp.content)
+        self.assertIn('The course {0} is already in your cart.'.format(text_type(self.course_key)), resp.content)
 
     def test_course_discount_invalid_coupon(self):
         self.add_coupon(self.course_key, True, self.coupon_code)
@@ -428,7 +429,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn("Discount does not exist against code '{0}'.".format(self.coupon_code), resp.content)
 
     def test_course_does_not_exist_in_cart_against_valid_coupon(self):
-        course_key = self.course_key.to_deprecated_string() + 'testing'
+        course_key = text_type(self.course_key) + 'testing'
         self.add_coupon(course_key, True, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
 
@@ -441,7 +442,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         test to redeem inactive registration code and
         it returns an error.
         """
-        course_key = self.course_key.to_deprecated_string()
+        course_key = text_type(self.course_key)
         self.add_reg_code(course_key, is_valid=False)
         self.add_course_to_user_cart(self.course_key)
 
@@ -454,7 +455,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
                 enrollment_code=self.reg_code), resp.content)
 
     def test_course_does_not_exist_in_cart_against_valid_reg_code(self):
-        course_key = self.course_key.to_deprecated_string() + 'testing'
+        course_key = text_type(self.course_key) + 'testing'
         self.add_reg_code(course_key)
         self.add_course_to_user_cart(self.course_key)
 
@@ -463,7 +464,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn("Code '{0}' is not valid for any course in the shopping cart.".format(self.reg_code), resp.content)
 
     def test_cart_item_qty_greater_than_1_against_valid_reg_code(self):
-        course_key = self.course_key.to_deprecated_string()
+        course_key = text_type(self.course_key)
         self.add_reg_code(course_key)
         item = self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
@@ -477,7 +478,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     @ddt.data(True, False)
     def test_reg_code_uses_associated_mode(self, expired_mode):
         """Tests the use of reg codes on verified courses, expired or active. """
-        course_key = self.course_key.to_deprecated_string()
+        course_key = text_type(self.course_key)
         expiration_date = self.yesterday if expired_mode else self.tomorrow
         self._add_course_mode(mode_slug='verified', expiration_date=expiration_date)
         self.add_reg_code(course_key, mode_slug='verified')
@@ -489,7 +490,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     @ddt.data(True, False)
     def test_reg_code_uses_unknown_mode(self, expired_mode):
         """Tests the use of reg codes on verified courses, expired or active. """
-        course_key = self.course_key.to_deprecated_string()
+        course_key = text_type(self.course_key)
         expiration_date = self.yesterday if expired_mode else self.tomorrow
         self._add_course_mode(mode_slug='verified', expiration_date=expiration_date)
         self.add_reg_code(course_key, mode_slug='bananas')
@@ -618,7 +619,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_upgrade_from_valid_reg_code(self):
         """Use a valid registration code to upgrade from honor to verified mode. """
         # Ensure the course has a verified mode
-        course_key = self.course_key.to_deprecated_string()
+        course_key = text_type(self.course_key)
         self._add_course_mode(mode_slug='verified')
         self.add_reg_code(course_key, mode_slug='verified')
 
@@ -769,9 +770,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
         self.login_user()
-        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(reverse('add_course_to_cart', args=[text_type(self.course_key)]))
         self.assertEqual(resp.status_code, 400)
-        self.assertIn('You are already registered in course {0}.'.format(self.course_key.to_deprecated_string()), resp.content)
+        self.assertIn('You are already registered in course {0}.'.format(text_type(self.course_key)), resp.content)
 
     def test_add_nonexistent_course_to_cart(self):
         self.login_user()
@@ -781,8 +782,8 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
     def test_add_course_to_cart_success(self):
         self.login_user()
-        reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()])
-        resp = self.client.post(reverse('add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        reverse('add_course_to_cart', args=[text_type(self.course_key)])
+        resp = self.client.post(reverse('add_course_to_cart', args=[text_type(self.course_key)]))
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
@@ -1435,7 +1436,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             'edx.course.enrollment.upgrade.succeeded',
             {
                 'user_id': self.user.id,
-                'course_id': self.verified_course_key.to_deprecated_string(),
+                'course_id': text_type(self.verified_course_key),
                 'mode': 'verified'
             }
         )
@@ -1446,7 +1447,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         """
         CourseEnrollment.enroll(self.user, self.course_key)
         self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.course.id)}))
+        resp = self.client.get(reverse('courseware', kwargs={'course_id': text_type(self.course.id)}))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('<a class="shopping-cart"', resp.content)
 
@@ -1483,7 +1484,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.testing_course.id)
         with patch('microsite_configuration.microsite.is_request_in_microsite',
                    Mock(return_value=True)):
-            resp = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.course.id)}))
+            resp = self.client.get(reverse('courseware', kwargs={'course_id': text_type(self.course.id)}))
             self.assertEqual(resp.status_code, 200)
             self.assertNotIn('<a class="shopping-cart"', resp.content)
 
@@ -1798,7 +1799,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         CourseSalesAdminRole(self.course.id).add_users(instructor)
 
         url = reverse('generate_registration_codes',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+                      kwargs={'course_id': text_type(self.course.id)})
 
         data = {
             'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',

@@ -18,6 +18,7 @@ from django.test.client import RequestFactory
 from django.utils.timezone import now
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
@@ -69,8 +70,8 @@ class ProblemSubmissionTestMixin(TestCase):
         return reverse(
             'xblock_handler',
             kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
-                'usage_id': quote_slashes(problem_location.to_deprecated_string()),
+                'course_id': text_type(self.course.id),
+                'usage_id': quote_slashes(text_type(problem_location)),
                 'handler': 'xmodule_handler',
                 'suffix': dispatch,
             }
@@ -602,7 +603,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3').to_deprecated_string(): {
+                text_type(self.problem_location('p3')): {
                     'points_earned': 1,
                     'points_possible': 1,
                     'created_at': now(),
@@ -612,7 +613,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
             # Verify that the submissions API was sent an anonymized student ID
             mock_get_scores.assert_called_with(
-                self.course.id.to_deprecated_string(),
+                text_type(self.course.id),
                 anonymous_id_for_user(self.student_user, self.course.id)
             )
 

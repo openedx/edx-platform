@@ -26,6 +26,7 @@ from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.tests.util import expected_redirect_url
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import change_enrollment
@@ -528,7 +529,7 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
                 request = self.request_factory.post('/change_enrollment')
 
                 request.POST.update({'enrollment_action': 'enroll',
-                                     'course_id': course.id.to_deprecated_string()})
+                                     'course_id': text_type(course.id)})
                 request.user = student
                 response = change_enrollment(request)
                 # If course is not limited or student has correct shib extauth then enrollment should be allowed
@@ -570,7 +571,7 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
         self.client.logout()
         params = [
-            ('course_id', course.id.to_deprecated_string()),
+            ('course_id', text_type(course.id)),
             ('enrollment_action', 'enroll'),
             ('next', '/testredirect')
         ]

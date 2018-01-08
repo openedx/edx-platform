@@ -32,6 +32,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from six import text_type
 
 import instructor_analytics.basic
 import instructor_analytics.csvs
@@ -952,7 +953,7 @@ def list_course_role_members(request, course_id):
         }
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         rolename: map(extract_user_info, list_with_level(
             course, rolename
         )),
@@ -1014,7 +1015,7 @@ def get_grading_config(request, course_id):
     grading_config_summary = instructor_analytics.basic.dump_grading_context(course)
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         'grading_config_summary': grading_config_summary,
     }
     return JsonResponse(response_payload)
@@ -1041,7 +1042,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
             item['created_by'] = item['created_by'].username
 
         response_payload = {
-            'course_id': course_id.to_deprecated_string(),
+            'course_id': text_type(course_id),
             'sale': sale_data,
             'queried_features': query_features
         }
@@ -1669,7 +1670,7 @@ def generate_registration_codes(request, course_id):
     discount = (float(quantity * course_price) - float(sale_price))
     course_url = '{base_url}{course_about}'.format(
         base_url=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-        course_about=reverse('about_course', kwargs={'course_id': course_id.to_deprecated_string()})
+        course_about=reverse('about_course', kwargs={'course_id': text_type(course_id)})
     )
     dashboard_url = '{base_url}{dashboard}'.format(
         base_url=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
@@ -1821,14 +1822,14 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(unicode(filename).encode('utf-8'))
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
         # but trying to do the right thing anyway.
-        encoded = [unicode(s).encode('utf-8') for s in header]
+        encoded = [text_type(s).encode('utf-8') for s in header]
         writer.writerow(encoded)
         for row in rows:
-            encoded = [unicode(s).encode('utf-8') for s in row]
+            encoded = [text_type(s).encode('utf-8') for s in row]
             writer.writerow(encoded)
         return response
 
@@ -1837,7 +1838,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     ).order_by('id')
     header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
     rows = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_id, save=False)] for s in students]
-    return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
+    return csv_response(text_type(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @require_POST
@@ -1861,10 +1862,10 @@ def get_student_progress_url(request, course_id):
     course_id = CourseKey.from_string(course_id)
     user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
-    progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
+    progress_url = reverse('student_progress', kwargs={'course_id': text_type(course_id), 'student_id': user.id})
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         'progress_url': progress_url,
     }
     return JsonResponse(response_payload)
@@ -2513,7 +2514,7 @@ def list_forum_members(request, course_id):
         }
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         rolename: map(extract_user_info, users),
         'division_scheme': course_discussion_settings.division_scheme,
     }
@@ -2590,7 +2591,7 @@ def send_email(request, course_id):
     lms.djangoapps.instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         'success': True,
     }
 
@@ -2657,7 +2658,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Role does not exist.")
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         'action': action,
     }
     return JsonResponse(response_payload)
@@ -2684,9 +2685,9 @@ def _display_unit(unit):
     """
     name = getattr(unit, 'display_name', None)
     if name:
-        return u'{0} ({1})'.format(name, unit.location.to_deprecated_string())
+        return u'{0} ({1})'.format(name, text_type(unit.location))
     else:
-        return unit.location.to_deprecated_string()
+        return text_type(unit.location)
 
 
 @handle_dashboard_error

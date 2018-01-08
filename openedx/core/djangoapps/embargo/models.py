@@ -24,6 +24,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django_countries import countries
 from django_countries.fields import CountryField
+from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
@@ -65,7 +66,7 @@ class EmbargoedCourse(models.Model):
         if self.embargoed:
             not_em = ""
         # pylint: disable=no-member
-        return u"Course '{}' is {}Embargoed".format(self.course_id.to_deprecated_string(), not_em)
+        return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
 class EmbargoedState(ConfigurationModel):

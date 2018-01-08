@@ -14,6 +14,7 @@ from django.utils.translation import get_language
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.models import StudentModule
@@ -417,8 +418,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         # Create a submission and score for the student using the submissions API
         student_item = {
             'student_id': anonymous_id_for_user(user, self.course_key),
-            'course_id': self.course_key.to_deprecated_string(),
-            'item_id': problem_location.to_deprecated_string(),
+            'course_id': text_type(self.course_key),
+            'item_id': text_type(problem_location),
             'item_type': 'openassessment'
         }
         submission = sub_api.create_submission(student_item, 'test answer')
@@ -727,7 +728,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         site = settings.SITE_NAME
         cls.course_url = u'https://{}/courses/{}/'.format(
             site,
-            cls.course.id.to_deprecated_string()
+            text_type(cls.course.id)
         )
         cls.course_about_url = cls.course_url + 'about'
         cls.registration_url = u'https://{}/register'.format(site)

@@ -4,6 +4,7 @@ Test for split test XModule
 from django.core.urlresolvers import reverse
 from mock import MagicMock
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -118,7 +119,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
 
         resp = self.client.get(reverse(
             'courseware_section',
-            kwargs={'course_id': self.course.id.to_deprecated_string(),
+            kwargs={'course_id': text_type(self.course.id),
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name}
         ))

@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from class_dashboard.dashboard_data import (
@@ -169,7 +170,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_problem_grades(self):
 
-        attributes = '?module_id=' + self.item.location.to_deprecated_string()
+        attributes = '?module_id=' + text_type(self.item.location)
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -187,7 +188,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     def test_get_students_problem_grades_max(self):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
-            attributes = '?module_id=' + self.item.location.to_deprecated_string()
+            attributes = '?module_id=' + text_type(self.item.location)
             request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
             response = get_students_problem_grades(request)
@@ -201,7 +202,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     def test_get_students_problem_grades_csv(self):
 
         tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
-        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + text_type(self.item.location) + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -221,7 +222,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_opened_subsection(self):
 
-        attributes = '?module_id=' + self.item.location.to_deprecated_string()
+        attributes = '?module_id=' + text_type(self.item.location)
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
@@ -234,7 +235,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
 
-            attributes = '?module_id=' + self.item.location.to_deprecated_string()
+            attributes = '?module_id=' + text_type(self.item.location)
             request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
             response = get_students_opened_subsection(request)
@@ -248,7 +249,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     def test_get_students_opened_subsection_csv(self):
 
         tooltip = '4162 students opened Subsection 5: Relational Algebra Exercises'
-        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + text_type(self.item.location) + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
@@ -267,7 +268,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         data = json.dumps({'sections': sections,
                            'tooltips': tooltips,
-                           'course_id': course_id.to_deprecated_string(),
+                           'course_id': text_type(course_id),
                            'data_type': data_type,
                            })
 
@@ -303,7 +304,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         data = json.dumps({'sections': sections,
                            'tooltips': tooltips,
-                           'course_id': course_id.to_deprecated_string(),
+                           'course_id': text_type(course_id),
                            'data_type': data_type,
                            })
 

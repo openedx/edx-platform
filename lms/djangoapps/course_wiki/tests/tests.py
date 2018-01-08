@@ -5,6 +5,7 @@ Tests for course wiki
 from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.tests.tests import LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -49,7 +50,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.enroll(self.toy)
 
-        referer = reverse("progress", kwargs={'course_id': self.toy.id.to_deprecated_string()})
+        referer = reverse("progress", kwargs={'course_id': text_type(self.toy.id)})
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         redirected_to = referer.replace("progress", "wiki/some/fake/wiki/page/")
@@ -78,7 +79,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.enroll(self.toy)
 
-        referer = reverse("progress", kwargs={'course_id': self.toy.id.to_deprecated_string()})
+        referer = reverse("progress", kwargs={'course_id': text_type(self.toy.id)})
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         resp = self.client.get(destination, HTTP_REFERER=referer)
@@ -90,8 +91,8 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         The user must be enrolled in the course to see the page.
         """
 
-        course_wiki_home = reverse('course_wiki', kwargs={'course_id': course.id.to_deprecated_string()})
-        referer = reverse("progress", kwargs={'course_id': course.id.to_deprecated_string()})
+        course_wiki_home = reverse('course_wiki', kwargs={'course_id': text_type(course.id)})
+        referer = reverse("progress", kwargs={'course_id': text_type(course.id)})
 
         resp = self.client.get(course_wiki_home, follow=True, HTTP_REFERER=referer)
 
@@ -123,7 +124,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.create_course_page(self.toy)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': self.toy.id.to_deprecated_string()})
+        referer = reverse("courseware", kwargs={'course_id': text_type(self.toy.id)})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
 
@@ -143,7 +144,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.login(self.student, self.password)
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': self.toy.id.to_deprecated_string()})
+        referer = reverse("courseware", kwargs={'course_id': text_type(self.toy.id)})
 
         # When not enrolled, we should get a 302
         resp = self.client.get(course_wiki_page, follow=False, HTTP_REFERER=referer)
@@ -153,7 +154,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         target_url, __ = resp.redirect_chain[-1]
         self.assertTrue(
-            target_url.endswith(reverse('about_course', args=[self.toy.id.to_deprecated_string()]))
+            target_url.endswith(reverse('about_course', args=[text_type(self.toy.id)]))
         )
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
@@ -198,7 +199,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.create_course_page(course)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': course.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': course.id.to_deprecated_string()})
+        referer = reverse("courseware", kwargs={'course_id': text_type(course.id)})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 200)
