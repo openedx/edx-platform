@@ -29,14 +29,7 @@
         <div class='transcript-actions'>
             <a
                 class="button-link download-transcript-button"
-                href="<%- StringUtils.interpolate(
-                    '{transcriptDownloadHandlerUrl}?edx_video_id={edxVideoID}&language_code={transcriptLanguageCode}',
-                    {
-                        transcriptDownloadHandlerUrl: transcriptDownloadHandlerUrl,
-                        edxVideoID: edxVideoID,
-                        transcriptLanguageCode: transcriptLanguageCode
-                    }
-                ) %>"
+                href="<%- getTranscriptDownloadLink(edxVideoID, transcriptLanguageCode, transcriptDownloadHandlerUrl) %>"
             >
                 <%- gettext('Download') %>
             </a>
