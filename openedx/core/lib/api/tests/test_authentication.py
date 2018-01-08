@@ -18,6 +18,7 @@ from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.http import urlencode
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
@@ -76,10 +77,9 @@ urlpatterns = [
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @pytest.mark.django111_expected_failure
+@override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
-    urls = 'openedx.core.lib.api.tests.test_authentication'
-
     def setUp(self):
         super(OAuth2Tests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
