@@ -18,8 +18,8 @@ function arrayToObject(array) {
 
 function countByType(type, assignments) {
   let count = 0;
-  assignments.map((value) => {
-    if (value === type) {
+  assignments.map(({format}) => {
+    if (format === type) {
       count += 1;
     }
   })
@@ -38,7 +38,7 @@ function getAssignmentCounts(types, assignments) {
 
 export function LearnerAnalyticsDashboard(props) {
 console.log('props: ', props);
-  const {grading_policy, grades} = props;
+  const {grading_policy, grades, schedule} = props;
 
   const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
     return {
@@ -51,7 +51,7 @@ console.log('props: ', props);
   // Get a list of assignment types minus duplicates
   const assignments = gradeBreakdown.map(value => value['label']);
   const assignmentTypes = [...new Set(assignments)];
-  const assignmentCounts = getAssignmentCounts(assignmentTypes, assignments);
+  const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
   const assignmentCountz = {
     Homework: 2,
     Exam: 1
@@ -78,20 +78,20 @@ console.log('counts: ', assignmentCounts);
     }
   ];
 
-  const dates = [
-    {
-      format: 'Homework',
-      due: '2018-02-01T00:00:00+00:00'
-    },
-    {
-      format: 'Homework',
-      due: '2017-12-29T01:30:00+00:00'
-    },
-    {
-      format: 'Exam',
-      due: '2018-05-27T01:30:00+00:00'
-    }
-  ];
+  // const dates = [
+  //   {
+  //     format: 'Homework',
+  //     due: '2018-02-01T00:00:00+00:00'
+  //   },
+  //   {
+  //     format: 'Homework',
+  //     due: '2017-12-29T01:30:00+00:00'
+  //   },
+  //   {
+  //     format: 'Exam',
+  //     due: '2018-05-27T01:30:00+00:00'
+  //   }
+  // ];
 
   return (
     <div className="learner-analytics-wrapper">
@@ -126,7 +126,7 @@ console.log('counts: ', assignmentCounts);
       <div className="analytics-group sidebar">
         <h2 className="group-heading">Timing</h2>
         <h3 className="section-heading">Course due dates</h3>
-        <DueDates dates={dates} assignmentCounts={assignmentCounts} />
+        <DueDates dates={schedule} assignmentCounts={assignmentCounts} />
       </div>
     </div>
   );
