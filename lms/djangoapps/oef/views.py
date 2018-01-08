@@ -15,7 +15,7 @@ def oef_dashboard(request):
     View for OEF dashboard
 
     """
-    user_surveys = UserOefSurvey.objects.filter(user_id=request.user.id)
+    user_surveys = OrganizationOefScore.objects.filter(user_id=request.user.id)
     surveys = []
     user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
     for survey in user_surveys:
@@ -44,15 +44,16 @@ def get_survey_by_id(request, user_survey_id):
     """
     Get a particular survey by its id
     """
-    uos = UserOefSurvey.objects.get(id=int(user_survey_id), user_id=request.user.id)
-    survey = uos.survey
-    topics = get_survey_topics(uos, survey.id)
-    levels = get_option_levels()
-    return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
-                                                   "is_completed": uos.status == 'completed',
-                                                   "topics": topics,
-                                                   "levels": levels
-                                                   })
+    pass
+    # uos = UserOefSurvey.objects.get(id=int(user_survey_id), user_id=request.user.id)
+    # survey = uos.survey
+    # topics = get_survey_topics(uos, survey.id)
+    # levels = get_option_levels()
+    # return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+    #                                                "is_completed": uos.status == 'completed',
+    #                                                "topics": topics,
+    #                                                "levels": levels
+    #                                                })
 
 
 @login_required
@@ -66,13 +67,13 @@ def fetch_survey(request):
         return redirect(reverse('oef_dashboard'))
 
     uos = get_user_survey(request.user, survey_info['survey'])
-    survey = uos.survey
+    survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
     topics = get_survey_topics(uos, survey.id)
     levels = get_option_levels()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
                                                    "topics": topics,
                                                    "levels": levels,
-                                                   'is_completed': uos.status == 'completed',
+                                                   'is_completed': False,
                                                    })
 
 
@@ -82,17 +83,13 @@ def save_answer(request):
     Save answers submitted by user
     """
     data = json.loads(request.body)
-    survey_id = int(data['survey_id'])
-    uos = UserOefSurvey.objects.get(survey_id=survey_id, user_id=request.user.id)
+    uos = OrganizationOefScore.objects.filter(user_id=request.user.id).latest('start_date')
 
     for answer_data in data['answers']:
-        question_id = int(answer_data['topic_id'])
+        setattr(uos, answer_data['score_name'], int(float(answer_data['answer_id'])))
+        uos.save()
 
-        answer = get_answer(uos, question_id) or create_answer(uos, answer_data)
-        answer.selected_option = get_option(float(answer_data['answer_id']))
-        answer.save()
-
-    check_if_complete(uos, len(data['answers']))
+    # check_if_complete(uos, len(data['answers']))
     return JsonResponse({
         'status': 'success'
     }, status=status.HTTP_201_CREATED)

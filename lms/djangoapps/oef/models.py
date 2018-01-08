@@ -25,6 +25,7 @@ class OptionLevel(TimeStampedModel):
 class TopicQuestion(TimeStampedModel):
     survey = models.ForeignKey(OefSurvey, related_name='topics')
     title = models.TextField()
+    score_name = models.CharField(max_length=50)
     description = models.TextField()
 
     def __str__(self):
@@ -41,40 +42,19 @@ class Option(TimeStampedModel):
         return self.text[:20]
 
 
-class UserOefSurvey(TimeStampedModel):
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-    )
-    user = models.ForeignKey(User)
-    survey = models.ForeignKey(OefSurvey)
-    started_on = models.DateField()
-    completed_on = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-
-    def __str__(self):
-        return '-'.join([self.user.username, self.survey.title])
-
-
-class UserAnswers(TimeStampedModel):
-    user_survey = models.ForeignKey(UserOefSurvey, related_name='answers')
-    question = models.ForeignKey(TopicQuestion)
-    selected_option = models.ForeignKey(OptionLevel)
-
-
 class OrganizationOefScore(TimeStampedModel):
     org = models.ForeignKey(Organization, related_name="organization_oef_scores")
     user = models.ForeignKey(User, related_name="organization_oef_scores")
     start_date = models.DateField()
-    finish_date = models.DateField()
+    finish_date = models.DateField(null=True, blank=True)
     version = models.CharField(max_length=10, default="v1.0")
-    human_resource_score = models.PositiveIntegerField()
-    leadership_score = models.PositiveIntegerField()
-    financial_management_score = models.PositiveIntegerField()
-    fundraising_score = models.PositiveIntegerField()
-    measurement_score = models.PositiveIntegerField()
-    marketing_score = models.PositiveIntegerField()
-    strategy_score = models.PositiveIntegerField()
-    program_design_score = models.PositiveIntegerField()
-    external_relations_score = models.PositiveIntegerField()
-    systems_score = models.PositiveIntegerField()
+    human_resource_score = models.PositiveIntegerField(null=True, blank=True)
+    leadership_score = models.PositiveIntegerField(null=True, blank=True)
+    financial_management_score = models.PositiveIntegerField(null=True, blank=True)
+    fundraising_score = models.PositiveIntegerField(null=True, blank=True)
+    measurement_score = models.PositiveIntegerField(null=True, blank=True)
+    marketing_score = models.PositiveIntegerField(null=True, blank=True)
+    strategy_score = models.PositiveIntegerField(null=True, blank=True)
+    program_design_score = models.PositiveIntegerField(null=True, blank=True)
+    external_relations_score = models.PositiveIntegerField(null=True, blank=True)
+    systems_score = models.PositiveIntegerField(null=True, blank=True)
