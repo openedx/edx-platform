@@ -22,7 +22,7 @@ BOKCHOY_DB_FILES = [
     'bok_choy_schema_student_module_history.sql'
 ]
 
-# Output files from scripts/calculate-bokchoy-migrations.sh
+# Output files from scripts/reset-test-db.sh --calculate_migrations
 MIGRATION_OUTPUT_FILES = [
     'bok_choy_default_migrations.yaml',
     'bok_choy_student_module_history_migrations.yaml'

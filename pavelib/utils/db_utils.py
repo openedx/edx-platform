@@ -110,7 +110,7 @@ def calculate_bokchoy_migrations(migration_output_files):
     NOTE: the script first clears out the database, then calculates
           what migrations need to be run, which is all of them.
     """
-    sh('{}/scripts/calculate-bokchoy-migrations.sh'.format(Env.REPO_ROOT))
+    sh('{}/scripts/reset-test-db --calculate_migrations'.format(Env.REPO_ROOT))
     verify_files_exist(migration_output_files)
 
 
