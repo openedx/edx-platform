@@ -1191,20 +1191,6 @@ class StartDateTests(ModuleStoreTestCase):
         # This should return in the format '%Y-%m-%dT%H:%M:%S%z'
         self.assertContains(response, "2013-09-16T07:17:28+0000")
 
-    @patch(
-        'util.date_utils.pgettext',
-        fake_pgettext(translations={("abbreviated month name", "Jul"): "JULY", })
-    )
-    @patch(
-        'util.date_utils.ugettext',
-        fake_ugettext(translations={"SHORT_DATE_FORMAT": "%Y-%b-%d", })
-    )
-    @unittest.skip
-    def test_format_localized_in_xml_course(self):
-        response = self.get_about_response(CourseKey.fron_string('edX/toy/TT_2012_Fall'))
-        # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
-        self.assertContains(response, "2015-JULY-17")
-
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
