@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for masquerade.
 """
@@ -5,6 +6,7 @@ import json
 import pickle
 from datetime import datetime
 
+import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
@@ -22,6 +24,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
@@ -256,6 +259,7 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
         self.verify_show_answer_present(True)
 
 
+@ddt.ddt
 @attr(shard=1)
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
@@ -337,16 +341,23 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         content = response.content
         self.assertIn("OOGIE BLOOGIE", content)
 
+    @ddt.data(
+        'john',  # Non-unicode username
+        u'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
+    )
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_masquerade_as_specific_student(self):
+    def test_masquerade_as_specific_student(self, username):
         """
         Test masquerading as a specific user.
 
         We answer the problem in our test course as the student and as staff user, and we use the
         progress as a proxy to determine who's state we currently see.
         """
+        student = UserFactory.create(username=username)
+        CourseEnrollment.enroll(student, self.course.id)
+        self.logout()
+        self.login(student.email, 'test')
         # Answer correctly as the student, and check progress.
-        self.login_student()
         self.submit_answer('Correct', 'Correct')
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
@@ -355,7 +366,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertEqual(self.get_progress_detail(), u'0/2')
 
         # Masquerade as the student, and check we can see the student state.
-        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.update_masquerade(role='student', user_name=student.username)
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
         # Temporarily override the student state.
@@ -371,7 +382,8 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertEqual(self.get_progress_detail(), u'0/2')
 
         # Verify the student state did not change.
-        self.login_student()
+        self.logout()
+        self.login(student.email, 'test')
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
     def test_masquerading_with_language_preference(self):

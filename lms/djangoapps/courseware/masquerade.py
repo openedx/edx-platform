@@ -9,6 +9,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
@@ -71,27 +72,25 @@ def handle_ajax(request, course_key_string):
     group_id = request_json.get('group_id', None)
     user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
     user_name = request_json.get('user_name', None)
+    found_user_name = None
     if user_name:
         users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)
         try:
-            if '@' in user_name:
-                user_name = users_in_course.get(email=user_name).username
-            else:
-                users_in_course.get(username=user_name)
+            found_user_name = users_in_course.get(Q(email=user_name) | Q(username=user_name)).username
         except User.DoesNotExist:
             return JsonResponse({
                 'success': False,
                 'error': _(
-                    'There is no user with the username or email address {user_name} '
+                    'There is no user with the username or email address "{user_identifier}" '
                     'enrolled in this course.'
-                ).format(user_name=user_name)
+                ).format(user_identifier=user_name)
             })
     masquerade_settings[course_key] = CourseMasquerade(
         course_key,
         role=role,
         user_partition_id=user_partition_id,
         group_id=group_id,
-        user_name=user_name,
+        user_name=found_user_name,
     )
     request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
     return JsonResponse({'success': True})
