@@ -7,6 +7,7 @@ import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
 import GradeTable from './GradeTable';
 import DueDates from './DueDates';
+import Discussions from './Discussions';
 
 function arrayToObject(array) {
   return array.reduce((accumulator, obj) => {
@@ -54,7 +55,7 @@ function getStreakString(count) {
 
 export function LearnerAnalyticsDashboard(props) {
 console.log('props: ', props);
-  const {grading_policy, grades, schedule, week_streak, weekly_active_users} = props;
+  const {grading_policy, grades, schedule, week_streak, weekly_active_users, discussion_info} = props;
   // temp. for local dev
   // const week_streak = 3;
   // const weekly_active_users = 83400;
@@ -118,7 +119,7 @@ console.log('props: ', props);
           </div>
         </div>
         <div className="analytics-group">
-          <h2 className="group-heading">Discussions</h2>
+          <Discussions {...discussion_info} />
         </div>
       </div>
       <div className="analytics-group sidebar">
@@ -133,7 +134,7 @@ console.log('props: ', props);
           </div>
         }
         <div className="active-users-wrapper">
-          <span className="fa fa-user" aria-hidden="true"></span>
+          <span className="fa fa-user count-icon" aria-hidden="true"></span>
           <span className="user-count">{weekly_active_users.toLocaleString('en', {useGrouping:true})}</span>
           <p className="label">{getActiveUserString(weekly_active_users)}</p>
         </div>
