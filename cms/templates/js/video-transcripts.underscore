@@ -35,6 +35,8 @@
             </a>
             <span class='transcript-actions-separator'> | </span>
             <button class="button-link upload-transcript-button"><%- gettext('Replace') %></button>
+            <span class='transcript-actions-separator'> | </span>
+            <button class="button-link delete-transcript-button"><%- gettext('Delete') %></button>
         </div>
     </div>
 <% }) %>

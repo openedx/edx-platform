@@ -653,6 +653,10 @@ def videos_index_html(course):
                 'transcript_upload_handler',
                 unicode(course.id)
             ),
+            'transcript_delete_handler_url': reverse_course_url(
+                'transcript_delete_handler',
+                unicode(course.id)
+            ),
             'transcription_plans': get_3rd_party_transcription_plans(),
             'trancript_download_file_format': Transcript.SRT
         }

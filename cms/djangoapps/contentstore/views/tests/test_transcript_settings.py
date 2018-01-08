@@ -5,11 +5,13 @@ from io import BytesIO
 from mock import Mock, patch, ANY
 
 from django.test.testcases import TestCase
+from edxval import api
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from student.roles import CourseStaffRole
 
 
 @ddt.ddt
@@ -468,3 +470,112 @@ class TranscriptUploadTest(CourseTestCase):
             json.loads(response.content)['error'],
             u'There is a problem with this transcript file. Try to upload a different file.'
         )
+
+
+@ddt.ddt
+@patch(
+    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
+    Mock(return_value=True)
+)
+class TranscriptUploadTest(CourseTestCase):
+    """
+    Tests for transcript deletion handler.
+    """
+    VIEW_NAME = 'transcript_delete_handler'
+
+    def get_url_for_course_key(self, course_id, **kwargs):
+        return reverse_course_url(self.VIEW_NAME, course_id, kwargs)
+
+    def test_302_with_anonymous_user(self):
+        """
+        Verify that redirection happens in case of unauthorized request.
+        """
+        self.client.logout()
+        transcript_delete_url = self.get_url_for_course_key(self.course.id, edx_video_id='test_id', language_code='en')
+        response = self.client.delete(transcript_delete_url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_405_with_not_allowed_request_method(self):
+        """
+        Verify that 405 is returned in case of not-allowed request methods.
+        Allowed request methods include DELETE.
+        """
+        transcript_delete_url = self.get_url_for_course_key(self.course.id, edx_video_id='test_id', language_code='en')
+        response = self.client.post(transcript_delete_url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_404_with_feature_disabled(self):
+        """
+        Verify that 404 is returned if the corresponding feature is disabled.
+        """
+        transcript_delete_url = self.get_url_for_course_key(self.course.id, edx_video_id='test_id', language_code='en')
+        with patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled') as feature:
+            feature.return_value = False
+            response = self.client.delete(transcript_delete_url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_404_with_non_staff_user(self):
+        """
+        Verify that 404 is returned if the user doesn't have studio write access.
+        """
+        # Making sure that user is not a staff / course's staff.
+        self.user.is_staff = False
+        self.user.save()
+
+        # Assert the user's role
+        self.assertFalse(self.user.is_staff)
+        self.assertFalse(CourseStaffRole(self.course.id).has_user(self.user))
+
+        # Now, Make request to deletion handler
+        transcript_delete_url = self.get_url_for_course_key(self.course.id, edx_video_id='test_id', language_code='en')
+        response = self.client.delete(transcript_delete_url)
+        self.assertEqual(response.status_code, 404)
+
+    @ddt.data(
+        {
+            'is_staff': True,
+            'is_course_staff': True
+        },
+        {
+            'is_staff': False,
+            'is_course_staff': True
+        },
+        {
+            'is_staff': True,
+            'is_course_staff': False
+        },
+    )
+    @ddt.unpack
+    def test_transcript_delete_handler(self, is_staff, is_course_staff):
+        """
+        Tests that transcript delete handler works as expected with combinations of staff and course's staff.
+        """
+        # Setup user's roles
+        self.user.is_staff = is_staff
+        self.user.save()
+        course_staff_role = CourseStaffRole(self.course.id)
+        if is_course_staff:
+            course_staff_role.add_users(self.user)
+        else:
+            course_staff_role.remove_users(self.user)
+
+        # Assert the user role
+        self.assertEqual(self.user.is_staff, is_staff)
+        self.assertEqual(CourseStaffRole(self.course.id).has_user(self.user), is_course_staff)
+
+        video_id, language_code = u'1234', u'en'
+        # Create a real transcript in VAL.
+        api.create_or_update_video_transcript(
+            video_id=video_id,
+            language_code=language_code,
+            metadata={'file_format': 'srt'}
+        )
+
+        # Make request to transcript deletion handler
+        response = self.client.delete(self.get_url_for_course_key(
+            self.course.id,
+            edx_video_id=video_id,
+            language_code=language_code
+        ))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(api.get_video_transcript_data([video_id], language_code=language_code))
