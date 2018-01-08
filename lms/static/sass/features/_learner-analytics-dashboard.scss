@@ -7,7 +7,6 @@ $heading-color: #292B2C;
 $grouping-background: #f5f5f5;
 $grouping-border: #D8D8D8;
 $trophy-gold: #F39C12;
-$user-icon: #92C9D3;
 
 .content-wrapper {
   .page-content.learner-analytics-dashboard-wrapper {
@@ -220,10 +219,8 @@ $user-icon: #92C9D3;
 
   .active-users-wrapper {
     .fa-user {
-      border: 2px solid $user-icon;
+      border: 2px solid $mint-green;
       border-radius: 50%;
-      color: $user-icon;
-      font-size: 24px;
       width: 28px;
       height: 28px;
       text-align: center;
@@ -234,16 +231,12 @@ $user-icon: #92C9D3;
         height: 2px;
         width: 12px;
         position: absolute;
-        background-color: $user-icon;
+        background-color: $mint-green;
         left: 6px;
         bottom: 0;
       }
     }
 
-    .user-count {
-      font-size: 1.5em;
-      margin-left: 10px;
-    }
 
     .label {
       color: $font-color;
