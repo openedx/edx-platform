@@ -9,7 +9,7 @@
         </strong>
     </button>
 <% } else { %>
-    <span class='transcripts-empty-text'><%- gettext('No transcript available yet.') %></span>
+    <span class='transcripts-empty-text'><%- gettext('No transcript uploaded.') %></span>
 <% }%>
 <div class='show-video-transcripts-wrapper hidden'>
 <% _.each(transcripts, function(transcriptLanguageText, transcriptLanguageCode){ %>

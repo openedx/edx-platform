@@ -24,7 +24,7 @@ define(
                 this.videoTranscriptSettings = options.videoTranscriptSettings;
                 this.template = HtmlUtils.template(videoTranscriptsTemplate);
                 this.transcriptUploadStatusTemplate = HtmlUtils.template(videoTranscriptUploadStatusTemplate);
-                this.defaultFailureTitle = gettext('Your file could not be uploaded');
+                this.defaultFailureTitle = gettext('The file could not be uploaded.');
                 this.defaultFailureMessage = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'); // eslint-disable-line max-len
                 this.transcriptUploadStatuses = {
                     uploaded: {
@@ -36,7 +36,7 @@ define(
                     uploading: {
                         statusClass: '',
                         iconClasses: 'fa-spinner fa-pulse',
-                        shortMessage: 'Uploading transcript',
+                        shortMessage: 'Uploading transcript.',
                         hiddenClass: 'hidden'
                     },
                     failed: {
@@ -119,10 +119,8 @@ define(
 
                 if (fileType !== this.videoTranscriptSettings.trancript_download_file_format) {
                     errorMessage = gettext(
-                        '{filename} is not in a supported file format. ' +
-                        'Supported file format is {supportedFileFormat}.'
+                        'This file type is not supported. Supported file type is {supportedFileFormat}.'
                     )
-                    .replace('{filename}', fileName)
                     .replace('{supportedFileFormat}', this.videoTranscriptSettings.trancript_download_file_format);
                 }
 

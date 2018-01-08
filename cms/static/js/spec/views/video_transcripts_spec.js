@@ -207,7 +207,7 @@ define(
                 // Verify appropriate text is shown
                 expect(
                     videoTranscriptsView.$el.find('.transcripts-empty-text').html()
-                ).toEqual('No transcript available yet.');
+                ).toEqual('No transcript uploaded.');
             });
 
             it('renders correct transcript attributes', function() {
@@ -324,7 +324,7 @@ define(
             it('should show error message in case of unsupported transcript file format', function() {
                 var languageCode = 'en',
                     transcriptFileName = 'unsupported-transcript-file-format.txt',
-                    errorMessage = transcriptFileName + ' is not in a supported file format. Supported file format is ' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT + '.',    // eslint-disable-line max-len
+                    errorMessage = 'This file type is not supported. Supported file type is ' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT + '.',    // eslint-disable-line max-len
                     $transcriptEl = videoTranscriptsView.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
 
                 $transcriptEl.find('.upload-transcript-button').click();
