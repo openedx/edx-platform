@@ -133,7 +133,6 @@ class CourseEntitlement(TimeStampedModel):
     """
     Represents a Student's Entitlement to a Course Run for a given Course.
     """
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
     course_uuid = models.UUIDField(help_text='UUID for the Course, not the Course Run')
