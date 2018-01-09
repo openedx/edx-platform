@@ -484,7 +484,6 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
     @mock.patch('django.conf.settings.MESSAGE_STORAGE', 'django.contrib.messages.storage.cookie.CookieStorage')
     @mock.patch('lms.djangoapps.student_account.views.enterprise_customer_for_request')
-    @mock.patch('openedx.core.djangoapps.user_api.api.enterprise_customer_for_request')
     @ddt.data(
         (
             'signin_user',
@@ -498,8 +497,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             url_name,
             current_backend,
             current_provider,
-            enterprise_customer_mock_1,
-            enterprise_customer_mock_2,
+            enterprise_customer_mock,
     ):
         params = []
         request = RequestFactory().get(reverse(url_name), params, HTTP_ACCEPT='text/html')
@@ -514,8 +512,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             'name': 'Dummy Enterprise',
             'identity_provider': dummy_idp,
         }
-        enterprise_customer_mock_1.return_value = enterprise_customer_data
-        enterprise_customer_mock_2.return_value = enterprise_customer_data
+        enterprise_customer_mock.return_value = enterprise_customer_data
         dummy_error_message = 'Authentication failed: SAML login failed ' \
                               '["invalid_response"] [SAML Response must contain 1 assertion]'
 
@@ -536,20 +533,12 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         expected_error_message = Text(_(
             u'We are sorry, you are not authorized to access {platform_name} via this channel. '
-            u'Please contact your {enterprise} administrator in order to access {platform_name} '
-            u'or contact {edx_support_link}.{line_break}'
-            u'{line_break}'
+            u'Please contact your learning administrator or manager in order to access {platform_name}.'
+            u'{line_break}{line_break}'
             u'Error Details:{line_break}{error_message}')
         ).format(
             platform_name=settings.PLATFORM_NAME,
-            enterprise=enterprise_customer_data['name'],
             error_message=dummy_error_message,
-            edx_support_link=HTML(
-                '<a href="{edx_support_url}">{support_url_name}</a>'
-            ).format(
-                edx_support_url=settings.SUPPORT_SITE_LINK,
-                support_url_name=_('edX Support'),
-            ),
             line_break=HTML('<br/>')
         )
         self._assert_saml_auth_data_with_error(
