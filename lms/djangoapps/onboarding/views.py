@@ -325,19 +325,13 @@ def update_account_settings(request):
     """
     View to handle update of registration extra fields
     """
-    user_extended_profile = request.user.extended_profile
+
+    user_extended_profile = UserExtendedProfile.objects.get(user_id=request.user.id)
     if request.method == 'POST':
 
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
-            user_extended_profile, prev_org = form.save(user=user_extended_profile.user, commit=False)
-
-            user_extended_profile.save()
-            if prev_org:
-                prev_org.save()
-
-            if user_extended_profile.organization:
-                user_extended_profile.organization.save()
+            user_extended_profile = form.save(user=user_extended_profile.user, commit=True)
 
     else:
         form = forms.UpdateRegModelForm(
