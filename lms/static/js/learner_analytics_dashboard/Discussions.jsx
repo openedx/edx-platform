@@ -9,12 +9,33 @@ class Discussions extends React.Component {
 
   getComparisons() {
     const {content_authored} = this.props;
-    const average_content = 7;
+    const content_average = 7;
+    let average_percent = 100;
+    let authored_percent = 0;
+
+    if (content_average > content_authored) {
+      average_percent = 100;
+      authored_percent = ( content_authored / content_average ) * 100;
+    } else {
+      authored_percent = 100;
+      average_percent = ( content_average / content_authored ) * 100;
+    }
 
     return (
       <div className="chart-wrapper">
-        You {content_authored}
-        Others {average_content}
+        {this.getCountChart(content_authored, authored_percent + '%', 'You')}
+        {this.getCountChart(content_average, average_percent + '%', 'Average graduate')}
+      </div>
+    );
+  }
+
+  getCountChart(count, percent, label) {
+    return (
+      <div className="count-chart">
+        <span className="chart-icon" aria-hidden="true"></span>
+        <div className="chart-label">{label}</div>
+        <div className="chart-bar" aria-hidden="true">{percent}</div>
+        <span className="count">{count}</span>
       </div>
     );
   }
