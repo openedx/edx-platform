@@ -62,9 +62,6 @@ urlpatterns = [
     # Darklang View to change the preview language (or dark language)
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
-    # URLs for managing theming
-    url(r'^theming/', include('openedx.core.djangoapps.theming.urls', namespace='theming')),
-
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
     url(r'^api/', include('cms.djangoapps.api.urls', namespace='api')),
@@ -255,3 +252,6 @@ urlpatterns += [
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 ]
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
+urlpatterns.extend(DjangoAppRegistry.get_plugin_url_patterns(ProjectType.CMS))
