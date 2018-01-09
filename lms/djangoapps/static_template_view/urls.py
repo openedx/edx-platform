@@ -11,8 +11,8 @@ urlpatterns = [
     # Semi-static views (these need to be rendered and have the login bar, but don't change)
     url(r'^404$', views.render, {'template': '404.html'}, name="404"),
     # display error page templates, for testing purposes
-    url(r'^404$', views.render_404),  # Can this be deleted? Test test_404_microsites fails with this.
-    url(r'^500$', views.render_500),
+    url(r'^404$', views.render_404, name='render_404'),  # Can this be deleted? Test test_404_microsites fails with this.
+    url(r'^500$', views.render_500, name='render_500'),
 
     url(r'^blog$', views.render, {'template': 'blog.html'}, name="blog"),
     url(r'^contact$', views.render, {'template': 'contact.html'}, name="contact"),

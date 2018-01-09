@@ -30,7 +30,7 @@ class MarketingSiteViewTests(TestCase):
         """
         Test the 404 view.
         """
-        url = reverse('static_template_view.views.render_404')
+        url = reverse('render_404')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp['Content-Type'], 'text/html')
@@ -41,7 +41,7 @@ class MarketingSiteViewTests(TestCase):
         """
         Test the 500 view.
         """
-        url = reverse('static_template_view.views.render_500')
+        url = reverse('render_500')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 500)
         self.assertEqual(resp['Content-Type'], 'text/html; charset=utf-8')
@@ -61,7 +61,7 @@ class MarketingSiteViewTests(TestCase):
         """
         Test the 404 view as if called in a microsite.
         """
-        url = reverse('static_template_view.views.render_404')
+        url = reverse('render_404')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp['Content-Type'], 'text/html')
@@ -74,7 +74,7 @@ class MarketingSiteViewTests(TestCase):
         """
         Test the 500 view as if called in a microsite.
         """
-        url = reverse('static_template_view.views.render_500')
+        url = reverse('render_500')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 500)
         self.assertEqual(resp['Content-Type'], 'text/html; charset=utf-8')
