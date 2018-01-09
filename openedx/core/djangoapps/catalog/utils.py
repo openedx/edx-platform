@@ -8,15 +8,14 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
+from pytz import UTC
 
-from openedx.core.djangoapps.catalog.cache import (
-    PROGRAM_CACHE_KEY_TPL,
-    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
-)
+from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
+                                                   SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
-from pytz import UTC
+from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 
@@ -276,11 +275,15 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     2) A user can enroll in
     3) A user can upgrade in
     4) Are published
+    5) Are not enrolled in already for an active session
 
     These are the only sessions that can be selected for an entitlement.
     """
 
     enrollable_sessions = []
+
+    enrollments_for_user = CourseEnrollment.enrollments_for_user(entitlement.user).filter(mode=entitlement.mode)
+    enrolled_sessions = frozenset([str(e.course_id) for e in enrollments_for_user])
 
     # Only show published course runs that can still be enrolled and upgraded
     now = datetime.datetime.now(UTC)
@@ -295,7 +298,8 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
         enrollment_start = course_run.get('enrollment_start')
         enrollment_end = course_run.get('enrollment_end')
         can_enroll = ((not enrollment_start or datetime_parse(enrollment_start) < now)
-                      and (not enrollment_end or datetime_parse(enrollment_end) > now))
+                      and (not enrollment_end or datetime_parse(enrollment_end) > now)
+                      and course_run.get('key') not in enrolled_sessions)
 
         # Only upgrade-able courses will be displayed
         can_upgrade = False
