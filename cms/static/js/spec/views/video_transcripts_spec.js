@@ -54,7 +54,7 @@ define(
                     TRANSCRIPT_DOWNLOAD_URL + '?edx_video_id=' + edxVideoID + '&language_code=' + transcriptLanguage
                 );
 
-                expect(uploadTranscriptActionEl.html().trim(), 'Upload');
+                expect(uploadTranscriptActionEl.html().trim(), 'Replace');
             };
 
             verifyMessage = function($transcriptEl, status) {

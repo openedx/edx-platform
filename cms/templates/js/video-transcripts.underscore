@@ -34,7 +34,7 @@
                 <%- gettext('Download') %>
             </a>
             <span class='transcript-actions-separator'> | </span>
-            <button class="button-link upload-transcript-button"><%- gettext('Upload') %></button>
+            <button class="button-link upload-transcript-button"><%- gettext('Replace') %></button>
         </div>
     </div>
 <% }) %>
