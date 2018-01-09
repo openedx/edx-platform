@@ -13,26 +13,33 @@ define([
             selectOptions,
             entitlementAvailableSessions,
             initialSessionId,
+            alreadyEnrolled,
+            hasSessions,
             entitlementUUID = 'a9aiuw76a4ijs43u18',
             testSessionIds = ['test_session_id_1', 'test_session_id_2'];
 
-        setupView = function(isAlreadyEnrolled) {
+        setupView = function(isAlreadyEnrolled, hasAvailableSessions) {
             setFixtures('<div class="course-entitlement-selection-container"></div>');
+            alreadyEnrolled = (typeof isAlreadyEnrolled !== 'undefined') ? isAlreadyEnrolled : true;
+            hasSessions = (typeof hasAvailableSessions !== 'undefined') ? hasAvailableSessions : true;
 
-            initialSessionId = isAlreadyEnrolled ? testSessionIds[0] : '';
-            entitlementAvailableSessions = [{
-                enrollment_end: null,
-                start: '2019-02-05T05:00:00+00:00',
-                pacing_type: 'instructor_paced',
-                session_id: testSessionIds[0],
-                end: null
-            }, {
-                enrollment_end: '2019-12-22T03:30:00Z',
-                start: '2020-01-03T13:00:00+00:00',
-                pacing_type: 'self_paced',
-                session_id: testSessionIds[1],
-                end: '2020-03-09T21:30:00+00:00'
-            }];
+            initialSessionId = alreadyEnrolled ? testSessionIds[0] : '';
+            entitlementAvailableSessions = [];
+            if (hasSessions) {
+                entitlementAvailableSessions = [{
+                    enrollment_end: null,
+                    start: '2019-02-05T05:00:00+00:00',
+                    pacing_type: 'instructor_paced',
+                    session_id: testSessionIds[0],
+                    end: null
+                }, {
+                    enrollment_end: '2019-12-22T03:30:00Z',
+                    start: '2020-01-03T13:00:00+00:00',
+                    pacing_type: 'self_paced',
+                    session_id: testSessionIds[1],
+                    end: '2020-03-09T21:30:00+00:00'
+                }];
+            }
 
             view = new CourseEntitlementView({
                 el: '.course-entitlement-selection-container',
@@ -92,6 +99,16 @@ define([
                 expect(view.$('.action-header').text().includes(
                     'To access the course, select a session.'
                 )).toBe(true);
+            });
+        });
+
+        describe('Available Sessions Select - Unfulfilled Entitlement without available sessions', function() {
+            beforeEach(function() {
+                setupView(false, false);
+            });
+
+            it('Should notify user that more sessions are coming soon if none available.', function() {
+                expect(view.$('.action-header').text().includes('More sessions coming soon.')).toBe(true);
             });
         });
 

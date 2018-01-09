@@ -75,7 +75,9 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_visible_course_runs_for_entitlement
+from openedx.core.djangoapps.catalog.utils import (
+    get_programs_with_type, get_visible_sessions_for_entitlement, get_pseudo_session_for_entitlement
+)
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -700,12 +702,18 @@ def dashboard(request):
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
+    # If an entitlement has no available sessions, pass through a mock course overview object
     course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
     course_entitlement_available_sessions = {}
+    unfulfilled_entitlement_pseudo_sessions = {}
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
-        valid_course_runs = get_visible_course_runs_for_entitlement(course_entitlement)
-        course_entitlement_available_sessions[str(course_entitlement.uuid)] = valid_course_runs
+        available_sessions = get_visible_sessions_for_entitlement(course_entitlement)
+        course_entitlement_available_sessions[str(course_entitlement.uuid)] = available_sessions
+        if not course_entitlement.enrollment_course_run:
+            # Unfulfilled entitlements need a mock session for metadata
+            pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
+            unfulfilled_entitlement_pseudo_sessions[str(course_entitlement.uuid)] = pseudo_session
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
@@ -916,6 +924,7 @@ def dashboard(request):
         'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
+        'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
         'course_optouts': course_optouts,
         'banner_account_activation_message': banner_account_activation_message,
         'sidebar_account_activation_message': sidebar_account_activation_message,

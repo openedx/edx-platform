@@ -161,17 +161,16 @@ from student.models import CourseEnrollment
                     # If the user has a fulfilled entitlement, pass through the entitlements CourseEnrollment object
                     enrollment = entitlement_session
                   else:
-                    # If the user has an unfulfilled entitlement, pass through a bare CourseEnrollment object built off of the next available session
-                    upcoming_sessions = course_entitlement_available_sessions[str(entitlement.uuid)]
-                    next_session = upcoming_sessions[0] if upcoming_sessions else None
-                    if not next_session:
+                    # If the user has an unfulfilled entitlement, pass through a bare CourseEnrollment object to populate card with metadata
+                    pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
+                    if not pseudo_session:
                         continue
-                    enrollment = CourseEnrollment(user=user, course_id=next_session['key'], mode=next_session['type'])
+                    enrollment = CourseEnrollment(user=user, course_id=pseudo_session['key'], mode=pseudo_session['type'])
                   # We only show email settings for entitlement cards if the entitlement has an associated enrollment
                   show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
                 else:
                   show_email_settings = (enrollment.course_id in show_email_settings_for)
-      
+
                 session_id = enrollment.course_id
                 show_courseware_link = (session_id in show_courseware_links_for)
                 cert_status = cert_statuses.get(session_id)
