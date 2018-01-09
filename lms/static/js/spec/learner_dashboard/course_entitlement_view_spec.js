@@ -10,19 +10,21 @@ define([
     describe('Course Entitlement View', function() {
         var view = null,
             setupView,
+            sessionIndex,
             selectOptions,
             entitlementAvailableSessions,
             initialSessionId,
             entitlementUUID = 'a9aiuw76a4ijs43u18',
             testSessionIds = ['test_session_id_1', 'test_session_id_2'];
 
-        setupView = function(isAlreadyEnrolled) {
+        setupView = function(isAlreadyEnrolled, specificSessionIndex) {
             setFixtures('<div class="course-entitlement-selection-container"></div>');
 
-            initialSessionId = isAlreadyEnrolled ? testSessionIds[0] : '';
+            sessionIndex = specificSessionIndex || 0;
+            initialSessionId = isAlreadyEnrolled ? testSessionIds[sessionIndex] : '';
             entitlementAvailableSessions = [{
                 enrollment_end: null,
-                start: '2019-02-05T05:00:00+00:00',
+                start: '2016-02-05T05:00:00+00:00',
                 pacing_type: 'instructor_paced',
                 session_id: testSessionIds[0],
                 end: null
@@ -121,6 +123,17 @@ define([
                 expect(view.$('.action-header').text().includes(
                     'Change to a different session or leave the current session.'
                 )).toBe(true);
+            });
+        });
+
+        describe('Available Sessions Select - Fulfilled Entitlement (session in the future)', function() {
+            beforeEach(function() {
+                setupView(true, 1);
+            });
+
+            it('Currently selected session should initialize to selected in the dropdown options.', function() {
+                var selectedOption = view.$('.session-select').find('option:selected');
+                expect(selectedOption.data('session_id')).toEqual(testSessionIds[1]);
             });
         });
 
