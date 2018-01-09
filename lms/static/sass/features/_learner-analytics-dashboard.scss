@@ -271,6 +271,20 @@ $trophy-gold: #F39C12;
     margin-left: 10px;
   }
 
+  .count-chart {
+    .chart-bar {
+      height: 10px;
+      border-radius: 2px;
+      background: $mint-green;
+    }
+
+    &:first-of-type {
+      .chart-bar {
+        background: $trophy-gold;
+      }
+    }
+  }
+
   @include media-breakpoint-up(sm) { .analytics-group.sidebar{border-color: red;} }
   @include media-breakpoint-up(md) { .analytics-group.sidebar{border-color: blue;} }
   @include media-breakpoint-up(lg) { .analytics-group.sidebar{border-color: green;} }
