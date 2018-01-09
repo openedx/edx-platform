@@ -89,6 +89,9 @@ class Bookmark(TimeStampedModel):
 
         user = data.pop('user')
 
+        # Sometimes this ends up in data, but newer versions of Django will fail on having unknown keys in defaults
+        data.pop('display_name', None)
+
         bookmark, created = cls.objects.get_or_create(usage_key=usage_key, user=user, defaults=data)
         return bookmark, created
 

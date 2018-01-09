@@ -96,7 +96,9 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
         return
 
     # if activating user, send welcome email
-    if activation and email_config.sailthru_welcome_template and is_default_site(site):
+    if activation and email_config.sailthru_welcome_template and is_default_site(site) and not \
+            sailthru_vars.get('is_enterprise_learner'):
+
         scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
         try:
             sailthru_response = sailthru_client.api_post(

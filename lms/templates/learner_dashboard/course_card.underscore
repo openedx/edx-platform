@@ -3,8 +3,8 @@
         <div class="course-content">
             <div class="course-details">
                 <h5 class="course-title">
-                    <% if ( (marketing_url || course_url) &&  !is_unfulfilled_entitlement) { %>
-                        <a href="<%- marketing_url || course_url %>" class="course-title-link">
+                    <% if (course_title_link) { %>
+                        <a href="<%- course_title_link %>" class="course-title-link">
                             <%- title %>
                         </a>
                     <% } else { %>
@@ -18,7 +18,7 @@
                     <% if (dateString && !is_unfulfilled_entitlement) { %>
                         <span class="run-period"><%- dateString %></span>
                         <% if (user_entitlement && !user_entitlement.expired_at && !is_unfulfilled_entitlement) { %>
-                            <button class="change-session btn-link" aria-controls="change-session-<%-user_entitlement.uuid%>"> <%- gettext('Change or Leave Session')%></button>
+                            <button class="change-session btn-link"> <%- gettext('Change or Leave Session')%></button>
                         <% } %>
                     <% } %>
                 </div>

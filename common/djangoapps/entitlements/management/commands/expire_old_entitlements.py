@@ -5,10 +5,9 @@ Management command for expiring old entitlements.
 import logging
 
 from django.core.management import BaseCommand
-from django.core.paginator import Paginator
 
 from entitlements.models import CourseEntitlement
-from entitlements.tasks.v1.tasks import expire_old_entitlements
+from entitlements.tasks import expire_old_entitlements
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -46,24 +45,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.info('Looking for entitlements which may be expirable.')
 
-        # This query could be optimized to return a more narrow set, but at a
-        # complexity cost. See bug LEARNER-3451 about improving it.
-        entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True).order_by('id')
-
+        total = CourseEntitlement.objects.count()
         batch_size = max(1, options.get('batch_size'))
-        entitlements = Paginator(entitlements, batch_size, allow_empty_first_page=False)
+        num_batches = ((total - 1) / batch_size + 1) if total > 0 else 0
 
         if options.get('commit'):
-            logger.info('Enqueuing entitlement expiration tasks for %d candidates.', entitlements.count)
+            logger.info('Enqueuing %d entitlement expiration tasks.', num_batches)
         else:
             logger.info(
-                'Found %d candidates. To enqueue entitlement expiration tasks, pass the -c or --commit flags.',
-                entitlements.count
+                'Found %d batches. To enqueue entitlement expiration tasks, pass the -c or --commit flags.',
+                num_batches
             )
             return
 
-        for page_num in entitlements.page_range:
-            page = entitlements.page(page_num)
-            expire_old_entitlements.delay(page, logid=str(page_num))
+        for batch_num in range(num_batches):
+            start = batch_num * batch_size + 1  # ids are 1-based, so add 1
+            end = min(start + batch_size, total + 1)
+            expire_old_entitlements.delay(start, end, logid=str(batch_num))
 
-        logger.info('Done. Successfully enqueued tasks.')
+        logger.info('Done. Successfully enqueued %d tasks.', num_batches)

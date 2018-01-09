@@ -7,7 +7,7 @@ import textwrap
 from datetime import datetime
 
 from django.conf import settings
-from fs.errors import ResourceNotFoundError
+from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
 from pkg_resources import resource_string
@@ -236,7 +236,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             )
             base = path(pointer_path).dirname()
             # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
-            filepath = "{base}/{name}.html".format(base=base, name=filename)
+            filepath = u"{base}/{name}.html".format(base=base, name=filename)
             # log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
             # VS[compat]
@@ -259,8 +259,8 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
                         break
 
             try:
-                with system.resources_fs.open(filepath) as infile:
-                    html = infile.read().decode('utf-8')
+                with system.resources_fs.open(filepath, encoding='utf-8') as infile:
+                    html = infile.read()
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html) and len(html) > 0:
                         msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)
@@ -275,7 +275,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
 
                     return definition, []
 
-            except (ResourceNotFoundError) as err:
+            except ResourceNotFound as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
                 # add more info and re-raise
@@ -295,8 +295,8 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             pathname=pathname
         )
 
-        resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as filestream:
+        resource_fs.makedirs(os.path.dirname(filepath), recreate=True)
+        with resource_fs.open(filepath, 'wb') as filestream:
             html_data = self.data.encode('utf-8')
             filestream.write(html_data)
 

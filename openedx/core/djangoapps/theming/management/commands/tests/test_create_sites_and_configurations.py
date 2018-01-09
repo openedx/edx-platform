@@ -12,8 +12,10 @@ from django.core.management import call_command, CommandError
 from provider.oauth2.models import Client
 from edx_oauth2_provider.models import TrustedClient
 from openedx.core.djangoapps.theming.models import SiteTheme
+from student.models import UserProfile
 
-SITES = ['site_a', 'site_b']
+SITES = ["site_a", "site_b"]
+MANAGEMENT_COMMAND_PATH = "openedx.core.djangoapps.theming.management.commands.create_sites_and_configurations."
 
 
 def _generate_site_config(dns_name, site_domain):
@@ -67,13 +69,22 @@ class TestCreateSiteAndConfiguration(TestCase):
                     _generate_site_config(self.dns_name, site.name)
                 )
 
+    def _assert_service_user_is_valid(self, username):
+        service_user = User.objects.filter(username=username)
+        self.assertEqual(len(service_user), 1)
+        self.assertTrue(service_user[0].is_active)
+        self.assertTrue(service_user[0].is_staff)
+        self.assertTrue(service_user[0].is_superuser)
+
+        user_profile = UserProfile.objects.filter(user=service_user)
+        self.assertEqual(len(user_profile), 1)
+        return service_user
+
     def _assert_ecommerce_clients_are_valid(self):
         """
         Checks that all ecommerce clients are valid
         """
-        service_user = User.objects.filter(username="ecommerce_worker")
-        self.assertEqual(len(service_user), 1)
-        self.assertTrue(service_user[0].is_staff)
+        service_user = self._assert_service_user_is_valid("ecommerce_worker")
 
         clients = Client.objects.filter(user=service_user)
         self.assertEqual(len(clients), len(SITES))
@@ -99,9 +110,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         """
         Checks that all discovery clients are valid
         """
-        service_user = User.objects.filter(username="lms_catalog_service_user")
-        self.assertEqual(len(service_user), 1)
-        self.assertTrue(service_user[0].is_staff)
+        service_user = self._assert_service_user_is_valid("lms_catalog_service_user")
 
         clients = Client.objects.filter(user=service_user)
         self.assertEqual(len(clients), len(SITES))
@@ -130,12 +139,12 @@ class TestCreateSiteAndConfiguration(TestCase):
                 "create_sites_and_configurations"
             )
 
-    @mock.patch(
-        'openedx.core.djangoapps.theming.management.commands.create_sites_and_configurations.Command._get_sites_data'
-    )
-    def test_with_dns(self, mock_get_sites):
+    @mock.patch(MANAGEMENT_COMMAND_PATH + "Command._enable_commerce_configuration")
+    @mock.patch(MANAGEMENT_COMMAND_PATH + "Command._get_sites_data")
+    def test_with_dns(self, mock_get_sites, mock_commerce):
         """ Test the command with dns_name """
         mock_get_sites.return_value = _get_sites(self.dns_name)
+        mock_commerce.return_value = None
         call_command(
             "create_sites_and_configurations",
             "--dns-name", self.dns_name,

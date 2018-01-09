@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.html import strip_tags
+from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
@@ -63,7 +64,7 @@ class Note(models.Model):
         Returns the absolute url for the note object.
         """
         # pylint: disable=no-member
-        kwargs = {'course_id': self.course_id.to_deprecated_string(), 'note_id': str(self.pk)}
+        kwargs = {'course_id': text_type(self.course_id), 'note_id': str(self.pk)}
         return reverse('notes_api_note', kwargs=kwargs)
 
     def as_dict(self):

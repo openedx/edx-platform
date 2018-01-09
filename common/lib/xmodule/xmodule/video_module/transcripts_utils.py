@@ -9,6 +9,7 @@ import json
 import requests
 import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
+from pysrt.srtexc import Error
 from lxml import etree
 from HTMLParser import HTMLParser
 
@@ -284,6 +285,32 @@ def generate_srt_from_sjson(sjson_subs, speed):
     return output
 
 
+def generate_sjson_from_srt(srt_subs):
+    """
+    Generate transcripts from sjson to SubRip (*.srt).
+
+    Arguments:
+        srt_subs(SubRip): "SRT" subs object
+
+    Returns:
+        Subs converted to "SJSON" format.
+    """
+    sub_starts = []
+    sub_ends = []
+    sub_texts = []
+    for sub in srt_subs:
+        sub_starts.append(sub.start.ordinal)
+        sub_ends.append(sub.end.ordinal)
+        sub_texts.append(sub.text.replace('\n', ' '))
+
+    sjson_subs = {
+        'start': sub_starts,
+        'end': sub_ends,
+        'text': sub_texts
+    }
+    return sjson_subs
+
+
 def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=None):
     """
     Renames `old_name` transcript file in storage to `new_name`.
@@ -544,10 +571,13 @@ class Transcript(object):
     """
     Container for transcript methods.
     """
+    SRT = 'srt'
+    TXT = 'txt'
+    SJSON = 'sjson'
     mime_types = {
-        'srt': 'application/x-subrip; charset=utf-8',
-        'txt': 'text/plain; charset=utf-8',
-        'sjson': 'application/json',
+        SRT: 'application/x-subrip; charset=utf-8',
+        TXT: 'text/plain; charset=utf-8',
+        SJSON: 'application/json',
     }
 
     @staticmethod
@@ -556,7 +586,10 @@ class Transcript(object):
         Convert transcript `content` from `input_format` to `output_format`.
 
         Accepted input formats: sjson, srt.
-        Accepted output format: srt, txt.
+        Accepted output format: srt, txt, sjson.
+
+        Raises:
+            TranscriptsGenerationException: On parsing the invalid srt content during conversion from srt to sjson.
         """
         assert input_format in ('srt', 'sjson')
         assert output_format in ('txt', 'srt', 'sjson')
@@ -571,7 +604,17 @@ class Transcript(object):
                 return HTMLParser().unescape(text)
 
             elif output_format == 'sjson':
-                raise NotImplementedError
+                try:
+                    # With error handling (set to 'ERROR_RAISE'), we will be getting
+                    # the exception if something went wrong in parsing the transcript.
+                    srt_subs = SubRipFile.from_string(
+                        content.decode('utf8'),
+                        error_handling=SubRipFile.ERROR_RAISE
+                    )
+                except Error as ex:   # Base exception from pysrt
+                    raise TranscriptsGenerationException(ex.message)
+
+                return generate_sjson_from_srt(srt_subs)
 
         if input_format == 'sjson':
 

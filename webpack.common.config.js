@@ -19,7 +19,7 @@ module.exports = {
         // Studio
         AssetsPage: './node_modules/@edx/studio-frontend/src/index.jsx',
         Import: './cms/static/js/features/import/factories/import.js',
-        StudioIndex: './cms/static/js/features_jsx/studio/index.jsx',
+        CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
         AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
 
         // LMS
@@ -76,7 +76,7 @@ module.exports = {
             // common/djangoapps/pipeline_mako/templates/static_content.html
             name: 'commons',
             filename: 'commons.js',
-            minChunks: 2
+            minChunks: 3
         })
     ],
 

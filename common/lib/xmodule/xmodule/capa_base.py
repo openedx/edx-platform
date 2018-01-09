@@ -19,6 +19,7 @@ except ImportError:
     dog_stats_api = None
 from pytz import utc
 from django.utils.encoding import smart_text
+from six import text_type
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
@@ -246,7 +247,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
         # there.
-        self.runtime.set('location', self.location.to_deprecated_string())
+        self.runtime.set('location', text_type(self.location))
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
@@ -264,7 +265,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
-                loc=self.location.to_deprecated_string(), err=err)
+                loc=text_type(self.location), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
             if self.runtime.DEBUG:
@@ -286,7 +287,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 problem_text = (
                     u'<problem><text><span class="inline-error">'
                     u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
-                        url=self.location.to_deprecated_string(),
+                        url=text_type(self.location),
                         msg=msg,
                     )
                 )
@@ -429,7 +430,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
-            'id': self.location.to_deprecated_string(),
+            'id': text_type(self.location),
             'ajax_url': self.runtime.ajax_url,
             'current_score': curr_score,
             'total_possible': total_possible,
@@ -550,7 +551,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             msg = (
                 u'[courseware.capa.capa_module] <font size="+1" color="red">'
                 u'Failed to generate HTML for problem {url}</font>'.format(
-                    url=cgi.escape(self.location.to_deprecated_string()))
+                    url=cgi.escape(text_type(self.location)))
             )
             msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
             msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
@@ -661,7 +662,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # Log this demand-hint request. Note that this only logs the last hint requested (although now
         # all previously shown hints are still displayed).
         event_info = dict()
-        event_info['module_id'] = self.location.to_deprecated_string()
+        event_info['module_id'] = text_type(self.location)
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
         event_info['hint_text'] = get_inner_html_from_xpath(demand_hints[hint_index])
@@ -723,7 +724,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         context = {
             'problem': content,
-            'id': self.location.to_deprecated_string(),
+            'id': text_type(self.location),
             'short_id': self.location.html_id(),
             'submit_button': submit_button,
             'submit_button_submitting': submit_button_submitting,
@@ -1005,7 +1006,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             (and also screen reader text).
         """
         event_info = dict()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = text_type(self.location)
         self.track_function_unmask('showanswer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
@@ -1159,7 +1160,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = text_type(self.location)
 
         self.lcp.has_saved_answers = False
         answers = self.make_dict_of_responses(data)
@@ -1475,7 +1476,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = text_type(self.location)
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
@@ -1535,7 +1536,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.to_deprecated_string()
+        event_info['problem_id'] = text_type(self.location)
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.closed():
@@ -1600,7 +1601,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         Returns the error messages for exceptions occurring while performing
         the rescoring, rather than throwing them.
         """
-        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.to_deprecated_string()}
+        event_info = {'state': self.lcp.get_state(), 'problem_id': text_type(self.location)}
 
         _ = self.runtime.service(self, "i18n").ugettext
 

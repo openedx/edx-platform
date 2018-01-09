@@ -11,6 +11,7 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
 from courseware.tabs import CourseTab, get_course_tab_list
 from notes import api, models, utils
@@ -136,7 +137,7 @@ class ApiTest(TestCase):
         self.client.login(username=username, password=password)
 
     def url(self, name, args={}):
-        args.update({'course_id': self.course_key.to_deprecated_string()})
+        args.update({'course_id': text_type(self.course_key)})
         return reverse(name, kwargs=args)
 
     def create_notes(self, num_notes, create=True):

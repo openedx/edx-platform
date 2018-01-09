@@ -185,12 +185,18 @@
 
                 setActiveCourseRun: function(courseRun, userPreferences) {
                     var startDateString,
+                        courseTitleLink = '',
                         isEnrolled = this.isEnrolledInSession() && courseRun.key;
                     if (courseRun) {
                         if (this.valueIsDefined(courseRun.advertised_start)) {
                             startDateString = courseRun.advertised_start;
                         } else {
                             startDateString = this.formatDate(courseRun.start, userPreferences);
+                        }
+                        if (isEnrolled && courseRun.course_url) {
+                            courseTitleLink = courseRun.course_url;
+                        } else if (!isEnrolled && courseRun.marketing_url) {
+                            courseTitleLink = courseRun.marketing_url;
                         }
                         this.set({
                             certificate_url: courseRun.certificate_url,
@@ -210,7 +216,8 @@
                             start_date: startDateString,
                             upcoming_course_runs: this.getUpcomingCourseRuns(),
                             upgrade_url: courseRun.upgrade_url,
-                            price: this.getCertificatePriceString(courseRun)
+                            price: this.getCertificatePriceString(courseRun),
+                            course_title_link: courseTitleLink
                         });
 
                         // This is used to render the date for completed and in progress courses

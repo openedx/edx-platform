@@ -435,6 +435,9 @@ the following properties:
 -  ``label`` is the primary_course_id described above
 -  ``campaign source`` is "schedules"
 -  ``campaign medium`` is "email"
+-  ``campaign name`` is the name of the message that was sent:
+   recurringnudge_day3, recurringnudge_day10, upgradereminder,
+   or courseupdate.
 -  ``campaign content`` is the unique identifier for the message
 
 When the user clicks a link in the email the following UTM parameters are
@@ -442,6 +445,9 @@ included in the URL:
 
 -  ``campaign source`` is "schedules"
 -  ``campaign medium`` is "email"
+-  ``campaign name`` is the name of the message that was sent:
+   recurringnudge_day3, recurringnudge_day10, upgradereminder,
+   or courseupdate.
 -  ``campaign content`` is the unique identifier for the message
 -  ``campaign term`` is the primary_course_id described above
 

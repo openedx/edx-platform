@@ -751,6 +751,9 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
             'country': (user.profile, 'country'),
         })
 
+        # Remove username from list of fields for update
+        field_mapping.pop('username', None)
+
         # Track any fields that would raise an integrity error if there was a conflict.
         integrity_conflict_fields = {'email': user.email, 'username': user.username}
 

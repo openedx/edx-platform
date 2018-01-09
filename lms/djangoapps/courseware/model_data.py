@@ -1007,13 +1007,12 @@ def set_score(user_id, usage_key, score, max_score):
             )
     except IntegrityError:
         # log information for duplicate entry and get the record as above command failed.
-        student_module = StudentModule.objects.get(**kwargs)
-        log.warning(
-            'set_score: IntegrityError for student %d - course_id %s - usage_key %s having '
-            'score %d and max_score %d same as request score %d and max_score %d',
-            user_id, usage_key.course_key, usage_key, student_module.grade, student_module.max_grade,
-            score, max_score
+        log.exception(
+            'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
+            'score %d and max_score %d',
+            str(user_id), usage_key.course_key, usage_key, score, max_score
         )
+        student_module = StudentModule.objects.get(**kwargs)
 
     if not created:
         student_module.grade = score

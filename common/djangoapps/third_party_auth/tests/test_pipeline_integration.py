@@ -379,9 +379,11 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
         # User now has updated information in the DB.
         user = User.objects.get()
         assert user.email == 'new+{}'.format(self.old_email)
-        assert user.username == 'new_{}'.format(self.old_username)
         assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
         assert user.profile.country == 'PK'
+
+        # Now verify that username field is not updated
+        assert user.username == self.old_username
 
         assert len(mail.outbox) == 1
 
@@ -403,9 +405,11 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
         # The email is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
         assert user.email == self.old_email
-        assert user.username == 'new_{}'.format(self.old_username)
         assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
         assert user.profile.country == 'PK'
+
+        # Now verify that username field is not updated
+        assert user.username == self.old_username
 
         # No email should be sent for an email change.
         assert len(mail.outbox) == 0

@@ -5,6 +5,7 @@ import logging
 from abc import ABCMeta
 
 from django.core.files.storage import get_storage_class
+from six import text_type
 from xblock.fields import List
 
 from openedx.core.lib.api.plugins import PluginError
@@ -266,7 +267,7 @@ class TabFragmentViewMixin(object):
         # If not, then use the generic course tab URL
         def link_func(course, reverse_func):
             """ Returns a function that returns the course tab's URL. """
-            return reverse_func("course_tab_view", args=[course.id.to_deprecated_string(), self.type])
+            return reverse_func("course_tab_view", args=[text_type(course.id), self.type])
 
         return link_func
 
@@ -304,7 +305,7 @@ class StaticTab(CourseTab):
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
             """ Returns a function that returns the static tab's URL. """
-            return reverse_func(self.type, args=[course.id.to_deprecated_string(), self.url_slug])
+            return reverse_func(self.type, args=[text_type(course.id), self.url_slug])
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
 
@@ -612,7 +613,7 @@ def course_reverse_func_from_name_func(reverse_name_func):
     """
     return lambda course, reverse_url_func: reverse_url_func(
         reverse_name_func(course),
-        args=[course.id.to_deprecated_string()]
+        args=[text_type(course.id)]
     )
 
 

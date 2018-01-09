@@ -3,6 +3,7 @@ Test cases for tabs.
 """
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -57,13 +58,12 @@ class TabTestCase(SharedModuleStoreTestCase):
         super(TabTestCase, self).setUp()
         self.reverse = lambda name, args: "name/{0}/args/{1}".format(name, ",".join(str(a) for a in args))
 
-    def create_mock_user(self, is_authenticated=True, is_staff=True, is_enrolled=True):
+    def create_mock_user(self, is_staff=True, is_enrolled=True):
         """
         Creates a mock user with the specified properties.
         """
         user = UserFactory(is_staff=is_staff)
         user.is_enrolled = is_enrolled
-        user.is_authenticated = lambda: is_authenticated
         return user
 
     def is_tab_enabled(self, tab, course, user):
@@ -155,16 +155,17 @@ class TabTestCase(SharedModuleStoreTestCase):
     ):
         """Checks can display results for various users"""
         if for_staff_only:
-            user = self.create_mock_user(is_authenticated=True, is_staff=True, is_enrolled=True)
+            user = self.create_mock_user(is_staff=True, is_enrolled=True)
             self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
         if for_authenticated_users_only:
-            user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=False)
+            user = self.create_mock_user(is_staff=False, is_enrolled=False)
             self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
+            assert False
         if not for_staff_only and not for_authenticated_users_only and not for_enrolled_users_only:
-            user = self.create_mock_user(is_authenticated=False, is_staff=False, is_enrolled=False)
+            user = AnonymousUser()
             self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
         if for_enrolled_users_only:
-            user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
+            user = self.create_mock_user(is_staff=False, is_enrolled=True)
             self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
 
     def check_get_and_set_methods(self, tab):
@@ -214,7 +215,7 @@ class TextbooksTestCase(TabTestCase):
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
 
         num_textbooks_found = 0
-        user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
+        user = self.create_mock_user(is_staff=False, is_enrolled=True)
         for tab in xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user):
             # verify all textbook type tabs
             if tab.type == 'single_textbook':
@@ -704,7 +705,7 @@ class CourseTabListTestCase(TabListTestCase):
                                                             course_staff_only=True))
         self.course.save()
 
-        user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
+        user = self.create_mock_user(is_staff=False, is_enrolled=True)
         request = get_mock_request(user)
         course_tab_list = get_course_tab_list(request, self.course)
         name_list = [x.name for x in course_tab_list]
@@ -837,7 +838,7 @@ class DiscussionLinkTestCase(TabTestCase):
         self.course.tabs = tab_list
         self.course.discussion_link = discussion_link_in_course
         discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
-        user = self.create_mock_user(is_authenticated=True, is_staff=is_staff, is_enrolled=is_enrolled)
+        user = self.create_mock_user(is_staff=is_staff, is_enrolled=is_enrolled)
         with patch('student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
             check_is_enrolled.return_value = is_enrolled
             self.assertEquals(

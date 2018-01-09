@@ -16,6 +16,7 @@ from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
 
 from lxml import etree
+from six import text_type
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String, ReferenceValueDict
@@ -225,7 +226,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                 updated_group_id = [g_id for g_id, loc in self.group_id_to_child.items() if loc == child_location][0]
                 inactive_contents.append({
                     'group_name': _(u'{group_name} (inactive)').format(group_name=group_name),
-                    'id': child.location.to_deprecated_string(),
+                    'id': text_type(child.location),
                     'content': rendered_child.content,
                     'group_id': updated_group_id,
                 })
@@ -233,7 +234,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
             active_contents.append({
                 'group_name': group_name,
-                'id': child.location.to_deprecated_string(),
+                'id': text_type(child.location),
                 'content': rendered_child.content,
                 'group_id': updated_group_id,
             })
@@ -332,7 +333,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Record in the tracking logs which child was rendered
         """
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('xblock.split_test.child_render', {'child_id': self.child.scope_ids.usage_id.to_deprecated_string()})
+        self.system.track_function('xblock.split_test.child_render', {'child_id': text_type(self.child.scope_ids.usage_id)})
         return Response()
 
     def get_icon_class(self):
@@ -394,7 +395,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         renderable_groups = {}
         # json.dumps doesn't know how to handle Location objects
         for group in self.group_id_to_child:
-            renderable_groups[group] = self.group_id_to_child[group].to_deprecated_string()
+            renderable_groups[group] = text_type(self.group_id_to_child[group])
         xml_object.set('group_id_to_child', json.dumps(renderable_groups))
         xml_object.set('user_partition_id', str(self.user_partition_id))
         for child in self.get_children():

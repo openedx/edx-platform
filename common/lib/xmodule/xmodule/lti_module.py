@@ -66,6 +66,7 @@ from pytz import UTC
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
 from pkg_resources import resource_string
+from six import text_type
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
@@ -532,7 +533,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         context_id is an opaque identifier that uniquely identifies the context (e.g., a course)
         that contains the link being launched.
         """
-        return self.course_id.to_deprecated_string()
+        return text_type(self.course_id)
 
     @property
     def role(self):
@@ -557,8 +558,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
 
         client = oauthlib.oauth1.Client(
-            client_key=unicode(client_key),
-            client_secret=unicode(client_secret)
+            client_key=text_type(client_key),
+            client_secret=text_type(client_secret)
         )
 
         # Must have parameters for correct signing from LTI:

@@ -39,7 +39,8 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
     def assert_access_role(self, course_run, user, role):
         # An error will be raised if the endpoint did not create the role
-        CourseAccessRole.objects.get(course_id=course_run.id, org=course_run.id.org, user=user, role=role)
+        assert CourseAccessRole.objects.filter(
+            course_id=course_run.id, org=course_run.id.org, user=user, role=role).count() == 1
 
     def assert_course_access_role_count(self, course_run, expected):
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == expected
@@ -138,42 +139,91 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert response.status_code == 400
         assert response.data == {'team': [{'user': ['Object with username=test-user does not exist.']}]}
 
-    def test_partial_update(self):
-        role = 'staff'
+    def test_update_with_pacing_type(self):
+        """
+        Test that update run updates the pacing type
+        """
+        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
+        data = {
+            'pacing_type': 'self_paced',
+        }
+        course_run_detail_url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
+        response = self.client.patch(course_run_detail_url, data, format='json')
+        assert response.status_code == 200
+
+        course_run = modulestore().get_course(course_run.id)
+        assert course_run.self_paced is True
+        self.assert_course_run_schedule(course_run, start, None, None, None)
+
+    def test_update_with_instructor_role(self):
+        """
+        Test that update creates a new instructor role only if it does not exist
+        """
+        instructor_role = 'instructor'
+        start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        new_user = UserFactory()
+        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 0
+        data = {
+            'team': [
+                {
+                    'user': new_user.username,
+                    'role': instructor_role,
+                },
+            ],
+            'pacing_type': 'self_paced',
+        }
+        course_run_detail_url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
+        response = self.client.patch(course_run_detail_url, data, format='json')
+        assert response.status_code == 200
+        self.assert_access_role(course_run, new_user, instructor_role)
+        self.assert_course_access_role_count(course_run, 1)
+
+        # Requesting again with the same data should not create new instructor role
+        response = self.client.patch(course_run_detail_url, data, format='json')
+        assert response.status_code == 200
+        self.assert_access_role(course_run, new_user, instructor_role)
+        self.assert_course_access_role_count(course_run, 1)
+
+    def test_update_with_multiple_roles(self):
+        """
+        Test that update creates an instructor role for a user in addition to any other role/roles he already has
+        """
+        staff_role = 'staff'
+        instructor_role = 'instructor'
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
 
-        # The request should only update or create new team members
         existing_user = UserFactory()
-        CourseAccessRole.objects.create(course_id=course_run.id, org=course_run.id.org, role=role, user=existing_user)
+        CourseAccessRole.objects.create(
+            course_id=course_run.id, org=course_run.id.org, role=staff_role, user=existing_user
+        )
+        # existing_user already has a staff role in the course
+        # The request should create an additional instructor role for existing_user
+
         new_user = UserFactory()
-        CourseAccessRole.objects.create(course_id=course_run.id, org=course_run.id.org, role=role, user=new_user)
-        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 2
+        assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 1
 
         data = {
             'team': [
                 {
                     'user': existing_user.username,
-                    'role': role,
+                    'role': instructor_role,
                 },
                 {
                     'user': new_user.username,
-                    'role': role,
+                    'role': instructor_role,
                 },
             ],
-            'pacing_type': 'self_paced',
         }
 
-        url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
-        response = self.client.patch(url, data, format='json')
+        course_run_detail_url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
+        response = self.client.patch(course_run_detail_url, data, format='json')
         assert response.status_code == 200
-        self.assert_access_role(course_run, existing_user, role)
-        self.assert_access_role(course_run, new_user, role)
-        self.assert_course_access_role_count(course_run, 2)
-
-        course_run = modulestore().get_course(course_run.id)
-        assert course_run.self_paced is True
-        self.assert_course_run_schedule(course_run, start, None, None, None)
+        self.assert_access_role(course_run, existing_user, instructor_role)
+        self.assert_access_role(course_run, new_user, instructor_role)
+        self.assert_course_access_role_count(course_run, 3)
 
     @ddt.data(
         ('instructor_paced', False),

@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from pytz import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from six import text_type
 from xblock.core import XBlock
 
 from courseware.access_response import (
@@ -607,7 +608,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.to_deprecated_string() if isinstance(obj, XBlock) else str(obj),
+              text_type(obj.location) if isinstance(obj, XBlock) else str(obj),
               action)
         return result
 

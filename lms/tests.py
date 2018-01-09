@@ -6,6 +6,7 @@ import mimetypes
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from mock import patch
+from six import text_type
 
 from edxmako import LOOKUP, add_lookup
 from microsite_configuration import microsite
@@ -58,6 +59,6 @@ class HelpModalTests(ModuleStoreTestCase):
         Simple test to make sure that you don't get a 500 error when the modal
         is enabled.
         """
-        url = reverse(course_home_url_name(self.course.id), args=[self.course.id.to_deprecated_string()])
+        url = reverse(course_home_url_name(self.course.id), args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)

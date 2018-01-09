@@ -4,6 +4,7 @@ controlling the new assets page.
 """
 from config_models.models import ConfigurationModel
 from django.db.models import BooleanField
+from six import text_type
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
@@ -74,4 +75,4 @@ class CourseNewAssetsPageFlag(ConfigurationModel):
         if self.enabled:
             not_en = ""
         # pylint: disable=no-member
-        return u"Course '{}': New assets page {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+        return u"Course '{}': New assets page {}Enabled".format(text_type(self.course_id), not_en)

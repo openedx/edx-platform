@@ -98,7 +98,6 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         client = AjaxEnabledTestClient()
         if authenticate:
             client.login(username=nonstaff.username, password=password)
-        nonstaff.is_authenticated = lambda: authenticate
         return client, nonstaff
 
     def reload_course(self):

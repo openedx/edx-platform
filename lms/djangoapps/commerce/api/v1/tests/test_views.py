@@ -417,7 +417,7 @@ class OrderViewTests(UserMixin, TestCase):
 
     def test_order_not_found(self):
         """ If the order is not found, the view should return a 404. """
-        with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=exceptions.HttpNotFoundError):
+        with mock_order_endpoint(order_number=self.ORDER_NUMBER, status=404):
             response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
 

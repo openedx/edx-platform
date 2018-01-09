@@ -19,6 +19,7 @@ from django.utils.translation import get_language, to_locale
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.access import has_access
@@ -138,7 +139,7 @@ class ChooseModeView(View):
             CourseMode.is_credit_mode(mode) for mode
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
-        course_id = course_key.to_deprecated_string()
+        course_id = text_type(course_key)
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",

@@ -24,6 +24,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.storage import get_storage
@@ -306,5 +307,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(course_id.to_deprecated_string()).hexdigest()
+        hashed_course_id = hashlib.sha1(text_type(course_id)).hexdigest()
         return os.path.join(hashed_course_id, filename)
