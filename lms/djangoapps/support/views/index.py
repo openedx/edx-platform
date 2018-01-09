@@ -26,6 +26,11 @@ SUPPORT_INDEX_URLS = [
         "name": _("Enrollment"),
         "description": _("View and update learner enrollments."),
     },
+    {
+        "url": reverse_lazy("support:manage_user"),
+        "name": _("Manage User"),
+        "description": _("Disable User Account"),
+    },
 ]
 
 

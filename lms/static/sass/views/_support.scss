@@ -16,6 +16,13 @@
   }
 }
 
+.manage-user-search{
+  margin: 40px 0;
+
+  input[name="query"] {
+    width: 350px;
+  }
+}
 
 .certificates-results {
   table {
@@ -144,6 +151,37 @@
     box-shadow: none;
     text-shadow: none;
   }
+}
+
+.manage-user-results {
+
+  .manage-user-table {
+    display: inline-block;
+  }
+
+  th {
+    @extend %t-title7;
+    text-align: center;
+  }
+
+  td{
+    padding: 0 23px;
+  }
+
+  .disable-account-btn,
+  .disable-account-btn:hover {
+    @extend %t-action4;
+    letter-spacing: normal;
+    text-transform: none;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+  }
+}
+
+.manage-user-content{
+  text-align: center;
 }
 
 .contact-us-wrapper {

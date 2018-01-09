@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 
 import ddt
 import pytest
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.models import signals
 from nose.plugins.attrib import attr
@@ -44,6 +45,51 @@ class SupportViewTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Could not log in")
 
 
+class SupportViewManageUserTests(SupportViewTestCase):
+    """
+    Base class for support view tests.
+    """
+
+    def setUp(self):
+        """Make the user support staff"""
+        super(SupportViewManageUserTests, self).setUp()
+        SupportStaffRole().add_users(self.user)
+
+    def test_get_support_form(self):
+        """
+        Tests Support View to return Manage User Form
+        """
+        url = reverse('support:manage_user')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_form_with_user_info(self):
+        """
+        Tests Support View to return Manage User Form
+        with user info
+        """
+        url = reverse('support:manage_user_detail') + self.user.username
+        response = self.client.get(url)
+        data = json.loads(response.content)
+        self.assertEqual(data['username'], self.user.username)
+
+    def test_disable_user_account(self):
+        """
+        Tests Support View to disable the user account
+        """
+        test_user = UserFactory(
+            username='foobar', email='foobar@foobar.com', password='foobar'
+        )
+        url = reverse('support:manage_user_detail') + test_user.username
+        response = self.client.post(url, data={
+            'username_or_email': test_user.username
+        })
+        data = json.loads(response.content)
+        self.assertEqual(data['success_msg'], 'User Disabled Successfully')
+        test_user = User.objects.get(username=test_user.username, email=test_user.email)
+        self.assertEqual(test_user.has_usable_password(), False)
+
+
 @attr(shard=3)
 @ddt.ddt
 class SupportViewAccessTests(SupportViewTestCase):
@@ -59,7 +105,9 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:certificates',
             'support:refund',
             'support:enrollment',
-            'support:enrollment_list'
+            'support:enrollment_list',
+            'support:manage_user',
+            'support:manage_user_detail'
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -85,7 +133,9 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:certificates",
         "support:refund",
         "support:enrollment",
-        "support:enrollment_list"
+        "support:enrollment_list",
+        "support:manage_user",
+        "support:manage_user_detail"
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)

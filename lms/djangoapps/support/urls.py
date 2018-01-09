@@ -18,4 +18,10 @@ urlpatterns = [
         views.EnrollmentSupportListView.as_view(),
         name="enrollment_list"
     ),
+    url(r'^manage_user/?$', views.ManageUserSupportView.as_view(), name="manage_user"),
+    url(
+        r'^manage_user/(?P<username_or_email>[\w.@+-]+)?$',
+        views.ManageUserDetailView.as_view(),
+        name="manage_user_detail"
+    ),
 ]
