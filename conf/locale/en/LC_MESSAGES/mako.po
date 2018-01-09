@@ -1,14 +1,14 @@
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-07 12:08+0000\n"
-"PO-Revision-Date: 2017-12-07 12:14:23.000787\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.748076\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -104,6 +104,7 @@ msgstr ""
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr ""
 
@@ -644,6 +645,7 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -663,6 +665,7 @@ msgstr ""
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -680,6 +683,8 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
@@ -1966,6 +1971,10 @@ msgstr ""
 #. Translators: git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded for this course."
+msgstr ""
+
+#: lms/templates/text-me-the-app.html
+msgid "Text Me The App"
 msgstr ""
 
 #: lms/templates/textannotation.html
@@ -4059,6 +4068,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr ""
 
@@ -4086,6 +4099,26 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session to access the course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Change or Leave Session"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can no longer change sessions."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -4120,16 +4153,41 @@ msgid "Course options for"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Available Actions"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Buy all remaining courses in this program and save 10%"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade All Remaining Courses ("
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{\"{0:.2f}\".format(a)}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid " ${price:.2f} {currency} ) "
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can contact the account holder to request payment, or you can "
+"unenroll from this course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -4284,6 +4342,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+msgid "Course options for {courseName}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
@@ -7010,6 +7072,22 @@ msgstr ""
 msgid "Program Details"
 msgstr ""
 
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Get the {platform_name} Mobile App!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "We'll send you a one time SMS with a link to download the app."
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Mobile phone number"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Send me a text with the link"
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr ""
@@ -8182,40 +8260,6 @@ msgid "Important Course Dates"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show/Hide"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show less"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid ""
-"Sample verified certificate with your name, the course title, the logo of "
-"the institution and the signatures of the instructors for this course."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Official proof of completion"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Easily shareable certificate"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Proven motivator to complete the course"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Certificate purchases help us continue to offer free courses"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Upgrade ({price})"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr ""
@@ -8225,6 +8269,14 @@ msgstr ""
 msgid "Edit your course goal:"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Pursue a verified certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Upgrade ({price})"
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr ""
@@ -8232,6 +8284,83 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
 msgid "Reviews"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Learn About Verified Certificates"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{platform_name} Verified Certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Why upgrade?"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Official proof of completion"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Easily shareable certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Proven motivator to complete the course"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"Certificate purchases help {platform_name} continue to offer free courses"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "How it works"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Pay the Verified Certificate upgrade fee"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Verify your identity with a webcam and government-issued ID"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Study hard and pass the course"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Share your certificate with friends, employers, and others"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "edX Learner Stories"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
+"really help me land                             my dream job!"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{learner_name}, edX Learner"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Upgrade ({course_price})"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html

@@ -41,6 +41,7 @@
                     data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
                 );
                 this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+                this.syncLearnerProfileData = data.thirdPartyAuth.syncLearnerProfileData || false;
                 this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                 this.platformName = data.platformName;
                 this.resetModel = data.resetModel;
@@ -49,6 +50,8 @@
                 this.createAccountOption = data.createAccountOption;
                 this.accountActivationMessages = data.accountActivationMessages;
                 this.hideAuthWarnings = data.hideAuthWarnings;
+                this.pipelineUserDetails = data.pipelineUserDetails;
+                this.enterpriseName = data.enterpriseName;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -63,10 +66,13 @@
                     context: {
                         fields: fields,
                         currentProvider: this.currentProvider,
+                        syncLearnerProfileData: this.syncLearnerProfileData,
                         providers: this.providers,
                         hasSecondaryProviders: this.hasSecondaryProviders,
                         platformName: this.platformName,
-                        createAccountOption: this.createAccountOption
+                        createAccountOption: this.createAccountOption,
+                        pipelineUserDetails: this.pipelineUserDetails,
+                        enterpriseName: this.enterpriseName
                     }
                 }));
 

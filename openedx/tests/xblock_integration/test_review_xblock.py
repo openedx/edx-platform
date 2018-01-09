@@ -368,7 +368,7 @@ class TestReviewFunctions(TestReviewXBlock):
         # The problems are defaulted to correct upon load
         # This happens because the problems "raw_possible" field is 0 and the
         # "raw_earned" field is also 0.
-        expected_correctness_text = 'correct'
+        expected_correctness_text = ' correct '
         expected_problems = ['Review Problem 1', 'Review Problem 2', 'Review Problem 3',
                              'Review Problem 4', 'Review Problem 5', 'Review Problem 6']
 

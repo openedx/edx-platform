@@ -4,7 +4,7 @@ Basic unit tests for LibraryRoot
 """
 from mock import patch
 
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 from xmodule.x_module import AUTHOR_VIEW
 

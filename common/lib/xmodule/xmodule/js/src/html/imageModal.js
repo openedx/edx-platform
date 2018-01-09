@@ -8,9 +8,9 @@ var setupFullScreenModal = function() {
     // if contents of zoomable link is image and large image link exists: setup modal
         if (smallImageObject.is('img') && largeImageSRC) {
             var data = {
-                'smallHTML': $(this).html(),
-                'largeALT': smallImageObject.attr('alt'),
-                'largeSRC': largeImageSRC
+                smallHTML: $(this).html(),
+                largeALT: smallImageObject.attr('alt'),
+                largeSRC: largeImageSRC
             };
             var html = _.template($('#image-modal-tpl').text())(data);
             $(this).replaceWith(html);

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 import openedx.core.djangoapps.external_auth.views
 from xmodule.modulestore.django import modulestore
@@ -74,7 +75,7 @@ def login(request):
             if course_id and _get_course_enrollment_domain(course_id):
                 response = openedx.core.djangoapps.external_auth.views.course_specific_login(
                     request,
-                    course_id.to_deprecated_string(),
+                    text_type(course_id),
                 )
 
     return response

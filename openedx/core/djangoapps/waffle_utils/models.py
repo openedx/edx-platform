@@ -4,6 +4,7 @@ Models for configuring waffle utils.
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
+from six import text_type
 
 from config_models.models import ConfigurationModel
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
@@ -58,4 +59,4 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
     def __unicode__(self):
         enabled_label = "Enabled" if self.enabled else "Not Enabled"
         # pylint: disable=no-member
-        return u"Course '{}': Persistent Grades {}".format(self.course_id.to_deprecated_string(), enabled_label)
+        return u"Course '{}': Persistent Grades {}".format(text_type(self.course_id), enabled_label)

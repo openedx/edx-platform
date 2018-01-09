@@ -1,11 +1,11 @@
 """Test Entitlements models"""
 
 import unittest
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-import pytz
 from django.conf import settings
 from django.test import TestCase
+from django.utils.timezone import now
 
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.api import MODES
@@ -25,7 +25,7 @@ class TestModels(TestCase):
     def setUp(self):
         super(TestModels, self).setUp()
         self.course = CourseOverviewFactory.create(
-            start=datetime.utcnow()
+            start=now()
         )
         self.enrollment = CourseEnrollmentFactory.create(course_id=self.course.id)
 
@@ -40,11 +40,15 @@ class TestModels(TestCase):
         assert entitlement.is_entitlement_redeemable() is True
 
         # Create a date 2 years in the past (greater than the policy expire period of 450 days)
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        past_datetime = now() - timedelta(days=365 * 2)
         entitlement.created = past_datetime
         entitlement.save()
 
         assert entitlement.is_entitlement_redeemable() is False
+
+        entitlement = CourseEntitlementFactory.create(expired_at=now())
+
+        assert entitlement.is_entitlement_refundable() is False
 
     def test_is_entitlement_refundable(self):
         """
@@ -60,7 +64,7 @@ class TestModels(TestCase):
         assert entitlement.is_entitlement_refundable() is False
 
         # Create a date 70 days in the past (greater than the policy refund expire period of 60 days)
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=70)
+        past_datetime = now() - timedelta(days=70)
         entitlement = CourseEntitlementFactory.create(created=past_datetime)
 
         assert entitlement.is_entitlement_refundable() is False
@@ -68,7 +72,7 @@ class TestModels(TestCase):
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
         # Create a date 20 days in the past (less than the policy refund expire period of 60 days)
         # but more than the policy regain period of 14 days and also the course start
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
+        past_datetime = now() - timedelta(days=20)
         entitlement.created = past_datetime
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
@@ -82,6 +86,10 @@ class TestModels(TestCase):
         entitlement.enrollment_course_run = None
 
         assert entitlement.is_entitlement_refundable() is True
+
+        entitlement = CourseEntitlementFactory.create(expired_at=now())
+
+        assert entitlement.is_entitlement_refundable() is False
 
     def test_is_entitlement_regainable(self):
         """
@@ -103,7 +111,7 @@ class TestModels(TestCase):
 
         # Create a date 20 days in the past (greater than the policy expire period of 14 days)
         # and apply it to both the entitlement and the course
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
+        past_datetime = now() - timedelta(days=20)
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment, created=past_datetime)
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
@@ -112,6 +120,10 @@ class TestModels(TestCase):
         self.enrollment.save()
 
         assert entitlement.is_entitlement_regainable() is False
+
+        entitlement = CourseEntitlementFactory.create(expired_at=now())
+
+        assert entitlement.is_entitlement_regainable
 
     def test_get_days_until_expiration(self):
         """
@@ -135,7 +147,7 @@ class TestModels(TestCase):
         assert entitlement.expired_at is None
 
         # Verify an entitlement from two years ago is expired and the db row is updated
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        past_datetime = now() - timedelta(days=365 * 2)
         entitlement.created = past_datetime
         entitlement.save()
         expired_at_datetime = entitlement.expired_at_datetime
@@ -151,7 +163,7 @@ class TestModels(TestCase):
 
         # Verify that an entitlement that has been redeemed but not within 14 days
         # and the course started more than two weeks ago is expired
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
+        past_datetime = now() - timedelta(days=20)
         entitlement.created = past_datetime
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
@@ -163,14 +175,29 @@ class TestModels(TestCase):
         assert expired_at_datetime
         assert entitlement.expired_at
 
+        # Verify that an entitlement that has just been created, but the user has been enrolled in the course for
+        # greater than 14 days, and the course started more than 14 days ago is not expired
+        entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
+        past_datetime = now() - timedelta(days=20)
+        entitlement.created = now()
+        self.enrollment.created = past_datetime
+        self.course.start = past_datetime
+        entitlement.save()
+        self.enrollment.save()
+        self.course.save()
+        assert entitlement.enrollment_course_run
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime is None
+        assert entitlement.expired_at is None
+
         # Verify a date 451 days in the past (1 days after the policy expiration)
         # That is enrolled and started in within the regain period is still expired
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
-        expired_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=451)
+        expired_datetime = now() - timedelta(days=451)
         entitlement.created = expired_datetime
-        now = datetime.now(tz=pytz.UTC)
-        self.enrollment.created = now
-        self.course.start = now
+        start = now()
+        self.enrollment.created = start
+        self.course.start = start
         entitlement.save()
         self.course.save()
         self.enrollment.save()

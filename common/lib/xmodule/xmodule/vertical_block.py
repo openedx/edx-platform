@@ -10,10 +10,10 @@ import logging
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 import six
+from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
-from xblock.fragment import Fragment
 
 
 from xmodule.mako_module import MakoTemplateBlockBase
@@ -106,7 +106,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # pylint: disable=no-member
         for child in self.get_display_items():
             rendered_child = child.render(STUDENT_VIEW, child_context)
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
 
             contents.append({
                 'id': six.text_type(child.location),

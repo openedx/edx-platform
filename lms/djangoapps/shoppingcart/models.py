@@ -29,6 +29,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
@@ -666,6 +667,16 @@ class OrderItem(TimeStampedModel):
     def line_cost(self):
         """ Return the total cost of this OrderItem """
         return self.qty * self.unit_cost
+
+    @line_cost.setter
+    def line_cost(self, value):
+        """
+        Django requires there be a setter for this, but it is not
+        necessary for the way we currently use it. Raising errors
+        here will cause a lot of issues and these should not be
+        mutable after construction, so for now we just eat this.
+        """
+        pass
 
     @classmethod
     def add_to_order(cls, order, *args, **kwargs):
@@ -1826,7 +1837,7 @@ class CourseRegCodeItemAnnotation(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+        return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class PaidCourseRegistrationAnnotation(models.Model):
@@ -1844,7 +1855,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+        return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class CertificateItem(OrderItem):

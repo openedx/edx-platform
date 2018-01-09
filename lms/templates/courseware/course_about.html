@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import get_course_about_section
 from django.conf import settings
+from six import text_type
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
@@ -42,7 +43,7 @@ from openedx.core.lib.courses import course_image_url
 
       $("#add_to_cart_post").click(function(event){
         $.ajax({
-          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
+          url: "${reverse('add_course_to_cart', args=[text_type(course.id)])}",
           type: "POST",
           /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
           complete: add_course_complete_handler
@@ -65,7 +66,7 @@ from openedx.core.lib.courses import course_image_url
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id | u}&enrollment_action=enroll";
+        location.href = "${reverse('course-specific-register', args=[text_type(course.id)])}?course_id=${course.id | u}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
         $('#register_error').html("${perms_error}").css("display", "block");
       } else {
@@ -105,6 +106,8 @@ from openedx.core.lib.courses import course_image_url
 <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info">
+
+  <%block name="course_about_header">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
       <div class="table">
@@ -199,6 +202,7 @@ from openedx.core.lib.courses import course_image_url
     </div>
       </div>
   </header>
+  </%block>
 
   <div class="container">
     <div class="details">
@@ -218,6 +222,7 @@ from openedx.core.lib.courses import course_image_url
 
         <%include file="course_about_sidebar_header.html" />
 
+        <%block name="course_about_important_dates">
         <ol class="important-dates">
           <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
@@ -288,16 +293,20 @@ from openedx.core.lib.courses import course_image_url
             </p>
           </li>
           % endif
+
           % if get_course_about_section(request, course, "prerequisites"):
             <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
+        </%block>
     </div>
 
+      <%block name="course_about_reviews_tool">
       ## Course reviews tool
       % if reviews_fragment_view:
        ${HTML(reviews_fragment_view.body_html())}
       % endif
+      </%block>
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):

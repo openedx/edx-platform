@@ -1,4 +1,6 @@
 """ User model wrapper for comment service"""
+from six import text_type
+
 import settings
 
 import models
@@ -102,7 +104,7 @@ class User(models.Model):
         if not self.course_id:
             raise utils.CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
-        params = {'course_id': self.course_id.to_deprecated_string()}
+        params = {'course_id': text_type(self.course_id)}
         params = utils.merge_dict(params, query_params)
         response = utils.perform_request(
             'get',
@@ -118,7 +120,7 @@ class User(models.Model):
         if not self.course_id:
             raise utils.CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
-        params = {'course_id': self.course_id.to_deprecated_string()}
+        params = {'course_id': text_type(self.course_id)}
         params = utils.merge_dict(params, query_params)
         response = utils.perform_request(
             'get',
@@ -140,7 +142,7 @@ class User(models.Model):
         retrieve_params = self.default_retrieve_params.copy()
         retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
-            retrieve_params['course_id'] = self.course_id.to_deprecated_string()
+            retrieve_params['course_id'] = text_type(self.course_id)
         if self.attributes.get('group_id'):
             retrieve_params['group_id'] = self.group_id
         try:

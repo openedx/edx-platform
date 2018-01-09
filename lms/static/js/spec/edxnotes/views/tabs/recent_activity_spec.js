@@ -8,13 +8,13 @@ define([
     'use strict';
     describe('EdxNotes RecentActivityView', function() {
         var notes = {
-                'count': 3,
-                'current_page': 1,
-                'num_pages': 1,
-                'start': 0,
-                'next': null,
-                'previous': null,
-                'results': [
+                count: 3,
+                current_page: 1,
+                num_pages: 1,
+                start: 0,
+                next: null,
+                previous: null,
+                results: [
                     {
                         created: 'December 11, 2014 at 11:12AM',
                         updated: 'December 11, 2014 at 11:12AM',
@@ -34,7 +34,8 @@ define([
                         quote: 'Should be listed third'
                     }
                 ]
-            }, getView, tabInfo, recentActivityTabId;
+            },
+            getView, tabInfo, recentActivityTabId;
 
         getView = function(collection, tabsCollection, options) {
             var view;
@@ -82,13 +83,13 @@ define([
 
         it('will not render header and footer if there are no notes', function() {
             var notes = {
-                'count': 0,
-                'current_page': 1,
-                'num_pages': 1,
-                'start': 0,
-                'next': null,
-                'previous': null,
-                'results': []
+                count: 0,
+                current_page: 1,
+                num_pages: 1,
+                start: 0,
+                next: null,
+                previous: null,
+                results: []
             };
             var collection = new NotesCollection(notes, {perPage: 10, parse: true});
             var view = getView(collection, this.tabsCollection);

@@ -213,6 +213,21 @@ class EmailMarketingTests(TestCase):
         self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_email_not_sent_to_enterprise_learners(self, mock_sailthru_post):
+        """
+        tests that welcome email is not sent to the enterprise learner
+        """
+        mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
+        update_user.delay(
+            sailthru_vars={
+                'is_enterprise_learner': True,
+                'enterprise_name': 'test name',
+            },
+            email=self.user.email
+        )
+        self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
+
+    @patch('email_marketing.tasks.SailthruClient.api_post')
     @patch('email_marketing.tasks.SailthruClient.api_get')
     def test_add_user_list_existing_domain(self, mock_sailthru_get, mock_sailthru_post):
         """

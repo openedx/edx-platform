@@ -8,10 +8,9 @@ from logging import getLogger
 from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
-from lms.djangoapps.grades.scores import get_score, possibly_scored
+from lms.djangoapps.grades.scores import get_score, possibly_scored, compute_percent
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore, ShowCorrectness
-
 
 log = getLogger(__name__)
 
@@ -141,10 +140,7 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
 
     @property
     def percent_graded(self):
-        if self.graded_total.possible > 0:
-            return self.graded_total.earned / self.graded_total.possible
-        else:
-            return 0.0
+        return compute_percent(self.graded_total.earned, self.graded_total.possible)
 
     @staticmethod
     def _compute_block_score(
@@ -230,11 +226,11 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
 
         super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
 
-    def update_or_create_model(self, student, score_deleted=False):
+    def update_or_create_model(self, student, score_deleted=False, force_update_subsections=False):
         """
         Saves or updates the subsection grade in a persisted model.
         """
-        if self._should_persist_per_attempted(score_deleted):
+        if self._should_persist_per_attempted(score_deleted, force_update_subsections):
             return PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
 
     @classmethod
@@ -250,17 +246,23 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         ]
         return PersistentSubsectionGrade.bulk_create_grades(params, student.id, course_key)
 
-    def _should_persist_per_attempted(self, score_deleted=False):
+    def _should_persist_per_attempted(self, score_deleted=False, force_update_subsections=False):
         """
         Returns whether the SubsectionGrade's model should be
         persisted based on settings and attempted status.
 
         If the learner's score was just deleted, they will have
         no attempts but the grade should still be persisted.
+
+        If the learner's enrollment track has changed, and the
+        subsection *only* contains track-specific problems that the
+        user has attempted, a re-grade will not occur. Should force
+        a re-grade in this case. See EDUCATOR-1280.
         """
         return (
             self.all_total.first_attempted is not None or
-            score_deleted
+            score_deleted or
+            force_update_subsections
         )
 
     def _persisted_model_params(self, student):

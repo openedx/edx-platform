@@ -5,7 +5,7 @@
         function($, Logger, moment) {
             return function() {
                 // define variables for code legibility
-                var toggleActionElements = $('.toggle-visibility-button');
+                var $toggleActionElements = $('.toggle-visibility-button');
 
                 var updateToggleActionText = function(elementIsHidden, actionElement) {
                     var show_text = actionElement.data('show'),
@@ -28,18 +28,18 @@
                     }
                 };
 
-                $.each(toggleActionElements, function(i, elem) {
-                    var toggleActionElement = $(elem),
-                        toggleTargetElement = toggleActionElement.siblings('.toggle-visibility-element'),
+                $.each($toggleActionElements, function(i, elem) {
+                    var $toggleActionElement = $(elem),
+                        toggleTargetElement = $toggleActionElement.siblings('.toggle-visibility-element'),
                         elementIsHidden = toggleTargetElement.is(':visible'),
                         date = toggleTargetElement.siblings('.date').text();
 
-                    updateToggleActionText(elementIsHidden, toggleActionElement);
+                    updateToggleActionText(elementIsHidden, $toggleActionElement);
 
-                    toggleActionElement.on('click', function(event) {
+                    $toggleActionElement.on('click', function(event) {
                         event.preventDefault();
                         toggleTargetElement.toggleClass('hidden');
-                        updateToggleActionText(!toggleTargetElement.hasClass('hidden'), toggleActionElement);
+                        updateToggleActionText(!toggleTargetElement.hasClass('hidden'), $toggleActionElement);
                         Logger.log('edx.course.home.course_update.toggled', {
                             action: elementIsHidden ? 'hide' : 'show',
                             publish_date: moment(date, 'MMM DD, YYYY').format()
@@ -48,4 +48,4 @@
                 });
             };
         });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

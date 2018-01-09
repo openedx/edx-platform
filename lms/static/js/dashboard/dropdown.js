@@ -8,26 +8,26 @@ var edx = edx || {};
 
     // Generate the properties object to be passed along with business intelligence events.
     edx.dashboard.dropdown.toggleCourseActionsDropdownMenu = function(event) {
-        // define variables for code legibility
-        var dashboardIndex = $(event.currentTarget).data().dashboardIndex,
-            $dropdown = $('#actions-dropdown-' + dashboardIndex),
-            dropdownButton = $('#actions-dropdown-link-' + dashboardIndex),
-            ariaExpandedState = (dropdownButton.attr('aria-expanded') === 'true'),
+        var $target = $(event.currentTarget),
+            dashboardIndex = $target.data().dashboardIndex,
+            $dropdown = $($target.data('dropdownSelector') || '#actions-dropdown-' + dashboardIndex),
+            $dropdownButton = $($target.data('dropdownButtonSelector') || '#actions-dropdown-link-' + dashboardIndex),
+            ariaExpandedState = ($dropdownButton.attr('aria-expanded') === 'true'),
             menuItems = $dropdown.find('a');
 
         var catchKeyPress = function(object, event) {
             // get currently focused item
-            var focusedItem = $(':focus');
+            var $focusedItem = $(':focus');
 
             // get the index of the currently focused item
-            var focusedItemIndex = menuItems.index(focusedItem);
+            var focusedItemIndex = menuItems.index($focusedItem);
 
             // var to store next focused item index
             var itemToFocusIndex;
 
             // if space or escape key pressed
             if (event.which === 32 || event.which === 27) {
-                dropdownButton.click();
+                $dropdownButton.click();
                 event.preventDefault();
             }
 
@@ -63,11 +63,11 @@ var edx = edx || {};
             $dropdown.focus();
         } else {
             $dropdown.removeAttr('tabindex');
-            dropdownButton.focus();
+            $dropdownButton.focus();
         }
 
         // Inform the ARIA framework that the dropdown has been expanded
-        dropdownButton.attr('aria-expanded', !ariaExpandedState);
+        $dropdownButton.attr('aria-expanded', !ariaExpandedState);
 
         // catch keypresses when inside dropdownMenu (we want to catch spacebar;
         // escape; up arrow or shift+tab; and down arrow or tab)
@@ -76,14 +76,15 @@ var edx = edx || {};
         });
     };
 
-    edx.dashboard.dropdown.bindToggleButtons = function() {
-        $('.action-more').bind(
+    edx.dashboard.dropdown.bindToggleButtons = function(selector) {
+        $(selector).bind(
         'click',
         edx.dashboard.dropdown.toggleCourseActionsDropdownMenu
       );
     };
 
     $(document).ready(function() {
-        edx.dashboard.dropdown.bindToggleButtons();
+        edx.dashboard.dropdown.bindToggleButtons('.action-more');
+        edx.dashboard.dropdown.bindToggleButtons('.js-entitlement-action-more');
     });
-})(jQuery);
+}(jQuery));

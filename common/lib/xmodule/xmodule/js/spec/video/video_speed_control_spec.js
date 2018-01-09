@@ -23,12 +23,12 @@
                 });
 
                 it('add the video speed control to player', function() {
-                    var secondaryControls = $('.secondary-controls'),
-                        li = secondaryControls.find('.video-speeds li');
+                    var $secondaryControls = $('.secondary-controls'),
+                        li = $secondaryControls.find('.video-speeds li');
 
-                    expect(secondaryControls).toContainElement('.speeds');
-                    expect(secondaryControls).toContainElement('.video-speeds');
-                    expect(secondaryControls.find('.value').text())
+                    expect($secondaryControls).toContainElement('.speeds');
+                    expect($secondaryControls).toContainElement('.video-speeds');
+                    expect($secondaryControls.find('.value').text())
                         .toBe('1.50x');
                     expect(li.filter('.is-active')).toHaveData(
                         'speed', state.videoSpeedControl.currentSpeed
@@ -56,7 +56,7 @@
             });
 
             describe('when running on non-touch based device', function() {
-                var speedControl, speedEntries, speedButton, speedsContainer,
+                var $speedControl, speedEntries, $speedButton, $speedsContainer,
                     KEY = $.ui.keyCode,
 
                     keyPressEvent = function(key) {
@@ -65,55 +65,55 @@
 
                 beforeEach(function() {
                     state = jasmine.initializePlayer();
-                    speedControl = $('.speeds');
-                    speedButton = $('.speed-button');
-                    speedsContainer = $('.video-speeds');
-                    speedEntries = speedsContainer.find('.speed-option');
+                    $speedControl = $('.speeds');
+                    $speedButton = $('.speed-button');
+                    $speedsContainer = $('.video-speeds');
+                    speedEntries = $speedsContainer.find('.speed-option');
                 });
 
                 it('open/close the speed menu on mouseenter/mouseleave',
                    function() {
-                       speedControl.mouseenter();
-                       expect(speedControl).toHaveClass('is-opened');
-                       speedControl.mouseleave();
-                       expect(speedControl).not.toHaveClass('is-opened');
+                       $speedControl.mouseenter();
+                       expect($speedControl).toHaveClass('is-opened');
+                       $speedControl.mouseleave();
+                       expect($speedControl).not.toHaveClass('is-opened');
                    });
 
                 it('do not close the speed menu on mouseleave if a speed ' +
                     'entry has focus', function() {
                     // Open speed meenu. Focus is on last speed entry.
-                    speedControl.trigger(keyPressEvent(KEY.ENTER));
-                    speedControl.mouseenter().mouseleave();
-                    expect(speedControl).toHaveClass('is-opened');
+                    $speedControl.trigger(keyPressEvent(KEY.ENTER));
+                    $speedControl.mouseenter().mouseleave();
+                    expect($speedControl).toHaveClass('is-opened');
                 });
 
                 it('close the speed menu on outside click', function() {
-                    speedControl.trigger(keyPressEvent(KEY.ENTER));
+                    $speedControl.trigger(keyPressEvent(KEY.ENTER));
                     $(window).click();
-                    expect(speedControl).not.toHaveClass('is-opened');
+                    expect($speedControl).not.toHaveClass('is-opened');
                 });
 
                 it('open the speed menu on ENTER keydown', function() {
-                    speedControl.trigger(keyPressEvent(KEY.ENTER));
-                    expect(speedControl).toHaveClass('is-opened');
+                    $speedControl.trigger(keyPressEvent(KEY.ENTER));
+                    expect($speedControl).toHaveClass('is-opened');
                     expect(speedEntries.last()).toBeFocused();
                 });
 
                 it('open the speed menu on SPACE keydown', function() {
-                    speedControl.trigger(keyPressEvent(KEY.SPACE));
-                    expect(speedControl).toHaveClass('is-opened');
+                    $speedControl.trigger(keyPressEvent(KEY.SPACE));
+                    expect($speedControl).toHaveClass('is-opened');
                     expect(speedEntries.last()).toBeFocused();
                 });
 
                 it('open the speed menu on UP keydown', function() {
-                    speedControl.trigger(keyPressEvent(KEY.UP));
-                    expect(speedControl).toHaveClass('is-opened');
+                    $speedControl.trigger(keyPressEvent(KEY.UP));
+                    expect($speedControl).toHaveClass('is-opened');
                     expect(speedEntries.last()).toBeFocused();
                 });
 
                 it('close the speed menu on ESCAPE keydown', function() {
-                    speedControl.trigger(keyPressEvent(KEY.ESCAPE));
-                    expect(speedControl).not.toHaveClass('is-opened');
+                    $speedControl.trigger(keyPressEvent(KEY.ESCAPE));
+                    expect($speedControl).not.toHaveClass('is-opened');
                 });
 
                 it('UP and DOWN keydown function as expected on speed entries',
@@ -122,7 +122,7 @@
                            speed_1_0 = speedEntries.filter(':contains("1.0x")');
 
                     // First open menu
-                       speedControl.trigger(keyPressEvent(KEY.UP));
+                       $speedControl.trigger(keyPressEvent(KEY.UP));
                        expect(speed_0_75).toBeFocused();
 
                        speed_0_75.trigger(keyPressEvent(KEY.UP));
@@ -134,26 +134,26 @@
 
                 it('ESC keydown on speed entry closes menu', function() {
                     // First open menu. Focus is on last speed entry.
-                    speedControl.trigger(keyPressEvent(KEY.UP));
+                    $speedControl.trigger(keyPressEvent(KEY.UP));
                     speedEntries.last().trigger(keyPressEvent(KEY.ESCAPE));
 
                     // Menu is closed and focus has been returned to speed
                     // control.
-                    expect(speedControl).not.toHaveClass('is-opened');
-                    expect(speedButton).toBeFocused();
+                    expect($speedControl).not.toHaveClass('is-opened');
+                    expect($speedButton).toBeFocused();
                 });
 
                 it('ENTER keydown on speed entry selects speed and closes menu',
                    function() {
                     // First open menu.
-                       speedControl.trigger(keyPressEvent(KEY.UP));
+                       $speedControl.trigger(keyPressEvent(KEY.UP));
                     // Focus on 1.50x speed
                        speedEntries.eq(0).focus();
                        speedEntries.eq(0).trigger(keyPressEvent(KEY.ENTER));
 
                     // Menu is closed, focus has been returned to speed
                     // control and video speed is 1.50x.
-                       expect(speedButton).toBeFocused();
+                       expect($speedButton).toBeFocused();
                        expect($('.video-speeds li[data-speed="1.50"]'))
                         .toHaveClass('is-active');
                        expect($('.speeds .value')).toHaveHtml('1.50x');
@@ -162,14 +162,14 @@
                 it('SPACE keydown on speed entry selects speed and closes menu',
                    function() {
                     // First open menu.
-                       speedControl.trigger(keyPressEvent(KEY.UP));
+                       $speedControl.trigger(keyPressEvent(KEY.UP));
                     // Focus on 1.50x speed
                        speedEntries.eq(0).focus();
                        speedEntries.eq(0).trigger(keyPressEvent(KEY.SPACE));
 
                     // Menu is closed, focus has been returned to speed
                     // control and video speed is 1.50x.
-                       expect(speedButton).toBeFocused();
+                       expect($speedButton).toBeFocused();
                        expect($('.video-speeds li[data-speed="1.50"]'))
                         .toHaveClass('is-active');
                        expect($('.speeds .value')).toHaveHtml('1.50x');

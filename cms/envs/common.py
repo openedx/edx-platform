@@ -45,6 +45,9 @@ import imp
 import os
 import sys
 from datetime import timedelta
+
+import django
+
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
@@ -127,7 +130,6 @@ from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
-import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
@@ -167,6 +169,10 @@ FEATURES = {
 
     # Don't autoplay videos for course authors
     'AUTOPLAY_VIDEOS': False,
+
+    # Move the course author to next page when a video finishes. Set to True to
+    # show an auto-advance button in videos. If False, videos never auto-advance.
+    'ENABLE_AUTOADVANCE_VIDEOS': False,
 
     # If set to True, new Studio users won't be able to author courses unless
     # an Open edX admin has added them to the course creator group.
@@ -330,7 +336,6 @@ CONTEXT_PROCESSORS = (
     'django.template.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',
-    'dealer.contrib.django.staff.context_processor',  # access git revision
     'help_tokens.context_processor',
 )
 
@@ -433,6 +438,13 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
+if django.VERSION < (1, 9):
+    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
+else:
+    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
+
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
     'request_cache.middleware.RequestCache',
@@ -442,7 +454,7 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'birdcage.v1_11.csrf.CsrfViewMiddleware',
+    _csrf_middleware,
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # Instead of SessionMiddleware, we use a more secure version
@@ -601,15 +613,8 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = []
 MANAGERS = ADMINS
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/studio/'
@@ -1003,9 +1008,6 @@ INSTALLED_APPS = [
     'require',
     'webpack_loader',
 
-    # Theming
-    'openedx.core.djangoapps.theming.apps.ThemingConfig',
-
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 
@@ -1118,13 +1120,12 @@ INSTALLED_APPS = [
     # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
 
-    # Dynamic schedules
-    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
-    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
-
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # Entitlements, used in openedx tests
+    'entitlements',
 ]
 
 
@@ -1489,3 +1490,17 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 ZENDESK_OAUTH_ACCESS_TOKEN = None
 ZENDESK_CUSTOM_FIELDS = {}
+
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+
+
+############## Installed Django Apps #########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+INSTALLED_APPS.extend(DjangoAppRegistry.get_plugin_apps(ProjectType.CMS))
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.COMMON)

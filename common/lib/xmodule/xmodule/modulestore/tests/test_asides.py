@@ -1,9 +1,9 @@
 """
 Tests for Asides
 """
+from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 from unittest import TestCase
 from xmodule.modulestore.tests.utils import XmlModulestoreBuilder
 from mock import patch

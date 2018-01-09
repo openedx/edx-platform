@@ -50,54 +50,21 @@ describe('Course Home factory', () => {
   describe('Upgrade message events', () => {
     const segmentEventProperties = {
       promotion_id: 'courseware_verified_certificate_upsell',
-      creative: 'original_hero',
+      creative: 'sidebarupsell',
       name: 'In-Course Verification Prompt',
-      position: 'hero',
+      position: 'sidebar-message',
     };
 
     it('should send events to Segment and edX on initial load', () => {
       expect(window.analytics.track).toHaveBeenCalledWith('Promotion Viewed', segmentEventProperties);
-      expect(Logger.log).toHaveBeenCalledWith('edx.bi.course.upgrade.hero.displayed', { courseRunKey: runKey });
+      expect(Logger.log).toHaveBeenCalledWith('edx.bi.course.upgrade.sidebarupsell.displayed', { courseRunKey: runKey });
     });
 
     it('should send events to Segment and edX after clicking the upgrade button ', () => {
-      $('.vc-message .btn-upgrade').click();
+      $('.section-upgrade .btn-upgrade').click();
       expect(window.analytics.track).toHaveBeenCalledWith('Promotion Viewed', segmentEventProperties);
-      expect(Logger.log).toHaveBeenCalledWith('edx.bi.course.upgrade.hero.clicked', { courseRunKey: runKey });
-      expect(Logger.log).toHaveBeenCalledWith('edx.course.enrollment.upgrade.clicked', { location: 'hero' });
-    });
-  });
-
-  describe('upgrade message display toggle', () => {
-    let $message;
-    let $toggle;
-
-    beforeEach(() => {
-      $.fx.off = true;
-
-      $message = $('.vc-message');
-      $toggle = $('.vc-toggle', $message);
-      expect($message.length).toEqual(1);
-      expect($toggle.length).toEqual(1);
-    });
-
-    it('hides/shows the message and writes/removes a key from local storage', () => {
-      // NOTE (CCB): Ideally this should be two tests--one for collapse, another for expansion.
-      // After a couple hours I have been unable to make these two tests pass, probably due to
-      // issues with the initial state of local storage.
-      expect($message.is(':visible')).toBeTruthy();
-      expect($message.hasClass('polite')).toBeFalsy();
-      expect($toggle.text().trim()).toEqual('Show less');
-
-      $toggle.click();
-      expect($message.hasClass('polite')).toBeTruthy();
-      expect($toggle.text().trim()).toEqual('Show more');
-      expect(window.localStorage.getItem(home.msgStateStorageKey)).toEqual('true');
-
-      $toggle.click();
-      expect($message.hasClass('polite')).toBeFalsy();
-      expect($toggle.text().trim()).toEqual('Show less');
-      expect(window.localStorage.getItem(home.msgStateStorageKey)).toBeNull();
+      expect(Logger.log).toHaveBeenCalledWith('edx.bi.course.upgrade.sidebarupsell.clicked', { courseRunKey: runKey });
+      expect(Logger.log).toHaveBeenCalledWith('edx.course.enrollment.upgrade.clicked', { location: 'sidebar-message' });
     });
   });
 });

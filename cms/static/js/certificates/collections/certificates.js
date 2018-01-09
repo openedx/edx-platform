@@ -31,8 +31,7 @@ function(Backbone, gettext, Certificate) {
                 // otherwise return empty array
                 if (typeof certificate_info === 'object') {
                     return_array = certificate_info;
-                }
-                else {
+                } else {
                     console.error(
                         interpolate(
                             gettext('Could not parse certificate JSON. %(message)s'), {message: ex.message}, true

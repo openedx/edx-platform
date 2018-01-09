@@ -125,7 +125,7 @@ def send_credit_notifications(username, course_key):
     to_address = user.email
 
     # send the root email message
-    msg = EmailMessage(subject, None, from_address, [to_address])
+    msg = EmailMessage(subject, '', from_address, [to_address])
     msg.attach(notification_msg)
     msg.send()
 

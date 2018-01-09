@@ -12,7 +12,7 @@ from rest_framework import status
 log = logging.getLogger(__name__)
 
 
-def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=None):
+def create_zendesk_ticket(requester_name, requester_email, subject, body, custom_fields=None, uploads=None, tags=None):
     """
     Create a Zendesk ticket via API.
 
@@ -20,12 +20,13 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
     common/djangoapps/util/views.py). Both of those callers use basic auth, and should be switched over to this oauth
     implementation once the immediate pressures of zendesk_proxy are resolved.
     """
-    if not (settings.ZENDESK_URL and settings.ZENDESK_OAUTH_ACCESS_TOKEN):
-        log.debug('Zendesk is not configured. Cannot create a ticket.')
-        return status.HTTP_503_SERVICE_UNAVAILABLE
+    def _std_error_message(details, payload):
+        """Internal helper to standardize error message. This allows for simpler splunk alerts."""
+        return 'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
 
-    # Remove duplicates from tags list
-    tags = list(set(tags))
+    if tags:
+        # Remove duplicates from tags list
+        tags = list(set(tags))
 
     data = {
         'ticket': {
@@ -34,7 +35,11 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
                 'email': requester_email
             },
             'subject': subject,
-            'comment': {'body': body},
+            'comment': {
+                'body': body,
+                'uploads': uploads
+            },
+            'custom_fields': custom_fields,
             'tags': tags
         }
     }
@@ -42,16 +47,16 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
     # Encode the data to create a JSON payload
     payload = json.dumps(data)
 
+    if not (settings.ZENDESK_URL and settings.ZENDESK_OAUTH_ACCESS_TOKEN):
+        log.error(_std_error_message("zendesk not configured", payload))
+        return status.HTTP_503_SERVICE_UNAVAILABLE
+
     # Set the request parameters
     url = urljoin(settings.ZENDESK_URL, '/api/v2/tickets.json')
     headers = {
         'content-type': 'application/json',
         'Authorization': "Bearer {}".format(settings.ZENDESK_OAUTH_ACCESS_TOKEN),
     }
-
-    def _std_error_message(details, payload):
-        """Internal helper to standardize error message. This allows for simpler splunk alerts."""
-        return 'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
 
     try:
         response = requests.post(url, data=payload, headers=headers)

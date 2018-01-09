@@ -34,6 +34,7 @@ from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful S
 from pyparsing import ParseException
 from pytz import UTC
 from shapely.geometry import MultiPoint, Point
+from six import text_type
 
 import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
@@ -368,7 +369,7 @@ class LoncapaResponse(object):
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
         event_info = dict()
-        event_info['module_id'] = self.capa_module.location.to_deprecated_string()
+        event_info['module_id'] = text_type(self.capa_module.location)
         event_info['problem_part_id'] = self.id
         event_info['trigger_type'] = 'single'  # maybe be overwritten by log_extra
         event_info['hint_label'] = label

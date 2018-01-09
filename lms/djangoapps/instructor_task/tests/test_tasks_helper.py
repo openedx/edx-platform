@@ -23,6 +23,7 @@ from freezegun import freeze_time
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from six import text_type
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -611,7 +612,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
 
         course_registration_code = CourseRegistrationCode(
             code='abcde',
-            course_id=self.course.id.to_deprecated_string(),
+            course_id=text_type(self.course.id),
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
@@ -652,7 +653,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         invoice_transaction.save()
         course_registration_code = CourseRegistrationCode(
             code='abcde',
-            course_id=self.course.id.to_deprecated_string(),
+            course_id=text_type(self.course.id),
             created_by=self.instructor,
             invoice=self.sale_invoice_1,
             invoice_item=self.invoice_item,
@@ -2557,7 +2558,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
 
                     # pylint: disable=maybe-no-member
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
-                    course_id_string = urllib.quote(self.course.id.to_deprecated_string().replace('/', '_'))
+                    course_id_string = urllib.quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)

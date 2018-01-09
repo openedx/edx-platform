@@ -19,13 +19,14 @@ from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 
 from course_modes.models import CourseMode
+from entitlements.signals import REFUND_ENTITLEMENT
+from entitlements.tests.factories import CourseEntitlementFactory
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
 from . import JSON
+from .mocks import mock_create_refund, mock_process_refund
 from ..models import CommerceConfiguration
 from ..signals import create_zendesk_ticket, generate_refund_notification_body, send_refund_notification
-from .mocks import mock_create_refund, mock_process_refund
 
 ZENDESK_URL = 'http://zendesk.example.com/'
 ZENDESK_USER = 'test@example.com'
@@ -320,3 +321,139 @@ class TestRefundSignal(TestCase):
             }
         }
         self.assertDictEqual(json.loads(last_request.body), expected)
+
+
+@override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY)
+class TestRevokeEntitlementSignal(TestCase):
+    """
+    Exercises logic triggered by the REVOKE_ENTITLEMENT signal.
+    """
+
+    def setUp(self):
+        super(TestRevokeEntitlementSignal, self).setUp()
+
+        # Ensure the E-Commerce service user exists
+        UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
+
+        self.requester = UserFactory(username="test-requester")
+        self.student = UserFactory(
+            username="test-student",
+            email="test-student@example.com",
+        )
+        self.course_entitlement = CourseEntitlementFactory(
+            user=self.student,
+            mode=CourseMode.VERIFIED
+        )
+
+        self.config = CommerceConfiguration.current()
+        self.config.enable_automatic_refund_approval = True
+        self.config.save()
+
+    def send_signal(self):
+        """
+        DRY helper: emit the REVOKE_ENTITLEMENT signal, as is done in
+        common.djangoapps.entitlements.views after a successful unenrollment and revoke of the entitlement.
+        """
+        REFUND_ENTITLEMENT.send(sender=None, course_entitlement=self.course_entitlement)
+
+    @override_settings(
+        ECOMMERCE_PUBLIC_URL_ROOT=None,
+        ECOMMERCE_API_URL=None,
+    )
+    def test_no_service(self):
+        """
+        Ensure that the receiver quietly bypasses attempts to initiate
+        refunds when there is no external service configured.
+        """
+        with mock.patch('lms.djangoapps.commerce.signals.refund_seat') as mock_refund_entitlement:
+            self.send_signal()
+            self.assertFalse(mock_refund_entitlement.called)
+
+    @mock.patch('lms.djangoapps.commerce.signals.get_request_user')
+    @mock.patch('lms.djangoapps.commerce.signals.refund_entitlement')
+    def test_receiver(self, mock_refund_entitlement, mock_get_user):
+        """
+        Ensure that the REVOKE_ENTITLEMENT signal triggers correct calls to
+        refund_entitlement(), when it is appropriate to do so.
+        """
+        mock_get_user.return_value = self.student
+        self.send_signal()
+        self.assertTrue(mock_refund_entitlement.called)
+        self.assertEqual(mock_refund_entitlement.call_args[0], (self.course_entitlement,))
+
+        # if the course_entitlement is not refundable, we should not try to initiate a refund.
+        mock_refund_entitlement.reset_mock()
+        self.course_entitlement.is_entitlement_refundable = mock.Mock(return_value=False)
+        self.send_signal()
+        self.assertFalse(mock_refund_entitlement.called)
+
+    @mock.patch('lms.djangoapps.commerce.signals.refund_entitlement')
+    @mock.patch('lms.djangoapps.commerce.signals.get_request_user', return_value=None)
+    def test_requester(self, mock_get_request_user, mock_refund_entitlement):
+        """
+        Ensure the right requester is specified when initiating refunds.
+        """
+        # no HTTP request/user: No Refund called.
+        self.send_signal()
+        self.assertFalse(mock_refund_entitlement.called)
+
+        # HTTP user is the student: auth to commerce service as the unenrolled student and refund.
+        mock_get_request_user.return_value = self.student
+        mock_refund_entitlement.reset_mock()
+        self.send_signal()
+        self.assertTrue(mock_refund_entitlement.called)
+        self.assertEqual(mock_refund_entitlement.call_args[0], (self.course_entitlement,))
+
+        # HTTP user is another user: No refund invalid user.
+        mock_get_request_user.return_value = self.requester
+        mock_refund_entitlement.reset_mock()
+        self.send_signal()
+        self.assertFalse(mock_refund_entitlement.called)
+
+        # HTTP user is another server (AnonymousUser): do not try to initiate a refund at all.
+        mock_get_request_user.return_value = AnonymousUser()
+        mock_refund_entitlement.reset_mock()
+        self.send_signal()
+        self.assertFalse(mock_refund_entitlement.called)
+
+    @mock.patch('lms.djangoapps.commerce.signals.get_request_user',)
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
+    def test_notification_when_approval_fails(self, mock_send_notification, mock_get_user):
+        """
+        Ensure the notification function is triggered when refunds are initiated, and cannot be automatically approved.
+        """
+        refund_id = 1
+        failed_refund_id = 2
+
+        with mock_create_refund(status=201, response=[refund_id, failed_refund_id]):
+            with mock_process_refund(refund_id, reset_on_exit=False):
+                with mock_process_refund(failed_refund_id, status=500, reset_on_exit=False):
+                    mock_get_user.return_value = self.student
+                    self.send_signal()
+                    self.assertTrue(mock_send_notification.called)
+                    mock_send_notification.assert_called_with(self.course_entitlement, [failed_refund_id])
+
+    @mock.patch('lms.djangoapps.commerce.signals.get_request_user')
+    @mock.patch('lms.djangoapps.commerce.signals.send_refund_notification')
+    def test_notification_if_automatic_approval_disabled(self, mock_send_notification, mock_get_user):
+        """
+        Ensure the notification is always sent if the automatic approval functionality is disabled.
+        """
+        refund_id = 1
+        self.config.enable_automatic_refund_approval = False
+        self.config.save()
+
+        with mock_create_refund(status=201, response=[refund_id]):
+            mock_get_user.return_value = self.student
+            self.send_signal()
+            self.assertTrue(mock_send_notification.called)
+            mock_send_notification.assert_called_with(self.course_entitlement, [refund_id])
+
+    @mock.patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site', return_value=True)
+    def test_notification_themed_site(self, mock_is_request_in_themed_site):  # pylint: disable=unused-argument
+        """
+        Ensure the notification function raises an Exception if used in the
+        context of themed site.
+        """
+        with self.assertRaises(NotImplementedError):
+            send_refund_notification(self.course_entitlement, [1, 2, 3])

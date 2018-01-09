@@ -14,7 +14,8 @@ define(['jquery', 'underscore', 'js/views/xblock', 'js/utils/module', 'gettext',
             xblockReady: function() {
                 XBlockView.prototype.xblockReady.call(this);
                 var reorderableClass, reorderableContainer,
-                    newParent, oldParent, self = this;
+                    newParent, oldParent,
+                    self = this;
 
                 this.requestToken = this.$('div.xblock').first().data('request-token');
                 reorderableClass = this.makeRequestSpecificSelector('.reorderable-container');
@@ -91,7 +92,8 @@ define(['jquery', 'underscore', 'js/views/xblock', 'js/utils/module', 'gettext',
             },
 
             updateChildren: function(targetParent, successCallback) {
-                var children, childLocators, xblockInfo = this.model;
+                var children, childLocators,
+                    xblockInfo = this.model;
 
                 // Find descendants with class "studio-xblock-wrapper" whose parent === targetParent.
                 // This is necessary to filter our grandchildren, great-grandchildren, etc.

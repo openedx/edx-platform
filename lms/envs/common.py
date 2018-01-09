@@ -33,12 +33,11 @@ import imp
 import sys
 import os
 
-import dealer.git
+import django
 from path import Path as path
 from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
-from .discussionsettings import *
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
@@ -162,6 +161,10 @@ FEATURES = {
 
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
+
+    # Move the student to next page when a video finishes. Set to True to show
+    # an auto-advance button in videos. If False, videos never auto-advance.
+    'ENABLE_AUTOADVANCE_VIDEOS': False,
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
@@ -1230,6 +1233,13 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
+if django.VERSION < (1, 9):
+    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
+else:
+    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
+
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
@@ -1271,7 +1281,7 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'birdcage.v1_11.csrf.CsrfViewMiddleware',
+    _csrf_middleware,
 
     'splash.middleware.SplashMiddleware',
 
@@ -2005,14 +2015,6 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
-############################# Persistent Grades ####################################
-
-# Queue to use for updating persistent grades
-RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
-
-# Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
-
 ############################# Email Opt In ####################################
 
 # Minimum age for organization-wide email opt in
@@ -2095,9 +2097,6 @@ INSTALLED_APPS = [
     # For content serving
     'openedx.core.djangoapps.contentserver',
 
-    # Theming
-    'openedx.core.djangoapps.theming.apps.ThemingConfig',
-
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 
@@ -2126,7 +2125,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
-    'lms.djangoapps.grades.apps.GradesConfig',
 
     # Signals
     'openedx.core.djangoapps.signals.apps.SignalConfig',
@@ -2334,8 +2332,6 @@ INSTALLED_APPS = [
     'database_fixups',
 
     'openedx.core.djangoapps.waffle_utils',
-    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
-    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # Course Goals
     'lms.djangoapps.course_goals',
@@ -2410,6 +2406,9 @@ STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 SUPPORT_SITE_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
+
+# Days before the expired date that we warn the user
+ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
 
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
@@ -2973,6 +2972,10 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
+### Analytics API
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "http://localhost:18100"
+
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
@@ -3085,6 +3088,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "requires_parental_consent",
         "account_privacy",
         "accomplishments_shared",
+        "extended_profile",
     ]
 }
 
@@ -3426,25 +3430,21 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 
-############## Settings for ACE ####################################
-ACE_ENABLED_CHANNELS = [
-    'file_email'
-]
-ACE_ENABLED_POLICIES = [
-    'bulk_email_optout'
-]
-ACE_CHANNEL_SAILTHRU_DEBUG = True
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = 'Automated Communication Engine Email'
-ACE_CHANNEL_SAILTHRU_API_KEY = None
-ACE_CHANNEL_SAILTHRU_API_SECRET = None
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'
 
-ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
+############## Settings for Completion API #########################
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+
+############### Settings for Django Rate limit #####################
+RATELIMIT_ENABLE = True
+RATELIMIT_RATE = '30/m'
+
+############## Plugin Django Apps #########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+INSTALLED_APPS.extend(DjangoAppRegistry.get_plugin_apps(ProjectType.LMS))
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.LMS, SettingsType.COMMON)

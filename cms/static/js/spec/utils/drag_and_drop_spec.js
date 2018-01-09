@@ -1,5 +1,5 @@
 define(['sinon', 'js/utils/drag_and_drop', 'common/js/components/views/feedback_notification',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery', 'underscore'],
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery', 'underscore'],
     function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
         'use strict';
         describe('Overview drag and drop functionality', function() {
@@ -312,7 +312,7 @@ define(['sinon', 'js/utils/drag_and_drop', 'common/js/components/views/feedback_
                 });
                 it('should send an update on reorder from one parent to another', function() {
                     var requests, request, savingOptions;
-                    requests = AjaxHelpers['requests'](this);
+                    requests = AjaxHelpers.requests(this);
                     ContentDragger.dragState.dropDestination = $('#unit-4');
                     ContentDragger.dragState.attachMethod = 'after';
                     ContentDragger.dragState.parentList = $('#subsection-2');
@@ -343,7 +343,7 @@ define(['sinon', 'js/utils/drag_and_drop', 'common/js/components/views/feedback_
                     expect($('#subsection-2').data('refresh')).toHaveBeenCalled();
                 });
                 it('should send an update on reorder within the same parent', function() {
-                    var requests = AjaxHelpers['requests'](this),
+                    var requests = AjaxHelpers.requests(this),
                         request;
                     ContentDragger.dragState.dropDestination = $('#unit-2');
                     ContentDragger.dragState.attachMethod = 'after';

@@ -25,7 +25,7 @@ function($, _, Backbone, gettext,
             'change .certificate-course-title-input': 'setCourseTitle',
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
-            'submit': 'setAndClose',
+            submit: 'setAndClose',
             'click .action-cancel': 'cancel',
             'click .action-add-signatory': 'addSignatory'
         },

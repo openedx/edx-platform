@@ -1,14 +1,14 @@
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-07 12:08+0000\n"
-"PO-Revision-Date: 2017-12-07 12:14:22.719950\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.271348\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -281,6 +281,10 @@ msgstr ""
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid "Full Name cannot contain the following characters: < >"
 msgstr ""
 
 #: common/djangoapps/student/forms.py
@@ -892,13 +896,6 @@ msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
-msgstr ""
-
-#: common/djangoapps/third_party_auth/models.py
-msgid ""
-"Whether to drop an existing session when accessing a view decorated with "
-"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
-"URL query parameter mapping to this provider is included in the request."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -3090,6 +3087,34 @@ msgstr ""
 msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/graders.py
+msgid "Generated"
+msgstr ""
+
+#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
+#. released for viewing.
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} {index} Unreleased - 0% (?/?)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "The lowest {drop_count} {section_type} scores are dropped."
+msgstr ""
+
+#. Translators: "Homework Average = 0%"
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} Average = {percent:.0%}"
+msgstr ""
+
+#. Translators: Avg is short for Average
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{short_label} Avg"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr ""
@@ -3654,6 +3679,17 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video auto-advance"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify whether to show an auto-advance button in videos. If the student "
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
 msgstr ""
 
@@ -4185,6 +4221,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "The default speed for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether to advance automatically to the next unit when the video "
+"ends."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4979,14 +5021,15 @@ msgstr ""
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
 msgstr ""
 
@@ -5032,6 +5075,34 @@ msgstr ""
 msgid ""
 "If your course does not appear on your dashboard, contact "
 "{payment_support_link}."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid ""
+"BlockCompletion.objects.submit_batch_completion should not be called when "
+"the feature is disabled."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Key '{key}' not found."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "Invalid course key: {}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "User is not enrolled in course."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Block with key: '{key}' is not in course {course}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "ok"
 msgstr ""
 
 #: lms/djangoapps/completion/models.py
@@ -6107,6 +6178,7 @@ msgstr ""
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "City"
 msgstr ""
@@ -6734,6 +6806,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr ""
@@ -6741,6 +6814,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr ""
@@ -6753,6 +6827,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Title"
 msgstr ""
@@ -7999,6 +8074,16 @@ msgstr ""
 msgid "You do not have permission to view this page."
 msgstr ""
 
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
+msgstr ""
+
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
 msgstr ""
@@ -8011,8 +8096,55 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #: lms/djangoapps/student_account/views.py
-msgid "Continue"
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Mailing address"
+msgstr ""
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
 msgstr ""
 
 #: lms/djangoapps/support/views/index.py
@@ -9739,10 +9871,6 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
@@ -9827,44 +9955,6 @@ msgid "Year of birth"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Mailing address"
-msgstr ""
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Country or Region of Residence"
@@ -9900,15 +9990,13 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service"
-msgstr ""
-
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
@@ -10117,6 +10205,17 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"Thank you for joining {platform_name}. Just a couple steps before you start "
+"learning!"
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+msgid "Continue"
 msgstr ""
 
 #: openedx/features/learner_profile/views/learner_profile.py

@@ -497,8 +497,8 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
     Setup base class for draft/published/OLX tests.
     """
 
-    EXPORTED_COURSE_BEFORE_DIR_NAME = 'exported_course_before'
-    EXPORTED_COURSE_AFTER_DIR_NAME = 'exported_course_after_{}'
+    EXPORTED_COURSE_BEFORE_DIR_NAME = u'exported_course_before'
+    EXPORTED_COURSE_AFTER_DIR_NAME = u'exported_course_after_{}'
 
     def setUp(self):
         super(DraftPublishedOpBaseTestSetup, self).setUp()

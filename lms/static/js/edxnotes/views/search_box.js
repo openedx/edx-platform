@@ -11,7 +11,7 @@
     ], function($, _, Backbone, gettext, HtmlUtils, NotesLogger, NotesCollection) {
         var SearchBoxView = Backbone.View.extend({
             events: {
-                'submit': 'submitHandler'
+                submit: 'submitHandler'
             },
 
             errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
@@ -108,8 +108,8 @@
                 if (args) {
                     this.options.search.apply(this, args);
                     this.logger.emit('edx.course.student_notes.searched', {
-                        'number_of_results': args[0].getTotalRecords(),
-                        'search_string': args[1]
+                        number_of_results: args[0].getTotalRecords(),
+                        search_string: args[1]
                     });
                 } else {
                     this.options.error(this.errorMessage, this.searchQuery);

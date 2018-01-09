@@ -31,7 +31,7 @@ class RenderForm extends React.Component {
   }
 
   submitForm() {
-    const url = `${this.props.context.zendeskApiHost}/api/v2/tickets.json`,
+    const url = this.props.context.zendeskProxyUrl,
       $userInfo = $('.user-info'),
       request = new XMLHttpRequest(),
       $course = $('#course'),
@@ -39,14 +39,17 @@ class RenderForm extends React.Component {
         subject: $('#subject').val(),
         comment: {
           body: $('#message').val(),
-          uploads: $.map($('.uploaded-files button'), n => n.id),
         },
         tags: this.props.context.zendeskTags,
       };
 
     let course;
 
-    data.requester = $userInfo.data('email');
+    data.requester = {
+      email: $userInfo.data('email'),
+      name: $userInfo.data('username')
+    };
+
     course = $course.find(':selected').val();
     if (!course) {
       course = $course.val();
@@ -59,12 +62,10 @@ class RenderForm extends React.Component {
 
     if (this.validateData(data)) {
       request.open('POST', url, true);
-      request.setRequestHeader('Authorization', `Bearer ${this.props.context.accessToken}`);
-      request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+      request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
 
-      request.send(JSON.stringify({
-        ticket: data,
-      }));
+      request.send(JSON.stringify(data));
 
       request.onreadystatechange = function success() {
         if (request.readyState === 4 && request.status === 201) {
@@ -81,16 +82,7 @@ class RenderForm extends React.Component {
   }
 
   validateData(data) {
-    const errors = [],
-      regex = /^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-
-    if (!data.requester) {
-      errors.push(gettext('Enter a valid email address.'));
-      $('#email').closest('.form-group').addClass('has-error');
-    } else if (!regex.test(data.requester)) {
-      errors.push(gettext('Enter a valid email address.'));
-      $('#email').closest('.form-group').addClass('has-error');
-    }
+    const errors = [];
     if (!data.subject) {
       errors.push(gettext('Enter a subject for your support request.'));
       $('#subject').closest('.form-group').addClass('has-error');
@@ -124,8 +116,7 @@ class RenderForm extends React.Component {
     if (this.props.context.user) {
       userElement = (<LoggedInUser
         userInformation={this.props.context.user}
-        zendeskApiHost={this.props.context.zendeskApiHost}
-        accessToken={this.props.context.accessToken}
+        zendeskProxyUrl={this.props.context.zendeskProxyUrl}
         setErrorState={this.setErrorState}
         submitForm={this.submitForm}
       />);

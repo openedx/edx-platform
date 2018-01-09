@@ -1,10 +1,10 @@
 define(
     ['underscore', 'gettext', 'js/utils/date_utils', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
-        'common/js/components/views/feedback_notification', 'js/views/video_thumbnail',
+        'common/js/components/views/feedback_notification', 'js/views/video_thumbnail', 'js/views/video_transcripts',
         'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/previous-video-upload.underscore'],
-    function(_, gettext, DateUtils, BaseView, PromptView, NotificationView, VideoThumbnailView, ViewUtils, HtmlUtils,
-             previousVideoUploadTemplate) {
+    function(_, gettext, DateUtils, BaseView, PromptView, NotificationView, VideoThumbnailView, VideoTranscriptsView,
+            ViewUtils, HtmlUtils, previousVideoUploadTemplate) {
         'use strict';
 
         var PreviousVideoUploadView = BaseView.extend({
@@ -20,6 +20,7 @@ define(
                 this.template = HtmlUtils.template(previousVideoUploadTemplate);
                 this.videoHandlerUrl = options.videoHandlerUrl;
                 this.videoImageUploadEnabled = options.videoImageSettings.video_image_upload_enabled;
+                this.isVideoTranscriptEnabled = options.isVideoTranscriptEnabled;
 
                 if (this.videoImageUploadEnabled) {
                     this.videoThumbnailView = new VideoThumbnailView({
@@ -29,11 +30,22 @@ define(
                         videoImageSettings: options.videoImageSettings
                     });
                 }
+                if (this.isVideoTranscriptEnabled) {
+                    this.videoTranscriptsView = new VideoTranscriptsView({
+                        transcripts: this.model.get('transcripts'),
+                        edxVideoID: this.model.get('edx_video_id'),
+                        clientVideoID: this.model.get('client_video_id'),
+                        transcriptAvailableLanguages: options.transcriptAvailableLanguages,
+                        videoSupportedFileFormats: options.videoSupportedFileFormats,
+                        videoTranscriptSettings: options.videoTranscriptSettings
+                    });
+                }
             },
 
             render: function() {
                 var renderedAttributes = {
                     videoImageUploadEnabled: this.videoImageUploadEnabled,
+                    isVideoTranscriptEnabled: this.isVideoTranscriptEnabled,
                     created: DateUtils.renderDate(this.model.get('created')),
                     status: this.model.get('status')
                 };
@@ -46,6 +58,9 @@ define(
 
                 if (this.videoImageUploadEnabled) {
                     this.videoThumbnailView.setElement(this.$('.thumbnail-col')).render();
+                }
+                if (this.isVideoTranscriptEnabled) {
+                    this.videoTranscriptsView.setElement(this.$('.transcripts-col')).render();
                 }
                 return this;
             },

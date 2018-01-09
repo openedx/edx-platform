@@ -1,12 +1,13 @@
 import uuid as uuid_tools
-from datetime import datetime, timedelta
+from datetime import timedelta
+from util.date_utils import strftime_localized
 
-import pytz
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
+from django.utils.timezone import now
 
-from certificates.models import GeneratedCertificate  # pylint: disable=import-error
+from certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -44,19 +45,20 @@ class CourseEntitlementPolicy(models.Model):
         Returns an integer of number of days until the entitlement expires.
         Includes the logic for regaining an entitlement.
         """
-        now = datetime.now(tz=pytz.UTC)
+        now_timestamp = now()
         expiry_date = entitlement.created + self.expiration_period
-        days_until_expiry = (expiry_date - now).days
+        days_until_expiry = (expiry_date - now_timestamp).days
         if not entitlement.enrollment_course_run:
             return days_until_expiry
         course_overview = CourseOverview.get_from_id(entitlement.enrollment_course_run.course_id)
         # Compute the days left for the regain
-        days_since_course_start = (now - course_overview.start).days
-        days_since_enrollment = (now - entitlement.enrollment_course_run.created).days
+        days_since_course_start = (now_timestamp - course_overview.start).days
+        days_since_enrollment = (now_timestamp - entitlement.enrollment_course_run.created).days
+        days_since_entitlement_created = (now_timestamp - entitlement.created).days
 
         # We want to return whichever days value is less since it is then the more recent one
         days_until_regain_ends = (self.regain_period.days -  # pylint: disable=no-member
-                                  min(days_since_course_start, days_since_enrollment))
+                                  min(days_since_course_start, days_since_enrollment, days_since_entitlement_created))
 
         # If the base days until expiration is less than the days until the regain period ends, use that instead
         if days_until_expiry < days_until_regain_ends:
@@ -70,6 +72,9 @@ class CourseEntitlementPolicy(models.Model):
         to by leaving and regaining their entitlement within policy.regain_period days from start date of
         the course or their redemption, whichever comes later, and the expiration period hasn't passed yet
         """
+        if entitlement.expired_at:
+            return False
+
         if entitlement.enrollment_course_run:
             if GeneratedCertificate.certificate_for_student(
                     entitlement.user_id, entitlement.enrollment_course_run.course_id) is not None:
@@ -86,6 +91,10 @@ class CourseEntitlementPolicy(models.Model):
         yet been redeemed (enrollment_course_run is NULL) and policy.refund_period has not yet passed, or if
         the entitlement has been redeemed, but the regain period hasn't passed yet.
         """
+        # If the Entitlement is expired already it is not refundable
+        if entitlement.expired_at:
+            return False
+
         # If there's no order number, it cannot be refunded
         if entitlement.order_number is None:
             return False
@@ -108,7 +117,8 @@ class CourseEntitlementPolicy(models.Model):
         # This is < because a get_days_since_created of expiration_period means that that many days have passed,
         # which should then expire the entitlement
         return (entitlement.get_days_since_created() < self.expiration_period.days  # pylint: disable=no-member
-                and not entitlement.enrollment_course_run)
+                and not entitlement.enrollment_course_run
+                and not entitlement.expired_at)
 
     def __unicode__(self):
         return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}'\
@@ -123,7 +133,6 @@ class CourseEntitlement(TimeStampedModel):
     """
     Represents a Student's Entitlement to a Course Run for a given Course.
     """
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
     course_uuid = models.UUIDField(help_text='UUID for the Course, not the Course Run')
@@ -175,8 +184,7 @@ class CourseEntitlement(TimeStampedModel):
         """
         Returns an integer of number of days since the entitlement has been created
         """
-        utc = pytz.UTC
-        return (datetime.now(tz=utc) - self.created).days
+        return (now() - self.created).days
 
     def update_expired_at(self):
         """
@@ -186,7 +194,7 @@ class CourseEntitlement(TimeStampedModel):
         if not self.expired_at:
             if (self.policy.get_days_until_expiration(self) < 0 or
                     (self.enrollment_course_run and not self.is_entitlement_regainable())):
-                self.expired_at = datetime.utcnow()
+                self.expired_at = now()
                 self.save()
 
     def get_days_until_expiration(self):
@@ -213,9 +221,67 @@ class CourseEntitlement(TimeStampedModel):
         """
         return self.policy.is_entitlement_redeemable(self)
 
-    @classmethod
-    def set_enrollment(cls, entitlement, enrollment):
+    def to_dict(self):
+        """
+        Convert entitlement to dictionary representation including relevant policy information.
+
+        Returns:
+            The entitlement UUID
+            The associated course's UUID
+            The date at which the entitlement expired. None if it is still active.
+            The localized string representing the date at which the entitlement expires.
+        """
+        expiration_date = None
+        if self.get_days_until_expiration() < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD:
+            expiration_date = strftime_localized(
+                now() + timedelta(days=self.get_days_until_expiration()),
+                'SHORT_DATE'
+            )
+        expired_at = strftime_localized(self.expired_at_datetime, 'SHORT_DATE') if self.expired_at_datetime else None
+
+        return {
+            'uuid': str(self.uuid),
+            'course_uuid': str(self.course_uuid),
+            'expired_at': expired_at,
+            'expiration_date': expiration_date
+        }
+
+    def set_enrollment(self, enrollment):
         """
         Fulfills an entitlement by specifying a session.
         """
-        cls.objects.filter(id=entitlement.id).update(enrollment_course_run=enrollment)
+        self.enrollment_course_run = enrollment
+        self.save()
+
+    @classmethod
+    def unexpired_entitlements_for_user(cls, user):
+        return cls.objects.filter(user=user, expired_at=None).select_related('user')
+
+    @classmethod
+    def get_entitlement_if_active(cls, user, course_uuid):
+        """
+        Returns an entitlement for a given course uuid if an active entitlement exists, otherwise returns None.
+        An active entitlement is defined as an entitlement that has not yet expired or has a currently enrolled session.
+        """
+        return cls.objects.filter(
+            user=user,
+            course_uuid=course_uuid
+        ).exclude(expired_at__isnull=False, enrollment_course_run=None).first()
+
+    @classmethod
+    def get_active_entitlements_for_user(cls, user):
+        """
+        Returns a list of active (enrolled or not yet expired) entitlements.
+
+        Returns any entitlements that are:
+            1) Not expired and no session selected
+            2) Not expired and a session is selected
+            3) Expired and a session is selected
+
+        Does not return any entitlements that are:
+            1) Expired and no session selected
+        """
+        return cls.objects.filter(user=user).exclude(
+            expired_at__isnull=False,
+            enrollment_course_run=None
+        ).select_related('user').select_related('enrollment_course_run')

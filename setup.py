@@ -59,9 +59,21 @@ setup(
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
+            "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer"
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
+        ],
+        "lms.djangoapp": [
+            "grades = lms.djangoapps.grades.apps:GradesConfig",
+            "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
+            "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
+        ],
+        "cms.djangoapp": [
+            "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
+            "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
         ],
     }
 )

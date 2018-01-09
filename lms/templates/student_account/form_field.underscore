@@ -91,6 +91,7 @@
             <% } %>
             <% if ( restrictions.min_length ) { %> minlength="<%- restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%- restrictions.max_length %>"<% } %>
+            <% if ( restrictions.readonly )   { %> readonly <% } %>
             <% if ( required ) { %> required<% } %>
             <% if ( typeof errorMessages !== 'undefined' ) {
                 _.each(errorMessages, function( msg, type ) {%>

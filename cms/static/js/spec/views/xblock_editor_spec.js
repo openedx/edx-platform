@@ -76,7 +76,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 });
 
                 it('saves any custom metadata', function() {
-                    var requests = AjaxHelpers.requests(this), request, response;
+                    var requests = AjaxHelpers.requests(this),
+                        request, response;
                     editor.render();
                     AjaxHelpers.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
@@ -92,7 +93,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 });
 
                 it('can render a module with only settings', function() {
-                    var requests = AjaxHelpers.requests(this), mockXModuleEditorHtml;
+                    var requests = AjaxHelpers.requests(this),
+                        mockXModuleEditorHtml;
                     mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
 
                     editor.render();

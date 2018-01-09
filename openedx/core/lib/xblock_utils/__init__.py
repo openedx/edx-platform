@@ -19,9 +19,10 @@ from pytz import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
+from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
-from xblock.fragment import Fragment
 from xblock.scorable import ScorableXBlockMixin
 
 from xmodule.seq_module import SequenceModule
@@ -37,7 +38,7 @@ def wrap_fragment(fragment, new_content):
     as its content, and all of the resources from fragment
     """
     wrapper_frag = Fragment(content=new_content)
-    wrapper_frag.add_frag_resources(fragment)
+    wrapper_frag.add_fragment_resources(fragment)
     return wrapper_frag
 
 
@@ -223,7 +224,7 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
         redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
         the end of this URL at re-write time
 
-    output: a new :class:`~xblock.fragment.Fragment` that modifies `frag` with
+    output: a new :class:`~web_fragments.fragment.Fragment` that modifies `frag` with
         content that has been update with /jump_to_id links replaced
     """
     return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))
@@ -270,7 +271,7 @@ def grade_histogram(module_id):
         WHERE courseware_studentmodule.module_id=%s
         GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(query, [module_id.to_deprecated_string()])
+    cursor.execute(query, [text_type(module_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -305,7 +306,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
 
         if is_studio_course:
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            edit_link = "//" + settings.CMS_BASE + '/container/' + unicode(block.location)
+            edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
 
             # return edit link in rendered HTML for display
             return wrap_fragment(

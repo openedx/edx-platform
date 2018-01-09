@@ -62,9 +62,6 @@ urlpatterns = [
     # Darklang View to change the preview language (or dark language)
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
-    # URLs for managing theming
-    url(r'^theming/', include('openedx.core.djangoapps.theming.urls', namespace='theming')),
-
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
     url(r'^api/', include('cms.djangoapps.api.urls', namespace='api')),
@@ -142,6 +139,13 @@ urlpatterns = [
         contentstore.views.transcript_preferences_handler, name='transcript_preferences_handler'),
     url(r'^transcript_credentials/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.transcript_credentials_handler, name='transcript_credentials_handler'),
+    url(r'^transcript_download/{}$'.format(settings.COURSE_KEY_PATTERN),
+        contentstore.views.transcript_download_handler, name='transcript_download_handler'),
+    url(r'^transcript_upload/{}$'.format(settings.COURSE_KEY_PATTERN),
+        contentstore.views.transcript_upload_handler, name='transcript_upload_handler'),
+    url(r'^transcript_delete/{}(?:/(?P<edx_video_id>[-\w]+))?(?:/(?P<language_code>[^/]*))?$'.format(
+        settings.COURSE_KEY_PATTERN
+    ), contentstore.views.transcript_delete_handler, name='transcript_delete_handler'),
     url(r'^video_encodings_download/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.video_encodings_download, name='video_encodings_download'),
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN),
@@ -255,3 +259,6 @@ urlpatterns += [
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 ]
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
+urlpatterns.extend(DjangoAppRegistry.get_plugin_url_patterns(ProjectType.CMS))

@@ -2,13 +2,11 @@
 import json
 
 import ddt
-import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
@@ -264,14 +262,13 @@ class TestCertificateGenerationHistory(TestCase):
         ({"statuses_to_regenerate": ['downloadable', 'not_readable']}, 'already received', False),
     )
     @ddt.unpack
-    @pytest.mark.django111_expected_failure
     def test_get_certificate_generation_candidates(self, task_input, expected, is_regeneration):
         staff = AdminFactory.create()
         instructor_task = InstructorTaskFactory.create(
             task_input=json.dumps(task_input),
             requester=staff,
-            task_key=Mock(),
-            task_id=Mock(),
+            task_key='',
+            task_id='',
         )
         certificate_generation_history = CertificateGenerationHistory(
             course_id=instructor_task.course_id,
@@ -286,14 +283,13 @@ class TestCertificateGenerationHistory(TestCase):
 
     @ddt.data((True, "regenerated"), (False, "generated"))
     @ddt.unpack
-    @pytest.mark.django111_expected_failure
     def test_get_task_name(self, is_regeneration, expected):
         staff = AdminFactory.create()
         instructor_task = InstructorTaskFactory.create(
             task_input=json.dumps({}),
             requester=staff,
-            task_key=Mock(),
-            task_id=Mock(),
+            task_key='',
+            task_id='',
         )
         certificate_generation_history = CertificateGenerationHistory(
             course_id=instructor_task.course_id,

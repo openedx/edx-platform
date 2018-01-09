@@ -2,13 +2,13 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'edx-ui-toolkit/js/utils/string-utils',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'text!../../../templates/learner_dashboard/empty_programs_list.underscore'
-        ],
+        'jquery',
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/string-utils',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!../../../templates/learner_dashboard/empty_programs_list.underscore'
+    ],
         function(Backbone,
                   $,
                   _,

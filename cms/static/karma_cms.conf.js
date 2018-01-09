@@ -34,7 +34,7 @@ var options = {
     ],
 
     fixtureFiles: [
-        {pattern: 'coffee/fixtures/**/*.underscore'},
+        {pattern: '../templates/js/**/*.underscore'},
         {pattern: 'templates/**/*.underscore'}
     ],
 

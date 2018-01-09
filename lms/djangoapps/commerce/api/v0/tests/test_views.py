@@ -303,7 +303,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
 
     def test_order_not_found(self):
         """ If the order is not found, the view should return a 404. """
-        with mock_basket_order(basket_id=1, exception=exceptions.HttpNotFoundError):
+        with mock_basket_order(basket_id=1, status=404):
             response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
 

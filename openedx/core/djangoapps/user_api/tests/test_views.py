@@ -16,6 +16,7 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from pytz import common_timezones_set, UTC
+from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
@@ -198,7 +199,7 @@ class RoleTestCase(UserApiTestCase):
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={
             "page_size": 3,
-            "course_id": self.course_id.to_deprecated_string(),
+            "course_id": text_type(self.course_id),
         })
         self.assertEqual(first_page["count"], 5)
         first_page_next_uri = first_page["next"]
@@ -1593,12 +1594,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         # Terms of service field should also be present
         link_label = "Terms of Service"
+        link_template = "<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
                 "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_label=link_label
+                    link_label=link_template.format(link_label=link_label)
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
@@ -1640,12 +1642,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         link_label = 'Terms of Service'
         # Terms of service field should also be present
+        link_template = "<a href='/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
                 "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_label=link_label
+                    link_label=link_template.format(link_label=link_label)
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
@@ -1729,6 +1732,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "level_of_education",
             "company",
             "title",
+            "job_title",
             "mailing_address",
             "goals",
             "honor_code",

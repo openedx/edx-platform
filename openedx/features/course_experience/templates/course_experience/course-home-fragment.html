@@ -58,40 +58,6 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
     </header>
     <div class="page-content">
         <main class="page-content-main">
-
-            % if upgrade_url and upgrade_price:
-                <div class="section">
-                    <div class="vc-message tex2jax_ignore" role="group" aria-labelledby="vc-title" tabindex="-1" style="display: none;">
-
-                        <h3 class="vc-title vc-fade vc-polite-only">Pursue a verified certificate</h3>
-
-                        <button class="vc-toggle vc-fade vc-polite-only btn-link" type="button" aria-controls="moreinfo"
-                                aria-expanded="true" aria-label="${_("Show/Hide")}">
-                            ${_("Show less")}
-                        </button>
-
-                        <div class="vc-hero vc-fade">
-                            <img src="${static.url('course_experience/images/verified-cert.png')}"
-                                 alt="${_("Sample verified certificate with your name, the course title, the logo of the institution and the signatures of the instructors for this course.")}"/>
-                        </div>
-
-                        <ul class="vc-selling-points vc-fade">
-                            <li class="vc-selling-point">${_("Official proof of completion")}</li>
-                            <li class="vc-selling-point">${_("Easily shareable certificate")}</li>
-                            <li class="vc-selling-point">${_("Proven motivator to complete the course")}</li>
-                            <li class="vc-selling-point">${_("Certificate purchases help us continue to offer free courses")}</li>
-                        </ul>
-
-                        <div class="vc-cta vc-fade vc-polite-only">
-                            <a class="btn btn-upgrade"
-                               href="${ upgrade_url }"
-                               data-creative="hero_matthew_smith"
-                               data-position="hero">${_("Upgrade ({price})").format(price=upgrade_price)}</a>
-                        </div>
-                    </div>
-                </div>
-            % endif
-
             % if course_home_message_fragment:
                 ${HTML(course_home_message_fragment.body_html())}
             % endif
@@ -145,6 +111,23 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                             </li>
                         % endfor
                     </ul>
+                </div>
+            % endif
+            % if upgrade_url and upgrade_price:
+                <div class="section section-upgrade course-home-sidebar-upgrade">
+                    <h3 class="hd hd-6">${_("Pursue a verified certificate")}</h3>
+                        <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
+                        <div class="upgrade-container">
+                            <p>
+                                <a class="btn-brand btn-upgrade"
+                                   href="${upgrade_url}"
+                                   data-creative="sidebarupsell"
+                                   data-position="sidebar-message">
+                                   ${_("Upgrade ({price})").format(price=upgrade_price)}
+                                </a>
+                            </p>
+                    <p><button class="btn-link btn-small promo-learn-more">${_('Learn More')}</button></p>
+                        </div>
                 </div>
             % endif
             % if dates_fragment:

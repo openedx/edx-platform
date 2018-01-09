@@ -308,34 +308,6 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-docstring
 class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = SymbolicResponseXMLFactory
 
-    def test_grade_single_input_correct(self):
-        problem = self.build_problem(math_display=True, expect="2*x+3*y")
-
-        # Correct answers
-        correct_inputs = [
-            ('2x+3y', textwrap.dedent("""
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
-                    <mstyle displaystyle="true">
-                    <mn>2</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
-                    </mstyle></math>"""),
-             'snuggletex_2x+3y.xml'),
-
-            ('x+x+3y', textwrap.dedent("""
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
-                    <mstyle displaystyle="true">
-                    <mi>x</mi><mo>+</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
-                    </mstyle></math>"""),
-             'snuggletex_x+x+3y.xml'),
-        ]
-
-        for (input_str, input_mathml, server_fixture) in correct_inputs:
-            print "Testing input: {0}".format(input_str)
-            server_resp = load_fixture(server_fixture)
-            self._assert_symbolic_grade(
-                problem, input_str, input_mathml,
-                'correct', snuggletex_resp=server_resp
-            )
-
     def test_grade_single_input_incorrect(self):
         problem = self.build_problem(math_display=True, expect="2*x+3*y")
 
@@ -351,23 +323,6 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
 
         for (input_str, input_mathml) in incorrect_inputs:
             self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
-
-    def test_complex_number_grade_correct(self):
-        problem = self.build_problem(
-            math_display=True,
-            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
-            options=["matrix", "imaginary"]
-        )
-
-        correct_snuggletex = load_fixture('snuggletex_correct.html')
-        dynamath_input = load_fixture('dynamath_input.txt')
-        student_response = "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]"
-
-        self._assert_symbolic_grade(
-            problem, student_response, dynamath_input,
-            'correct',
-            snuggletex_resp=correct_snuggletex
-        )
 
     def test_complex_number_grade_incorrect(self):
 

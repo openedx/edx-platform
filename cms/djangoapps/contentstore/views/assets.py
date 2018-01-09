@@ -155,6 +155,8 @@ def _assets_json(request, course_key):
         'totalCount': total_count,
         'assets': assets_in_json_format,
         'sort': request_options['requested_sort'],
+        'direction': request_options['requested_sort_direction'],
+        'assetTypes': _get_requested_file_types_from_requested_filter(request_options['requested_asset_type']),
     }
 
     return JsonResponse(response_payload)
@@ -166,7 +168,7 @@ def _parse_request_to_dictionary(request):
         'requested_page_size': int(_get_requested_attribute(request, 'page_size')),
         'requested_sort': _get_requested_attribute(request, 'sort'),
         'requested_sort_direction': _get_requested_attribute(request, 'direction'),
-        'requested_asset_type': _get_requested_attribute(request, 'asset_type')
+        'requested_asset_type': _get_requested_attribute(request, 'asset_type'),
     }
 
 
@@ -254,7 +256,7 @@ def _get_files_and_upload_type_filters():
 
 
 def _get_requested_file_types_from_requested_filter(requested_filter):
-    return requested_filter.split(',')
+    return requested_filter.split(',') if requested_filter else []
 
 
 def _get_extensions_for_file_type(requested_file_type):

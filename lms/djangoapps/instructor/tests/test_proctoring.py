@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import AdminFactory
@@ -38,7 +39,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         Create URL for instructor dashboard
         """
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(course.id)})
 
     def setup_course(self, enable_proctored_exams, enable_timed_exams):
         """

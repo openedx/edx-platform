@@ -255,19 +255,23 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         Checks that a single failure to award one of several certificates
         does not cause the entire task to fail.  Also ensures that
-        successfully awarded certs are logged as INFO and exceptions
-        that arise are logged also.
+        successfully awarded certs are logged as INFO and warning is logged
+        for failed requests if there are retries available.
         """
         mock_get_completed_programs.return_value = [1, 2]
         mock_get_certified_programs.side_effect = [[], [2]]
         mock_award_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
 
         with mock.patch(TASKS_MODULE + '.LOGGER.info') as mock_info, \
-                mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
+                mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
             tasks.award_program_certificates.delay(self.student.username).get()
 
         self.assertEqual(mock_award_program_certificate.call_count, 3)
-        mock_exception.assert_called_once_with(mock.ANY, 1, self.student.username)
+        mock_warning.assert_called_once_with(
+            'Failed to award certificate for program {uuid} to user {username}.'.format(
+                uuid=1,
+                username=self.student.username)
+        )
         mock_info.assert_any_call(mock.ANY, 1, self.student.username)
         mock_info.assert_any_call(mock.ANY, 2, self.student.username)
 

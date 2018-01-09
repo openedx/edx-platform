@@ -160,8 +160,7 @@
                 describe('[loadedmetadata]', function() {
                     it(
                         'player state was changed, start/end was defined, ' +
-                        'onReady called', function(done)
-                    {
+                        'onReady called', function(done) {
                         jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
@@ -220,7 +219,7 @@
                         }).done(done);
                     });
 
-                    it('set new inccorrect values', function() {
+                    it('set new incorrect values', function() {
                         var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);

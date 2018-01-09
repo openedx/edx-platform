@@ -10,8 +10,8 @@ import json
 import logging
 
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
-from xblock.fragment import Fragment
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor

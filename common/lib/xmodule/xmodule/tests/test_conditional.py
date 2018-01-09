@@ -4,6 +4,7 @@ import unittest
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
+from six import text_type
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -273,7 +274,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
-                'ajax_url': '{}/xmodule_handler'.format(location.to_deprecated_string()),
+                'ajax_url': '{}/xmodule_handler'.format(text_type(location)),
                 'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
                 'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
             }

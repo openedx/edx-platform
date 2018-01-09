@@ -2,12 +2,12 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'text!../../../templates/learner_dashboard/program_card.underscore',
-            'picturefill'
-           ],
+        'jquery',
+        'underscore',
+        'gettext',
+        'text!../../../templates/learner_dashboard/program_card.underscore',
+        'picturefill'
+    ],
          function(
              Backbone,
              $,
@@ -23,7 +23,7 @@
                  attributes: function() {
                      return {
                          'aria-labelledby': 'program-' + this.model.get('uuid'),
-                         'role': 'group'
+                         role: 'group'
                      };
                  },
 
@@ -68,7 +68,6 @@
                      var progress = this.progressModel ? this.progressModel.toJSON() : false;
 
                      if (progress) {
-
                          progress.total = progress.completed +
                                           progress.in_progress +
                                           progress.not_started;

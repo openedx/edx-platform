@@ -21,6 +21,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
+from six import text_type
 
 import shoppingcart  # pylint: disable=import-error
 from bulk_email.models import Optout  # pylint: disable=import-error
@@ -442,11 +443,11 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertEqual(len(optout_object), 1)
 
         # Direct link to course redirect to user dashboard
-        self.client.get(reverse('courseware', kwargs={"course_id": self.course.id.to_deprecated_string()}))
+        self.client.get(reverse('courseware', kwargs={"course_id": text_type(self.course.id)}))
         log_warning.assert_called_with(
             u'User %s cannot access the course %s because payment has not yet been received',
             self.user,
-            unicode(self.course.id),
+            text_type(self.course.id),
         )
 
         # Now re-validating the invoice
@@ -711,7 +712,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
         self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.mode_changed',
             {
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': text_type(course_key),
                 'user_id': user.pk,
                 'mode': mode
             }
@@ -723,7 +724,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
         self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.activated',
             {
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': text_type(course_key),
                 'user_id': user.pk,
                 'mode': CourseMode.DEFAULT_MODE_SLUG
             }
@@ -735,7 +736,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
         self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
             'edx.course.enrollment.deactivated',
             {
-                'course_id': course_key.to_deprecated_string(),
+                'course_id': text_type(course_key),
                 'user_id': user.pk,
                 'mode': CourseMode.DEFAULT_MODE_SLUG
             }
@@ -942,7 +943,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         """ Enroll a student in a course. """
         response = self.client.post(
             reverse('change_enrollment'), {
-                'course_id': course.id.to_deprecated_string(),
+                'course_id': text_type(course.id),
                 'enrollment_action': 'enroll'
             }
         )

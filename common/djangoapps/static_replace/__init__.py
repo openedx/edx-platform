@@ -8,6 +8,7 @@ from django.conf import settings
 from xmodule.contentstore.content import StaticContent
 
 from opaque_keys.edx.locator import AssetLocator
+from six import text_type
 
 log = logging.getLogger(__name__)
 XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
@@ -83,7 +84,7 @@ def replace_course_urls(text, course_key):
     returns: text with the links replaced
     """
 
-    course_id = course_key.to_deprecated_string()
+    course_id = text_type(course_key)
 
     def replace_course_url(match):
         quote = match.group('quote')

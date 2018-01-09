@@ -66,7 +66,11 @@ class CourseGradeFactory(object):
         or course_key should be provided.
         """
         course_data = CourseData(user, course, collected_block_structure, course_structure, course_key)
-        return self._update(user, course_data, force_update_subsections=force_update_subsections)
+        return self._update(
+            user,
+            course_data,
+            force_update_subsections=force_update_subsections
+        )
 
     def iter(
             self,
@@ -164,7 +168,11 @@ class CourseGradeFactory(object):
         if should_persist and force_update_subsections:
             prefetch(user, course_data.course_key)
 
-        course_grade = CourseGrade(user, course_data, force_update_subsections=force_update_subsections)
+        course_grade = CourseGrade(
+            user,
+            course_data,
+            force_update_subsections=force_update_subsections
+        )
         course_grade = course_grade.update()
 
         should_persist = should_persist and course_grade.attempted

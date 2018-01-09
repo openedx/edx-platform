@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from certificates.models import GeneratedCertificate
 
@@ -118,7 +119,7 @@ class Command(BaseCommand):
         print ' '.join(["{:>16}".format(heading) for heading in status_headings])
 
         # print the report
-        print "{0:>26}".format(course_id.to_deprecated_string()),
+        print "{0:>26}".format(text_type(course_id)),
         for heading in status_headings:
             if heading in cert_data[course_id]:
                 print "{:>16}".format(cert_data[course_id][heading]),

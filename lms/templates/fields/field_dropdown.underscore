@@ -40,6 +40,12 @@
     <% } %>
 </span>
 
+<% if (editable != 'never' && id === 'account_privacy') { %>
+    <button class="btn btn-change-privacy hidden">
+        <span><%- gettext('Save') %></span>
+    </button>
+<% } %>
+
 <span class="u-field-message" id="u-field-message-<%- id %>">
     <span class="u-field-message-notification" aria-live="polite"></span>
     <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- message %></span>

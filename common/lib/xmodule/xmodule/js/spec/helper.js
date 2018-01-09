@@ -82,13 +82,13 @@
                 duration: 'PT5M0S'
             }
         },
-        'cogebirgzzM': {
+        cogebirgzzM: {
             contentDetails: {
                 id: 'cogebirgzzM',
                 duration: 'PT3M20S'
             }
         },
-        'abcdefghijkl': {
+        abcdefghijkl: {
             contentDetails: {
                 id: 'abcdefghijkl',
                 duration: 'PT6M40S'

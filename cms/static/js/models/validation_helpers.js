@@ -14,6 +14,6 @@ define(['jquery'],
         };
 
         return {
-            'validateIntegerRange': validateIntegerRange
+            validateIntegerRange: validateIntegerRange
         };
     });

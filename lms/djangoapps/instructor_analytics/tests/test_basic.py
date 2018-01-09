@@ -13,6 +13,7 @@ from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import UsageKey
+from six import text_type
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -312,7 +313,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         )
         for i in range(5):
             course_code = CourseRegistrationCode(
-                code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
+                code="test_code{}".format(i), course_id=text_type(self.course.id),
                 created_by=self.instructor, invoice=sale_invoice, invoice_item=invoice_item, mode_slug='honor'
             )
             course_code.save()
@@ -541,7 +542,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         mode.save()
 
         url = reverse('generate_registration_codes',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+                      kwargs={'course_id': text_type(self.course.id)})
 
         data = {
             'total_registration_codes': 12, 'company_name': 'Test Group', 'unit_price': 122.45,
@@ -574,7 +575,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(course_registration['code'], [registration_code.code for registration_code in registration_codes])
             self.assertIn(
                 course_registration['course_id'],
-                [registration_code.course_id.to_deprecated_string() for registration_code in registration_codes]
+                [text_type(registration_code.course_id) for registration_code in registration_codes]
             )
             self.assertIn(
                 course_registration['company_name'],
@@ -630,5 +631,5 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
                 self.assertIn(active_coupon['expiration_date'], [coupon.display_expiry_date for coupon in active_coupons])
             self.assertIn(
                 active_coupon['course_id'],
-                [coupon.course_id.to_deprecated_string() for coupon in active_coupons]
+                [text_type(coupon.course_id) for coupon in active_coupons]
             )

@@ -179,7 +179,7 @@
             };
 
             return DiscussionContentView;
-        })(Backbone.View);
+        }(Backbone.View));
         this.DiscussionContentShowView = (function(_super) {
             __extends(DiscussionContentShowView, _super);
 

@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define(['gettext', 'underscore', 'backbone', 'js/edxnotes/views/note_item',
-    'common/js/components/views/paging_header', 'common/js/components/views/paging_footer'],
+        'common/js/components/views/paging_header', 'common/js/components/views/paging_footer'],
 function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView) {
     var TabPanelView = Backbone.View.extend({
         tagName: 'section',
@@ -9,7 +9,7 @@ function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView)
         title: '',
         titleTemplate: _.template('<h2 class="sr"><%- text %></h2>'),
         attributes: {
-            'tabindex': -1
+            tabindex: -1
         },
 
         initialize: function(options) {
@@ -44,7 +44,9 @@ function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView)
         },
 
         getNotes: function(collection) {
-            var container = document.createDocumentFragment(), scrollToTag = this.options.scrollToTag, view = this.title,
+            var container = document.createDocumentFragment(),
+                scrollToTag = this.options.scrollToTag,
+                view = this.title,
                 notes = _.map(collection, function(model) {
                     var note = new NoteItemView({model: model, scrollToTag: scrollToTag, view: view});
                     container.appendChild(note.render().el);

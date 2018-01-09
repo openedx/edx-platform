@@ -13,6 +13,7 @@ from datetime import datetime
 from webob import Response
 
 from xblock.core import XBlock
+from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
@@ -50,13 +51,14 @@ class VideoStudentViewHandlers(object):
         Update values of xfields, that were changed by student.
         """
         accepted_keys = [
-            'speed', 'saved_video_position', 'transcript_language',
+            'speed', 'auto_advance', 'saved_video_position', 'transcript_language',
             'transcript_download_format', 'youtube_is_available',
             'bumper_last_view_date', 'bumper_do_not_show_again'
         ]
 
         conversions = {
             'speed': json.loads,
+            'auto_advance': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
         }
@@ -202,6 +204,33 @@ class VideoStudentViewHandlers(object):
                 )
         return response
 
+    @XBlock.json_handler
+    def publish_completion(self, data, dispatch):  # pylint: disable=unused-argument
+        """
+        Entry point for completion for student_view.
+
+        Parameters:
+            data: JSON dict:
+                key: "completion"
+                value: float in range [0.0, 1.0]
+
+            dispatch: Ignored.
+        Return value: JSON response (200 on success, 400 for malformed data)
+        """
+        completion_service = self.runtime.service(self, 'completion')
+        if completion_service is None:
+            raise JsonHandlerError(500, u"No completion service found")
+        elif not completion_service.completion_tracking_enabled():
+            raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")
+        if not isinstance(data['completion'], (int, float)):
+            message = u"Invalid completion value {}. Must be a float in range [0.0, 1.0]"
+            raise JsonHandlerError(400, message.format(data['completion']))
+        elif not 0.0 <= data['completion'] <= 1.0:
+            message = u"Invalid completion value {}. Must be in range [0.0, 1.0]"
+            raise JsonHandlerError(400, message.format(data['completion']))
+        self.runtime.publish(self, "completion", data)
+        return {"result": "ok"}
+
     @XBlock.handler
     def transcript(self, request, dispatch):
         """
@@ -282,6 +311,8 @@ class VideoStudentViewHandlers(object):
                 transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
                     transcripts, transcript_format=self.transcript_download_format, lang=lang
                 )
+            except (KeyError, UnicodeDecodeError):
+                return Response(status=404)
             except (ValueError, NotFoundError):
                 response = Response(status=404)
                 # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
@@ -319,8 +350,6 @@ class VideoStudentViewHandlers(object):
                         response.content_type = Transcript.mime_types[self.transcript_download_format]
 
                 return response
-            except (KeyError, UnicodeDecodeError):
-                return Response(status=404)
             else:
                 response = Response(
                     transcript_content,

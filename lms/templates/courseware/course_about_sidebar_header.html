@@ -5,6 +5,7 @@ import urllib
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from six import text_type
 %>
 
 <header>
@@ -29,7 +30,7 @@ from django.conf import settings
                 protocol=site_protocol,
                 domain=site_domain,
                 path=urllib.quote_plus(
-                    reverse('about_course', args=[course.id.to_deprecated_string()])
+                    reverse('about_course', args=[text_type(course.id)])
                 )
             )
         ).replace(u" ", u"+")
@@ -47,7 +48,7 @@ from django.conf import settings
                     protocol=site_protocol,
                     domain=site_domain,
                     path=urllib.quote_plus(
-                        reverse('about_course', args=[course.id.to_deprecated_string()]),
+                        reverse('about_course', args=[text_type(course.id)]),
                     )
                 )
             )

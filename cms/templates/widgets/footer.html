@@ -16,7 +16,7 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILI
       </div>
 
       % if is_any_marketing_link_set(['TOS', 'PRIVACY']) or waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
-        <nav class="nav-peripheral">
+        <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
             % if is_marketing_link_set('TOS'):
               <li class="nav-item nav-peripheral-tos">

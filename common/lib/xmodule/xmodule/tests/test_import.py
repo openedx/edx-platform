@@ -9,6 +9,7 @@ from lxml import etree
 from mock import Mock, patch
 
 from pytz import UTC
+from six import text_type
 
 from xmodule.xml_module import is_pointer_tag
 from opaque_keys.edx.locations import Location
@@ -219,7 +220,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(node.attrib['org'], ORG)
 
         # Does the course still have unicorns?
-        with descriptor.runtime.export_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
+        with descriptor.runtime.export_fs.open(u'course/{url_name}.xml'.format(url_name=url_name)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], unicorn_color)
@@ -233,7 +234,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
-        with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
+        with descriptor.runtime.export_fs.open(u'chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertNotIn('due', chapter_xml.attrib)
@@ -446,7 +447,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print "Checking {0}".format(node.location.to_deprecated_string())
+            print "Checking {0}".format(text_type(node.location))
             self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
                 check_for_key(key, c, value)

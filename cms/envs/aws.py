@@ -36,7 +36,6 @@ CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
-
 ############### ALWAYS THE SAME ################################
 
 DEBUG = False
@@ -94,6 +93,9 @@ CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 # Things like server locations, ports, etc.
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
+
+# Do NOT calculate this dynamically at startup with git because it's *slow*.
+EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
@@ -235,6 +237,7 @@ LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
 LANGUAGE_COOKIE = ENV_TOKENS.get('LANGUAGE_COOKIE', LANGUAGE_COOKIE)
 
 USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
+ALL_LANGUAGES = ENV_TOKENS.get('ALL_LANGUAGES', ALL_LANGUAGES)
 
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
@@ -547,6 +550,20 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+
+########################## Settings for Completion API #####################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
+    'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
+    COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
+)
+
+####################### Plugin Settings ##########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.AWS)
 
 ########################## Derive Any Derived Settings  #######################
 

@@ -62,7 +62,7 @@ def get_password_reset_form():
     return form_desc
 
 
-def get_login_session_form():
+def get_login_session_form(request):
     """Return a description of the login form.
 
     This decouples clients from the API definition:
@@ -77,6 +77,7 @@ def get_login_session_form():
 
     """
     form_desc = FormDescription("post", reverse("user_api_login_session"))
+    _apply_third_party_auth_overrides(request, form_desc)
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
@@ -128,6 +129,38 @@ def get_login_session_form():
     return form_desc
 
 
+def _apply_third_party_auth_overrides(request, form_desc):
+    """Modify the login form if the user has authenticated with a third-party provider.
+    If a user has successfully authenticated with a third-party provider,
+    and an email is associated with it then we fill in the email field with readonly property.
+    Arguments:
+        request (HttpRequest): The request for the registration form, used
+            to determine if the user has successfully authenticated
+            with a third-party provider.
+        form_desc (FormDescription): The registration form description
+    """
+    if third_party_auth.is_enabled():
+        running_pipeline = third_party_auth.pipeline.get(request)
+        if running_pipeline:
+            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            if current_provider and enterprise_customer_for_request(request):
+                pipeline_kwargs = running_pipeline.get('kwargs')
+
+                # Details about the user sent back from the provider.
+                details = pipeline_kwargs.get('details')
+                email = details.get('email', '')
+
+                # override the email field.
+                form_desc.override_field_properties(
+                    "email",
+                    default=email,
+                    restrictions={"readonly": "readonly"} if email else {
+                        "min_length": accounts.EMAIL_MIN_LENGTH,
+                        "max_length": accounts.EMAIL_MAX_LENGTH,
+                    }
+                )
+
+
 class RegistrationFormFactory(object):
     """HTTP end-points for creating a new user. """
 
@@ -144,6 +177,7 @@ class RegistrationFormFactory(object):
         "year_of_birth",
         "level_of_education",
         "company",
+        "job_title",
         "title",
         "mailing_address",
         "goals",
@@ -652,6 +686,23 @@ class RegistrationFormFactory(object):
             required=required
         )
 
+    def _add_job_title_field(self, form_desc, required=False):
+        """Add a Job Title field to a form description.
+        Arguments:
+            form_desc: A form description
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Job Title
+        job_title_label = _(u"Job Title")
+
+        form_desc.add_field(
+            "job_title",
+            label=job_title_label,
+            required=required
+        )
+
     def _add_first_name_field(self, form_desc, required=False):
         """Add a First Name field to a form description.
         Arguments:
@@ -786,13 +837,14 @@ class RegistrationFormFactory(object):
         # in order to register a new account.
         terms_label = _(u"Terms of Service")
         terms_link = marketing_link("TOS")
-        terms_text = _(u"Review the Terms of Service")
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
+        label = Text(_(u"I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
+            terms_of_service=terms_label,
+            tos_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            tos_link_end=HTML("</a>"),
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
@@ -811,8 +863,6 @@ class RegistrationFormFactory(object):
             error_messages={
                 "required": error_msg
             },
-            supplementalLink=terms_link,
-            supplementalText=terms_text
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):
@@ -844,8 +894,11 @@ class RegistrationFormFactory(object):
                     # When the TPA Provider is configured to skip the registration form and we are in an
                     # enterprise context, we need to hide all fields except for terms of service and
                     # ensure that the user explicitly checks that field.
-                    hide_registration_fields_except_tos = (current_provider.skip_registration_form and
-                                                           enterprise_customer_for_request(request))
+                    hide_registration_fields_except_tos = (
+                        (
+                            current_provider.skip_registration_form and enterprise_customer_for_request(request)
+                        ) or current_provider.sync_learner_profile_data
+                    )
 
                     for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
                         if field_name in field_overrides:

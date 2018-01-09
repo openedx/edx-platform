@@ -1,23 +1,41 @@
 """
 Views related to the transcript preferences feature
 """
+import os
+import json
+import logging
+
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotFound
+from django.core.files.base import ContentFile
+from django.http import HttpResponseNotFound, HttpResponse
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST, require_GET
 from edxval.api import (
+    create_or_update_video_transcript,
+    delete_video_transcript,
+    get_available_transcript_languages,
     get_3rd_party_transcription_plans,
+    get_video_transcript_data,
     update_transcript_credentials_state_for_org,
 )
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
+from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
 
 from contentstore.views.videos import TranscriptProvider
+from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
 
-__all__ = ['transcript_credentials_handler']
+__all__ = [
+    'transcript_credentials_handler',
+    'transcript_download_handler',
+    'transcript_upload_handler',
+    'transcript_delete_handler'
+]
+
+LOGGER = logging.getLogger(__name__)
 
 
 class TranscriptionProviderErrorType:
@@ -108,3 +126,166 @@ def transcript_credentials_handler(request, course_key_string):
             response = JsonResponse({'error': error_message}, status=400)
 
     return response
+
+
+@login_required
+@require_GET
+def transcript_download_handler(request, course_key_string):
+    """
+    JSON view handler to download a transcript.
+
+    Arguments:
+        request: WSGI request object
+        course_key_string: course key
+
+    Returns:
+        - A 200 response with SRT transcript file attached.
+        - A 400 if there is a validation error.
+        - A 404 if there is no such transcript or feature flag is disabled.
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    if not VideoTranscriptEnabledFlag.feature_enabled(course_key):
+        return HttpResponseNotFound()
+
+    missing = [attr for attr in ['edx_video_id', 'language_code'] if attr not in request.GET]
+    if missing:
+        return JsonResponse(
+            {'error': _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))},
+            status=400
+        )
+
+    edx_video_id = request.GET['edx_video_id']
+    language_code = request.GET['language_code']
+    transcript = get_video_transcript_data(video_ids=[edx_video_id], language_code=language_code)
+    if transcript:
+        name_and_extension = os.path.splitext(transcript['file_name'])
+        basename, file_format = name_and_extension[0], name_and_extension[1][1:]
+        transcript_filename = '{base_name}.{ext}'.format(base_name=basename.encode('utf8'), ext=Transcript.SRT)
+        transcript_content = Transcript.convert(
+            content=transcript['content'],
+            input_format=file_format,
+            output_format=Transcript.SRT
+        )
+        # Construct an HTTP response
+        response = HttpResponse(transcript_content, content_type=Transcript.mime_types[Transcript.SRT])
+        response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=transcript_filename)
+    else:
+        response = HttpResponseNotFound()
+
+    return response
+
+
+def validate_transcript_upload_data(data, files):
+    """
+    Validates video transcript file.
+    Arguments:
+        data: A request's data part.
+        files: A request's files part.
+    Returns:
+        None or String
+        If there is error returns error message otherwise None.
+    """
+    error = None
+    # Validate the must have attributes - this error is unlikely to be faced by common users.
+    must_have_attrs = ['edx_video_id', 'language_code', 'new_language_code']
+    missing = [attr for attr in must_have_attrs if attr not in data]
+    if missing:
+        error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
+    elif (
+        data['language_code'] != data['new_language_code'] and
+        data['new_language_code'] in get_available_transcript_languages([data['edx_video_id']])
+    ):
+        error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
+            language_code=data['new_language_code']
+        ))
+    elif 'file' not in files:
+        error = _(u'A transcript file is required.')
+
+    return error
+
+
+@login_required
+@require_POST
+def transcript_upload_handler(request, course_key_string):
+    """
+    View to upload a transcript file.
+
+    Arguments:
+        request: A WSGI request object
+        course_key_string: Course key identifying a course
+
+    Transcript file, edx video id and transcript language are required.
+    Transcript file should be in SRT(SubRip) format.
+
+    Returns
+        - A 400 if any of the validation fails
+        - A 404 if the corresponding feature flag is disabled
+        - A 200 if transcript has been uploaded successfully
+    """
+    # Check whether the feature is available for this course.
+    course_key = CourseKey.from_string(course_key_string)
+    if not VideoTranscriptEnabledFlag.feature_enabled(course_key):
+        return HttpResponseNotFound()
+
+    error = validate_transcript_upload_data(data=request.POST, files=request.FILES)
+    if error:
+        response = JsonResponse({'error': error}, status=400)
+    else:
+        edx_video_id = request.POST['edx_video_id']
+        language_code = request.POST['language_code']
+        new_language_code = request.POST['new_language_code']
+        transcript_file = request.FILES['file']
+        try:
+            # Convert SRT transcript into an SJSON format
+            # and upload it to S3.
+            sjson_subs = Transcript.convert(
+                content=transcript_file.read(),
+                input_format=Transcript.SRT,
+                output_format=Transcript.SJSON
+            )
+            create_or_update_video_transcript(
+                video_id=edx_video_id,
+                language_code=language_code,
+                metadata={
+                    'provider': TranscriptProvider.CUSTOM,
+                    'file_format': Transcript.SJSON,
+                    'language_code': new_language_code
+                },
+                file_data=ContentFile(json.dumps(sjson_subs)),
+            )
+            response = JsonResponse(status=201)
+        except (TranscriptsGenerationException, UnicodeDecodeError):
+            response = JsonResponse(
+                {'error': _(u'There is a problem with this transcript file. Try to upload a different file.')},
+                status=400
+            )
+
+    return response
+
+
+@login_required
+@require_http_methods(["DELETE"])
+def transcript_delete_handler(request, course_key_string, edx_video_id, language_code):
+    """
+    View to delete a transcript file.
+
+    Arguments:
+        request: A WSGI request object
+        course_key_string: Course key identifying a course.
+        edx_video_id: edX video identifier whose transcript need to be deleted.
+        language_code: transcript's language code.
+
+    Returns
+        - A 404 if the corresponding feature flag is disabled or user does not have required permisions
+        - A 200 if transcript is deleted without any error(s)
+    """
+    # Check whether the feature is available for this course.
+    course_key = CourseKey.from_string(course_key_string)
+    video_transcripts_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_key)
+    # User needs to have studio write access for this course.
+    if not video_transcripts_enabled or not has_studio_write_access(request.user, course_key):
+        return HttpResponseNotFound()
+
+    delete_video_transcript(video_id=edx_video_id, language_code=language_code)
+
+    return JsonResponse(status=200)

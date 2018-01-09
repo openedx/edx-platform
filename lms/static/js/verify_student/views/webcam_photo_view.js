@@ -18,7 +18,7 @@
          el: '#webcam',
 
          backends: {
-             'html5': {
+             html5: {
                  name: 'html5',
 
                  initialize: function(obj) {
@@ -84,7 +84,7 @@
                  getUserMediaCallback: function(stream) {
                      var video = this.getVideo();
                      this.stream = stream;
-                     video.src = this.URL.createObjectURL(stream);
+                     video.srcObject = stream;
                      video.play();
                      this.trigger('webcam-loaded');
                  },
@@ -106,7 +106,7 @@
                  }
              },
 
-             'flash': {
+             flash: {
 
                  name: 'flash',
 
@@ -162,7 +162,7 @@
                          '<param name="quality" value="high">' +
                          '<param name="allowscriptaccess" value="sameDomain">' +
                          '</object>'
-                    );
+                     );
                  },
 
                  getFlashObject: function() {
@@ -348,7 +348,7 @@
 
          isMobileDevice: function() {
             // Check whether user is using mobile device or not
-             return (navigator.userAgent.match(/(Android|iPad|iPhone|iPod)/g) ? true : false);
+             return (!!navigator.userAgent.match(/(Android|iPad|iPhone|iPod)/g));
          }
      });
 
@@ -395,4 +395,4 @@
         // allow users to take a photo with the camera.
          return new edx.verify_student.ImageInputView(obj);
      };
- })(jQuery, _, Backbone, gettext);
+ }(jQuery, _, Backbone, gettext));

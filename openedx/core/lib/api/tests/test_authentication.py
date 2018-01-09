@@ -9,7 +9,7 @@ import itertools
 import json
 import unittest
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import ddt
 import pytest
@@ -18,7 +18,9 @@ from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.http import urlencode
+from django.utils.timezone import now
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
 from rest_framework import status
@@ -76,10 +78,9 @@ urlpatterns = [
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @pytest.mark.django111_expected_failure
+@override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
-    urls = 'openedx.core.lib.api.tests.test_authentication'
-
     def setUp(self):
         super(OAuth2Tests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
@@ -123,7 +124,7 @@ class OAuth2Tests(TestCase):
             user=self.user,
             token='dot-access-token',
             application=self.dot_oauth2_client,
-            expires=datetime.now() + timedelta(days=30),
+            expires=now() + timedelta(days=30),
         )
 
         # This is the a change we've made from the django-rest-framework-oauth version
@@ -253,7 +254,7 @@ class OAuth2Tests(TestCase):
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_with_expired_access_token_failing_auth(self):
         """Ensure POSTing with expired access token fails with a 'token_expired' error"""
-        self.access_token.expires = datetime.now() - timedelta(seconds=10)  # 10 seconds late
+        self.access_token.expires = now() - timedelta(seconds=10)  # 10 seconds late
         self.access_token.save()
         response = self.post_with_bearer_token('/oauth2-test/')
         self.check_error_codes(

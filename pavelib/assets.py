@@ -45,6 +45,7 @@ COMMON_LOOKUP_PATHS = [
     path("common/static/sass"),
     path('node_modules/@edx'),
     path('node_modules'),
+    path('node_modules/edx-pattern-library/node_modules'),
 ]
 
 # A list of NPM installed libraries that should be copied into the common
@@ -52,7 +53,7 @@ COMMON_LOOKUP_PATHS = [
 NPM_INSTALLED_LIBRARIES = [
     'backbone.paginator/lib/backbone.paginator.js',
     'backbone/backbone.js',
-    'bootstrap/dist/js/bootstrap.js',
+    'bootstrap/dist/js/bootstrap.bundle.js',
     'hls.js/dist/hls.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
@@ -60,7 +61,6 @@ NPM_INSTALLED_LIBRARIES = [
     'moment-timezone/builds/moment-timezone-with-data.js',
     'moment/min/moment-with-locales.js',
     'picturefill/dist/picturefill.js',
-    'popper.js/dist/umd/popper.js',
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
@@ -701,10 +701,31 @@ def collect_assets(systems, settings, **kwargs):
     `settings` is the Django settings module to use.
     `**kwargs` include arguments for using a log directory for collectstatic output. Defaults to /dev/null.
     """
+    ignore_patterns = [
+        # Karma test related files...
+        "fixtures",
+        "karma_*.js",
+        "spec",
+        "spec_helpers",
+        "spec-helpers",
+        "xmodule_js",  # symlink for tests
+
+        # Geo-IP data, only accessed in Python
+        "geoip",
+
+        # We compile these out, don't need the source files in staticfiles
+        "sass",
+        "*.coffee",
+    ]
+
+    ignore_args = " ".join(
+        '--ignore "{}"'.format(pattern) for pattern in ignore_patterns
+    )
 
     for sys in systems:
         collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
-        sh(django_cmd(sys, settings, "collectstatic --noinput {logfile_str}".format(
+        sh(django_cmd(sys, settings, "collectstatic {ignore_args} --noinput {logfile_str}".format(
+            ignore_args=ignore_args,
             logfile_str=collectstatic_stdout_str
         )))
         print("\t\tFinished collecting {} assets.".format(sys))

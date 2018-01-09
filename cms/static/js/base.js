@@ -1,4 +1,4 @@
-require([
+define([
     'domReady',
     'jquery',
     'underscore',
@@ -25,8 +25,7 @@ require([
         ModuleUtils,
         IframeUtils,
         DropdownMenuView
-    )
-{
+    ) {
         var $body;
 
         domReady(function() {

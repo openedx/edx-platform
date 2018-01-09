@@ -5,13 +5,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
-<<<<<<< HEAD
 import Table from './Table';
 
-export function LearnerAnalyticsDashboard(props) {
-console.log('props: ', props);
-  const {grading_policy} = props;
-=======
 import GradeTable from './GradeTable';
 import DueDates from './DueDates';
 import Discussions from './Discussions';
@@ -72,13 +67,12 @@ console.log('props: ', props);
       label: type,
       sliceIndex: index + 1
     }
-  }).sort((a, b) => a.value < b.value);
+  });
+
 
   // Get a list of assignment types minus duplicates
-  const assignmentTypes = [...new Set(gradeBreakdown.map(value => value['label']))];
-
-  const tableHeadings = ['Assessment', 'Passing', 'You'];
   const assignments = gradeBreakdown.map(value => value['label']);
+  const assignmentTypes = [...new Set(assignments)];
   const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
   const tableData = [
     {
@@ -123,9 +117,10 @@ console.log('props: ', props);
 
           <h3 className="section-heading">Graded Assessments</h3>
           <div className="graded-assessments-wrapper">
-            <GradeTable assignmentTypes={assignmentTypes} data={JSON.parse(grades)} />
+            <GradeTable assignmentTypes={assignmentTypes} grades={grades} />
             <p className="footnote">*Calculated based on current average</p>
           </div>
+          <CircleChartLegend data={gradeBreakdown} />
         </div>
         <div className="analytics-group">
           <Discussions {...discussion_info} />

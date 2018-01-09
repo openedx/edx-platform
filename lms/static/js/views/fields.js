@@ -31,32 +31,32 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': HtmlUtils.joinHtml(
+                canEdit: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Editable'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'error': HtmlUtils.joinHtml(
+                error: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Error'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'validationError': HtmlUtils.joinHtml(
+                validationError: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Validation Error'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'inProgress': HtmlUtils.joinHtml(
+                inProgress: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('In Progress'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'success': HtmlUtils.joinHtml(
+                success: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Success'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'plus': HtmlUtils.joinHtml(
+                plus: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
                     gettext('Placeholder'),
                     HtmlUtils.HTML('</span>')
@@ -64,11 +64,11 @@
             },
 
             messages: {
-                'canEdit': '',
-                'error': gettext('An error occurred. Please try again.'),
-                'validationError': '',
-                'inProgress': gettext('Saving'),
-                'success': gettext('Your changes have been saved.')
+                canEdit: '',
+                error: gettext('An error occurred. Please try again.'),
+                validationError: '',
+                inProgress: gettext('Saving'),
+                success: gettext('Your changes have been saved.')
             },
 
             constructor: function(options) {
@@ -397,7 +397,7 @@
             fieldTemplate: field_dropdown_template,
 
             events: {
-                'click': 'startEditing',
+                click: 'startEditing',
                 'focusout select': 'finishEditing'
             },
 
@@ -458,8 +458,7 @@
                 var value;
                 if (this.editable === 'never') {
                     value = this.modelValueIsSet() ? this.modelValue() : null;
-                }
-                else {
+                } else {
                     value = this.$('.u-field-value select').val();
                 }
                 return value === '' ? null : value;
@@ -530,10 +529,10 @@
 
             createGroupOptions: function() {
                 return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
-                    [{
-                        groupTitle: null,
-                        selectOptions: this.options.options
-                    }];
+                [{
+                    groupTitle: null,
+                    selectOptions: this.options.options
+                }];
             }
         });
 
@@ -625,8 +624,7 @@
             fieldValue: function() {
                 if (this.mode === 'edit') {
                     return this.$('.u-field-value textarea').val();
-                }
-                else {
+                } else {
                     return this.$('.u-field-value .u-field-value-readonly').text();
                 }
             },

@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
@@ -283,9 +284,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': text_type(self.course.id),
             'usage_id': quote_slashes(
-                InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id).to_deprecated_string()
+                text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id))
             ),
             'handler': 'xmodule_handler',
             'suffix': 'problem_check',

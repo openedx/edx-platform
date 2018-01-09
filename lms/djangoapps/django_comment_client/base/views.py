@@ -13,6 +13,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 import django_comment_client.settings as cc_settings
 import lms.lib.comment_client as cc
@@ -256,7 +257,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': text_type(course_key),
         'user_id': user.id,
         'thread_type': post["thread_type"],
         'body': post["body"],
@@ -374,7 +375,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         user_id=user.id,
-        course_id=course_key.to_deprecated_string(),
+        course_id=text_type(course_key),
         thread_id=thread_id,
         parent_id=parent_id,
         body=post["body"]

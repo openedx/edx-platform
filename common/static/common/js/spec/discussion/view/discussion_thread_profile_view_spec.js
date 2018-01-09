@@ -53,8 +53,8 @@
                 // I really have no idea what it is supposed to mean - probably just iteration, but better be safe
                 for (
                     i = _i = 0, _ref = numberOfImages - 1;
-                    0 <= _ref ? _i <= _ref : _i >= _ref;
-                    i = 0 <= _ref ? ++_i : --_i
+                    _ref >= 0 ? _i <= _ref : _i >= _ref;
+                    i = _ref >= 0 ? ++_i : --_i
                 ) {
                     threadData.body = threadData.body + imageTag;
                     if (i === 0) {

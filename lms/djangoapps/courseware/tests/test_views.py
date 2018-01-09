@@ -11,7 +11,6 @@ from urllib import quote, urlencode
 from uuid import uuid4
 
 import ddt
-import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, reverse_lazy
@@ -26,15 +25,16 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from pytz import UTC
+from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 
 import courseware.views.views as views
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates import api as certs_api
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
+from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist
 from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -62,6 +62,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.tests.util import expected_redirect_url
 from student.models import CourseEnrollment
 from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
@@ -100,22 +101,6 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skip
-    def test_jumpto_from_chapter(self):
-        location = self.course_key.make_usage_key('chapter', 'Overview')
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', unicode(self.course_key), unicode(location))
-        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
-        response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
-
-    @unittest.skip
-    def test_jumpto_id(self):
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', unicode(self.course_key), 'Overview')
-        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
-        response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
-
-    @pytest.mark.django111_expected_failure
     def test_jumpto_from_section(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -132,9 +117,8 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(section.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
-    @pytest.mark.django111_expected_failure
     def test_jumpto_from_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -156,7 +140,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module1.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
         expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
             course_id=unicode(course.id),
@@ -170,9 +154,8 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
-    @pytest.mark.django111_expected_failure
     def test_jumpto_from_nested_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -199,7 +182,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
         location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
@@ -536,16 +519,16 @@ class ViewsTestCase(ModuleStoreTestCase):
         # test the course location
         self.assertEqual(
             u'/courses/{course_key}/courseware?{activate_block_id}'.format(
-                course_key=self.course_key.to_deprecated_string(),
-                activate_block_id=urlencode({'activate_block_id': self.course.location.to_deprecated_string()})
+                course_key=text_type(self.course_key),
+                activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})
             ),
             get_redirect_url(self.course_key, self.course.location),
         )
         # test a section location
         self.assertEqual(
             u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
-                course_key=self.course_key.to_deprecated_string(),
-                activate_block_id=urlencode({'activate_block_id': self.section.location.to_deprecated_string()})
+                course_key=text_type(self.course_key),
+                activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})
             ),
             get_redirect_url(self.course_key, self.section.location),
         )
@@ -593,22 +576,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         # TODO add a test for no data *
         response = self.client.get(reverse('jump_to', args=['foo/bar/baz', 'baz']))
         self.assertEquals(response.status_code, 404)
-
-    @unittest.skip
-    def test_no_end_on_about_page(self):
-        # Toy course has no course end date or about/end_date blob
-        self.verify_end_date('edX/toy/TT_2012_Fall')
-
-    @unittest.skip
-    def test_no_end_about_blob(self):
-        # test_end has a course end date, no end_date HTML blob
-        self.verify_end_date("edX/test_end/2012_Fall", "Sep 17, 2015")
-
-    @unittest.skip
-    def test_about_blob_end_date(self):
-        # test_about_blob_end_date has both a course end date and an end_date HTML blob.
-        # HTML blob wins
-        self.verify_end_date("edX/test_about_blob_end_date/2012_Fall", "Learning never ends")
 
     def verify_end_date(self, course_id, expected_end_text=None):
         """
@@ -1194,20 +1161,6 @@ class StartDateTests(ModuleStoreTestCase):
         # This should return in the format '%Y-%m-%dT%H:%M:%S%z'
         self.assertContains(response, "2013-09-16T07:17:28+0000")
 
-    @patch(
-        'util.date_utils.pgettext',
-        fake_pgettext(translations={("abbreviated month name", "Jul"): "JULY", })
-    )
-    @patch(
-        'util.date_utils.ugettext',
-        fake_ugettext(translations={"SHORT_DATE_FORMAT": "%Y-%b-%d", })
-    )
-    @unittest.skip
-    def test_format_localized_in_xml_course(self):
-        response = self.get_about_response(CourseKey.fron_string('edX/toy/TT_2012_Fall'))
-        # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
-        self.assertContains(response, "2015-JULY-17")
-
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
@@ -1465,13 +1418,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(35 if self_paced else 34, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(36 if self_paced else 35, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 41, 27),
-        (True, 34, 23)
+        (False, 42, 28),
+        (True, 35, 24)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1561,6 +1514,49 @@ class ProgressPageTests(ProgressPageBaseTests):
             course_grade.passed = True
             course_grade.summary = {
                 'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
+            }
+
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"View Certificate")
+            self.assert_invalidate_certificate(generated_certificate)
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_page_with_whitelisted_certificate_with_html_view(self):
+        """
+        Verify that for white listed user the view certificate is
+        appearing on dashboard
+        """
+        generated_certificate = self.generate_certificate(
+            "http://www.example.com/certificate.pdf", "honor"
+        )
+
+        # Course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'dummy',
+                'description': 'dummy description',
+                'course_title': 'dummy title',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        CertificateWhitelist.objects.create(
+            user=self.user,
+            course_id=self.course.id,
+            whitelist=True
+        )
+
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = False
+            course_grade.summary = {
+                'grade': 'Fail', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
             }
 
             resp = self._get_progress_page()

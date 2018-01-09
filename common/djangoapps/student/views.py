@@ -45,6 +45,7 @@ from provider.oauth2.models import Client
 from pytz import UTC
 from ratelimitbackend.exceptions import RateLimitException
 from requests import HTTPError
+from six import text_type
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
@@ -74,7 +75,9 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type, get_course_runs_for_course
+from openedx.core.djangoapps.catalog.utils import (
+    get_programs_with_type, get_visible_sessions_for_entitlement, get_pseudo_session_for_entitlement
+)
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -83,10 +86,15 @@ from openedx.core.djangoapps.external_auth.login_and_register import register as
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.programs.utils import (
+    ProgramDataExtender,
+    ProgramProgressMeter
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, WaffleFlag
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_url_name
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
@@ -125,6 +133,7 @@ from student.models import (
 )
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
+from student.text_me_the_app import TextMeTheAppFragmentView
 from third_party_auth import pipeline, provider
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
@@ -603,7 +612,7 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
                 track.views.server_track(
                     request,
                     "change-email1-settings",
-                    {"receive_emails": "no", "course": course_key.to_deprecated_string()},
+                    {"receive_emails": "no", "course": text_type(course_key)},
                     page='dashboard',
                 )
                 break
@@ -693,11 +702,18 @@ def dashboard(request):
     course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
-    course_entitlements = list(CourseEntitlement.objects.filter(user=user).select_related('enrollment_course_run'))
-    course_entitlement_available_sessions = {
-        str(entitlement.uuid): get_course_runs_for_course(str(entitlement.course_uuid))
-        for entitlement in course_entitlements
-    }
+    # If an entitlement has no available sessions, pass through a mock course overview object
+    course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
+    course_entitlement_available_sessions = {}
+    unfulfilled_entitlement_pseudo_sessions = {}
+    for course_entitlement in course_entitlements:
+        course_entitlement.update_expired_at()
+        available_sessions = get_visible_sessions_for_entitlement(course_entitlement)
+        course_entitlement_available_sessions[str(course_entitlement.uuid)] = available_sessions
+        if not course_entitlement.enrollment_course_run:
+            # Unfulfilled entitlements need a mock session for metadata
+            pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
+            unfulfilled_entitlement_pseudo_sessions[str(course_entitlement.uuid)] = pseudo_session
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
@@ -778,7 +794,27 @@ def dashboard(request):
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
     meter = ProgramProgressMeter(request.site, user, enrollments=course_enrollments)
+    ecommerce_service = EcommerceService()
     inverted_programs = meter.invert_programs()
+
+    urls, program_data = {}, {}
+    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
+
+    if (bundles_on_dashboard_flag.is_enabled()):
+        programs_data = meter.programs
+        if programs_data:
+            program_data = meter.programs[0]
+            program_data = ProgramDataExtender(program_data, request.user).extend()
+            course_data = meter.progress(programs=[program_data], count_only=False)[0]
+
+            program_data.pop('courses')
+            skus = program_data.get('skus')
+
+            urls = {
+                'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
+                'buy_button_url': ecommerce_service.get_checkout_page_url(*skus)
+            }
+            urls['completeProgramURL'] = urls['buy_button_url'] + '&bundle=' + program_data.get('uuid')
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -877,6 +913,8 @@ def dashboard(request):
         course_enrollments = [enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id]  # pylint: disable=line-too-long
 
     context = {
+        'urls': urls,
+        'program_data': program_data,
         'enterprise_message': enterprise_message,
         'consent_required_courses': consent_required_courses,
         'enterprise_customer_name': enterprise_customer_name,
@@ -886,6 +924,7 @@ def dashboard(request):
         'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
+        'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
         'course_optouts': course_optouts,
         'banner_account_activation_message': banner_account_activation_message,
         'sidebar_account_activation_message': sidebar_account_activation_message,
@@ -919,7 +958,6 @@ def dashboard(request):
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
     }
 
-    ecommerce_service = EcommerceService()
     if ecommerce_service.is_enabled(request.user):
         context.update({
             'use_ecommerce_payment_flow': True,
@@ -1938,7 +1976,7 @@ def create_account_with_params(request, params):
             params["email"] = eamap.external_email
         except ValidationError:
             pass
-        if eamap.external_name.strip() != '':
+        if len(eamap.external_name.strip()) >= accounts_settings.NAME_MIN_LENGTH:
             params["name"] = eamap.external_name
         params["password"] = eamap.internal_password
         log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
@@ -3062,3 +3100,19 @@ class LogoutView(TemplateView):
         })
 
         return context
+
+
+@ensure_csrf_cookie
+def text_me_the_app(request):
+    """
+    Text me the app view.
+    """
+    text_me_fragment = TextMeTheAppFragmentView().render_to_fragment(request)
+    context = {
+        'nav_hidden': True,
+        'show_dashboard_tabs': True,
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'fragment': text_me_fragment
+    }
+
+    return render_to_response('text-me-the-app.html', context)

@@ -80,7 +80,7 @@ define([
                 ]
             };
 
-            setupView(course, false);
+            setupView(course, true);
         });
 
         afterEach(function() {
@@ -89,12 +89,6 @@ define([
 
         it('should exist', function() {
             expect(view).toBeDefined();
-        });
-
-        it('should render the course card based on the data enrolled', function() {
-            view.remove();
-            setupView(course, true);
-            validateCourseInfoDisplay();
         });
 
         it('should render final grade if course is completed', function() {
@@ -110,10 +104,13 @@ define([
         });
 
         it('should render the course card based on the data not enrolled', function() {
+            view.remove();
+            setupView(course, false);
             validateCourseInfoDisplay();
         });
 
         it('should update render if the course card is_enrolled updated', function() {
+            setupView(course, false);
             courseCardModel.set({
                 is_enrolled: true
             });
@@ -216,23 +213,59 @@ define([
             expect(view.$('.enrollment-opens').length).toEqual(0);
         });
 
-        it('should link to the marketing site when a URL is available', function() {
+        it('should link to the marketing site when the user is not enrolled', function() {
+            setupView(course, false);
             expect(view.$('.course-title-link').attr('href')).toEqual(course.course_runs[0].marketing_url);
         });
 
-        it('should link to the course home when no marketing URL is available', function() {
-            course.course_runs[0].marketing_url = null;
-            setupView(course, false);
-
+        it('should link to the course home when the user is enrolled', function() {
+            setupView(course, true);
             expect(view.$('.course-title-link').attr('href')).toEqual(course.course_runs[0].course_url);
         });
 
-        it('should not link to the marketing site or the course home if neither URL is available', function() {
+        it('should not link to the marketing site if the URL is not available', function() {
             course.course_runs[0].marketing_url = null;
-            course.course_runs[0].course_url = null;
             setupView(course, false);
 
             expect(view.$('.course-title-link').length).toEqual(0);
+        });
+
+        it('should not link to the course home if the URL is not available', function() {
+            course.course_runs[0].course_url = null;
+            setupView(course, true);
+
+            expect(view.$('.course-title-link').length).toEqual(0);
+        });
+
+        it('should show an unfulfilled user entitlement allows you to select a session', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, false);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You must select a session by');
+        });
+
+        it('should show a fulfilled expired user entitlement does not allow the changing of sessions', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expired_at: '2017-12-06 01:06:12',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, true);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You can no longer change sessions.');
+        });
+
+        it('should show a fulfilled user entitlement allows the changing of sessions', function() {
+            course.user_entitlement = {
+                uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                course_uuid: '99fc7414c36d4f56b37e8e30acf4c7ba',
+                expiration_date: '2017-12-05 01:06:12'
+            };
+            setupView(course, true);
+            expect(view.$('.info-expires-at').text().trim()).toContain('You can change sessions until');
         });
     });
 }

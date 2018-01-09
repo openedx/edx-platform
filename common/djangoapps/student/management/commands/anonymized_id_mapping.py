@@ -15,6 +15,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from student.models import anonymous_id_for_user
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 
 class Command(BaseCommand):
@@ -34,12 +35,12 @@ class Command(BaseCommand):
 
         # Generate the output filename from the course ID.
         # Change slashes to dashes first, and then append .csv extension.
-        output_filename = course_key.to_deprecated_string().replace('/', '-') + ".csv"
+        output_filename = text_type(course_key).replace('/', '-') + ".csv"
 
         # Figure out which students are enrolled in the course
         students = User.objects.filter(courseenrollment__course_id=course_key)
         if len(students) == 0:
-            self.stdout.write("No students enrolled in %s" % course_key.to_deprecated_string())
+            self.stdout.write("No students enrolled in %s" % text_type(course_key))
             return
 
         # Write mapping to output file in CSV format with a simple header

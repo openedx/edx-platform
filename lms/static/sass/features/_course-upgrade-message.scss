@@ -1,152 +1,54 @@
 /*
-  NOTE: If you make significant changes to the design, remember to update the Segment event properties and change
-  the creative property. This will allow us to better track individual performance of each style of the message.
-  Search for the courseware_verified_certificate_upsell promotion ID.
- */
+NOTE: If you make significant changes to the design, remember to update the Segment event properties and change
+the creative property. This will allow us to better track individual performance of each style of the message.
+Search for the courseware_verified_certificate_upsell promotion ID.
+*/
 
-// Expanded upgrade message
-.vc-message {
-  background: $lms-hero-color;
-  color: $white;
-  padding: $baseline;
-  position: relative;
-  margin: 0 0 $baseline;
+.course-home-sidebar-upgrade .btn-upgrade {
+  padding: 10px 20px;
+}
 
-  // CSS animation for smooth height transition
-  -webkit-transition: all 0.2s ease-in-out;
-  transition: all 0.2s ease-in-out;
+.course-home-sidebar-upgrade .promo-learn-more {
+  border: none;
+}
 
-  &::after {
-    content: "";
-    display: table;
-    clear: both;
-  }
+.section.section-upgrade {
+  border-left: solid 1px #d9d9d9;
+  border-bottom: solid 1px #d9d9d9;
+  border-right: solid 1px #d9d9d9;
+  border-top: 5px solid #008100;
+  padding: 20px;
+}
 
-  // Message copy
-  .vc-title {
-    font-size: 1.25rem;
-    font-weight: $font-weight-light;
-    margin-bottom: 1rem;
-    width: calc(100% - 70px);
-  }
+.section.section-upgrade .btn-link {
+  font-weight: normal;
+}
 
-  .vc-selling-points {
-    @include padding-left(0);
+.section.section-upgrade .btn-upgrade {
+  background-color: #008100;
+  border-color: #008100;
+}
 
-    font-size: 0.825rem;
-    margin: 1rem 0;
-    display: table;
+.section-upgrade .upgrade-container {
+  float: right;
+  text-align: center;
+  margin-top: 15px;
+}
 
-    > .vc-selling-point {
-      list-style: none;
-      display: table-row;
-
-      &::before {
-        content: "\2022";
-        display: table-cell;
-
-        @include padding-right($baseline/2);
-      }
-
-      &::after {
-        content: "";
-        display: table-row;
-        height: 0.25rem;
-      }
-    }
-  }
-
-  // Upgrade button
-  .btn-upgrade {
-    color: theme-color("inverse");
-    background-color: theme-color("purchase");
-    font-size: $font-size-base;
-    -webkit-transition: $btn-transition;
-    transition: $btn-transition;
-
-    &:hover {
-      background-color: theme-color("success");
-    }
-  }
-
-  // Show/hide button
-  .vc-toggle {
-    @include right($baseline/2);
-
-    top: $baseline/2;
-    position: absolute;
-    color: theme-color("inverse");
-
-    &:hover {
-      cursor: pointer;
-      text-decoration: none;
-      color: theme-color("light");
-    }
-  }
-
-  // Cert image
-  .vc-hero {
-    @include float(right);
-    @include padding-left(1rem);
-
-    clear: both;
-
-    img {
-      @include float(right);
-
-      clear: both;
-      width: 250px;
-    }
+@media only screen and (max-width: 991px) and (min-width: 768px)  {
+  .section-upgrade .upgrade-container {
+    float: none;
   }
 }
 
-// Collapsed upgrade message
-.vc-message.polite {
-  @include padding($baseline/2, 0, $baseline/2, $baseline);
-  padding-top: $baseline/2;
-  padding-bottom: $baseline/2;
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-
-  .vc-title {
-    @include margin-right(auto);
-
-    margin: 0;
-    flex-grow: 1;
-  }
-
-  .vc-cta {
-    flex-grow: 1;
-  }
-
-  .vc-toggle {
-    @include right(0);
-
-    margin: 0 $baseline/2;
-    order: 99;
-    position: relative;
-    white-space: nowrap;
-    width: $baseline*6;
-    top: 0;
-  }
-
-  .vc-fade:not(.vc-polite-only) {
-    display: none;
-  }
-
-  @include media-breakpoint-down(sm) {
-    flex-flow: row wrap;
-
-    .vc-title {
-      width: auto;
-      margin-bottom: $baseline/2;
-    }
-  }
+.section.section-upgrade p {
+  margin: 0.5em 0;
 }
 
-@media (max-width: $grid-breakpoints-sm) {
-  .vc-message .vc-hero {
-    display: none !important;
-  }
+.btn-brand {
+  color: white !important;
+}
+
+.section.section-upgrade img {
+  width: 43%;
 }
