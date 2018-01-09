@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-07 12:14+0000\n"
-"PO-Revision-Date: 2017-12-07 12:14:22.810167\n"
+"POT-Creation-Date: 2018-01-03 14:53+0000\n"
+"PO-Revision-Date: 2018-01-03 14:53:33.593885\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -331,6 +331,10 @@ msgstr ""
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid "Full Name cannot contain the following characters: < >"
 msgstr ""
 
 #: common/djangoapps/student/forms.py
@@ -942,13 +946,6 @@ msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
-msgstr ""
-
-#: common/djangoapps/third_party_auth/models.py
-msgid ""
-"Whether to drop an existing session when accessing a view decorated with "
-"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
-"URL query parameter mapping to this provider is included in the request."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -3726,6 +3723,17 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video auto-advance"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify whether to show an auto-advance button in videos. If the student "
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
 msgstr ""
 
@@ -4260,6 +4268,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "The default speed for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether to advance automatically to the next unit when the video "
+"ends."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -5134,6 +5148,34 @@ msgstr ""
 msgid ""
 "If your course does not appear on your dashboard, contact "
 "{payment_support_link}."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid ""
+"BlockCompletion.objects.submit_batch_completion should not be called when "
+"the feature is disabled."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Key '{key}' not found."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "Invalid course key: {}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "User is not enrolled in course."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Block with key: '{key}' is not in course {course}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "ok"
 msgstr ""
 
 #: lms/djangoapps/completion/models.py
@@ -6216,6 +6258,7 @@ msgstr ""
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6857,6 +6900,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr ""
@@ -6864,6 +6908,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr ""
@@ -6878,6 +6923,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 msgid "Title"
 msgstr ""
@@ -8129,6 +8175,21 @@ msgstr ""
 msgid "You do not have permission to view this page."
 msgstr ""
 
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your {enterprise} administrator in order to access "
+"{platform_name} or contact {edx_support_link}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
+msgstr ""
+
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+msgid "edX Support"
+msgstr ""
+
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
 msgstr ""
@@ -8141,9 +8202,56 @@ msgstr ""
 msgid "Create Account"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #: lms/djangoapps/student_account/views.py
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Continue"
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr ""
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
 msgstr ""
 
 #: lms/djangoapps/support/views/index.py
@@ -8663,6 +8771,7 @@ msgstr ""
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -8683,6 +8792,7 @@ msgstr ""
 #. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "window open"
@@ -9913,10 +10023,6 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
@@ -10010,45 +10116,6 @@ msgid "Year of birth"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr ""
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Country or Region of Residence"
@@ -10083,15 +10150,13 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service"
-msgstr ""
-
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
@@ -10310,6 +10375,18 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"Thank you for joining {platform_name}. Just a couple steps before you start "
+"learning!"
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Continue"
 msgstr ""
 
 #: openedx/features/learner_profile/views/learner_profile.py
@@ -11427,6 +11504,8 @@ msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
@@ -12588,6 +12667,10 @@ msgstr ""
 #. Translators: git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded for this course."
+msgstr ""
+
+#: lms/templates/text-me-the-app.html
+msgid "Text Me The App"
 msgstr ""
 
 #: lms/templates/textannotation.html
@@ -14581,6 +14664,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr ""
 
@@ -14606,6 +14693,26 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session to access the course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Change or Leave Session"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can no longer change sessions."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -14638,15 +14745,40 @@ msgid "Course options for"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Available Actions"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Buy all remaining courses in this program and save 10%"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade All Remaining Courses ("
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{\"{0:.2f}\".format(a)}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid " ${price:.2f} {currency} ) "
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can contact the account holder to request payment, or you can "
+"unenroll from this course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -14797,6 +14929,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+msgid "Course options for {courseName}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
@@ -17402,6 +17538,22 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Get the {platform_name} Mobile App!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "We'll send you a one time SMS with a link to download the app."
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Mobile phone number"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Send me a text with the link"
 msgstr ""
 
 #: lms/templates/modal/_modal-settings-language.html
@@ -21858,6 +22010,10 @@ msgstr ""
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "Policies"
 msgstr ""
 
 #: cms/templates/widgets/footer.html

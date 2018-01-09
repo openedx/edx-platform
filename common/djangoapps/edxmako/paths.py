@@ -18,6 +18,15 @@ from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme
 from . import LOOKUP
 
 
+class TopLevelTemplateURI(unicode):
+    """
+    A marker class for template URIs used to signal the template lookup infrastructure that the template corresponding
+    to the URI should be looked up straight in the standard edx-platform location instead of trying to locate an
+    overridding template in the current theme first.
+    """
+    pass
+
+
 class DynamicTemplateLookup(TemplateLookup):
     """
     A specialization of the standard mako `TemplateLookup` class which allows
@@ -51,6 +60,28 @@ class DynamicTemplateLookup(TemplateLookup):
         self._collection.clear()
         self._uri_cache.clear()
 
+    def adjust_uri(self, uri, calling_uri):
+        """
+        This method is called by mako when including a template in another template or when inheriting an existing mako
+        template. The method adjusts the `uri` to make it relative to the calling template's location.
+
+        This method is overridden to detect when a template from a theme tries to override the same template from a
+        standard location, for example when the dashboard.html template is overridden in the theme while at the same
+        time inheriting from the standard LMS dashboard.html template.
+
+        When this self-inheritance is detected, the uri is wrapped in the TopLevelTemplateURI marker class to ensure
+        that template lookup skips the current theme and looks up the built-in template in standard locations.
+        """
+        # Make requested uri relative to the calling uri.
+        relative_uri = super(DynamicTemplateLookup, self).adjust_uri(uri, calling_uri)
+        # Is the calling template (calling_uri) which is including or inheriting current template (uri)
+        # located inside a theme?
+        if calling_uri != strip_site_theme_templates_path(calling_uri):
+            # Is the calling template trying to include/inherit itself?
+            if calling_uri == get_template_path_with_theme(relative_uri):
+                return TopLevelTemplateURI(relative_uri)
+        return relative_uri
+
     def get_template(self, uri):
         """
         Overridden method for locating a template in either the database or the site theme.
@@ -68,14 +99,23 @@ class DynamicTemplateLookup(TemplateLookup):
         # if microsite template is not present or request is not in microsite then
         # let mako find and serve a template
         if not template:
-            try:
-                # Try to find themed template, i.e. see if current theme overrides the template
-                template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
-            except TopLevelLookupException:
-                # strip off the prefix path to theme and look in default template dirs
-                template = super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))
+            if isinstance(uri, TopLevelTemplateURI):
+                template = self._get_toplevel_template(uri)
+            else:
+                try:
+                    # Try to find themed template, i.e. see if current theme overrides the template
+                    template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
+                except TopLevelLookupException:
+                    template = self._get_toplevel_template(uri)
 
         return template
+
+    def _get_toplevel_template(self, uri):
+        """
+        Lookup a default/toplevel template, ignoring current theme.
+        """
+        # Strip off the prefix path to theme and look in default template dirs.
+        return super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))
 
 
 def clear_lookups(namespace):

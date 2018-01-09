@@ -2,11 +2,11 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'teams/js/views/team_utils',
-            'text!teams/templates/team-profile-header-actions.underscore'],
+        'jquery',
+        'underscore',
+        'gettext',
+        'teams/js/views/team_utils',
+        'text!teams/templates/team-profile-header-actions.underscore'],
         function(Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
             return Backbone.View.extend({
 
@@ -64,7 +64,7 @@
                     $.ajax({
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
-                        data: {'username': view.context.userInfo.username, 'team_id': view.model.get('id')}
+                        data: {username: view.context.userInfo.username, team_id: view.model.get('id')}
                     }).done(function(data) {
                         view.model.fetch()
                             .done(function() {
@@ -99,7 +99,7 @@
                             $.ajax({
                                 type: 'GET',
                                 url: view.context.teamMembershipsUrl,
-                                data: {'username': username, 'course_id': view.context.courseID}
+                                data: {username: username, course_id: view.context.courseID}
                             }).done(function(data) {
                                 info.alreadyMember = (data.count > 0);
                                 info.memberOfCurrentTeam = false;

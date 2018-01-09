@@ -46,6 +46,10 @@ class TestModels(TestCase):
 
         assert entitlement.is_entitlement_redeemable() is False
 
+        entitlement = CourseEntitlementFactory.create(expired_at=datetime.now())
+
+        assert entitlement.is_entitlement_refundable() is False
+
     def test_is_entitlement_refundable(self):
         """
         Test that the entitlement is refundable when created now, and is not refundable when created 70 days
@@ -83,6 +87,10 @@ class TestModels(TestCase):
 
         assert entitlement.is_entitlement_refundable() is True
 
+        entitlement = CourseEntitlementFactory.create(expired_at=datetime.now())
+
+        assert entitlement.is_entitlement_refundable() is False
+
     def test_is_entitlement_regainable(self):
         """
         Test that the entitlement is not expired when created now, and is expired when created20 days
@@ -112,6 +120,10 @@ class TestModels(TestCase):
         self.enrollment.save()
 
         assert entitlement.is_entitlement_regainable() is False
+
+        entitlement = CourseEntitlementFactory.create(expired_at=datetime.now())
+
+        assert entitlement.is_entitlement_regainable
 
     def test_get_days_until_expiration(self):
         """
@@ -162,6 +174,21 @@ class TestModels(TestCase):
         expired_at_datetime = entitlement.expired_at_datetime
         assert expired_at_datetime
         assert entitlement.expired_at
+
+        # Verify that an entitlement that has just been created, but the user has been enrolled in the course for
+        # greater than 14 days, and the course started more than 14 days ago is not expired
+        entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
+        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=20)
+        entitlement.created = datetime.utcnow().replace(tzinfo=pytz.UTC)
+        self.enrollment.created = past_datetime
+        self.course.start = past_datetime
+        entitlement.save()
+        self.enrollment.save()
+        self.course.save()
+        assert entitlement.enrollment_course_run
+        expired_at_datetime = entitlement.expired_at_datetime
+        assert expired_at_datetime is None
+        assert entitlement.expired_at is None
 
         # Verify a date 451 days in the past (1 days after the policy expiration)
         # That is enrolled and started in within the regain period is still expired

@@ -54,6 +54,7 @@ class TestVideoYouTube(TestVideo):
         sources = [u'example.mp4', u'example.webm']
 
         expected_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
@@ -64,6 +65,7 @@ class TestVideoYouTube(TestVideo):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
+                'autoAdvance': False,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -84,14 +86,13 @@ class TestVideoYouTube(TestVideo):
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
                 'ytKey': None,
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -135,6 +136,7 @@ class TestVideoNonYouTube(TestVideo):
         sources = [u'example.mp4', u'example.webm']
 
         expected_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
@@ -145,6 +147,7 @@ class TestVideoNonYouTube(TestVideo):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
+                'autoAdvance': False,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
@@ -165,14 +168,13 @@ class TestVideoNonYouTube(TestVideo):
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
                 'ytKey': None,
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -203,6 +205,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         super(TestGetHtmlMethod, self).setUp()
         self.setup_course()
         self.default_metadata_dict = OrderedDict({
+            'autoAdvance': False,
             'saveStateUrl': '',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'streams': '1.00:3_yD_cEKoCk',
@@ -223,15 +226,23 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'ytApiUrl': 'https://www.youtube.com/iframe_api',
             'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
             'ytKey': None,
-            'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
             'autohideHtml5': False,
             'recordedYoutubeIsAvailable': True,
+            'completionEnabled': False,
+            'completionPercentage': 0.95,
+            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
         })
+
+    def get_handler_url(self, handler, suffix):
+        """
+        Return the URL for the specified handler on the block represented by
+        self.item_descriptor.
+        """
+        return self.item_descriptor.xmodule_runtime.handler_url(
+            self.item_descriptor, handler, suffix
+        ).rstrip('/?')
 
     def test_get_html_track(self):
         SOURCE_XML = """
@@ -287,6 +298,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         sources = [u'example.mp4', u'example.webm']
 
         expected_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
@@ -318,20 +330,15 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
             self.initialize_module(data=DATA)
-            track_url = self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'download'
-            ).rstrip('/?')
+            track_url = self.get_handler_url('transcript', 'download')
 
             context = self.item_descriptor.render(STUDENT_VIEW).content
             metadata.update({
                 'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": u'Українська'},
                 'transcriptLanguage': u'en' if not data['transcripts'] or data.get('sub') else u'uk',
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sub': data['sub'],
             })
@@ -410,6 +417,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         ]
 
         initial_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
@@ -441,12 +449,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
@@ -535,6 +540,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         metadata['autoplay'] = False
         metadata['sources'] = ""
         initial_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
@@ -581,12 +587,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
-            'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'sources': data['result']['sources'],
         })
@@ -709,6 +712,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         metadata = self.default_metadata_dict
         metadata['sources'] = ""
         initial_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
@@ -742,12 +746,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # expected_context, expected context to be returned by get_html
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
-            'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                self.item_descriptor, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+            'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+            'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+            'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'sources': data['result']['sources'],
         })
@@ -818,6 +819,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         ]
 
         initial_context = {
+            'autoadvance_enabled': False,
             'branding_info': {
                 'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
                 'logo_tag': 'Video hosted by XuetangX.com',
@@ -854,12 +856,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             context = self.item_descriptor.render('student_view').content
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation/__lang__'
-                ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'].get('sources', []),
             })
@@ -1366,6 +1365,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                     "fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0},
                     "youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}
                 },
+                "all_sources": [self.TEST_SOURCE_URL],
             }
         )
 
@@ -1380,6 +1380,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "duration": None,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
                 "encoded_videos": {"youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}},
+                "all_sources": [],
             }
         )
 
@@ -1397,6 +1398,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "only_on_web": False,
                 "duration": self.TEST_DURATION,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+                'all_sources': [self.TEST_SOURCE_URL],
             }
         )
 
@@ -1560,9 +1562,11 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         create_or_update_video_transcript(
             video_id=self.descriptor.edx_video_id,
             language_code='ar',
-            file_name='ext101.srt',
-            file_format='srt',
-            provider='Cielo24',
+            metadata={
+                'provider': 'Cielo24',
+                'file_name': 'ext101.srt',
+                'file_format': 'srt'
+            }
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=None)
@@ -1588,9 +1592,11 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         create_or_update_video_transcript(
             video_id=external_video_id,
             language_code='ar',
-            file_name='ext101.srt',
-            file_format='srt',
-            provider='Cielo24',
+            metadata={
+                'provider': 'Cielo24',
+                'file_name': 'ext101.srt',
+                'file_format': 'srt'
+            }
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=None)
@@ -1713,7 +1719,8 @@ class TestVideoWithBumper(TestVideo):
     """
     CATEGORY = "video"
     METADATA = {}
-    FEATURES = settings.FEATURES
+    # Use temporary FEATURES in this test without affecting the original
+    FEATURES = dict(settings.FEATURES)
 
     @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
     def test_is_bumper_enabled(self, get_bumper_settings):
@@ -1761,6 +1768,7 @@ class TestVideoWithBumper(TestVideo):
         content = self.item_descriptor.render(STUDENT_VIEW).content
         sources = [u'example.mp4', u'example.webm']
         expected_context = {
+            'autoadvance_enabled': False,
             'branding_info': None,
             'license': None,
             'bumper_metadata': json.dumps(OrderedDict({
@@ -1771,14 +1779,13 @@ class TestVideoWithBumper(TestVideo):
                 'transcriptLanguage': 'en',
                 'transcriptLanguages': {'en': 'English'},
                 'transcriptTranslationUrl': video_utils.set_query_parameter(
-                    self.item_descriptor.xmodule_runtime.handler_url(
-                        self.item_descriptor, 'transcript', 'translation/__lang__'
-                    ).rstrip('/?'), 'is_bumper', 1
+                    self.get_handler_url('transcript', 'translation/__lang__'), 'is_bumper', 1
                 ),
                 'transcriptAvailableTranslationsUrl': video_utils.set_query_parameter(
-                    self.item_descriptor.xmodule_runtime.handler_url(
-                        self.item_descriptor, 'transcript', 'available_translations'
-                    ).rstrip('/?'), 'is_bumper', 1
+                    self.get_handler_url('transcript', 'available_translations'), 'is_bumper', 1
+                ),
+                "publishCompletionUrl": video_utils.set_query_parameter(
+                    self.get_handler_url('publish_completion', ''), 'is_bumper', 1
                 ),
             })),
             'cdn_eval': False,
@@ -1788,6 +1795,7 @@ class TestVideoWithBumper(TestVideo):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
+                'autoAdvance': False,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -1795,6 +1803,78 @@ class TestVideoWithBumper(TestVideo):
                 'sources': sources,
                 'poster': None,
                 'duration': None,
+                'captionDataDir': None,
+                'showCaptions': 'true',
+                'generalSpeed': 1.0,
+                'speed': None,
+                'savedVideoPosition': 0.0,
+                'start': 3603.0,
+                'end': 3610.0,
+                'transcriptLanguage': 'en',
+                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'ytTestTimeout': 1500,
+                'ytApiUrl': 'https://www.youtube.com/iframe_api',
+                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
+                'ytKey': None,
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'autohideHtml5': False,
+                'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+            })),
+            'track': None,
+            'transcript_download_format': u'srt',
+            'transcript_download_formats_list': [
+                {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
+                {'display_name': 'Text (.txt) file', 'value': 'txt'}
+            ],
+            'poster': json.dumps(OrderedDict({
+                'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
+                'type': 'youtube'
+            }))
+        }
+
+        expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+        self.assertEqual(content, expected_content)
+
+
+@ddt.ddt
+class TestAutoAdvanceVideo(TestVideo):
+    """
+    Tests the server side of video auto-advance.
+    """
+    CATEGORY = "video"
+    METADATA = {}
+    # Use temporary FEATURES in this test without affecting the original
+    FEATURES = dict(settings.FEATURES)
+
+    def prepare_expected_context(self, autoadvanceenabled_flag, autoadvance_flag):
+        """
+        Build a dictionary with data expected by some operations in this test.
+        Only parameters related to auto-advance are variable, rest is fixed.
+        """
+        context = {
+            'autoadvance_enabled': autoadvanceenabled_flag,
+            'branding_info': None,
+            'license': None,
+            'cdn_eval': False,
+            'cdn_exp_group': None,
+            'display_name': u'A Name',
+            'download_video_link': u'example.mp4',
+            'handout': None,
+            'id': self.item_descriptor.location.html_id(),
+            'bumper_metadata': 'null',
+            'metadata': json.dumps(OrderedDict({
+                'autoAdvance': autoadvance_flag,
+                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'autoplay': False,
+                'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
+                'sub': 'a_sub_file.srt.sjson',
+                'sources': [u'example.mp4', u'example.webm'],
+                'duration': None,
+                'poster': None,
                 'captionDataDir': None,
                 'showCaptions': 'true',
                 'generalSpeed': 1.0,
@@ -1816,6 +1896,9 @@ class TestVideoWithBumper(TestVideo):
                 ).rstrip('/?'),
                 'autohideHtml5': False,
                 'recordedYoutubeIsAvailable': True,
+                'completionEnabled': False,
+                'completionPercentage': 0.95,
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -1823,11 +1906,63 @@ class TestVideoWithBumper(TestVideo):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-            'poster': json.dumps(OrderedDict({
-                'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
-                'type': 'youtube'
-            }))
+            'poster': 'null'
         }
+        return context
 
-        expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+    def assert_content_matches_expectations(self, autoadvanceenabled_must_be, autoadvance_must_be):
+        """
+        Check (assert) that loading video.html produces content that corresponds
+        to the passed context.
+        Helper function to avoid code repetition.
+        """
+
+        with override_settings(FEATURES=self.FEATURES):
+            content = self.item_descriptor.render(STUDENT_VIEW).content
+
+        expected_context = self.prepare_expected_context(
+            autoadvanceenabled_flag=autoadvanceenabled_must_be,
+            autoadvance_flag=autoadvance_must_be,
+        )
+
+        with override_settings(FEATURES=self.FEATURES):
+            expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+
         self.assertEqual(content, expected_content)
+
+    def change_course_setting_autoadvance(self, new_value):
+        """
+        Change the .video_auto_advance course setting (a.k.a. advanced setting).
+        This avoids doing .save(), and instead modifies the instance directly.
+        Based on test code for video_bumper setting.
+        """
+        # This first render is done to initialize the instance
+        self.item_descriptor.render(STUDENT_VIEW)
+        item_instance = self.item_descriptor.xmodule_runtime.xmodule_instance
+        item_instance.video_auto_advance = new_value
+        # After this step, render() should see the new value
+        # e.g. use self.item_descriptor.render(STUDENT_VIEW).content
+
+    @ddt.data(
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    )
+    @ddt.unpack
+    def test_is_autoadvance_available_and_enabled(self, global_setting, course_setting):
+        """
+        Check that the autoadvance is not available when it is disabled via feature flag
+        (ENABLE_AUTOADVANCE_VIDEOS set to False) or by the course setting.
+        It checks that:
+        - only when the feature flag and the course setting are True (at the same time)
+          the controls are visible
+        - in that case (when the controls are visible) the video will autoadvance
+          (because that's the default), in other cases it won't
+        """
+        self.FEATURES.update({"ENABLE_AUTOADVANCE_VIDEOS": global_setting})
+        self.change_course_setting_autoadvance(new_value=course_setting)
+        self.assert_content_matches_expectations(
+            autoadvanceenabled_must_be=(global_setting and course_setting),
+            autoadvance_must_be=(global_setting and course_setting),
+        )

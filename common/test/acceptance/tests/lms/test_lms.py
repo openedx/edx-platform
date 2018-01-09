@@ -709,10 +709,8 @@ class HighLevelTabTest(UniqueCourseTest):
         self.assertTrue(self.tab_nav.is_on_tab('Wiki'))
 
         # Assert that a default wiki is created
-        expected_article_name = "{org}.{course_number}.{course_run}".format(
-            org=self.course_info['org'],
-            course_number=self.course_info['number'],
-            course_run=self.course_info['run']
+        expected_article_name = "{course_name}".format(
+            course_name=self.course_info['display_name']
         )
         self.assertEqual(expected_article_name, course_wiki.article_name)
 

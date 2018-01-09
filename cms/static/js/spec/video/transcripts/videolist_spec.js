@@ -68,7 +68,7 @@ function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
 
         beforeEach(function() {
             var tpl = sandbox({
-                'class': 'component',
+                class: 'component',
                 'data-locator': component_locator
             });
 

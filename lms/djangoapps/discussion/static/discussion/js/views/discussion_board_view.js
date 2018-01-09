@@ -279,12 +279,17 @@
                     crumbs = [],
                     subTopic = $('.forum-nav-browse-title', $item)
                         .first()
+                        .contents()
+                        .last()
                         .text()
                         .trim();
 
                 $parentSubMenus.each(function(i, el) {
-                    crumbs.push($(el).siblings('.forum-nav-browse-title')
+                    crumbs.push(
+                        $(el).siblings('.forum-nav-browse-title')
                         .first()
+                        .contents()
+                        .last()
                         .text()
                         .trim()
                     );

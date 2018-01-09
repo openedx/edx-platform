@@ -1002,12 +1002,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         policy_dir = None
         url_name = xml_obj.get('url_name', xml_obj.get('slug'))
         if url_name:
-            policy_dir = 'policies/' + url_name
+            policy_dir = u'policies/' + url_name
 
         # Try to load grading policy
-        paths = ['grading_policy.json']
+        paths = [u'grading_policy.json']
         if policy_dir:
-            paths = [policy_dir + '/grading_policy.json'] + paths
+            paths = [policy_dir + u'/grading_policy.json'] + paths
 
         try:
             policy = json.loads(cls.read_grading_policy(paths, system))

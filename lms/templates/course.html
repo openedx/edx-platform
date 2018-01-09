@@ -3,10 +3,11 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from six import text_type
 %>
 <%page args="course" expression_filter="h"/>
 <article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
-  <a href="${reverse('about_course', args=[course.id.to_deprecated_string()])}">
+  <a href="${reverse('about_course', args=[text_type(course.id)])}">
     <header class="course-image">
       <div class="cover-image">
         <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />

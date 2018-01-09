@@ -127,7 +127,6 @@ class TestCollectAssets(PaverTestCase):
         specified_log_dict = specified_log_loc
         log_loc = options.get("expected_log_location", "> /dev/null")
         systems = options.get("systems", ["lms"])
-        expected_messages = self._set_expected_messages(log_location=log_loc, systems=systems)
         if specified_log_loc is None:
             collect_assets(
                 systems,
@@ -139,7 +138,7 @@ class TestCollectAssets(PaverTestCase):
                 Env.DEVSTACK_SETTINGS,
                 **specified_log_dict
             )
-        self.assertEqual(self.task_messages, expected_messages)
+        self._assert_correct_messages(log_location=log_loc, systems=systems)
 
     def test_collect_assets_debug(self):
         """
@@ -149,27 +148,22 @@ class TestCollectAssets(PaverTestCase):
         expected_log_loc = ""
         systems = ["lms"]
         kwargs = {COLLECTSTATIC_LOG_DIR_ARG: None}
-        expected_messages = self._set_expected_messages(log_location=expected_log_loc, systems=systems)
         collect_assets(systems, Env.DEVSTACK_SETTINGS, **kwargs)
-        self.assertEqual(self.task_messages, expected_messages)
+        self._assert_correct_messages(log_location=expected_log_loc, systems=systems)
 
-    def _set_expected_messages(self, log_location, systems):
+    def _assert_correct_messages(self, log_location, systems):
         """
-        Returns a list of messages that are expected to be sent from paver
-         to the commandline for collectstatic functions. This list is constructed
-         based on the log location and systems being passed in.
-        """
+        Asserts that the expected commands were run.
 
-        expected_messages = []
-        for sys in systems:
-            expected_messages.append(
-                'python manage.py {system} --settings={settings} collectstatic --noinput {log_loc}'.format(
-                    system=sys,
-                    settings=Env.DEVSTACK_SETTINGS,
-                    log_loc=log_location
-                )
-            )
-        return expected_messages
+        We just extract the pieces we care about here instead of specifying an
+        exact command, so that small arg changes don't break this test.
+        """
+        for i, sys in enumerate(systems):
+            msg = self.task_messages[i]
+            self.assertTrue(msg.startswith('python manage.py {}'.format(sys)))
+            self.assertIn(' collectstatic '.format(Env.DEVSTACK_SETTINGS), msg)
+            self.assertIn('--settings={}'.format(Env.DEVSTACK_SETTINGS), msg)
+            self.assertTrue(msg.endswith(' {}'.format(log_location)))
 
 
 @ddt.ddt
@@ -181,7 +175,7 @@ class TestUpdateAssetsTask(PaverTestCase):
 
     @ddt.data(
         [{"expected_substring": "> /dev/null"}],  # go to /dev/null by default
-        [{"cmd_args": ["--debug"], "expected_substring": "collectstatic --noinput "}]  # TODO: make this regex
+        [{"cmd_args": ["--debug"], "expected_substring": "collectstatic"}]  # TODO: make this regex
     )
     @ddt.unpack
     def test_update_assets_task_collectstatic_log_arg(self, options):

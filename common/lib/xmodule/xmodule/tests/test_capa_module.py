@@ -17,6 +17,7 @@ import ddt
 from django.utils.encoding import smart_text
 from lxml import etree
 from mock import Mock, patch, DEFAULT
+import six
 import webob
 from webob.multidict import MultiDict
 
@@ -1533,10 +1534,19 @@ class CapaModuleTest(unittest.TestCase):
         self.assertFalse(result['should_enable_next_hint'])
 
     def test_demand_hint_logging(self):
+        def mock_location_text(self):
+            """
+            Mock implementation of __unicode__ or __str__ for the module's location.
+            """
+            return u'i4x://edX/capa_test/problem/meh'
+
         module = CapaFactory.create(xml=self.demand_xml)
         # Re-mock the module_id to a fixed string, so we can check the logging
         module.location = Mock(module.location)
-        module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
+        if six.PY2:
+            module.location.__unicode__ = mock_location_text
+        else:
+            module.location.__str__ = mock_location_text
 
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.get_problem_html()

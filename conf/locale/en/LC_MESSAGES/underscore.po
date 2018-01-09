@@ -1,14 +1,14 @@
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2017.
+# EdX Team <info@edx.org>, 2018.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-07 12:08+0000\n"
-"PO-Revision-Date: 2017-12-07 12:14:23.213152\n"
+"POT-Creation-Date: 2018-01-03 14:47+0000\n"
+"PO-Revision-Date: 2018-01-03 14:53:33.979270\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -36,6 +36,7 @@ msgstr ""
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+#: lms/templates/learner_dashboard/verification_popover.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
@@ -137,6 +138,7 @@ msgstr ""
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: lms/templates/fields/field_dropdown.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
@@ -323,6 +325,7 @@ msgid "Search"
 msgstr ""
 
 #: common/static/common/templates/discussion/alert-popup.underscore
+#: lms/templates/learner_dashboard/verification_popover.underscore
 #: test_root/staticfiles/common/templates/discussion/alert-popup.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
@@ -2050,6 +2053,22 @@ msgstr ""
 msgid "Certificate Purchased"
 msgstr ""
 
+#: lms/templates/learner_dashboard/course_card.underscore
+msgid "Change or Leave Session"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore
+msgid "You can no longer change sessions."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore
+msgid "You can change sessions until {expiration_date}."
+msgstr ""
+
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Final Grade"
@@ -2071,8 +2090,7 @@ msgid "View Course"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
-msgid "Choose a course run:"
+msgid "Select a session:"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -2093,6 +2111,46 @@ msgstr ""
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "More sessions coming soon."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Change to a different session or leave the current session."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "To access the course, select a session."
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Session Selection Dropdown for {courseName}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "{sessionDates} - Currently Selected"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "{sessionDates} (Open until {enrollmentEnd})"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "More sessions coming soon"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Leave the current session and decide later"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Change Session"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Select Session"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -2421,6 +2479,10 @@ msgstr ""
 #: lms/templates/student_account/register.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
 msgid "or create a new one here"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -3257,4 +3319,8 @@ msgstr ""
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #, python-format
 msgid " %(username)s "
+msgstr ""
+
+#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
+msgid "Choose a course run:"
 msgstr ""

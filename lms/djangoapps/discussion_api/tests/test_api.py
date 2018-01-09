@@ -581,6 +581,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         super(GetThreadListTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -998,6 +999,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         super(GetCommentListTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -1477,6 +1479,7 @@ class CreateThreadTest(
         super(CreateThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -1741,6 +1744,7 @@ class CreateCommentTest(
         super(CreateCommentTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -2006,6 +2010,7 @@ class UpdateThreadTest(
         super(UpdateThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
 
         self.user = UserFactory.create()
@@ -2388,6 +2393,7 @@ class UpdateCommentTest(
 
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
 
         self.user = UserFactory.create()
@@ -2787,6 +2793,7 @@ class DeleteThreadTest(
         super(DeleteThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -2924,6 +2931,7 @@ class DeleteCommentTest(
         super(DeleteCommentTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -3078,6 +3086,7 @@ class RetrieveThreadTest(
         super(RetrieveThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)

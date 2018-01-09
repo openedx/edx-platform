@@ -250,7 +250,9 @@ def remove_item(request):
             item_id
         )
     else:
-        item = items[0]
+        # Reload the item directly to prevent select_subclasses() hackery from interfering with
+        # deletion of all objects in the model inheritance hierarchy
+        item = items[0].__class__.objects.get(id=item_id)
         if item.user == request.user:
             Order.remove_cart_item_from_order(item, request.user)
             item.order.update_order_type()
@@ -395,6 +397,9 @@ def register_code_redemption(request, registration_code):
             else:
                 for cart_item in cart_items:
                     if isinstance(cart_item, PaidCourseRegistration) or isinstance(cart_item, CourseRegCodeItem):
+                        # Reload the item directly to prevent select_subclasses() hackery from interfering with
+                        # deletion of all objects in the model inheritance hierarchy
+                        cart_item = cart_item.__class__.objects.get(id=cart_item.id)
                         cart_item.delete()
 
             #now redeem the reg code.

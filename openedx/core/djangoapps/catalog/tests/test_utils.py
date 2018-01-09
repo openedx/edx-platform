@@ -167,6 +167,10 @@ class TestGetProgramsWithType(TestCase):
         super(TestGetProgramsWithType, self).setUp()
         self.site = SiteFactory()
 
+        # We have seen what seem like flaky tests for these, but can't debug them due to the diff being too large.
+        # If you fix the flakiness of the tests this could go away as well.
+        self.maxDiff = None
+
     @mock.patch(UTILS_MODULE + '.get_programs')
     @mock.patch(UTILS_MODULE + '.get_program_types')
     def test_get_programs_with_type(self, mock_get_program_types, mock_get_programs):

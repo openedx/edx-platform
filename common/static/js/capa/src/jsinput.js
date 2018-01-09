@@ -145,12 +145,11 @@ var JSInput = (function($, undefined) {
                 }
 
                 if (typeof(jsonValue) === 'object') {
-                    stateValue = jsonValue['state'];
+                    stateValue = jsonValue.state;
                 } else {
                     stateValue = jsonValue;
                 }
-            }
-            else {
+            } else {
                 // use initial_state string as the JSON string for stateValue.
                 stateValue = initialState;
             }
@@ -179,8 +178,7 @@ var JSInput = (function($, undefined) {
                     } catch (err) {
                         setTimeout(function() { whileloop(n - 1); }, 200);
                     }
-                }
-                else {
+                } else {
                     console.debug('Error: could not set state');
                 }
             }
@@ -220,4 +218,4 @@ var JSInput = (function($, undefined) {
         jsinputConstructor: jsinputConstructor,
         walkDOM: walkDOM
     };
-})(window.jQuery);
+}(window.jQuery));

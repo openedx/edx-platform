@@ -318,6 +318,7 @@ class AccountSettingsOnCreationTest(TestCase):
             'language_proficiencies': [],
             'account_privacy': PRIVATE_VISIBILITY,
             'accomplishments_shared': False,
+            'extended_profile': [],
         })
 
 

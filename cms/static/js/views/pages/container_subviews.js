@@ -89,8 +89,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                 var viewLiveAction = this.$el.find('.button-view');
                 if (this.model.get('published')) {
                     viewLiveAction.removeClass(disabledCss).attr('aria-disabled', false);
-                }
-                else {
+                } else {
                     viewLiveAction.addClass(disabledCss).attr('aria-disabled', true);
                 }
             }
@@ -175,7 +174,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             discardChanges: function(e) {
-                var xblockInfo = this.model, renderPage = this.renderPage;
+                var xblockInfo = this.model,
+                    renderPage = this.renderPage;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
@@ -198,7 +198,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             toggleStaffLock: function(e) {
-                var xblockInfo = this.model, self = this, enableStaffLock, hasInheritedStaffLock,
+                var xblockInfo = this.model,
+                    self = this,
+                    enableStaffLock, hasInheritedStaffLock,
                     saveAndPublishStaffLock, revertCheckBox;
                 if (e && e.preventDefault) {
                     e.preventDefault();

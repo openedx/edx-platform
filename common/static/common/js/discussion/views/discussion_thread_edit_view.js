@@ -5,12 +5,12 @@
         this.DiscussionThreadEditView = Backbone.View.extend({
             tagName: 'form',
             events: {
-                'submit': 'updateHandler',
+                submit: 'updateHandler',
                 'click .post-cancel': 'cancelHandler'
             },
 
             attributes: {
-                'class': 'discussion-post edit-post-form'
+                class: 'discussion-post edit-post-form'
             },
 
             initialize: function(options) {

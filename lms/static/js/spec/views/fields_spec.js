@@ -1,6 +1,6 @@
 define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers', 'js/views/fields', 'js/spec/views/fields_helpers',
-        'string_utils'],
+    'common/js/spec_helpers/template_helpers', 'js/views/fields', 'js/spec/views/fields_helpers',
+    'string_utils'],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers) {
         'use strict';
 
@@ -72,8 +72,8 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
 
                 var view = new fieldViewClass(fieldData);
                 view.saveAttributes(
-                    {'language': 'ur'},
-                    {'headers': {'Priority': 'Urgent'}}
+                    {language: 'ur'},
+                    {headers: {Priority: 'Urgent'}}
                 );
 
                 var request = requests[0];
@@ -94,7 +94,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage);
                 expect(view.fieldValue()).toBe(USERNAME);
 
-                view.model.set({'username': 'bookworm'});
+                view.model.set({username: 'bookworm'});
                 expect(view.fieldValue()).toBe('bookworm');
             });
 
@@ -147,7 +147,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 expect(view.$(dropdownSelectClass).length).toBe(0);
                 expect(view.$(dropdownButtonClass).length).toBe(0);
 
-                view.model.set({'name': fieldData.options[1][0]});
+                view.model.set({name: fieldData.options[1][0]});
                 expect(view.el).toHaveClass('mode-display');
                 expect(view.fieldValue()).toBe(fieldData.options[1][0]);
                 expect(view.$(readOnlyDisplayClass).text()).toBe(fieldData.options[1][1]);
@@ -262,7 +262,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 expect(view.$(textareaLinkClass).length).toBe(0);
 
                 var bio = 'Too much to tell!';
-                view.model.set({'bio': bio});
+                view.model.set({bio: bio});
                 expect(view.el).toHaveClass('mode-display');
                 expect(view.fieldValue()).toBe(bio);
                 view.$el.click();
@@ -284,7 +284,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     persistChanges: true,
                     messagePosition: 'header'
                 });
-                fieldData.model.set({'bio': ''});
+                fieldData.model.set({bio: ''});
 
                 var view = new FieldViews.TextareaFieldView(fieldData).render();
 
@@ -300,7 +300,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 expect(view.fieldValue()).toBe(BIO);
                 expect(view.$(textareaLinkClass).length).toBe(0);
                 AjaxHelpers.expectJsonRequest(
-                    requests, 'PATCH', view.model.url, {'bio': BIO}
+                    requests, 'PATCH', view.model.url, {bio: BIO}
                 );
                 AjaxHelpers.respondWithNoContent(requests);
                 expect(view.el).toHaveClass('mode-display');

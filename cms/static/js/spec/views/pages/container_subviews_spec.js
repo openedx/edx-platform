@@ -1,8 +1,8 @@
 define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers', 'js/spec_helpers/edit_helpers',
-        'common/js/components/views/feedback_prompt', 'js/views/pages/container',
-        'js/views/pages/container_subviews', 'js/models/xblock_info', 'js/views/utils/xblock_utils',
-        'js/models/course'],
+    'common/js/spec_helpers/template_helpers', 'js/spec_helpers/edit_helpers',
+    'common/js/components/views/feedback_prompt', 'js/views/pages/container',
+    'js/views/pages/container_subviews', 'js/models/xblock_info', 'js/views/utils/xblock_utils',
+    'js/models/course'],
     function($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils, Course) {
         var VisibilityState = XBlockUtils.VisibilityState;
@@ -10,7 +10,8 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
         describe('Container Subviews', function() {
             var model, containerPage, requests, createContainerPage, renderContainerPage,
                 respondWithHtml, fetch,
-                disabledCss = 'is-disabled', defaultXBlockInfo, createXBlockInfo,
+                disabledCss = 'is-disabled',
+                defaultXBlockInfo, createXBlockInfo,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
@@ -75,7 +76,7 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
             respondWithHtml = function(html, options) {
                 AjaxHelpers.respondWithJson(
                     requests,
-                    {html: html, 'resources': []}
+                    {html: html, resources: []}
                 );
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                 AjaxHelpers.respondWithJson(requests, createXBlockInfo(options));
@@ -143,7 +144,7 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpies);
 
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container',
-                        {'publish': 'discard_changes'}
+                        {publish: 'discard_changes'}
                     );
                 };
 
@@ -230,11 +231,11 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     EditHelpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container',
-                        {'publish': 'make_public'}
+                        {publish: 'make_public'}
                     );
 
                     // Response to publish call
-                    AjaxHelpers.respondWithJson(requests, {'id': 'locator-container', 'data': null, 'metadata': {}});
+                    AjaxHelpers.respondWithJson(requests, {id: 'locator-container', data: null, metadata: {}});
                     EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
@@ -279,7 +280,7 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     numRequests = requests.length;
 
                     // Respond with success.
-                    AjaxHelpers.respondWithJson(requests, {'id': 'locator-container'});
+                    AjaxHelpers.respondWithJson(requests, {id: 'locator-container'});
                     EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     // Verify other requests are sent to the server to update page state.
@@ -359,7 +360,7 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     it('renders correctly when the release date is not set', function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         fetch({
-                            visibility_state: VisibilityState.unscheduled, 'released_to_students': false,
+                            visibility_state: VisibilityState.unscheduled, released_to_students: false,
                             release_date: null, release_date_from: null
                         });
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');

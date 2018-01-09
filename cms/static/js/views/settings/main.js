@@ -32,7 +32,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
                    this.$el.find('#course-name').val(this.model.get('run'));
-                   this.$el.find('.set-date').datepicker({'dateFormat': 'm/d/yy'});
+                   this.$el.find('.set-date').datepicker({dateFormat: 'm/d/yy'});
 
         // Avoid showing broken image on mistyped/nonexistent image
                    this.$el.find('img').error(function() {
@@ -46,7 +46,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.listenTo(this.model, 'change', this.showNotificationBar);
                    this.selectorToField = _.invert(this.fieldToSelectorMap);
         // handle license separately, to avoid reimplementing view logic
-                   this.licenseModel = new LicenseModel({'asString': this.model.get('license')});
+                   this.licenseModel = new LicenseModel({asString: this.model.get('license')});
                    this.licenseView = new LicenseView({
                        model: this.licenseModel,
                        el: this.$('#course-license-selector').get(),
@@ -83,7 +83,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    DateUtils.setupDatePicker('enrollment_start', this);
                    DateUtils.setupDatePicker('enrollment_end', this);
 
-                   this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
+                   this.$el.find('#' + this.fieldToSelectorMap.overview).val(this.model.get('overview'));
                    this.codeMirrorize(null, $('#course-overview')[0]);
 
                    if (this.model.get('title') !== '') {
@@ -96,16 +96,15 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#' + this.fieldToSelectorMap.duration).val(this.model.get('duration'));
                    this.$el.find('#' + this.fieldToSelectorMap.description).val(this.model.get('description'));
 
-                   this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
+                   this.$el.find('#' + this.fieldToSelectorMap.short_description).val(this.model.get('short_description'));
 
                    this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
-                   this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
+                   this.$el.find('#' + this.fieldToSelectorMap.intro_video).val(this.model.get('intro_video') || '');
                    if (this.model.has('intro_video')) {
                        this.$el.find('.remove-course-introduction-video').show();
-                   }
-                   else this.$el.find('.remove-course-introduction-video').hide();
+                   } else this.$el.find('.remove-course-introduction-video').hide();
 
-                   this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
+                   this.$el.find('#' + this.fieldToSelectorMap.effort).val(this.model.get('effort'));
 
                    var courseImageURL = this.model.get('course_image_asset_path');
                    this.$el.find('#course-image-url').val(courseImageURL);
@@ -121,17 +120,16 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                    var pre_requisite_courses = this.model.get('pre_requisite_courses');
                    pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
-                   this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
+                   this.$el.find('#' + this.fieldToSelectorMap.pre_requisite_courses).val(pre_requisite_courses);
 
                    if (this.model.get('entrance_exam_enabled') == 'true') {
-                       this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
+                       this.$('#' + this.fieldToSelectorMap.entrance_exam_enabled).attr('checked', this.model.get('entrance_exam_enabled'));
                        this.$('.div-grade-requirements').show();
-                   }
-                   else {
-                       this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
+                   } else {
+                       this.$('#' + this.fieldToSelectorMap.entrance_exam_enabled).removeAttr('checked');
                        this.$('.div-grade-requirements').hide();
                    }
-                   this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
+                   this.$('#' + this.fieldToSelectorMap.entrance_exam_minimum_score_pct).val(this.model.get('entrance_exam_minimum_score_pct'));
 
                    var selfPacedButton = this.$('#course-pace-self-paced'),
                        instructorPacedButton = this.$('#course-pace-instructor-paced'),
@@ -141,8 +139,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        selfPacedButton.removeAttr('disabled');
                        instructorPacedButton.removeAttr('disabled');
                        paceToggleTip.text('');
-                   }
-                   else {
+                   } else {
                        selfPacedButton.attr('disabled', true);
                        instructorPacedButton.attr('disabled', true);
                        paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
@@ -212,8 +209,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        currentTimeText = StringUtils.interpolate(
                 gettext('{hours}:{minutes} (current UTC time)'),
                            {
-                               'hours': hours,
-                               'minutes': minutes
+                               hours: hours,
+                               minutes: minutes
                            }
             );
 
@@ -268,8 +265,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
             // If the val is an empty string then update model with default value.
                        if ($(event.currentTarget).val() === '') {
                            this.model.set('entrance_exam_minimum_score_pct', this.model.defaults.entrance_exam_minimum_score_pct);
-                       }
-                       else {
+                       } else {
                            this.setField(event);
                        }
                        break;
@@ -288,8 +284,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                            this.$el.find('.current-course-introduction-video iframe').attr('src', previewsource);
                            if (this.model.has('intro_video')) {
                                this.$el.find('.remove-course-introduction-video').show();
-                           }
-                           else {
+                           } else {
                                this.$el.find('.remove-course-introduction-video').hide();
                            }
                        }, this), 1000);
@@ -333,7 +328,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    if (this.model.has('intro_video')) {
                        this.model.set_videosource(null);
                        this.$el.find('.current-course-introduction-video iframe').attr('src', '');
-                       this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val('');
+                       this.$el.find('#' + this.fieldToSelectorMap.intro_video).val('');
                        this.$el.find('.remove-course-introduction-video').hide();
                    }
                },
@@ -345,8 +340,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        thisTarget.id = $(thisTarget).attr('id');
                    } else if (e !== null) {
                        thisTarget = e.currentTarget;
-                   } else
-        {
+                   } else {
             // e and forcedTarget can be null so don't deference it
             // This is because in cases where we have a marketing site
             // we don't display the codeMirrors for editing the marketing
@@ -413,7 +407,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                uploadImage: function(event) {
                    event.preventDefault();
-                   var title = '', selector = '', image_key = '', image_path_key = '';
+                   var title = '',
+                       selector = '',
+                       image_key = '',
+                       image_path_key = '';
                    switch (event.currentTarget.id) {
                    case 'upload-course-image':
                        title = gettext('Upload your course image.');

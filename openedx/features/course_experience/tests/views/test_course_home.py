@@ -512,15 +512,15 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
 
     def assert_upgrade_message_not_displayed(self):
         response = self.client.get(self.url)
-        self.assertNotIn('vc-message', response.content)
+        self.assertNotIn('section-upgrade', response.content)
 
     def assert_upgrade_message_displayed(self):
         response = self.client.get(self.url)
-        self.assertIn('vc-message', response.content)
+        self.assertIn('section-upgrade', response.content)
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertIn('<a class="btn btn-upgrade"', response.content)
+        self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
         self.assertIn(url, response.content)
-        self.assertIn('Upgrade (${price})</a>'.format(price=self.verified_mode.min_price), response.content)
+        self.assertIn('Upgrade (${price})'.format(price=self.verified_mode.min_price), response.content)
 
     def test_no_upgrade_message_if_logged_out(self):
         self.client.logout()

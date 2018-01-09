@@ -100,6 +100,9 @@ urlpatterns = [
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
 
+    # Completion API
+    url(r'^api/completion/', include('completion.api.urls', namespace='completion_api')),
+
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
@@ -1082,4 +1085,10 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             courseware_views.financial_assistance_request,
             name='submit_financial_assistance_request'
         )
+    ]
+
+# Branch.io Text Me The App
+if settings.BRANCH_IO_KEY:
+    urlpatterns += [
+        url(r'^text-me-the-app', 'student.views.text_me_the_app', name='text_me_the_app'),
     ]

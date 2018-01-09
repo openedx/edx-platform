@@ -27,8 +27,7 @@ $(function() {
         var circuit_so_far = $(editingCircuit).val();
 
         var n = editorCircuit.schematic.components.length;
-        for (var i = 0; i < n; i++)
-            editorCircuit.schematic.components[n - 1 - i].remove();
+        for (var i = 0; i < n; i++) { editorCircuit.schematic.components[n - 1 - i].remove(); }
 
         editorCircuit.schematic.load_schematic(circuit_so_far, '');
         editorCircuit.schematic.zoomall();
@@ -40,8 +39,7 @@ $(function() {
         var saving_circuit = $(editorCircuit).val();
 
         var n = editingCircuit.schematic.components.length;
-        for (var i = 0; i < n; i++)
-            editingCircuit.schematic.components[n - 1 - i].remove();
+        for (var i = 0; i < n; i++) { editingCircuit.schematic.components[n - 1 - i].remove(); }
 
         editingCircuit.schematic.load_schematic(saving_circuit, '');
         editingCircuit.schematic.zoomall();

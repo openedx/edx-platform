@@ -3,12 +3,14 @@
 <%def name="online_help_token()"><% return "learnerdashboard" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
+import pytz
+from datetime import datetime, timedelta
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.template import RequestContext
 from entitlements.models import CourseEntitlement
-import third_party_auth
 from third_party_auth import pipeline
+from util.date_utils import strftime_localized
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -56,6 +58,16 @@ from student.models import CourseEnrollment
         browseCourses: "${marketing_link('COURSES') | n, js_escaped_string}"
       },
       isEdx: false
+    });
+  </%static:require_module>
+  <%static:require_module module_name="js/learner_dashboard/entitlement_unenrollment_factory" class_name="EntitlementUnenrollmentFactory">
+    ## Wait until the document is fully loaded before initializing the EntitlementUnenrollmentView
+    ## to ensure events are setup correctly.
+    $(document).ready(function() {
+      EntitlementUnenrollmentFactory({
+        dashboardPath: "${reverse('dashboard') | n, js_escaped_string}",
+        signInPath: "${reverse('signin_user') | n, js_escaped_string}"
+      });
     });
   </%static:require_module>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
@@ -126,6 +138,10 @@ from student.models import CourseEnrollment
                 # Check if the course run is an entitlement and if it has an associated session
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
                 entitlement_session = entitlement.enrollment_course_run if entitlement else None
+                entitlement_days_until_expiration = entitlement.get_days_until_expiration() if entitlement else None
+                entitlement_expiration = datetime.now(tz=pytz.UTC) + timedelta(days=entitlement_days_until_expiration) if (entitlement and entitlement_days_until_expiration < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD) else None
+                entitlement_expiration_date = strftime_localized(entitlement_expiration, 'SHORT_DATE') if entitlement and entitlement_expiration else None
+                entitlement_expired_at = strftime_localized(entitlement.expired_at_datetime, 'SHORT_DATE') if entitlement and entitlement.expired_at_datetime else None
 
                 is_fulfilled_entitlement = True if entitlement and entitlement_session else False
                 is_unfulfilled_entitlement = True if entitlement and not entitlement_session else False
@@ -137,9 +153,9 @@ from student.models import CourseEnrollment
                     'session_id': course['key'],
                     'enrollment_end': course['enrollment_end'],
                     'pacing_type': course['pacing_type'],
-                    'session_start_advertised': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).advertised_start,
-                    'session_start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).start,
-                    'session_end': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).end,
+                    'advertised_start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).advertised_start,
+                    'start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).start,
+                    'end': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).end,
                     } for course in course_entitlement_available_sessions[str(entitlement.uuid)]]
                   if is_fulfilled_entitlement:
                     # If the user has a fulfilled entitlement, pass through the entitlements CourseEnrollment object
@@ -151,23 +167,27 @@ from student.models import CourseEnrollment
                     if not next_session:
                         continue
                     enrollment = CourseEnrollment(user=user, course_id=next_session['key'], mode=next_session['type'])
-
+                  # We only show email settings for entitlement cards if the entitlement has an associated enrollment
+                  show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
+                else:
+                  show_email_settings = (enrollment.course_id in show_email_settings_for)
+      
                 session_id = enrollment.course_id
                 show_courseware_link = (session_id in show_courseware_links_for)
                 cert_status = cert_statuses.get(session_id)
+                can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
                 can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
                 credit_status = credit_statuses.get(session_id)
-                show_email_settings = (session_id in show_email_settings_for)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
                 is_course_blocked = (session_id in block_courses)
                 course_verification_status = verification_status_by_course.get(session_id, {})
                 course_requirements = courses_requirements_not_met.get(session_id)
-                related_programs = inverted_programs.get(unicode(session_id))
+                related_programs = inverted_programs.get(unicode(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
                 show_consent_link = (session_id in consent_required_courses)
                 course_overview = enrollment.course_overview
               %>
-              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name' />
             % endfor
 
             </ul>
@@ -316,3 +336,5 @@ from student.models import CourseEnrollment
     </form>
   </div>
 </div>
+
+<%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>

@@ -90,7 +90,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
             set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-                if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({'intro_video': null}, {validate: true});
+                if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
         // TODO remove all whitespace w/in string
                 else {
                     if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});

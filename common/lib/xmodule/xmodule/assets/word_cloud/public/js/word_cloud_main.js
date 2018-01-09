@@ -86,7 +86,7 @@
          */
         WordCloudMain.prototype.submitAnswer = function() {
             var _this = this,
-                data = {'student_words': []};
+                data = {student_words: []};
 
             // Populate the data to be sent to the server with user's words.
             this.wordCloudEl.find('input.input-cloud').each(function(index, value) {

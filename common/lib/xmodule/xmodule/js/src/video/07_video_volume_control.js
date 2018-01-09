@@ -80,18 +80,18 @@ function(HtmlUtils) {
             this.state.el
                 .off('play.volume')
                 .off({
-                    'keydown': this.keyDownHandler,
-                    'volumechange': this.onVolumeChangeHandler
+                    keydown: this.keyDownHandler,
+                    volumechange: this.onVolumeChangeHandler
                 });
             this.el.off({
-                'mouseenter': this.openMenu,
-                'mouseleave': this.closeMenu
+                mouseenter: this.openMenu,
+                mouseleave: this.closeMenu
             });
             this.button.off({
-                'mousedown': this.toggleMuteHandler,
-                'keydown': this.keyDownButtonHandler,
-                'focus': this.openMenu,
-                'blur': this.closeMenu
+                mousedown: this.toggleMuteHandler,
+                keydown: this.keyDownButtonHandler,
+                focus: this.openMenu,
+                blur: this.closeMenu
             });
             this.el.remove();
             delete this.state.videoVolumeControl;
@@ -157,18 +157,18 @@ function(HtmlUtils) {
         bindHandlers: function() {
             this.state.el.on({
                 'play.volume': _.once(this.updateVolumeSilently),
-                'volumechange': this.onVolumeChangeHandler
+                volumechange: this.onVolumeChangeHandler
             });
             this.state.el.find('.volume').on({
-                'mouseenter': this.openMenu,
-                'mouseleave': this.closeMenu
+                mouseenter: this.openMenu,
+                mouseleave: this.closeMenu
             });
             this.button.on({
-                'keydown': this.keyDownHandler,
-                'click': false,
-                'mousedown': this.toggleMuteHandler,
-                'focus': this.openMenu,
-                'blur': this.closeMenu
+                keydown: this.keyDownHandler,
+                click: false,
+                mousedown: this.toggleMuteHandler,
+                focus: this.openMenu,
+                blur: this.closeMenu
             });
             this.state.el.on('destroy', this.destroy);
         },
@@ -455,7 +455,7 @@ function(HtmlUtils) {
         /** Initializes the module. */
         initialize: function() {
             this.liveRegion = $('<div />', {
-                'class': 'sr video-live-region',
+                class: 'sr video-live-region',
                 'aria-hidden': 'false',
                 'aria-live': 'polite'
             });
@@ -470,7 +470,7 @@ function(HtmlUtils) {
         update: function(volume) {
             this.liveRegion.text([
                 this.getVolumeDescription(volume),
-                this.i18n['Volume'] + '.'
+                this.i18n.Volume + '.'
             ].join(' '));
 
             $(this.button).parent().find('.volume-slider')
@@ -483,20 +483,20 @@ function(HtmlUtils) {
          */
         getVolumeDescription: function(volume) {
             if (volume === 0) {
-                return this.i18n['Muted'];
+                return this.i18n.Muted;
             } else if (volume <= 20) {
                 return this.i18n['Very low'];
             } else if (volume <= 40) {
-                return this.i18n['Low'];
+                return this.i18n.Low;
             } else if (volume <= 60) {
-                return this.i18n['Average'];
+                return this.i18n.Average;
             } else if (volume <= 80) {
-                return this.i18n['Loud'];
+                return this.i18n.Loud;
             } else if (volume <= 99) {
                 return this.i18n['Very loud'];
             }
 
-            return this.i18n['Maximum'];
+            return this.i18n.Maximum;
         }
     };
 

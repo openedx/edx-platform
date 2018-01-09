@@ -49,7 +49,7 @@
                 DiscussionUtil.loadRoles([]);
                 this.comment.updateInfo({
                     ability: {
-                        'can_delete': true
+                        can_delete: true
                     }
                 });
                 this.view.render();
@@ -68,7 +68,7 @@
                 DiscussionUtil.loadRoles([]);
                 this.comment.updateInfo({
                     ability: {
-                        'can_edit': true
+                        can_edit: true
                     }
                 });
                 this.view.render();

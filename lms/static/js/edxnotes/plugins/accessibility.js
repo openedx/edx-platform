@@ -47,8 +47,8 @@
 
             addFocusGrabber: function() {
                 this.focusGrabber = $('<span />', {
-                    'class': 'edx-notes-focus-grabber',
-                    'tabindex': '-1'
+                    class: 'edx-notes-focus-grabber',
+                    tabindex: '-1'
                 });
                 this.annotator.wrapper.before(this.focusGrabber);
             },
@@ -73,9 +73,9 @@
                     var id = annotation.id || _.uniqueId();
 
                     this.annotator.wrapper.after($('<div />', {
-                        'class': 'aria-note-description sr',
-                        'id': 'aria-note-description-' + id,
-                        'text': Annotator.Util.escape(annotation.text)
+                        class: 'aria-note-description sr',
+                        id: 'aria-note-description-' + id,
+                        text: Annotator.Util.escape(annotation.text)
                     }));
 
                     $(annotation.highlights).attr({
@@ -92,9 +92,9 @@
             addAriaAttributes: function(field, annotation) {
             // Add ARIA attributes to associated note ie <div>My note</div>
                 $(field).attr({
-                    'tabindex': -1,
-                    'role': 'note',
-                    'class': 'annotator-note'
+                    tabindex: -1,
+                    role: 'note',
+                    class: 'annotator-note'
                 });
             },
 
@@ -114,7 +114,8 @@
             },
 
             getViewerTabControls: function() {
-                var viewer, note, viewerControls, editButton, delButton, closeButton, tabControls = [];
+                var viewer, note, viewerControls, editButton, delButton, closeButton,
+                    tabControls = [];
 
             // Viewer elements
                 viewer = this.annotator.element.find('.annotator-viewer');
@@ -130,7 +131,9 @@
             },
 
             getEditorTabControls: function() {
-                var editor, editorControls, textArea, saveButton, cancelButton, tabControls = [], annotatorItems,
+                var editor, editorControls, textArea, saveButton, cancelButton,
+                    tabControls = [],
+                    annotatorItems,
                     tagInput = null;
 
             // Editor elements
@@ -191,7 +194,7 @@
             onHighlightKeyDown: function(event) {
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode,
-                    target = $(event.currentTarget),
+                    $target = $(event.currentTarget),
                     annotation, position;
 
                 switch (keyCode) {
@@ -206,8 +209,8 @@
                 case KEY.ENTER:
                 case KEY.SPACE:
                     if (!this.annotator.viewer.isShown()) {
-                        position = target.position();
-                        this.showViewer(position, target.data('annotation'));
+                        position = $target.position();
+                        this.showViewer(position, $target.data('annotation'));
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -223,7 +226,7 @@
             onViewerKeyDown: function(event) {
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode,
-                    target = $(event.target),
+                    $target = $(event.target),
                     listing = this.annotator.element.find('.annotator-listing'),
                     tabControls;
 
@@ -231,18 +234,16 @@
                 case KEY.TAB:
                     tabControls = this.getViewerTabControls();
                     if (event.shiftKey) { // Tabbing backwards
-                        if (target.is(listing)) {
+                        if ($target.is(listing)) {
                             _.last(tabControls).focus();
-                        }
-                        else {
-                            this.focusOnPreviousTabControl(tabControls, target);
+                        } else {
+                            this.focusOnPreviousTabControl(tabControls, $target);
                         }
                     } else { // Tabbing forward
-                        if (target.is(listing)) {
+                        if ($target.is(listing)) {
                             _.first(tabControls).focus();
-                        }
-                        else {
-                            this.focusOnNextTabControl(tabControls, target);
+                        } else {
+                            this.focusOnNextTabControl(tabControls, $target);
                         }
                     }
                     event.preventDefault();
@@ -250,7 +251,7 @@
                     break;
                 case KEY.ENTER:
                 case KEY.SPACE:
-                    if (target.hasClass('annotator-close')) {
+                    if ($target.hasClass('annotator-close')) {
                         this.onClose();
                         this.annotator.viewer.hide();
                         event.preventDefault();
@@ -267,7 +268,7 @@
             onEditorKeyDown: function(event) {
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode,
-                    target = $(event.target),
+                    $target = $(event.target),
                     editor, form, editorControls, save, cancel,
                     tabControls;
 
@@ -281,26 +282,26 @@
                 case KEY.TAB:
                     tabControls = this.getEditorTabControls();
                     if (event.shiftKey) { // Tabbing backwards
-                        if (target.is(form)) {
+                        if ($target.is(form)) {
                             _.last(tabControls).focus();
                         } else {
-                            this.focusOnPreviousTabControl(tabControls, target);
+                            this.focusOnPreviousTabControl(tabControls, $target);
                         }
                     } else { // Tabbing forward
-                        if (target.is(form)) {
+                        if ($target.is(form)) {
                             _.first(tabControls).focus();
                         } else {
-                            this.focusOnNextTabControl(tabControls, target);
+                            this.focusOnNextTabControl(tabControls, $target);
                         }
                     }
                     event.preventDefault();
                     event.stopPropagation();
                     break;
                 case KEY.ENTER:
-                    if (target.is(save) || event.metaKey || event.ctrlKey) {
+                    if ($target.is(save) || event.metaKey || event.ctrlKey) {
                         this.onClose();
                         this.annotator.editor.submit();
-                    } else if (target.is(cancel)) {
+                    } else if ($target.is(cancel)) {
                         this.onClose();
                         this.annotator.editor.hide();
                     } else {
@@ -309,10 +310,10 @@
                     event.preventDefault();
                     break;
                 case KEY.SPACE:
-                    if (target.is(save)) {
+                    if ($target.is(save)) {
                         this.onClose();
                         this.annotator.editor.submit();
-                    } else if (target.is(cancel)) {
+                    } else if ($target.is(cancel)) {
                         this.onClose();
                         this.annotator.editor.hide();
                     } else {

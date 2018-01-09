@@ -33,8 +33,7 @@
 
             isUserMemberOfTeam: function(memberships, requestUsername) {
                 return _.isObject(
-                    _.find(memberships, function(membership)
-                    {
+                    _.find(memberships, function(membership) {
                         return membership.user.username === requestUsername;
                     })
                 );
@@ -45,13 +44,13 @@
             },
 
             showMessage: function(message, type) {
-                var messageElement = $('#teams-message');
+                var $messageElement = $('#teams-message');
                 if (_.isUndefined(type)) {
                     type = 'warning';
                 }
-                messageElement.removeClass('is-hidden').addClass(type);
+                $messageElement.removeClass('is-hidden').addClass(type);
                 $('.teams-content .msg-content .copy').text(message);
-                messageElement.focus();
+                $messageElement.focus();
             },
 
             /**

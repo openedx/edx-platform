@@ -117,13 +117,13 @@ define([
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.used_unit_link',
                 {
-                    'note_id': 'id-123',
-                    'component_usage_id': 'usage_id-123',
-                    'view': 'Test View'
+                    note_id: 'id-123',
+                    component_usage_id: 'usage_id-123',
+                    view: 'Test View'
                 },
                 null,
                 {
-                    'timeout': 2000
+                    timeout: 2000
                 }
             );
             expect(view.redirectTo).not.toHaveBeenCalled();

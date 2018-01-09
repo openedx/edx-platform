@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.urlresolvers import reverse
 from django.db.models import F, Q
-from django.utils.formats import dateformat, get_format
 
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace.recipient import Recipient
@@ -21,6 +20,7 @@ from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperienc
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangolib.translation_utils import translate_date
 from openedx.features.course_experience import course_home_url_name
 
 LOG = logging.getLogger(__name__)
@@ -313,13 +313,9 @@ def _get_upsell_information_for_schedule(user, schedule):
 
     if has_verified_upgrade_link:
         template_context['upsell_link'] = verified_upgrade_link
-        template_context['user_schedule_upgrade_deadline_time'] = dateformat.format(
-            enrollment.dynamic_upgrade_deadline,
-            get_format(
-                'DATE_FORMAT',
-                lang=course.closest_released_language,
-                use_l10n=True
-            )
+        template_context['user_schedule_upgrade_deadline_time'] = translate_date(
+            date=enrollment.dynamic_upgrade_deadline,
+            language=course.closest_released_language,
         )
 
     template_context['show_upsell'] = has_verified_upgrade_link
@@ -356,7 +352,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             try:
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
-                LOG.exception(
+                LOG.warning(
                     'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
                         user, week_num, enrollment.course_id
                     )

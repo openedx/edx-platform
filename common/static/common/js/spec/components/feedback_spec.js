@@ -2,8 +2,8 @@
 (function() {
     'use strict';
     define(['jquery', 'common/js/components/views/feedback', 'common/js/components/views/feedback_notification',
-          'common/js/components/views/feedback_alert', 'common/js/components/views/feedback_prompt',
-          'common/js/spec_helpers/view_helpers', 'sinon', 'jquery.simulate'],
+        'common/js/components/views/feedback_alert', 'common/js/components/views/feedback_prompt',
+        'common/js/spec_helpers/view_helpers', 'sinon', 'jquery.simulate'],
     function($, SystemFeedback, NotificationView, AlertView, PromptView, ViewHelpers, sinon) {
         var tpl;
         tpl = readFixtures('common/templates/components/system-feedback.underscore');
@@ -123,11 +123,11 @@
                     actions: {
                         primary: {
                             text: "Yes, I'm sure.",
-                            'class': 'confirm-button'
+                            class: 'confirm-button'
                         },
                         secondary: {
                             text: 'Cancel',
-                            'class': 'cancel-button'
+                            class: 'cancel-button'
                         }
                     }
                 };
@@ -207,12 +207,12 @@
                     actions: {
                         primary: {
                             text: 'Save',
-                            'class': 'save-button',
+                            class: 'save-button',
                             click: this.primaryClickSpy
                         },
                         secondary: {
                             text: 'Revert',
-                            'class': 'cancel-button',
+                            class: 'cancel-button',
                             click: this.secondaryClickSpy
                         }
                     }
@@ -280,11 +280,11 @@
                         secondary: [
                             {
                                 text: 'Option One',
-                                'class': 'option-one',
+                                class: 'option-one',
                                 click: this.secondarySpyOne
                             }, {
                                 text: 'Option Two',
-                                'class': 'option-two',
+                                class: 'option-two',
                                 click: this.secondarySpyTwo
                             }
                         ]

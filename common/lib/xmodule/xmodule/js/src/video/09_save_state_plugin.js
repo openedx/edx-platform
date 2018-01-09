@@ -1,6 +1,6 @@
 (function(define) {
     'use strict';
-    define('video/09_save_state_plugin.js', [], function() {
+    define('video/09_save_state_plugin.js', ['underscore'], function(_) {
     /**
      * Save state module.
      * @exports video/09_save_state_plugin.js
@@ -15,8 +15,8 @@
                 return new SaveStatePlugin(state, i18n, options);
             }
 
-            _.bindAll(this, 'onSpeedChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload', 'onYoutubeAvailability',
-            'onLanguageChange', 'destroy');
+            _.bindAll(this, 'onSpeedChange', 'onAutoAdvanceChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload',
+            'onYoutubeAvailability', 'onLanguageChange', 'destroy');
             this.state = state;
             this.options = _.extend({events: []}, options);
             this.state.videoSaveStatePlugin = this;
@@ -37,11 +37,12 @@
 
             initialize: function() {
                 this.events = {
-                    'speedchange': this.onSpeedChange,
-                    'play': this.bindUnloadHandler,
+                    speedchange: this.onSpeedChange,
+                    autoadvancechange: this.onAutoAdvanceChange,
+                    play: this.bindUnloadHandler,
                     'pause destroy': this.saveStateHandler,
                     'language_menu:change': this.onLanguageChange,
-                    'youtube_availability': this.onYoutubeAvailability
+                    youtube_availability: this.onYoutubeAvailability
                 };
                 this.bindHandlers();
             },
@@ -69,6 +70,11 @@
                 this.saveState(true, {speed: newSpeed});
                 this.state.storage.setItem('speed', newSpeed, true);
                 this.state.storage.setItem('general_speed', newSpeed);
+            },
+
+            onAutoAdvanceChange: function(event, enabled) {
+                this.saveState(true, {auto_advance: enabled});
+                this.state.storage.setItem('auto_advance', enabled);
             },
 
             saveStateHandler: function() {
@@ -111,7 +117,7 @@
                 $.ajax({
                     url: this.state.config.saveStateUrl,
                     type: 'POST',
-                    async: async ? true : false,
+                    async: !!async,
                     dataType: 'json',
                     data: data
                 });

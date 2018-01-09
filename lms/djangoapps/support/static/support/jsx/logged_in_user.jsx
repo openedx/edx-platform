@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import FileUpload from './file_upload';
 
-function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, accessToken, submitForm }) {
+function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitForm }) {
   let courseElement;
   if (userInformation.enrollments) {
     courseElement = (<div>
@@ -70,11 +70,12 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, accessTo
       </div>
     </div>
 
-    <FileUpload
-      setErrorState={setErrorState}
-      zendeskApiHost={zendeskApiHost}
-      accessToken={accessToken}
-    />
+    {/*TODO file uploading will be done after initial release*/}
+    {/*<FileUpload*/}
+      {/*setErrorState={setErrorState}*/}
+      {/*zendeskApiHost={zendeskApiHost}*/}
+      {/*accessToken={accessToken}*/}
+    {/*/>*/}
 
     <div className="row">
       <div className="col-sm-12">
@@ -91,8 +92,7 @@ LoggedInUser.propTypes = {
   setErrorState: PropTypes.func.isRequired,
   submitForm: PropTypes.func.isRequired,
   userInformation: PropTypes.arrayOf(PropTypes.object).isRequired,
-  zendeskApiHost: PropTypes.string.isRequired,
-  accessToken: PropTypes.string.isRequired,
+  zendeskProxyUrl: PropTypes.string.isRequired,
 };
 
 export default LoggedInUser;

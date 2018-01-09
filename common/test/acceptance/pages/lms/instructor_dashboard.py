@@ -1137,6 +1137,7 @@ class StudentAdminPage(PageObject):
     Student admin section of the Instructor dashboard.
     """
     url = None
+    PAGE_SELECTOR = 'section#student_admin'
     CONTAINER = None
 
     PROBLEM_INPUT_NAME = None
@@ -1226,6 +1227,19 @@ class StudentAdminPage(PageObject):
         Return Background Tasks History button.
         """
         return self._input_with_name(self.BACKGROUND_TASKS_BUTTON_NAME)
+
+    @property
+    def running_tasks_section(self):
+        """
+        Returns the "Pending Instructor Tasks" section.
+        """
+        return self.get_selector('div.running-tasks-container')
+
+    def get_selector(self, css_selector):
+        """
+        Makes query selector by pre-pending student admin section
+        """
+        return self.q(css=' '.join([self.PAGE_SELECTOR, css_selector]))
 
     def wait_for_task_history_table(self):
         """

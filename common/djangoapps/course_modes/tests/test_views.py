@@ -484,6 +484,5 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
 
     @httpretty.activate
     def test_embargo_allow(self):
-
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)

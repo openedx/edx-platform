@@ -1,10 +1,10 @@
 define(['js/views/validation',
-        'jquery',
-        'underscore',
-        'gettext',
-        'codemirror',
-        'js/views/modals/validation_error_modal',
-        'edx-ui-toolkit/js/utils/html-utils'],
+    'jquery',
+    'underscore',
+    'gettext',
+    'codemirror',
+    'js/views/modals/validation_error_modal',
+    'edx-ui-toolkit/js/utils/html-utils'],
     function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUtils) {
         var AdvancedView = ValidatingView.extend({
             error_saving: 'error_saving',
@@ -119,7 +119,7 @@ define(['js/views/validation',
                         self.render();
                         self.showSavedBar(title, message);
                         analytics.track('Saved Advanced Settings', {
-                            'course': course_location_analytics
+                            course: course_location_analytics
                         });
                     },
                     silent: true,
@@ -152,8 +152,8 @@ define(['js/views/validation',
             renderTemplate: function(key, model) {
                 var newKeyId = _.uniqueId('policy_key_'),
                     newEle = this.template({key: key, display_name: model.display_name, help: model.help,
-            value: JSON.stringify(model.value, null, 4), deprecated: model.deprecated,
-            keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_')});
+                        value: JSON.stringify(model.value, null, 4), deprecated: model.deprecated,
+                        keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_')});
 
                 this.fieldToSelectorMap[key] = newKeyId;
                 this.selectorToField[newKeyId] = key;

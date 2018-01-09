@@ -10,6 +10,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils.http import urlquote_plus
+from six import text_type
 %>
 <%block name="bodyclass">view-in-course view-progress</%block>
 
@@ -158,10 +159,11 @@ from django.utils.http import urlquote_plus
                                         <%
                                         earned = section.all_total.earned
                                         total = section.all_total.possible
-                                        percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
+
+                                        percentageString = "{0:.0%}".format(section.percent_graded) if earned > 0 and total > 0 else ""
                                         %>
                                         <h4 class="hd hd-4">
-                                            <a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section.url_name))}">
+                                            <a href="${reverse('courseware_section', kwargs=dict(course_id=text_type(course.id), chapter=chapter['url_name'], section=section.url_name))}">
                                                 ${ section.display_name}
                                                 %if total > 0 or earned > 0:
                                                 <span class="sr">

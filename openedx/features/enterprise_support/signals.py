@@ -11,11 +11,17 @@ from email_marketing.tasks import update_user  # pylint: disable=import-error
 
 
 @receiver(post_save, sender=EnterpriseCustomerUser)
-def update_email_marketing_user_with_enterprise_flag(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
+def update_email_marketing_user_with_enterprise_vars(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
-    Enable the is_enterprise_learner flag in SailThru vars.
+    Update the SailThru user with enterprise-related vars.
     """
     user = User.objects.get(id=instance.user_id)
 
     # perform update asynchronously
-    update_user.delay(sailthru_vars={'is_enterprise_learner': True}, email=user.email)
+    update_user.delay(
+        sailthru_vars={
+            'is_enterprise_learner': True,
+            'enterprise_name': instance.enterprise_customer.name,
+        },
+        email=user.email
+    )

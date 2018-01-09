@@ -30,8 +30,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext'],
             getIcon: function(messageType) {
                 if (messageType === this.model.ERROR) {
                     return 'fa-exclamation-circle';
-                }
-                else if (messageType === this.model.WARNING || messageType === this.model.NOT_CONFIGURED) {
+                } else if (messageType === this.model.WARNING || messageType === this.model.NOT_CONFIGURED) {
                     return 'fa-exclamation-triangle';
                 }
                 return null;
@@ -47,8 +46,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext'],
                     // Translators: This message will be added to the front of messages of type warning,
                     // e.g. "Warning: this component has not been configured yet".
                     return gettext('Warning');
-                }
-                else if (messageType === this.model.ERROR) {
+                } else if (messageType === this.model.ERROR) {
                     // Translators: This message will be added to the front of messages of type error,
                     // e.g. "Error: required field is missing".
                     return gettext('Error');

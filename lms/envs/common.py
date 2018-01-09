@@ -33,12 +33,11 @@ import imp
 import sys
 import os
 
-import dealer.git
+import django
 from path import Path as path
 from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
-from .discussionsettings import *
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
@@ -162,6 +161,10 @@ FEATURES = {
 
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
+
+    # Move the student to next page when a video finishes. Set to True to show
+    # an auto-advance button in videos. If False, videos never auto-advance.
+    'ENABLE_AUTOADVANCE_VIDEOS': False,
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
@@ -1230,6 +1233,13 @@ simplefilter('ignore')
 
 ################################# Middleware ###################################
 
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
+if django.VERSION < (1, 9):
+    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
+else:
+    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
+
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
@@ -1271,7 +1281,7 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'birdcage.v1_11.csrf.CsrfViewMiddleware',
+    _csrf_middleware,
 
     'splash.middleware.SplashMiddleware',
 
@@ -2411,6 +2421,9 @@ SUPPORT_SITE_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
+# Days before the expired date that we warn the user
+ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
+
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
 SOCIAL_SHARING_SETTINGS = {
@@ -2973,6 +2986,10 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
+### Analytics API
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "http://localhost:18100"
+
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
@@ -3085,6 +3102,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "requires_parental_consent",
         "account_privacy",
         "accomplishments_shared",
+        "extended_profile",
     ]
 }
 
@@ -3440,11 +3458,15 @@ ACE_CHANNEL_SAILTHRU_API_SECRET = None
 
 ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+# Initialize to 'unknown', but read from JSON in aws.py
+EDX_PLATFORM_REVISION = 'unknown'
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+
+############### Settings for Django Rate limit #####################
+RATELIMIT_ENABLE = True
+RATELIMIT_RATE = '30/m'

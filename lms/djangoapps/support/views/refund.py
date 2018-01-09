@@ -113,6 +113,7 @@ class RefundSupportView(FormView):
         """
         extra context data to add to page
         """
+        kwargs = super(RefundSupportView, self).get_context_data(**kwargs)
         form = getattr(kwargs['form'], 'cleaned_data', {})
         if form.get('confirmed') == 'true':
             kwargs['cert'] = form.get('cert')

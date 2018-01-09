@@ -54,7 +54,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_
 
                     AjaxHelpers.respondWithJson(requests, {
                         html: mockContainerHTML,
-                        'resources': []
+                        resources: []
                     });
 
                     $('body').append(containerView.$el);

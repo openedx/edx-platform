@@ -113,8 +113,9 @@ class CreatorGroupTest(TestCase):
 
     def test_add_user_to_group_requires_authenticated(self):
         with self.assertRaises(PermissionDenied):
-            self.admin.is_authenticated = mock.Mock(return_value=False)
-            add_users(self.admin, CourseCreatorRole(), self.user)
+            with mock.patch('django.contrib.auth.models.User.is_authenticated') as mock_is_auth:
+                mock_is_auth.return_value = False
+                add_users(self.admin, CourseCreatorRole(), self.user)
 
     def test_remove_user_from_group_requires_staff_access(self):
         with self.assertRaises(PermissionDenied):
@@ -128,8 +129,9 @@ class CreatorGroupTest(TestCase):
 
     def test_remove_user_from_group_requires_authenticated(self):
         with self.assertRaises(PermissionDenied):
-            self.admin.is_authenticated = mock.Mock(return_value=False)
-            remove_users(self.admin, CourseCreatorRole(), self.user)
+            with mock.patch('django.contrib.auth.models.User.is_authenticated') as mock_is_auth:
+                mock_is_auth.return_value = False
+                remove_users(self.admin, CourseCreatorRole(), self.user)
 
 
 class CCXCourseGroupTest(TestCase):

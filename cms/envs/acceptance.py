@@ -8,7 +8,6 @@ so that we can run the lettuce acceptance tests.
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 from .test import *
-from lms.envs.sauce import *
 
 # You need to start the server in debug mode,
 # otherwise the browser will not render the pages correctly

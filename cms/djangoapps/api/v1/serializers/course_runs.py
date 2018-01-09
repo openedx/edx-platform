@@ -58,11 +58,11 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
         # when using `bulk_create` with existing data. Given the relatively small number of team members
         # in a course, this is not worth optimizing at this time.
         for member in team:
-            CourseAccessRole.objects.update_or_create(
+            CourseAccessRole.objects.get_or_create(
                 course_id=instance.id,
                 org=instance.id.org,
                 user=User.objects.get(username=member['user']),
-                defaults={'role': member['role']}
+                role=member['role']
             )
 
 

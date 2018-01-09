@@ -799,6 +799,92 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 
 
 @ddt.ddt
+@patch.object(settings, 'FEATURES', create=True, new={
+    'FALLBACK_TO_ENGLISH_TRANSCRIPTS': False,
+})
+class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
+    """
+    Make sure that VideoDescriptor returns the expected student_view_data.
+    """
+
+    VIDEO_URL_1 = 'http://www.example.com/source_low.mp4'
+    VIDEO_URL_2 = 'http://www.example.com/source_med.mp4'
+    VIDEO_URL_3 = 'http://www.example.com/source_high.mp4'
+
+    @ddt.data(
+        # Ensure no extra data is returned if video module configured only for web display.
+        (
+            {'only_on_web': True},
+            {'only_on_web': True},
+        ),
+        # Ensure that the deprecated `source` attribute is included in the `all_sources` list.
+        (
+            {
+                'only_on_web': False,
+                'youtube_id_1_0': None,
+                'source': VIDEO_URL_1,
+            },
+            {
+                'only_on_web': False,
+                'duration': None,
+                'transcripts': {},
+                'encoded_videos': {
+                    'fallback': {'url': VIDEO_URL_1, 'file_size': 0},
+                },
+                'all_sources': [VIDEO_URL_1],
+            },
+        ),
+        # Ensure that `html5_sources` take precendence over deprecated `source` url
+        (
+            {
+                'only_on_web': False,
+                'youtube_id_1_0': None,
+                'source': VIDEO_URL_1,
+                'html5_sources': [VIDEO_URL_2, VIDEO_URL_3],
+            },
+            {
+                'only_on_web': False,
+                'duration': None,
+                'transcripts': {},
+                'encoded_videos': {
+                    'fallback': {'url': VIDEO_URL_2, 'file_size': 0},
+                },
+                'all_sources': [VIDEO_URL_2, VIDEO_URL_3, VIDEO_URL_1],
+            },
+        ),
+        # Ensure that YouTube URLs are included in `encoded_videos`, but not `all_sources`.
+        (
+            {
+                'only_on_web': False,
+                'youtube_id_1_0': 'abc',
+                'html5_sources': [VIDEO_URL_2, VIDEO_URL_3],
+            },
+            {
+                'only_on_web': False,
+                'duration': None,
+                'transcripts': {},
+                'encoded_videos': {
+                    'fallback': {'url': VIDEO_URL_2, 'file_size': 0},
+                    'youtube': {'url': 'https://www.youtube.com/watch?v=abc', 'file_size': 0},
+                },
+                'all_sources': [VIDEO_URL_2, VIDEO_URL_3],
+            },
+        ),
+    )
+    @ddt.unpack
+    @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course')
+    def test_student_view_data(self, field_data, expected_student_view_data, mock_transcript_feature):
+        """
+        Ensure that student_view_data returns the expected results for video modules.
+        """
+        mock_transcript_feature.return_value = False
+        descriptor = instantiate_descriptor(**field_data)
+        descriptor.runtime.course_id = MagicMock()
+        student_view_data = descriptor.student_view_data()
+        self.assertEquals(student_view_data, expected_student_view_data)
+
+
+@ddt.ddt
 @patch.object(settings, 'YOUTUBE', create=True, new={
     # YouTube JavaScript API
     'API': 'www.youtube.com/iframe_api',

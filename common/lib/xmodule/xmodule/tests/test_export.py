@@ -71,14 +71,14 @@ class RoundTripTestCase(unittest.TestCase):
     @mock.patch('xmodule.video_module.video_module.edxval_api', None)
     @mock.patch('xmodule.course_module.requests.get')
     @ddt.data(
-        "toy",
-        "simple",
-        "conditional_and_poll",
-        "conditional",
-        "self_assessment",
-        "test_exam_registration",
-        "word_cloud",
-        "pure_xblock",
+        u"toy",
+        u"simple",
+        u"conditional_and_poll",
+        u"conditional",
+        u"self_assessment",
+        u"test_exam_registration",
+        u"word_cloud",
+        u"pure_xblock",
     )
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def test_export_roundtrip(self, course_dir, mock_get):
@@ -107,12 +107,12 @@ class RoundTripTestCase(unittest.TestCase):
         # will still be there.
         print "Starting export"
         file_system = OSFS(root_dir)
-        initial_course.runtime.export_fs = file_system.makeopendir(course_dir)
+        initial_course.runtime.export_fs = file_system.makedir(course_dir, recreate=True)
         root = lxml.etree.Element('root')
 
         initial_course.add_xml_to_node(root)
-        with initial_course.runtime.export_fs.open('course.xml', 'w') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml)
+        with initial_course.runtime.export_fs.open('course.xml', 'wb') as course_xml:
+            lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
 
         print "Starting second import"
         second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))

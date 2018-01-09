@@ -41,10 +41,10 @@ function() {
 
     function destroy() {
         this.el.off({
-            'mousemove': this.videoControl.showControls,
-            'keydown': this.videoControl.showControls,
-            'destroy': this.videoControl.destroy,
-            'initialize': this.videoControl.focusFirst
+            mousemove: this.videoControl.showControls,
+            keydown: this.videoControl.showControls,
+            destroy: this.videoControl.destroy,
+            initialize: this.videoControl.focusFirst
         });
 
         this.el.off('controls:show');
@@ -77,8 +77,8 @@ function() {
     function _bindHandlers(state) {
         if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.el.on({
-                'mousemove': state.videoControl.showControls,
-                'keydown': state.videoControl.showControls
+                mousemove: state.videoControl.showControls,
+                keydown: state.videoControl.showControls
             });
         }
 

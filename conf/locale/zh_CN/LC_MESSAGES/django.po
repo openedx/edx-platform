@@ -17,7 +17,7 @@
 # Christina Guo <csu2008guoting@163.com>, 2016
 # ckyOL, 2015
 # focusheart <focusheart@gmail.com>, 2014
-# focusheart <focusheart@gmail.com>, 2014
+# focusheart <focusheart@gmail.com>, 2014,2017
 # focusheart <focusheart@gmail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
@@ -149,7 +149,7 @@
 # Yufei Xue <cmouse@163.com>, 2013
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
-# focusheart <focusheart@gmail.com>, 2014
+# focusheart <focusheart@gmail.com>, 2014,2017
 # Hanwei <chuxiking@163.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # HAO WU <u5135571@anu.edu.au>, 2014
@@ -352,7 +352,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-06 10:06+0000\n"
+"POT-Creation-Date: 2017-12-17 20:42+0000\n"
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -648,6 +648,10 @@ msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr "与此电子邮件地址关联的用户帐户不能重新设置密码。"
+
+#: common/djangoapps/student/forms.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
@@ -6595,6 +6599,7 @@ msgstr "团队"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -7236,6 +7241,7 @@ msgstr "群组化"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "名"
@@ -7243,6 +7249,7 @@ msgstr "名"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "姓"
@@ -7257,6 +7264,7 @@ msgstr "公司名称"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 msgid "Title"
 msgstr "标题"
@@ -8646,6 +8654,51 @@ msgstr ""
 msgid "Continue"
 msgstr "继续"
 
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "州/省/地区"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "公司"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "邮寄地址"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "告诉我们您为何对{platform_name}感兴趣"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
+msgstr ""
+
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "查看并产生证书。"
@@ -9161,6 +9214,7 @@ msgstr "预览"
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
 #: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -9181,6 +9235,7 @@ msgstr "Wiki预览"
 #. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "window open"
@@ -10416,10 +10471,6 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}'字段无法编辑."
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
@@ -10509,45 +10560,6 @@ msgid "Year of birth"
 msgstr "出生年份"
 
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "邮寄地址"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr "告诉我们您为何对{platform_name}感兴趣"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr "州/省/地区"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr "公司"
-
-#. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Country or Region of Residence"
@@ -10582,15 +10594,13 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Review the Terms of Service"
-msgstr ""
-
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
-msgid "I agree to the {platform_name} {terms_of_service}"
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
@@ -11930,6 +11940,8 @@ msgstr "保存设置"
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
@@ -13101,6 +13113,10 @@ msgstr "无记载git导入日志。"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "No git import logs have been recorded for this course."
 msgstr "此课程无记载git导入日志。"
+
+#: lms/templates/text-me-the-app.html
+msgid "Text Me The App"
+msgstr ""
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -15206,6 +15222,10 @@ msgstr ""
 " 。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course details"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} 主页"
 
@@ -15231,6 +15251,32 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer select a session, your final day to select a session was "
+"{entitlement_expired_at}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session by {expiration_date} to access the course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You must select a session to access the course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Change Session"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can no longer change sessions."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15263,6 +15309,7 @@ msgid "Course options for"
 msgstr "课程选项，关于"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Available Actions"
 msgstr "可用的操作"
 
@@ -15272,6 +15319,13 @@ msgstr "电子邮件设置"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. You can contact the account holder to request payment, or you can "
+"unenroll from this course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15426,6 +15480,10 @@ msgstr "{provider_name} 未批准你的课程学分申请。欲了解更多信�
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr "本次交易出错了。联系{support_email}寻求帮助。"
+
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
+msgid "Course options for {courseName}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
 msgid "Consent to share your data"
@@ -18069,6 +18127,22 @@ msgstr "我的课程"
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "项目详情"
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Get the {platform_name} Mobile App!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "We'll send you a one time SMS with a link to download the app."
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Mobile phone number"
+msgstr ""
+
+#: lms/templates/learner_dashboard/text-me-fragment.html
+msgid "Send me a text with the link"
+msgstr ""
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -21076,12 +21150,41 @@ msgid "What content is imported?"
 msgstr "哪些内容被导入了？"
 
 #: cms/templates/import.html
+msgid "The following content is imported."
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Course content and structure"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Course dates"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Grading policy"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Any group configurations"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "Settings on the Advanced Settings page"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "The following content is not imported."
+msgstr ""
+
+#: cms/templates/import.html
 msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are imported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, remains the same as it was in the existing course."
-msgstr "只有课程内容和结构(包括章，节，单元)被导入了。其它数据，包括学生数据，分数信息，讨论数据，课程设置的课程团队信息，将沿用当前课程。"
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+
+#: cms/templates/import.html
+msgid "The course team"
+msgstr ""
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
@@ -22564,6 +22667,10 @@ msgstr ""
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "Policies"
 msgstr ""
 
 #: cms/templates/widgets/footer.html
