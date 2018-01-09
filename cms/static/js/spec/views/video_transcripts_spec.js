@@ -10,20 +10,27 @@ define(
                 verifyMessage,
                 verifyDetailedErrorMessage,
                 createFakeTranscriptFile,
-                transcripts = {
-                    en: 'English',
-                    es: 'Spanish',
-                    ur: 'Urdu'
-                },
+                transcripts = ['en', 'es', 'ur'],
                 edxVideoID = 'test-edx-video-id',
                 clientVideoID = 'Video client title name.mp4',
-                transcriptAvailableLanguages = {
-                    en: 'English',
-                    es: 'Spanish',
-                    cn: 'Chinese',
-                    ar: 'Arabic',
-                    ur: 'Urdu'
-                },
+                transcriptAvailableLanguages = [
+                    {
+                        language_code: 'en',
+                        language_text: 'English'
+                    },
+                    {
+                        language_code: 'es',
+                        language_text: 'Spanish'
+                    },
+                    {
+                        language_code: 'ar',
+                        language_text: 'Chinese'
+                    },
+                    {
+                        language_code: 'ur',
+                        language_text: 'Urdu'
+                    }
+                ],
                 TRANSCRIPT_DOWNLOAD_FILE_FORMAT = 'srt',
                 TRANSCRIPT_DOWNLOAD_URL = 'abc.com/transcript_download/course_id',
                 TRANSCRIPT_UPLOAD_URL = 'abc.com/transcript_upload/course_id',
@@ -146,7 +153,7 @@ define(
                     videoTranscriptsView.$el.find('.show-video-transcripts-wrapper').hasClass('hidden')
                 ).toEqual(true);
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (' + _.size(transcripts) + ')'
+                    'Show transcripts (' + transcripts.length + ')'
                 );
             });
 
@@ -158,7 +165,7 @@ define(
 
                 // Verify initial button text
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (' + _.size(transcripts) + ')'
+                    'Show transcripts (' + transcripts.length + ')'
                 );
                 videoTranscriptsView.$el.find('.toggle-show-transcripts-button').click();
 
@@ -169,7 +176,7 @@ define(
 
                 // Verify button text is changed.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Hide transcripts (' + _.size(transcripts) + ')'
+                    'Hide transcripts (' + transcripts.length + ')'
                 );
             });
 
@@ -179,7 +186,7 @@ define(
 
                 // Verify button text.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Hide transcripts (' + _.size(transcripts) + ')'
+                    'Hide transcripts (' + transcripts.length + ')'
                 );
 
                 // Verify transcript container is not hidden
@@ -191,7 +198,7 @@ define(
 
                 // Verify button text is changed.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (' + _.size(transcripts) + ')'
+                    'Show transcripts (' + transcripts.length + ')'
                 );
 
                 // Verify transcript container is hidden
@@ -215,10 +222,10 @@ define(
                 // Show transcripts
                 videoTranscriptsView.$el.find('.toggle-show-transcripts-button').click();
                 expect(videoTranscriptsView.$el.find('.show-video-transcript-content').length).toEqual(
-                    _.size(transcripts)
+                    transcripts.length
                 );
 
-                _.each(transcripts, function(langaugeText, languageCode) {
+                _.each(transcripts, function(languageCode) {
                     $transcriptEl = videoTranscriptsView.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
                     // Verify correct transcript title is set.
                     expect($transcriptEl.find('.transcript-title').html()).toEqual(
