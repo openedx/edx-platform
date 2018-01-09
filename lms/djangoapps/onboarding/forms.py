@@ -667,9 +667,16 @@ class UpdateRegModelForm(RegModelForm):
         user.last_name = last_name
 
         if commit:
-            extended_profile.save()
+            user.save()
 
-        return extended_profile, prev_org
+            extended_profile.save()
+            if prev_org:
+                prev_org.save()
+
+            if extended_profile.organization:
+                extended_profile.organization.save()
+
+        return extended_profile
 
 
 class OrganizationMetricModelForm(BaseOnboardingModelForm):
