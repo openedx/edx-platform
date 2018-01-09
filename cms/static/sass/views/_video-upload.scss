@@ -8,13 +8,59 @@
       @extend %t-copy;
 
       vertical-align: bottom;
-      margin-right: ($baseline/5);
+      @include margin-right($baseline/45);
     }
   }
 
   .fixed-container {
     position: fixed !important;
     top: 0 !important;
+  }
+
+  .button-link {
+    background:none;
+    border:none;
+    padding:0;
+    color: $ui-link-color;
+    cursor:pointer
+  }
+
+  .show-video-transcripts-wrapper {
+    display: block;
+
+    .button-link {
+      color: $ui-link-color !important;
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .show-video-transcript-content {
+    margin-top: ($baseline/2);
+
+    .transcript-upload-status-container {
+
+      .video-transcript-detail-status, .more-details-action {
+        @include font-size(12);
+        @include line-height(12);
+        @include margin-left($baseline/4);
+      }
+    }
+
+    .transcript-upload-status-container.error {
+      color: $color-error;
+    }
+
+    .transcript-upload-status-container.success {
+      color: $color-ready;
+    }
+
+    .transcript-language-menu {
+      display: block;
+      width: 200px;
+    }
   }
 
   .course-video-settings-container {
@@ -29,14 +75,6 @@
     -webkit-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
     -moz-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
     box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
-
-    .button-link {
-      background:none;
-      border:none;
-      padding:0;
-      color: $ui-link-color;
-      cursor:pointer
-    }
 
     .action-close-wrapper {
       .action-close-course-video-settings {
@@ -414,6 +452,10 @@
 
       .name-col {
         width: 25%;
+      }
+
+      .transcripts-col {
+        width: 17%;
       }
 
       .thumbnail-col, .video-id-col {

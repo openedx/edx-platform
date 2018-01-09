@@ -15,7 +15,13 @@ import pytz
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
-from edxval.api import create_profile, create_video, get_video_info, get_course_video_image_url
+from edxval.api import (
+    create_profile,
+    create_video,
+    get_video_info,
+    get_course_video_image_url,
+    create_or_update_video_transcript
+)
 from mock import Mock, patch
 
 from contentstore.models import VideoUploadConfig
@@ -227,6 +233,86 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 response_video['status'],
                 convert_video_status(original_video)
             )
+
+    @ddt.data(
+        (
+            False,
+            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url'],
+            [],
+            {}
+        ),
+        (
+            True,
+            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
+                'transcripts'],
+            [
+                {
+                    'video_id': 'test1',
+                    'language_code': 'en',
+                    'file_name': 'edx101.srt',
+                    'file_format': 'srt',
+                    'provider': 'Cielo24'
+                }
+            ],
+            {
+                'en': 'English'
+            }
+        ),
+        (
+            True,
+            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
+                'transcripts'],
+            [
+                {
+                    'video_id': 'test1',
+                    'language_code': 'en',
+                    'file_name': 'edx101_en.srt',
+                    'file_format': 'srt',
+                    'provider': 'Cielo24'
+                },
+                {
+                    'video_id': 'test1',
+                    'language_code': 'es',
+                    'file_name': 'edx101_es.srt',
+                    'file_format': 'srt',
+                    'provider': 'Cielo24'
+                }
+            ],
+            {
+                'en': 'English',
+                'es': 'Spanish'
+            }
+        )
+    )
+    @ddt.unpack
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
+    def test_get_json_transcripts(self, is_video_transcript_enabled, expected_video_keys, uploaded_transcripts,
+                                  expected_transcripts, video_transcript_feature):
+        """
+        Test that transcripts are attached based on whether the video transcript feature is enabled.
+        """
+        video_transcript_feature.return_value = is_video_transcript_enabled
+
+        for transcript in uploaded_transcripts:
+            create_or_update_video_transcript(
+                transcript['video_id'],
+                transcript['language_code'],
+                metadata={
+                    'file_name': transcript['file_name'],
+                    'file_format': transcript['file_format'],
+                    'provider': transcript['provider']
+                }
+            )
+
+        response = self.client.get_json(self.url)
+        self.assertEqual(response.status_code, 200)
+        response_videos = json.loads(response.content)['videos']
+        self.assertEqual(len(response_videos), len(self.previous_uploads))
+
+        for response_video in response_videos:
+            self.assertEqual(set(response_video.keys()), set(expected_video_keys))
+            if response_video['edx_video_id'] == self.previous_uploads[0]['edx_video_id']:
+                self.assertDictEqual(response_video.get('transcripts', {}), expected_transcripts)
 
     def test_get_html(self):
         response = self.client.get(self.url)
