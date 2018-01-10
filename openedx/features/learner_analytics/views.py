@@ -57,9 +57,7 @@ class LearnerAnalyticsTab(EnrolledTab):
         """
         if not super(LearnerAnalyticsTab, cls).is_enabled(course, user=user):
             return False
-        return (ENABLE_DASHBOARD_TAB.is_enabled(course.id) and
-                CourseEnrollment.is_enrolled_as_verified(user, course.id))
-
+        return ENABLE_DASHBOARD_TAB.is_enabled(course.id)
 
 class LearnerAnalyticsView(View):
     """
