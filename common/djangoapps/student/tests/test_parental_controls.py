@@ -4,6 +4,7 @@ import datetime
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.timezone import now
 
 from student.models import UserProfile
 from student.tests.factories import UserFactory
@@ -40,20 +41,20 @@ class ProfileParentalControlsTest(TestCase):
         self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=False))
 
         # Verify that even a child does not require parental consent
-        current_year = datetime.datetime.now().year
+        current_year = now().year
         self.set_year_of_birth(current_year - 10)
         self.assertFalse(self.profile.requires_parental_consent())
 
     def test_adult_user(self):
         """Verify the behavior for an adult."""
-        current_year = datetime.datetime.now().year
+        current_year = now().year
         self.set_year_of_birth(current_year - 20)
         self.assertFalse(self.profile.requires_parental_consent())
         self.assertTrue(self.profile.requires_parental_consent(age_limit=21))
 
     def test_child_user(self):
         """Verify the behavior for a child."""
-        current_year = datetime.datetime.now().year
+        current_year = now().year
 
         # Verify for a child born 13 years agp
         self.set_year_of_birth(current_year - 13)
@@ -70,14 +71,14 @@ class ProfileParentalControlsTest(TestCase):
         """Verify that a profile's image obeys parental controls."""
 
         # Verify that an image cannot be set for a user with no year of birth set
-        self.profile.profile_image_uploaded_at = datetime.datetime.now()
+        self.profile.profile_image_uploaded_at = now()
         self.profile.save()
         self.assertFalse(self.profile.has_profile_image)
 
         # Verify that an image can be set for an adult user
-        current_year = datetime.datetime.now().year
+        current_year = now().year
         self.set_year_of_birth(current_year - 20)
-        self.profile.profile_image_uploaded_at = datetime.datetime.now()
+        self.profile.profile_image_uploaded_at = now()
         self.profile.save()
         self.assertTrue(self.profile.has_profile_image)
 

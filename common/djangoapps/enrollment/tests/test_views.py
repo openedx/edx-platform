@@ -454,9 +454,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         # enforced at the data layer, so we need to handle the case
         # in which no dates are specified.
         (None, None, None, None),
-        (datetime.datetime(2015, 1, 2, 3, 4, 5), None, "2015-01-02T03:04:05Z", None),
-        (None, datetime.datetime(2015, 1, 2, 3, 4, 5), None, "2015-01-02T03:04:05Z"),
-        (datetime.datetime(2014, 6, 7, 8, 9, 10), datetime.datetime(2015, 1, 2, 3, 4, 5), "2014-06-07T08:09:10Z", "2015-01-02T03:04:05Z"),
+        (datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC), None, "2015-01-02T03:04:05Z", None),
+        (None, datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC), None, "2015-01-02T03:04:05Z"),
+        (datetime.datetime(2014, 6, 7, 8, 9, 10, tzinfo=pytz.UTC), datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC), "2014-06-07T08:09:10Z", "2015-01-02T03:04:05Z"),
     )
     @ddt.unpack
     def test_get_course_details_course_dates(self, start_datetime, end_datetime, expected_start, expected_end):
@@ -579,7 +579,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
             mode_display_name=CourseMode.VERIFIED,
-            expiration_datetime='1970-01-01 05:00:00'
+            expiration_datetime='1970-01-01 05:00:00Z'
         )
 
         # Passes the include_expired parameter to the API call
