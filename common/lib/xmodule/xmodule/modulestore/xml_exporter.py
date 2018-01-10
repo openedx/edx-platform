@@ -58,12 +58,12 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
                 # if module has no parent, set its parent_url to `None`
                 parent_url = None
                 if parent_loc is not None:
-                    parent_url = parent_loc.to_deprecated_string()
+                    parent_url = text_type(parent_loc)
 
                 draft_node = draft_node_constructor(
                     draft_module,
                     location=draft_module.location,
-                    url=draft_module.location.to_deprecated_string(),
+                    url=text_type(draft_module.location),
                     parent_location=parent_loc,
                     parent_url=parent_url,
                 )

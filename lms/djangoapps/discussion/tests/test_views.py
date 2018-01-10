@@ -10,6 +10,7 @@ from django.test.utils import override_settings
 from django.utils import translation
 from mock import ANY, Mock, call, patch
 from nose.tools import assert_true
+from six import text_type
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -113,7 +114,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_from_django_user.return_value = Mock()
 
         url = reverse('user_profile',
-                      kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
+                      kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
 
@@ -130,7 +131,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_from_django_user.return_value = Mock()
 
         url = reverse('followed_threads',
-                      kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
+                      kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
 
@@ -295,7 +296,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         request.user = self.student
         response = views.single_thread(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             "dummy_discussion_id",
             "test_thread_id"
         )
@@ -332,7 +333,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         request.user = self.student
         response = views.single_thread(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             "dummy_discussion_id",
             "test_thread_id"
         )
@@ -363,7 +364,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         request = RequestFactory().post("dummy_url")
         response = views.single_thread(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             "dummy_discussion_id",
             "dummy_thread_id"
         )
@@ -378,7 +379,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             Http404,
             views.single_thread,
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             "test_discussion_id",
             "test_thread_id"
         )
@@ -451,7 +452,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             with patch.dict("django.conf.settings.FEATURES", dict(ENABLE_ENTERPRISE_INTEGRATION=enterprise_enabled)):
                 response = views.single_thread(
                     request,
-                    course.id.to_deprecated_string(),
+                    text_type(course.id),
                     "dummy_discussion_id",
                     test_thread_id
                 )
@@ -491,7 +492,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         request.user = self.student
         response = views.single_thread(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             "cohorted_topic",
             self.mock_thread_id
         )
@@ -551,7 +552,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):
         request.user = user
         return views.single_thread(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             commentable_id,
             thread_id
         )
@@ -847,7 +848,7 @@ class InlineDiscussionGroupIdTestCase(
         request.user = user
         return views.inline_discussion(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             commentable_id
         )
 
@@ -1091,7 +1092,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         request.user = user
         return views.followed_threads(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             user.id
         )
 
@@ -1135,7 +1136,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id
         )
         return views.inline_discussion(
-            request, self.course.id.to_deprecated_string(), self.discussion1.discussion_id
+            request, text_type(self.course.id), self.discussion1.discussion_id
         )
 
     def verify_response(self, response):
@@ -1198,7 +1199,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
             StringEndsWithMatcher('/users/{}/active_threads'.format(self.profiled_user.id)),
             data=None,
             params=PartialDictMatcher({
-                "course_id": self.course.id.to_deprecated_string(),
+                "course_id": text_type(self.course.id),
                 "page": params.get("page", 1),
                 "per_page": views.THREADS_PER_PAGE
             }),
@@ -1254,7 +1255,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         with self.assertRaises(Http404):
             views.user_profile(
                 request,
-                self.course.id.to_deprecated_string(),
+                text_type(self.course.id),
                 unenrolled_user.id
             )
 
@@ -1264,7 +1265,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         with self.assertRaises(Http404):
             views.user_profile(
                 request,
-                self.course.id.to_deprecated_string(),
+                text_type(self.course.id),
                 -999
             )
 
@@ -1286,7 +1287,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         request.user = self.student
         response = views.user_profile(
             request,
-            self.course.id.to_deprecated_string(),
+            text_type(self.course.id),
             self.profiled_user.id
         )
         self.assertEqual(response.status_code, 405)
@@ -1337,7 +1338,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
             reverse(
                 "single_thread",
                 kwargs={
-                    "course_id": self.course.id.to_deprecated_string(),
+                    "course_id": text_type(self.course.id),
                     "discussion_id": "dummy_discussion_id",
                     "thread_id": thread_id,
                 }
@@ -1353,7 +1354,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.client.get(
             reverse(
                 "forum_form_discussion",
-                kwargs={"course_id": self.course.id.to_deprecated_string()}
+                kwargs={"course_id": text_type(self.course.id)}
             ),
         )
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
@@ -1384,7 +1385,7 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
         request.user = self.student
 
         response = views.inline_discussion(
-            request, self.course.id.to_deprecated_string(), self.course.discussion_topics['General']['id']
+            request, text_type(self.course.id), self.course.discussion_topics['General']['id']
         )
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
@@ -1416,7 +1417,7 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
-        response = views.forum_form_discussion(request, self.course.id.to_deprecated_string())
+        response = views.forum_form_discussion(request, text_type(self.course.id))
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
@@ -1503,7 +1504,7 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
-        response = views.forum_form_discussion(request, self.course.id.to_deprecated_string())
+        response = views.forum_form_discussion(request, text_type(self.course.id))
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
@@ -1536,7 +1537,7 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
-        response = views.single_thread(request, self.course.id.to_deprecated_string(), "dummy_discussion_id", thread_id)
+        response = views.single_thread(request, text_type(self.course.id), "dummy_discussion_id", thread_id)
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data["content"]["title"], text)
@@ -1568,7 +1569,7 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
-        response = views.user_profile(request, self.course.id.to_deprecated_string(), str(self.student.id))
+        response = views.user_profile(request, text_type(self.course.id), str(self.student.id))
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
@@ -1600,7 +1601,7 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
-        response = views.followed_threads(request, self.course.id.to_deprecated_string(), str(self.student.id))
+        response = views.followed_threads(request, text_type(self.course.id), str(self.student.id))
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
@@ -1626,7 +1627,7 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         request = RequestFactory().get('dummy_url')
         request.user = self.student
         with self.assertRaises(CourseAccessRedirect):
-            views.forum_form_discussion(request, course_id=self.course.id.to_deprecated_string())
+            views.forum_form_discussion(request, course_id=text_type(self.course.id))
 
 
 @patch('requests.request', autospec=True)

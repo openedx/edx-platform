@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from six import text_type
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
@@ -71,21 +72,21 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.client.login(username=self.instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
 
     def get_dashboard_enrollment_message(self):
         """
         Returns expected dashboard enrollment message with link to Insights.
         """
         return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(unicode(self.course.id))
+               'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
         return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(unicode(self.course.id))
+               'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
         """

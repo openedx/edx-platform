@@ -15,6 +15,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from pyquery import PyQuery as pq
+from six import text_type
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from util.date_utils import strftime_localized
@@ -50,7 +51,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
 
     def test_logged_in_unenrolled(self):
         self.setup_user()
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -58,7 +59,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
 
     def test_logged_in_enrolled(self):
         self.enroll(self.course)
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
@@ -72,19 +73,19 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.setup_user()
         self.enroll(self.course)
 
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
 
         self.verify_consent_required(self.client, url)
 
     def test_anonymous_user(self):
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("OOGIE BLOOGIE", resp.content)
 
     def test_logged_in_not_enrolled(self):
         self.setup_user()
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         self.client.get(url)
 
         # Check whether the user has been enrolled in the course.
@@ -103,7 +104,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         """
         self.setup_user()
         self.enroll(self.course)
-        url = reverse('info', args=[unicode(self.course.id)])
+        url = reverse('info', args=[text_type(self.course.id)])
         response = self.client.get(url)
         start_date = strftime_localized(self.course.start, 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
@@ -125,7 +126,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
-        url = reverse('info', args=[unicode(self.course.id)])
+        url = reverse('info', args=[text_type(self.course.id)])
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
@@ -335,14 +336,14 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
-        url = reverse('info', args=[self.xml_course_key.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.xml_course_key)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
-        url = reverse('info', args=[self.xml_course_key.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.xml_course_key)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn(self.xml_data, resp.content)
@@ -372,7 +373,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         Fetch the given course's info page, asserting the number of SQL
         and Mongo queries.
         """
-        url = reverse('info', args=[unicode(course.id)])
+        url = reverse('info', args=[text_type(course.id)])
         with self.assertNumQueries(sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(mongo_queries):
                 with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):

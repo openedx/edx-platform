@@ -6,6 +6,7 @@ import json
 
 from django.core.urlresolvers import reverse
 from pyquery import PyQuery as pq
+from six import text_type
 
 from courseware.tests.factories import StaffFactory
 from student.models import CourseEnrollment
@@ -166,7 +167,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         last_accessed_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': course.id.to_deprecated_string(),
+                'course_id': text_type(course.id),
                 'chapter': chapter.url_name,
                 'section': sequential.url_name,
             }

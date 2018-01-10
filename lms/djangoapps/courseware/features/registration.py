@@ -4,11 +4,12 @@ import time
 
 from lettuce import step, world
 from lettuce.django import django_url
+from six import text_type
 
 
 @step('I register for the course "([^"]*)"$')
 def i_register_for_the_course(_step, course):
-    url = django_url('courses/%s/about' % world.scenario_dict['COURSE'].id.to_deprecated_string())
+    url = django_url('courses/%s/about' % text_type(world.scenario_dict['COURSE'].id))
     world.browser.visit(url)
     world.css_click('.intro a.register')
     assert world.is_css_present('.dashboard')
@@ -16,7 +17,7 @@ def i_register_for_the_course(_step, course):
 
 @step('I register to audit the course$')
 def i_register_to_audit_the_course(_step):
-    url = django_url('courses/%s/about' % world.scenario_dict['COURSE'].id.to_deprecated_string())
+    url = django_url('courses/%s/about' % text_type(world.scenario_dict['COURSE'].id))
     world.browser.visit(url)
     world.css_click('.intro a.register')
     # When the page first loads some animation needs to

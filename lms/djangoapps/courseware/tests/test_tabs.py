@@ -9,6 +9,7 @@ from django.http import Http404
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
@@ -222,7 +223,7 @@ class TextbooksTestCase(TabTestCase):
                 book_type, book_index = tab.tab_id.split("/", 1)
                 expected_link = self.reverse(
                     type_to_reverse_name[book_type],
-                    args=[self.course.id.to_deprecated_string(), book_index]
+                    args=[text_type(self.course.id), book_index]
                 )
                 self.assertEqual(tab.link_func(self.course, self.reverse), expected_link)
                 self.assertTrue(tab.name.startswith('Book{0}'.format(book_index)))
@@ -249,13 +250,13 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
     def test_logged_in(self):
         self.setup_user()
-        url = reverse('static_tab', args=[self.course.id.to_deprecated_string(), 'new_tab'])
+        url = reverse('static_tab', args=[text_type(self.course.id), 'new_tab'])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
 
     def test_anonymous_user(self):
-        url = reverse('static_tab', args=[self.course.id.to_deprecated_string(), 'new_tab'])
+        url = reverse('static_tab', args=[text_type(self.course.id), 'new_tab'])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -274,7 +275,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
         # Test render works okay
         tab_content = get_static_tab_fragment(request, course, tab).content
-        self.assertIn(self.course.id.to_deprecated_string(), tab_content)
+        self.assertIn(text_type(self.course.id), tab_content)
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
@@ -323,14 +324,14 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
-        url = reverse('static_tab', args=[self.xml_course_key.to_deprecated_string(), self.xml_url])
+        url = reverse('static_tab', args=[text_type(self.xml_course_key), self.xml_url])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
-        url = reverse('static_tab', args=[self.xml_course_key.to_deprecated_string(), self.xml_url])
+        url = reverse('static_tab', args=[text_type(self.xml_course_key), self.xml_url])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
@@ -490,7 +491,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
                 book_type, book_index = tab.tab_id.split("/", 1)
                 expected_link = reverse(
                     type_to_reverse_name[book_type],
-                    args=[self.course.id.to_deprecated_string(), book_index]
+                    args=[text_type(self.course.id), book_index]
                 )
                 tab_link = tab.link_func(self.course, reverse)
                 self.assertEqual(tab_link, expected_link)
@@ -733,7 +734,7 @@ class ProgressTestCase(TabTestCase):
         return self.check_tab(
             tab_class=ProgressTab,
             dict_tab={'type': ProgressTab.type, 'name': 'same'},
-            expected_link=self.reverse('progress', args=[self.course.id.to_deprecated_string()]),
+            expected_link=self.reverse('progress', args=[text_type(self.course.id)]),
             expected_tab_id=ProgressTab.type,
             invalid_dict_tab=None,
         )
@@ -766,7 +767,7 @@ class StaticTabTestCase(TabTestCase):
         tab = self.check_tab(
             tab_class=xmodule_tabs.StaticTab,
             dict_tab={'type': xmodule_tabs.StaticTab.type, 'name': 'same', 'url_slug': url_slug},
-            expected_link=self.reverse('static_tab', args=[self.course.id.to_deprecated_string(), url_slug]),
+            expected_link=self.reverse('static_tab', args=[text_type(self.course.id), url_slug]),
             expected_tab_id='static_tab_schmug',
             invalid_dict_tab=self.fake_dict_tab,
         )
