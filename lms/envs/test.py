@@ -43,6 +43,7 @@ ALLOWED_HOSTS = [
     'testserver.fakeother',
     'edx.org',
     'example.none',
+    'microsite.example.com',
 ]
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
