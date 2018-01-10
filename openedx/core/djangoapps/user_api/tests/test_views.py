@@ -31,7 +31,6 @@ from third_party_auth.tests.utils import (
 from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from ..helpers import FormDescription
 from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
@@ -1966,24 +1965,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "required": False,
             "defaultValue": backend.name
         })
-
-    def test_create_account_not_allowed(self):
-        """
-        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
-        """
-        def _side_effect_for_get_value(value, default=None):
-            """
-            returns a side_effect with given return value for a given value
-            """
-            if value == 'ALLOW_PUBLIC_ACCOUNT_CREATION':
-                return False
-            else:
-                return get_value(value, default)
-
-        with mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value') as mock_get_value:
-            mock_get_value.side_effect = _side_effect_for_get_value
-            response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
-            self.assertEqual(response.status_code, 403)
 
 
 @httpretty.activate

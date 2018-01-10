@@ -46,10 +46,6 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
-    # Note: these are older versions of the User API that will eventually be
-    # subsumed by api/user listed below.
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-
     url(r'^notifier_api/', include('notifier_api.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -68,9 +64,6 @@ urlpatterns = (
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
-
-    # User API endpoints
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Bookmarks API endpoints
     url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
@@ -142,6 +135,19 @@ if settings.FEATURES.get('EDX_SOLUTIONS_API'):
         url(r'^api/server/', include('edx_solutions_api_integration.urls')),
         url(r'^api/completion/v0/', include('lms.djangoapps.completion_api.urls')),
     )
+
+# OPEN EDX USER API
+# mattdrayer: Please note that the user_api declaration must follow
+# the server api declaration.  When declared ahead of the server api
+# the user_api will oddly begin to return server-oriented user URIs
+# At this time I'm not sure why this seems to be a one-way scenario.
+urlpatterns += (
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
+)
+urlpatterns += (
+    # User API endpoints
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+)
 
 if settings.FEATURES["ENABLE_OPENBADGES"]:
     urlpatterns += (
