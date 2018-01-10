@@ -697,9 +697,14 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         works in conjunction with the Django pipeline to ensure that in development mode
         the files are loaded individually, but in production just the single bundle is loaded.
         """
-        dependencies = Set()
-        dependencies.update(self.get_js_dependencies('discussion_vendor'))
-        return list(dependencies)
+        vendor_dependencies = self.get_js_dependencies('discussion_vendor')
+        if settings.FEATURES.get('EDX_SOLUTIONS_API', False):
+            base_vendor_dependencies = self.get_js_dependencies('base_vendor')
+            base_vendor_dependencies.append('js/vendor/jquery.leanModal.js')
+            base_vendor_dependencies.append('lms/js/require-config.js')
+            vendor_dependencies = base_vendor_dependencies + vendor_dependencies
+
+        return vendor_dependencies
 
     def js_dependencies(self):
         """
