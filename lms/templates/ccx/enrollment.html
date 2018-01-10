@@ -79,9 +79,9 @@ from openedx.core.djangolib.markup import HTML, Text
         <table>
           <thead>
             <tr>
-              <th class="label" scope="col">Username</th>
-              <th class="label" scope="col">Email</th>
-              <th class="label" scope="col">Revoke access</th>
+              <th class="label" scope="col">${_("Username")}</th>
+              <th class="label" scope="col">${_("Email")}</th>
+              <th class="label" scope="col">${_("Revoke access")}</th>
             </tr>
           </thead>
           <tbody>
@@ -98,7 +98,7 @@ from openedx.core.djangolib.markup import HTML, Text
       <div class="bottom-bar">
         <label for="student-id" class="sr">${_("Enter username or email")}</label>
         <input name="student-id" id="student-id" class="add-field" placeholder="${_("Enter username or email")}" type="text">
-        <input name="student-action" class="add" value="Add Student" type="button">
+        <input name="student-action" class="add" value="${_("Add Student")}" type="button">
         <div class="enroll-option">
             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper" disabled>
             <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
