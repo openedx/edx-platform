@@ -28,7 +28,6 @@ var options = {
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'course_bookmarks/**/!(*spec).js'},
-        {pattern: 'course_experience/**/!(*spec).js'},
         {pattern: 'course_search/**/!(*spec).js'},
         {pattern: 'discussion/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
@@ -63,7 +62,7 @@ var options = {
 options.specFiles
     .filter(function(file) { return file.webpack; })
     .forEach(function(file) {
-        options.preprocessors[file.pattern] = ['webpack', 'sourcemap'];
+        options.preprocessors[file.pattern] = ['webpack', 'sourcemap', 'coverage'];
     });
 
 module.exports = function(config) {
