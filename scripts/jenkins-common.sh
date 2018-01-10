@@ -57,13 +57,6 @@ echo "done setting up nodeenv"
 echo "node version is `node --version`"
 echo "npm version is `npm --version`"
 
-# TODO: Provide a cached node_modules/ directory for faster/smaller installs
-
-# Manage the npm cache on Jenkins.
-# (In this case, remove it. That ensures from run-to-run, it is a clean npm environment)
-echo "--> Cleaning npm cache"
-npm cache clean
-
 # Log any paver or ansible command timing
 TIMESTAMP=$(date +%s)
 export PAVER_TIMER_LOG="test_root/log/timing.paver.$TIMESTAMP.log"
