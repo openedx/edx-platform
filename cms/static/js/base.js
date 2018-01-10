@@ -1,4 +1,4 @@
-require([
+define([
     'domReady',
     'jquery',
     'underscore',
