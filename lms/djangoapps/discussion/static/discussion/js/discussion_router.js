@@ -33,7 +33,9 @@
 
                 start: function() {
                     var self = this,
-                        $newPostButton = $('.new-post-btn');
+                        $newPostButton = $('.new-post-btn'),
+                        rootUrl = '/courses/' + this.courseId + '/discussion/',
+                        result = window.location.pathname.match('.*/discussion');
                     this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
                     $newPostButton.bind('click', _.bind(this.showNewPost, this));
                     $newPostButton.bind('keydown', function(event) {
@@ -53,16 +55,14 @@
                     this.discussionBoardView.discussionThreadListView.on(
                         'thread:created', _.bind(this.navigateToThread, this)
                     );
-                    var root_url = '/courses/' + this.courseId + '/discussion/';
-                    var result = window.location.pathname.match('.*/discussion');
-                    root_url = (result !== null) ? result[0] + '/' : root_url;
+                    rootUrl = (result !== null) ? result[0] + '/' : rootUrl;
                     // stop history if it is already started.
                     if (Backbone.History.started) {
                         Backbone.history.stop();
                     }
                     Backbone.history.start({
                         pushState: true,
-                        root: root_url
+                        root: rootUrl
                     });
                 },
 

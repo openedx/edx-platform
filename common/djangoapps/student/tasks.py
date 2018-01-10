@@ -82,4 +82,3 @@ def publish_course_notifications_task(course_id, notification_msg, exclude_user_
         # Notifications are never critical, so we don't want to disrupt any
         # other logic processing. So log and continue.
         log.exception(ex)
-

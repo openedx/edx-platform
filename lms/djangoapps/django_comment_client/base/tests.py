@@ -35,13 +35,11 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
-from openedx.core.djangoapps.course_groups.models import CourseCohort
-
 from openedx.core.djangoapps.course_groups.cohorts import add_cohort, add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 
 from edx_notifications.lib.consumer import get_notifications_for_user, get_notifications_count_for_user
-from edx_notifications.startup import initialize  as initialize_notifications
+from edx_notifications.startup import initialize as initialize_notifications
 
 from social_engagement.models import StudentSocialEngagementScore
 

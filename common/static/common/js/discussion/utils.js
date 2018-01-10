@@ -195,9 +195,9 @@
                 $elem.prop('disabled', true);
             }
             if (params.type && params.type === 'POST') {
-                params.beforeSend = function(xhr) {
+                params.beforeSend = function(xhr) {  // eslint-disable-line no-param-reassign
                     xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-                }
+                };
             }
             if (params.$loading) {
                 if (params.loadingCallback) {

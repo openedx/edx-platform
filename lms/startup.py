@@ -91,7 +91,6 @@ def run():
             settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
         disable_solutions_apps_signals()
 
-
     # In order to allow modules to use a handler url, we need to
     # monkey-patch the x_module library.
     # TODO: Remove this code when Runtimes are no longer created by modulestores
