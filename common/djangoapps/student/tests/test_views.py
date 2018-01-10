@@ -1,17 +1,17 @@
 """
 Test the student dashboard view.
 """
-import datetime
 import itertools
 import json
 import unittest
+from datetime import timedelta
 
 import ddt
-import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.utils.timezone import now
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -241,9 +241,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
 
     EMAIL_SETTINGS_ELEMENT_ID = "#actions-item-email-settings-0"
     ENABLED_SIGNALS = ['course_published']
-    TOMORROW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
-    THREE_YEARS_FROM_NOW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=(365 * 3))
-    THREE_YEARS_AGO = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=(365 * 3))
+    TOMORROW = now() + timedelta(days=1)
+    THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
+    THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
     MOCK_SETTINGS = {
         'FEATURES': {
             'DISABLE_START_DATES': False,
@@ -391,7 +391,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         CourseEntitlementFactory(
             user=self.user,
             created=self.THREE_YEARS_AGO,
-            expired_at=datetime.datetime.now()
+            expired_at=now()
         )
         mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
         mock_course_runs.return_value = [

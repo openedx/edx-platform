@@ -10,6 +10,7 @@ import dateutil.parser
 import pytz
 import requests
 from celery.task import task
+from django.utils.timezone import now
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
@@ -188,7 +189,7 @@ def _update_data(entity_id, public_key, sso_url, expires_at):
         True if a new record was created. (Either this is a new provider or something changed.)
     """
     data_obj = SAMLProviderData.current(entity_id)
-    fetched_at = datetime.datetime.now()
+    fetched_at = now()
     if data_obj and (data_obj.public_key == public_key and data_obj.sso_url == sso_url):
         data_obj.expires_at = expires_at
         data_obj.fetched_at = fetched_at
