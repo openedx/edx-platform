@@ -34,7 +34,7 @@ def side_effect_exception(*args, **kwargs):  # pylint: disable=unused-argument
     raise Exception('Boom!')
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MEDIA_ROOT='/tmp')
 class ExportCourseTestCase(CourseTestCase):
     """
     Tests of the export_olx task applied to courses
@@ -93,7 +93,7 @@ class ExportCourseTestCase(CourseTestCase):
         self.assertEqual(error.text, error_message)
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MEDIA_ROOT='/tmp')
 class ExportLibraryTestCase(LibraryTestCase):
     """
     Tests of the export_olx task applied to libraries
