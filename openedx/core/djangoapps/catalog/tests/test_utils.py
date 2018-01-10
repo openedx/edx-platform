@@ -7,6 +7,7 @@ import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
@@ -18,6 +19,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_course_runs_for_course,
     get_course_run_details,
     get_currency_data,
+    get_localized_price_text,
     get_program_types,
     get_programs,
     get_programs_with_type
@@ -264,6 +266,30 @@ class TestGetCurrency(CatalogIntegrationMixin, TestCase):
         UserFactory(username=catalog_integration.service_username)
         data = get_currency_data()
         self.assertEqual(data, currency_data)
+
+
+@mock.patch(UTILS_MODULE + '.get_currency_data')
+class TestGetLocalizedPriceText(TestCase):
+    """
+    Tests covering converting prices to a localized currency
+    """
+    def setUp(self):
+        super(TestGetLocalizedPriceText, self).setUp()
+
+    def test_localized_string(self, mock_get_currency_data):
+        currency_data = {
+            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": "\u20ac"},
+            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": "\u00a3"},
+            "CAN": {"rate": 2, "code": "CAD", "symbol": "$"},
+        }
+        mock_get_currency_data.return_value = currency_data
+
+        request = RequestFactory().get('/dummy-url')
+        request.session = {
+            'country_code': 'CA'
+        }
+        expected_result = '$20 CAD'
+        self.assertEqual(get_localized_price_text(10, request), expected_result)
 
 
 @skip_unless_lms
