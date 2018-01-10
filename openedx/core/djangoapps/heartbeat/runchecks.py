@@ -3,8 +3,6 @@ from importlib import import_module
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from .defaults import HEARTBEAT_DEFAULT_CHECKS, HEARTBEAT_EXTENDED_DEFAULT_CHECKS
-
 
 def runchecks(include_extended=False):
     """
@@ -13,11 +11,9 @@ def runchecks(include_extended=False):
     """
     response_dict = {}
 
-    #Taken straight from Django
-    #If there is a better way, I don't know it
-    list_of_checks = getattr(settings, 'HEARTBEAT_CHECKS', HEARTBEAT_DEFAULT_CHECKS)
+    list_of_checks = list(settings.HEARTBEAT_CHECKS)
     if include_extended:
-        list_of_checks += getattr(settings, 'HEARTBEAT_EXTENDED_CHECKS', HEARTBEAT_EXTENDED_DEFAULT_CHECKS)
+        list_of_checks += settings.HEARTBEAT_EXTENDED_CHECKS
 
     for path in list_of_checks:
         module, _, attr = path.rpartition('.')
