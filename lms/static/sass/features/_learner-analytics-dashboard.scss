@@ -1,12 +1,12 @@
-$mint-green: #92C9D3;
-$slices: #386F77, #1ABC9C, $mint-green, #397D1C, #A39D3D, #0E5AAA;
-$border-color: #4A4A4A;
+$mint-green: #92c9d3;
+$slices: #386f77, #1abc9c, $mint-green, #397d1c, #a39d3d, #0a5aaa;
+$border-color: #4a4a4a;
 $table-border: rgba(155, 155, 155, 0.2);
-$font-color: #636C72;
-$heading-color: #292B2C;
+$font-color: #636c72;
+$heading-color: #292b2c;
 $grouping-background: #f5f5f5;
-$grouping-border: #D8D8D8;
-$trophy-gold: #F39C12;
+$grouping-border: #d8d8d8;
+$trophy-gold: #f39c12;
 
 .content-wrapper {
   .page-content.learner-analytics-dashboard-wrapper {
@@ -42,11 +42,8 @@ $trophy-gold: #F39C12;
 
   .grading-weight-wrapper {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-
+    flex-flow: row wrap;
     border-bottom: 1px solid $border-color;
-
     .chart-wrapper {
       width: 90px;
       height: 90px;
@@ -226,7 +223,7 @@ $trophy-gold: #F39C12;
       text-align: center;
       position: relative;
 
-      &:after {
+      &::after {
         content: '';
         height: 2px;
         width: 12px;
@@ -245,15 +242,9 @@ $trophy-gold: #F39C12;
 
   .discussions-wrapper {
     display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-
+    flex-flow: column wrap;
     .group-heading {
       width: 100%;
-    }
-
-    .comparison-charts {
-
     }
 
     .post-counts {
@@ -285,10 +276,13 @@ $trophy-gold: #F39C12;
     }
   }
 
-  @include media-breakpoint-up(sm) { .analytics-group.sidebar{border-color: red;} }
-  @include media-breakpoint-up(md) { .analytics-group.sidebar{border-color: blue;} }
-  @include media-breakpoint-up(lg) { .analytics-group.sidebar{border-color: green;} }
-  @include media-breakpoint-up(xl) { .analytics-group.sidebar{border-color: black;} }
+  @include media-breakpoint-up(sm) { .analytics-group.sidebar { border-color: red; } }
+
+  @include media-breakpoint-up(md) { .analytics-group.sidebar { border-color: blue; } }
+
+  @include media-breakpoint-up(lg) { .analytics-group.sidebar { border-color: green; } }
+
+  @include media-breakpoint-up(xl) { .analytics-group.sidebar { border-color: black; } }
 
   @include media-breakpoint-up(md) {
     .analytics-group {
@@ -322,8 +316,7 @@ $trophy-gold: #F39C12;
   @include media-breakpoint-up(xl) {
     .learner-analytics-wrapper {
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
+      flex-flow: row wrap;
       justify-content: space-between;
 
       .main-block {
