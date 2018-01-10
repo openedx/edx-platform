@@ -66,13 +66,12 @@ class Command(BaseCommand):
                     client_type="discovery" if is_discovery else "ecommerce",
                 ),
                 "url": url,
-                "client_id": "{client_type}-key-{site_name}".format(
+                "client_id": "{client_type}-key{site_name}".format(
                     client_type="discovery" if is_discovery else "ecommerce",
-                    site_name=site_name
+                    site_name="" if site_name == "edx" else "-{}".format(site_name)
                 ),
-                "client_secret": "{client_type}-secret-{dns_name}".format(
-                    client_type="discovery" if is_discovery else "ecommerce",
-                    dns_name=self.dns_name
+                "client_secret": "{client_type}-secret".format(
+                    client_type="discovery" if is_discovery else "ecommerce"
                 ),
                 "client_type": CONFIDENTIAL,
                 "logout_uri": "{url}logout/".format(url=url)

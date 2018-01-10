@@ -102,6 +102,14 @@ class TestCreateSiteAndConfiguration(TestCase):
                 "{ecommerce_url}complete/edx-oidc/".format(ecommerce_url=ecommerce_url)
             )
             self.assertEqual(
+                client.client_id,
+                "ecommerce-key-{site_name}".format(site_name=site_name)
+            )
+            self.assertEqual(
+                client.client_secret,
+                "ecommerce-secret"
+            )
+            self.assertEqual(
                 len(TrustedClient.objects.filter(client=client)),
                 1
             )
@@ -126,6 +134,14 @@ class TestCreateSiteAndConfiguration(TestCase):
             self.assertEqual(
                 client.redirect_uri,
                 "{discovery_url}complete/edx-oidc/".format(discovery_url=discovery_url)
+            )
+            self.assertEqual(
+                client.client_id,
+                "discovery-key-{site_name}".format(site_name=site_name)
+            )
+            self.assertEqual(
+                client.client_secret,
+                "discovery-secret"
             )
             self.assertEqual(
                 len(TrustedClient.objects.filter(client=client)),
