@@ -56,9 +56,13 @@
                     var root_url = '/courses/' + this.courseId + '/discussion/';
                     var result = window.location.pathname.match('.*/discussion');
                     root_url = (result !== null) ? result[0] + '/' : root_url;
+                    // stop history if it is already started.
+                    if (Backbone.History.started) {
+                        Backbone.history.stop();
+                    }
                     Backbone.history.start({
                         pushState: true,
-                        root: this.rootUrl
+                        root: root_url
                     });
                 },
 
