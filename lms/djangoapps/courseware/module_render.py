@@ -63,7 +63,6 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock
 )
 from progress.models import CourseModuleCompletion
-from social_engagement.services import DiscussionService
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -691,7 +690,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         'credit': CreditService(),
         'bookmarks': BookmarksService(user=user),
         'courseware_parent_info': CoursewareParentInfoService(),
-        'discussion': DiscussionService(descriptor.runtime),
     }
 
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
