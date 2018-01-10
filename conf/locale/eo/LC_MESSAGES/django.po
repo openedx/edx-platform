@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:53+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.593885\n"
+"POT-Creation-Date: 2018-01-10 10:50+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.384997\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4037,6 +4037,38 @@ msgstr ""
 "{assignment_type} = {weighted_percent:.2%} öf ä pössïßlé {weight:.2%} Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: common/lib/xmodule/xmodule/graders.py
+msgid "Generated"
+msgstr "Générätéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
+#. released for viewing.
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} {index} Unreleased - 0% (?/?)"
+msgstr ""
+"{section_type} {index} Ûnréléäséd - 0% (?/?) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "The lowest {drop_count} {section_type} scores are dropped."
+msgstr ""
+"Thé löwést {drop_count} {section_type} sçörés äré dröppéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#. Translators: "Homework Average = 0%"
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} Average = {percent:.0%}"
+msgstr "{section_type} Àvérägé = {percent:.0%} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#. Translators: Avg is short for Average
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{short_label} Avg"
+msgstr "{short_label} Àvg Ⱡ'σяєм ιρѕυм #"
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr "Téxt Ⱡ'σяєм ι#"
@@ -6619,7 +6651,7 @@ msgstr ""
 "Àütömätïçällý äpprövé välïd réfünd réqüésts, wïthöüt mänüäl pröçéssïng "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: lms/djangoapps/commerce/signals.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -6628,7 +6660,8 @@ msgstr ""
 "À réfünd réqüést häs ßéén ïnïtïätéd för {username} ({email}). Tö pröçéss "
 "thïs réqüést, pléäsé vïsït thé lïnk(s) ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
 msgstr "[Réfünd] Ûsér-Réqüéstéd Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -6994,6 +7027,7 @@ msgstr "Ûpgrädé ({upgrade_price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr "Léärn Möré Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -10547,24 +10581,19 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
-"channel. Please contact your {enterprise} administrator in order to access "
-"{platform_name} or contact {edx_support_link}.{line_break}{line_break}Error "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
 "Details:{line_break}{error_message}"
 msgstr ""
 "Wé äré sörrý, ýöü äré nöt äüthörïzéd tö äççéss {platform_name} vïä thïs "
-"çhännél. Pléäsé çöntäçt ýöür {enterprise} ädmïnïsträtör ïn ördér tö äççéss "
-"{platform_name} ör çöntäçt {edx_support_link}.{line_break}{line_break}Érrör "
+"çhännél. Pléäsé çöntäçt ýöür léärnïng ädmïnïsträtör ör mänägér ïn ördér tö "
+"äççéss {platform_name}.{line_break}{line_break}Érrör "
 "Détäïls:{line_break}{error_message} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
 " α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє "
 "мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ "
 "łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι#"
-
-#: lms/djangoapps/student_account/test/test_views.py
-#: openedx/features/enterprise_support/utils.py
-msgid "edX Support"
-msgstr "édX Süppört Ⱡ'σяєм ιρѕυм ∂σłσя #"
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυ#"
 
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
@@ -13797,6 +13826,32 @@ msgid "The information you entered is incorrect."
 msgstr ""
 "Thé ïnförmätïön ýöü éntéréd ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+"Thé föllöwïng pärämétérs äré réqüïréd: {missing}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+"À tränsçrïpt wïth thé \"{language_code}\" längüägé çödé älréädý éxïsts. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "A transcript file is required."
+msgstr "À tränsçrïpt fïlé ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Théré ïs ä prößlém wïth thïs tränsçrïpt fïlé. Trý tö üplöäd ä dïfférént "
+"fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -23752,52 +23807,6 @@ msgid "Important Course Dates"
 msgstr "Ìmpörtänt Çöürsé Dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show/Hide"
-msgstr "Shöw/Hïdé Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show less"
-msgstr "Shöw léss Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid ""
-"Sample verified certificate with your name, the course title, the logo of "
-"the institution and the signatures of the instructors for this course."
-msgstr ""
-"Sämplé vérïfïéd çértïfïçäté wïth ýöür nämé, thé çöürsé tïtlé, thé lögö öf "
-"thé ïnstïtütïön änd thé sïgnätürés öf thé ïnstrüçtörs för thïs çöürsé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ є#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Official proof of completion"
-msgstr "Öffïçïäl prööf öf çömplétïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Easily shareable certificate"
-msgstr "Éäsïlý shäréäßlé çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Proven motivator to complete the course"
-msgstr ""
-"Prövén mötïvätör tö çömplété thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Certificate purchases help us continue to offer free courses"
-msgstr ""
-"Çértïfïçäté pürçhäsés hélp üs çöntïnüé tö öffér fréé çöürsés Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Upgrade ({price})"
-msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr "Göäl:  Ⱡ'σяєм ιρѕυ#"
 
@@ -23805,9 +23814,122 @@ msgstr "Göäl:  Ⱡ'σяєм ιρѕυ#"
 msgid "Edit your course goal:"
 msgstr "Édït ýöür çöürsé göäl: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Pursue a verified certificate"
+msgstr "Pürsüé ä vérïfïéd çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Upgrade ({price})"
+msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Learn About Verified Certificates"
+msgstr ""
+"Léärn Àßöüt Vérïfïéd Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{platform_name} Verified Certificate"
+msgstr ""
+"{platform_name} Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Why upgrade?"
+msgstr "Whý üpgrädé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Official proof of completion"
+msgstr "Öffïçïäl prööf öf çömplétïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Easily shareable certificate"
+msgstr "Éäsïlý shäréäßlé çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Proven motivator to complete the course"
+msgstr ""
+"Prövén mötïvätör tö çömplété thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"Certificate purchases help {platform_name} continue to offer free courses"
+msgstr ""
+"Çértïfïçäté pürçhäsés hélp {platform_name} çöntïnüé tö öffér fréé çöürsés "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "How it works"
+msgstr "Höw ït wörks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Pay the Verified Certificate upgrade fee"
+msgstr ""
+"Päý thé Vérïfïéd Çértïfïçäté üpgrädé féé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Verify your identity with a webcam and government-issued ID"
+msgstr ""
+"Vérïfý ýöür ïdéntïtý wïth ä wéßçäm änd gövérnmént-ïssüéd ÌD Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Study hard and pass the course"
+msgstr "Stüdý härd änd päss thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Share your certificate with friends, employers, and others"
+msgstr ""
+"Shäré ýöür çértïfïçäté wïth frïénds, émplöýérs, änd öthérs Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "edX Learner Stories"
+msgstr "édX Léärnér Störïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
+"really help me land                             my dream job!"
+msgstr ""
+"Mý çértïfïçäté häs hélpéd mé shöwçäsé mý knöwlédgé ön mý"
+"                             résümé - Ì féél lïké thïs çértïfïçäté çöüld "
+"réällý hélp mé länd                             mý dréäm jöß! Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρ#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{learner_name}, edX Learner"
+msgstr "{learner_name}, édX Léärnér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
+msgstr ""
+"Ì wäntéd tö ïnçlüdé ä vérïfïéd çértïfïçäté ön mý résümé änd mý pröfïlé tö"
+"                             ïllüsträté thät Ì äm wörkïng töwärds thïs göäl "
+"Ì hävé änd thät Ì hävé                             äçhïévéd söméthïng whïlé "
+"Ì wäs ünémplöýéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
+" ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєł#"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Upgrade ({course_price})"
+msgstr "Ûpgrädé ({course_price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."

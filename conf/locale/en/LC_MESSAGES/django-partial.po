@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:47+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.502454\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.271348\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3087,6 +3087,34 @@ msgstr ""
 msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/graders.py
+msgid "Generated"
+msgstr ""
+
+#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
+#. released for viewing.
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} {index} Unreleased - 0% (?/?)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "The lowest {drop_count} {section_type} scores are dropped."
+msgstr ""
+
+#. Translators: "Homework Average = 0%"
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} Average = {percent:.0%}"
+msgstr ""
+
+#. Translators: Avg is short for Average
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{short_label} Avg"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr ""
@@ -4993,14 +5021,15 @@ msgstr ""
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
 msgstr ""
 
@@ -8050,14 +8079,9 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
-"channel. Please contact your {enterprise} administrator in order to access "
-"{platform_name} or contact {edx_support_link}.{line_break}{line_break}Error "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
 "Details:{line_break}{error_message}"
-msgstr ""
-
-#: lms/djangoapps/student_account/test/test_views.py
-#: openedx/features/enterprise_support/utils.py
-msgid "edX Support"
 msgstr ""
 
 #: lms/djangoapps/student_account/views.py

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:51+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.648617\n"
+"POT-Creation-Date: 2018-01-10 10:48+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.500606\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Language: en\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: common/static/bundles/Import.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/Import.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -134,6 +134,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
+#: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 msgid "Close"
@@ -1887,13 +1888,11 @@ msgstr ""
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr ""
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show less"
 msgstr ""
 
