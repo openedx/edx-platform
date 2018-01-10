@@ -28,6 +28,7 @@ class TestPaverWatchAssetTasks(TestCase):
             path('common/static'),
             path('node_modules/@edx'),
             path('node_modules'),
+            path('node_modules/edx-pattern-library/node_modules'),
             path('lms/static/sass/partials'),
             path('lms/static/sass'),
             path('lms/static/certificates/sass'),
