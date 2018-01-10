@@ -27,9 +27,8 @@
 
 .forum-nav {
   @include media-breakpoint-up(md) {
-    // Note: a single width setting is not obeyed by a flex layout
-    min-width: 300px;
     max-width: 300px;
+    width: 25%;
   }
 }
 
@@ -42,6 +41,7 @@
 
     min-height: 500px;
     margin-bottom: 0;
+    width: 75%;
   }
 
   .new-post-article {
