@@ -7,17 +7,24 @@ import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory,
+    CourseRunFactory,
+    ProgramFactory,
+    ProgramTypeFactory
+)
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
     get_course_runs_for_course,
     get_course_run_details,
     get_currency_data,
+    get_localized_price_text,
     get_program_types,
     get_programs,
     get_programs_with_type
@@ -266,6 +273,27 @@ class TestGetCurrency(CatalogIntegrationMixin, TestCase):
         self.assertEqual(data, currency_data)
 
 
+@mock.patch(UTILS_MODULE + '.get_currency_data')
+class TestGetLocalizedPriceText(TestCase):
+    """
+    Tests covering converting prices to a localized currency
+    """
+    def test_localized_string(self, mock_get_currency_data):
+        currency_data = {
+            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": u"\u20ac"},
+            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": u"\u00a3"},
+            "CAN": {"rate": 2, "code": "CAD", "symbol": "$"},
+        }
+        mock_get_currency_data.return_value = currency_data
+
+        request = RequestFactory().get('/dummy-url')
+        request.session = {
+            'country_code': 'CA'
+        }
+        expected_result = '$20 CAD'
+        self.assertEqual(get_localized_price_text(10, request), expected_result)
+
+
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
@@ -278,7 +306,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args):  # pylint: disable=redefined-builtin
+    def assert_contract(self, call_args):
         """
         Verify that API data retrieval utility is used correctly.
         """

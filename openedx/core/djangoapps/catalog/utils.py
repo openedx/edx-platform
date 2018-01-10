@@ -2,6 +2,7 @@
 import copy
 import datetime
 import logging
+import pycountry
 
 from dateutil.parser import parse as datetime_parse
 from django.conf import settings
@@ -142,6 +143,49 @@ def get_currency_data():
                                 cache_key=cache_key if catalog_integration.is_cache_enabled else None)
     else:
         return []
+
+
+def format_price(price, symbol='$', code='USD'):
+    """
+    Format the price to have the appropriate currency and digits..
+
+    :param price: The price amount.
+    :param symbol: The symbol for the price (default: $)
+    :param code: The currency code to be appended to the price (default: USD)
+    :return: A formatted price string, i.e. '$10 USD', '$10.52 USD'.
+    """
+    if int(price) == price:
+        return '{}{} {}'.format(symbol, int(price), code)
+    return '{}{:0.2f} {}'.format(symbol, price, code)
+
+
+def get_localized_price_text(price, request):
+    """
+    Returns the localized converted price as string (ex. '$150 USD')
+
+    If the users location has been added to the request, this will return the given price based on conversion rate
+    from the Catalog service and return a localized string otherwise will return the default price in USD
+    """
+    user_currency = {
+        'symbol': '$',
+        'rate': 1,
+        'code': 'USD'
+    }
+
+    # session.country_code is added via CountryMiddleware in the LMS
+    user_location = getattr(request, 'session', {}).get('country_code')
+
+    # Override default user_currency if location is available
+    if user_location and get_currency_data:
+        currency_data = get_currency_data()
+        user_country = pycountry.countries.get(alpha2=user_location)
+        user_currency = currency_data.get(user_country.alpha3, user_currency)
+
+    return format_price(
+        price=(price * user_currency['rate']),
+        symbol=user_currency['symbol'],
+        code=user_currency['code']
+    )
 
 
 def get_programs_with_type(site, include_hidden=True):
