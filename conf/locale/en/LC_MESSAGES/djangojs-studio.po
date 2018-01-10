@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:51+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.695735\n"
+"POT-Creation-Date: 2018-01-10 10:48+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.584473\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1278,6 +1278,32 @@ msgstr ""
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Image upload failed. "
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "The file could not be uploaded."
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Show"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Hide"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This file type is not supported. Supported file type is "
+"{supportedFileFormat}."
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 msgstr ""
 
 #: cms/static/js/views/xblock_editor.js

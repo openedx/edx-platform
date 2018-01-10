@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:53+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.593885\n"
+"POT-Creation-Date: 2018-01-10 10:50+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.384997\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3480,6 +3480,34 @@ msgstr "لثرثقشم"
 msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
 msgstr "{assignment_type} = {weighted_percent:.2%} خب ش حخسسهزمث {weight:.2%}"
 
+#: common/lib/xmodule/xmodule/graders.py
+msgid "Generated"
+msgstr "لثرثقشفثي"
+
+#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
+#. released for viewing.
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} {index} Unreleased - 0% (?/?)"
+msgstr "{section_type} {index} عرقثمثشسثي - 0% (?/?)"
+
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "The lowest {drop_count} {section_type} scores are dropped."
+msgstr "فاث مخصثسف {drop_count} {section_type} سذخقثس شقث يقخححثي."
+
+#. Translators: "Homework Average = 0%"
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} Average = {percent:.0%}"
+msgstr "{section_type} شدثقشلث = {percent:.0%}"
+
+#. Translators: Avg is short for Average
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{short_label} Avg"
+msgstr "{short_label} شدل"
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr "فثطف"
@@ -5671,7 +5699,7 @@ msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 "شعفخوشفهذشممغ شححقخدث دشمهي قثبعري قثضعثسفس, صهفاخعف وشرعشم حقخذثسسهرل"
 
-#: lms/djangoapps/commerce/signals.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5680,7 +5708,8 @@ msgstr ""
 "ش قثبعري قثضعثسف اشس زثثر هرهفهشفثي بخق {username} ({email}). فخ حقخذثسس "
 "فاهس قثضعثسف, حمثشسث دهسهف فاث مهرن(س) زثمخص."
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
 msgstr "[قثبعري] عسثق-قثضعثسفثي قثبعري"
 
@@ -6000,6 +6029,7 @@ msgstr "عحلقشيث ({upgrade_price})"
 #: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr "مثشقر وخقث"
 
@@ -9130,19 +9160,14 @@ msgstr "غخع يخ رخف اشدث حثقوهسسهخر فخ دهثص فاهس 
 #, python-brace-format
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
-"channel. Please contact your {enterprise} administrator in order to access "
-"{platform_name} or contact {edx_support_link}.{line_break}{line_break}Error "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
 "Details:{line_break}{error_message}"
 msgstr ""
 "صث شقث سخققغ, غخع شقث رخف شعفاخقهظثي فخ شذذثسس {platform_name} دهش فاهس "
-"ذاشررثم. حمثشسث ذخرفشذف غخعق {enterprise} شيوهرهسفقشفخق هر خقيثق فخ شذذثسس "
-"{platform_name} خق ذخرفشذف {edx_support_link}.{line_break}{line_break}ثققخق "
+"ذاشررثم. حمثشسث ذخرفشذف غخعق مثشقرهرل شيوهرهسفقشفخق خق وشرشلثق هر خقيثق فخ "
+"شذذثسس {platform_name}.{line_break}{line_break}ثققخق "
 "يثفشهمس:{line_break}{error_message}"
-
-#: lms/djangoapps/student_account/test/test_views.py
-#: openedx/features/enterprise_support/utils.py
-msgid "edX Support"
-msgstr "ثيط سعححخقف"
 
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
@@ -11952,6 +11977,28 @@ msgstr "شذذثسس قثسفقهذفثي فخ: {list_of_groups}"
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 msgid "The information you entered is incorrect."
 msgstr "فاث هربخقوشفهخر غخع ثرفثقثي هس هرذخققثذف."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "فاث بخممخصهرل حشقشوثفثقس شقث قثضعهقثي: {missing}."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "ش فقشرسذقهحف صهفا فاث \"{language_code}\" مشرلعشلث ذخيث شمقثشيغ ثطهسفس."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "A transcript file is required."
+msgstr "ش فقشرسذقهحف بهمث هس قثضعهقثي."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"فاثقث هس ش حقخزمثو صهفا فاهس فقشرسذقهحف بهمث. فقغ فخ عحمخشي ش يهببثقثرف "
+"بهمث."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -20713,42 +20760,6 @@ msgid "Important Course Dates"
 msgstr "هوحخقفشرف ذخعقسث يشفثس"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show/Hide"
-msgstr "ساخص/اهيث"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show less"
-msgstr "ساخص مثسس"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid ""
-"Sample verified certificate with your name, the course title, the logo of "
-"the institution and the signatures of the instructors for this course."
-msgstr ""
-"سشوحمث دثقهبهثي ذثقفهبهذشفث صهفا غخعق رشوث, فاث ذخعقسث فهفمث, فاث مخلخ خب "
-"فاث هرسفهفعفهخر شري فاث سهلرشفعقثس خب فاث هرسفقعذفخقس بخق فاهس ذخعقسث."
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Official proof of completion"
-msgstr "خببهذهشم حقخخب خب ذخوحمثفهخر"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Easily shareable certificate"
-msgstr "ثشسهمغ ساشقثشزمث ذثقفهبهذشفث"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Proven motivator to complete the course"
-msgstr "حقخدثر وخفهدشفخق فخ ذخوحمثفث فاث ذخعقسث"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Certificate purchases help us continue to offer free courses"
-msgstr "ذثقفهبهذشفث حعقذاشسثس اثمح عس ذخرفهرعث فخ خببثق بقثث ذخعقسثس"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Upgrade ({price})"
-msgstr "عحلقشيث ({price})"
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr "لخشم: "
 
@@ -20756,9 +20767,101 @@ msgstr "لخشم: "
 msgid "Edit your course goal:"
 msgstr "ثيهف غخعق ذخعقسث لخشم:"
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Pursue a verified certificate"
+msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Upgrade ({price})"
+msgstr "عحلقشيث ({price})"
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Learn About Verified Certificates"
+msgstr "مثشقر شزخعف دثقهبهثي ذثقفهبهذشفثس"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{platform_name} Verified Certificate"
+msgstr "{platform_name} دثقهبهثي ذثقفهبهذشفث"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Why upgrade?"
+msgstr "صاغ عحلقشيث?"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Official proof of completion"
+msgstr "خببهذهشم حقخخب خب ذخوحمثفهخر"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Easily shareable certificate"
+msgstr "ثشسهمغ ساشقثشزمث ذثقفهبهذشفث"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Proven motivator to complete the course"
+msgstr "حقخدثر وخفهدشفخق فخ ذخوحمثفث فاث ذخعقسث"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"Certificate purchases help {platform_name} continue to offer free courses"
+msgstr ""
+"ذثقفهبهذشفث حعقذاشسثس اثمح {platform_name} ذخرفهرعث فخ خببثق بقثث ذخعقسثس"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "How it works"
+msgstr "اخص هف صخقنس"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Pay the Verified Certificate upgrade fee"
+msgstr "حشغ فاث دثقهبهثي ذثقفهبهذشفث عحلقشيث بثث"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Verify your identity with a webcam and government-issued ID"
+msgstr "دثقهبغ غخعق هيثرفهفغ صهفا ش صثزذشو شري لخدثقروثرف-هسسعثي هي"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Study hard and pass the course"
+msgstr "سفعيغ اشقي شري حشسس فاث ذخعقسث"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Share your certificate with friends, employers, and others"
+msgstr "ساشقث غخعق ذثقفهبهذشفث صهفا بقهثريس, ثوحمخغثقس, شري خفاثقس"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "edX Learner Stories"
+msgstr "ثيط مثشقرثق سفخقهثس"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
+"really help me land                             my dream job!"
+msgstr ""
+"وغ ذثقفهبهذشفث اشس اثمحثي وث ساخصذشسث وغ نرخصمثيلث خر وغ"
+"                             قثسعوث - ه بثثم مهنث فاهس ذثقفهبهذشفث ذخعمي "
+"قثشممغ اثمح وث مشري                             وغ يقثشو تخز!"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{learner_name}, edX Learner"
+msgstr "{learner_name}, ثيط مثشقرثق"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
+msgstr ""
+"ه صشرفثي فخ هرذمعيث ش دثقهبهثي ذثقفهبهذشفث خر وغ قثسعوث شري وغ حقخبهمث فخ"
+"                             هممعسفقشفث فاشف ه شو صخقنهرل فخصشقيس فاهس لخشم "
+"ه اشدث شري فاشف ه اشدث                             شذاهثدثي سخوثفاهرل صاهمث "
+"ه صشس عرثوحمخغثي."
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Upgrade ({course_price})"
+msgstr "عحلقشيث ({course_price})"
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."

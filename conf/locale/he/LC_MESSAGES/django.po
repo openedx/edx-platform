@@ -38,6 +38,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dotanlaks <dotanlaks6@gmail.com>, 2014
@@ -14533,7 +14534,7 @@ msgstr "תוצאה"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
-msgstr "לוח הבקרה של CCX Coach"
+msgstr "לוח בקרה של מאמן CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Name your CCX"

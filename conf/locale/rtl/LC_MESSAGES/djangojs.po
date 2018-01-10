@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:47+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.877068\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.873858\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: common/static/bundles/Import.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/Import.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -204,6 +204,7 @@ msgstr "عحمخشيهرل"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
+#: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
@@ -1415,6 +1416,7 @@ msgstr "قثحمشذث صهفا"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Replace"
 msgstr "قثحمشذث"
@@ -2085,13 +2087,11 @@ msgstr "فاثقث صشس شر ثققخق عحيشفهرل غخعق لخشم."
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr "ساخص وخقث"
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show less"
 msgstr "ساخص مثسس"
 
@@ -6885,6 +6885,35 @@ msgstr "ذخعمي رخف عحمخشي فاث دهيثخ هوشلث بهمث"
 msgid "Image upload failed. "
 msgstr "هوشلث عحمخشي بشهمثي. "
 
+#: cms/static/js/views/video_transcripts.js
+msgid "The file could not be uploaded."
+msgstr "فاث بهمث ذخعمي رخف زث عحمخشيثي."
+
+#: cms/static/js/views/video_transcripts.js
+msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
+msgstr "{toggleShowTranscriptText} فقشرسذقهحفس ({totalTranscripts})"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Show"
+msgstr "ساخص"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Hide"
+msgstr "اهيث"
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This file type is not supported. Supported file type is "
+"{supportedFileFormat}."
+msgstr ""
+"فاهس بهمث فغحث هس رخف سعححخقفثي. سعححخقفثي بهمث فغحث هس "
+"{supportedFileFormat}."
+
+#: cms/static/js/views/video_transcripts.js
+#: cms/templates/js/video-transcripts.underscore
+msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+msgstr "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
 msgstr "ثيهفخق"
@@ -8935,6 +8964,40 @@ msgid "Create an Account."
 msgstr "ذقثشفث شر شذذخعرف."
 
 #: lms/templates/student_account/login.underscore
+msgid "Sign in to continue learning as {email}"
+msgstr "سهلر هر فخ ذخرفهرعث مثشقرهرل شس {email}"
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in to continue learning"
+msgstr "سهلر هر فخ ذخرفهرعث مثشقرهرل"
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You already have an edX account with your {enterprise_name} email address."
+msgstr ""
+"غخع شمقثشيغ اشدث شر ثيط شذذخعرف صهفا غخعق {enterprise_name} ثوشهم شييقثسس."
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"Going forward, your account information will be updated and maintained by "
+"{enterprise_name}."
+msgstr ""
+"لخهرل بخقصشقي, غخعق شذذخعرف هربخقوشفهخر صهمم زث عحيشفثي شري وشهرفشهرثي زغ "
+"{enterprise_name}."
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You can view your information or unlink from {enterprise_name} anytime in "
+"your Account Settings."
+msgstr ""
+"غخع ذشر دهثص غخعق هربخقوشفهخر خق عرمهرن بقخو {enterprise_name} شرغفهوث هر "
+"غخعق شذذخعرف سثففهرلس."
+
+#: lms/templates/student_account/login.underscore
+msgid "To continue learning with this account, sign in below."
+msgstr "فخ ذخرفهرعث مثشقرهرل صهفا فاهس شذذخعرف, سهلر هر زثمخص."
+
+#: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Sign In"
 msgstr "سهلر هر"
@@ -10847,6 +10910,7 @@ msgid "Component Location ID"
 msgstr "ذخوحخرثرف مخذشفهخر هي"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "يخصرمخشي"
@@ -10902,6 +10966,10 @@ msgstr "فاعوزرشهم"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "دهيثخ هي"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Transcripts"
+msgstr "فقشرسذقهحفس"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"
@@ -11404,6 +11472,18 @@ msgid ""
 msgstr ""
 "قثذخووثريثي هوشلث قثسخمعفهخر هس {imageResolution}, وشطهوعو هوشلث بهمث سهظث "
 "ساخعمي زث {maxFileSize} شري بخقوشف وعسف زث خرث خب {supportedImageFormats}."
+
+#: cms/templates/js/video-transcript-upload-status.underscore
+msgid "Read more"
+msgstr "قثشي وخقث"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "ساخص فقشرسذقهحفس ({totalTranscripts})"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "No transcript uploaded."
+msgstr "رخ فقشرسذقهحف عحمخشيثي."
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"

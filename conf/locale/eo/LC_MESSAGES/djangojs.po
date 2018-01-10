@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:47+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.877068\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.873858\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: common/static/bundles/Import.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/Import.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -226,6 +226,7 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
+#: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
@@ -1479,6 +1480,7 @@ msgstr "Répläçé wïth Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Replace"
 msgstr "Répläçé Ⱡ'σяєм ιρѕυм #"
@@ -2181,13 +2183,11 @@ msgstr ""
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show less"
 msgstr "Shöw léss Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -7746,6 +7746,39 @@ msgstr ""
 msgid "Image upload failed. "
 msgstr "Ìmägé üplöäd fäïléd.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: cms/static/js/views/video_transcripts.js
+msgid "The file could not be uploaded."
+msgstr "Thé fïlé çöüld nöt ßé üplöädéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
+msgstr ""
+"{toggleShowTranscriptText} tränsçrïpts ({totalTranscripts}) Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Show"
+msgstr "Shöw Ⱡ'σяєм ι#"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Hide"
+msgstr "Hïdé Ⱡ'σяєм ι#"
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This file type is not supported. Supported file type is "
+"{supportedFileFormat}."
+msgstr ""
+"Thïs fïlé týpé ïs nöt süppörtéd. Süppörtéd fïlé týpé ïs "
+"{supportedFileFormat}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/views/video_transcripts.js
+#: cms/templates/js/video-transcripts.underscore
+msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+msgstr ""
+"{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
 msgstr "Édïtör Ⱡ'σяєм ιρѕυ#"
@@ -9912,6 +9945,45 @@ msgid "Create an Account."
 msgstr "Çréäté än Àççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/student_account/login.underscore
+msgid "Sign in to continue learning as {email}"
+msgstr ""
+"Sïgn ïn tö çöntïnüé léärnïng äs {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in to continue learning"
+msgstr "Sïgn ïn tö çöntïnüé léärnïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You already have an edX account with your {enterprise_name} email address."
+msgstr ""
+"Ýöü älréädý hävé än édX äççöünt wïth ýöür {enterprise_name} émäïl äddréss. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"Going forward, your account information will be updated and maintained by "
+"{enterprise_name}."
+msgstr ""
+"Göïng förwärd, ýöür äççöünt ïnförmätïön wïll ßé üpdätéd änd mäïntäïnéd ßý "
+"{enterprise_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You can view your information or unlink from {enterprise_name} anytime in "
+"your Account Settings."
+msgstr ""
+"Ýöü çän vïéw ýöür ïnförmätïön ör ünlïnk fröm {enterprise_name} änýtïmé ïn "
+"ýöür Àççöünt Séttïngs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/student_account/login.underscore
+msgid "To continue learning with this account, sign in below."
+msgstr ""
+"Tö çöntïnüé léärnïng wïth thïs äççöünt, sïgn ïn ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Sign In"
 msgstr "Sïgn Ìn Ⱡ'σяєм ιρѕυм #"
@@ -12054,6 +12126,7 @@ msgid "Component Location ID"
 msgstr "Çömpönént Löçätïön ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "Döwnlöäd Ⱡ'σяєм ιρѕυм ∂#"
@@ -12112,6 +12185,10 @@ msgstr "Thümßnäïl Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "Vïdéö ÌD Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Transcripts"
+msgstr "Tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"
@@ -12692,6 +12769,18 @@ msgstr ""
 "Réçömméndéd ïmägé résölütïön ïs {imageResolution}, mäxïmüm ïmägé fïlé sïzé "
 "shöüld ßé {maxFileSize} änd förmät müst ßé öné öf {supportedImageFormats}. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/templates/js/video-transcript-upload-status.underscore
+msgid "Read more"
+msgstr "Réäd möré Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "Shöw tränsçrïpts ({totalTranscripts}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "No transcript uploaded."
+msgstr "Nö tränsçrïpt üplöädéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"
