@@ -317,10 +317,10 @@ class FieldData(object):
             # FIXME: Bug with Course Blocks API and student_view_data fixed by
             #  https://github.com/edx/edx-platform/pull/15905/commits/ae15e69a0ad52fec2f146176e418eb2e37f0ecb2
             # Will be brought in once McKinsey's apps have been updated.
-            # For now, only deployed where DEBUG=True, so QA can test.
+            # For now, only deployed where settings.FEATURES['ENABLE_STUDENT_VIEW_DATA_BUGFIX']=True, so QA can test.
             # See lms/djangoapps/course_api/blocks/transformers/tests/test_student_view.py
-            #   TestStudentViewTransformer.test_transform for affected test.
-            if settings.DEBUG:
+            #   TestStudentViewTransformer for affected tests.
+            if settings.FEATURES.get('ENABLE_STUDENT_VIEW_DATA_BUGFIX', False):
                 del self.fields[field_name]
             else:
                 delattr(self.fields, field_name)
