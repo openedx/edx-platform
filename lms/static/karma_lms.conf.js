@@ -62,7 +62,7 @@ var options = {
 options.specFiles
     .filter(function(file) { return file.webpack; })
     .forEach(function(file) {
-        options.preprocessors[file.pattern] = ['webpack', 'sourcemap', 'coverage'];
+        options.preprocessors[file.pattern] = ['webpack', 'sourcemap'];
     });
 
 module.exports = function(config) {
