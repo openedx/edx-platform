@@ -179,6 +179,54 @@ class TestProgramProgressMeter(TestCase):
         program = data[0]
         self.assertEqual(meter.engaged_programs, [program])
 
+    def test_single_program_multiple_entitlements(self, mock_get_programs):
+        """
+        Verify that the most recent entitlement is returned when a user has multiple for the same course
+        """
+        course_uuid = uuid.uuid4()
+        data = [
+            ProgramFactory(courses=[CourseFactory(uuid=str(course_uuid))]),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+        course_run_key = generate_course_run_key()
+        course_run_key2 = generate_course_run_key()
+
+        enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course_run_key,
+            mode=CourseMode.VERIFIED,
+            is_active=False
+        )
+        enrollment2 = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=course_run_key2,
+            mode=CourseMode.VERIFIED
+        )
+
+        CourseEntitlementFactory.create(
+            user=self.user,
+            course_uuid=course_uuid,
+            expired_at=datetime.datetime.now(utc),
+            mode=CourseMode.VERIFIED,
+            enrollment_course_run=enrollment
+
+        )
+        CourseEntitlementFactory.create(
+            user=self.user,
+            course_uuid=course_uuid,
+            mode=CourseMode.VERIFIED,
+            enrollment_course_run=enrollment2
+        )
+
+        meter = ProgramProgressMeter(self.site, self.user)
+        self._attach_detail_url(data)
+        self.assertEqual(len(meter.entitlements), 1)
+
+        entitlement = meter.entitlements[0]
+        self.assertIsNone(entitlement.expired_at)
+        self.assertEqual(entitlement.enrollment_course_run.course_id, enrollment2.course_id)
+
     def test_course_progress(self, mock_get_programs):
         """
         Verify that the progress meter can represent progress in terms of
