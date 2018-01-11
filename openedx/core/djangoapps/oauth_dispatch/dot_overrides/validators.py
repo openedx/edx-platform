@@ -5,12 +5,14 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
+import django
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from pytz import utc
+from ratelimitbackend.backends import RateLimitMixin
 
 from ..models import RestrictedApplication
 
@@ -27,6 +29,23 @@ def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disab
     is_application_restricted = RestrictedApplication.objects.filter(application=instance.application).exists()
     if is_application_restricted:
         RestrictedApplication.set_access_token_as_expired(instance)
+
+
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Allow users that are inactive to still authenticate while keeping rate-limiting functionality.
+if django.VERSION < (1, 10):
+    from django.contrib.auth.backends import ModelBackend as UserModelBackend
+else:
+    # Django 1.10+ disallows inactive users from authenticating unless using the backend below.
+    from django.contrib.auth.backends import AllowAllUsersModelBackend as UserModelBackend
+class EdxRateLimitedAllowAllUsersModelBackend(RateLimitMixin, UserModelBackend):
+    """
+    Authentication backend needed to incorporate rate limiting of logins - but also
+    enabling users with is_active of False in the Django auth_user model to still authenticate,
+    which is necessary for mobule users who have not activated their accounts.
+    See: https://openedx.atlassian.net/browse/TNL-4516
+    """
+    pass
 
 
 class EdxOAuth2Validator(OAuth2Validator):
