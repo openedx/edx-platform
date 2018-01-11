@@ -302,7 +302,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
     <div class="messages-list">
 
       % if entitlement and not entitlement_expired_at:
-        <div class="course-entitlement-selection-container ${'' if is_unfulfilled_entitlement else 'hidden'}"></div>
+        <div class="course-entitlement-selection-container${' ' if is_unfulfilled_entitlement else ' hidden '}bootstrap"></div>
         <%static:require_module module_name="js/learner_dashboard/course_entitlement_factory" class_name="EntitlementFactory">
           EntitlementFactory({
               el: '${ '#course-card-' + str(course_card_index) + ' .course-entitlement-selection-container' | n, js_escaped_string }',
