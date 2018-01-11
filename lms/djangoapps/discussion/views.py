@@ -559,7 +559,6 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': context['annotated_content_info'],
             })
         else:
-            print context
             return render_to_response('discussion/discussion_profile_page.html', context)
     except User.DoesNotExist:
         raise Http404

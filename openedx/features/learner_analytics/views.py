@@ -45,12 +45,11 @@ class LearnerAnalyticsView(View):
         self.analytics_client = Client(base_url=settings.ANALYTICS_API_URL, auth_token=settings.ANALYTICS_API_KEY)
 
     @method_decorator(login_required)
-    @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
     def get(self, request, course_id):
         """
-        Displays the user's bookmarks for the specified course.
+        Displays the user's Learner Analytics for the specified course.
 
         Arguments:
             request: HTTP request
@@ -64,12 +63,10 @@ class LearnerAnalyticsView(View):
         grading_policy = course.grading_policy
 
         (grade_data, answered_percent) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
-        schedule_data = self.get_schedule(request, course_key)
-        (grade_data, schedule_data) = self.verify_assignment_orders(grade_data, schedule_data)
+        schedule_data = self.get_assignments_with_due_date(request, course_key)
+        (grade_data, schedule_data) = self.sort_grade_and_schedule_data(grade_data, schedule_data)
 
-        # Render the course bookmarks page
         context = {
-            'csrf': csrf(request)['csrf_token'],
             'course': course,
             'course_url': course_url,
             'disable_courseware_js': True,
@@ -82,7 +79,7 @@ class LearnerAnalyticsView(View):
             'assignment_schedule': schedule_data,
             'profile_image_urls': get_profile_image_urls_for_user(request.user, request),
             'discussion_info': self.get_discussion_data(request, course_key),
-            'weekly_active_users': self.get_weekly_course_activities(course_key),
+            'weekly_active_users': self.get_weekly_course_activity_count(course_key),
             'week_streak': self.consecutive_weeks_of_course_activity_for_user(
                 request.user.username, course_key
             )
@@ -95,8 +92,9 @@ class LearnerAnalyticsView(View):
         Collects and formats the grades data for a particular user and course.
 
         Args:
-            user: User
-            course_key: CourseKey
+            user (User)
+            course_key (CourseKey)
+            grade_cutoffs: # TODO: LEARNER-3854: Complete docstring if implementing Learner Analytics.
         """
         course_grade = CourseGradeFactory().read(user, course_key=course_key)
         grades = []
@@ -127,9 +125,9 @@ class LearnerAnalyticsView(View):
             answered_percent = float(total_earned) / total_possible
         return (grades, answered_percent)
 
-    def verify_assignment_orders(self, grade_data, schedule_data):
+    def sort_grade_and_schedule_data(self, grade_data, schedule_data):
         """
-        Verify that the assignments in grade_data and schedule_data are in the same order.
+        Sort the assignments in grade_data and schedule_data to be in the same order.
         """
         schedule_dict = {assignment['location']: assignment for assignment in schedule_data}
 
@@ -148,12 +146,14 @@ class LearnerAnalyticsView(View):
         Collects and formats the discussion data from a particular user and course.
 
         Args:
-            user: User
-            course_key: CourseKey
+            request (HttpRequest)
+            course_key (CourseKey)
         """
         context = create_user_profile_context(request, course_key, request.user.id)
         threads = context['threads']
         profiled_user = context['profiled_user']
+
+        # TODO: LEARNER-3854: If implementing Learner Analytics, rename to content_authored_count.
         content_authored = profiled_user['threads_count'] + profiled_user['comments_count']
         thread_votes = 0
         for thread in threads:
@@ -165,13 +165,14 @@ class LearnerAnalyticsView(View):
         }
         return discussion_data
 
-    def get_schedule(self, request, course_key):
+    def get_assignments_with_due_date(self, request, course_key):
         """
-        Get the schedule of graded assignments in the course.
+        Returns a list of assignment (graded) blocks with due dates, including
+        due date and location.
 
         Args:
-            request: HttpRequest
-            course_key: CourseKey
+            request (HttpRequest)
+            course_key (CourseKey)
         """
         course_usage_key = modulestore().make_course_usage_key(course_key)
         all_blocks = get_blocks(
@@ -182,21 +183,21 @@ class LearnerAnalyticsView(View):
             requested_fields=['display_name', 'due', 'graded', 'format'],
             block_types_filter=['sequential']
         )
-        graded_blocks = []
+        assignment_blocks = []
         for (location, block) in all_blocks['blocks'].iteritems():
             if block.get('graded', False) and block.get('due') is not None:
-                graded_blocks.append(block)
+                assignment_blocks.append(block)
                 block['due'] = block['due'].isoformat()
                 block['location'] = unicode(location)
 
-        return graded_blocks
+        return assignment_blocks
 
-    def get_weekly_course_activities(self, course_key):
+    def get_weekly_course_activity_count(self, course_key):
         """
-        Get the count of any course activity from previous 7 days
+        Get the count of any course activity (total for all users) from previous 7 days.
 
         Args:
-            course_key: CourseKey
+            course_key (CourseKey)
         """
         cache_key = 'learner_analytics_{course_key}_weekly_activities'.format(course_key=course_key)
         activities = cache.get(cache_key)
@@ -220,8 +221,8 @@ class LearnerAnalyticsView(View):
         Get the most recent count of consecutive days that a user has performed a course activity
 
         Args:
-            username: Username
-            course_key: CourseKey
+            username (str)
+            course_key (CourseKey)
         """
         cache_key = 'learner_analytics_{username}_{course_key}_engagement_timeline'\
             .format(username=username, course_key=course_key)
@@ -261,7 +262,7 @@ class LearnerAnalyticsView(View):
         check to see if any of those days had any activity.
 
         Args:
-            daily_activities: list of dictionaries containing activities and their counts
+            daily_activities: sorted list of dictionaries containing activities and their counts
         """
         week_streak = 0
         seven_day_buckets = [daily_activities[i:i + 7] for i in range(0, len(daily_activities), 7)]
