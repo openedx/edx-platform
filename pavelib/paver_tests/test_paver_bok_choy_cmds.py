@@ -193,7 +193,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
 
     def test_default(self):
         suite = Pa11yCrawler(
-            'pa11ycrawler', course_key="course-v1:edX+Test101+course",
+            'pa11ycrawler', course_key="course-v1:edX+TC102+course",
         )
         ignore = (
             "pa11y_ignore_rules_url="
@@ -207,7 +207,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
             "-a",
             "port=8003",
             "-a",
-            "course_key=course-v1:edX+Test101+course",
+            "course_key=course-v1:edX+TC102+course",
             "-a",
             ignore,
             "-a",
@@ -244,9 +244,9 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         else:
             self._mock_sh.assert_has_calls([
                 call(
-                    'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=downloaded_to)),
+                    'wget {targz} -O {dir}supported_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=downloaded_to)),
                 call(
-                    'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=downloaded_to)),
+                    'tar zxf {dir}supported_course.tar.gz -C {dir}'.format(dir=downloaded_to)),
             ])
 
     @patch("pavelib.utils.test.suites.bokchoy_suite.path")

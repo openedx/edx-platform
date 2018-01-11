@@ -35,7 +35,7 @@ __test__ = False  # do not collect
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
 
-DEMO_COURSE_TAR_GZ = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
+DEMO_COURSE_TAR_GZ = "http://api.github.com/repos/edx/supported-components/tarball/master"
 DEMO_COURSE_IMPORT_DIR = path('test_root/courses/')
 
 
@@ -108,7 +108,7 @@ def get_test_course(options):
     options.imports_dir = DEMO_COURSE_IMPORT_DIR
 
     options.imports_dir.makedirs_p()
-    zipped_course = options.imports_dir + 'demo_course.tar.gz'
+    zipped_course = options.imports_dir + 'supported_course.tar.gz'
 
     msg = colorize('green', "Fetching the test course from github...")
     print msg

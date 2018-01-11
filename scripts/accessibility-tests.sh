@@ -12,4 +12,5 @@ SELENIUM_BROWSER=phantomjs paver test_a11y
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
 echo "Running pa11ycrawler against test course..."
+pip install ubcpi-xblock
 paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
