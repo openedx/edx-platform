@@ -191,5 +191,5 @@ class RefundableTest(SharedModuleStoreTestCase):
             )
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
-        resp = self.client.post(reverse('student.views.dashboard', args=[]))
+        resp = self.client.post(reverse('dashboard', args=[]))
         self.assertEqual(resp.status_code, 200)
