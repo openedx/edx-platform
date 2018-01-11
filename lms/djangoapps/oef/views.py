@@ -21,9 +21,9 @@ def oef_dashboard(request):
     for survey in user_surveys:
         surveys.append({
             'id': survey.id,
-            'started_on': survey.started_on.strftime('%m/%d/%Y'),
-            'completed_on': survey.completed_on.strftime('%m/%d/%Y') if survey.completed_on else '',
-            'status': survey.status
+            'started_on': survey.start_date.strftime('%m/%d/%Y'),
+            'completed_on': survey.finish_date.strftime('%m/%d/%Y') if survey.finish_date else '',
+            'status': 'Draft' if not survey.finish_date else 'Finished'
         })
 
     return render(request, 'oef/oef-org.html', {'surveys': surveys, 'error': user_survey_status['error']})
@@ -44,16 +44,16 @@ def get_survey_by_id(request, user_survey_id):
     """
     Get a particular survey by its id
     """
-    pass
-    # uos = UserOefSurvey.objects.get(id=int(user_survey_id), user_id=request.user.id)
-    # survey = uos.survey
-    # topics = get_survey_topics(uos, survey.id)
-    # levels = get_option_levels()
-    # return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
-    #                                                "is_completed": uos.status == 'completed',
-    #                                                "topics": topics,
-    #                                                "levels": levels
-    #                                                })
+
+    uos = OrganizationOefScore.objects.get(id=int(user_survey_id), user_id=request.user.id)
+    survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
+    topics = get_survey_topics(uos, survey.id)
+    levels = get_option_levels()
+    return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "is_completed": bool(uos.finish_date),
+                                                   "topics": topics,
+                                                   "levels": levels
+                                                   })
 
 
 @login_required
@@ -87,9 +87,11 @@ def save_answer(request):
 
     for answer_data in data['answers']:
         setattr(uos, answer_data['score_name'], int(float(answer_data['answer_id'])))
-        uos.save()
 
-    # check_if_complete(uos, len(data['answers']))
+    if data['is_complete']:
+        uos.finish_date = datetime.date.today()
+    uos.save()
+
     return JsonResponse({
         'status': 'success'
     }, status=status.HTTP_201_CREATED)

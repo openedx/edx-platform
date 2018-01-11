@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 
-from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, UserAnswers, OptionLevel, \
+from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, OptionLevel, \
     OrganizationOefScore
 from oef.messages import NON_APPLICABLE_OEF, PENDING_DRAFT
 
@@ -74,9 +74,6 @@ def get_user_survey(user, latest_survey):
     return uos
 
 
-def is_answered(uos, question_id):
-    return UserAnswers.objects.filter(user_survey_id=uos.id).filter(question_id=question_id).exists()
-
 
 def get_survey_topics(uos, survey_id):
     topics = TopicQuestion.objects.filter(survey_id=survey_id)
@@ -102,13 +99,3 @@ def get_option_levels():
 
 def get_option(option_value):
     return OptionLevel.objects.get(value=option_value)
-
-
-def check_if_complete(uos, answers_count):
-    """
-    Check if the survey has been completed
-    if yes, mark it complete
-    """
-    if uos.survey.topics.count() == answers_count:
-        uos.finish_date = datetime.date.today()
-        uos.save()
