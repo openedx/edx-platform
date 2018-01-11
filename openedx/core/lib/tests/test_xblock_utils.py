@@ -8,7 +8,7 @@ import uuid
 import ddt
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies

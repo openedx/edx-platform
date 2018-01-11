@@ -20,9 +20,9 @@ from django.utils.html import escape
 from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
-from xblock.fragment import Fragment
 from xblock.scorable import ScorableXBlockMixin
 
 from xmodule.seq_module import SequenceModule
@@ -38,7 +38,7 @@ def wrap_fragment(fragment, new_content):
     as its content, and all of the resources from fragment
     """
     wrapper_frag = Fragment(content=new_content)
-    wrapper_frag.add_frag_resources(fragment)
+    wrapper_frag.add_fragment_resources(fragment)
     return wrapper_frag
 
 
@@ -224,7 +224,7 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
         redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
         the end of this URL at re-write time
 
-    output: a new :class:`~xblock.fragment.Fragment` that modifies `frag` with
+    output: a new :class:`~web_fragments.fragment.Fragment` that modifies `frag` with
         content that has been update with /jump_to_id links replaced
     """
     return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))

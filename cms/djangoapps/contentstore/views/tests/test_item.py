@@ -14,11 +14,11 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import Location
 from pyquery import PyQuery
 from pytz import UTC
+from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope, ScopeIds, String
-from xblock.fragment import Fragment
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage

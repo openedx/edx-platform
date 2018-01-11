@@ -18,9 +18,9 @@ from xmodule.modulestore.inheritance import UserPartitionList
 from lxml import etree
 from six import text_type
 
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String, ReferenceValueDict
-from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -218,7 +218,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             child_descriptor = self.get_child_descriptor_by_location(child_location)
             child = self.system.get_module(child_descriptor)
             rendered_child = child.render(STUDENT_VIEW, context)
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
 
             if updated_group_id is None:  # inactive group
@@ -300,7 +300,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                         DEFAULT_GROUP_NAME.format(group_id=group_id),
                         group_name
                     )
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
             html = html + rendered_child.content
 
         return html
@@ -322,7 +322,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                 'child_content': child_fragment.content,
                 'child_id': self.child.scope_ids.usage_id,
             }))
-            fragment.add_frag_resources(child_fragment)
+            fragment.add_fragment_resources(child_fragment)
             fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_student.js'))
             fragment.initialize_js('SplitTestStudentView')
             return fragment

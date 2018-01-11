@@ -22,6 +22,7 @@ import pymongo
 from pytz import UTC
 from shutil import rmtree
 from tempfile import mkdtemp
+from web_fragments.fragment import Fragment
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -33,7 +34,6 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String, ScopeIds
-from xblock.fragment import Fragment
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 

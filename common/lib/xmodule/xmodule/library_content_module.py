@@ -14,10 +14,10 @@ from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
 from six import text_type
+from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
-from xblock.fragment import Fragment
 
 from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
@@ -325,7 +325,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         for child in self._get_selected_child_blocks():
             for displayable in child.displayable_items():
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
-                fragment.add_frag_resources(rendered_child)
+                fragment.add_fragment_resources(rendered_child)
                 contents.append({
                     'id': text_type(displayable.location),
                     'content': rendered_child.content,

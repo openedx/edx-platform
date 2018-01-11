@@ -12,8 +12,8 @@ import uuid
 import ddt
 import mock
 from django.core.urlresolvers import reverse
+from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
-from xblock.fragment import Fragment
 
 from course_api.blocks.tests.helpers import deserialize_usage_key
 from courseware.module_render import get_module_for_descriptor_internal

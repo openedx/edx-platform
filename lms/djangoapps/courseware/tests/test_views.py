@@ -26,9 +26,9 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from pytz import UTC
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 
 import courseware.views.views as views
 import shoppingcart

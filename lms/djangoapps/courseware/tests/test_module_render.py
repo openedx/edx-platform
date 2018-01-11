@@ -27,11 +27,11 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
-from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory

@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import get_language_bidi
 from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
