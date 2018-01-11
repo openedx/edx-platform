@@ -691,7 +691,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                          })
     effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
                                      required=False,
-                                     label=ugettext_noop('End date of lat Fiscal Year'),
+                                     label=ugettext_noop('End date of last Fiscal Year'),
                                      label_suffix='*')
 
     def __init__(self,  *args, **kwargs):
