@@ -524,12 +524,12 @@ OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
     'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
     'SCOPES': {
-        'read': 'Read scope',
-        'write': 'Write scope',
-        'email': 'Email scope',
+        'read': 'Read access',
+        'write': 'Write access',
+        'email': 'Know your email address',
         # conform profile scope message that is presented to end-user
         # to lms/templates/provider/authorize.html. This may be revised later.
-        'profile': 'Read your user profile',
+        'profile': 'Know your name and username',
     },
 }
 # This is required for the migrations in oauth_dispatch.models
