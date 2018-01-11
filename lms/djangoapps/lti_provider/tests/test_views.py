@@ -45,14 +45,18 @@ COURSE_PARAMS = {
 ALL_PARAMS = dict(LTI_DEFAULT_PARAMS.items() + COURSE_PARAMS.items())
 
 
-def build_launch_request():
+def build_launch_request(extra_post_data=None, param_to_delete=None):
     """
     Helper method to create a new request object for the LTI launch.
     """
-    request = RequestFactory().post('/')
+    if extra_post_data is None:
+        extra_post_data = {}
+    post_data = dict(LTI_DEFAULT_PARAMS.items() + extra_post_data.items())
+    if param_to_delete:
+        del post_data[param_to_delete]
+    request = RequestFactory().post('/', data=post_data)
     request.user = UserFactory.create()
     request.session = {}
-    request.POST.update(LTI_DEFAULT_PARAMS)
     return request
 
 
@@ -110,8 +114,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         """
         Helper method to remove a parameter from the LTI launch and call the view
         """
-        request = build_launch_request()
-        del request.POST[missing_param]
+        request = build_launch_request(param_to_delete=missing_param)
         return views.lti_launch(request, None, None)
 
     def test_launch_with_missing_parameters(self):
@@ -152,8 +155,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
         self.mock_verify.return_value = False
 
-        request = build_launch_request()
-        request.POST.update(LTI_OPTIONAL_PARAMS)
+        request = build_launch_request(LTI_OPTIONAL_PARAMS)
         with self.assertNumQueries(3):
             views.lti_launch(request, None, None)
         consumer = models.LtiConsumer.objects.get(
