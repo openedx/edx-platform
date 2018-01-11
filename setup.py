@@ -27,7 +27,6 @@ setup(
             "external_link = lms.djangoapps.courseware.tabs:ExternalLinkCourseTab",
             "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookTabs",
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardTab",
-            "learner_analytics = openedx.features.learner_analytics.views:LearnerAnalyticsTab",
             "notes = lms.djangoapps.notes.views:NotesTab",
             "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookTabs",
             "progress = lms.djangoapps.courseware.tabs:ProgressTab",
