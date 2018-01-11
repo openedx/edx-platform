@@ -92,7 +92,9 @@ def compute_fingerprint(path_list):
         if os.path.isfile(path_item):
             with open(path_item, "rb") as file_handle:
                 hasher.update(file_handle.read())
+                print "current hash w/ {} is: {}".format(path_item, hasher.hexdigest())
 
+    print "Final hash is: {}".format(hasher.hexdigest())
     return hasher.hexdigest()
 
 
