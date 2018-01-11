@@ -31,6 +31,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.features.course_experience import default_course_url_name
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 log = logging.getLogger(__name__)
 
@@ -79,6 +80,7 @@ class LearnerAnalyticsView(View):
             'assignment_grades': grade_data,
             'answered_percent': answered_percent,
             'assignment_schedule': schedule_data,
+            'profile_image_urls': get_profile_image_urls_for_user(request.user, request),
             'discussion_info': self.get_discussion_data(request, course_key),
             'weekly_active_users': self.get_weekly_course_activities(course_key),
             'week_streak': self.consecutive_weeks_of_course_activity_for_user(
