@@ -272,14 +272,14 @@ class InterestsForm(BaseOnboardingForm):
 
         interested_learners_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTED_LEARNERS_LABELS)
         self.fields['interested_learners'] = forms.ChoiceField(
-            label=ugettext_noop('Which type of other Philanthropy University learners are interesting to you? '
+            label=ugettext_noop('Which types of other Philanthropy University learners are interesting to you? '
                                 '(Check all that apply.)'),
             choices=interested_learners_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
         personal_goal_choices = get_sorted_choices_from_dict(UserExtendedProfile.GOALS_LABELS)
         self.fields['personal_goals'] = forms.ChoiceField(
-            label=ugettext_noop('What is your most important personal goals in joining Philanthropy University? '
+            label=ugettext_noop('What is your most important personal goal in joining Philanthropy University? '
                                 '(Check all that apply.)'),
             choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
