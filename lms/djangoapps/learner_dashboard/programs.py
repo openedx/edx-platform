@@ -1,6 +1,8 @@
 """
 Fragments for rendering programs.
 """
+import json
+
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
@@ -30,11 +32,12 @@ class ProgramsFragmentView(EdxFragmentView):
         Render the program listing fragment.
         """
         user = request.user
+        mobile_only = json.loads(request.GET.get('mobile_only', 'false'))
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
         if not programs_config.enabled or not user.is_authenticated():
             raise Http404
 
-        meter = ProgramProgressMeter(request.site, user)
+        meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
 
         context = {
             'marketing_url': get_program_marketing_url(programs_config),
