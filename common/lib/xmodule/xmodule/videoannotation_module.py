@@ -5,8 +5,8 @@ import textwrap
 
 from lxml import etree
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
 from xblock.core import Scope, String
-from xblock.fragment import Fragment
 
 from xmodule.annotator_mixin import get_extension, get_instructions
 from xmodule.annotator_token import retrieve_token

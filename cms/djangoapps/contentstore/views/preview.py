@@ -9,9 +9,9 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
-from xblock.fragment import Fragment
 from xblock.runtime import KvsFieldData
 
 import static_replace
@@ -130,14 +130,14 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
         position_for_asides = '<!-- footer for xblock_aside -->'
         result = Fragment()
-        result.add_frag_resources(frag)
+        result.add_fragment_resources(frag)
 
         for aside, aside_fn in aside_frag_fns:
             aside_frag = aside_fn(block, context)
             if aside_frag.content != u'':
                 aside_frag_wrapped = self.wrap_aside(block, aside, view_name, aside_frag, context)
                 aside.save()
-                result.add_frag_resources(aside_frag_wrapped)
+                result.add_fragment_resources(aside_frag_wrapped)
                 replacement = position_for_asides + aside_frag_wrapped.content
                 frag.content = frag.content.replace(position_for_asides, replacement)
 

@@ -11,8 +11,8 @@ from pkg_resources import resource_string
 from six import text_type
 
 from opaque_keys.edx.locator import BlockUsageLocator
+from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
-from xblock.fragment import Fragment
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_module import SequenceDescriptor

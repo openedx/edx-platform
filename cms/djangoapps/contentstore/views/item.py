@@ -18,9 +18,9 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
-from xblock.fragment import Fragment
 
 import dogstats_wrapper as dog_stats_api
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
@@ -87,7 +87,7 @@ highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
 
 def hash_resource(resource):
     """
-    Hash a :class:`xblock.fragment.FragmentResource`.
+    Hash a :class:`web_fragments.fragment.FragmentResource`.
     """
     md5 = hashlib.md5()
     md5.update(repr(resource))
