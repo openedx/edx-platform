@@ -36,7 +36,6 @@ CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
-
 ############### ALWAYS THE SAME ################################
 
 DEBUG = False
@@ -560,6 +559,11 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
+
+####################### Plugin Settings ##########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.AWS)
 
 ########################## Derive Any Derived Settings  #######################
 

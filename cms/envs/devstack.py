@@ -143,6 +143,10 @@ JWT_AUTH.update({
     'JWT_AUDIENCE': 'lms-key',
 })
 
+#####################################################################
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.DEVSTACK)
+
 ###############################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):

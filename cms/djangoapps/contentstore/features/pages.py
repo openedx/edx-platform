@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 # pylint: disable=unused-argument
+# pylint: disable=no-member
 
 from lettuce import step, world
 from nose.tools import assert_equal, assert_in

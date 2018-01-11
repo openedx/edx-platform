@@ -1008,9 +1008,6 @@ INSTALLED_APPS = [
     'require',
     'webpack_loader',
 
-    # Theming
-    'openedx.core.djangoapps.theming.apps.ThemingConfig',
-
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 
@@ -1122,10 +1119,6 @@ INSTALLED_APPS = [
 
     # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
-
-    # Dynamic schedules
-    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
-    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
 
     # DRF filters
     'django_filters',
@@ -1504,3 +1497,10 @@ ZENDESK_CUSTOM_FIELDS = {}
 # Once a user has watched this percentage of a video, mark it as complete:
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+
+
+############## Installed Django Apps #########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+INSTALLED_APPS.extend(DjangoAppRegistry.get_plugin_apps(ProjectType.CMS))
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.COMMON)
