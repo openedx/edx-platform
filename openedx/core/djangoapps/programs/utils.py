@@ -82,6 +82,7 @@ class ProgramProgressMeter(object):
     def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False):
         self.site = site
         self.user = user
+        self.mobile_only = mobile_only
 
         self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
         self.enrollments.sort(key=lambda e: e.created, reverse=True)
@@ -106,7 +107,7 @@ class ProgramProgressMeter(object):
         if uuid:
             self.programs = [get_programs(self.site, uuid=uuid)]
         else:
-            self.programs = attach_program_detail_url(get_programs(self.site), mobile_only)
+            self.programs = attach_program_detail_url(get_programs(self.site), self.mobile_only)
 
     def invert_programs(self):
         """Intersect programs and enrollments.
@@ -407,9 +408,11 @@ class ProgramDataExtender(object):
         program_data (dict): Representation of a program.
         user (User): The user whose enrollments to inspect.
     """
-    def __init__(self, program_data, user):
+    def __init__(self, program_data, user, mobile_only=False):
         self.data = program_data
         self.user = user
+        self.mobile_only = mobile_only
+        self.data.update({'is_mobile_only': self.mobile_only})
 
         self.course_run_key = None
         self.course_overview = None
@@ -452,7 +455,10 @@ class ProgramDataExtender(object):
         ) if certificate_uuid else None
 
     def _attach_course_run_course_url(self, run_mode):
-        run_mode['course_url'] = reverse('course_root', args=[self.course_run_key])
+        if self.mobile_only:
+            run_mode['course_url'] = 'edxapp://enrolled_course_info?course_id={}'.format(run_mode.get('key'))
+        else:
+            run_mode['course_url'] = reverse('course_root', args=[self.course_run_key])
 
     def _attach_course_run_enrollment_open_date(self, run_mode):
         run_mode['enrollment_open_date'] = strftime_localized(self.enrollment_start, 'SHORT_DATE')
@@ -497,6 +503,9 @@ class ProgramDataExtender(object):
 
     def _attach_course_run_may_certify(self, run_mode):
         run_mode['may_certify'] = self.course_overview.may_certify()
+
+    def _attach_course_run_is_mobile_only(self, run_mode):
+        run_mode['is_mobile_only'] = self.mobile_only
 
     def _filter_out_courses_with_entitlements(self, courses):
         """
@@ -670,7 +679,6 @@ def get_certificates(user, extended_program):
     return certificates
 
 
-# pylint: disable=missing-docstring
 class ProgramMarketingDataExtender(ProgramDataExtender):
     """
     Utility for extending program data meant for the program marketing page which lives in the

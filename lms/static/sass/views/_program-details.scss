@@ -352,7 +352,7 @@
         margin-bottom: 0;
       }
 
-      button {
+      button, .enroll-course-button {
         background-color: palette(primary, dark);
         height: 37px;
         width: 128px;
@@ -370,6 +370,10 @@
         @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
           @include float(right);
         }
+      }
+
+      .enroll-course-button {
+        padding: 7px 18.5px 0 18.5px;
       }
     }
 

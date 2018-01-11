@@ -20,7 +20,7 @@
                     <div><%- gettext('To complete the program, you must earn a verified certificate for each course.') %></div>
                 </div>
             <% } %>
-            <% if (is_learner_eligible_for_one_click_purchase) { %>
+            <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
             <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program">
                 <%- gettext('Upgrade All Remaining Courses (')%>
                 <% if (discount_data.is_discounted) { %>

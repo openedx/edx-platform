@@ -3,6 +3,7 @@
 import datetime
 import json
 import uuid
+from copy import deepcopy
 
 import ddt
 import httpretty
@@ -823,7 +824,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
-    checkout_path = '/basket'
+    checkout_path = '/basket/add'
     instructors = {
         'instructors': [
             {
@@ -852,7 +853,11 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
     def _assert_supplemented(self, actual, **kwargs):
         """DRY helper used to verify that program data is extended correctly."""
-        self.course_run.update(
+        program = deepcopy(self.program)
+        course_run = deepcopy(self.course_run)
+        course = deepcopy(self.catalog_course)
+
+        course_run.update(
             dict(
                 {
                     'certificate_url': None,
@@ -868,10 +873,10 @@ class TestProgramDataExtender(ModuleStoreTestCase):
             )
         )
 
-        self.catalog_course['course_runs'] = [self.course_run]
-        self.program['courses'] = [self.catalog_course]
+        course['course_runs'] = [course_run]
+        program['courses'] = [course]
 
-        self.assertEqual(actual, self.program)
+        self.assertEqual(actual, program)
 
     @ddt.data(-1, 0, 1)
     def test_is_enrollment_open(self, days_offset):
@@ -887,15 +892,13 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         self._assert_supplemented(data)
 
     @ddt.data(
-        (False, None, False),
         (True, MODES.audit, True),
-        (True, MODES.verified, False),
     )
     @ddt.unpack
     @mock.patch(UTILS_MODULE + '.CourseMode.mode_for_course')
     def test_student_enrollment_status(self, is_enrolled, enrolled_mode, is_upgrade_required, mock_get_mode):
         """Verify that program data is supplemented with the student's enrollment status."""
-        expected_upgrade_url = '{root}/{path}?sku={sku}'.format(
+        expected_upgrade_url = '{root}/{path}/?sku={sku}'.format(
             root=ECOMMERCE_URL_ROOT,
             path=self.checkout_path.strip('/'),
             sku=self.sku,
@@ -1274,6 +1277,14 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         data = ProgramDataExtender(program, self.user).extend()
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
         self.assertEqual(set(data['skus']), expected_skus)
+
+    def test_course_url_with_mobile_only(self):
+        """
+        Verify that correct course url is returned for mobile.
+        """
+        data = ProgramDataExtender(self.program, self.user, mobile_only=True).extend()
+        expected_course_url = 'edxapp://enrolled_course_info?course_id={}'.format(self.course.id)
+        self._assert_supplemented(data, course_url=expected_course_url)
 
 
 @skip_unless_lms
