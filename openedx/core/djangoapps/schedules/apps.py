@@ -6,6 +6,8 @@ class SchedulesConfig(AppConfig):
     name = 'openedx.core.djangoapps.schedules'
     verbose_name = _('Schedules')
 
+    plugin_app = {}
+
     def ready(self):
         # noinspection PyUnresolvedReferences
         from . import signals, tasks  # pylint: disable=unused-variable
