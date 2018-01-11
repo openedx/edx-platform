@@ -21,6 +21,7 @@ from pavelib.utils.test.bokchoy_options import (
 )
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.timer import timed
+from pavelib.database import update_local_bokchoy_db_from_s3
 
 import os
 
@@ -135,8 +136,15 @@ def get_test_course(options):
 def reset_test_database():
     """
     Reset the database used by the bokchoy tests.
+
+    If the tests are being run on Jenkins, use the database cache automation
+    defined in pavelib/database.py
+    If not, reset the test database and apply migrations
     """
-    sh("{}/scripts/reset-test-db.sh --migrations".format(Env.REPO_ROOT))
+    if os.environ.get('USER', None) == 'jenkins':
+        update_local_bokchoy_db_from_s3()
+    else:
+        sh("{}/scripts/reset-test-db.sh --migrations".format(Env.REPO_ROOT))
 
 
 @task

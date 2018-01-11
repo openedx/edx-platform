@@ -43,6 +43,9 @@ for i in "$@"; do
         -m|--migrations)
             APPLY_MIGRATIONS=true
             ;;
+        -c|--calculate_migrations)
+            CALCULATE_MIGRATIONS=true
+            ;;
     esac
 done
 
@@ -50,6 +53,14 @@ declare -A databases
 declare -a database_order
 databases=(["default"]="edxtest" ["student_module_history"]="student_module_history_test")
 database_order=("default" "student_module_history")
+
+calculate_migrations() {
+    echo "Calculating migrations for fingerprinting."
+    output_file="common/test/db_cache/bok_choy_${db}_migrations.yaml"
+    # Redirect stdout to /dev/null because the script will print
+    # out all migrations to both stdout and the output file.
+    ./manage.py lms --settings $SETTINGS show_unapplied_migrations --database $db --output_file $output_file 1>/dev/null
+}
 
 run_migrations() {
     echo "Running the lms migrations on the $db bok_choy DB."
@@ -114,5 +125,9 @@ if [[ $REBUILD_CACHE ]]; then
 elif [[ $APPLY_MIGRATIONS ]]; then
     for db in "${database_order[@]}"; do
         run_migrations
+    done
+elif [[ $CALCULATE_MIGRATIONS ]]; then
+    for db in "${database_order[@]}"; do
+        calculate_migrations
     done
 fi
