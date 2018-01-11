@@ -8,7 +8,7 @@ class Discussions extends React.Component {
   }
 
   getComparisons() {
-    const {content_authored} = this.props;
+    const {content_authored, profileImages} = this.props;
     const content_average = 7;
     let average_percent = 1;
     let authored_percent = 0;
@@ -23,7 +23,7 @@ class Discussions extends React.Component {
 
     return (
       <div className="chart-wrapper">
-        {this.getCountChart(content_authored, authored_percent, 'You', 'http://localhost:18000/static/images/profiles/default_50.png')}
+        {this.getCountChart(content_authored, authored_percent, 'You', profileImages.medium)}
         {this.getCountChart(content_average, average_percent, 'Average graduate')}
       </div>
     );

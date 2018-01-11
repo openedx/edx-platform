@@ -299,16 +299,12 @@ $trophy-gold: #f39c12;
       display: flex;
       flex-flow: row wrap;
       align-items: baseline;
+
+      .user-count {
+        margin-top: -10px;
+      }
     }
   }
-
-  @include media-breakpoint-up(sm) { .analytics-group.sidebar { border-color: red; } }
-
-  @include media-breakpoint-up(md) { .analytics-group.sidebar { border-color: blue; } }
-
-  @include media-breakpoint-up(lg) { .analytics-group.sidebar { border-color: green; } }
-
-  @include media-breakpoint-up(xl) { .analytics-group.sidebar { border-color: black; } }
 
   @include media-breakpoint-up(md) {
     .analytics-group {

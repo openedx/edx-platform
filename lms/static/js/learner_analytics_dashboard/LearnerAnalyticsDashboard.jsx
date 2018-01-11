@@ -54,7 +54,7 @@ function getStreakString(count) {
 }
 
 export function LearnerAnalyticsDashboard(props) {
-  const {grading_policy, grades, schedule, week_streak, weekly_active_users, discussion_info} = props;
+  const {grading_policy, grades, schedule, week_streak, weekly_active_users, discussion_info, profile_images} = props;
   // temp. for local dev
   // const week_streak = 3;
   // const weekly_active_users = 83400;
@@ -98,11 +98,10 @@ export function LearnerAnalyticsDashboard(props) {
           <h3 className="section-heading">Graded Assessments</h3>
           <div className="graded-assessments-wrapper">
             <GradeTable assignmentTypes={assignmentTypes} grades={grades} />
-            <p className="footnote">*Calculated based on current average</p>
           </div>
         </div>
         <div className="analytics-group">
-          <Discussions {...discussion_info} />
+          <Discussions {...discussion_info} profileImages={profile_images} />
         </div>
       </div>
       <div className="analytics-group sidebar">
