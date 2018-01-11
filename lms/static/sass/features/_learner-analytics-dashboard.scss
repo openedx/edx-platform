@@ -263,16 +263,42 @@ $trophy-gold: #f39c12;
   }
 
   .count-chart {
+    position: relative;
+    min-height: 50px;
+    margin-bottom: 20px;
+    padding-left: 70px;
+
     .chart-bar {
       height: 10px;
       border-radius: 2px;
       background: $mint-green;
     }
 
+    .chart-icon {
+      width: 50px;
+      height: 50px;
+      background: $mint-green;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 24px;
+      padding-top: 13px;
+      color: white;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
     &:first-of-type {
-      .chart-bar {
+      .chart-bar,
+      .chart-icon {
         background: $trophy-gold;
       }
+    }
+
+    .chart-display {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: baseline;
     }
   }
 

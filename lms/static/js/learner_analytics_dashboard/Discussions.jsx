@@ -10,56 +10,41 @@ class Discussions extends React.Component {
   getComparisons() {
     const {content_authored} = this.props;
     const content_average = 7;
-    let average_percent = 100;
+    let average_percent = 1;
     let authored_percent = 0;
 
     if (content_average > content_authored) {
-      average_percent = 100;
-      authored_percent = ( content_authored / content_average ) * 100;
+      average_percent = 1;
+      authored_percent = content_authored / content_average;
     } else {
-      authored_percent = 100;
-      average_percent = ( content_average / content_authored ) * 100;
+      authored_percent = 1;
+      average_percent = content_average / content_authored;
     }
 
     return (
       <div className="chart-wrapper">
-        {this.getCountChart(content_authored, authored_percent + '%', 'You')}
-        {this.getCountChart(content_average, average_percent + '%', 'Average graduate')}
+        {this.getCountChart(content_authored, authored_percent, 'You', 'http://localhost:18000/static/images/profiles/default_50.png')}
+        {this.getCountChart(content_average, average_percent, 'Average graduate')}
       </div>
     );
   }
 
-  testComparisons(content_authored, content_average) {
-    let average_percent = 100;
-    let authored_percent = 0;
-
-    if (content_average > content_authored) {
-      average_percent = 100;
-      authored_percent = ( content_authored / content_average ) * 100;
-    } else {
-      authored_percent = 100;
-      average_percent = ( content_average / content_authored ) * 100;
-    }
-
-    return (
-      <div className="chart-wrapper">
-        {this.getCountChart(content_authored, authored_percent + '%', 'You')}
-        {this.getCountChart(content_average, average_percent + '%', 'Average graduate')}
-      </div>
-    );
-  }
-
-  getCountChart(count, percent, label) {
+  getCountChart(count, percent, label, img = false) {
     return (
       <div className="count-chart">
-        <span className="chart-icon" aria-hidden="true"></span>
+        <div className={classNames(
+                'chart-icon',
+                {'fa fa-graduation-cap': !img}
+              )}
+              style={{backgroundImage: !!img ? `url(${img})` : 'none'}}
+              aria-hidden="true"></div>
         <div className="chart-label">{label}</div>
         <div className="chart-display">
           <div className="chart-bar"
                aria-hidden="true"
-               style={{width: `calc(${percent})`}}></div>
+               style={{width: `calc((100% - 40px) * ${percent})`}}></div>
+          <span className="user-count">{count}</span>
         </div>
-        <span className="count">{count}</span>
       </div>
     );
   }
