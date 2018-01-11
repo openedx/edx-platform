@@ -21,11 +21,13 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
 from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params, unenroll_email
+from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment, CourseEnrollmentException
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+
 
 log = logging.getLogger("edx.ccx")
 
@@ -94,6 +96,27 @@ def get_date(ccx, node, date_type=None, parent_node=None):
         date = get_date(ccx, node=parent_node, date_type=date_type)
 
     return date
+
+
+def get_enrollment_action_and_identifiers(request):
+    """
+    Extracts action type and student identifiers from the request
+    on Enrollment tab of CCX Dashboard.
+    """
+    action, identifiers = None, None
+    student_action = request.POST.get('student-action', None)
+    batch_action = request.POST.get('enrollment-button', None)
+
+    if student_action:
+        action = student_action
+        student_id = request.POST.get('student-id', '')
+        identifiers = [student_id]
+    elif batch_action:
+        action = batch_action
+        identifiers_raw = request.POST.get('student-ids')
+        identifiers = _split_input_list(identifiers_raw)
+
+    return action, identifiers
 
 
 def validate_date(year, month, day, hour, minute):
@@ -208,16 +231,10 @@ def get_valid_student_with_email(identifier):
 
 def ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, coach):
     """
-    Function to enroll/add or unenroll/revoke students.
-
-    This function exists for backwards compatibility: in CCX there are
-    two different views to manage students that used to implement
-    a different logic. Now the logic has been reconciled at the point that
-    this function can be used by both.
-    The two different views can be merged after some UI refactoring.
+    Function to enroll or unenroll/revoke students.
 
     Arguments:
-        action (str): type of action to perform (add, Enroll, revoke, Unenroll)
+        action (str): type of action to perform (Enroll, Unenroll/revoke)
         identifiers (list): list of students username/email
         email_students (bool): Flag to send an email to students
         course_key (CCXLocator): a CCX course key
@@ -229,7 +246,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
     """
     errors = []
 
-    if action == 'Enroll' or action == 'add':
+    if action == 'Enroll':
         ccx_course_overview = CourseOverview.get_from_id(course_key)
         course_locator = course_key.to_course_locator()
         staff = CourseStaffRole(course_locator).users_with_role()

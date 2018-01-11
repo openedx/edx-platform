@@ -23,7 +23,7 @@ class CoachDashboardPage(CoursePage):
         """
         check if enrollment page in ccx dashboard is open.
         """
-        return self.q(css='div.batch-enrollment').present
+        return self.q(css='div.batch-enrollment-ccx').present
 
     def fill_ccx_name_text_box(self, ccx_name):
         """

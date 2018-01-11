@@ -592,10 +592,8 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
 
     @ddt.data(
-        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Enroll')),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll')),
-        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'add')),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add')),
+        ('ccx-manage-students', True, 1, 'student-ids', ('enrollment-button', 'Enroll')),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Enroll')),
     )
     @ddt.unpack
     def test_enroll_member_student(self, view_name, send_email, outbox_count, student_form_input_name, button_tuple):
@@ -656,7 +654,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ]
 
         url = reverse(
-            'ccx_invite',
+            'ccx-manage-students',
             kwargs={'course_id': ccx_course_key}
         )
         data = {
@@ -687,81 +685,11 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[5]).exists()
         )
 
-    def test_manage_student_enrollment_limit(self):
-        """
-        Enroll students up to the enrollment limit.
-
-        This test is specific to one of the enrollment views: the reason is because
-        the view used in this test cannot perform bulk enrollments.
-        """
-        students_limit = 1
-        self.make_coach()
-        staff = self.make_staff()
-        ccx = self.make_ccx(max_students_allowed=students_limit)
-        ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        students = [
-            UserFactory.create(is_staff=False) for _ in range(2)
-        ]
-
-        url = reverse(
-            'ccx_manage_student',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
-        )
-        # enroll the first student
-        data = {
-            'student-action': 'add',
-            'student-id': students[0].email,
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # a CcxMembership exists for this student
-        self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
-        )
-
-        # try to enroll the second student without success
-        # enroll the first student
-        data = {
-            'student-action': 'add',
-            'student-id': students[1].email,
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # a CcxMembership does not exist for this student
-        self.assertFalse(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[1]).exists()
-        )
-        error_message = 'The course is full: the limit is {students_limit}'.format(
-            students_limit=students_limit
-        )
-        self.assertContains(response, error_message, status_code=200)
-
-        # try to enroll the 3rd student which is staff
-        data = {
-            'student-action': 'add',
-            'student-id': staff.email,
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # staff gets enroll
-        self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=staff).exists()
-        )
-
-        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key), 1)
-
-        # asert that number of enroll is still 0 because staff and instructor do not count.
-        CourseEnrollment.enroll(staff, self.course.id)
-        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(self.course.id), 0)
-        # assert that handles  wrong ccx id code
-        ccx_course_key_fake = CCXLocator.from_course_locator(self.course.id, 55)
-        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key_fake), 0)
-
     @ddt.data(
-        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll')),
-        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'revoke')),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'revoke')),
+        ('ccx-manage-students', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Unenroll')),
+        ('ccx-manage-students', True, 1, 'student-id', ('student-action', 'revoke')),
+        ('ccx-manage-students', False, 0, 'student-id', ('student-action', 'revoke')),
     )
     @ddt.unpack
     def test_unenroll_member_student(self, view_name, send_email, outbox_count, student_form_input_name, button_tuple):
@@ -803,14 +731,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
 
     @ddt.data(
-        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
-        ('ccx_manage_student', True, 0, 'student-id', ('student-action', 'add'), 'dummy_student_id'),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add'), 'dummy_student_id'),
-        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'add'), 'xyz@gmail.com'),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add'), 'xyz@gmail.com'),
+        ('ccx-manage-students', True, 1, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', True, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
     )
     @ddt.unpack
     def test_enroll_non_user_student(
@@ -860,10 +784,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             )
 
     @ddt.data(
-        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
+        ('ccx-manage-students', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
     )
     @ddt.unpack
     def test_unenroll_non_user_student(
