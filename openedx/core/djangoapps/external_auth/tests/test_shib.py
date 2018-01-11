@@ -526,10 +526,10 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
         # Tests the two case for courses, limited and not
         for course in [shib_course, open_enroll_course]:
             for student in [shib_student, other_ext_student, int_student]:
-                request = self.request_factory.post('/change_enrollment')
-
-                request.POST.update({'enrollment_action': 'enroll',
-                                     'course_id': text_type(course.id)})
+                request = self.request_factory.post(
+                    '/change_enrollment',
+                    data={'enrollment_action': 'enroll', 'course_id': text_type(course.id)}
+                )
                 request.user = student
                 response = change_enrollment(request)
                 # If course is not limited or student has correct shib extauth then enrollment should be allowed
