@@ -88,7 +88,9 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         Verify that the updates course tool is visible only when the course
         has one or more updates.
         """
+        remove_course_updates(self.user, self.course)
         url = course_home_url(self.course)
+        # from nose.tools import set_trace; set_trace()
         response = self.client.get(url)
         self.assertNotContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
