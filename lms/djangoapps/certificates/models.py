@@ -183,6 +183,20 @@ class CertificateWhitelist(models.Model):
             })
         return result
 
+    @classmethod
+    def is_student_whitelisted_in_course(cls, course_key, student):
+        """
+        Returns bool whether or not the student is whitelisted in the course
+
+        Arguments:
+            course_key (CourseKey): The identifier for the course
+            student (User object): User object identifier
+
+        Returns:
+            boolean showing whether to the student is whitelisted in the course or not
+        """
+        return cls.objects.filter(user=student, course_id=course_key, whitelist=True).exists()
+
 
 class EligibleCertificateManager(models.Manager):
     """
