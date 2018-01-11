@@ -60,18 +60,6 @@ define(
             },
 
             /*
-            Sorts object by value and returns a sorted array.
-            */
-            sortByValue: function(itemObject) {
-                var sortedArray = [];
-                _.each(itemObject, function(value, key) {
-                    // Push each JSON Object entry in array by [value, key]
-                    sortedArray.push([value, key]);
-                });
-                return sortedArray.sort();
-            },
-
-            /*
             Returns transcript title.
             */
             getTranscriptClientTitle: function() {
@@ -113,7 +101,7 @@ define(
                         gettext('{toggleShowTranscriptText} transcripts ({totalTranscripts})'),
                         {
                             toggleShowTranscriptText: $transcriptsWrapperEl.hasClass('hidden') ? gettext('Show') : gettext('Hide'), // eslint-disable-line max-len
-                            totalTranscripts: _.size(this.transcripts)
+                            totalTranscripts: this.transcripts.length
                         }
                     )
                 );
@@ -275,7 +263,7 @@ define(
                     this.$el,
                     this.template({
                         transcripts: this.transcripts,
-                        transcriptAvailableLanguages: this.sortByValue(this.transcriptAvailableLanguages),
+                        transcriptAvailableLanguages: this.transcriptAvailableLanguages,
                         edxVideoID: this.edxVideoID,
                         transcriptClientTitle: this.getTranscriptClientTitle(),
                         transcriptFileFormat: this.videoTranscriptSettings.trancript_download_file_format,

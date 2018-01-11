@@ -239,7 +239,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             False,
             ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url'],
             [],
-            {}
+            []
         ),
         (
             True,
@@ -254,9 +254,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                     'provider': 'Cielo24'
                 }
             ],
-            {
-                'en': 'English'
-            }
+            ['en']
         ),
         (
             True,
@@ -278,10 +276,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                     'provider': 'Cielo24'
                 }
             ],
-            {
-                'en': 'English',
-                'es': 'Spanish'
-            }
+            ['en', 'es']
         )
     )
     @ddt.unpack
@@ -312,7 +307,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         for response_video in response_videos:
             self.assertEqual(set(response_video.keys()), set(expected_video_keys))
             if response_video['edx_video_id'] == self.previous_uploads[0]['edx_video_id']:
-                self.assertDictEqual(response_video.get('transcripts', {}), expected_transcripts)
+                self.assertEqual(response_video.get('transcripts', []), expected_transcripts)
 
     def test_get_html(self):
         response = self.client.get(self.url)
