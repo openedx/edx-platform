@@ -22,6 +22,6 @@ define([], function() {
                 '). Use the <%static:require_page> template tag.'
             );
         }
-        factory.apply(window.pageFactoryArguments[factory.name]);
+        factory.apply(null, window.pageFactoryArguments[factory.name]);
     };
 });
