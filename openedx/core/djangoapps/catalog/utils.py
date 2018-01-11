@@ -270,7 +270,7 @@ def get_visible_sessions_for_entitlement(entitlement):
 
 def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     """
-    Takes a list of course runs and returns only the course runs that:
+    Takes a list of course runs and returns only the course runs, sorted by start date, that:
 
     1) Are currently running or in the future
     2) A user can enroll in
@@ -311,6 +311,7 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
         if is_running and can_upgrade and can_enroll and is_published:
             enrollable_sessions.append(course_run)
 
+    enrollable_sessions.sort(key=lambda session: session.get('start'))
     return enrollable_sessions
 
 
