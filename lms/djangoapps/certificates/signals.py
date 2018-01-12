@@ -17,7 +17,6 @@ from openedx.core.djangoapps.certificates.api import auto_certificate_generation
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from student.models import CourseEnrollment
-from course_modes.models import CourseMode
 
 
 log = logging.getLogger(__name__)
@@ -89,8 +88,10 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
     If the learner is verified and their cert has the 'unverified' status,
     we regenerate the cert.
     """
+    from course_modes.models import CourseMode
+    
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    modes_for_auto_cert_creation = GeneratedCertificate.VERIFIED_CERTS_MODES \
+    modes_for_cert_auto_creation = GeneratedCertificate.VERIFIED_CERTS_MODES \
         + [CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE]
 
     mode_is_verified = enrollment_mode in modes_for_cert_auto_creation
