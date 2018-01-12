@@ -3,6 +3,7 @@
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
+from datetime import datetime
 import json
 import os
 import re
@@ -14,8 +15,205 @@ from openedx.core.djangolib.markup import HTML
 from .utils.envs import Env
 from .utils.timer import timed
 
-ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
+ALL_SYSTEMS = 'cms'
 
+CHECKS = [
+    "too-few-format-args",
+    "nonexistent-operator",
+    "unnecessary-pass",
+    "unnecessary-lambda",
+    "unneeded-not",
+    "simplifiable-range",
+    "old-style-class",
+    "return-outside-function",
+    "bad-reversed-sequence",
+    "nonimplemented-raised",
+    "unbalance-tuple-unpacking",
+    "yield-outside-function",
+    "model-no-explicit-unicode",
+    "syntax-error",
+    "super-method-not-called",
+    "bad-option-value",
+    "continue-in-finally",
+    "lost-exception",
+    "cyclical-import",
+    "redefined-variable-type",
+    "model-unicode-not-callable",
+    "expression-not-assigned",
+    "unrecognized-inline-option",
+    "confusing-with-statement",
+    "unreachable",
+    "deprecated-pragma",
+    "test-inherits-tests",
+    "wrong-assert-type",
+    "model-has-unicode",
+    "pointless-string-statement",
+    "singleton-comparison",
+    "translation-of-non-string",
+    "useless-else-on-loop",
+    "not-in-loop",
+    "pointless-statement",
+    "too-many-nested-blocks",
+    "non-parent-method-called",
+    "duplicate-key",
+    "assert-on-tuple",
+    "useless-suppression",
+    "bad-inline-option",
+    "slots-on-old-class",
+    "raising-bad-type",
+    "simplifiable-if-statement",
+    "unidiomatic-typecheck",
+    "raising-non-exception",
+    "misplaced-bare-raise",
+    "raw-checker-failed",
+    "literal-used-as-attribute",
+    "django-not-available-placeholder",
+    "parse-error",
+    "mixed-fomat-string",
+    "wrong-spelling-in-docstring",
+    "redefined-in-handler",
+    "astroid-error",
+    "invalid-characters-in-docstring",
+    "wrong-spelling-in-comment",
+    "django-not-available",
+    "eval-used",
+    "fatal",
+    "anomalous-backslash-in-string",
+    "anomalous-unicode-escape-in-string",
+    "bare-except",
+    "exec-used",
+    "catching-non-exception",
+    "invalid-encoded-data",
+    "bad-except-order",
+    "broad-except",
+    "using-constant-test",
+    "nonstandard-exception",
+    "consider-using-enumerate",
+    "not-a-mapping",
+    "binary-op-exception",
+    "property-on-old-class",
+    "duplicate-except",
+    "model-missing-unicode",
+    "invalid-all-object",
+    "global-at-module-level",
+    "global-variable-not-assigned",
+    "undefined-variable",
+    "undefined-all-variable",
+    "used-before-assignment",
+    "global-variable-undefined",
+    "unused-import",
+    "redefined-builtin",
+    "empty-docstring",
+    "redefined-outer-name",
+    "invalid-length-returned",
+    "missing-docstring",
+    "unexpected-special-method-signature",
+    "non-iterator-returned",
+    "dangerous-default-value",
+    "cell-var-from-loop",
+    "unpacking-non-sequence",
+    "unnecessary-semicolon",
+    "trailing-whitespace",
+    "superfluous-parens",
+    "mixed-indentation",
+    "unexpected-line-ending-format",
+    "line-too-long",
+    "missing-final-newline",
+    "multiple-statements",
+    "missing-super-argument",
+    "super-on-old-class",
+    "trailing-newlines",
+    "mixed-line-endings",
+    "bad-super-call",
+    "undefined-loop-variable",
+    "duplicate-argument-name",
+    "bad-whitespace",
+    "return-in-init",
+    "init-is-generator",
+    "return-arg-in-generator",
+    "function-redefined",
+    "too-many-boolean-expressions",
+    "too-many-statements",
+    "boolean-datetime",
+    "not-an-iterable",
+    "unused-variable",
+    "unused-argument",
+    "no-name-in-module",
+    "import-error",
+    "wildcard-import",
+    "misplaced-future",
+    "import-self",
+    "blacklisted-name",
+    "relative-import",
+    "deprecated-module",
+    "reimported",
+    "multiple-imports",
+    "no-classmethod-decorator",
+    "protected-access",
+    "no-method-argument",
+    "invalid-slots-object",
+    "invalid-slots",
+    "method-hidden",
+    "no-staticmethod-decorator",
+    "duplicate-bases",
+    "no-self-argument",
+    "inconsistent-mro",
+    "signature-differs",
+    "inherit-non-class",
+    "access-member-before-definition",
+    "bad-staticmethod-argument",
+    "assigning-non-slot",
+    "arguments-differ",
+    "super-init-not-called",
+    "abstract-method",
+    "bad-classmethod-argument",
+    "bad-mcs-classmethod-argument",
+    "method-check-failed",
+    "bad-mcs-method-argument",
+    "attribute-defined-outside-init",
+    "ungrouped-imports",
+    "wrong-import-order",
+    "wrong-import-position",
+    "deprecated-method",
+    "redundant-unittest-assert",
+    "abstract-class-instantiated",
+    "consider-iterating-dictionary",
+    "bad-str-strip-call",
+    "format-combined-specification",
+    "unused-format-string-key",
+    "bad-open-mode",
+    "bad-format-string-key",
+    "bad-format-string",
+    "format-needs-mapping",
+    "missing-format-attribute",
+    "unused-format-string-argument",
+    "missing-format-argument-key",
+    "invalid-format-index",
+    "bad-format-character",
+    "truncated-format-string",
+    "missing-format-string-key",
+    "too-many-format-args",
+    "logging-not-lazy",
+    "logging-unsupported-format",
+    "logging-too-few-args",
+    "logging-too-many-args",
+    "assignment-from-no-return",
+    "not-context-manager",
+    "not-callable",
+    "redundant-keyword-arg",
+    "no-member",
+    "too-many-function-args",
+    "unexpected-keyword-arg",
+    "assignment-from-none",
+    "no-value-for-parameter",
+    "invalid-slice-index",
+    "invalid-unary-operand-type",
+    "repeated-keyword",
+    "unsupported-binary-operation",
+    "unsupported-membership-test",
+    "invalid-sequence-index",
+    "unsubscriptable-object",
+]
 
 def top_python_dirs(dirname):
     """
@@ -99,15 +297,24 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
 
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
-            sh(
-                "pylint {flags} --output-format=parseable {apps} "
-                "> {report_dir}/pylint.report".format(
-                    flags=" ".join(flags),
-                    apps=apps_list,
-                    report_dir=report_dir
-                ),
-                ignore_error=True,
-            )
+            if os.path.isfile(system_report):
+                os.remove(system_report)
+            for check in CHECKS:
+                start = datetime.utcnow()
+                sh(
+                    "pylint {flags} --output-format=parseable --score=n "
+                    "--disable=all --enable={check} {apps} "
+                    ">> {report}".format(
+                        flags=" ".join(flags),
+                        check=check,
+                        apps=apps_list,
+                        report=system_report
+                    ),
+                    ignore_error=True,
+                )
+                duration = (datetime.utcnow() - start).total_seconds()
+                with open(system_report, "a") as report_file:
+                    report_file.write("== {} {} seconds processing time ==\n\n".format(check, duration))
 
         num_violations += _count_pylint_violations(system_report)
         with open(system_report) as report_contents:
@@ -851,3 +1058,7 @@ def get_violations_reports(violations_type):
             if f == "{violations_type}.report".format(violations_type=violations_type):
                 violations_files.append(os.path.join(subdir, f))
     return violations_files
+
+
+def get_pylint_checks():
+    pass
