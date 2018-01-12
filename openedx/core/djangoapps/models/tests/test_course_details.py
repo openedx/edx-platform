@@ -29,7 +29,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         details = CourseDetails.fetch(self.course.id)
         self.assertEqual(details.org, self.course.location.org, "Org not copied into")
         self.assertEqual(details.course_id, self.course.location.course, "Course_id not copied into")
-        self.assertEqual(details.run, self.course.location.name, "Course name not copied into")
+        self.assertEqual(details.run, self.course.location.block_id, "Course name not copied into")
         self.assertEqual(details.course_image_name, self.course.course_image)
         self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))

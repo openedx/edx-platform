@@ -34,7 +34,7 @@ def wrap_draft(item):
     Sets `item.is_draft` to `True` if the item is DRAFT, and `False` otherwise.
     Sets the item's location to the non-draft location in either case.
     """
-    item.is_draft = (item.location.revision == MongoRevisionKey.draft)
+    item.is_draft = (item.location.branch == MongoRevisionKey.draft)
     item.location = item.location.replace(revision=MongoRevisionKey.published)
     return item
 
@@ -99,7 +99,7 @@ class DraftModuleStore(MongoModuleStore):
             return get_published()
 
         # if the item is direct-only, there can only be a published version
-        elif usage_key.category in DIRECT_ONLY_CATEGORIES:
+        elif usage_key.block_type in DIRECT_ONLY_CATEGORIES:
             return get_published()
 
         # return the draft version (without any fallback to PUBLISHED) if DRAFT-ONLY is requested
@@ -226,7 +226,7 @@ class DraftModuleStore(MongoModuleStore):
         for module in modules:
             original_loc = module.location
             module.location = module.location.map_into_course(dest_course_id)
-            if module.location.category == 'course':
+            if module.location.block_type == 'course':
                 module.location = module.location.replace(name=module.location.run)
 
             log.info("Cloning module %s to %s....", original_loc, module.location)
@@ -416,7 +416,7 @@ class DraftModuleStore(MongoModuleStore):
         _verify_revision_is_published(location)
 
         # ensure we are not creating a DRAFT of an item that is direct-only
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.block_type in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(location)
 
         def convert_item(item, to_be_deleted):
@@ -469,7 +469,7 @@ class DraftModuleStore(MongoModuleStore):
         draft_loc = self.for_branch_setting(xblock.location)
 
         # if the revision is published, defer to base
-        if draft_loc.revision == MongoRevisionKey.published:
+        if draft_loc.branch == MongoRevisionKey.published:
             item = super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
             course_key = xblock.location.course_key
             if isPublish or (item.category in DIRECT_ONLY_CATEGORIES and not child_update):
@@ -517,7 +517,7 @@ class DraftModuleStore(MongoModuleStore):
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
 
-        is_item_direct_only = location.category in DIRECT_ONLY_CATEGORIES
+        is_item_direct_only = location.block_type in DIRECT_ONLY_CATEGORIES
         if is_item_direct_only or revision == ModuleStoreEnum.RevisionOption.published_only:
             parent_revision = MongoRevisionKey.published
         elif revision == ModuleStoreEnum.RevisionOption.all:
@@ -542,7 +542,7 @@ class DraftModuleStore(MongoModuleStore):
         for parent_location in parent_locations:
             # don't remove from direct_only parent if other versions of this still exists (this code
             # assumes that there's only one parent_location in this case)
-            if not is_item_direct_only and parent_location.category in DIRECT_ONLY_CATEGORIES:
+            if not is_item_direct_only and parent_location.block_type in DIRECT_ONLY_CATEGORIES:
                 # see if other version of to-be-deleted root exists
                 query = location.to_deprecated_son(prefix='_id.')
                 del query['_id.revision']
@@ -699,7 +699,7 @@ class DraftModuleStore(MongoModuleStore):
                 for child_loc in item.children:
                     _internal_depth_first(child_loc, False)
 
-            if item_location.category in DIRECT_ONLY_CATEGORIES or not getattr(item, 'is_draft', False):
+            if item_location.block_type in DIRECT_ONLY_CATEGORIES or not getattr(item, 'is_draft', False):
                 # ignore noop attempt to publish something that can't be or isn't currently draft
                 return
 
@@ -757,7 +757,7 @@ class DraftModuleStore(MongoModuleStore):
         to remove things from the published version
         """
         # ensure we are not creating a DRAFT of an item that is direct-only
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.block_type in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(location)
 
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
@@ -779,7 +779,7 @@ class DraftModuleStore(MongoModuleStore):
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
 
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.block_type in DIRECT_ONLY_CATEGORIES:
             return
 
         if not self.has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only):
@@ -855,7 +855,7 @@ class DraftModuleStore(MongoModuleStore):
             query = []
             for item in items:
                 item_usage_key = UsageKey.from_string(item).map_into_course(course_key)
-                if item_usage_key.category not in DIRECT_ONLY_CATEGORIES:
+                if item_usage_key.block_type not in DIRECT_ONLY_CATEGORIES:
                     query.append(as_draft(item_usage_key).to_deprecated_son())
             if query:
                 query = {'_id': {'$in': query}}
@@ -907,4 +907,4 @@ def _verify_revision_is_published(location):
     """
     Asserts that the revision set on the given location is MongoRevisionKey.published
     """
-    assert location.revision == MongoRevisionKey.published
+    assert location.branch == MongoRevisionKey.published

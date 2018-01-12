@@ -208,7 +208,7 @@ def library_blocks_view(library, user, response_format):
         return JsonResponse({
             "display_name": library.display_name,
             "library_id": unicode(library.location.library_key),
-            "version": unicode(library.runtime.course_entry.course_key.version),
+            "version": unicode(library.runtime.course_entry.course_key.version_guid),
             "previous_version": unicode(prev_version) if prev_version else None,
             "blocks": [unicode(x) for x in children],
         })

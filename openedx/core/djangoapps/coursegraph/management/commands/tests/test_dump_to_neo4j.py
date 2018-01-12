@@ -275,12 +275,12 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         ).for_version('test_version')
 
         self.assertIsNotNone(location.branch)
-        self.assertIsNotNone(location.version)
+        self.assertIsNotNone(location.version_guid)
 
         stripped_location = strip_branch_and_version(location)
 
         self.assertIsNone(stripped_location.branch)
-        self.assertIsNone(stripped_location.version)
+        self.assertIsNone(stripped_location.version_guid)
 
     @staticmethod
     def _extract_relationship_pairs(relationships, relationship_type):

@@ -932,7 +932,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         root_block_key = modulestore().make_course_usage_key(course_key)
         self.assertIsInstance(root_block_key, root_block_cls)
         self.assertEqual(root_block_key.block_type, "course")
-        self.assertEqual(root_block_key.name, "course")
+        self.assertEqual(root_block_key.block_id, "course")
 
 
 class TestCourseStructureCache(SplitModuleTest):

@@ -132,7 +132,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     def test_tooltip(self):
         html = self._get_rendered_student_view(self.sequence_3_1, requested_child=None)
         for child in self.sequence_3_1.children:
-            self.assertIn("'page_title': '{}'".format(child.name), html)
+            self.assertIn("'page_title': '{}'".format(child.block_id), html)
 
     def test_hidden_content_before_due(self):
         html = self._get_rendered_student_view(self.sequence_4_1)

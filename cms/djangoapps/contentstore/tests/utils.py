@@ -137,7 +137,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         vertical.location = vertical.location.replace(name='no_references')
         self.store.update_item(vertical, self.user.id, allow_not_found=True)
         orphan_vertical = self.store.get_item(vertical.location)
-        self.assertEqual(orphan_vertical.location.name, 'no_references')
+        self.assertEqual(orphan_vertical.location.block_id, 'no_references')
         self.assertEqual(len(orphan_vertical.children), len(vertical.children))
 
         # create an orphan vertical and html; we already don't try to import

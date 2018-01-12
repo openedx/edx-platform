@@ -536,7 +536,7 @@ def get_problems_in_section(section):
     for subsection in section_descriptor.get_children():
         for vertical in subsection.get_children():
             for component in vertical.get_children():
-                if component.location.category == 'problem' and getattr(component, 'has_score', False):
+                if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
                     problem_descriptors[unicode(component.location)] = component
 
     return problem_descriptors

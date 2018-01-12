@@ -541,7 +541,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):
 
         # We are ignoring the value of the thumbnail_location-- we only care whether
         # or not a thumbnail has been stored, and we can now easily create the correct path.
-        thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name)
+        thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.block_id)
 
         try:
             thumbnail_content = contentstore().find(thumbnail_location)

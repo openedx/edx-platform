@@ -227,8 +227,8 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': review_section_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': review_section_actual.location.block_id,
             }
         ))
 
@@ -253,8 +253,8 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section1_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section1_actual.location.block_id,
             }
         ))
         if num_desired > 6:
@@ -262,16 +262,16 @@ class TestReviewFunctions(TestReviewXBlock):
                 'courseware_section',
                 kwargs={
                     'course_id': self.course_actual.id,
-                    'chapter': self.chapter_actual.location.name,
-                    'section': self.section2_actual.location.name,
+                    'chapter': self.chapter_actual.location.block_id,
+                    'section': self.section2_actual.location.block_id,
                 }
             ))
             self.client.get(reverse(
                 'courseware_section',
                 kwargs={
                     'course_id': self.course_actual.id,
-                    'chapter': self.chapter_actual.location.name,
-                    'section': self.section3_actual.location.name,
+                    'chapter': self.chapter_actual.location.block_id,
+                    'section': self.section3_actual.location.block_id,
                 }
             ))
 
@@ -295,8 +295,8 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': review_section_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': review_section_actual.location.block_id,
             }
         ))
 
@@ -318,24 +318,24 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section1_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section1_actual.location.block_id,
             }
         ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section2_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section2_actual.location.block_id,
             }
         ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section3_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section3_actual.location.block_id,
             }
         ))
 
@@ -359,8 +359,8 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': review_section_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': review_section_actual.location.block_id,
             }
         ))
 
@@ -397,24 +397,24 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section1_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section1_actual.location.block_id,
             }
         ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section2_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section2_actual.location.block_id,
             }
         ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section3_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section3_actual.location.block_id,
             }
         ))
 
@@ -456,16 +456,16 @@ class TestReviewFunctions(TestReviewXBlock):
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section1_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section1_actual.location.block_id,
             }
         ))
         self.client.get(reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course_actual.id,
-                'chapter': self.chapter_actual.location.name,
-                'section': self.section3_actual.location.name,
+                'chapter': self.chapter_actual.location.block_id,
+                'section': self.section3_actual.location.block_id,
             }
         ))
 

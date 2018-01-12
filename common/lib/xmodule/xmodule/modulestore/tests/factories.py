@@ -402,7 +402,7 @@ class ItemFactory(XModuleFactory):
 
                 course = store.get_course(location.course_key)
                 course.tabs.append(
-                    CourseTab.load('static_tab', name='Static Tab', url_slug=location.name)
+                    CourseTab.load('static_tab', name='Static Tab', url_slug=location.block_id)
                 )
                 store.update_item(course, user_id)
 

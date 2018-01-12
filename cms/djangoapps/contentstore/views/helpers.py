@@ -282,7 +282,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
             course.tabs.append(
                 StaticTab(
                     name=display_name,
-                    url_slug=dest_usage_key.name,
+                    url_slug=dest_usage_key.block_id,
                 )
             )
             store.update_item(course, user.id)
@@ -298,7 +298,7 @@ def is_item_in_course_tree(item):
     if its parent has been deleted and is now an orphan.
     """
     ancestor = item.get_parent()
-    while ancestor is not None and ancestor.location.category != "course":
+    while ancestor is not None and ancestor.location.block_type != "course":
         ancestor = ancestor.get_parent()
 
     return ancestor is not None

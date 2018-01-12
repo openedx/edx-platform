@@ -585,7 +585,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
         # for static tabs, their containing course also records their display name
         course = store.get_course(xblock.location.course_key)
-        if xblock.location.category == 'static_tab':
+        if xblock.location.block_type == 'static_tab':
             # find the course's reference to this tab and update the name.
             static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
             # only update if changed
@@ -916,7 +916,7 @@ def _delete_item(usage_key, user):
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
-        if usage_key.category == 'static_tab':
+        if usage_key.block_type == 'static_tab':
 
             dog_stats_api.increment(
                 DEPRECATION_VSCOMPAT_EVENT,
@@ -928,7 +928,7 @@ def _delete_item(usage_key, user):
 
             course = store.get_course(usage_key.course_key)
             existing_tabs = course.tabs or []
-            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
+            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.block_id]
             store.update_item(course, user.id)
 
         store.delete_item(usage_key, user.id)
@@ -988,7 +988,7 @@ def _get_xblock(usage_key, user):
         try:
             return store.get_item(usage_key, depth=None)
         except ItemNotFoundError:
-            if usage_key.category in CREATE_IF_NOT_FOUND:
+            if usage_key.block_type in CREATE_IF_NOT_FOUND:
                 # Create a new one for certain categories only. Used for course info handouts.
                 return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
             else:

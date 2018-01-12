@@ -299,7 +299,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         for item in items:
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
-            self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
+            self.assertTrue(filesystem.exists(item.location.block_id + filename_suffix))
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_export_course_roundtrip(self, mock_get):

@@ -86,8 +86,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'chapter': self.chapter.location.name,
-                'section': self.sequential.location.name,
+                'chapter': self.chapter.location.block_id,
+                'section': self.sequential.location.block_id,
             }
         )
         return self.client.get(url)

@@ -93,7 +93,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
     filtered_metadata = {k: v for k, v in items.iteritems() if k not in FILTER_LIST}
 
     destination[unicode(module.location)] = {
-        'category': module.location.category,
+        'category': module.location.block_type,
         'children': [unicode(child) for child in getattr(module, 'children', [])],
         'metadata': filtered_metadata,
     }

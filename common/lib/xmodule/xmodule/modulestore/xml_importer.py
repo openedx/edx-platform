@@ -741,7 +741,7 @@ def _update_and_import_module(
     asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
     block = store.import_xblock(
-        user_id, dest_course_id, module.location.category,
+        user_id, dest_course_id, module.location.block_type,
         module.location.block_id, fields, runtime, asides=asides
     )
 
@@ -749,7 +749,7 @@ def _update_and_import_module(
     # Get to the point where XML import is happening inside the
     # modulestore that is eventually going to store the data.
     # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
-    if block.location.category == 'library_content':
+    if block.location.block_type == 'library_content':
         # if library exists, update source_library_version and children
         # according to this existing library and library content block.
         if store.get_library(block.source_library_key):
@@ -919,7 +919,7 @@ def check_module_metadata_editability(module):
     we can't support editing. However we always allow 'display_name'
     and 'xml_attributes'
     """
-    allowed = allowed_metadata_by_category(module.location.category)
+    allowed = allowed_metadata_by_category(module.location.block_type)
     if '*' in allowed:
         # everything is allowed
         return 0
@@ -994,7 +994,7 @@ def validate_no_non_editable_metadata(module_store, course_id, category):
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
         module = module_store.modules[course_id][module_loc]
-        if module.location.category == category:
+        if module.location.block_type == category:
             err_cnt = err_cnt + check_module_metadata_editability(module)
 
     return err_cnt
@@ -1007,19 +1007,19 @@ def validate_category_hierarchy(
     parents = []
     # get all modules of parent_category
     for module in module_store.modules[course_id].itervalues():
-        if module.location.category == parent_category:
+        if module.location.block_type == parent_category:
             parents.append(module)
 
     for parent in parents:
         for child_loc in parent.children:
-            if child_loc.category != expected_child_category:
+            if child_loc.block_type != expected_child_category:
                 err_cnt += 1
                 print(
                     "ERROR: child {child} of parent {parent} was expected to be "
                     "category of {expected} but was {actual}".format(
                         child=child_loc, parent=parent.location,
                         expected=expected_child_category,
-                        actual=child_loc.category
+                        actual=child_loc.block_type
                     )
                 )
 
@@ -1063,7 +1063,7 @@ def validate_course_policy(module_store, course_id):
     # is there a reliable way to get the module location just given the course_id?
     warn_cnt = 0
     for module in module_store.modules[course_id].itervalues():
-        if module.location.category == 'course':
+        if module.location.block_type == 'course':
             if not module._field_data.has(module, 'rerandomize'):
                 warn_cnt += 1
                 print(

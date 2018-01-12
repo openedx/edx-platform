@@ -137,7 +137,7 @@ def find_urls(course_id, block, child_to_parent, request):
     if block_count > 3:
         position = 1
         for block in section.children:
-            if block.name == block_list[3].url_name:
+            if block.block_id == block_list[3].url_name:
                 break
             position += 1
 

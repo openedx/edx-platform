@@ -279,7 +279,7 @@ class CoursewareIndex(View):
         """
         child = None
         if url_name:
-            child = parent.get_child_by(lambda m: m.location.name == url_name)
+            child = parent.get_child_by(lambda m: m.location.block_id == url_name)
             if not child:
                 # User may be trying to access a child that isn't live yet
                 if not self._is_masquerading_as_student():
@@ -523,7 +523,7 @@ def save_child_position(seq_module, child_name):
     child_name: url_name of the child
     """
     for position, child in enumerate(seq_module.get_display_items(), start=1):
-        if child.location.name == child_name:
+        if child.location.block_id == child_name:
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
@@ -553,6 +553,6 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
             )
 
         if parent and hasattr(parent, 'position'):
-            save_child_position(parent, current_module.location.name)
+            save_child_position(parent, current_module.location.block_id)
 
         current_module = parent

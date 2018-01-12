@@ -264,7 +264,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 if self.cached_metadata is not None:
                     # fish the parent out of here if it's available
                     parent_url = self.cached_metadata.get(unicode(location), {}).get('parent', {}).get(
-                        ModuleStoreEnum.Branch.published_only if location.revision is None
+                        ModuleStoreEnum.Branch.published_only if location.branch is None
                         else ModuleStoreEnum.Branch.draft_preferred
                     )
                     if parent_url:
@@ -274,7 +274,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     # try looking it up just-in-time (but not if we're working with a detached block).
                     parent = self.modulestore.get_parent_location(
                         as_published(location),
-                        ModuleStoreEnum.RevisionOption.published_only if location.revision is None
+                        ModuleStoreEnum.RevisionOption.published_only if location.branch is None
                         else ModuleStoreEnum.RevisionOption.draft_preferred
                     )
 
@@ -453,7 +453,7 @@ def as_draft(location):
     Returns the Location that is the draft for `location`
     If the location is in the DIRECT_ONLY_CATEGORIES, returns itself
     """
-    if location.category in DIRECT_ONLY_CATEGORIES:
+    if location.block_type in DIRECT_ONLY_CATEGORIES:
         return location
     return location.replace(revision=MongoRevisionKey.draft)
 
@@ -666,7 +666,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Returns the Location that is for the current branch setting.
         """
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.block_type in DIRECT_ONLY_CATEGORIES:
             return location.replace(revision=MongoRevisionKey.published)
         if self.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred:
             return location.replace(revision=MongoRevisionKey.draft)
@@ -730,7 +730,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 results_by_url[location_url].setdefault('definition', {})['children'] = set(total_children)
             else:
                 results_by_url[location_url] = result
-            if location.category == 'course':
+            if location.block_type == 'course':
                 root = location_url
 
         # now traverse the tree and compute down the inherited metadata
@@ -1628,7 +1628,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                         multi=False,
                         upsert=True,
                     )
-                elif ancestor_loc.category == 'course':
+                elif ancestor_loc.block_type == 'course':
                     # once we reach the top location of the tree and if the location is not an orphan then the
                     # parent is not an orphan either
                     non_orphan_parents.append(parent_loc)
@@ -1641,7 +1641,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Helper for get_parent_location that finds the location that is the parent of this location in this course,
         but does NOT return a version agnostic location.
         '''
-        assert location.revision is None
+        assert location.branch is None
         assert revision == ModuleStoreEnum.RevisionOption.published_only \
             or revision == ModuleStoreEnum.RevisionOption.draft_preferred
 

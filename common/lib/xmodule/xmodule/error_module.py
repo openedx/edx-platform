@@ -99,7 +99,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             # access to the user context, and this will only be seen by staff
             error_msg = 'Error not available'
 
-        if location.category == 'error':
+        if location.block_type == 'error':
             location = location.replace(
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,
