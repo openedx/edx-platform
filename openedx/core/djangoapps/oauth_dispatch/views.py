@@ -17,8 +17,6 @@ from edx_oauth2_provider import views as dop_views  # django-oauth2-provider vie
 from jwkest.jwk import RSAKey
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
-from ratelimit import ALL
-from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
@@ -86,16 +84,12 @@ class _DispatchingView(View):
             return request.POST.get('client_id')
 
 
-class AccessTokenView(RatelimitMixin, _DispatchingView):
+class AccessTokenView(_DispatchingView):
     """
     Handle access token requests.
     """
     dot_view = dot_views.TokenView
     dop_view = dop_views.AccessTokenView
-    ratelimit_key = 'openedx.core.djangoapps.util.ratelimit.real_ip'
-    ratelimit_rate = settings.RATELIMIT_RATE
-    ratelimit_block = True
-    ratelimit_method = ALL
 
     def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
