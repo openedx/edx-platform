@@ -517,6 +517,11 @@ def create_user_profile_context(request, course_key, user_id):
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
     with function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
+
+        # TODO: LEARNER-3854: If we actually implement Learner Analytics code, this
+        #   code was original protected to not run in user_profile() if is_ajax().
+        #   Someone should determine if that is still necessary (i.e. was that ever
+        #   called as is_ajax()) and clean this up as necessary.
         user_roles = django_user.roles.filter(
             course_id=course.id
         ).order_by("name").values_list("name", flat=True).distinct()
@@ -559,7 +564,6 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': context['annotated_content_info'],
             })
         else:
-            print context
             return render_to_response('discussion/discussion_profile_page.html', context)
     except User.DoesNotExist:
         raise Http404

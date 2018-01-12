@@ -1,3 +1,3 @@
 from django.test import TestCase
 
-# Create your tests here.
+# TODO: LEARNER-3854: Implement tests or remove file after Learner Analytics test.
