@@ -3438,10 +3438,6 @@ EDX_PLATFORM_REVISION = 'unknown'
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
-############### Settings for Django Rate limit #####################
-RATELIMIT_ENABLE = True
-RATELIMIT_RATE = '30/m'
-
 ############## Plugin Django Apps #########################
 
 from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
