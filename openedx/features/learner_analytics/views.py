@@ -232,7 +232,7 @@ class LearnerAnalyticsView(View):
             log.info('Engagement timeline for course {course_key} was not cached - fetching from Analytics API'
                      .format(course_key=course_key))
 
-            # TODO: @jaebradley replace this once the Analytics client has an engagement timeline method
+            # TODO (LEARNER-3470): @jaebradley replace this once the Analytics client has an engagement timeline method
             url = '{base_url}/engagement_timelines/{username}?course_id={course_key}'\
                 .format(base_url=settings.ANALYTICS_API_URL,
                         username=username,
