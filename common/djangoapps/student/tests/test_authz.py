@@ -205,7 +205,6 @@ class CourseGroupTest(TestCase):
         add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
         self.assertTrue(user_has_role(self.assistant, CourseAssistantRole(self.course_key)))
 
-
     def test_add_user_to_course_group_permission_denied(self):
         """
         Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.

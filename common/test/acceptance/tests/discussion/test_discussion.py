@@ -1214,6 +1214,7 @@ class DiscussionXBlockInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, Di
         """ Returns selected discussion_id """
         return self.discussion_page.get_discussion_id()
 
+
 @attr(shard=2)
 class DiscussionUserProfileTest(UniqueCourseTest):
     """

@@ -4,27 +4,24 @@ Common utility functions useful throughout the contentstore
 
 import logging
 from datetime import datetime
-from pytz import UTC
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import UTC
+
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
-
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-
+from student import auth
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.models import CourseEnrollment
-from student import auth
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
-from util.signals import course_deleted
-
 
 log = logging.getLogger(__name__)
 
@@ -74,15 +71,6 @@ def delete_course(course_key, user_id, keep_instructors=False):
     if not keep_instructors:
         _remove_instructors(course_key)
 
-    # Broadcast the deletion event to CMS listeners
-    print 'Notifying CMS system components...'
-    course_deleted.send(sender=None, course_key=course_key)
-
-    print 'CMS Course Cleanup Complete!'
-    print 'You must now execute this same command in LMS to clean up orphaned records'
-    print 'COMMAND: ./manage.py lms delete_course_references <course_id> commit'
-
-
 
 def _delete_course_from_modulestore(course_key, user_id):
     """
@@ -105,8 +93,6 @@ def _remove_instructors(course_key):
         remove_all_instructors(course_key)
     except Exception as err:
         log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
-
-
 
 
 def get_lms_link_for_item(location, preview=False):

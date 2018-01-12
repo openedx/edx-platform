@@ -29,6 +29,7 @@ from .models import (
     UnregisteredLearnerCohortAssignments
 )
 
+
 class AlreadyAddedToCohortException(ValueError):
     """
     Raised when an attempt is made to add user to a cohort he's already added to
@@ -631,6 +632,7 @@ def delete_empty_cohort(course_key, name):
                 name, course_key))
 
     cohort.delete()
+
 
 def get_legacy_discussion_settings(course_key):
 

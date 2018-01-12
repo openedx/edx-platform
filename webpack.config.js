@@ -65,7 +65,7 @@ var wpconfig = {
         // invoke this plugin until we can upgrade karma-webpack.
         new webpack.optimize.CommonsChunkPlugin({
             // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html 
+            // common/djangoapps/pipeline_mako/templates/static_content.html
             name: 'commons',
             filename: 'commons.js',
             minChunks: 2

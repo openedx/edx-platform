@@ -10,17 +10,6 @@ from functools import partial
 import ddt
 import pytz
 from bson import ObjectId
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from course_modes.models import CourseMode
-from courseware import module_render as render
-from courseware.courses import get_course_info_section, get_course_with_access
-from courseware.field_overrides import OverrideFieldData
-from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
-from courseware.module_render import get_module_for_descriptor, hash_resource
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
-from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from courseware.tests.tests import LoginEnrollmentTestCase
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
@@ -37,13 +26,31 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
-from student.models import anonymous_id_for_user
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
+
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from course_modes.models import CourseMode
+from courseware import module_render as render
+from courseware.courses import get_course_info_section, get_course_with_access
+from courseware.field_overrides import OverrideFieldData
+from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
+from courseware.module_render import get_module_for_descriptor, hash_resource
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
+from courseware.tests.test_submitting_problems import TestSubmittingProblems
+from courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.url_utils import quote_slashes
+from student.models import anonymous_id_for_user
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -56,13 +63,6 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
-
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
-from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.url_utils import quote_slashes
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -441,12 +441,12 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
-            request,
-            self.course_key.to_deprecated_string(),
-            'invalid Location',
-            'dummy_handler'
-            'dummy_dispatch'
-        )
+                request,
+                self.course_key.to_deprecated_string(),
+                'invalid Location',
+                'dummy_handler'
+                'dummy_dispatch'
+            )
 
     def test_too_many_files(self):
         request = self.request_factory.post(
@@ -504,36 +504,36 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
-            request,
-            'bad_course_id',
-            quote_slashes(self.location.to_deprecated_string()),
-            'xmodule_handler',
-            'goto_position',
-        )
+                request,
+                'bad_course_id',
+                quote_slashes(self.location.to_deprecated_string()),
+                'xmodule_handler',
+                'goto_position',
+            )
 
     def test_bad_location(self):
         request = self.request_factory.post('dummy_url')
         request.user = self.mock_user
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
-            request,
-            self.course_key.to_deprecated_string(),
-            quote_slashes(self.course_key.make_usage_key('chapter', 'bad_location').to_deprecated_string()),
-            'xmodule_handler',
-            'goto_position',
-        )
+                request,
+                self.course_key.to_deprecated_string(),
+                quote_slashes(self.course_key.make_usage_key('chapter', 'bad_location').to_deprecated_string()),
+                'xmodule_handler',
+                'goto_position',
+            )
 
     def test_bad_xmodule_dispatch(self):
         request = self.request_factory.post('dummy_url')
         request.user = self.mock_user
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
-            request,
-            self.course_key.to_deprecated_string(),
-            quote_slashes(self.location.to_deprecated_string()),
-            'xmodule_handler',
-            'bad_dispatch',
-        )
+                request,
+                self.course_key.to_deprecated_string(),
+                quote_slashes(self.location.to_deprecated_string()),
+                'xmodule_handler',
+                'bad_dispatch',
+            )
 
     def test_missing_handler(self):
         request = self.request_factory.post('dummy_url')
@@ -546,28 +546,6 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 'bad_handler',
                 'bad_dispatch',
             )
-
-    def test_xblock_view_handler(self):
-        args = [
-            'edX/toy/2012_Fall',
-            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
-            'student_view'
-        ]
-        xblock_view_url = reverse(
-            'xblock_view',
-            args=args
-        )
-
-        request = self.request_factory.get(xblock_view_url)
-        request.user = self.mock_user
-        response = render.xblock_view(request, *args)
-        self.assertEquals(200, response.status_code)
-
-        expected = ['csrf_token', 'html', 'resources']
-        content = json.loads(response.content)
-        for section in expected:
-            self.assertIn(section, content)
-        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
