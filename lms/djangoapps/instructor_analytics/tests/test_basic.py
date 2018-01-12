@@ -536,10 +536,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         CourseSalesAdminRole(self.course.id).add_users(self.instructor)
 
         # Create a paid course mode.
-        mode = CourseModeFactory.create()
-        mode.course_id = self.course.id
-        mode.min_price = 1
-        mode.save()
+        mode = CourseModeFactory.create(course_id=self.course.id, min_price=1)
 
         url = reverse('generate_registration_codes',
                       kwargs={'course_id': text_type(self.course.id)})
