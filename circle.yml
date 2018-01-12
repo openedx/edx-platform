@@ -35,6 +35,9 @@ dependencies:
 
     - pip install coveralls==1.0
 
+    # We need to pin djangorestframework until we have upgraded to edxval 0.0.19 or greater
+    - pip install --upgrade --force-reinstall git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
+
     # Output the installed python packages to the console to help
     # with troubleshooting any issues with python requirements.
     - pip freeze
