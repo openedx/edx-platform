@@ -571,6 +571,9 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id)
     }
 
+    if not deprecated_block_types:
+        return data
+
     try:
         structure_data = api.course_structure(course_module.id, block_types=deprecated_block_types)
     except errors.CourseStructureNotAvailableError:
@@ -1019,7 +1022,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     if len(excerpt) > max_len:
                         excerpt = "{}...".format(excerpt[:max_len])
                     announcement_open_url = "https://{site_name}/courses/{course_id}/announcements/{date}/".format(
-                        site_name=settings.SITE_NAME,
+                        site_name=settings.LMS_BASE,
                         course_id=unicode(course_key),
                         date=dateutil.parser.parse(announcement_date).strftime('%m/%d/%Y'),
                     )
@@ -1035,6 +1038,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                             'open_url': announcement_open_url,
                             'announcement_date': announcement_date,
                             'title': title,
+                            'notification_type': 'courseannouncement'
                         }
                     )
 

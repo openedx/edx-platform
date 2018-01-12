@@ -1,9 +1,12 @@
 """
 Tests for StudentViewTransformer.
 """
+import ddt
+from mock import patch
+from django.conf import settings
 
 # pylint: disable=protected-access
-
+from django.test.utils import override_settings
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -11,6 +14,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from ..student_view import StudentViewTransformer
 
 
+@ddt.ddt
 class TestStudentViewTransformer(ModuleStoreTestCase):
     """
     Test proper behavior for StudentViewTransformer
@@ -21,20 +25,63 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)
 
-    def test_transform(self):
+    # pylint: disable=fixme
+    # FIXME: See openedx/core/lib/block_structure/block_structure.py FieldData.__delattr__
+    # This test demonstrates that the student_view_data bug is present by default.
+    # This test can be removed entirely once the bug fix is enabled.
+    @ddt.data(
+        'video', 'html', ['video', 'html'], [],
+    )
+    def test_transform_bug_enabled_by_default(self, requested_student_view_data):
         # collect phase
         StudentViewTransformer.collect(self.block_structure)
         self.block_structure._collect_requested_xblock_fields()
 
         # transform phase
-        StudentViewTransformer('video').transform(usage_info=None, block_structure=self.block_structure)
+        StudentViewTransformer(requested_student_view_data).transform(
+            usage_info=None,
+            block_structure=self.block_structure,
+        )
 
-        # verify video data
+        # verify both video and html data are always returned
         video_block_key = self.course_key.make_usage_key('video', 'sample_video')
         self.assertIsNotNone(
             self.block_structure.get_transformer_block_field(
                 video_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
             )
+        )
+        html_block_key = self.course_key.make_usage_key('html', 'toyhtml')
+        self.assertIsNotNone(
+            self.block_structure.get_transformer_block_field(
+                html_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
+            )
+        )
+
+    # pylint: disable=fixme
+    # FIXME: See openedx/core/lib/block_structure/block_structure.py FieldData.__delattr__
+    # Remove this patch once the student_view_data bug is fixed for good.
+    @patch.dict(settings.FEATURES, {'ENABLE_STUDENT_VIEW_DATA_BUGFIX': True})
+    @ddt.data(
+        'video', 'html', ['video', 'html'], [],
+    )
+    def test_transform(self, requested_student_view_data):
+        # collect phase
+        StudentViewTransformer.collect(self.block_structure)
+        self.block_structure._collect_requested_xblock_fields()
+
+        # transform phase
+        StudentViewTransformer(requested_student_view_data).transform(
+            usage_info=None,
+            block_structure=self.block_structure,
+        )
+
+        # verify video data returned iff requested
+        video_block_key = self.course_key.make_usage_key('video', 'sample_video')
+        self.assertEqual(
+            self.block_structure.get_transformer_block_field(
+                video_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
+            ) is not None,
+            'video' in requested_student_view_data
         )
         self.assertFalse(
             self.block_structure.get_transformer_block_field(
@@ -42,12 +89,13 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
             )
         )
 
-        # verify html data
+        # verify html data returned iff requested
         html_block_key = self.course_key.make_usage_key('html', 'toyhtml')
-        self.assertIsNotNone(
+        self.assertEqual(
             self.block_structure.get_transformer_block_field(
                 html_block_key, StudentViewTransformer, StudentViewTransformer.STUDENT_VIEW_DATA,
-            )
+            ) is not None,
+            'html' in requested_student_view_data
         )
         self.assertTrue(
             self.block_structure.get_transformer_block_field(

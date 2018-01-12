@@ -409,6 +409,9 @@ FEATURES = {
     # Whether to check the "Notify users by email" checkbox in the batch enrollment form
     # in the instructor dashboard.
     'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
+
+    # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
+    'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -678,7 +681,7 @@ USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
 
 
 # Verticals having children with any of these categories would be excluded from progress calculations
-PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project']
+PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project', 'eoc-journal']
 # Modules having these categories would be excluded from progress calculations
 PROGRESS_DETACHED_CATEGORIES = PROGRESS_DETACHED_VERTICAL_CATEGORIES + ['discussion-forum']
 ############################## EVENT TRACKING #################################
@@ -2974,6 +2977,9 @@ FIELD_OVERRIDE_PROVIDERS = ()
 # require student context.
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
 
+# IMAGE CONFIG
+IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+
 # PROFILE IMAGE CONFIG
 # WARNING: Certain django storage backends do not support atomic
 # file overwrites (including the default, OverwriteStorage) - instead
@@ -3002,6 +3008,54 @@ PROFILE_IMAGE_SIZES_MAP = {
     'large': 120,
     'medium': 50,
     'small': 30
+}
+
+# ORGANIZATION IMAGES CONFIG
+# WARNING: Certain django storage backends do not support atomic
+# file overwrites (including the default, OverwriteStorage) - instead
+# there are separate calls to delete and then write a new file in the
+# storage backend.  This introduces the risk of a race condition
+# occurring when a user uploads a new image to replace an
+# earlier one (the file will temporarily be deleted).
+ORGANIZATION_THEME_IMAGE_SECRET_KEY = 'placeholder secret key'
+
+ORGANIZATION_LOGO_IMAGE_BACKEND = {
+    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'options': {
+        'location': os.path.join(MEDIA_ROOT, 'organization-logo-images/'),
+        'base_url': os.path.join(MEDIA_URL, 'organization-logo-images/'),
+    },
+}
+
+# This secret key is used in generating unguessable URLs to users'
+# profile images.  Once it has been set, changing it will make the
+# platform unaware of current image URLs, resulting in reverting all
+# users' profile images to the default placeholder image.
+ORGANIZATION_LOGO_IMAGE_DEFAULT_FILENAME = 'images/organization-logo/default'
+ORGANIZATION_LOGO_IMAGE_KEY_PREFIX = 'logo'
+
+# logo image for organization in mobile apps
+ORGANIZATION_LOGO_IMAGE_SIZES_MAP = {
+    'full': '500x135',
+    'large': '375x105',
+    'medium': '250x70',
+    'small': '187x52',
+    'x-small': '125x35',
+}
+
+ORGANIZATION_HEADER_BG_IMAGE_KEY_PREFIX = 'header_bg'
+# header background image for organization in mobile apps
+ORGANIZATION_HEADER_BG_IMAGE_SIZES_MAP = {
+    'ipad_01': '1668x128',
+    'ipad_02': '2048x128',
+    'ipad_03': '1536x128',
+    'iphone_01': '750x128',
+    'iphone_plus_01': '1242x192',
+    'mdpi': '375x200',
+    'hdpi': '562x300',
+    'xhdpi': '750x400',
+    'xxhdpi': '1125x600',
+    'xxxhdpi': '1500x800',
 }
 
 # Sets the maximum number of courses listed on the homepage
