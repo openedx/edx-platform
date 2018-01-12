@@ -225,8 +225,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                     'courseware_section',
                     kwargs={
                         'course_id': unicode(course.id),
-                        'chapter': unicode(chapter.location.name),
-                        'section': unicode(section.location.name),
+                        'chapter': unicode(chapter.location.block_id),
+                        'section': unicode(section.location.block_id),
                     }
                 )
                 response = self.client.get(url)
@@ -345,8 +345,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course_key),
-                'chapter': unicode(self.chapter.location.name) if chapter_name is None else chapter_name,
-                'section': unicode(self.section2.location.name) if section_name is None else section_name,
+                'chapter': unicode(self.chapter.location.block_id) if chapter_name is None else chapter_name,
+                'section': unicode(self.section2.location.block_id) if section_name is None else section_name,
             }
         )
         response = self.client.get(url)
@@ -365,7 +365,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         url = reverse(
             'courseware_chapter',
-            kwargs={'course_id': unicode(self.course.id), 'chapter': unicode(self.chapter.location.name)},
+            kwargs={'course_id': unicode(self.course.id), 'chapter': unicode(self.chapter.location.block_id)},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -388,8 +388,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course_key),
-                'chapter': unicode(self.chapter.location.name),
-                'section': unicode(self.section.location.name),
+                'chapter': unicode(self.chapter.location.block_id),
+                'section': unicode(self.section.location.block_id),
             }
         )
         # create the url for enroll_staff view
@@ -546,8 +546,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             '/courses',
             unicode(self.course.id),
             'courseware',
-            self.chapter.location.name,
-            self.section.location.name,
+            self.chapter.location.block_id,
+            self.section.location.block_id,
             'f'
         ])
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
@@ -559,8 +559,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             '/courses',
             unicode(self.course.id),
             'courseware',
-            self.chapter.location.name,
-            self.section.location.name,
+            self.chapter.location.block_id,
+            self.section.location.block_id,
             '1'
         ]
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
@@ -2516,8 +2516,8 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'chapter': unicode(self.chapter.location.name),
-                'section': unicode(self.section.location.name),
+                'chapter': unicode(self.chapter.location.block_id),
+                'section': unicode(self.section.location.block_id),
             }
         )
         response = self.client.get(url, HTTP_USER_AGENT=user_agent)

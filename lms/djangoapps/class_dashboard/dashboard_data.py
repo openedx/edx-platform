@@ -170,7 +170,7 @@ def get_d3_problem_grade_distrib(course_id):
                 for child in unit.get_children():
 
                     # Student data is at the problem level
-                    if child.location.category == 'problem':
+                    if child.location.block_type == 'problem':
                         c_problem += 1
                         stack_data = []
 
@@ -327,7 +327,7 @@ def get_d3_section_grade_distrib(course_id, section):
             c_unit += 1
             c_problem = 0
             for child in unit.get_children():
-                if child.location.category == 'problem':
+                if child.location.block_type == 'problem':
                     c_problem += 1
                     problem_set.append(child.location)
                     problem_info[child.location] = {
@@ -414,7 +414,7 @@ def get_array_section_has_problem(course_id):
         for subsection in section.get_children():
             for unit in subsection.get_children():
                 for child in unit.get_children():
-                    if child.location.category == 'problem':
+                    if child.location.block_type == 'problem':
                         b_section_has_problem[i] = True
                         break  # out of child loop
                 if b_section_has_problem[i]:

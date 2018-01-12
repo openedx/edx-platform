@@ -326,7 +326,7 @@ class InheritingFieldData(KvsFieldData):
             # from parent as '_copy_from_templates' puts fields into
             # defaults.
             if ancestor and \
-               ancestor.location.category == 'library_content' and \
+               ancestor.location.block_type == 'library_content' and \
                self.has_default_value(name):
                 return super(InheritingFieldData, self).default(block, name)
 

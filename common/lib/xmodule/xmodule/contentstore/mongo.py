@@ -196,7 +196,7 @@ class MongoContentStore(ContentStore):
             self.export(asset['asset_key'], output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize', 'asset_key']:
-                    policy.setdefault(asset['asset_key'].name, {})[attr] = value
+                    policy.setdefault(asset['asset_key'].block_id, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f, sort_keys=True, indent=4)
@@ -384,13 +384,22 @@ class MongoContentStore(ContentStore):
     # stability of order is more important than sanity of order as any changes to order make things
     # unfindable
     ordered_key_fields = ['category', 'name', 'course', 'tag', 'org', 'revision']
+    property_names = {
+        'category': 'block_type',
+        'name': 'block_id',
+        'course': 'course',
+        'tag': 'DEPRECATED_TAG',
+        'org': 'org',
+        'revision': 'branch',
+    }
 
     @classmethod
     def asset_db_key(cls, location):
         """
         Returns the database _id and son structured lookup to find the given asset location.
         """
-        dbkey = SON((field_name, getattr(location, field_name)) for field_name in cls.ordered_key_fields)
+        dbkey = SON((field_name,
+                     getattr(location, cls.property_names[field_name])) for field_name in cls.ordered_key_fields)
         if getattr(location, 'deprecated', False):
             content_id = dbkey
         else:

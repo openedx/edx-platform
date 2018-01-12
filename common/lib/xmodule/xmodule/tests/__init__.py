@@ -549,11 +549,11 @@ class CourseComparisonTest(BulkAssertionTest):
                 actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
                 # split and old mongo use different names for the course root but we don't know which
                 # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
-                if expected_item.location.category == 'course':
+                if expected_item.location.block_type == 'course':
                     actual_item_location = actual_item_location.replace(name=actual_item_location.run)
                 actual_item = actual_item_map.get(map_key(actual_item_location))
                 # must be split
-                if actual_item is None and expected_item.location.category == 'course':
+                if actual_item is None and expected_item.location.block_type == 'course':
                     actual_item_location = actual_item_location.replace(name='course')
                     actual_item = actual_item_map.get(map_key(actual_item_location))
 

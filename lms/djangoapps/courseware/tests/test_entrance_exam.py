@@ -233,8 +233,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         expected_url = reverse('courseware_section',
                                kwargs={
                                    'course_id': unicode(self.course.id),
-                                   'chapter': self.entrance_exam.location.name,
-                                   'section': self.exam_1.location.name
+                                   'chapter': self.entrance_exam.location.block_id,
+                                   'section': self.exam_1.location.block_id
                                })
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
@@ -248,8 +248,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         expected_url = reverse('courseware_section',
                                kwargs={
                                    'course_id': unicode(self.course.id),
-                                   'chapter': self.chapter.location.name,
-                                   'section': self.welcome.location.name
+                                   'chapter': self.chapter.location.block_id,
+                                   'section': self.welcome.location.block_id
                                })
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
@@ -265,8 +265,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         expected_url = reverse('courseware_section',
                                kwargs={
                                    'course_id': unicode(self.course.id),
-                                   'chapter': self.entrance_exam.location.name,
-                                   'section': self.exam_1.location.name
+                                   'chapter': self.entrance_exam.location.block_id,
+                                   'section': self.exam_1.location.block_id
                                })
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
@@ -296,8 +296,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'chapter': self.entrance_exam.location.name,
-                'section': self.exam_1.location.name,
+                'chapter': self.entrance_exam.location.block_id,
+                'section': self.exam_1.location.block_id,
             }
         )
         resp = self.client.get(url)
@@ -320,8 +320,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'chapter': self.entrance_exam.location.name,
-                'section': self.exam_1.location.name
+                'chapter': self.entrance_exam.location.block_id,
+                'section': self.exam_1.location.block_id
             }
         )
         resp = self.client.get(url)
@@ -346,8 +346,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'chapter': self.chapter.location.name,
-                'section': self.chapter_subsection.location.name
+                'chapter': self.chapter.location.block_id,
+                'section': self.chapter_subsection.location.block_id
             }
         )
         resp = self.client.get(url)
@@ -366,8 +366,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'courseware_section',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'chapter': self.entrance_exam.location.name,
-                'section': self.exam_1.location.name
+                'chapter': self.entrance_exam.location.block_id,
+                'section': self.exam_1.location.block_id
             }
         )
 
@@ -450,8 +450,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         expected_url = reverse('courseware_section',
                                kwargs={
                                    'course_id': unicode(self.course.id),
-                                   'chapter': self.entrance_exam.location.name,
-                                   'section': self.exam_1.location.name
+                                   'chapter': self.entrance_exam.location.block_id,
+                                   'section': self.exam_1.location.block_id
                                })
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 

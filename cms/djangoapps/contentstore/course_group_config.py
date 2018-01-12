@@ -135,7 +135,7 @@ class GroupConfiguration(object):
 
         unit_url = reverse_usage_url(
             'container_handler',
-            course.location.course_key.make_usage_key(unit_for_url.location.block_type, unit_for_url.location.name)
+            course.location.course_key.make_usage_key(unit_for_url.location.block_type, unit_for_url.location.block_id)
         )
 
         usage_dict = {'label': u"{} / {}".format(unit.display_name, item.display_name), 'url': unit_url}

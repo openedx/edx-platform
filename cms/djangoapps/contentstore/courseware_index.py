@@ -597,7 +597,7 @@ class CourseAboutSearchIndexer(object):
 
         # load data for all of the 'about' modules for this course into a dictionary
         about_dictionary = {
-            item.location.name: item.data
+            item.location.block_id: item.data
             for item in modulestore.get_items(course.id, qualifiers={"category": "about"})
         }
 

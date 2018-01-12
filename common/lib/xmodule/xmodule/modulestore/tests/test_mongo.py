@@ -715,7 +715,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course_key = CourseLocator(org="edX", course="101", run="2015")
         root_block_key = self.draft_store.make_course_usage_key(course_key)
         self.assertEqual(root_block_key.block_type, "course")
-        self.assertEqual(root_block_key.name, "2015")
+        self.assertEqual(root_block_key.block_id, "2015")
 
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
