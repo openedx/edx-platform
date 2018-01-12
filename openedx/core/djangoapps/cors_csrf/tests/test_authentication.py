@@ -16,7 +16,8 @@ class CrossDomainAuthTest(TestCase):
 
     URL = "/dummy_url"
     REFERER = "https://www.edx.org"
-    CSRF_TOKEN = 'abcd1234'
+    # Token length is 32 characters, which keeps it from being replaced during sanitization.
+    CSRF_TOKEN = 'abcd1234abcd1234abcd1234abcd1234'
 
     def setUp(self):
         super(CrossDomainAuthTest, self).setUp()
