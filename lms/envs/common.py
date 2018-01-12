@@ -521,7 +521,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
 OAUTH2_PROVIDER = {
-    'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxOAuth2Validator',
     'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
     'SCOPES': {
         'read': 'Read access',
@@ -531,6 +531,7 @@ OAUTH2_PROVIDER = {
         # to lms/templates/provider/authorize.html. This may be revised later.
         'profile': 'Know your name and username',
     },
+    'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
 }
 # This is required for the migrations in oauth_dispatch.models
 # otherwise it fails saying this attribute is not present in Settings
