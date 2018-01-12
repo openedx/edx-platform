@@ -12,7 +12,7 @@ from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from pytz import utc
 
-from .models import RestrictedApplication
+from ..models import RestrictedApplication
 
 
 @receiver(pre_save, sender=AccessToken)

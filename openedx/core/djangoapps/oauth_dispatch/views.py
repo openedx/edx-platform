@@ -24,6 +24,7 @@ from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
 
 from . import adapters
+from .dot_overrides import views as dot_overrides_views
 
 
 class _DispatchingView(View):
@@ -129,7 +130,7 @@ class AuthorizationView(_DispatchingView):
     Part of the authorization flow.
     """
     dop_view = dop_views.Capture
-    dot_view = dot_views.AuthorizationView
+    dot_view = dot_overrides_views.EdxOAuth2AuthorizationView
 
 
 class AccessTokenExchangeView(_DispatchingView):
