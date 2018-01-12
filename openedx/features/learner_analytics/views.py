@@ -1,7 +1,6 @@
 """
 Learner analytics dashboard views
 """
-import json
 import logging
 import math
 import urllib
@@ -14,12 +13,10 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import render_to_response
-from django.template.context_processors import csrf
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
@@ -32,6 +29,8 @@ from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.features.course_experience import default_course_url_name
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+
+from . import ENABLE_DASHBOARD_TAB
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +55,9 @@ class LearnerAnalyticsView(View):
             course_id (unicode): course id
         """
         course_key = CourseKey.from_string(course_id)
+        if not ENABLE_DASHBOARD_TAB.is_enabled(course_key):
+            raise Http404
+
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
