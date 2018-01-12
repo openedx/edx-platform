@@ -13,7 +13,7 @@ define(
             events: {
                 'click .toggle-show-transcripts-button': 'toggleShowTranscripts',
                 'click .upload-transcript-button': 'chooseFile',
-                'click .delete-transcript-button': 'removeTranscript',
+                'click .delete-transcript-button': 'deleteTranscript',
                 'click .more-details-action': 'showUploadFailureMessage'
             },
 
@@ -106,7 +106,7 @@ define(
             Toggles Show/Hide transcript button and transcripts container.
             */
             toggleShowTranscripts: function() {
-                var $transcriptsWrapperEl = this.$el.find('.show-video-transcripts-wrapper');
+                var $transcriptsWrapperEl = this.$el.find('.video-transcripts-wrapper');
 
                 if ($transcriptsWrapperEl.hasClass('hidden')) {
                     this.showTranscripts();
@@ -119,13 +119,13 @@ define(
 
             showTranscripts: function() {
                 // Show transcript wrapper
-                this.$el.find('.show-video-transcripts-wrapper').removeClass('hidden');
+                this.$el.find('.video-transcripts-wrapper').removeClass('hidden');
 
                 // Update button text.
                 HtmlUtils.setHtml(
                     this.$el.find('.toggle-show-transcripts-button-text'),
                     StringUtils.interpolate(
-                        gettext('Show transcripts ({transcriptCount})'),
+                        gettext('Hide transcripts ({transcriptCount})'),
                         {
                             transcriptCount: this.transcripts.length
                         }
@@ -138,15 +138,15 @@ define(
 
             hideTranscripts: function() {
                 // Hide transcript wrapper
-                this.$el.find('.show-video-transcripts-wrapper').addClass('hidden');
+                this.$el.find('.video-transcripts-wrapper').addClass('hidden');
 
                 // Update button text.
                 HtmlUtils.setHtml(
                     this.$el.find('.toggle-show-transcripts-button-text'),
                     StringUtils.interpolate(
-                        gettext('Hide transcripts ({transcriptCount})'),
+                        gettext('Show transcripts ({transcriptCount})'),
                         {
-                            transcriptCount: _.size(this.transcripts)
+                            transcriptCount: this.transcripts.length
                         }
                     )
                 );
@@ -171,7 +171,7 @@ define(
             },
 
             chooseFile: function(event) {
-                var $transcriptContainer = $(event.target).parents('.show-video-transcript-content'),
+                var $transcriptContainer = $(event.target).parents('.video-transcript-content'),
                     $transcriptUploadEl = $transcriptContainer.find('.upload-transcript-input');
 
                 $transcriptUploadEl.fileupload({
@@ -191,7 +191,7 @@ define(
 
             transcriptSelected: function(event, data) {
                 var errorMessage,
-                    $transcriptContainer = $(event.target).parents('.show-video-transcript-content');
+                    $transcriptContainer = $(event.target).parents('.video-transcript-content');
 
                 errorMessage = this.validateTranscriptUpload(data.files[0]);
                 if (!errorMessage) {
@@ -209,7 +209,7 @@ define(
             transcriptUploadSucceeded: function(event, data) {
                 var languageCode = data.formData.language_code,
                     newLanguageCode = data.formData.new_language_code,
-                    $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 $transcriptContainer.attr('data-language-code', newLanguageCode);
                 $transcriptContainer.find('.download-transcript-button').attr(
@@ -238,7 +238,7 @@ define(
             transcriptUploadFailed: function(event, data) {
                 var errorMessage,
                     languageCode = data.formData.language_code,
-                    $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 try {
                     errorMessage = JSON.parse(data.jqXHR.responseText).error;
@@ -252,19 +252,19 @@ define(
                 this.renderMessage($transcriptContainer, 'failed', errorMessage);
             },
 
-            removeTranscript: function(event) {
+            deleteTranscript: function(event) {
                 var self = this,
-                    $transcriptEl = $(event.target).parents('.show-video-transcript-content'),
+                    $transcriptEl = $(event.target).parents('.video-transcript-content'),
                     languageCode = $transcriptEl.attr('data-language-code'),
-                    transcriptDeleteUrl = this.getTranscriptDeleteUrl(
-                        this.edxVideoID,
+                    transcriptDeleteUrl = self.getTranscriptDeleteUrl(
+                        self.edxVideoID,
                         languageCode,
-                        this.videoTranscriptSettings.transcript_delete_handler_url
+                        self.videoTranscriptSettings.transcript_delete_handler_url
                     );
 
                 ViewUtils.confirmThenRunOperation(
-                    gettext('Are you sure you want to remove this transcript from the video?'),
-                    gettext('Removing a transcript from this video will have impact on all the video components using this video.'),  // eslint-disable-line max-len
+                    gettext('Are you sure you want to remove this transcript?'),
+                    gettext('If you remove this transcript, the transcript will not be available for any components that use this video.'),  // eslint-disable-line max-len
                     gettext('Remove'),
                     function() {
                         ViewUtils.runOperationShowingMessage(
@@ -275,7 +275,7 @@ define(
                                     type: 'DELETE'
                                 }).done(function() {
                                     // Update transcripts.
-                                    self.transcripts = _.omit(self.transcripts, languageCode);
+                                    self.transcripts = _.without(self.transcripts, languageCode);
                                     // re-render transcripts.
                                     self.render();
                                 });
@@ -346,7 +346,11 @@ define(
                     })
                 );
 
-                this.isCollapsed ? this.hideTranscripts() : this.showTranscripts();
+                if (this.isCollapsed) {
+                    this.hideTranscripts();
+                } else {
+                    this.showTranscripts();
+                }
                 return this;
             }
         });
