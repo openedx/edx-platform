@@ -33,50 +33,67 @@ class OrgSector(models.Model):
     """
     Specifies what sector the organization is working in.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class OperationLevel(models.Model):
     """
     Specifies the level of organization like national, international etc.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class FocusArea(models.Model):
     """
     The are of focus of an organization.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class TotalEmployee(models.Model):
     """
     Total employees in an organization.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
 
+    class Meta:
+        ordering = ['order']
+
 
 class PartnerNetwork(models.Model):
     """
     Specifies about the partner network being used in an organization.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=255)
 
@@ -84,6 +101,9 @@ class PartnerNetwork(models.Model):
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class Currency(models.Model):
@@ -95,30 +115,42 @@ class EducationLevel(models.Model):
     """
     Models education level of the user
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class EnglishProficiency(models.Model):
     """
     Models english proficiency level of the user.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
 
+    class Meta:
+        ordering = ['order']
+
 
 class FunctionArea(models.Model):
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=255)
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class Organization(TimeStampedModel):
@@ -181,11 +213,15 @@ class RoleInsideOrg(models.Model):
     """
     Specifies what is the role of a user inside the organization.
     """
+    order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
     def __str__(self):
         return self.label
+
+    class Meta:
+        ordering = ['order']
 
 
 class OrganizationAdminHashKeys(TimeStampedModel):
@@ -251,7 +287,7 @@ class UserExtendedProfile(TimeStampedModel):
         "goal_contribute_to_org": "Help improve my organization",
         "goal_gain_new_skill": "Develop new skills",
         "goal_improve_job_prospect": "Get a job",
-        "goal_relation_with_other": "Build relantionships with other nonprofit leaders"
+        "goal_relation_with_other": "Build relationships with other nonprofit leaders"
     }
 
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='extended_profile')

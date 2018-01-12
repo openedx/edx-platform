@@ -34,9 +34,11 @@ def create_records(apps, ModelClass, records_map):
     all_codes = ModelClass.objects.all().values_list('code', flat=True)
 
     objs = []
+    idx = 1
     for code, label in records_map.items():
         if not code in all_codes:
-            objs.append(ModelClass(code=code, label=label))
+            objs.append(ModelClass(order=idx, code=code, label=label))
+            idx += 1
 
     if objs:
         ModelClass.objects.bulk_create(objs)
@@ -53,7 +55,7 @@ class Migration(migrations.Migration):
             "IWRNS": "I'd rather not say",
             "MD": "Master's degree",
             "NFE": "No formal educational degree",
-            "SUND": "Some college, no degree",
+            "SUND": "Some university, no degree",
         }
         EducationLevel = apps.get_model('onboarding', 'EducationLevel')
         create_records(apps, EducationLevel, _levels)
@@ -119,11 +121,10 @@ class Migration(migrations.Migration):
             "HEALTH": "Health",
             "HCR": "Human and Civil Rights",
             "HSRV": "Human Services",
-            "IWRNS": "I'd rather not say",
             "INERNAIONA": "International",
-            "OTHER": "Other",
             "RELIGION": "Religion",
             "RPP": "Research and Public Policy",
+            "OTHER": "Other",
         }
         FocusArea = apps.get_model('onboarding', 'FocusArea')
         create_records(apps, FocusArea, _levels)
@@ -131,15 +132,15 @@ class Migration(migrations.Migration):
     def insert_total_employees(apps, schema_editor):
         _levels = {
             "1-ONLY": "1 (only yourself)",
-            "1,000+": "1,000+",
-            "101-200": "101-200",
-            "11-20": "11-20",
             "2-5": "2-5",
-            "201-501": "201-501",
+            "6-10": "6-10",
+            "11-20": "11-20",
             "21-50": "21-50",
+            "101-200": "101-200",
+            "201-501": "201-501",
             "501-1,000": "501-1,000",
             "51-100": "51-100",
-            "6-10": "6-10",
+            "1,000+": "1,000+",
             "NA": "Not applicable",
         }
         TotalEmployee = apps.get_model('onboarding', 'TotalEmployee')
