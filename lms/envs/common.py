@@ -954,6 +954,7 @@ STATIC_ROOT = ENV_ROOT / "staticfiles"
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    NODE_MODULES_ROOT / "@edx",
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
