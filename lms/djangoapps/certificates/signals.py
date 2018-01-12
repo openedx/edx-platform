@@ -17,7 +17,7 @@ from openedx.core.djangoapps.certificates.api import auto_certificate_generation
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from student.models import CourseEnrollment
-from common.djangoapps.course_modes.models import CourseMode
+from course_modes.models import CourseMode
 
 
 log = logging.getLogger(__name__)
