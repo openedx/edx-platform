@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.tests.factories import GlobalStaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -118,7 +119,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         for (displayname, accordion, tabs) in test_data:
             response = self.client.get(reverse('courseware_section', kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
+                'course_id': text_type(self.course.id),
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
@@ -129,7 +130,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTabActive('courseware', response)
 
         response = self.client.get(reverse('courseware_section', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': text_type(self.course.id),
             'chapter': 'Chrome',
             'section': 'progress_tab',
         }))
@@ -169,9 +170,9 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.course.id.to_deprecated_string()}))
+                               kwargs={'course_id': text_type(self.course.id)}))
         self.assertRedirects(resp, reverse(
-            'courseware_section', kwargs={'course_id': self.course.id.to_deprecated_string(),
+            'courseware_section', kwargs={'course_id': text_type(self.course.id),
                                           'chapter': 'Overview',
                                           'section': 'Welcome'}))
 
@@ -188,14 +189,14 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         section_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
+                'course_id': text_type(self.course.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             },
         )
         self.client.get(section_url)
         resp = self.client.get(
-            reverse('courseware', kwargs={'course_id': self.course.id.to_deprecated_string()}),
+            reverse('courseware', kwargs={'course_id': text_type(self.course.id)}),
         )
         self.assertRedirects(resp, section_url)
 
@@ -212,7 +213,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         section_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': self.course.id.to_deprecated_string(),
+                'course_id': text_type(self.course.id),
                 'chapter': 'factory_chapter',
                 'section': 'factory_section',
             }
@@ -222,7 +223,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # And now hitting the courseware tab should redirect to 'factory_chapter'
         url = reverse(
             'courseware',
-            kwargs={'course_id': self.course.id.to_deprecated_string()}
+            kwargs={'course_id': text_type(self.course.id)}
         )
         resp = self.client.get(url)
         self.assertRedirects(resp, section_url)
@@ -235,7 +236,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.test_course, True)
 
-        test_course_id = self.test_course.id.to_deprecated_string()
+        test_course_id = text_type(self.test_course.id)
 
         url = reverse(
             'courseware',
@@ -289,7 +290,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.test_course_proctored, True)
 
-        test_course_id = self.test_course_proctored.id.to_deprecated_string()
+        test_course_id = text_type(self.test_course_proctored.id)
 
         with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False}):
             url = reverse(

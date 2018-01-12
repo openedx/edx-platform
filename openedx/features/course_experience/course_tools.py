@@ -1,7 +1,7 @@
 """
 Support for course tool plugins.
 """
-from openedx.core.lib.api.plugins import PluginManager
+from openedx.core.lib.plugins import PluginManager
 
 # Stevedore extension point namespace
 COURSE_TOOLS_NAMESPACE = 'openedx.course_tool'

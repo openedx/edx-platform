@@ -9,9 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.http import HttpResponseNotFound, HttpResponse
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_http_methods, require_POST, require_GET
 from edxval.api import (
     create_or_update_video_transcript,
+    delete_video_transcript,
     get_available_transcript_languages,
     get_3rd_party_transcription_plans,
     get_video_transcript_data,
@@ -21,12 +22,18 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
+from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
 
 from contentstore.views.videos import TranscriptProvider
 from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
 
-__all__ = ['transcript_credentials_handler', 'transcript_download_handler', 'transcript_upload_handler']
+__all__ = [
+    'transcript_credentials_handler',
+    'transcript_download_handler',
+    'transcript_upload_handler',
+    'transcript_delete_handler'
+]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -254,3 +261,31 @@ def transcript_upload_handler(request, course_key_string):
             )
 
     return response
+
+
+@login_required
+@require_http_methods(["DELETE"])
+def transcript_delete_handler(request, course_key_string, edx_video_id, language_code):
+    """
+    View to delete a transcript file.
+
+    Arguments:
+        request: A WSGI request object
+        course_key_string: Course key identifying a course.
+        edx_video_id: edX video identifier whose transcript need to be deleted.
+        language_code: transcript's language code.
+
+    Returns
+        - A 404 if the corresponding feature flag is disabled or user does not have required permisions
+        - A 200 if transcript is deleted without any error(s)
+    """
+    # Check whether the feature is available for this course.
+    course_key = CourseKey.from_string(course_key_string)
+    video_transcripts_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_key)
+    # User needs to have studio write access for this course.
+    if not video_transcripts_enabled or not has_studio_write_access(request.user, course_key):
+        return HttpResponseNotFound()
+
+    delete_video_transcript(video_id=edx_video_id, language_code=language_code)
+
+    return JsonResponse(status=200)

@@ -25,7 +25,7 @@
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
@@ -3219,14 +3219,14 @@ msgid ""
 "early_with_info. To display only the links to passing students as soon as "
 "certificates are generated, enter early_no_info."
 msgstr ""
-"Ingresa fin, early_with_info, o early_no_info. Después de la generación del "
-"certificado, estudiantes que aprobaron ven un enlace a sus certificados en "
-"el panel y estudiantes que no aprobaron ven información acerca de la "
-"configuración de la escala. El predeterminado es fin,cual muestra esa "
-"información a todos los estudiantes lo mas pronto después que sus "
-"certificados son generados, ingresa early_with_info. Para mostrar solo los "
-"enlaces a los estudiantes que pasan tal pronto sus certificados son "
-"generados,ingresa early_no_info."
+"Ingrese end, early_with_info, o early_no_info. Después de la generación del "
+"certificado, los estudiantes que aprobaron ven un enlace a sus certificados "
+"en el panel y los estudiantes que no aprobaron ven información acerca de la "
+"configuración de calificaciones. El predeterminado es end, el cual muestra "
+"esa información los estudiantes al finalizar el curso. Para mostrar la "
+"información tan pronto los certificados son generados, ingrese "
+"early_with_info. Para mostrar solo los enlaces a los estudiantes que ya "
+"obtuvieron un certificado ingrese early_no_info."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"

@@ -11,6 +11,7 @@ from django.test import RequestFactory, TestCase
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from six import text_type
 
 import django_comment_client.utils as utils
 from course_modes.models import CourseMode
@@ -180,8 +181,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
                 reverse(
                     "jump_to",
                     kwargs={
-                        "course_id": self.course.id.to_deprecated_string(),
-                        "location": discussion.location.to_deprecated_string()
+                        "course_id": text_type(self.course.id),
+                        "location": text_type(discussion.location)
                     }
                 )
             )

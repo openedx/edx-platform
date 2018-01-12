@@ -12,10 +12,10 @@ from lxml import etree
 from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
-from xblock.fragment import Fragment
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -386,7 +386,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             context['bookmarked'] = is_bookmarked
 
             rendered_item = item.render(STUDENT_VIEW, context)
-            fragment.add_frag_resources(rendered_item)
+            fragment.add_fragment_resources(rendered_item)
 
             iteminfo = {
                 'content': rendered_item.content,

@@ -108,7 +108,7 @@ Glossary
 An Overview of edX's Dynamic Pacing System
 ------------------------------------------
 
-.. image:: img/system_diagram.png
+.. image:: images/system_diagram.png
 
 
 Running the Management Commands

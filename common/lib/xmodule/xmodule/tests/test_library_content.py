@@ -7,7 +7,7 @@ Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 from bson.objectid import ObjectId
 from mock import Mock, patch
 
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor

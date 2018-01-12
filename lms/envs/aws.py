@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This is the default template for our main set of AWS servers. This does NOT
-cover the content machines, which use content.py
+This is the default template for our main set of AWS servers.
 
 Common traits:
 * Use memcached, and cache-backed sessions
@@ -45,7 +44,6 @@ CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 # based on the service variant. If no variant is use, don't use a
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
 
 ################################ ALWAYS THE SAME ##############################
 
@@ -271,12 +269,6 @@ BULK_EMAIL_ROUTING_KEY = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY', HIGH_PRIORITY_
 # we have to reset the value here.
 BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL_JOBS', LOW_PRIORITY_QUEUE)
 
-# Queue to use for updating persistent grades
-RECALCULATE_GRADES_ROUTING_KEY = ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
-
-# Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = ENV_TOKENS.get('POLICY_CHANGE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
-
 # Queue to use for expiring old entitlements
 ENTITLEMENTS_EXPIRATION_ROUTING_KEY = ENV_TOKENS.get('ENTITLEMENTS_EXPIRATION_ROUTING_KEY', LOW_PRIORITY_QUEUE)
 
@@ -361,6 +353,8 @@ VIRTUAL_UNIVERSITIES = ENV_TOKENS.get('VIRTUAL_UNIVERSITIES', [])
 META_UNIVERSITIES = ENV_TOKENS.get('META_UNIVERSITIES', {})
 COMMENTS_SERVICE_URL = ENV_TOKENS.get("COMMENTS_SERVICE_URL", '')
 COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY", '')
+CERT_NAME_SHORT = ENV_TOKENS.get('CERT_NAME_SHORT', CERT_NAME_SHORT)
+CERT_NAME_LONG = ENV_TOKENS.get('CERT_NAME_LONG', CERT_NAME_LONG)
 CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
 ZENDESK_URL = ENV_TOKENS.get('ZENDESK_URL', ZENDESK_URL)
 ZENDESK_CUSTOM_FIELDS = ENV_TOKENS.get('ZENDESK_CUSTOM_FIELDS', ZENDESK_CUSTOM_FIELDS)
@@ -1075,15 +1069,6 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     PARENTAL_CONSENT_AGE_LIMIT
 )
 
-############## Settings for ACE ####################################
-ACE_ENABLED_CHANNELS = ENV_TOKENS.get('ACE_ENABLED_CHANNELS', ACE_ENABLED_CHANNELS)
-ACE_ENABLED_POLICIES = ENV_TOKENS.get('ACE_ENABLED_POLICIES', ACE_ENABLED_POLICIES)
-ACE_CHANNEL_SAILTHRU_DEBUG = ENV_TOKENS.get('ACE_CHANNEL_SAILTHRU_DEBUG', ACE_CHANNEL_SAILTHRU_DEBUG)
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = ENV_TOKENS.get('ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME', ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME)
-ACE_CHANNEL_SAILTHRU_API_KEY = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_KEY', ACE_CHANNEL_SAILTHRU_API_KEY)
-ACE_CHANNEL_SAILTHRU_API_SECRET = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_SECRET', ACE_CHANNEL_SAILTHRU_API_SECRET)
-ACE_ROUTING_KEY = ENV_TOKENS.get('ACE_ROUTING_KEY', ACE_ROUTING_KEY)
-
 # Do NOT calculate this dynamically at startup with git because it's *slow*.
 EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
@@ -1100,6 +1085,11 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
+
+############################### Plugin Settings ###############################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.LMS, SettingsType.AWS)
 
 ########################## Derive Any Derived Settings  #######################
 

@@ -1,17 +1,17 @@
 """
 Test the student dashboard view.
 """
-import datetime
 import itertools
 import json
 import unittest
+from datetime import timedelta
 
 import ddt
-import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.utils.timezone import now
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -241,9 +241,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
 
     EMAIL_SETTINGS_ELEMENT_ID = "#actions-item-email-settings-0"
     ENABLED_SIGNALS = ['course_published']
-    TOMORROW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
-    THREE_YEARS_FROM_NOW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=(365 * 3))
-    THREE_YEARS_AGO = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=(365 * 3))
+    TOMORROW = now() + timedelta(days=1)
+    THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
+    THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
     MOCK_SETTINGS = {
         'FEATURES': {
             'DISABLE_START_DATES': False,
@@ -347,9 +347,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertNotIn('<div class="prerequisites">', response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch('student.views.get_visible_sessions_for_entitlement')
+    @patch('student.views.get_pseudo_session_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
-    def test_unfulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
+    def test_unfulfilled_entitlement(self, mock_course_overview, mock_pseudo_session, mock_course_runs, mock_get_programs):
         """
         When a learner has an unfulfilled entitlement, their course dashboard should have:
             - a hidden 'View Course' button
@@ -369,13 +370,17 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
                 'type': 'verified'
             }
         ]
+        mock_pseudo_session.return_value = {
+            'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+            'type': 'verified'
+        }
         response = self.client.get(self.path)
         self.assertIn('class="enter-course hidden"', response.content)
         self.assertIn('You must select a session to access the course.', response.content)
         self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
         self.assertIn('Related Programs:', response.content)
 
-    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch('student.views.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs):
         """
@@ -386,7 +391,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         CourseEntitlementFactory(
             user=self.user,
             created=self.THREE_YEARS_AGO,
-            expired_at=datetime.datetime.now()
+            expired_at=now()
         )
         mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
         mock_course_runs.return_value = [
@@ -468,7 +473,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         # self.assertNotIn(noAvailableSessions, response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch('student.views.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     @patch('opaque_keys.edx.keys.CourseKey.from_string')
     def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
@@ -505,7 +510,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn('Related Programs:', response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.get_visible_course_runs_for_entitlement')
+    @patch('student.views.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     @patch('opaque_keys.edx.keys.CourseKey.from_string')
     def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):

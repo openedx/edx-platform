@@ -34,7 +34,7 @@ if course is not None:
     tab_list = get_course_tab_list(request, course)
     %>
     % if uses_bootstrap:
-        <nav class="navbar course-tabs pb-0 navbar-expand">
+        <nav class="navbar course-tabs pb-0 navbar-expand" aria-label="${_('Course')}">
             <ul class="navbar-nav mr-auto">
                 % for tab in tab_list:
                     <%

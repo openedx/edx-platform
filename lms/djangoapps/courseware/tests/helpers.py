@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
+from six import text_type
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
@@ -253,7 +254,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
-            'course_id': course.id.to_deprecated_string(),
+            'course_id': text_type(course.id),
             'check_access': True,
         })
         result = resp.status_code == 200
@@ -269,7 +270,7 @@ class LoginEnrollmentTestCase(TestCase):
         url = reverse('change_enrollment')
         request_data = {
             'enrollment_action': 'unenroll',
-            'course_id': course.id.to_deprecated_string(),
+            'course_id': text_type(course.id),
         }
         self.assert_request_status_code(200, url, method="POST", data=request_data)
 

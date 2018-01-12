@@ -4,10 +4,10 @@ Structured Tagging based on XBlockAsides
 """
 
 from django.conf import settings
+from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import Dict, Scope
-from xblock.fragment import Fragment
 
 from edxmako.shortcuts import render_to_string
 from xmodule.capa_module import CapaModule

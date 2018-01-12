@@ -33,6 +33,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework import status
+from six import text_type
 from web_fragments.fragment import Fragment
 
 import shoppingcart
@@ -246,10 +247,10 @@ def jump_to_id(request, course_id, module_id):
             module_id,
             course_id,
             request.META.get("HTTP_REFERER", ""),
-            items[0].location.to_deprecated_string()
+            text_type(items[0].location)
         )
 
-    return jump_to(request, course_id, items[0].location.to_deprecated_string())
+    return jump_to(request, course_id, text_type(items[0].location))
 
 
 @ensure_csrf_cookie
@@ -303,7 +304,7 @@ def course_info(request, course_id):
             section_module = get_current_child(chapter_module)
             if section_module is not None:
                 url = reverse('courseware_section', kwargs={
-                    'course_id': unicode(course.id),
+                    'course_id': text_type(course.id),
                     'chapter': chapter_module.url_name,
                     'section': section_module.url_name
                 })
@@ -337,7 +338,7 @@ def course_info(request, course_id):
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
         if not user_can_skip_entrance_exam(user, course):
-            return redirect(reverse('courseware', args=[unicode(course.id)]))
+            return redirect(reverse('courseware', args=[text_type(course.id)]))
 
         # TODO: LEARNER-611: Remove deprecated course.bypass_home.
         # If the user is coming from the dashboard and bypass_home setting is set,
@@ -367,7 +368,7 @@ def course_info(request, course_id):
         context = {
             'request': request,
             'masquerade_user': user,
-            'course_id': course_key.to_deprecated_string(),
+            'course_id': text_type(course_key),
             'url_to_enroll': CourseTabView.url_to_enroll(course_key),
             'cache': None,
             'course': course,
@@ -476,7 +477,7 @@ class CourseTabView(EdxFragmentView):
         """
         Returns the URL to use to enroll in the specified course.
         """
-        url_to_enroll = reverse('about_course', args=[unicode(course_key)])
+        url_to_enroll = reverse('about_course', args=[text_type(course_key)])
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
         return url_to_enroll
@@ -536,7 +537,7 @@ class CourseTabView(EdxFragmentView):
             request.path,
             getattr(user, 'real_user', user),
             user,
-            unicode(course.id),
+            text_type(course.id),
         )
         try:
             return render_to_response(
@@ -703,7 +704,7 @@ class EnrollStaffView(View):
             return redirect(_next)
 
         # In any other case redirect to the course about page.
-        return redirect(reverse('about_course', args=[unicode(course_key)]))
+        return redirect(reverse('about_course', args=[text_type(course_key)]))
 
 
 @ensure_csrf_cookie
@@ -727,7 +728,7 @@ def course_about(request, course_id):
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-            return redirect(reverse(course_home_url_name(course.id), args=[unicode(course.id)]))
+            return redirect(reverse(course_home_url_name(course.id), args=[text_type(course.id)]))
 
         registered = registered_for_course(course, request.user)
 
@@ -735,9 +736,9 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
-            course_target = reverse(course_home_url_name(course.id), args=[course.id.to_deprecated_string()])
+            course_target = reverse(course_home_url_name(course.id), args=[text_type(course.id)])
         else:
-            course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+            course_target = reverse('about_course', args=[text_type(course.id)])
 
         show_courseware_link = bool(
             (
@@ -1160,7 +1161,7 @@ def submission_history(request, course_id, student_username, location):
         'scores': scores,
         'username': student_username,
         'location': location,
-        'course_id': course_key.to_deprecated_string()
+        'course_id': text_type(course_key)
     }
 
     return render_to_response('courseware/submission_history.html', context)
@@ -1391,7 +1392,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
             event_name,
             {
                 'category': 'certificates',
-                'label': unicode(course_id)
+                'label': text_type(course_id)
             },
             context={
                 'ip': tracking_context.get('ip'),
@@ -1427,7 +1428,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         # get the block, which verifies whether the user has access to the block.
         block, _ = get_module_by_usage_id(
-            request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True, course=course
+            request, text_type(course_key), text_type(usage_key), disable_staff_debug_info=True, course=course
         )
 
         student_view_context = request.GET.dict()
@@ -1575,7 +1576,7 @@ def financial_assistance_form(request):
             'email': user.email,
             'username': user.username,
             'name': user.profile.name,
-            'country': unicode(user.profile.country.name),
+            'country': text_type(user.profile.country.name),
         },
         'submit_url': reverse('submit_financial_assistance_request'),
         'fields': [
@@ -1675,7 +1676,7 @@ def get_financial_aid_courses(user):
             financial_aid_courses.append(
                 {
                     'name': enrollment.course_overview.display_name,
-                    'value': unicode(enrollment.course_id)
+                    'value': text_type(enrollment.course_id)
                 }
             )
 

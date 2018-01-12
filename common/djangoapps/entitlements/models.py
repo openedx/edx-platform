@@ -1,11 +1,11 @@
 import uuid as uuid_tools
-from datetime import datetime, timedelta
+from datetime import timedelta
 from util.date_utils import strftime_localized
 
-import pytz
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
+from django.utils.timezone import now
 
 from certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
@@ -45,16 +45,16 @@ class CourseEntitlementPolicy(models.Model):
         Returns an integer of number of days until the entitlement expires.
         Includes the logic for regaining an entitlement.
         """
-        now = datetime.now(tz=pytz.UTC)
+        now_timestamp = now()
         expiry_date = entitlement.created + self.expiration_period
-        days_until_expiry = (expiry_date - now).days
+        days_until_expiry = (expiry_date - now_timestamp).days
         if not entitlement.enrollment_course_run:
             return days_until_expiry
         course_overview = CourseOverview.get_from_id(entitlement.enrollment_course_run.course_id)
         # Compute the days left for the regain
-        days_since_course_start = (now - course_overview.start).days
-        days_since_enrollment = (now - entitlement.enrollment_course_run.created).days
-        days_since_entitlement_created = (now - entitlement.created).days
+        days_since_course_start = (now_timestamp - course_overview.start).days
+        days_since_enrollment = (now_timestamp - entitlement.enrollment_course_run.created).days
+        days_since_entitlement_created = (now_timestamp - entitlement.created).days
 
         # We want to return whichever days value is less since it is then the more recent one
         days_until_regain_ends = (self.regain_period.days -  # pylint: disable=no-member
@@ -133,7 +133,6 @@ class CourseEntitlement(TimeStampedModel):
     """
     Represents a Student's Entitlement to a Course Run for a given Course.
     """
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
     course_uuid = models.UUIDField(help_text='UUID for the Course, not the Course Run')
@@ -185,8 +184,7 @@ class CourseEntitlement(TimeStampedModel):
         """
         Returns an integer of number of days since the entitlement has been created
         """
-        utc = pytz.UTC
-        return (datetime.now(tz=utc) - self.created).days
+        return (now() - self.created).days
 
     def update_expired_at(self):
         """
@@ -196,7 +194,7 @@ class CourseEntitlement(TimeStampedModel):
         if not self.expired_at:
             if (self.policy.get_days_until_expiration(self) < 0 or
                     (self.enrollment_course_run and not self.is_entitlement_regainable())):
-                self.expired_at = datetime.utcnow()
+                self.expired_at = now()
                 self.save()
 
     def get_days_until_expiration(self):
@@ -236,7 +234,7 @@ class CourseEntitlement(TimeStampedModel):
         expiration_date = None
         if self.get_days_until_expiration() < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD:
             expiration_date = strftime_localized(
-                datetime.now(tz=pytz.UTC) + timedelta(days=self.get_days_until_expiration()),
+                now() + timedelta(days=self.get_days_until_expiration()),
                 'SHORT_DATE'
             )
         expired_at = strftime_localized(self.expired_at_datetime, 'SHORT_DATE') if self.expired_at_datetime else None

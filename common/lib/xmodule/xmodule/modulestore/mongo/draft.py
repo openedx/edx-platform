@@ -11,6 +11,7 @@ import logging
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import Location
+from six import text_type
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
@@ -263,7 +264,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # create a query to find all items in the course that have the given location listed as a child
         query = self._course_key_to_son(location.course_key)
-        query['definition.children'] = location.to_deprecated_string()
+        query['definition.children'] = text_type(location)
 
         # find all the items that satisfy the query
         parents = self.collection.find(query, {'_id': True}, sort=[SORT_REVISION_FAVOR_DRAFT])

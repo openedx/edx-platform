@@ -4,6 +4,7 @@ Utilities for grades related tests
 from contextlib import contextmanager
 from datetime import datetime
 
+import pytz
 from mock import patch, MagicMock
 
 from courseware.model_data import FieldDataCache
@@ -30,7 +31,7 @@ def mock_passing_grade(letter_grade='Pass', percent=0.75, ):
 
 
 @contextmanager
-def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0)):
+def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)):
     """
     Mocks the get_score function to return a valid grade.
     """
@@ -48,7 +49,7 @@ def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0,
 
 
 @contextmanager
-def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0)):
+def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)):
     """
     Mocks the _get_submissions_score function to return the specified values
     """

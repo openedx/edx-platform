@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:47+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.877068\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.873858\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -37,7 +37,7 @@ msgstr ""
 "Language: en\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: common/static/bundles/Import.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/Import.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -200,6 +200,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
+#: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
@@ -1405,6 +1406,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Replace"
 msgstr ""
@@ -2041,13 +2043,11 @@ msgstr ""
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show more"
 msgstr ""
 
 #: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "Show less"
 msgstr ""
 
@@ -6509,6 +6509,33 @@ msgstr ""
 msgid "Image upload failed. "
 msgstr ""
 
+#: cms/static/js/views/video_transcripts.js
+msgid "The file could not be uploaded."
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Show"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Hide"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This file type is not supported. Supported file type is "
+"{supportedFileFormat}."
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+#: cms/templates/js/video-transcripts.underscore
+msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+msgstr ""
+
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
 msgstr ""
@@ -8496,6 +8523,35 @@ msgid "Create an Account."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
+msgid "Sign in to continue learning as {email}"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Sign in to continue learning"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You already have an edX account with your {enterprise_name} email address."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"Going forward, your account information will be updated and maintained by "
+"{enterprise_name}."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You can view your information or unlink from {enterprise_name} anytime in "
+"your Account Settings."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "To continue learning with this account, sign in below."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Sign In"
 msgstr ""
@@ -10277,6 +10333,7 @@ msgid "Component Location ID"
 msgstr ""
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr ""
@@ -10329,6 +10386,10 @@ msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Transcripts"
 msgstr ""
 
 #: cms/templates/js/previous-video-upload.underscore
@@ -10772,6 +10833,18 @@ msgstr ""
 msgid ""
 "Recommended image resolution is {imageResolution}, maximum image file size "
 "should be {maxFileSize} and format must be one of {supportedImageFormats}."
+msgstr ""
+
+#: cms/templates/js/video-transcript-upload-status.underscore
+msgid "Read more"
+msgstr ""
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr ""
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "No transcript uploaded."
 msgstr ""
 
 #: cms/templates/js/xblock-access-editor.underscore

@@ -51,7 +51,7 @@ def export_courses_to_output_path(output_path):
         print("-" * 80)
         print("Exporting course id = {0} to {1}".format(course_id, output_path))
         try:
-            course_dir = course_id.to_deprecated_string().replace('/', '...')
+            course_dir = text_type(course_id).replace('/', '...')
             export_course_to_xml(module_store, content_store, course_id, root_dir, course_dir)
         except Exception as err:  # pylint: disable=broad-except
             failed_export_courses.append(text_type(course_id))

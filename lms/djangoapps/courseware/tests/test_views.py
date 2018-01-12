@@ -25,9 +25,10 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from pytz import UTC
+from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 
 import courseware.views.views as views
 import shoppingcart
@@ -533,16 +534,16 @@ class ViewsTestCase(ModuleStoreTestCase):
         # test the course location
         self.assertEqual(
             u'/courses/{course_key}/courseware?{activate_block_id}'.format(
-                course_key=self.course_key.to_deprecated_string(),
-                activate_block_id=urlencode({'activate_block_id': self.course.location.to_deprecated_string()})
+                course_key=text_type(self.course_key),
+                activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})
             ),
             get_redirect_url(self.course_key, self.course.location),
         )
         # test a section location
         self.assertEqual(
             u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
-                course_key=self.course_key.to_deprecated_string(),
-                activate_block_id=urlencode({'activate_block_id': self.section.location.to_deprecated_string()})
+                course_key=text_type(self.course_key),
+                activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})
             ),
             get_redirect_url(self.course_key, self.section.location),
         )

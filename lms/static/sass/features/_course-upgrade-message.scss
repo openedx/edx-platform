@@ -4,6 +4,14 @@ the creative property. This will allow us to better track individual performance
 Search for the courseware_verified_certificate_upsell promotion ID.
 */
 
+.course-home-sidebar-upgrade .btn-upgrade {
+  padding: 10px 20px;
+}
+
+.course-home-sidebar-upgrade .promo-learn-more {
+  border: none;
+}
+
 .section.section-upgrade {
   border-left: solid 1px #d9d9d9;
   border-bottom: solid 1px #d9d9d9;
@@ -24,6 +32,13 @@ Search for the courseware_verified_certificate_upsell promotion ID.
 .section-upgrade .upgrade-container {
   float: right;
   text-align: center;
+  margin-top: 15px;
+}
+
+@media only screen and (max-width: 991px) and (min-width: 768px)  {
+  .section-upgrade .upgrade-container {
+    float: none;
+  }
 }
 
 .section.section-upgrade p {

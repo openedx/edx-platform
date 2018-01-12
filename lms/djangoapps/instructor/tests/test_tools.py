@@ -7,11 +7,13 @@ import json
 import unittest
 
 import mock
+import six
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
@@ -120,7 +122,7 @@ class TestFindUnit(SharedModuleStoreTestCase):
         """
         Test finding a nested unit.
         """
-        url = self.homework.location.to_deprecated_string()
+        url = text_type(self.homework.location)
         found_unit = tools.find_unit(self.course, url)
         self.assertEqual(found_unit.location, self.homework.location)
 
@@ -161,8 +163,10 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     def test_it(self):
 
         def urls(seq):
-            "URLs for sequence of nodes."
-            return sorted(i.location.to_deprecated_string() for i in seq)
+            """
+            URLs for sequence of nodes.
+            """
+            return sorted(text_type(i.location) for i in seq)
 
         self.assertEquals(
             urls(tools.get_units_with_due_date(self.course)),
@@ -179,9 +183,18 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'hello')
 
     def test_url(self):
+        def mock_location_text(self):
+            """
+            Mock implementation of __unicode__ or __str__ for the unit's location.
+            """
+            return u'test:hello'
+
         unit = mock.Mock(display_name=None)
-        unit.location.to_deprecated_string.return_value = 'test:hello'
-        self.assertEquals(tools.title_or_url(unit), 'test:hello')
+        if six.PY2:
+            unit.location.__unicode__ = mock_location_text
+        else:
+            unit.location.__str__ = mock_location_text
+        self.assertEquals(tools.title_or_url(unit), u'test:hello')
 
 
 @attr(shard=1)

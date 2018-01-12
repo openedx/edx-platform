@@ -1,8 +1,9 @@
 define(
     ['underscore', 'gettext', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
         'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils',
-        'text!templates/video-transcripts.underscore', 'text!templates/video-transcript-upload-status.underscore'],
-    function(_, gettext, BaseView, PromptView, HtmlUtils, StringUtils, videoTranscriptsTemplate,
+        'common/js/components/utils/view_utils', 'text!templates/video-transcripts.underscore',
+        'text!templates/video-transcript-upload-status.underscore'],
+    function(_, gettext, BaseView, PromptView, HtmlUtils, StringUtils, ViewUtils, videoTranscriptsTemplate,
                 videoTranscriptUploadStatusTemplate) {
         'use strict';
 
@@ -12,10 +13,12 @@ define(
             events: {
                 'click .toggle-show-transcripts-button': 'toggleShowTranscripts',
                 'click .upload-transcript-button': 'chooseFile',
+                'click .delete-transcript-button': 'deleteTranscript',
                 'click .more-details-action': 'showUploadFailureMessage'
             },
 
             initialize: function(options) {
+                this.isCollapsed = true;
                 this.transcripts = options.transcripts;
                 this.edxVideoID = options.edxVideoID;
                 this.clientVideoID = options.clientVideoID;
@@ -60,18 +63,6 @@ define(
             },
 
             /*
-            Sorts object by value and returns a sorted array.
-            */
-            sortByValue: function(itemObject) {
-                var sortedArray = [];
-                _.each(itemObject, function(value, key) {
-                    // Push each JSON Object entry in array by [value, key]
-                    sortedArray.push([value, key]);
-                });
-                return sortedArray.sort();
-            },
-
-            /*
             Returns transcript title.
             */
             getTranscriptClientTitle: function() {
@@ -98,32 +89,70 @@ define(
             },
 
             /*
+            Returns transcript delete handler url.
+            */
+            getTranscriptDeleteUrl: function(edxVideoID, transcriptLanguageCode, transcriptDeleteHandlerUrl) {
+                return StringUtils.interpolate(
+                    '{transcriptDeleteHandlerUrl}/{edxVideoID}/{transcriptLanguageCode}',
+                    {
+                        transcriptDeleteHandlerUrl: transcriptDeleteHandlerUrl,
+                        edxVideoID: edxVideoID,
+                        transcriptLanguageCode: transcriptLanguageCode
+                    }
+                );
+            },
+
+            /*
             Toggles Show/Hide transcript button and transcripts container.
             */
             toggleShowTranscripts: function() {
-                var $transcriptsWrapperEl = this.$el.find('.show-video-transcripts-wrapper');
+                var $transcriptsWrapperEl = this.$el.find('.video-transcripts-wrapper');
 
-                // Toggle show transcript wrapper.
-                $transcriptsWrapperEl.toggleClass('hidden');
+                if ($transcriptsWrapperEl.hasClass('hidden')) {
+                    this.showTranscripts();
+                    this.isCollapsed = false;
+                } else {
+                    this.hideTranscripts();
+                    this.isCollapsed = true;
+                }
+            },
 
-                // Toggle button text.
+            showTranscripts: function() {
+                // Show transcript wrapper
+                this.$el.find('.video-transcripts-wrapper').removeClass('hidden');
+
+                // Update button text.
                 HtmlUtils.setHtml(
                     this.$el.find('.toggle-show-transcripts-button-text'),
                     StringUtils.interpolate(
-                        gettext('{toggleShowTranscriptText} transcripts ({totalTranscripts})'),
+                        gettext('Hide transcripts ({transcriptCount})'),
                         {
-                            toggleShowTranscriptText: $transcriptsWrapperEl.hasClass('hidden') ? gettext('Show') : gettext('Hide'), // eslint-disable-line max-len
-                            totalTranscripts: _.size(this.transcripts)
+                            transcriptCount: this.transcripts.length
                         }
                     )
                 );
+                this.$el.find('.toggle-show-transcripts-icon')
+                    .removeClass('fa-caret-right')
+                    .addClass('fa-caret-down');
+            },
 
-                // Toggle icon class.
-                if ($transcriptsWrapperEl.hasClass('hidden')) {
-                    this.$el.find('.toggle-show-transcripts-icon').removeClass('fa-caret-down').addClass('fa-caret-right'); // eslint-disable-line max-len
-                } else {
-                    this.$el.find('.toggle-show-transcripts-icon').removeClass('fa-caret-right').addClass('fa-caret-down'); // eslint-disable-line max-len
-                }
+            hideTranscripts: function() {
+                // Hide transcript wrapper
+                this.$el.find('.video-transcripts-wrapper').addClass('hidden');
+
+                // Update button text.
+                HtmlUtils.setHtml(
+                    this.$el.find('.toggle-show-transcripts-button-text'),
+                    StringUtils.interpolate(
+                        gettext('Show transcripts ({transcriptCount})'),
+                        {
+                            transcriptCount: this.transcripts.length
+                        }
+                    )
+                );
+                this.$el.find('.toggle-show-transcripts-icon')
+                    .removeClass('fa-caret-down')
+                    .addClass('fa-caret-right');
             },
 
             validateTranscriptUpload: function(file) {
@@ -142,7 +171,7 @@ define(
             },
 
             chooseFile: function(event) {
-                var $transcriptContainer = $(event.target).parents('.show-video-transcript-content'),
+                var $transcriptContainer = $(event.target).parents('.video-transcript-content'),
                     $transcriptUploadEl = $transcriptContainer.find('.upload-transcript-input');
 
                 $transcriptUploadEl.fileupload({
@@ -162,7 +191,7 @@ define(
 
             transcriptSelected: function(event, data) {
                 var errorMessage,
-                    $transcriptContainer = $(event.target).parents('.show-video-transcript-content');
+                    $transcriptContainer = $(event.target).parents('.video-transcript-content');
 
                 errorMessage = this.validateTranscriptUpload(data.files[0]);
                 if (!errorMessage) {
@@ -180,7 +209,7 @@ define(
             transcriptUploadSucceeded: function(event, data) {
                 var languageCode = data.formData.language_code,
                     newLanguageCode = data.formData.new_language_code,
-                    $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 $transcriptContainer.attr('data-language-code', newLanguageCode);
                 $transcriptContainer.find('.download-transcript-button').attr(
@@ -209,7 +238,7 @@ define(
             transcriptUploadFailed: function(event, data) {
                 var errorMessage,
                     languageCode = data.formData.language_code,
-                    $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 try {
                     errorMessage = JSON.parse(data.jqXHR.responseText).error;
@@ -221,6 +250,39 @@ define(
                 $transcriptContainer.find('.transcript-language-menu').val(languageCode);
 
                 this.renderMessage($transcriptContainer, 'failed', errorMessage);
+            },
+
+            deleteTranscript: function(event) {
+                var self = this,
+                    $transcriptEl = $(event.target).parents('.video-transcript-content'),
+                    languageCode = $transcriptEl.attr('data-language-code'),
+                    transcriptDeleteUrl = self.getTranscriptDeleteUrl(
+                        self.edxVideoID,
+                        languageCode,
+                        self.videoTranscriptSettings.transcript_delete_handler_url
+                    );
+
+                ViewUtils.confirmThenRunOperation(
+                    gettext('Are you sure you want to remove this transcript?'),
+                    gettext('If you remove this transcript, the transcript will not be available for any components that use this video.'),  // eslint-disable-line max-len
+                    gettext('Remove'),
+                    function() {
+                        ViewUtils.runOperationShowingMessage(
+                            gettext('Removing'),
+                            function() {
+                                return $.ajax({
+                                    url: transcriptDeleteUrl,
+                                    type: 'DELETE'
+                                }).done(function() {
+                                    // Update transcripts.
+                                    self.transcripts = _.without(self.transcripts, languageCode);
+                                    // re-render transcripts.
+                                    self.render();
+                                });
+                            }
+                        );
+                    }
+                );
             },
 
             clearMessage: function() {
@@ -275,7 +337,7 @@ define(
                     this.$el,
                     this.template({
                         transcripts: this.transcripts,
-                        transcriptAvailableLanguages: this.sortByValue(this.transcriptAvailableLanguages),
+                        transcriptAvailableLanguages: this.transcriptAvailableLanguages,
                         edxVideoID: this.edxVideoID,
                         transcriptClientTitle: this.getTranscriptClientTitle(),
                         transcriptFileFormat: this.videoTranscriptSettings.trancript_download_file_format,
@@ -283,6 +345,12 @@ define(
                         transcriptDownloadHandlerUrl: this.videoTranscriptSettings.transcript_download_handler_url
                     })
                 );
+
+                if (this.isCollapsed) {
+                    this.hideTranscripts();
+                } else {
+                    this.showTranscripts();
+                }
                 return this;
             }
         });

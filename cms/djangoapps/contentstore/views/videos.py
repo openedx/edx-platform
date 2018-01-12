@@ -539,11 +539,7 @@ def _get_videos(course):
         video["status"] = convert_video_status(video)
 
         if is_video_transcript_enabled:
-            all_languages = get_all_transcript_languages()
-            video['transcripts'] = {
-                lang_code: all_languages[lang_code]
-                for lang_code in get_available_transcript_languages([video['edx_video_id']])
-            }
+            video['transcripts'] = get_available_transcript_languages([video['edx_video_id']])
 
     return videos
 
@@ -598,8 +594,15 @@ def get_all_transcript_languages():
     third_party_transcription_languages.update(cielo_fidelity['PREMIUM']['languages'])
     third_party_transcription_languages.update(cielo_fidelity['PROFESSIONAL']['languages'])
 
+    all_languages_dict = dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
     # Return combined system settings and 3rd party transcript languages.
-    return dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
+    all_languages = []
+    for key, value in sorted(all_languages_dict.iteritems(), key=lambda (k, v): v):
+        all_languages.append({
+            'language_code': key,
+            'language_text': value
+        })
+    return all_languages
 
 
 def videos_index_html(course):
@@ -648,6 +651,10 @@ def videos_index_html(course):
             ),
             'transcript_upload_handler_url': reverse_course_url(
                 'transcript_upload_handler',
+                unicode(course.id)
+            ),
+            'transcript_delete_handler_url': reverse_course_url(
+                'transcript_delete_handler',
                 unicode(course.id)
             ),
             'transcription_plans': get_3rd_party_transcription_plans(),

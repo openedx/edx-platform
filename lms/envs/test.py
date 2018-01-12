@@ -297,10 +297,6 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
-########################### Grades #################################
-FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
-FEATURES['ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS'] = True
-
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
@@ -532,9 +528,6 @@ NOTES_DISABLED_TABS = []
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
 
-# Enable teams feature for tests.
-FEATURES['ENABLE_TEAMS'] = True
-
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 
@@ -600,6 +593,11 @@ ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
+
+####################### Plugin Settings ##########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.LMS, SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 

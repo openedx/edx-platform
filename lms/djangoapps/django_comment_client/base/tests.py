@@ -16,6 +16,7 @@ from mock import ANY, Mock, patch
 from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from course_modes.models import CourseMode
@@ -1970,7 +1971,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         request = getattr(RequestFactory(), method)("dummy_url", kwargs)
         request.user = self.student
         request.view_name = "users"
-        return views.users(request, course_id=course_id.to_deprecated_string())
+        return views.users(request, course_id=text_type(course_id))
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def test_finds_exact_match(self, mock_request):

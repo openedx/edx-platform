@@ -1097,7 +1097,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
 
 def hash_resource(resource):
     """
-    Hash a :class:`xblock.fragment.FragmentResource
+    Hash a :class:`web_fragments.fragment.FragmentResource
     """
     md5 = hashlib.md5()
     for data in resource:

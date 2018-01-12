@@ -717,6 +717,33 @@ class TestProgramProgressMeter(TestCase):
 
             self.assertEqual(meter.progress(count_only=False), expected)
 
+    def test_detail_url_for_mobile_only(self, mock_get_programs):
+        """
+        Verify that correct program detail url is returned for mobile.
+        """
+        course_run_key = generate_course_run_key()
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key),
+                    ]),
+                ]
+            ),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        self._create_enrollments(course_run_key)
+        meter = ProgramProgressMeter(self.site, self.user, mobile_only=True)
+
+        program_data = meter.engaged_programs[0]
+        detail_fragment_url = reverse('program_details_fragment_view', kwargs={'program_uuid': program_data['uuid']})
+        path_id = detail_fragment_url.replace('/dashboard/', '')
+        expected_url = 'edxapp://enrolled_program_info?path_id={}'.format(path_id)
+
+        self.assertEqual(program_data['detail_url'], expected_url)
+
 
 def _create_course(self, course_price, course_run_count=1, make_entitlement=False):
     """

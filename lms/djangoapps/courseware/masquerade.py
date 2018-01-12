@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
 from student.models import CourseEnrollment

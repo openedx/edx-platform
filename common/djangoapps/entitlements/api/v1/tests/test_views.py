@@ -2,11 +2,11 @@ import json
 import logging
 import unittest
 import uuid
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.timezone import now
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -41,7 +41,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+            expiration_datetime=now() + timedelta(days=1)
         )
 
         self.entitlements_list_url = reverse('entitlements_api:v1:entitlements-list')
@@ -216,11 +216,11 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert results == CourseEntitlementSerializer([entitlement], many=True).data
 
     def test_staff_get_expired_entitlements(self):
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        past_datetime = now() - timedelta(days=365 * 2)
         entitlements = CourseEntitlementFactory.create_batch(2, created=past_datetime, user=self.user)
 
         # Set the first entitlement to be at a time that it isn't expired
-        entitlements[0].created = datetime.utcnow()
+        entitlements[0].created = now()
         entitlements[0].save()
 
         response = self.client.get(
@@ -233,7 +233,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert results[0].get('expired_at') is None and results[1].get('expired_at') is None
 
     def test_get_user_expired_entitlements(self):
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        past_datetime = now() - timedelta(days=365 * 2)
         not_staff_user = UserFactory()
         self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
         entitlement_user2 = CourseEntitlementFactory.create_batch(2, user=not_staff_user, created=past_datetime)
@@ -241,7 +241,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         url += '?user={username}'.format(username=not_staff_user.username)
 
         # Set the first entitlement to be at a time that it isn't expired
-        entitlement_user2[0].created = datetime.utcnow()
+        entitlement_user2[0].created = now()
         entitlement_user2[0].save()
 
         response = self.client.get(
@@ -284,7 +284,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert results == CourseEntitlementSerializer(entitlement).data and results.get('expired_at') is None
 
     def test_get_expired_entitlement_by_uuid(self):
-        past_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=365 * 2)
+        past_datetime = now() - timedelta(days=365 * 2)
         entitlement = CourseEntitlementFactory(created=past_datetime)
         CourseEntitlementFactory.create_batch(2)
 

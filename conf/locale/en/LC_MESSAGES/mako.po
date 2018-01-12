@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-03 14:47+0000\n"
-"PO-Revision-Date: 2018-01-03 14:53:33.769464\n"
+"POT-Creation-Date: 2018-01-10 10:44+0000\n"
+"PO-Revision-Date: 2018-01-10 10:50:56.748076\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -104,6 +104,7 @@ msgstr ""
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr ""
 
@@ -8259,40 +8260,6 @@ msgid "Important Course Dates"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show/Hide"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show less"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid ""
-"Sample verified certificate with your name, the course title, the logo of "
-"the institution and the signatures of the instructors for this course."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Official proof of completion"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Easily shareable certificate"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Proven motivator to complete the course"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Certificate purchases help us continue to offer free courses"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Upgrade ({price})"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr ""
@@ -8302,6 +8269,14 @@ msgstr ""
 msgid "Edit your course goal:"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Pursue a verified certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Upgrade ({price})"
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr ""
@@ -8309,6 +8284,83 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
 msgid "Reviews"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Learn About Verified Certificates"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{platform_name} Verified Certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Why upgrade?"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Official proof of completion"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Easily shareable certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Proven motivator to complete the course"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"Certificate purchases help {platform_name} continue to offer free courses"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "How it works"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Pay the Verified Certificate upgrade fee"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Verify your identity with a webcam and government-issued ID"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Study hard and pass the course"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Share your certificate with friends, employers, and others"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "edX Learner Stories"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
+"really help me land                             my dream job!"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{learner_name}, edX Learner"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Upgrade ({course_price})"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html

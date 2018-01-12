@@ -106,6 +106,8 @@ from openedx.core.lib.courses import course_image_url
 <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info">
+
+  <%block name="course_about_header">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
       <div class="table">
@@ -200,6 +202,7 @@ from openedx.core.lib.courses import course_image_url
     </div>
       </div>
   </header>
+  </%block>
 
   <div class="container">
     <div class="details">
@@ -219,6 +222,7 @@ from openedx.core.lib.courses import course_image_url
 
         <%include file="course_about_sidebar_header.html" />
 
+        <%block name="course_about_important_dates">
         <ol class="important-dates">
           <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
@@ -289,16 +293,20 @@ from openedx.core.lib.courses import course_image_url
             </p>
           </li>
           % endif
+
           % if get_course_about_section(request, course, "prerequisites"):
             <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
+        </%block>
     </div>
 
+      <%block name="course_about_reviews_tool">
       ## Course reviews tool
       % if reviews_fragment_view:
        ${HTML(reviews_fragment_view.body_html())}
       % endif
+      </%block>
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):

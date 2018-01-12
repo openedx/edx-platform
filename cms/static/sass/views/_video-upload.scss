@@ -25,7 +25,7 @@
     cursor:pointer
   }
 
-  .show-video-transcripts-wrapper {
+  .video-transcripts-wrapper {
     display: block;
 
     .button-link {
@@ -37,7 +37,7 @@
     display: none;
   }
 
-  .show-video-transcript-content {
+  .video-transcript-content {
     margin-top: ($baseline/2);
 
     .transcript-upload-status-container {

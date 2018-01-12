@@ -43,7 +43,7 @@ def get_program_marketing_url(programs_config):
     return urljoin(settings.MKTG_URLS.get('ROOT'), programs_config.marketing_path).rstrip('/')
 
 
-def attach_program_detail_url(programs):
+def attach_program_detail_url(programs, mobile_only=False):
     """Extend program representations by attaching a URL to be used when linking to program details.
 
     Facilitates the building of context to be passed to templates containing program data.
@@ -55,7 +55,14 @@ def attach_program_detail_url(programs):
         list, containing extended program dicts
     """
     for program in programs:
-        program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
+        if mobile_only:
+            detail_fragment_url = reverse('program_details_fragment_view', kwargs={'program_uuid': program['uuid']})
+            path_id = detail_fragment_url.replace('/dashboard/', '')
+            detail_url = 'edxapp://enrolled_program_info?path_id={path_id}'.format(path_id=path_id)
+        else:
+            detail_url = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
+
+        program['detail_url'] = detail_url
 
     return programs
 
@@ -72,7 +79,7 @@ class ProgramProgressMeter(object):
             will only inspect this one program, not all programs the user may be
             engaged with.
     """
-    def __init__(self, site, user, enrollments=None, uuid=None):
+    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False):
         self.site = site
         self.user = user
 
@@ -99,7 +106,7 @@ class ProgramProgressMeter(object):
         if uuid:
             self.programs = [get_programs(self.site, uuid=uuid)]
         else:
-            self.programs = attach_program_detail_url(get_programs(self.site))
+            self.programs = attach_program_detail_url(get_programs(self.site), mobile_only)
 
     def invert_programs(self):
         """Intersect programs and enrollments.

@@ -74,6 +74,7 @@
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
+# Yovany Alvarez <yalvarez@innovapues.com>, 2018
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2017 edX
@@ -132,7 +133,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-12-17 20:42+0000\n"
-"PO-Revision-Date: 2017-12-05 09:15+0000\n"
+"PO-Revision-Date: 2018-01-08 17:05+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"

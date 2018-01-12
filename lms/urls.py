@@ -133,9 +133,6 @@ urlpatterns = [
     # URLs for managing dark launches of languages
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
-    # URLs for managing theming
-    url(r'^theming/', include('openedx.core.djangoapps.theming.urls', namespace='theming')),
-
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
 
@@ -477,13 +474,6 @@ urlpatterns += [
         courseware_views.program_marketing,
         name='program_marketing_view',
     ),
-
-    # rest api for grades
-    url(
-        r'^api/grades/',
-        include('lms.djangoapps.grades.api.urls', namespace='grades_api')
-    ),
-
 
     # For the instructor
     url(
@@ -1092,3 +1082,7 @@ if settings.BRANCH_IO_KEY:
     urlpatterns += [
         url(r'^text-me-the-app', 'student.views.text_me_the_app', name='text_me_the_app'),
     ]
+
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
+urlpatterns.extend(DjangoAppRegistry.get_plugin_url_patterns(ProjectType.LMS))

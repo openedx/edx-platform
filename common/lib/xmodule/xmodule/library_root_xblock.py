@@ -3,9 +3,9 @@
 """
 import logging
 
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
-from xblock.fragment import Fragment
 
 from xmodule.studio_editable import StudioEditableModule
 
@@ -97,7 +97,7 @@ class LibraryRoot(XBlock):
                 rendered_child = self.runtime.render_child(child, child_view_name, child_context)
             else:
                 rendered_child = self.runtime.render_child_placeholder(child, child_view_name, child_context)
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
 
             contents.append({
                 'id': unicode(child.location),

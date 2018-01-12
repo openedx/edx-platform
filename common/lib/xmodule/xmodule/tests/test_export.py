@@ -12,6 +12,7 @@ import unittest
 from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
 from path import Path as path
+from six import text_type
 from tempfile import mkdtemp
 from textwrap import dedent
 
@@ -30,7 +31,7 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print "strip filename from {desc}".format(desc=descriptor.location.to_deprecated_string())
+    print "strip filename from {desc}".format(desc=text_type(descriptor.location))
     if descriptor._field_data.has(descriptor, 'filename'):
         descriptor._field_data.delete(descriptor, 'filename')
 
@@ -171,10 +172,10 @@ class TestEdxJsonEncoder(unittest.TestCase):
 
     def test_encode_location(self):
         loc = Location('org', 'course', 'run', 'category', 'name', None)
-        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
+        self.assertEqual(text_type(loc), self.encoder.default(loc))
 
         loc = Location('org', 'course', 'run', 'category', 'name', 'version')
-        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
+        self.assertEqual(text_type(loc), self.encoder.default(loc))
 
     def test_encode_naive_datetime(self):
         self.assertEqual(

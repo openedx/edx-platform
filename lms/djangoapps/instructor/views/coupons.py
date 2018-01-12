@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.locator import CourseKey
+from six import text_type
 
 from shoppingcart.models import Coupon, CourseRegistrationCode
 from util.json_request import JsonResponse
@@ -161,7 +162,7 @@ def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
     return JsonResponse({
         'coupon_code': coupon.code,
         'coupon_description': coupon.description,
-        'coupon_course_id': coupon.course_id.to_deprecated_string(),
+        'coupon_course_id': text_type(coupon.course_id),
         'coupon_discount': coupon.percentage_discount,
         'expiry_date': expiry_date,
         'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)

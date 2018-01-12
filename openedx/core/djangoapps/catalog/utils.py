@@ -243,9 +243,26 @@ def get_course_runs_for_course(course_uuid):
         return []
 
 
-def get_visible_course_runs_for_entitlement(entitlement):
+def get_pseudo_session_for_entitlement(entitlement):
     """
-    Returns only the course runs that the user can currently enroll in.
+    This function is used to pass pseudo-data to the front end, returning a single session, regardless of whether that
+    session is currently available.
+
+    First tries to return the first available session, followed by the first session regardless of availability.
+    Returns None if there are no sessions for that course.
+    """
+    sessions_for_course = get_course_runs_for_course(entitlement.course_uuid)
+    available_sessions = get_fulfillable_course_runs_for_entitlement(entitlement, sessions_for_course)
+    if available_sessions:
+        return available_sessions[0]
+    if sessions_for_course:
+        return sessions_for_course[0]
+    return None
+
+
+def get_visible_sessions_for_entitlement(entitlement):
+    """
+    Takes an entitlement object and returns the course runs that a user can currently enroll in.
     """
     sessions_for_course = get_course_runs_for_course(entitlement.course_uuid)
     return get_fulfillable_course_runs_for_entitlement(entitlement, sessions_for_course)
@@ -253,7 +270,7 @@ def get_visible_course_runs_for_entitlement(entitlement):
 
 def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     """
-    Takes a list of course runs and returns only the course runs that:
+    Takes a list of course runs and returns only the course runs, sorted by start date, that:
 
     1) Are currently running or in the future
     2) A user can enroll in
@@ -294,6 +311,7 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
         if is_running and can_upgrade and can_enroll and is_published:
             enrollable_sessions.append(course_run)
 
+    enrollable_sessions.sort(key=lambda session: session.get('start'))
     return enrollable_sessions
 
 

@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from pytz import UTC
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog
@@ -84,7 +85,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         response = self.client.post(
             reverse('sysadmin_courses'),
             {
-                'course_id': course.id.to_deprecated_string(),
+                'course_id': text_type(course.id),
                 'action': 'del_course',
             }
         )

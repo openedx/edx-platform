@@ -7,6 +7,7 @@ import unittest
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.timezone import now
 from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
@@ -43,7 +44,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         # Old Course
         old_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
         __, enrollment = self._create_course_and_enrollment(old_course_location)
-        enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0)
+        enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0, tzinfo=UTC)
         enrollment.save()
 
         # New Course
@@ -107,7 +108,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
                 'Run{num}'.format(num=idx)
             )
             course, enrollment = self._create_course_and_enrollment(course_location)
-            enrollment.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds_past)
+            enrollment.created = now() - datetime.timedelta(seconds=seconds_past)
             enrollment.save()
             courses.append(course)
 

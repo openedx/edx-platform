@@ -5,6 +5,7 @@ import mongoengine
 from opaque_keys.edx.locations import Location
 from types import NoneType
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from six import text_type
 
 
 class CourseKeyField(mongoengine.StringField):
@@ -22,7 +23,7 @@ class CourseKeyField(mongoengine.StringField):
         assert isinstance(course_key, (NoneType, CourseKey))
         if course_key:
             # don't call super as base.BaseField.to_mongo calls to_python() for some odd reason
-            return course_key.to_deprecated_string()
+            return text_type(course_key)
         else:
             return None
 
@@ -43,7 +44,7 @@ class CourseKeyField(mongoengine.StringField):
     def validate(self, value):
         assert isinstance(value, (NoneType, basestring, CourseKey))
         if isinstance(value, CourseKey):
-            return super(CourseKeyField, self).validate(value.to_deprecated_string())
+            return super(CourseKeyField, self).validate(text_type(value))
         else:
             return super(CourseKeyField, self).validate(value)
 
@@ -62,7 +63,7 @@ class UsageKeyField(mongoengine.StringField):
         assert isinstance(location, (NoneType, UsageKey))
         if location is None:
             return None
-        return super(UsageKeyField, self).to_mongo(location.to_deprecated_string())
+        return super(UsageKeyField, self).to_mongo(text_type(location))
 
     def to_python(self, location):
         """
@@ -80,7 +81,7 @@ class UsageKeyField(mongoengine.StringField):
     def validate(self, value):
         assert isinstance(value, (NoneType, basestring, UsageKey))
         if isinstance(value, UsageKey):
-            return super(UsageKeyField, self).validate(value.to_deprecated_string())
+            return super(UsageKeyField, self).validate(text_type(value))
         else:
             return super(UsageKeyField, self).validate(value)
 

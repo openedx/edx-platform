@@ -11,9 +11,9 @@ from fs.errors import ResourceNotFound
 from lxml import etree
 from path import Path as path
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
-from xblock.fragment import Fragment
 
 import dogstats_wrapper as dog_stats_api
 from xmodule.contentstore.content import StaticContent
