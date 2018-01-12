@@ -15,10 +15,24 @@ from django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
+from openedx.features.learner_analytics import ENABLE_DASHBOARD_TAB
 %>
+
+<%block name="header_extras">
+  <link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
+</%block>
 
 <%block name="content">
 <div class="course-view page-content-container" id="course-container">
+
+    % if ENABLE_DASHBOARD_TAB.is_enabled(course_key):
+        ${static.renderReact(
+          component="UpsellExperimentModal",
+          id="upsell-modal",
+          props={},
+        )}
+    % endif
+
     <header class="page-header has-secondary">
         <div class="page-header-main">
             <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
