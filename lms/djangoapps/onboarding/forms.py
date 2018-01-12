@@ -69,12 +69,12 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
     NO_SELECT_CHOICE = [('', ugettext_noop('- Select -'))]
 
-    LEVEL_OF_EDUCAION_CHOICES = NO_SELECT_CHOICE  + [(el.code, el.label)
-                                                     for el in EducationLevel.objects.all().order_by("label")]
-    ENLISHP_ROFICIENCY_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label)
-                                                     for ep in EnglishProficiency.objects.all().order_by("label")]
+    LEVEL_OF_EDUCATION_CHOICES = NO_SELECT_CHOICE  + [(el.code, el.label)
+                                                     for el in EducationLevel.objects.all()]
+    ENGLISH_PROFICIENCY_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label)
+                                                     for ep in EnglishProficiency.objects.all()]
     ROLE_IN_ORG_CHOICES = NO_SELECT_CHOICE + [(r.code, r.label)
-                                              for r in RoleInsideOrg.objects.all().order_by("label")]
+                                              for r in RoleInsideOrg.objects.all()]
 
     year_of_birth = forms.IntegerField(
         label="Year of Birth",
@@ -105,13 +105,13 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                                                                        'and/or city of residence.'),
                                                    required=False)
     level_of_education = forms.ChoiceField(label=ugettext_noop('Level of Education'), label_suffix="*",
-                                           choices=LEVEL_OF_EDUCAION_CHOICES,
+                                           choices=LEVEL_OF_EDUCATION_CHOICES,
                                            error_messages={
                                                 'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
                                                     'Level of Education')),
                                            })
     english_proficiency = forms.ChoiceField(label=ugettext_noop('English Language Proficiency'), label_suffix="*",
-                                            choices=ENLISHP_ROFICIENCY_CHOICES,
+                                            choices=ENGLISH_PROFICIENCY_CHOICES,
                                             error_messages={
                                                  'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
                                                      'English Language Proficiency')),
@@ -302,13 +302,13 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
 
     NO_SELECT_CHOICE = [('', '- Select -')]
 
-    ORG_TYPE_CHOICES = NO_SELECT_CHOICE + [(os.code, os.label) for os in OrgSector.objects.all().order_by('label')]
+    ORG_TYPE_CHOICES = NO_SELECT_CHOICE + [(os.code, os.label) for os in OrgSector.objects.all()]
     OPERATION_LEVEL_CHOICES = NO_SELECT_CHOICE + [(ol.code, ol.label)
-                                                  for ol in OperationLevel.objects.all().order_by('label')]
-    FOCUS_AREA_CHOICES = NO_SELECT_CHOICE + [(fa.code, fa.label) for fa in FocusArea.objects.all().order_by('label')]
+                                                  for ol in OperationLevel.objects.all()]
+    FOCUS_AREA_CHOICES = NO_SELECT_CHOICE + [(fa.code, fa.label) for fa in FocusArea.objects.all()]
     TOTAL_EMPLOYEES_CHOICES = NO_SELECT_CHOICE + [(ep.code, ep.label)
-                                                  for ep in TotalEmployee.objects.all().order_by('label')]
-    PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all().order_by('label')]
+                                                  for ep in TotalEmployee.objects.all()]
+    PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all()]
 
     is_org_url_exist = forms.ChoiceField(label=ugettext_noop('Does your organization have a website?'),
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
@@ -342,6 +342,10 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
                                    })
 
     total_employees = forms.ChoiceField(label=ugettext_noop('Total Employees'), label_suffix="*",
+                                        help_text="An employee is a member of your staff who is paid for their work. "
+                                                  "An staff member working full-time counts as 1 employee; a staff "
+                                                  "member working half-time counts as 0.5 of an employee. Please "
+                                                  "include yourself in your organization's employee count.",
                                         choices=TOTAL_EMPLOYEES_CHOICES,
                                         error_messages={
                                             'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format('Total Employees')),
@@ -691,7 +695,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                          })
     effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
                                      required=False,
-                                     label=ugettext_noop('End date of lat Fiscal Year'),
+                                     label=ugettext_noop('End date of last Fiscal Year'),
                                      label_suffix='*')
 
     def __init__(self,  *args, **kwargs):
