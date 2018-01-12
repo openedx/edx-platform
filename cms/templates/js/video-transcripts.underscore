@@ -1,4 +1,4 @@
-<div class='show-video-transcripts-container'>
+<div class='video-transcripts-header'>
 <% if (transcripts.length) { %>
     <button class="button-link toggle-show-transcripts-button">
         <strong>
@@ -11,10 +11,10 @@
 <% } else { %>
     <span class='transcripts-empty-text'><%- gettext('No transcript uploaded.') %></span>
 <% }%>
-<div class='show-video-transcripts-wrapper hidden'>
+<div class='video-transcripts-wrapper'>
 <% _.each(transcripts, function(transcriptLanguageCode){ %>
     <% selectedLanguageCodes = _.keys(_.omit(transcripts, transcriptLanguageCode)); %>
-    <div class='show-video-transcript-content' data-edx-video-id="<%- edxVideoID %>" data-language-code="<%- transcriptLanguageCode %>">
+    <div class='video-transcript-content' data-edx-video-id="<%- edxVideoID %>" data-language-code="<%- transcriptLanguageCode %>">
         <div class='transcript-upload-status-container'></div>
         <strong class='transcript-title'><%- StringUtils.interpolate(gettext('{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}'), {transcriptClientTitle: transcriptClientTitle, transcriptLanguageCode: transcriptLanguageCode, fileExtension: transcriptFileFormat}) %></strong>
         <select class='transcript-language-menu'>
@@ -35,6 +35,8 @@
             </a>
             <span class='transcript-actions-separator'> | </span>
             <button class="button-link upload-transcript-button"><%- gettext('Replace') %></button>
+            <span class='transcript-actions-separator'> | </span>
+            <button class="button-link delete-transcript-button"><%- gettext('Delete') %></button>
         </div>
     </div>
 <% }) %>
