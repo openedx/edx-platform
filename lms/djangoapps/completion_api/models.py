@@ -5,14 +5,15 @@ wrapping progress extension models.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from django.core.cache import cache
+from edx_solutions_api_integration.courses.views import (
+    _get_course_progress_metrics,
+)
+from edx_solutions_api_integration.utils import get_aggregate_exclusion_user_ids
 
-from django.conf import settings
-from django.test import RequestFactory
-from edx_solutions_api_integration.courses.views import CoursesMetricsCompletionsLeadersList
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from progress.models import CourseModuleCompletion
-import six
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -83,6 +84,8 @@ class CourseCompletionFacade(CompletionDataMixin, object):
     """
 
     _all_stats = None
+
+    MEAN_CACHE_KEY_FORMAT = 'completion-api-v0.mean-completion.{course_key}'
 
     def __init__(self, inner):
         self._inner = inner
@@ -216,19 +219,12 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         """
         Return the mean completion ratio for all enrolled users.
         """
-        url = '/api/server/courses/{course_id}/metrics/completions/leaders/'
-        course_key_text = six.text_type(self.course_key)
-        request = RequestFactory().get(
-            url.format(course_id=course_key_text),
-            data={'skipleaders': True, 'user_id': self.user.id},
-            HTTP_X_EDX_API_KEY=settings.EDX_API_KEY,
-            HTTP_ACCEPT='application/json',
-        )
-        request.user = self.user
-        response = CoursesMetricsCompletionsLeadersList().dispatch(request, course_id=course_key_text)
-        mean = None
-        if response.status_code == 200:
-            mean = response.data['course_avg']
+        mean_cache_key = self.MEAN_CACHE_KEY_FORMAT.format(course_key=self.course_key)
+        mean = cache.get(mean_cache_key)
+        if mean is None:
+            excluded_users = get_aggregate_exclusion_user_ids(self.course_key)
+            mean = _get_course_progress_metrics(self.course_key, exclude_users=excluded_users)['course_avg']
+            cache.set(mean_cache_key, mean, 1800)  # Cache for 30 minutes
         return mean / 100.0
 
 
