@@ -144,8 +144,8 @@ JWT_AUTH.update({
 })
 
 #####################################################################
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
-DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.DEVSTACK)
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEVSTACK)
 
 ###############################################################################
 # See if the developer has any local overrides.
