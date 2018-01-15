@@ -11,7 +11,7 @@ from django.db import migrations, models
 
 def forwards(apps, schema_editor):
     """
-    Migrate the initial badge classes, assertions, and course image configurations from certificates.
+    Migrate the initial badge classes, assertions, and course image configurations from lms.djangoapps.certificates.
     """
     from django.core.files.base import ContentFile
     from xmodule.modulestore.django import modulestore

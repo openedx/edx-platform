@@ -1036,9 +1036,6 @@ INSTALLED_APPS = [
     # Country embargo support
     'openedx.core.djangoapps.embargo',
 
-    # Signals
-    'openedx.core.djangoapps.signals.apps.SignalConfig',
-
     # Course action state
     'course_action_state',
 
@@ -1501,6 +1498,6 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
 ############## Installed Django Apps #########################
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
-INSTALLED_APPS.extend(DjangoAppRegistry.get_plugin_apps(ProjectType.CMS))
-DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.COMMON)
+from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
+INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.CMS))
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.COMMON)

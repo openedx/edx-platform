@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytz import UTC
 
-from certificates.models import CertificateWhitelist
+from lms.djangoapps.certificates.models import CertificateWhitelist
 from openedx.core.djangoapps.certificates.config import waffle
 from student.models import CourseEnrollment
 

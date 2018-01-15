@@ -12,7 +12,7 @@ from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
 from branding import api as branding_api
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateInvalidation,
@@ -23,7 +23,7 @@ from certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from certificates.queue import XQueueCertInterface
+from lms.djangoapps.certificates.queue import XQueueCertInterface
 from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
@@ -377,7 +377,7 @@ def example_certificates_status(course_key):
 
     Example Usage:
 
-        >>> from certificates import api as certs_api
+        >>> from lms.djangoapps.certificates import api as certs_api
         >>> certs_api.example_certificate_status(course_key)
         [
             {

@@ -10,8 +10,8 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 
-from certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
-from certificates.tests.factories import CertificateInvalidationFactory
+from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory

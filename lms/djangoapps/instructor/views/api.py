@@ -40,8 +40,10 @@ import instructor_analytics.distributions
 import lms.djangoapps.instructor.enrollment as enrollment
 import lms.djangoapps.instructor_task.api
 from bulk_email.models import BulkEmailFlag, CourseEmail
-from certificates import api as certs_api
-from certificates.models import CertificateInvalidation, CertificateStatuses, CertificateWhitelist, GeneratedCertificate
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
+    CertificateInvalidation, CertificateStatuses, CertificateWhitelist, GeneratedCertificate,
+)
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule

@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 
 from branding import views as branding_views
-from certificates import views as certificates_views
+from lms.djangoapps.certificates import views as certificates_views
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
 from courseware.module_render import handle_xblock_callback, handle_xblock_callback_noauth, xblock_view, xqueue_callback
@@ -1076,5 +1076,5 @@ if settings.BRANCH_IO_KEY:
     ]
 
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
-urlpatterns.extend(DjangoAppRegistry.get_plugin_url_patterns(ProjectType.LMS))
+from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
+urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

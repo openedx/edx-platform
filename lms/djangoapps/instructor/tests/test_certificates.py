@@ -16,15 +16,15 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from capa.xqueue_interface import XQueueInterface
-from certificates import api as certs_api
-from certificates.models import (
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
     CertificateWhitelist,
     GeneratedCertificate
 )
-from certificates.tests.factories import (
+from lms.djangoapps.certificates.tests.factories import (
     CertificateInvalidationFactory,
     CertificateWhitelistFactory,
     GeneratedCertificateFactory

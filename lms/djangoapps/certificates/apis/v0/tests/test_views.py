@@ -10,8 +10,8 @@ from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from certificates.models import CertificateStatuses
-from certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

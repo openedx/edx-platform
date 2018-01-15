@@ -11,7 +11,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
 
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     CertificateGenerationHistory,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -21,7 +21,7 @@ from certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate
 )
-from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

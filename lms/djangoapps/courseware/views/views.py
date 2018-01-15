@@ -38,8 +38,8 @@ from web_fragments.fragment import Fragment
 
 import shoppingcart
 import survey.views
-from certificates import api as certs_api
-from certificates.models import CertificateStatuses
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import CertificateStatuses
 from course_modes.models import CourseMode, get_course_prices
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
