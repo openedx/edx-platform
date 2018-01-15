@@ -64,13 +64,15 @@ setup(
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
         ],
         "lms.djangoapp": [
-            "grades = lms.djangoapps.grades.apps:GradesConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "grades = lms.djangoapps.grades.apps:GradesConfig",
+            "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
         ],

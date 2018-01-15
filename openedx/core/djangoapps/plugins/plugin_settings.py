@@ -32,6 +32,7 @@ def _iter_plugins(project_type, settings_type):
             continue
 
         plugin_settings_path = utils.get_module_path(app_config, settings_config, constants.PluginSettings)
+
         log.info(u'Plugin Apps [Settings]: Found %s for %s and %s', app_config.name, project_type, settings_type)
         yield utils.import_module(plugin_settings_path)
 
