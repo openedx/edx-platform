@@ -7,13 +7,13 @@ from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
 from .models import CourseOverview
-from openedx.core.djangoapps.signals.signals import COURSE_PACING_CHANGED
 from xmodule.modulestore.django import SignalHandler
 
 LOG = logging.getLogger(__name__)
 
 
 COURSE_START_DATE_CHANGED = Signal(providing_args=["updated_course_overview", "previous_start_date"])
+COURSE_PACING_CHANGED = Signal(providing_args=["updated_course_overview", "previous_self_paced"])
 
 
 @receiver(SignalHandler.course_published)
