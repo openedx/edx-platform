@@ -251,43 +251,43 @@ class UserExtendedProfile(TimeStampedModel):
     SURVEYS_LIST = ["user_info", "interests", "organization", "org_detail_survey"]
 
     FUNCTIONS_LABELS = {
-        "function_strategy_planning": "Strategy and planning",
-        "function_leadership_governance": "Leadership and governance",
-        "function_program_design": "Program design and development",
-        "function_measurement_eval": "Measurement, evaluation, and learning",
-        "function_stakeholder_engagement": "Stakeholder engagement and partnerships",
-        "function_human_resource": "Human resource management",
-        "function_financial_management": "Financial management",
-        "function_fundraising": "Fundraising and resource mobilization",
-        "function_marketing_communication": "Marketing, communications, and PR",
-        "function_system_tools": "Systems, tools, and processes",
+        "0=function_strategy_planning": "Strategy and planning",
+        "1=function_leadership_governance": "Leadership and governance",
+        "2=function_program_design": "Program design and development",
+        "3=function_measurement_eval": "Measurement, evaluation, and learning",
+        "4=function_stakeholder_engagement": "Stakeholder engagement and partnerships",
+        "5=function_human_resource": "Human resource management",
+        "6=function_financial_management": "Financial management",
+        "7=function_fundraising": "Fundraising and resource mobilization",
+        "8=function_marketing_communication": "Marketing, communications, and PR",
+        "9=function_system_tools": "Systems, tools, and processes",
     }
 
     INTERESTS_LABELS = {
-        "interest_strategy_planning": "Strategy and planning",
-        "interest_leadership_governance": "Leadership and governance",
-        "interest_program_design": "Program design and development",
-        "interest_measurement_eval": "Measurement, evaluation, and learning",
-        "interest_stakeholder_engagement": "Stakeholder engagement and partnerships",
-        "interest_human_resource": "Human resource management",
-        "interest_financial_management": "Financial management",
-        "interest_fundraising": "Fundraising and resource mobilization",
-        "interest_marketing_communication": "Marketing, communications, and PR",
-        "interest_system_tools": "Systems, tools, and processes",
+        "0=interest_strategy_planning": "Strategy and planning",
+        "1=interest_leadership_governance": "Leadership and governance",
+        "2=interest_program_design": "Program design and development",
+        "3=interest_measurement_eval": "Measurement, evaluation, and learning",
+        "4=interest_stakeholder_engagement": "Stakeholder engagement and partnerships",
+        "5=interest_human_resource": "Human resource management",
+        "6=interest_financial_management": "Financial management",
+        "7=interest_fundraising": "Fundraising and resource mobilization",
+        "8=interest_marketing_communication": "Marketing, communications, and PR",
+        "9=interest_system_tools": "Systems, tools, and processes",
     }
 
     INTERESTED_LEARNERS_LABELS = {
-        "learners_same_region": "Learners from my region or country",
-        "learners_similar_oe_interest": "Learners interested in same areas of organization effectiveness",
-        "learners_similar_org": "Learners working for similar organizations",
-        "learners_diff_who_are_different": "Learners who are different from me"
+        "0=learners_same_region": "Learners from my region or country",
+        "1=learners_similar_oe_interest": "Learners interested in same areas of organization effectiveness",
+        "2=learners_similar_org": "Learners working for similar organizations",
+        "3=learners_diff_who_are_different": "Learners who are different from me"
     }
 
     GOALS_LABELS = {
-        "goal_contribute_to_org": "Help improve my organization",
-        "goal_gain_new_skill": "Develop new skills",
-        "goal_improve_job_prospect": "Get a job",
-        "goal_relation_with_other": "Build relationships with other nonprofit leaders"
+        "0=goal_contribute_to_org": "Help improve my organization",
+        "1=goal_gain_new_skill": "Develop new skills",
+        "2=goal_improve_job_prospect": "Get a job",
+        "3=goal_relation_with_other": "Build relationships with other nonprofit leaders"
     }
 
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='extended_profile')
@@ -304,43 +304,43 @@ class UserExtendedProfile(TimeStampedModel):
                                                  validators=[MaxValueValidator(168)])
 
     # User functions related fields
-    function_strategy_planning = models.SmallIntegerField(FUNCTIONS_LABELS["function_strategy_planning"], default=0)
-    function_leadership_governance = models.SmallIntegerField(FUNCTIONS_LABELS["function_leadership_governance"], default=0)
-    function_program_design = models.SmallIntegerField(FUNCTIONS_LABELS["function_program_design"], default=0)
-    function_measurement_eval = models.SmallIntegerField(FUNCTIONS_LABELS["function_measurement_eval"], default=0)
-    function_stakeholder_engagement = models.SmallIntegerField(FUNCTIONS_LABELS["function_stakeholder_engagement"], default=0)
-    function_human_resource = models.SmallIntegerField(FUNCTIONS_LABELS["function_human_resource"], default=0)
-    function_financial_management = models.SmallIntegerField(FUNCTIONS_LABELS["function_financial_management"], default=0)
-    function_fundraising = models.SmallIntegerField(FUNCTIONS_LABELS["function_fundraising"], default=0)
-    function_marketing_communication = models.SmallIntegerField(FUNCTIONS_LABELS["function_strategy_planning"], default=0)
-    function_system_tools = models.SmallIntegerField(FUNCTIONS_LABELS["function_system_tools"], default=0)
+    function_strategy_planning = models.SmallIntegerField(FUNCTIONS_LABELS["0=function_strategy_planning"], default=0)
+    function_leadership_governance = models.SmallIntegerField(FUNCTIONS_LABELS["1=function_leadership_governance"], default=0)
+    function_program_design = models.SmallIntegerField(FUNCTIONS_LABELS["2=function_program_design"], default=0)
+    function_measurement_eval = models.SmallIntegerField(FUNCTIONS_LABELS["3=function_measurement_eval"], default=0)
+    function_stakeholder_engagement = models.SmallIntegerField(FUNCTIONS_LABELS["4=function_stakeholder_engagement"], default=0)
+    function_human_resource = models.SmallIntegerField(FUNCTIONS_LABELS["5=function_human_resource"], default=0)
+    function_financial_management = models.SmallIntegerField(FUNCTIONS_LABELS["6=function_financial_management"], default=0)
+    function_fundraising = models.SmallIntegerField(FUNCTIONS_LABELS["7=function_fundraising"], default=0)
+    function_marketing_communication = models.SmallIntegerField(FUNCTIONS_LABELS["8=function_marketing_communication"], default=0)
+    function_system_tools = models.SmallIntegerField(FUNCTIONS_LABELS["9=function_system_tools"], default=0)
 
     # User interests related fields
-    interest_strategy_planning = models.SmallIntegerField(INTERESTS_LABELS["interest_strategy_planning"], default=0)
-    interest_leadership_governance = models.SmallIntegerField(INTERESTS_LABELS["interest_leadership_governance"], default=0)
-    interest_program_design = models.SmallIntegerField(INTERESTS_LABELS["interest_program_design"], default=0)
-    interest_measurement_eval = models.SmallIntegerField(INTERESTS_LABELS["interest_measurement_eval"], default=0)
-    interest_stakeholder_engagement = models.SmallIntegerField(INTERESTS_LABELS["interest_stakeholder_engagement"], default=0)
-    interest_human_resource = models.SmallIntegerField(INTERESTS_LABELS["interest_human_resource"], default=0)
-    interest_financial_management = models.SmallIntegerField(INTERESTS_LABELS["interest_financial_management"], default=0)
-    interest_fundraising = models.SmallIntegerField(INTERESTS_LABELS["interest_fundraising"], default=0)
-    interest_marketing_communication = models.SmallIntegerField(INTERESTS_LABELS["interest_marketing_communication"], default=0)
-    interest_system_tools = models.SmallIntegerField(INTERESTS_LABELS["interest_system_tools"], default=0)
+    interest_strategy_planning = models.SmallIntegerField(INTERESTS_LABELS["0=interest_strategy_planning"], default=0)
+    interest_leadership_governance = models.SmallIntegerField(INTERESTS_LABELS["1=interest_leadership_governance"], default=0)
+    interest_program_design = models.SmallIntegerField(INTERESTS_LABELS["2=interest_program_design"], default=0)
+    interest_measurement_eval = models.SmallIntegerField(INTERESTS_LABELS["3=interest_measurement_eval"], default=0)
+    interest_stakeholder_engagement = models.SmallIntegerField(INTERESTS_LABELS["4=interest_stakeholder_engagement"], default=0)
+    interest_human_resource = models.SmallIntegerField(INTERESTS_LABELS["5=interest_human_resource"], default=0)
+    interest_financial_management = models.SmallIntegerField(INTERESTS_LABELS["6=interest_financial_management"], default=0)
+    interest_fundraising = models.SmallIntegerField(INTERESTS_LABELS["7=interest_fundraising"], default=0)
+    interest_marketing_communication = models.SmallIntegerField(INTERESTS_LABELS["8=interest_marketing_communication"], default=0)
+    interest_system_tools = models.SmallIntegerField(INTERESTS_LABELS["9=interest_system_tools"], default=0)
 
     # Learners related field
-    learners_same_region = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["learners_same_region"],
+    learners_same_region = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["0=learners_same_region"],
                                                     default=0)
-    learners_similar_oe_interest = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["learners_similar_oe_interest"],
+    learners_similar_oe_interest = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["1=learners_similar_oe_interest"],
                                                             default=0)
-    learners_similar_org = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["learners_similar_org"], default=0)
+    learners_similar_org = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["2=learners_similar_org"], default=0)
     learners_diff_who_are_different = models.SmallIntegerField(
-        INTERESTED_LEARNERS_LABELS["learners_diff_who_are_different"], default=0)
+        INTERESTED_LEARNERS_LABELS["3=learners_diff_who_are_different"], default=0)
 
     # User goals related fields
-    goal_contribute_to_org = models.SmallIntegerField(GOALS_LABELS["goal_contribute_to_org"], default=0)
-    goal_gain_new_skill = models.SmallIntegerField(GOALS_LABELS["goal_gain_new_skill"], default=0)
-    goal_improve_job_prospect = models.SmallIntegerField(GOALS_LABELS["goal_improve_job_prospect"], default=0)
-    goal_relation_with_other = models.SmallIntegerField(GOALS_LABELS["goal_relation_with_other"], default=0)
+    goal_contribute_to_org = models.SmallIntegerField(GOALS_LABELS["0=goal_contribute_to_org"], default=0)
+    goal_gain_new_skill = models.SmallIntegerField(GOALS_LABELS["1=goal_gain_new_skill"], default=0)
+    goal_improve_job_prospect = models.SmallIntegerField(GOALS_LABELS["2=goal_improve_job_prospect"], default=0)
+    goal_relation_with_other = models.SmallIntegerField(GOALS_LABELS["3=goal_relation_with_other"], default=0)
 
     is_interests_data_submitted = models.BooleanField(default=False)
     is_organization_metrics_submitted = models.BooleanField(default=False)
@@ -352,30 +352,39 @@ class UserExtendedProfile(TimeStampedModel):
 
     def get_user_selected_functions(self, _type="labels"):
         if _type == "labels":
-            return [label for field_name, label in self.FUNCTIONS_LABELS.items() if getattr(self, field_name) == 1]
+            return [label for field_name, label in self.FUNCTIONS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
         else:
-            return [field_name for field_name, label in self.FUNCTIONS_LABELS.items() if getattr(self, field_name) == 1]
+            return [field_name for field_name, label in self.FUNCTIONS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
 
     def get_user_selected_interests(self, _type="labels"):
         if _type == "labels":
-            return [label for field_name, label in self.INTERESTS_LABELS.items() if getattr(self, field_name) == 1]
+            return [label for field_name, label in self.INTERESTS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
         else:
-            return [field_name for field_name, label in self.INTERESTS_LABELS.items() if getattr(self, field_name) == 1]
+            return [field_name for field_name, label in self.INTERESTS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
 
     def get_user_selected_interested_learners(self, _type="labels"):
         if _type == "labels":
-            return [label for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if getattr(self, field_name) == 1]
+            return [label for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
         else:
-            return [field_name for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if getattr(self, field_name) == 1]
+            return [field_name for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
 
     def get_user_selected_personal_goal(self, _type="labels"):
         if _type == "labels":
-            return [label for field_name, label in self.GOALS_LABELS.items() if getattr(self, field_name) == 1]
+            return [label for field_name, label in self.GOALS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
         else:
-            return [field_name for field_name, label in self.GOALS_LABELS.items() if getattr(self, field_name) == 1]
+            return [field_name for field_name, label in self.GOALS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
 
     def save_user_function_areas(self, selected_values):
         for function_area_field, label in self.FUNCTIONS_LABELS.items():
+            function_area_field = function_area_field.split("=")[1]
             if function_area_field in selected_values:
                 _updated_value = 1
             else:
@@ -385,6 +394,7 @@ class UserExtendedProfile(TimeStampedModel):
 
     def save_user_interests(self, selected_values):
         for interest_field, label in self.INTERESTS_LABELS.items():
+            interest_field = interest_field.split("=")[1]
             if interest_field in selected_values:
                 _updated_value = 1
             else:
@@ -394,6 +404,7 @@ class UserExtendedProfile(TimeStampedModel):
 
     def save_user_interested_learners(self, selected_values):
         for interested_learner_field, label in self.INTERESTED_LEARNERS_LABELS.items():
+            interested_learner_field = interested_learner_field.split("=")[1]
             if interested_learner_field in selected_values:
                 _updated_value = 1
             else:
@@ -410,6 +421,7 @@ class UserExtendedProfile(TimeStampedModel):
 
     def save_user_personal_goals(self, selected_values):
         for goal_field, label in self.GOALS_LABELS.items():
+            goal_field = goal_field.split("=")[1]
             if goal_field in selected_values:
                 _updated_value = 1
             else:
