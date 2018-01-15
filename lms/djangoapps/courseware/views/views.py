@@ -42,7 +42,7 @@ import shoppingcart
 import survey.views
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
-from course_modes.models import CourseMode, get_course_prices
+from course_modes.models import CourseMode, get_course_prices, get_course_all_prices
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
 from courseware.courses import (
@@ -817,6 +817,7 @@ def course_about(request, course_id):
                 ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
 
         registration_price, course_price = get_course_prices(course)
+        course_all_prices = get_course_all_prices(course_key)
 
         # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
@@ -858,7 +859,9 @@ def course_about(request, course_id):
             'registered': registered,
             'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
+            'is_cosmetic_multiple_prices_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_MULTIPLE_PRICES'),
             'course_price': course_price,
+            'course_all_prices': course_all_prices,
             'in_cart': in_cart,
             'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
