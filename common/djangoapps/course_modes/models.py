@@ -769,6 +769,19 @@ def get_course_prices(course, verified_only=False):
     return registration_price, format_course_price(price)
 
 
+def get_course_all_prices(course_key):
+    """
+    Return all cosmetic_display_prices defined for the course_key in CourseModes.
+    * price is the course mode price as a string preceded by correct currency, or 'Free'.
+    """
+    course_all_prices = {}
+    all_modes = CourseMode.modes_for_course_dict(course_key, include_expired=True)
+    for key,mode in all_modes.iteritems():
+        course_all_prices[key] = {'name': mode.name, 'price': format_course_price(mode.min_price)}
+
+    return course_all_prices
+
+
 def format_course_price(price):
     """
     Return a formatted price for a course (a string preceded by correct currency, or 'Free').
