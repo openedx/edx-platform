@@ -265,13 +265,21 @@ from openedx.core.lib.courses import course_image_url
           ##<li class="important-dates-item"><span class="icon fa fa-clock-o" aria-hidden="true"></span><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
-            %for key,mode in all_modes.iteritems():
+            %if not is_cosmetic_multiple_prices_enabled:
               <li class="important-dates-item">
                 <span class="icon fa fa-money" aria-hidden="true"></span>
-                <p class="important-dates-item-title">${_("Price")} ${mode.name}</p>
-                <span class="important-dates-item-text">${settings.PAID_COURSE_REGISTRATION_CURRENCY[1]}${mode.min_price}</span>
+                <p class="important-dates-item-title">${_("Price")}</p>
+                <span class="important-dates-item-text">${course_price}</span>
               </li>
-            %endfor
+            %elif course_all_prices:
+              %for key,mode in course_all_prices.iteritems():
+                <li class="important-dates-item">
+                  <span class="icon fa fa-money" aria-hidden="true"></span>
+                  <p class="important-dates-item-title">${_("Price")} - ${mode['name']}</p>
+                  <span class="important-dates-item-text">${mode['price']}</span>
+                </li>
+              %endfor
+            %endif
           %endif
 
           % if pre_requisite_courses:

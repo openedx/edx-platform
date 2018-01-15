@@ -39,7 +39,7 @@ import shoppingcart
 import survey.views
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
-from course_modes.models import CourseMode, get_course_prices
+from course_modes.models import CourseMode, get_course_prices, get_course_all_prices
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
 from courseware.courses import (
@@ -809,7 +809,7 @@ def course_about(request, course_id):
         # Embed the course reviews tool
         reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
 
-        all_modes = CourseMode.modes_for_course_dict(course_key, include_expired=True)
+        course_all_prices = get_course_all_prices(course_key)
 
         context = {
             'course': course,
@@ -819,6 +819,7 @@ def course_about(request, course_id):
             'registered': registered,
             'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
+            'is_cosmetic_multiple_prices_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_MULTIPLE_PRICES'),
             'course_price': course_price,
             'in_cart': in_cart,
             'ecommerce_checkout': ecommerce_checkout,
@@ -840,7 +841,7 @@ def course_about(request, course_id):
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
-            'all_modes': all_modes,
+            'course_all_prices': course_all_prices,
         }
 
         return render_to_response('courseware/course_about.html', context)

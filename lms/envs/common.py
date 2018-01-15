@@ -194,6 +194,10 @@ FEATURES = {
     # Enable the display of cosmetic course price display (set in course advanced settings)
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
+    # Enable the display of cosmetic course multiple prices display (set in Course Modes of Django Admin)
+    # The parameter ENABLE_COSMETIC_DISPLAY_PRICE must be set to True in order for this to work
+    'ENABLE_COSMETIC_DISPLAY_MULTIPLE_PRICES': False,
+
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
