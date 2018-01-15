@@ -16,8 +16,8 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from certificates import api
-from certificates.models import CertificateInvalidation
+from lms.djangoapps.certificates import api
+from lms.djangoapps.certificates.models import CertificateInvalidation
 from courseware.access import has_access
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

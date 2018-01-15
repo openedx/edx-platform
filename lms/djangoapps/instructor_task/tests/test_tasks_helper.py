@@ -27,8 +27,8 @@ from six import text_type
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate
-from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory

@@ -20,7 +20,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from badges.events.course_complete import get_completion_badge
 from badges.utils import badges_enabled
-from certificates.api import (
+from lms.djangoapps.certificates.api import (
     emit_certificate_event,
     get_active_web_certificate,
     get_certificate_footer_context,
@@ -28,7 +28,7 @@ from certificates.api import (
     get_certificate_template,
     get_certificate_url
 )
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,

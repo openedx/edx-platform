@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from student.tests.factories import UserFactory
 
 

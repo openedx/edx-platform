@@ -24,8 +24,8 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.models import BulkEmailFlag
-from certificates import api as certs_api
-from certificates.models import (
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationHistory,
     CertificateInvalidation,

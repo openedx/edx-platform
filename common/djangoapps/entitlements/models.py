@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.timezone import now
 
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 

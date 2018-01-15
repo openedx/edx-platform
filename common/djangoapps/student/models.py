@@ -50,7 +50,7 @@ import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,

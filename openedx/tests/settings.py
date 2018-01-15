@@ -61,7 +61,7 @@ INSTALLED_APPS = (
     'edxval',
     'courseware',
     'student',
-    'certificates.apps.CertificatesConfig',
+    'lms.djangoapps.certificates.apps.CertificatesConfig',
     'course_modes.apps.CourseModesConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'openedx.core.djangoapps.dark_lang',

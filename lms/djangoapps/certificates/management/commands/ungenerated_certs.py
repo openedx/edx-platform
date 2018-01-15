@@ -12,8 +12,8 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
-from certificates.api import generate_user_certificates
-from certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)

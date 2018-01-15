@@ -17,7 +17,7 @@ from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
 import xmodule.graders as xmgraders
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from courseware.models import StudentModule
 from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
