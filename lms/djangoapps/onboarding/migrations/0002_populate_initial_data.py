@@ -49,50 +49,50 @@ class Migration(migrations.Migration):
     def insert_education_levels(apps, schema_editor):
          
         _levels = {
-            "BD": "Bachelor's degree",
             "DPD": "Doctoral or professional degree",
-            "HSDOE": "High school diploma or equivalent secondary degree",
-            "IWRNS": "I'd rather not say",
             "MD": "Master's degree",
-            "NFE": "No formal educational degree",
+            "BD": "Bachelor's degree",
             "SUND": "Some university, no degree",
+            "HSDOE": "High school diploma or equivalent secondary degree",
+            "NFE": "No formal educational degree",
+            "IWRNS": "I'd rather not say"
         }
         EducationLevel = apps.get_model('onboarding', 'EducationLevel')
         create_records(apps, EducationLevel, _levels)
 
     def insert_english_proficiency(apps, schema_editor):
         _levels = {
-            "ADV": "Advanced",
+            "NP": "No proficiency",
             "BEG": "Beginning",
-            "IWRNS": "I'd rather not say",
             "INT": "Intermediate",
+            "ADV": "Advanced",
             "NS": "Native speaker",
-            "NP": "No proficiency"
+            "IWRNS": "I'd rather not say"
         }
         EnglishProficiency = apps.get_model('onboarding', 'EnglishProficiency')
         create_records(apps, EnglishProficiency, _levels)
 
     def insert_role_inside_org(apps, schema_editor):
         _levels = {
-            "DIR": "Director",
-            "EL": "Entry level",
-            "EXC": "Executive Director/CEO",
-            "IWRNS": "I'd rather not say",
-            "INTERN": "Internship",
-            "MAN": "Manager",
             "VOL": "Volunteer",
+            "INTERN": "Internship",
+            "EL": "Entry level",
+            "MAN": "Manager",
+            "DIR": "Director",
+            "EXC": "Executive Director/CEO",
+            "IWRNS": "I'd rather not say"
         }
         RoleInsideOrg = apps.get_model('onboarding', 'RoleInsideOrg')
         create_records(apps, RoleInsideOrg, _levels)
 
     def insert_operation_levels(apps, schema_editor):
         _levels = {
-            "IWRNS": "I'd rather not say",
             "INERNAIONA": "International",
-            "LOCAL": "Local",
+            "RMC": "Regional including offices in multiple countries",
             "NATIONAL": "National",
             "RMLOC": "Regional including multiple offices within one country",
-            "RMC": "Regional including offices in multiple countries",
+            "LOCAL": "Local",
+            "IWRNS": "I'd rather not say",
         }
         OperationLevel = apps.get_model('onboarding', 'OperationLevel')
         create_records(apps, OperationLevel, _levels)
@@ -103,10 +103,10 @@ class Migration(migrations.Migration):
             "FPC": "For-Profit Company",
             "GOVTA": "Government Agency",
             "GFND": "Grantmaking Foundation",
-            "IWRNS": "I'd rather not say",
             "NPORG": "Non-Profit Organization",
             "SLFEMP": "Self-Employed",
             "SENTR": "Social Enterprise",
+            "IWRNS": "I'd rather not say",
         }
         OrgSector = apps.get_model('onboarding', 'OrgSector')
         create_records(apps, OrgSector, _levels)
@@ -125,6 +125,7 @@ class Migration(migrations.Migration):
             "RELIGION": "Religion",
             "RPP": "Research and Public Policy",
             "OTHER": "Other",
+            "IWRNS": "I'd rather not say",
         }
         FocusArea = apps.get_model('onboarding', 'FocusArea')
         create_records(apps, FocusArea, _levels)
