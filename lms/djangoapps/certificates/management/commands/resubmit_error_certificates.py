@@ -23,8 +23,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from certificates import api as certs_api
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)

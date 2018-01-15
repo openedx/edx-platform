@@ -33,9 +33,6 @@ from xblock.fields import Scope, String
 import courseware.views.views as views
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates import api as certs_api
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist
-from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
@@ -45,6 +42,11 @@ from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
+    CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist,
+)
+from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
@@ -1627,7 +1629,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
@@ -1641,7 +1643,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
@@ -1655,7 +1657,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
@@ -1669,7 +1671,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('certificates.api.certificate_downloadable_status',
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status()):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 

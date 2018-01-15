@@ -6,15 +6,17 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
+    CertificateGenerationCourseSetting,
     CertificateWhitelist,
     GeneratedCertificate
 )
-from certificates.tasks import generate_certificate
+from lms.djangoapps.certificates.tasks import generate_certificate
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -22,6 +24,21 @@ from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 CERTIFICATE_DELAY_SECONDS = 2
+
+
+@receiver(COURSE_PACING_CHANGED, dispatch_uid="update_cert_settings_on_pacing_change")
+def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kwargs):  # pylint: disable=unused-argument
+    """
+    Catches the signal that course pacing has changed and enable/disable
+    the self-generated certificates according to course-pacing.
+    """
+    CertificateGenerationCourseSetting.set_self_generatation_enabled_for_course(
+        updated_course_overview.id,
+        updated_course_overview.self_paced,
+    )
+    log.info(u'Certificate Generation Setting Toggled for {course_id} via pacing change'.format(
+        course_id=updated_course_overview.id
+    ))
 
 
 @receiver(post_save, sender=CertificateWhitelist, dispatch_uid="append_certificate_whitelist")

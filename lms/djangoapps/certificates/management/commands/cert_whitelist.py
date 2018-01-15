@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
-from certificates.models import CertificateWhitelist
+from lms.djangoapps.certificates.models import CertificateWhitelist
 
 
 def get_user_from_identifier(identifier):

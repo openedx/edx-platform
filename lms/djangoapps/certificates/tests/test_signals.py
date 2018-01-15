@@ -5,19 +5,18 @@ and disabling for instructor-paced courses.
 import ddt
 import mock
 
-from certificates import api as certs_api
-from certificates.models import (
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateWhitelist,
     GeneratedCertificate,
     CertificateStatuses,
 )
-from certificates.signals import fire_ungenerated_certificate_task
+from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task, CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
-from lms.djangoapps.certificates.signals import CERTIFICATE_DELAY_SECONDS
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

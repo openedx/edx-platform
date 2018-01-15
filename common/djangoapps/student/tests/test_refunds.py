@@ -16,8 +16,8 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
-from certificates.models import CertificateStatuses, GeneratedCertificate
-from certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory

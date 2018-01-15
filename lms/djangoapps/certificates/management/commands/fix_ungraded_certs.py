@@ -6,7 +6,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from courseware import courses
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 

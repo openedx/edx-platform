@@ -12,7 +12,7 @@ from six import text_type
 from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -168,7 +168,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
     @ddt.data(True, False)
     @override_settings(CERT_QUEUE='test-queue')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_OPENBADGES': True})
-    @patch('certificates.api.XQueueCertInterface', spec=True)
+    @patch('lms.djangoapps.certificates.api.XQueueCertInterface', spec=True)
     def test_clear_badge(self, issue_badges, xqueue):
         """
         Given that I have a user with a badge

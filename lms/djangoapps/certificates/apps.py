@@ -13,7 +13,7 @@ class CertificatesConfig(AppConfig):
     """
     Application Configuration for Certificates.
     """
-    name = u'certificates'
+    name = u'lms.djangoapps.certificates'
 
     def ready(self):
         """

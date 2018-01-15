@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import certificates.models
 import jsonfield.fields
 import model_utils.fields
 import django.db.models.deletion
 import django.utils.timezone
 from badges.models import validate_badge_image
 from django.conf import settings
+from lms.djangoapps.certificates import models as cert_models
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('description', models.CharField(help_text='Description of the asset.', max_length=255, null=True, blank=True)),
-                ('asset', models.FileField(help_text='Asset file. It could be an image or css file.', max_length=255, upload_to=certificates.models.template_assets_path)),
+                ('asset', models.FileField(help_text='Asset file. It could be an image or css file.', max_length=255, upload_to=cert_models.template_assets_path)),
             ],
             options={
                 'get_latest_by': 'created',
@@ -127,8 +127,8 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('description', models.CharField(help_text="A human-readable description of the example certificate.  For example, 'verified' or 'honor' to differentiate between two types of certificates.", max_length=255)),
-                ('uuid', models.CharField(default=certificates.models._make_uuid, help_text='A unique identifier for the example certificate.  This is used when we receive a response from the queue to determine which example certificate was processed.', unique=True, max_length=255, db_index=True)),
-                ('access_key', models.CharField(default=certificates.models._make_uuid, help_text='An access key for the example certificate.  This is used when we receive a response from the queue to validate that the sender is the same entity we asked to generate the certificate.', max_length=255, db_index=True)),
+                ('uuid', models.CharField(default=cert_models._make_uuid, help_text='A unique identifier for the example certificate.  This is used when we receive a response from the queue to determine which example certificate was processed.', unique=True, max_length=255, db_index=True)),
+                ('access_key', models.CharField(default=cert_models._make_uuid, help_text='An access key for the example certificate.  This is used when we receive a response from the queue to validate that the sender is the same entity we asked to generate the certificate.', max_length=255, db_index=True)),
                 ('full_name', models.CharField(default='John Do\xeb', help_text='The full name that will appear on the certificate.', max_length=255)),
                 ('template', models.CharField(help_text='The template file to use when generating the certificate.', max_length=255)),
                 ('status', models.CharField(default=b'started', help_text='The status of the example certificate.', max_length=255, choices=[(b'started', b'Started'), (b'success', b'Success'), (b'error', b'Error')])),
