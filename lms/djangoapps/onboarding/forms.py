@@ -14,7 +14,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
-from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict
+from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict, \
+    get_actual_field_names
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
     Organization,
@@ -132,6 +133,9 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         focus_area_choices = ((field_name, label) for field_name, label in
                                 UserExtendedProfile.FUNCTIONS_LABELS.items())
+
+        focus_area_choices = sorted(focus_area_choices, key=lambda focus_area_choices: focus_area_choices[0])
+
         self.fields['function_areas'] = forms.ChoiceField(choices=focus_area_choices,
             label=ugettext_noop('Department of Function (Check all that apply.)'),
             widget=forms.CheckboxSelectMultiple)
@@ -227,7 +231,8 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             user_info_survey.country_of_employment = get_country_iso(request.POST.get('country_of_employment'))
         user_info_survey.city_of_employment = self.cleaned_data['city_of_employment']
 
-        user_info_survey.user.extended_profile.save_user_function_areas(request.POST.getlist('function_areas'))
+        selected_function_areas = get_actual_field_names(request.POST.getlist('function_areas'))
+        user_info_survey.user.extended_profile.save_user_function_areas(selected_function_areas)
         if commit:
             user_info_survey.save()
 
@@ -264,6 +269,7 @@ class InterestsForm(BaseOnboardingForm):
         super(InterestsForm, self).__init__( *args, **kwargs)
 
         interest_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTS_LABELS)
+        interest_choices = sorted(interest_choices, key=lambda interest_choices: interest_choices[0])
         self.fields['interests'] = forms.ChoiceField(
             label=ugettext_noop('Which of these areas of organizational effectiveness are you most interested '
                                 'to learn more about? (Check all that apply.)'),
@@ -271,6 +277,8 @@ class InterestsForm(BaseOnboardingForm):
             required=False)
 
         interested_learners_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTED_LEARNERS_LABELS)
+        interested_learners_choices = sorted(interested_learners_choices,
+                                             key=lambda interested_learners_choices: interested_learners_choices[0])
         self.fields['interested_learners'] = forms.ChoiceField(
             label=ugettext_noop('Which types of other Philanthropy University learners are interesting to you? '
                                 '(Check all that apply.)'),
@@ -278,6 +286,8 @@ class InterestsForm(BaseOnboardingForm):
             required=False)
 
         personal_goal_choices = get_sorted_choices_from_dict(UserExtendedProfile.GOALS_LABELS)
+        personal_goal_choices = sorted(personal_goal_choices,
+                                       key=lambda personal_goal_choices: personal_goal_choices[0])
         self.fields['personal_goals'] = forms.ChoiceField(
             label=ugettext_noop('What is your most important personal goal in joining Philanthropy University? '
                                 '(Check all that apply.)'),
@@ -285,9 +295,13 @@ class InterestsForm(BaseOnboardingForm):
             required=False)
 
     def save(self, request, user_exended_profile):
-        user_exended_profile.save_user_interests(request.POST.getlist('interests'))
-        user_exended_profile.save_user_interested_learners(request.POST.getlist('interested_learners'))
-        user_exended_profile.save_user_personal_goals(request.POST.getlist('personal_goals'))
+        selected_interests = get_actual_field_names(request.POST.getlist('interests'))
+        selected_interested_learners = get_actual_field_names(request.POST.getlist('interested_learners'))
+        selected_personal_goals = get_actual_field_names(request.POST.getlist('personal_goals'))
+
+        user_exended_profile.save_user_interests(selected_interests)
+        user_exended_profile.save_user_interested_learners(selected_interested_learners)
+        user_exended_profile.save_user_personal_goals(selected_personal_goals)
         user_exended_profile.is_interests_data_submitted = True
         user_exended_profile.save()
 

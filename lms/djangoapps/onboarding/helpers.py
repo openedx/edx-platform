@@ -246,3 +246,7 @@ def reorder_registration_form_fields(fields):
 
     required_order = sorted(fields, key=lambda k: k['order'])
     return required_order
+
+
+def get_actual_field_names(fields):
+    return [f.split("=")[1] for f in fields]

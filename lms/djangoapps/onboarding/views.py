@@ -134,16 +134,18 @@ def interests(request):
     if request.method == 'POST':
         form = forms.InterestsForm(request.POST, initial=initial)
 
+        is_action_update = user_extended_profile.is_interests_data_submitted
+
         form.save(request, user_extended_profile)
 
         save_interests.send(sender=UserExtendedProfile, instance=user_extended_profile)
 
         are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-        if user_extended_profile.is_organization_admin or is_first_signup_in_org:
+        if (user_extended_profile.is_organization_admin or is_first_signup_in_org) and not are_forms_complete:
             return redirect(reverse('organization'))
 
-        if are_forms_complete:
+        if are_forms_complete and not is_action_update:
             update_nodebb_for_user_status(request.user.username)
             return redirect(reverse('recommendations'))
 
