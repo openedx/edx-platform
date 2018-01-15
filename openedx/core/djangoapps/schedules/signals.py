@@ -15,7 +15,6 @@ from courseware.models import (
 from edx_ace.utils import date
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
-from openedx.core.djangoapps.signals.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
@@ -54,7 +53,6 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         ))
 
 
-@receiver(COURSE_START_DATE_CHANGED, dispatch_uid="update_schedules_on_course_start_changed")
 def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):
     """
     Updates all course schedules if course hasn't started yet and
