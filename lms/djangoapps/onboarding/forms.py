@@ -385,7 +385,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
     def __init__(self,  *args, **kwargs):
         super(OrganizationInfoForm, self).__init__( *args, **kwargs)
         self.fields['city'].required = False
-        self.fields['founding_year'].required = False
+        self.fields['founding_year'].required = True
 
     class Meta:
         """
@@ -419,7 +419,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
 
         error_messages = {
             'founding_year': {
-                'required': ugettext_noop(required_error.format('Founding Year')),
+                'required': ugettext_noop(EMPTY_FIELD_ERROR.format('Founding Year')),
             },
             'country': {
                 'required': ugettext_noop(EMPTY_FIELD_ERROR.format('Country of Organization Headquarters')),
@@ -453,7 +453,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
         if self.errors.get('partner_networks'):
             del self.errors['partner_networks']
 
-        year = cleaned_data['founding_year']
+        year = cleaned_data.get('founding_year', '')
 
         if year:
             if len("{}".format(year)) < 4 or year < 0 or len("{}".format(year)) > 4:
