@@ -597,7 +597,7 @@ def get_all_transcript_languages():
     all_languages_dict = dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
     # Return combined system settings and 3rd party transcript languages.
     all_languages = []
-    for key, value in sorted(all_languages_dict.iteritems(), key=lambda (k, v): v):
+    for key, value in sorted(all_languages_dict.iteritems(), key=lambda (k, v): (v, k)):
         all_languages.append({
             'language_code': key,
             'language_text': value
@@ -651,10 +651,6 @@ def videos_index_html(course):
             ),
             'transcript_upload_handler_url': reverse_course_url(
                 'transcript_upload_handler',
-                unicode(course.id)
-            ),
-            'transcript_delete_handler_url': reverse_course_url(
-                'transcript_delete_handler',
                 unicode(course.id)
             ),
             'transcription_plans': get_3rd_party_transcription_plans(),
