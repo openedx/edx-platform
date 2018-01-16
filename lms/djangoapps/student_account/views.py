@@ -40,7 +40,6 @@ from openedx.core.djangoapps.user_api.errors import (
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_customer_for_learner
-from student.cookies import set_experiments_is_enterprise_cookie
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
     update_logistration_context_for_enterprise,
@@ -48,8 +47,7 @@ from openedx.features.enterprise_support.utils import (
 )
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
 from student.models import UserProfile
-from student.views import register_user as old_register_view
-from student.views import signin_user as old_login_view
+from student.views import register_user as old_register_view, signin_user as old_login_view
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter

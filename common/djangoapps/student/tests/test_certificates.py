@@ -167,7 +167,7 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_no_certificate_status_no_problem(self):
-        with patch('student.views.cert_info', return_value={}):
+        with patch('student.views.dashboard.cert_info', return_value={}):
             self._create_certificate('honor')
             self._check_can_not_download_certificate()
 

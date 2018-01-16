@@ -1,4 +1,6 @@
-"""Base integration test for provider implementations."""
+"""
+Base integration test for provider implementations.
+"""
 
 import unittest
 

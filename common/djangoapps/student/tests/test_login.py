@@ -84,7 +84,11 @@ class LoginTest(CacheIsolationTestCase):
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
-        response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
+        response, mock_audit_log = self._login_response(
+            nonexistent_email,
+            'test_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
@@ -92,7 +96,11 @@ class LoginTest(CacheIsolationTestCase):
     @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
     def test_login_fail_incorrect_email_with_advanced_security(self):
         nonexistent_email = u'not_a_user@edx.org'
-        response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
+        response, mock_audit_log = self._login_response(
+            nonexistent_email,
+            'test_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
@@ -100,21 +108,33 @@ class LoginTest(CacheIsolationTestCase):
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_no_user_exists_no_pii(self):
         nonexistent_email = u'not_a_user@edx.org'
-        response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
+        response, mock_audit_log = self._login_response(
+            nonexistent_email,
+            'test_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [nonexistent_email])
 
     def test_login_fail_wrong_password(self):
-        response, mock_audit_log = self._login_response('test@edx.org', 'wrong_password')
+        response, mock_audit_log = self._login_response(
+            'test@edx.org',
+            'wrong_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
-        response, mock_audit_log = self._login_response('test@edx.org', 'wrong_password')
+        response, mock_audit_log = self._login_response(
+            'test@edx.org',
+            'wrong_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'invalid'])
@@ -126,7 +146,11 @@ class LoginTest(CacheIsolationTestCase):
         self.user.save()
 
         # Should now be unable to login
-        response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
+        response, mock_audit_log = self._login_response(
+            'test@edx.org',
+            'test_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value="In order to sign in, you need to activate your account.")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
@@ -138,7 +162,11 @@ class LoginTest(CacheIsolationTestCase):
         self.user.save()
 
         # Should now be unable to login
-        response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
+        response, mock_audit_log = self._login_response(
+            'test@edx.org',
+            'test_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False,
                               value="In order to sign in, you need to activate your account.")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
@@ -146,13 +174,21 @@ class LoginTest(CacheIsolationTestCase):
 
     def test_login_unicode_email(self):
         unicode_email = u'test@edx.org' + unichr(40960)
-        response, mock_audit_log = self._login_response(unicode_email, 'test_password')
+        response, mock_audit_log = self._login_response(
+            unicode_email,
+            'test_password',
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
 
     def test_login_unicode_password(self):
         unicode_password = u'test_password' + unichr(1972)
-        response, mock_audit_log = self._login_response('test@edx.org', unicode_password)
+        response, mock_audit_log = self._login_response(
+            'test@edx.org',
+            unicode_password,
+            'student.views.login.AUDIT_LOG'
+        )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
 
@@ -378,7 +414,9 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_response(response, success=True)
 
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG', extra_post_params=None):
-        ''' Post the login info '''
+        """
+        Post the login info
+        """
         post_params = {'email': email, 'password': password}
         if extra_post_params is not None:
             post_params.update(extra_post_params)
@@ -387,7 +425,7 @@ class LoginTest(CacheIsolationTestCase):
         return result, mock_audit_log
 
     def _assert_response(self, response, success=None, value=None):
-        '''
+        """
         Assert that the response had status 200 and returned a valid
         JSON-parseable dict.
 
@@ -396,7 +434,7 @@ class LoginTest(CacheIsolationTestCase):
 
         If value is provided, assert that the response contained that
         value for 'value' in the JSON dict.
-        '''
+        """
         self.assertEqual(response.status_code, 200)
 
         try:
@@ -499,16 +537,16 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Tests the redirects when visiting course-specific URL with @login_required.
         Should vary by course depending on its enrollment_domain
         """
-        TARGET_URL = reverse('courseware', args=[text_type(self.course.id)])            # pylint: disable=invalid-name
-        noshib_response = self.client.get(TARGET_URL, follow=True, HTTP_ACCEPT="text/html")
+        target_url = reverse('courseware', args=[text_type(self.course.id)])
+        noshib_response = self.client.get(target_url, follow=True, HTTP_ACCEPT="text/html")
         self.assertEqual(noshib_response.redirect_chain[-1],
-                         (expected_redirect_url('/login?next={url}'.format(url=TARGET_URL)), 302))
+                         (expected_redirect_url('/login?next={url}'.format(url=target_url)), 302))
         self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
-        TARGET_URL_SHIB = reverse('courseware', args=[text_type(self.shib_course.id)])  # pylint: disable=invalid-name
-        shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
+        target_url_shib = reverse('courseware', args=[text_type(self.shib_course.id)])
+        shib_response = self.client.get(**{'path': target_url_shib,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,
                                            'Shib-Identity-Provider': 'https://idp.stanford.edu/',
@@ -517,9 +555,9 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         # The 'courseware' page actually causes a redirect itself, so it's not the end of the chain and we
         # won't test its contents
         self.assertEqual(shib_response.redirect_chain[-3],
-                         (expected_redirect_url('/shib-login/?next={url}'.format(url=TARGET_URL_SHIB)), 302))
+                         (expected_redirect_url('/shib-login/?next={url}'.format(url=target_url_shib)), 302))
         self.assertEqual(shib_response.redirect_chain[-2],
-                         (expected_redirect_url(TARGET_URL_SHIB), 302))
+                         (expected_redirect_url(target_url_shib), 302))
         self.assertEqual(shib_response.status_code, 200)
 
 

@@ -665,7 +665,7 @@ derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 ###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
-AUTHENTICATION_BACKENDS = ['ratelimitbackend.backends.RateLimitModelBackend', ]
+AUTHENTICATION_BACKENDS = ['ratelimitbackend.backends.RateLimitModelBackend']
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 

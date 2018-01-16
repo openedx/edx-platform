@@ -233,7 +233,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._make_eligible()
 
         # The user should have the option to purchase credit
-        with patch('student.views.get_credit_provider_display_names') as mock_method:
+        with patch('student.views.dashboard.get_credit_provider_display_names') as mock_method:
             mock_method.return_value = providers_list
             response = self._load_dashboard()
 
