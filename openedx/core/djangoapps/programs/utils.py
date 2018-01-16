@@ -237,7 +237,10 @@ class ProgramProgressMeter(object):
                 elif self._is_course_enrolled(course) or active_entitlement:
                     # Show all currently enrolled courses and active entitlements as in progress
                     if active_entitlement:
-                        course['course_runs'] = get_fulfillable_course_runs_for_entitlement(active_entitlement, course['course_runs'])
+                        course['course_runs'] = get_fulfillable_course_runs_for_entitlement(
+                            active_entitlement,
+                            course['course_runs']
+                        )
                         course['user_entitlement'] = active_entitlement.to_dict()
                         course['enroll_url'] = reverse(
                             'entitlements_api:v1:enrollments',

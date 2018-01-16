@@ -800,12 +800,11 @@ def dashboard(request):
     urls, program_data = {}, {}
     bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
 
-    if (bundles_on_dashboard_flag.is_enabled()):
+    if bundles_on_dashboard_flag.is_enabled():
         programs_data = meter.programs
         if programs_data:
             program_data = meter.programs[0]
             program_data = ProgramDataExtender(program_data, request.user).extend()
-            course_data = meter.progress(programs=[program_data], count_only=False)[0]
 
             program_data.pop('courses')
             skus = program_data.get('skus')
