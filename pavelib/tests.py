@@ -54,6 +54,10 @@ __test__ = False  # do not collect
         help="Disable capturing of stdout/stderr"
     ),
     make_option(
+        "--disable-coverage", action="store_false", dest="with_coverage",
+        help="Run the unit tests directly through pytest, NOT coverage"
+    ),
+    make_option(
         '--disable-migrations',
         action='store_true',
         dest='disable_migrations',
@@ -139,6 +143,10 @@ def test_system(options, passthrough_options):
     make_option(
         "--disable_capture", action="store_true", dest="disable_capture",
         help="Disable capturing of stdout/stderr"
+    ),
+    make_option(
+        "--disable-coverage", action="store_false", dest="with_coverage",
+        help="Run the unit tests directly through pytest, NOT coverage"
     ),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
