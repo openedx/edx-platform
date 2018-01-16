@@ -36,6 +36,7 @@ from student.models import CourseEnrollment
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
+<link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
 % endfor
 </%block>
 
@@ -122,6 +123,11 @@ from student.models import CourseEnrollment
 
 <section class="dashboard" id="dashboard-main">
 <main class="main-container" id="main" aria-label="Content" tabindex="-1">
+  ${static.renderReact(
+      component="UpsellExperimentModal",
+      id="upsell-modal",
+      props={},
+  )}
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
