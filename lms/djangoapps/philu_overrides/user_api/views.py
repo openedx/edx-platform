@@ -1,6 +1,5 @@
 import datetime
 import json
-
 import logging
 
 from django.contrib.auth.models import User
@@ -34,7 +33,7 @@ from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from student.forms import AccountCreationForm, get_registration_extension_form
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from social.exceptions import AuthException, AuthAlreadyAssociated
-from student.tasks import send_activation_email
+from common.lib.mandrill_client.client import MandrillClient
 from edxmako.shortcuts import render_to_string
 from student.models import Registration, create_comments_service_user, PasswordHistory, UserProfile
 
@@ -366,7 +365,10 @@ def create_account_with_params_custom(request, params):
             dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
             message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                        '-' * 80 + '\n\n' + message)
-        send_activation_email.delay(subject, message, from_address, dest_addr)
+        MandrillClient.send_activation_mail(user.email, message, {
+            'name': profile.name,
+            'key': registration.activation_key,
+        })
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses

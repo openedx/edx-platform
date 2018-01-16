@@ -1,2 +1,3 @@
 pynodebb==0.0.13
 SurveyGizmo==1.2.3
+mandrill
