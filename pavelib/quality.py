@@ -696,18 +696,18 @@ def run_quality(options):
     :param: p, diff-quality will fail if the quality percentage calculated is
         below this percentage. For example, if p is set to 80, and diff-quality finds
         quality of the branch vs the compare branch is less than 80%, then this task will fail.
-        This threshold would be applied to both pep8 and pylint.
     """
     # Directory to put the diff reports in.
     # This makes the folder if it doesn't already exist.
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
 
     # Save the pass variable. It will be set to false later if failures are detected.
-    diff_quality_percentage_pass = True
+    diff_quality_pass = True
+    failure_reasons = []
 
     def _lint_output(linter, count, violations_list, is_html=False, limit=0):
         """
-        Given a count & list of pep8 violations, pretty-print the pep8 output.
+        Given a count & list of pylint violations, pretty-print the output.
         If `is_html`, will print out with HTML markup.
         """
         if is_html:
@@ -740,36 +740,16 @@ def run_quality(options):
 
         return ''.join(lines)
 
-    # Run pep8 directly since we have 0 violations on master
-    (count, violations_list) = _get_pep8_violations(clean=False)
-
-    # Print number of violations to log
-    print _lint_output('pep8', count, violations_list)
-
-    # Also write the number of violations to a file
-    with open(dquality_dir / "diff_quality_pep8.html", "w") as f:
-        f.write(_lint_output('pep8', count, violations_list, is_html=True))
-
-    if count > 0:
-        diff_quality_percentage_pass = False
-
-    # Generate diff-quality html report for pylint, and print to console
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
-
     (count, violations_list) = _get_pylint_violations(clean=False)
-
     _, upper_violations_limit, _, _ = _parse_pylint_options(options)
 
-    # Print number of violations to log
+    # Print total number of violations to log
     print _lint_output('pylint', count, violations_list, limit=upper_violations_limit)
-
-    # Also write the number of violations to a file
-    with open(dquality_dir / "diff_quality_pylint.html", "w") as f:
-        f.write(_lint_output('pylint', count, violations_list, is_html=True, limit=upper_violations_limit))
-
     if count > upper_violations_limit > -1:
-        diff_quality_percentage_pass = False
+        diff_quality_pass = False
+        failure_reasons.append('Too many total violations.')
 
     # ----- Set up for diff-quality pylint call -----
     # Set the string, if needed, to be used for the diff-quality --compare-branch switch.
@@ -784,10 +764,20 @@ def run_quality(options):
     if diff_threshold > -1:
         percentage_string = u'--fail-under={0}'.format(diff_threshold)
 
+    pylint_files = get_violations_reports("pylint")
+    pylint_reports = u' '.join(pylint_files)
+    if not run_diff_quality(
+        violations_type="pylint",
+        reports=pylint_reports,
+        percentage_string=percentage_string,
+        branch_string=compare_branch_string,
+        dquality_dir=dquality_dir
+    ):
+        diff_quality_pass = False
+        failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
+
     eslint_files = get_violations_reports("eslint")
     eslint_reports = u' '.join(eslint_files)
-
-    # run diff-quality for eslint.
     if not run_diff_quality(
             violations_type="eslint",
             reports=eslint_reports,
@@ -795,11 +785,12 @@ def run_quality(options):
             branch_string=compare_branch_string,
             dquality_dir=dquality_dir
     ):
-        diff_quality_percentage_pass = False
+        diff_quality_pass = False
+        failure_reasons.append('Eslint violation(s) were found in the lines of code that were added or changed.')
 
     # If one of the quality runs fails, then paver exits with an error when it is finished
-    if not diff_quality_percentage_pass:
-        msg = "FAILURE: Diff-quality failure(s). This means that violations were found in the current changeset."
+    if not diff_quality_pass:
+        msg = "FAILURE: " + " ".join(failure_reasons)
         raise BuildFailure(msg)
 
 

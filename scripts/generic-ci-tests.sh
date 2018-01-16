@@ -100,28 +100,43 @@ function run_paver_quality {
 case "$TEST_SUITE" in
 
     "quality")
-        echo "Finding fixme's and storing report..."
-        run_paver_quality find_fixme || EXIT=1
-        echo "Finding pep8 violations and storing report..."
-        run_paver_quality run_pep8 || EXIT=1
-        echo "Finding pylint violations and storing in report..."
-        run_paver_quality run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
 
         mkdir -p reports
 
-        echo "Finding ESLint violations and storing report..."
-        run_paver_quality run_eslint -l $ESLINT_THRESHOLD || EXIT=1
-        echo "Finding Stylelint violations and storing report..."
-        run_paver_quality run_stylelint -l $STYLELINT_THRESHOLD || EXIT=1
-        echo "Running code complexity report (python)."
-        run_paver_quality run_complexity || echo "Unable to calculate code complexity. Ignoring error."
-        echo "Running xss linter report."
-        run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || EXIT=1
-        echo "Running safe commit linter report."
-        run_paver_quality run_xsscommitlint || EXIT=1
-        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        echo "Running diff quality."
-        run_paver_quality run_quality -p 100 -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD || EXIT=1
+        case "$SHARD" in
+            1)
+                echo "Finding pylint violations and storing in report..."
+                run_paver_quality run_pylint --system=common  || { EXIT=1; }
+                ;;
+
+            2)
+                echo "Finding pylint violations and storing in report..."
+                run_paver_quality run_pylint --system=lms || { EXIT=1; }
+                ;;
+
+            3)
+                echo "Finding pylint violations and storing in report..."
+                run_paver_quality run_pylint --system="cms,openedx,pavelib" || { EXIT=1; }
+                ;;
+
+            4)
+                echo "Finding fixme's and storing report..."
+                run_paver_quality find_fixme || { EXIT=1; }
+                echo "Finding pep8 violations and storing report..."
+                run_paver_quality run_pep8 || { EXIT=1; }
+                echo "Finding ESLint violations and storing report..."
+                run_paver_quality run_eslint -l $ESLINT_THRESHOLD || { EXIT=1; }
+                echo "Finding Stylelint violations and storing report..."
+                run_paver_quality run_stylelint -l $STYLELINT_THRESHOLD || { EXIT=1; }
+                echo "Running code complexity report (python)."
+                run_paver_quality run_complexity || echo "Unable to calculate code complexity. Ignoring error."
+                echo "Running xss linter report."
+                run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || { EXIT=1; }
+                echo "Running safe commit linter report."
+                run_paver_quality run_xsscommitlint || { EXIT=1; }
+                ;;
+
+        esac
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.

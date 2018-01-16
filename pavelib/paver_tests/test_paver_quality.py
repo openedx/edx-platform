@@ -301,27 +301,10 @@ class TestPaverRunQuality(unittest.TestCase):
         self.addCleanup(report_dir_patcher.stop)
 
     @patch('__builtin__.open', mock_open())
-    def test_failure_on_diffquality_pep8(self):
-        """
-        If pep8 finds errors, pylint and eslint should still be run
-        """
-        # Mock _get_pep8_violations to return a violation
-        _mock_pep8_violations = MagicMock(
-            return_value=(1, ['lms/envs/common.py:32:2: E225 missing whitespace around operator'])
-        )
-        with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
-            with self.assertRaises(SystemExit):
-                pavelib.quality.run_quality("")
-
-        # Test that pep8, pylint and eslint were called by counting the calls to
-        # _get_pep8_violations (for pep8) and sh (5 for pylint & 1 for eslint)
-        self.assertEqual(_mock_pep8_violations.call_count, 1)
-        self.assertEqual(self._mock_paver_sh.call_count, 6)
-
-    @patch('__builtin__.open', mock_open())
     def test_failure_on_diffquality_pylint(self):
         """
-        If diff-quality fails on pylint, the paver task should also fail
+        If diff-quality fails on pylint, the paver task should also fail, but
+        only after runnning diff-quality with eslint
         """
 
         # Underlying sh call must fail when it is running the pylint diff-quality task
@@ -331,11 +314,11 @@ class TestPaverRunQuality(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     pavelib.quality.run_quality("")
 
-        # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pylint_violations (which calls "pylint") is called once
         self.assertEqual(_mock_pylint_violations.call_count, 1)
-        # And assert that sh was called 6 times (1 for pep8 & 1 for eslint).
-        # This means that even in the event of a diff-quality pylint failure, eslint and pep8 are still called.
+        # Assert that sh was called twice- once for diff quality with pylint
+        # and once for diff quality with eslint. This means that in the event
+        # of a diff-quality pylint failure, eslint is still called.
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
@@ -346,26 +329,23 @@ class TestPaverRunQuality(unittest.TestCase):
 
         # Underlying sh call must fail when it is running the eslint diff-quality task
         self._mock_paver_sh.side_effect = fail_on_eslint
-        _mock_pep8_violations = MagicMock(return_value=(0, []))
         _mock_pylint_violations = MagicMock(return_value=(0, []))
-        with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
-            with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
-                with self.assertRaises(SystemExit):
-                    pavelib.quality.run_quality("")
-                    self.assertRaises(BuildFailure)
+        with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
+            with self.assertRaises(SystemExit):
+                pavelib.quality.run_quality("")
+                self.assertRaises(BuildFailure)
         print self._mock_paver_sh.mock_calls
 
-        # Test that both pep8 and pylint were called by counting the calls
-        # Assert that _get_pep8_violations (which calls "pep8") is called once
-        _mock_pep8_violations.assert_called_once_with(clean=False)
+        # Test that pylint is called
         _mock_pylint_violations.assert_called_once_with(clean=False)
-        # And assert that sh was called once (the call to eslint)
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        # Assert that sh was called twice- once for diff quality with pylint
+        # and once for diff quality with eslint
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
     def test_other_exception(self):
         """
-        If diff-quality fails for an unknown reason on the first run (pep8), then
+        If diff-quality fails for an unknown reason on the first run, then
         pylint should not be run
         """
         self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
@@ -379,5 +359,8 @@ class TestPaverRunQuality(unittest.TestCase):
     def test_no_diff_quality_failures(self):
         # Assert nothing is raised
         pavelib.quality.run_quality("")
-        # And assert that sh was called 7 times (1 for pep8, 5 for pylint, and 1 for eslint)
+        # And assert that sh was called 7 times:
+        # 5 for pylint on each of the system directories
+        # 1 for diff_quality for pylint
+        # 1 for diff_quality for eslint
         self.assertEqual(self._mock_paver_sh.call_count, 7)

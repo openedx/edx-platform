@@ -65,8 +65,9 @@ class MockEnvironment(tasks.Environment):
 
 def fail_on_eslint(*args):
     """
-    For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
-    is going to fail when we pass in a percentage ("p") requirement.
+    For our tests, we need the call for diff-quality running eslint reports
+    to fail, since that is what is going to fail when we pass in a
+    percentage ("p") requirement.
     """
     if "eslint" in args[0]:
         # Essentially mock diff-quality exiting with 1
@@ -77,8 +78,9 @@ def fail_on_eslint(*args):
 
 def fail_on_pylint(*args):
     """
-    For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
-    is going to fail when we pass in a percentage ("p") requirement.
+    For our tests, we need the call for diff-quality running pylint reports
+    to fail, since that is what is going to fail when we pass in a
+    percentage ("p") requirement.
     """
     if "pylint" in args[0]:
         # Essentially mock diff-quality exiting with 1
