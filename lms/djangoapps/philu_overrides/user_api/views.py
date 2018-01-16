@@ -346,29 +346,12 @@ def create_account_with_params_custom(request, params):
     )
     if send_email:
         dest_addr = user.email
+        activation_link = render_to_string('emails/activation_link.txt', context)
         context = {
             'name': profile.name,
-            'key': registration.activation_key,
+            'key': activation_link,
         }
-
-        # composes activation email
-        subject = render_to_string('emails/activation_email_subject.txt', context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email.txt', context)
-
-        from_address = configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL
-        )
-        if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-            dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                       '-' * 80 + '\n\n' + message)
-        MandrillClient.send_activation_mail(user.email, message, {
-            'name': profile.name,
-            'key': registration.activation_key,
-        })
+        MandrillClient.send_activation_mail(dest_addr, context)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
