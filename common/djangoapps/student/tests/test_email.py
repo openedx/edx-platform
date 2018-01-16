@@ -388,7 +388,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.append_allowed_hosts("aGenericValidHostName")
 
         with patch('edxmako.request_context.get_current_request', return_value=request):
-            body = render_to_string('emails/confirm_email_change.txt', context)
+            body = render_to_string('emails/confirm_email_change.txt', context, request=request)
             url = safe_get_host(request)
 
         self.assertIn(url, body)
