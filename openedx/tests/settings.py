@@ -58,10 +58,12 @@ INSTALLED_APPS = (
     'djcelery',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
+    'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
     'edxval',
     'courseware',
     'student',
     'certificates.apps.CertificatesConfig',
+    'openedx.core.djangoapps.user_api',
     'course_modes.apps.CourseModesConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'openedx.core.djangoapps.dark_lang',
@@ -71,6 +73,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
     'milestones',
     'celery_utils',
+    'lms.djangoapps.completion.apps.CompletionAppConfig',
 )
 
 LMS_ROOT_URL = 'http://localhost:8000'
