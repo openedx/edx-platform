@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('onboarding', '0003_historicaluser'),
+        ('onboarding', '0001_initial'),
     ]
 
     operations = [

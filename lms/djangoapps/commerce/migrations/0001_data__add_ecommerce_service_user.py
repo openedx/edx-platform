@@ -19,6 +19,9 @@ def backwards(apps, schema_editor):
     User.objects.get(username=USERNAME, email=EMAIL).delete()
 
 class Migration(migrations.Migration):
+    dependencies = [
+        ('onboarding', '0003_historicaluser'),
+    ]
 
     operations = [
         migrations.RunPython(forwards, backwards),
