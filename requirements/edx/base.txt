@@ -67,7 +67,6 @@ firebase-token-generator==1.3.2
 fs==2.0.17
 fs-s3fs==0.1.5
 futures==3.2.0 ; python_version == "2.7"
-GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
 help-tokens==1.0.3
