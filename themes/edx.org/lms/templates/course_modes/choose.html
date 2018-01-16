@@ -1,10 +1,13 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.learner_analytics import ENABLE_DASHBOARD_TAB
 %>
 
 <%namespace name='static' file='/static_content.html'/>
@@ -61,6 +64,10 @@ from openedx.core.djangolib.markup import HTML, Text
     new Currency();
 </%static:webpack>
 
+<%block name="header_extras">
+    <link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
+</%block>
+
 <%block name="content">
     % if error:
         <div class="wrapper-msg wrapper-msg-error">
@@ -78,6 +85,14 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <div id="currency_data" value="${currency_data}"></div>
     <div class="container">
+       <% course_key = CourseKey.from_string('course-v1:Fake+Course+Key') %>
+       % if ENABLE_DASHBOARD_TAB.is_enabled(course_key):
+            ${static.renderReact(
+              component="UpsellExperimentModal",
+              id="upsell-modal",
+              props={},
+            )}
+        % endif
         <section class="wrapper">
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
