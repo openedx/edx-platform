@@ -29,7 +29,11 @@ set -e
 #
 ###############################################################################
 
-PAVER_ARGS="-v"
+if [[ $RUN_COVERAGE == 'false' ]]; then
+    PAVER_ARGS="-v --disable-coverage"
+else
+    PAVER_ARGS="-v"
+fi
 PARALLEL="--processes=-1"
 
 case "${TEST_SUITE}" in

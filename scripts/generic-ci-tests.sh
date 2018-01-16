@@ -78,7 +78,13 @@ elif [[ $DJANGO_VERSION == '1.9' ]]; then
 else
     TOX=""
 fi
-PAVER_ARGS="-v"
+
+if [[ $RUN_COVERAGE == 'false' ]]; then
+    PAVER_ARGS="-v --disable-coverage"
+else
+    PAVER_ARGS="-v"
+fi
+
 PARALLEL="--processes=-1"
 export SUBSET_JOB=$JOB_NAME
 
