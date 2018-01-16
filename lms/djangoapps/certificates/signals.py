@@ -88,8 +88,13 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
     If the learner is verified and their cert has the 'unverified' status,
     we regenerate the cert.
     """
+    from course_modes.models import CourseMode
+    
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
+    modes_for_cert_auto_creation = GeneratedCertificate.VERIFIED_CERTS_MODES \
+        + [CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE]
+
+    mode_is_verified = enrollment_mode in modes_for_cert_auto_creation
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
     if mode_is_verified and (cert is None or cert.status == 'unverified'):
         kwargs = {
