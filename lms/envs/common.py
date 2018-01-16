@@ -661,7 +661,7 @@ derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 
-AUTHENTICATION_BACKENDS = ['openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxRateLimitedAllowAllUsersModelBackend']
+AUTHENTICATION_BACKENDS = ['openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxRateLimitedAllowAllUsersModelBackend']
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
