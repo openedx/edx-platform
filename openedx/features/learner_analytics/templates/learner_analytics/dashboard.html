@@ -48,19 +48,26 @@ from openedx.features.course_experience import course_home_page_title
     </header>
     <div class="page-content learner-analytics-dashboard-wrapper">
         <div class="learner-analytics-dashboard">
-            ${static.renderReact(
-              component="LearnerAnalyticsDashboard",
-              id="react-learner-analytics-dashboard",
-              props={
-                'schedule': assignment_schedule,
-                'grading_policy': grading_policy,
-                'grades': assignment_grades,
-                'discussion_info': discussion_info,
-                'weekly_active_users': weekly_active_users,
-                'week_streak': week_streak,
-                'profile_images': profile_image_urls,
-              }
-            )}
+            % if is_verified:
+                ${static.renderReact(
+                  component="LearnerAnalyticsDashboard",
+                  id="react-learner-analytics-dashboard",
+                  props={
+                    'schedule': assignment_schedule,
+                    'grading_policy': grading_policy,
+                    'grades': assignment_grades,
+                    'discussion_info': discussion_info,
+                    'weekly_active_users': weekly_active_users,
+                    'week_streak': week_streak,
+                    'profile_images': profile_image_urls,
+                  }
+                )}
+            % else:
+                ## TODO: LEARNER-3854: Clean-up after Learner Analytics test.
+                ##   If we move forward with this, the upsell information should
+                ##   be added here.
+                Page is not available.
+            % endif
         </div>
     </div>
 </div>
