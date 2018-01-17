@@ -660,6 +660,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             expected_message = welcome_message.format(
                 start_bold=u'<b>',
                 end_bold=u'</b>',
+                line_break=u'<br/>',
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME
             )
