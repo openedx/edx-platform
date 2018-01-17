@@ -165,7 +165,7 @@ class Migration(migrations.Migration):
             create_currency(apps, currency)
 
     dependencies = [
-        ('onboarding', '0001_initial'),
+        ('onboarding', '0003_historicaluser'),
     ]
 
     operations = [
