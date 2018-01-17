@@ -56,7 +56,9 @@
 
                         $.extend(unselectedRun, {
                             marketing_url: courseRun.marketing_url,
-                            is_enrollment_open: courseRun.is_enrollment_open
+                            is_enrollment_open: courseRun.is_enrollment_open,
+                            key: courseRun.key || '',
+                            is_mobile_only: courseRun.is_mobile_only || false
                         });
                     }
 
@@ -196,7 +198,7 @@
                         if (isEnrolled && courseRun.course_url) {
                             courseTitleLink = courseRun.course_url;
                         } else if (!isEnrolled && courseRun.marketing_url) {
-                            courseTitleLink = courseRun.marketing_url;
+                            courseTitleLink = this.updateMarketingUrl(courseRun);
                         }
                         this.set({
                             certificate_url: courseRun.certificate_url,
@@ -217,7 +219,8 @@
                             upcoming_course_runs: this.getUpcomingCourseRuns(),
                             upgrade_url: courseRun.upgrade_url,
                             price: this.getCertificatePriceString(courseRun),
-                            course_title_link: courseTitleLink
+                            course_title_link: courseTitleLink,
+                            is_mobile_only: courseRun.is_mobile_only || false
                         });
 
                         // This is used to render the date for completed and in progress courses
@@ -239,6 +242,30 @@
                             if (run.key === selectedCourseRun.key) run.is_enrolled = true; // eslint-disable-line no-param-reassign, max-len
                         });
                         this.setActiveCourseRun(selectedCourseRun);
+                    }
+                },
+
+                // update marketing url for deep linking if is_mobile_only true
+                updateMarketingUrl: function(courseRun) {
+                    if (courseRun.is_mobile_only === true) {
+                        var marketingUrl = courseRun.marketing_url, // eslint-disable-line vars-on-top
+                            href = marketingUrl,
+                            path,
+                            start;
+
+                        if (marketingUrl.indexOf('course_info?path_id') < 0) {
+                            start = marketingUrl.indexOf('course/');
+
+                            if (start > -1) {
+                                path = marketingUrl.substr(start);
+                            }
+
+                            href = 'edxapp://course_info?path_id=' + path;
+                        }
+
+                        return href;
+                    } else {
+                        return courseRun.marketing_url;
                     }
                 }
             });

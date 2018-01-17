@@ -32,7 +32,11 @@ class ProgramsFragmentView(EdxFragmentView):
         Render the program listing fragment.
         """
         user = request.user
-        mobile_only = json.loads(request.GET.get('mobile_only', 'false'))
+        try:
+            mobile_only = json.loads(request.GET.get('mobile_only', 'false'))
+        except ValueError:
+            mobile_only = False
+
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
         if not programs_config.enabled or not user.is_authenticated():
             raise Http404
@@ -80,7 +84,12 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         if not program_data:
             raise Http404
 
-        program_data = ProgramDataExtender(program_data, request.user).extend()
+        try:
+            mobile_only = json.loads(request.GET.get('mobile_only', 'false'))
+        except ValueError:
+            mobile_only = False
+
+        program_data = ProgramDataExtender(program_data, request.user, mobile_only=mobile_only).extend()
         course_data = meter.progress(programs=[program_data], count_only=False)[0]
         certificate_data = get_certificates(request.user, program_data)
 

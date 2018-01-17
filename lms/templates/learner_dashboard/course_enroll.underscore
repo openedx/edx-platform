@@ -33,9 +33,15 @@
             </div>
         <% } %>
         <div class="enroll-button">
+            <% if (typeof is_mobile_only != 'undefined' && is_mobile_only === true) { %>
+            <a href="edxapp://enroll?course_id=<%- course_run_key %>&email_opt_in=true" class="enroll-course-button btn-brand btn cta-primary">
+                <%- gettext('Enroll Now') %>
+            </a>
+            <% } else { %>
             <button type="button" class="btn-brand btn cta-primary">
                 <%- gettext('Enroll Now') %>
             </button>
+            <% } %>
         </div>
     <% } else if (upcoming_course_runs.length > 0) {%>
         <div class="no-action-message">

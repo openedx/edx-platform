@@ -22,7 +22,8 @@
                  tpl: HtmlUtils.template(pageTpl),
 
                  events: {
-                     'click .enroll-button': 'handleEnroll'
+                     'click .enroll-button': 'handleEnroll',
+                     'change .run-select': 'updateEnrollUrl'
                  },
 
                  initialize: function(options) {
@@ -55,16 +56,18 @@
 
                  handleEnroll: function() {
                      // Enrollment click event handled here
-                     var courseRunKey = $('.run-select').val() || this.model.get('course_run_key');
-                     this.model.updateCourseRun(courseRunKey);
-                     if (this.model.get('is_enrolled')) {
-                         // Create the enrollment.
-                         this.enrollModel.save({
-                             course_id: courseRunKey
-                         }, {
-                             success: _.bind(this.enrollSuccess, this),
-                             error: _.bind(this.enrollError, this)
-                         });
+                     if (this.model.get('is_mobile_only') !== true) {
+                         var courseRunKey = $('.run-select').val() || this.model.get('course_run_key'); // eslint-disable-line vars-on-top, max-len
+                         this.model.updateCourseRun(courseRunKey);
+                         if (this.model.get('is_enrolled')) {
+                             // Create the enrollment.
+                             this.enrollModel.save({
+                                 course_id: courseRunKey
+                             }, {
+                                 success: _.bind(this.enrollSuccess, this),
+                                 error: _.bind(this.enrollError, this)
+                             });
+                         }
                      }
                  },
 
@@ -97,6 +100,14 @@
                          * have a free enrollment mode, so we can't auto-enroll.
                          */
                          this.redirect(this.trackSelectionUrl + this.model.get('course_run_key'));
+                     }
+                 },
+
+                 updateEnrollUrl: function() {
+                     if (this.model.get('is_mobile_only') === true) {
+                         var courseRunKey = $('.run-select').val(), // eslint-disable-line vars-on-top
+                             href = 'edxapp://enroll?course_id=' + courseRunKey + '&email_opt_in=true';
+                         $('.enroll-course-button').attr('href', href);
                      }
                  },
 
