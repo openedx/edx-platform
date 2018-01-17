@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -51,10 +52,23 @@ class CourseModeForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
+        # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
+        if len(args) > 0 and 'course' in args[0] and isinstance(args[0], QueryDict):
+            args_copy = args[0].copy()
+            args_copy['course'] = CourseKey.from_string(args_copy['course'])
+            args = [args_copy]
+
         super(CourseModeForm, self).__init__(*args, **kwargs)
 
-        if self.data.get('course'):
-            self.data['course'] = CourseKey.from_string(self.data['course'])
+        try:
+            if self.data.get('course'):
+                self.data['course'] = CourseKey.from_string(self.data['course'])
+        except AttributeError:
+            # Change the course ID string to a CourseLocator.
+            # On a POST request, self.data is a QueryDict and is immutable - so this code will fail.
+            # However, the args copy above before the super() call handles this case.
+            pass
 
         default_tz = timezone(settings.TIME_ZONE)
 

@@ -202,6 +202,9 @@ class CourseMode(models.Model):
         # Ensure currency is always lowercase.
         self.clean()  # ensure object-level validation is performed before we save.
         self.currency = self.currency.lower()
+        if self.id is None:
+            # If this model has no primary key at save time, it needs to be force-inserted.
+            force_insert = True
         super(CourseMode, self).save(force_insert, force_update, using)
 
     @property
