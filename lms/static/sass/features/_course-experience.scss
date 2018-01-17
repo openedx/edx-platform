@@ -285,6 +285,12 @@
         margin-top: ($baseline / 5);
       }
     }
+
+    @media print {
+      .section-tools {
+        display: none !important;
+      }
+    }
   }
 
   @include media-breakpoint-down(sm) {

@@ -635,4 +635,6 @@ footer#footer-edx-v3 {
       cursor: initial;
     }
   }
+  
+  @extend %ui-print-excluded;
 }
