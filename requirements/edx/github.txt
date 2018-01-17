@@ -98,7 +98,7 @@ git+https://github.com/edx/edx-user-state-client.git@1.0.2#egg=edx-user-state-cl
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.6#egg=lti_consumer-xblock==1.1.6
 git+https://github.com/edx/edx-proctoring.git@1.3.4#egg=edx-proctoring==1.3.4
 # This is here because all of the other XBlocks are located here. However, it is published to PyPI and will be installed that way
-xblock-review==1.1.2
+xblock-review==1.1.4
 git+https://github.com/edx/edx-analytics-data-api-client.git@0.13.0#egg=edx-analytics-data-api-client==0.13.0
 
 
