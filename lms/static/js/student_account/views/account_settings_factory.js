@@ -164,7 +164,7 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage: StringUtils.interpolate(
-                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages.'),  // eslint-disable-line max-len
+                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.'),  // eslint-disable-line max-len
                                     {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options,
