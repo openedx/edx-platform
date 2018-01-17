@@ -61,6 +61,10 @@ from openedx.core.djangolib.markup import HTML, Text
     new Currency();
 </%static:webpack>
 
+<%block name="header_extras">
+<link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
+</%block>
+
 <%block name="content">
     % if error:
         <div class="wrapper-msg wrapper-msg-error">
@@ -78,6 +82,11 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <div id="currency_data" value="${currency_data}"></div>
     <div class="container">
+        ${static.renderReact(
+            component="UpsellExperimentModal",
+            id="upsell-modal",
+            props={},
+        )}
         <section class="wrapper">
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">
