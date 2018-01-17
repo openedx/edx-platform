@@ -6,16 +6,16 @@ import math
 import string
 import urllib
 import urlparse
-from datetime import datetime, timedelta
+from datetime import timedelta
 from itertools import izip
 
 import ddt
 import mock
-import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import Resolver404, resolve, reverse
+from django.utils.timezone import now
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
 from opaque_keys.edx.keys import CourseKey
@@ -129,7 +129,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         auth_oauth2_provider = dot_models.AccessToken.objects.create(
             user=user,
             application=app_client_oauth2_provider,
-            expires=datetime.utcnow() + timedelta(weeks=1),
+            expires=now() + timedelta(weeks=1),
             scope='read write',
             token='16MGyP3OaQYHmpT1lK7Q6MMNAZsjwF'
         )
@@ -902,9 +902,7 @@ class CcxDetailTest(CcxRestApiTest):
         ccx.structure_json = json.dumps(self.master_course_chapters)
         ccx.save()
 
-        today = datetime.today()
-        start = today.replace(tzinfo=pytz.UTC)
-        override_field_for_ccx(ccx, self.course, 'start', start)
+        override_field_for_ccx(ccx, self.course, 'start', now())
         override_field_for_ccx(ccx, self.course, 'due', None)
         # Hide anything that can show up in the schedule
         hidden = 'visible_to_staff_only'
