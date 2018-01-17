@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-10 10:44+0000\n"
-"PO-Revision-Date: 2018-01-10 10:50:56.873858\n"
+"POT-Creation-Date: 2018-01-17 13:44+0000\n"
+"PO-Revision-Date: 2018-01-17 13:50:33.926347\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -83,6 +83,7 @@ msgstr "سشدهرل"
 #: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: common/static/common/templates/discussion/forum-action-delete.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-delete.underscore
@@ -269,6 +270,7 @@ msgstr "رخرث"
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
+#: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -327,7 +329,7 @@ msgid "Advanced"
 msgstr "شيدشرذثي"
 
 #: cms/static/js/views/previous_video_upload.js
-#: lms/static/js/views/image_field.js
+#: cms/static/js/views/video_transcripts.js lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "قثوخدهرل"
 
@@ -5001,10 +5003,12 @@ msgstr "ذاثذن غخعق ثوشهم شذذخعرف بخق هرسفقعذفه�
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
-"a limited number of languages."
+"a limited number of languages. Changing the value of this field will cause "
+"the page to refresh."
 msgstr ""
 "فاث مشرلعشلث عسثي فاقخعلاخعف فاهس سهفث. فاهس سهفث هس ذعققثرفمغ شدشهمشزمث هر "
-"ش مهوهفثي رعوزثق خب مشرلعشلثس."
+"ش مهوهفثي رعوزثق خب مشرلعشلثس. ذاشرلهرل فاث دشمعث خب فاهس بهثمي صهمم ذشعسث "
+"فاث حشلث فخ قثبقثسا."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
@@ -6890,16 +6894,12 @@ msgid "The file could not be uploaded."
 msgstr "فاث بهمث ذخعمي رخف زث عحمخشيثي."
 
 #: cms/static/js/views/video_transcripts.js
-msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
-msgstr "{toggleShowTranscriptText} فقشرسذقهحفس ({totalTranscripts})"
+msgid "Hide transcripts ({transcriptCount})"
+msgstr "اهيث فقشرسذقهحفس ({transcriptCount})"
 
 #: cms/static/js/views/video_transcripts.js
-msgid "Show"
-msgstr "ساخص"
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Hide"
-msgstr "اهيث"
+msgid "Show transcripts ({transcriptCount})"
+msgstr "ساخص فقشرسذقهحفس ({transcriptCount})"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
@@ -6913,6 +6913,18 @@ msgstr ""
 #: cms/templates/js/video-transcripts.underscore
 msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 msgstr "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr "شقث غخع سعقث غخع صشرف فخ قثوخدث فاهس فقشرسذقهحف?"
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for any "
+"components that use this video."
+msgstr ""
+"هب غخع قثوخدث فاهس فقشرسذقهحف, فاث فقشرسذقهحف صهمم رخف زث شدشهمشزمث بخق شرغ "
+"ذخوحخرثرفس فاشف عسث فاهس دهيثخ."
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"

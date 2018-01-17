@@ -62,16 +62,16 @@
       "%(num_points)s puntos posibles (calificados)"
     ], 
     "%(num_points)s point possible (graded, results hidden)": [
-      "%(num_points)s punto posible (calificado, resultados escondidos)", 
-      "%(num_points)s puntos posibles (calificados, resultados escondidos)"
+      "%(num_points)s punto posible (calificables, resultados escondidos)", 
+      "%(num_points)s puntos posibles (calificable, resultados escondidos)"
     ], 
     "%(num_points)s point possible (ungraded)": [
       "%(num_points)s punto posible (no calificado)", 
       "%(num_points)s puntos posibles (no calificados)"
     ], 
     "%(num_points)s point possible (ungraded, results hidden)": [
-      "%(num_points)s punto posible (calificado, resultados escondidos)", 
-      "%(num_points)s puntos posibles (no calificados, resultados escondidos)"
+      "%(num_points)s punto posible (calificable, resultados escondidos)", 
+      "%(num_points)s puntos posibles (no calificables, resultados escondidos)"
     ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
@@ -637,7 +637,7 @@
     "Everyone who has staff privileges in this course": "todos los usuarios con rol de funcionario para este curso", 
     "Exam Types": "Tipos de ex\u00e1men", 
     "Exception Granted": "Acceso concedido", 
-    "Exit full browser": "Salir del navegador expandido", 
+    "Exit full browser": "Salir de pantalla completa", 
     "Expand All": "Expandir todo", 
     "Explain if other.": "Si otro, explique.", 
     "Explanation": "Explicaci\u00f3n", 
@@ -653,7 +653,7 @@
     "File upload succeeded": "Archivo subido con exito", 
     "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB": "El archivo {filename} excede el tama\u00f1o maximo de  {maxFileSizeInMBs} MB", 
     "Files must be in JPEG or PNG format.": "Los archivos deben estar en formato JPEG o PNG.", 
-    "Fill browser": "Expandir el navegador", 
+    "Fill browser": "Ir a pantalla completa", 
     "Filter and sort topics": "Filtrar y ordenar los temas", 
     "Financial Assistance": "Asistencia financiera", 
     "Financial Assistance Application": "Solicitud de asistencia financiera", 
@@ -1327,7 +1327,7 @@
     "The post you selected has been deleted.": "La publicaci\u00f3n que seleccion\u00f3 ha sido borrada.", 
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "La versi\u00f3n publicada, {published}, fue restablecida a la versi\u00f3n borrador, {draft}.", 
     "The raw error message is:": "El error crudo es:", 
-    "The refund deadline for this course has passed,so you will not receive a refund.": "Su fecha l\u00edmite para devoluci\u00f3n en este curso ha pasado, por lo que no recibir\u00e1 una devoluci\u00f3n.", 
+    "The refund deadline for this course has passed,so you will not receive a refund.": "La fecha l\u00edmite para reembolso en este curso ya ha pasado, por lo que a\u00fan si realiz\u00f3 un pago, no recibir\u00e1 devoluci\u00f3n de dinero.", 
     "The selected content group does not exist": "No existe contenido para el curso seleccionado", 
     "The selected image must be larger than {minFileSizeInKB}.": "La imagen seleccionada debe ser mayor a {minFileSizeInKB}.", 
     "The selected image must be smaller than {maxFileSizeInMB}.": "La imagen seleccionada debe ser inferior a  {maxFileSizeInMB}.", 

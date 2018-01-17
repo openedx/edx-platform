@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # arrow1234 <aleoncavallo@gmail.com>, 2014
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # Anthony Mangano <amangano@edx.org>, 2017
@@ -59,6 +60,7 @@
 # 
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -93,6 +95,7 @@
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2014
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
@@ -121,7 +124,7 @@
 # Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
@@ -165,6 +168,7 @@
 # 
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Armindo Perozo-Mena <aperozomena@gmail.com>, 2016
@@ -205,6 +209,7 @@
 # Translators:
 # Cristian Salamea <ovnicraft@gmail.com>, 2015
 # Diego Rojas <diego.rojas@edunext.co>, 2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2018
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Laura Silva <lingison@edx.org>, 2016
 msgid ""
@@ -212,8 +217,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-12-17 20:42+0000\n"
-"PO-Revision-Date: 2017-09-28 17:01+0000\n"
-"Last-Translator: Zimeng Chen <schen@edx.org>\n"
+"PO-Revision-Date: 2018-01-15 15:42+0000\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -749,7 +754,7 @@ msgstr "Master o magíster"
 
 #: common/djangoapps/student/models.py
 msgid "Bachelor's degree"
-msgstr "Licenciatura"
+msgstr "Pregrado o Licenciatura"
 
 #: common/djangoapps/student/models.py
 msgid "Associate degree"
@@ -7696,7 +7701,7 @@ msgstr "Los datos de inscripciones ya están disponibles en {dashboard_link}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
-msgstr "Afiliación"
+msgstr "Inscripciones y roles"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
@@ -13067,7 +13072,7 @@ msgstr "Errores en la carga del curso"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Search Your Courses"
-msgstr "Busca tus cursos"
+msgstr "Busca en tus cursos"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -13092,7 +13097,7 @@ msgstr "Recibir mensajes de correo electrónico del curso"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Save Settings"
-msgstr "Guardar ajustes."
+msgstr "Guardar ajustes"
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -13143,7 +13148,7 @@ msgstr "Debes registrarte antes de intentar acceder a la unidad"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
-msgstr "Inscribirse"
+msgstr "Realizar la inscripción"
 
 #: lms/templates/enroll_staff.html
 msgid "Don't enroll"
@@ -13794,7 +13799,7 @@ msgstr "Ingresar con {provider_name}"
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Create your own {platform_name} account below"
-msgstr "Crea tu cuenta en {platform_name} a continuación"
+msgstr "Crea tu cuenta en {platform_name} a continuación:"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -13841,7 +13846,7 @@ msgstr "Se mostrará en cualquier discusión o foro en los que tu participes"
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "cannot be changed later"
-msgstr "No podrá ser cambiada después"
+msgstr "No podrá ser cambiado después"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -14023,7 +14028,7 @@ msgstr "Bienvenido!"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
-msgstr "Regístrate para crear tu cuenta en {platform_name}"
+msgstr "Regístrese para crear su cuenta en {platform_name}"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -20444,9 +20449,9 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"Le hemos enviado las instrucciones para configurar la contraseña a la "
-"dirección de correo electrónico que ha proporcionado. Usted debe recibirlas "
-"en breve."
+"Si existe una cuenta asociada al correo electrónico proporcionado se le "
+"enviaran las instrucciones para restablecer la contraseña. Recuerde revisar "
+"también en su carpeta de correo no deseado."
 
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html

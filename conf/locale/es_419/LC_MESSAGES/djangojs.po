@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Carlos Arias Fernandez <cararias@gmail.com>, 2016
@@ -21,7 +22,7 @@
 # Gerardo Laster, 2014
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # karlman72 <karlman72@gmail.com>, 2014
@@ -49,6 +50,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -81,6 +83,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Alex Dzul <alexexc2@gmail.com>, 2016
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
@@ -110,6 +113,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -133,8 +137,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-12-17 20:42+0000\n"
-"PO-Revision-Date: 2018-01-08 17:05+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"PO-Revision-Date: 2018-01-16 19:32+0000\n"
+"Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -314,16 +318,16 @@ msgstr "text_word_{uniqueId}"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
-msgstr[0] "%(num_points)s punto posible (calificado, resultados escondidos)"
+msgstr[0] "%(num_points)s punto posible (calificables, resultados escondidos)"
 msgstr[1] ""
-"%(num_points)s puntos posibles (calificados, resultados escondidos)"
+"%(num_points)s puntos posibles (calificable, resultados escondidos)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] "%(num_points)s punto posible (calificado, resultados escondidos)"
+msgstr[0] "%(num_points)s punto posible (calificable, resultados escondidos)"
 msgstr[1] ""
-"%(num_points)s puntos posibles (no calificados, resultados escondidos)"
+"%(num_points)s puntos posibles (no calificables, resultados escondidos)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
@@ -497,12 +501,12 @@ msgstr "Restablecer sonido"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
-msgstr "Salir del navegador expandido"
+msgstr "Salir de pantalla completa"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
-msgstr "Expandir el navegador"
+msgstr "Ir a pantalla completa"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
@@ -1990,8 +1994,8 @@ msgid ""
 "The refund deadline for this course has passed,so you will not receive a "
 "refund."
 msgstr ""
-"Su fecha límite para devolución en este curso ha pasado, por lo que no "
-"recibirá una devolución."
+"La fecha límite para reembolso en este curso ya ha pasado, por lo que aún si"
+" realizó un pago, no recibirá devolución de dinero."
 
 #: lms/static/js/dashboard/legacy.js
 #: lms/static/js/learner_dashboard/views/unenroll_view.js

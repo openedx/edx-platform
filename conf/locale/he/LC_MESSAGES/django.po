@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Avi Levy <avi@sysbind.co.il>, 2017
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dana bublil <dana.bublil@gmail.com>, 2016
@@ -5024,7 +5025,7 @@ msgstr "\"{course_title}\" צוות הקורס"
 
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
-msgstr "מטמון CCX"
+msgstr "מאמן CCX"
 
 #: lms/djangoapps/ccx/utils.py
 msgid ""

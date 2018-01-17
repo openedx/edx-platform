@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-10 10:50+0000\n"
-"PO-Revision-Date: 2018-01-10 10:50:56.384997\n"
+"POT-Creation-Date: 2018-01-17 13:50+0000\n"
+"PO-Revision-Date: 2018-01-17 13:50:33.506466\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5215,6 +5215,7 @@ msgstr "Hömé Ⱡ'σяєм ι#"
 #: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
@@ -11057,12 +11058,19 @@ msgstr "Wélçömé tö {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #, python-brace-format
 msgid ""
 "{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to offer you high-quality learning "
-"opportunities from the world's best universities."
+"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
+"quality learning programs to help you advance your knowledge and your "
+"career. {line_break}Please continue with registration, or log in if you are "
+"an existing user, and press continue to start learning."
 msgstr ""
 "{start_bold}{enterprise_name}{end_bold} häs pärtnéréd wïth "
-"{start_bold}{platform_name}{end_bold} tö öffér ýöü hïgh-qüälïtý léärnïng "
-"öppörtünïtïés fröm thé wörld's ßést ünïvérsïtïés. Ⱡ'σяєм ιρ#"
+"{start_bold}{platform_name}{end_bold} tö  öffér ýöü älwäýs äväïläßlé, hïgh-"
+"qüälïtý léärnïng prögräms tö hélp ýöü ädvänçé ýöür knöwlédgé änd ýöür "
+"çäréér. {line_break}Pléäsé çöntïnüé wïth régïsträtïön, ör lög ïn ïf ýöü äré "
+"än éxïstïng üsér, änd préss çöntïnüé tö stärt léärnïng. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ #"
 
 #: lms/templates/emails/password_reset_subject.txt
 #, python-format
@@ -18067,6 +18075,7 @@ msgstr "Réfïné Ýöür Séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "{course_number} Courseware"
 msgstr "{course_number} Çöürséwäré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -23948,6 +23957,10 @@ msgstr "Lätést Ûpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "Séärçh Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
+msgid "Learner Analytics"
+msgstr "Léärnér Ànälýtïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #. Translators: this section lists all the third-party authentication
 #. providers

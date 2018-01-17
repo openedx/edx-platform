@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-10 10:44+0000\n"
-"PO-Revision-Date: 2018-01-10 10:50:57.063530\n"
+"POT-Creation-Date: 2018-01-17 13:44+0000\n"
+"PO-Revision-Date: 2018-01-17 13:50:34.072010\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -113,6 +113,7 @@ msgstr ""
 #: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: common/static/common/templates/discussion/forum-action-delete.underscore
@@ -2093,6 +2094,7 @@ msgstr ""
 msgid "Select a session:"
 msgstr ""
 
+#: lms/templates/learner_dashboard/course_enroll.underscore
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"

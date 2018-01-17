@@ -20,7 +20,7 @@
 # Katerina <rosemaily@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
 # Ksenia Ivanova <Kauaiz666@mail.ru>, 2016
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2018
 # Madina Kanlybaeva <madika.kanlybaeva@mail.ru>, 2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
@@ -123,7 +123,7 @@
 # Katerina <rosemaily@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
 # KhJulia <lnujulia@ukr.net>, 2014
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2018
 # KhJulia <lnujulia@ukr.net>, 2014
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
@@ -1284,10 +1284,9 @@ msgstr ""
 msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
-#: common/djangoapps/third_party_auth/models.py lms/templates/help_modal.html
-#, python-brace-format
+#: lms/templates/help_modal.html
 msgid "{platform_name} Support"
-msgstr ""
+msgstr "Техподдержка {platform_name}"
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -5810,7 +5809,7 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "More about {fullname}'s accomplishment"
-msgstr "Дальнейшая информация о достижениях {fullname}"
+msgstr "Дополнительная информация о достижениях слушателя {fullname}"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
@@ -12994,7 +12993,7 @@ msgstr "Произошла ошибка."
 
 #: lms/templates/help_modal.html
 msgid "Please {link_start}send us e-mail{link_end}."
-msgstr "{link_start}Отправьте нам электронное сообщение{link_end}."
+msgstr "{link_start}Отправьте нам электронное сообщение{link_end}"
 
 #: lms/templates/help_modal.html
 msgid "Please try again later."
