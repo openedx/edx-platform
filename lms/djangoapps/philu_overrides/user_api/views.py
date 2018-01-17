@@ -346,12 +346,14 @@ def create_account_with_params_custom(request, params):
     )
     if send_email:
         dest_addr = user.email
-        activation_link = render_to_string('emails/activation_link.txt', context)
+        activation_link = render_to_string('emails/activation_link.txt', {
+            'key': registration.activation_key
+        })
         context = {
             'name': profile.name,
             'key': activation_link,
         }
-        MandrillClient.send_activation_mail(dest_addr, context)
+        MandrillClient().send_activation_mail(dest_addr, context)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
