@@ -27,6 +27,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.lib.comment_client.utils import CommentClient500Error
 from openedx.features.course_experience import default_course_url_name
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
@@ -62,30 +63,35 @@ class LearnerAnalyticsView(View):
         course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
-        grading_policy = course.grading_policy
-
-        (grade_data, answered_percent) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
-        schedule_data = self.get_assignments_with_due_date(request, course_key)
-        (grade_data, schedule_data) = self.sort_grade_and_schedule_data(grade_data, schedule_data)
-
+        is_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
         context = {
             'course': course,
             'course_url': course_url,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
             'is_self_paced': course.self_paced,
-            'is_verified': CourseEnrollment.is_enrolled_as_verified(request.user, course_key),
-            'grading_policy': grading_policy,
-            'assignment_grades': grade_data,
-            'answered_percent': answered_percent,
-            'assignment_schedule': schedule_data,
-            'profile_image_urls': get_profile_image_urls_for_user(request.user, request),
-            'discussion_info': self.get_discussion_data(request, course_key),
-            'weekly_active_users': self.get_weekly_course_activity_count(course_key),
-            'week_streak': self.consecutive_weeks_of_course_activity_for_user(
-                request.user.username, course_key
-            )
+            'is_verified': is_verified,
         }
+
+        if (is_verified):
+            grading_policy = course.grading_policy
+
+            (grade_data, answered_percent) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
+            schedule_data = self.get_assignments_with_due_date(request, course_key)
+            (grade_data, schedule_data) = self.sort_grade_and_schedule_data(grade_data, schedule_data)
+
+            context.update({
+                'grading_policy': grading_policy,
+                'assignment_grades': grade_data,
+                'answered_percent': answered_percent,
+                'assignment_schedule': schedule_data,
+                'profile_image_urls': get_profile_image_urls_for_user(request.user, request),
+                'discussion_info': self.get_discussion_data(request, course_key),
+                'weekly_active_users': self.get_weekly_course_activity_count(course_key),
+                'week_streak': self.consecutive_weeks_of_course_activity_for_user(
+                    request.user.username, course_key
+                )
+            })
 
         return render_to_response('learner_analytics/dashboard.html', context)
 
@@ -151,7 +157,15 @@ class LearnerAnalyticsView(View):
             request (HttpRequest)
             course_key (CourseKey)
         """
-        context = create_user_profile_context(request, course_key, request.user.id)
+        try:
+            context = create_user_profile_context(request, course_key, request.user.id)
+        except CommentClient500Error:
+            # TODO: LEARNER-3854: Clean-up error handling if continuing support.
+            return {
+                'content_authored': 0,
+                'thread_votes': 0,
+            }
+
         threads = context['threads']
         profiled_user = context['profiled_user']
 
