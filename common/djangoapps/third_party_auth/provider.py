@@ -71,6 +71,8 @@ class Registry(object):
     @classmethod
     def get(cls, provider_id):
         """Gets provider by provider_id string if enabled, else None."""
+        if not provider_id:
+            return None
         if '-' not in provider_id:  # Check format - see models.py:ProviderConfig
             raise ValueError("Invalid provider_id. Expect something like oa2-google")
         try:
