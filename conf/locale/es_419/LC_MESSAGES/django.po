@@ -2,7 +2,7 @@
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
@@ -57,7 +57,7 @@
 # edX translation file.
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
@@ -91,7 +91,7 @@
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2014
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
@@ -165,7 +165,7 @@
 # edX translation file
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
@@ -205,7 +205,7 @@
 # edX translation file
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Cristian Salamea <ovnicraft@gmail.com>, 2015
 # Diego Rojas <diego.rojas@edunext.co>, 2017
@@ -220,12 +220,12 @@ msgstr ""
 "PO-Revision-Date: 2018-01-15 15:42+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
+"Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
-"Language: es_419\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 1.3\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -2924,13 +2924,13 @@ msgstr "Trama para los temas de discusión"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Ingrese las categorías de discusión en el siguiente formato: "
 "\"CategoryName\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-"
@@ -13718,8 +13718,8 @@ msgstr "Ahora estás viendo el curso como {i_start}{user_name}{i_end}."
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] "Usted ha realizado {num_used} de {num_total} intento"
-msgstr[1] "Tu has realizado {num_used} de {num_total} intentos"
+msgstr[0] "Ha realizado {num_used} de {num_total} intento"
+msgstr[1] "Ha realizado {num_used} de {num_total} intentos"
 
 #: lms/templates/problem.html
 msgid ""
@@ -14177,7 +14177,8 @@ msgstr "Calificar el envío del estudiante nuevamente"
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Score Improves"
-msgstr "Puntuar de nuevo solamente si se mejora la calificación"
+msgstr ""
+"Calificar de nuevo. Solamente si mejora la calificación del estudiante"
 
 #: lms/templates/staff_problem_info.html
 msgid "Override Score"
@@ -22385,7 +22386,7 @@ msgstr "Ritmo del curso"
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
-msgstr "Ritmo propio."
+msgstr "A ritmo propio."
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Instructor-Paced"
@@ -22425,7 +22426,7 @@ msgstr "Aprenda más sobre la estructura del curso"
 
 #: cms/templates/course_outline.html
 msgid "Setting release dates and grading policies"
-msgstr "Configurar fechas de liberación y políticas de calificaciones"
+msgstr "Configurar fechas de publicación y políticas de calificaciones"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -22433,9 +22434,9 @@ msgid ""
 "date. When you configure a subsection, you can also set the grading policy "
 "and due date."
 msgstr ""
-"Selecciones el icono de configuración para una sección o subsección para "
-"definir su fecha de liberación. Al configurar una subsección, también puede "
-"definir la política de calificación y la fecha límite de entrega."
+"Seleccione el icono de configuración para una sección o subsección para "
+"definir su fecha de publicación. Al configurar una subsección, también puede"
+" definir la política de calificación y la fecha límite de entrega."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about grading policy settings"
@@ -24822,8 +24823,8 @@ msgid ""
 "assignments."
 msgstr ""
 "Los cursos que van al ritmo del instructor avanzan de acuerdo con las fechas"
-" establecidas por el autor. Usted puede configurar las fechas de liberación "
-"para el contenido del curso, así como para las tareas y actividades."
+" establecidas por el autor. Usted puede configurar las fechas de publicación"
+" para el contenido del curso, así como para las tareas y actividades."
 
 #: cms/templates/settings.html
 msgid ""
@@ -24831,7 +24832,7 @@ msgid ""
 " for assignments. Learners can complete course material at any time before "
 "the course end date."
 msgstr ""
-"Los cursos que van a ritmo propio no tienen fechas de liberación para el "
+"Los cursos que van a ritmo propio no tienen fechas de publicación para el "
 "contenido ni fechas límites para las tareas.  Los estudiantes pueden "
 "completar los materiales y actividades en cualquier momento antes de la "
 "fecha de fin del curso."
@@ -25011,7 +25012,7 @@ msgid ""
 msgstr ""
 "Puede usar la barra de desplazamiento bajo el rango general de "
 "calificaciones para especificar si su curso tiene la estructura de aprobado "
-"/ no aprobado o si se califica por letras y para establecer umbrales para "
+"/ no aprobado o si se califica por letras y para establecer límites para "
 "cada una de las calificaciones posibles."
 
 #: cms/templates/settings_graders.html
