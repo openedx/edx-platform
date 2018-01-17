@@ -16,6 +16,7 @@ from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import i4xEncoder
 
+from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError
@@ -31,7 +32,6 @@ from lms.djangoapps.instructor_task.tasks import (
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 PROBLEM_URL_NAME = "test_urlname"
@@ -69,11 +69,13 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             task_input['score'] = score
 
         course_id = course_id or self.course.id
-        instructor_task = InstructorTaskFactory.create(course_id=course_id,
-                                                       requester=self.instructor,
-                                                       task_input=json.dumps(task_input, cls=i4xEncoder),
-                                                       task_key='dummy value',
-                                                       task_id=task_id)
+        instructor_task = InstructorTaskFactory.create(
+            course_id=course_id,
+            requester=self.instructor,
+            task_input=json.dumps(task_input, cls=i4xEncoder),
+            task_key='dummy value',
+            task_id=task_id
+        )
         return instructor_task
 
     def _get_xmodule_instance_args(self):
@@ -149,19 +151,31 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
     def _create_students_with_state(self, num_students, state=None, grade=0, max_grade=1):
         """Create students, a problem, and StudentModule objects for testing"""
         self.define_option_problem(PROBLEM_URL_NAME)
-        students = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+        enrolled_students = self._create_and_enroll_students(num_students)
+
+        for student in enrolled_students:
+            StudentModuleFactory.create(
+                course_id=self.course.id,
+                module_state_key=self.location,
+                student=student,
+                grade=grade,
+                max_grade=max_grade,
+                state=state
+            )
+        return enrolled_students
+
+    def _create_and_enroll_students(self, num_students, mode=CourseMode.DEFAULT_MODE_SLUG):
+        """Create & enroll students for testing"""
+        return [
+            self.create_student(username='robot%d' % i, email='robot+test+%d@edx.org' % i, mode=mode)
             for i in xrange(num_students)
         ]
-        for student in students:
-            CourseEnrollmentFactory.create(course_id=self.course.id, user=student)
-            StudentModuleFactory.create(course_id=self.course.id,
-                                        module_state_key=self.location,
-                                        student=student,
-                                        grade=grade,
-                                        max_grade=max_grade,
-                                        state=state)
-        return students
+
+    def _create_students_with_no_state(self, num_students):
+        """Create students and a problem for testing"""
+        self.define_option_problem(PROBLEM_URL_NAME)
+        enrolled_students = self._create_and_enroll_students(num_students)
+        return enrolled_students
 
     def _assert_num_attempts(self, students, num_attempts):
         """Check the number attempts for all students is the same"""
@@ -248,12 +262,15 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         self._test_missing_current_task(override_problem_score)
 
     def test_override_undefined_course(self):
+        """Tests that override problem score raises exception with undefined course"""
         self._test_undefined_course(override_problem_score)
 
     def test_override_undefined_problem(self):
+        """Tests that override problem score raises exception with undefined problem"""
         self._test_undefined_problem(override_problem_score)
 
     def test_override_with_no_state(self):
+        """Tests override score with no problem state in StudentModule"""
         self._test_run_with_no_state(override_problem_score, 'overridden')
 
     def test_override_with_failure(self):
@@ -266,6 +283,9 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         self._test_run_with_short_error_msg(override_problem_score)
 
     def test_overriding_non_scorable(self):
+        """
+        Tests that override problem score raises an error if module descriptor has not `set_score` method.
+        """
         input_state = json.dumps({'done': True})
         num_students = 1
         self._create_students_with_state(num_students, input_state)
@@ -287,7 +307,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
 
     def test_overriding_unaccessable(self):
         """
-        Tests rescores a problem in a course, for all students fails if user has answered a
+        Tests score override for a problem in a course, for all students fails if user has answered a
         problem to which user does not have access to.
         """
         input_state = json.dumps({'done': True})
@@ -310,7 +330,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
 
     def test_overriding_success(self):
         """
-        Tests rescores a problem in a course, for all students succeeds.
+        Tests score override for a problem in a course, for all students succeeds.
         """
         mock_instance = MagicMock()
         getattr(mock_instance, 'override_problem_score').return_value = None
@@ -324,6 +344,25 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
 
+        self.assert_task_output(
+            output=self.get_task_output(task_entry.id),
+            total=num_students,
+            attempted=num_students,
+            succeeded=num_students,
+            skipped=0,
+            failed=0,
+            action_name='overridden'
+        )
+
+    def test_overriding_success_with_no_state(self):
+        """
+        Tests that score override is successful for a learner when they have no state.
+        """
+        num_students = 1
+        enrolled_students = self._create_students_with_no_state(num_students=num_students)
+        task_entry = self._create_input_entry(score=1, student_ident=enrolled_students[0].username)
+
+        self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
         self.assert_task_output(
             output=self.get_task_output(task_entry.id),
             total=num_students,
