@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-10 10:44+0000\n"
-"PO-Revision-Date: 2018-01-10 10:50:56.873858\n"
+"POT-Creation-Date: 2018-01-17 13:44+0000\n"
+"PO-Revision-Date: 2018-01-17 13:50:33.926347\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -91,6 +91,7 @@ msgstr "Sävïng Ⱡ'σяєм ιρѕυ#"
 #: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: common/static/common/templates/discussion/forum-action-delete.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-delete.underscore
@@ -291,6 +292,7 @@ msgstr "Nöné Ⱡ'σяєм ι#"
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
+#: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -349,7 +351,7 @@ msgid "Advanced"
 msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/static/js/views/previous_video_upload.js
-#: lms/static/js/views/image_field.js
+#: cms/static/js/views/video_transcripts.js lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "Rémövïng Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -5609,10 +5611,17 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
-"a limited number of languages."
+"a limited number of languages. Changing the value of this field will cause "
+"the page to refresh."
 msgstr ""
 "Thé längüägé üséd thröüghöüt thïs sïté. Thïs sïté ïs çürréntlý äväïläßlé ïn "
-"ä lïmïtéd nümßér öf längüägés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+"ä lïmïtéd nümßér öf längüägés. Çhängïng thé välüé öf thïs fïéld wïll çäüsé "
+"thé pägé tö réfrésh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
@@ -7751,18 +7760,12 @@ msgid "The file could not be uploaded."
 msgstr "Thé fïlé çöüld nöt ßé üplöädéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/static/js/views/video_transcripts.js
-msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
-msgstr ""
-"{toggleShowTranscriptText} tränsçrïpts ({totalTranscripts}) Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, #"
+msgid "Hide transcripts ({transcriptCount})"
+msgstr "Hïdé tränsçrïpts ({transcriptCount}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/static/js/views/video_transcripts.js
-msgid "Show"
-msgstr "Shöw Ⱡ'σяєм ι#"
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Hide"
-msgstr "Hïdé Ⱡ'σяєм ι#"
+msgid "Show transcripts ({transcriptCount})"
+msgstr "Shöw tränsçrïpts ({transcriptCount}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
@@ -7778,6 +7781,20 @@ msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 msgstr ""
 "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension} Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö rémövé thïs tränsçrïpt? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for any "
+"components that use this video."
+msgstr ""
+"Ìf ýöü rémövé thïs tränsçrïpt, thé tränsçrïpt wïll nöt ßé äväïläßlé för äný "
+"çömpönénts thät üsé thïs vïdéö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"

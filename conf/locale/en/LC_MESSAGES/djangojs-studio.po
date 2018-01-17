@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-10 10:48+0000\n"
-"PO-Revision-Date: 2018-01-10 10:50:56.584473\n"
+"POT-Creation-Date: 2018-01-17 13:48+0000\n"
+"PO-Revision-Date: 2018-01-17 13:50:33.692167\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1285,15 +1285,11 @@ msgid "The file could not be uploaded."
 msgstr ""
 
 #: cms/static/js/views/video_transcripts.js
-msgid "{toggleShowTranscriptText} transcripts ({totalTranscripts})"
+msgid "Hide transcripts ({transcriptCount})"
 msgstr ""
 
 #: cms/static/js/views/video_transcripts.js
-msgid "Show"
-msgstr ""
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Hide"
+msgid "Show transcripts ({transcriptCount})"
 msgstr ""
 
 #: cms/static/js/views/video_transcripts.js
@@ -1304,6 +1300,16 @@ msgstr ""
 
 #: cms/static/js/views/video_transcripts.js
 msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr ""
+
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for any "
+"components that use this video."
 msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
