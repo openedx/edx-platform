@@ -235,12 +235,17 @@ function setDefaults(files) {
 function getBaseConfig(config, useRequireJs) {
     var getFrameworkFiles = function() {
         var files = [
-            'node_modules/jquery/dist/jquery.js',
+            'common/static/common/js/vendor/jquery.js',
             'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
             'common/static/common/js/jasmine_stack_trace.js',
             'node_modules/karma-jasmine/lib/boot.js',
             'node_modules/karma-jasmine/lib/adapter.js',
-            'node_modules/jasmine-jquery/lib/jasmine-jquery.js'
+            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+            'node_modules/popper.js/dist/umd/popper.js',
+            'node_modules/bootstrap/dist/js/bootstrap.js',
+            'node_modules/underscore/underscore.js',
+            'node_modules/backbone/backbone.js',
+            'common/static/js/test/i18n.js',
         ];
 
         if (useRequireJs) {

@@ -303,7 +303,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
 
       % if entitlement and not entitlement_expired_at:
         <div class="course-entitlement-selection-container ${'' if is_unfulfilled_entitlement else 'hidden'}"></div>
-        <%static:require_module module_name="js/learner_dashboard/course_entitlement_factory" class_name="EntitlementFactory">
+        <%static:webpack entry="EntitlementFactory">
           EntitlementFactory({
               el: '${ '#course-card-' + str(course_card_index) + ' .course-entitlement-selection-container' | n, js_escaped_string }',
               triggerOpenBtn: '${ '#course-card-' + str(course_card_index) + ' .change-session' | n, js_escaped_string }',
@@ -321,7 +321,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               expiredAt: '${ entitlement.expired_at_datetime | n, js_escaped_string }',
               daysUntilExpiration: '${ entitlement.get_days_until_expiration() | n, js_escaped_string }'
           });
-        </%static:require_module>
+        </%static:webpack>
       %endif
 
       % if related_programs:

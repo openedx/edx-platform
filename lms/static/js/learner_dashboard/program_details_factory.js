@@ -1,13 +1,7 @@
-(function(define) {
-    'use strict';
+import ProgramDetailsView from './views/program_details_view';
 
-    define([
-        'js/learner_dashboard/views/program_details_view'
-    ],
-    function(ProgramDetailsView) {
-        return function(options) {
-            var ProgramDetails = new ProgramDetailsView(options);
-            return ProgramDetails;
-        };
-    });
-}).call(this, define || RequireJS.define);
+function ProgramDetailsFactory(options) {
+  return new ProgramDetailsView(options);
+}
+
+export { ProgramDetailsFactory }; // eslint-disable-line import/prefer-default-export

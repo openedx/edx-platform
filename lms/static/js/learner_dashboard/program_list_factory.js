@@ -1,39 +1,34 @@
-(function(define) {
-    'use strict';
+import CollectionListView from './views/collection_list_view';
+import ProgramCardView from './views/program_card_view';
+import ProgramCollection from './collections/program_collection';
+import ProgressCollection from './collections/program_progress_collection';
+import SidebarView from './views/sidebar_view';
 
-    define([
-        'js/learner_dashboard/views/collection_list_view',
-        'js/learner_dashboard/views/sidebar_view',
-        'js/learner_dashboard/views/program_card_view',
-        'js/learner_dashboard/collections/program_collection',
-        'js/learner_dashboard/collections/program_progress_collection'
-    ],
-    function(CollectionListView, SidebarView, ProgramCardView, ProgramCollection, ProgressCollection) {
-        return function(options) {
-            var progressCollection = new ProgressCollection();
+function ProgramListFactory(options) {
+  const progressCollection = new ProgressCollection();
 
-            if (options.userProgress) {
-                progressCollection.set(options.userProgress);
-                options.progressCollection = progressCollection;
-            }
+  if (options.userProgress) {
+    progressCollection.set(options.userProgress);
+    options.progressCollection = progressCollection; // eslint-disable-line no-param-reassign
+  }
 
-            new CollectionListView({
-                el: '.program-cards-container',
-                childView: ProgramCardView,
-                collection: new ProgramCollection(options.programsData),
-                context: options,
-                titleContext: {
-                    el: 'h2',
-                    title: 'Your Programs'
-                }
-            }).render();
+  new CollectionListView({
+    el: '.program-cards-container',
+    childView: ProgramCardView,
+    collection: new ProgramCollection(options.programsData),
+    context: options,
+    titleContext: {
+      el: 'h2',
+      title: 'Your Programs',
+    },
+  }).render();
 
-            if (options.programsData.length) {
-                new SidebarView({
-                    el: '.sidebar',
-                    context: options
-                }).render();
-            }
-        };
-    });
-}).call(this, define || RequireJS.define);
+  if (options.programsData.length) {
+    new SidebarView({
+      el: '.sidebar',
+      context: options,
+    }).render();
+  }
+}
+
+export { ProgramListFactory }; // eslint-disable-line import/prefer-default-export

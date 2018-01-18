@@ -97,7 +97,7 @@ define([
                     };
                     StaffDebug.doInstructorDashAction(action);
                     AjaxHelpers.respondWithTextError(requests);
-                    expect($('#idash_msg').text()).toBe('Failed to reset attempts for user. ');
+                    expect($('#idash_msg').text()).toBe('Failed to reset attempts for user. Unknown Error Occurred.');
                     $('#result_' + locationName).remove();
                 });
             });
