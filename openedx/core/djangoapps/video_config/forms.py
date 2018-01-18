@@ -11,6 +11,7 @@ from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag,
     CourseVideoTranscriptEnabledFlag,
 )
+from openedx.core.lib.courses import clean_course_id
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -29,22 +30,7 @@ class CourseSpecificFlagAdminBaseForm(forms.ModelForm):
         """
         Validate the course id
         """
-        cleaned_id = self.cleaned_data["course_id"]
-        try:
-            course_key = CourseLocator.from_string(cleaned_id)
-        except InvalidKeyError:
-            msg = u'Course id invalid. Entered course id was: "{course_id}."'.format(
-                course_id=cleaned_id
-            )
-            raise forms.ValidationError(msg)
-
-        if not modulestore().has_course(course_key):
-            msg = u'Course not found. Entered course id was: "{course_key}". '.format(
-                course_key=unicode(course_key)
-            )
-            raise forms.ValidationError(msg)
-
-        return course_key
+        return clean_course_id(self)
 
 
 class CourseHLSPlaybackFlagAdminForm(CourseSpecificFlagAdminBaseForm):

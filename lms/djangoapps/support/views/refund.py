@@ -22,6 +22,7 @@ from django.views.generic.edit import FormView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.lib.courses import clean_course_id
 from student.models import CourseEnrollment
 from support.decorators import require_support_permission
 
@@ -49,17 +50,9 @@ class RefundForm(forms.Form):
 
     def clean_course_id(self):
         """
-        validate course id field
+        Validate the course id
         """
-        course_id = self.cleaned_data['course_id']
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            try:
-                course_key = CourseKey.from_string(course_id)
-            except InvalidKeyError:
-                raise forms.ValidationError(_("Invalid course id"))
-        return course_key
+        return clean_course_id(self)
 
     def clean(self):
         """

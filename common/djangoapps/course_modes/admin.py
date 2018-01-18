@@ -19,6 +19,7 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # but the test suite for Studio will fail because
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
+from openedx.core.lib.courses import clean_course_id
 from util.date_utils import get_time_display
 from xmodule.modulestore.django import modulestore
 
@@ -92,16 +93,10 @@ class CourseModeForm(forms.ModelForm):
             )
 
     def clean_course_id(self):
-        course_id = self.cleaned_data['course']
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(course_id))
-
-        if not modulestore().has_course(course_key):
-            raise forms.ValidationError("Cannot find course with id {} in the modulestore".format(course_id))
-
-        return course_key
+        """
+        Validate the course id
+        """
+        return clean_course_id(self)
 
     def clean__expiration_datetime(self):
         """

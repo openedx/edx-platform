@@ -124,7 +124,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
         response = self.client.post(reverse('admin:student_courseaccessrole_add'), data=data)
         self.assertContains(
             response,
-            'Cannot find course with id {} in the modulestore'.format(
+            'Course not found. Entered course id was: &quot;{}&quot;.'.format(
                 course
             )
         )
