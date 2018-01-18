@@ -28,7 +28,7 @@ window.VerticalStudentView = function(runtime, element) {
         function(idx, block) {
             var blockKey = block.dataset.id;
 
-            if (block.dataset.completableByViewing === undefined) {
+            if (!block.dataset.completableByViewing) {
                 return;
             }
             // TODO: EDUCATOR-1778
