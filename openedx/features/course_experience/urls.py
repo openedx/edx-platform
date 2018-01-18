@@ -4,14 +4,14 @@ Defines URLs for the course experience.
 
 from django.conf.urls import url
 
-from views.course_dates import CourseDatesFragmentMobileView
-from views.course_home import CourseHomeFragmentView, CourseHomeView
-from views.course_outline import CourseOutlineFragmentView
-from views.course_reviews import CourseReviewsView
-from views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
-from views.course_sock import CourseSockFragmentView
-from views.latest_update import LatestUpdateFragmentView
-from views.welcome_message import WelcomeMessageFragmentView, dismiss_welcome_message
+from .views.course_dates import CourseDatesFragmentMobileView
+from .views.course_home import CourseHomeFragmentView, CourseHomeView
+from .views.course_outline import CourseOutlineFragmentView
+from .views.course_reviews import CourseReviewsView
+from .views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
+from .views.course_sock import CourseSockFragmentView
+from .views.latest_update import LatestUpdateFragmentView
+from .views.welcome_message import WelcomeMessageFragmentView, dismiss_welcome_message
 
 urlpatterns = [
     url(

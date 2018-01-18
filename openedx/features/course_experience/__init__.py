@@ -86,8 +86,8 @@ class CourseHomeMessages(UserMessageCollection):
     NAMESPACE = 'course_home_level_messages'
 
     @classmethod
-    def get_namespace(self):
+    def get_namespace(cls):
         """
         Returns the namespace of the message collection.
         """
-        return self.NAMESPACE
+        return cls.NAMESPACE
