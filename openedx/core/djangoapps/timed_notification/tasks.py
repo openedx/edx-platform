@@ -55,23 +55,23 @@ def task_course_notifications():
         # send email when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
             send_course_notification_email(course=course,
-                                           mako_template_path='timed_notification/course_early_welcome.txt',
+                                           template_name='course-early-welcome',
                                            context=context)
         # send email when 2 days left to course start
         elif course_start_date - timedelta(days=2) == date_now:
             send_course_notification_email(course=course,
-                                           mako_template_path='timed_notification/course_start_reminder.txt',
+                                           template_name='course-start-reminder',
                                            context=context)
         # send email the day the course starts
         elif course_start_date == date_now:
             send_course_notification_email(course=course,
-                                           mako_template_path='timed_notification/course_welcome.txt',
+                                           template_name='course-welcome',
                                            context=context)
 
         log.info('CELERY-TASK: date_now: %s, course_start_date: %s',
-                 date_now,
-                 course_start_date,
-                 )
+            date_now,
+            course_start_date,
+            )
 
         if course.end:
             log.info('CELERY-TASK: course_end_date: %s', course.end.date())
