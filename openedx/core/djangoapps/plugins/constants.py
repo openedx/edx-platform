@@ -58,3 +58,21 @@ class PluginURLs(object):
     REGEX = u'regex'
     RELATIVE_PATH = u'relative_path'
     DEFAULT_RELATIVE_PATH = u'urls'
+
+
+class PluginSignals(object):
+    """
+    The PluginSignals enum defines dictionary field names (and defaults)
+    that can be specified by a Plugin App in order to configure the signals
+    that it receives.
+    """
+    CONFIG = u'signals_config'
+
+    RECEIVERS = u'receivers'
+    DISPATCH_UID = u'dispatch_uid'
+    RECEIVER_FUNC_NAME = u'receiver_func_name'
+    SENDER_PATH = u'sender_path'
+    SIGNAL_PATH = u'signal_path'
+
+    RELATIVE_PATH = u'relative_path'
+    DEFAULT_RELATIVE_PATH = u'signals'

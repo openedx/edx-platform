@@ -7,7 +7,8 @@ Once a Django project is enhanced with this functionality, any participating
 Django app (a.k.a. Plugin App) that is PIP-installed on the system is
 automatically included in the Django project's INSTALLED_APPS list. In addition,
 the participating Django app's URLs and Settings are automatically recognized by
-the Django project.
+the Django project. Furthermore, the Plugin Signals feature allows Plugin Apps
+to shift their dependencies on Django Signal Senders from code-time to runtime.
 
 While Django+Python already support dynamic installation of components/apps,
 they do not have out-of-the-box support for plugin apps that auto-install
@@ -60,6 +61,22 @@ update:
 
    urlpatterns.extend(plugin_urls.get_patterns(...))
 
+4. its setup to register PluginsConfig (for connecting Plugin Signals)
+::
+
+    from setuptools import setup
+    setup(
+        ...
+        entry_points={
+            "lms.djangoapp": [
+                "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
+            ],
+            "cms.djangoapp": [
+                "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
+            ],
+        }
+    )
+
 
 Plugin Apps
 -----------
@@ -84,8 +101,8 @@ file::
         }
     )
 
-3. configure the Plugin App in their AppConfig class
-::
+3. configure the Plugin App in their AppConfig
+class::
 
     from django.apps import AppConfig
     from openedx.core.djangoapps.plugins.constants import (
@@ -103,42 +120,74 @@ file::
                 # Configure the Plugin URLs for each project type, as needed.
                 ProjectType.LMS: {
 
-                    # The namespace to provide to django's urls.include, per
-                    # https://docs.djangoproject.com/en/2.0/topics/http/urls/#url-namespaces
+                    # The namespace to provide to django's urls.include.
                     PluginURLs.NAMESPACE: u'my_app',
 
-                    # The regex to provide to django's urls.url.
-                    PluginURLs.REGEX: u'api/my_app/',
+                    # The application namespace to provide to django's urls.include.
+                    # Optional; Defaults to None.
+                    PluginURLs.APP_NAME: u'my_app',
 
-                    # The python path (relative to this app) to the URLs module
-                    # to be plugged into the project.
+                    # The regex to provide to django's urls.url.
+                    # Optional; Defaults to r''.
+                    PluginURLs.REGEX: r'api/my_app/',
+
+                    # The python path (relative to this app) to the URLs module to be plugged into the project.
+                    # Optional; Defaults to u'urls'.
                     PluginURLs.RELATIVE_PATH: u'api.urls',
                 }
             },
 
-
             # Configuration setting for Plugin Settings for this app.
             PluginSettings.CONFIG: {
 
-                # Configure the Plugin Settings for each Project Type, as
-                # needed.
+                # Configure the Plugin Settings for each Project Type, as needed.
                 ProjectType.LMS: {
 
                     # Configure each Settings Type, as needed.
                     SettingsType.AWS: {
-                        # The python path (relative to this app) to the settings
-                        # module for the relevant Project Type and Settings
-                        # Type.
+
+                        # The python path (relative to this app) to the settings module for the relevant Project Type and Settings Type.
+                        # Optional; Defaults to u'settings'.
                         PluginSettings.RELATIVE_PATH: u'settings.aws',
                     },
                     SettingsType.COMMON: {
                         PluginSettings.RELATIVE_PATH: u'settings.common',
                     },
                 }
+            },
+
+            # Configuration setting for Plugin Signals for this app.
+            PluginSignals.CONFIG: {
+
+                # Configure the Plugin Signals for each Project Type, as needed.
+                ProjectType.LMS: {
+
+                    # The python path (relative to this app) to the Signals module containing this app's Signal receivers.
+                    # Optional; Defaults to u'signals'.
+                    PluginSignals.RELATIVE_PATH: u'my_signals',
+
+                    # List of all plugin Signal receivers for this app and project type.
+                    PluginSignals.RECEIVERS: [{
+
+                        # The name of the app's signal receiver function.
+                        PluginSignals.RECEIVER_FUNC_NAME: u'on_signal_x',
+
+                        # The full path to the module where the signal is defined.
+                        PluginSignals.SIGNAL_PATH: u'full_path_to_signal_x_module.SignalX',
+
+                        # The value for dispatch_uid to pass to Signal.connect to prevent duplicate signals.
+                        # Optional; Defaults to full path to the signal's receiver function.
+                        PluginSignals.DISPATCH_UID: u'my_app.my_signals.on_signal_x',
+
+                        # The full path to a sender (if connecting to a specific sender) to be passed to Signal.connect.
+                        # Optional; Defaults to None.
+                        PluginSignals.SENDER_PATH: u'full_path_to_sender_app.ModelZ,
+                    }],
+                }
             }
         }
 
-OR use string constants when you cannot import from djangoapps.plugins::
+OR use string constants when they cannot import from djangoapps.plugins::
 
     from django.apps import AppConfig
     class MyAppConfig(AppConfig):
@@ -157,11 +206,21 @@ OR use string constants when you cannot import from djangoapps.plugins::
                     u'aws': { relative_path: u'settings.aws' },
                     u'common': { relative_path: u'settings.common'},
                 }
-            }
+            },
+            u'signals_config': {
+                u'lms.djangoapp': {
+                    u'relative_path': u'my_signals',
+                    u'receivers': [{
+                        u'receiver_func_name': u'on_signal_x',
+                        u'signal_path': u'full_path_to_signal_x_module.SignalX',
+                        u'dispatch_uid': u'my_app.my_signals.on_signal_x',
+                        u'sender_path': u'full_path_to_sender_app.ModelZ,
+                    }],
+                }
         }
 
-4. For Plugin Settings, insert the following function into each of the plugin
-settings modules::
+4. For Plugin Settings, insert the following function into each of the Plugin
+Settings modules::
 
     def plugin_settings(settings):
         # Update the provided settings module with any app-specific settings.
