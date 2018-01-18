@@ -110,7 +110,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
             fingerprint_file.write(self.expected_fingerprint)
 
         with patch.object(db_utils, 'get_file_from_s3', wraps=db_utils.get_file_from_s3) as _mock_get_file:
-            database.update_local_bokchoy_db_from_s3()
+            database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
             # Make sure that the local cache files are used - NOT downloaded from s3
             self.assertFalse(_mock_get_file.called)
         calls = [
@@ -149,7 +149,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
             fingerprint_file.write(local_fingerprint)
 
         with patch.object(db_utils, 'get_file_from_s3', wraps=db_utils.get_file_from_s3) as _mock_get_file:
-            database.update_local_bokchoy_db_from_s3()
+            database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
             # Make sure that the fingerprint file is downloaded from s3
             _mock_get_file.assert_called_once_with(
                 'moto_test_bucket', self.fingerprint_filename, db_utils.CACHE_FOLDER
@@ -181,7 +181,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
             fingerprint_file.write(local_fingerprint)
 
-        database.update_local_bokchoy_db_from_s3()
+        database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
             call('{}/scripts/reset-test-db.sh --rebuild_cache'.format(Env.REPO_ROOT))
@@ -208,5 +208,5 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
             fingerprint_file.write(local_fingerprint)
 
-        database.update_local_bokchoy_db_from_s3()
+        database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
         self.assertTrue(self.bucket.get_key(self.fingerprint_filename))

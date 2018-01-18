@@ -225,7 +225,7 @@ class Env(object):
             SERVICE_VARIANT = 'lms'
 
     @classmethod
-    def get_django_setting(self, django_setting, system, settings=None):
+    def get_django_setting(cls, django_setting, system, settings=None):
         """
         Interrogate Django environment for specific settings values
         :param django_setting: the django setting to get

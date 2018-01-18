@@ -12,10 +12,10 @@ import paver.tasks
 from ddt import ddt, file_data, data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path
-from paver.easy import BuildFailure
+from paver.easy import BuildFailure  # pylint: disable=ungrouped-imports
 
 import pavelib.quality
-from pavelib.paver_tests.utils import fail_on_eslint, fail_on_pylint
+from pavelib.paver_tests.utils import fail_on_eslint
 
 
 @ddt

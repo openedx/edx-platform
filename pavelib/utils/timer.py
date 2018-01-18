@@ -37,7 +37,7 @@ def timed(wrapped, instance, args, kwargs):  # pylint: disable=unused-argument
     exception_info = {}
     try:
         return wrapped(*args, **kwargs)
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:
         exception_info = {
             'exception': "".join(traceback.format_exception_only(type(exc), exc)).strip()
         }

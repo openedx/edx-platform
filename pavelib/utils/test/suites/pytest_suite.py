@@ -7,10 +7,6 @@ from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
-try:
-    from pygments.console import colorize
-except ImportError:
-    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 
@@ -123,12 +119,8 @@ class SystemTestSuite(PytestSuite):
 
         self.processes = int(self.processes)
 
-    def __enter__(self):
-        super(SystemTestSuite, self).__enter__()
-
     @property
     def cmd(self):
-
         if self.django_toxenv:
             cmd = ['tox', '-e', self.django_toxenv, '--']
         else:

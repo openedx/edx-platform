@@ -203,6 +203,7 @@ class TestPaverServerTasks(PaverTestCase):
             ]
         )
 
+    # pylint: disable=too-many-statements
     def verify_server_task(self, task_name, options, contracts_default=False):
         """
         Verify the output of a server task.
@@ -247,7 +248,9 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-            expected_messages.extend([c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND])
+            expected_messages.extend(
+                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
+            )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
                 static_root_lms=None,
@@ -291,7 +294,9 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-            expected_messages.extend([c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND])
+            expected_messages.extend(
+                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
+            )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
                 static_root_lms=None,

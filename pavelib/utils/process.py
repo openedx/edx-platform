@@ -18,8 +18,6 @@ def kill_process(proc):
     Kill the process `proc` created with `subprocess`.
     """
     p1_group = psutil.Process(proc.pid)
-
-    # pylint: disable=unexpected-keyword-arg
     child_pids = p1_group.get_children(recursive=True)
 
     for child_pid in child_pids:
@@ -112,8 +110,6 @@ def run_background_process(cmd, out_log=None, err_log=None, cwd=None):
         killed properly.
         """
         p1_group = psutil.Process(proc.pid)
-
-        # pylint: disable=unexpected-keyword-arg
         child_pids = p1_group.get_children(recursive=True)
 
         for child_pid in child_pids:

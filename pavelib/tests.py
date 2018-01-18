@@ -80,8 +80,8 @@ def test_system(options, passthrough_options):
     test_id = getattr(options, 'test_id', None)
     django_version = getattr(options, 'django_version', None)
 
-    assert(system in (None, 'lms', 'cms'))
-    assert(django_version in (None, '1.8', '1.9', '1.10', '1.11'))
+    assert system in (None, 'lms', 'cms')
+    assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
 
     if test_id:
         # Testing a single test ID.
@@ -159,7 +159,7 @@ def test_lib(options, passthrough_options):
     test_id = getattr(options, 'test_id', lib)
     django_version = getattr(options, 'django_version', None)
 
-    assert(django_version in (None, '1.8', '1.9', '1.10', '1.11'))
+    assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
 
     if test_id:
         # Testing a single test id.
