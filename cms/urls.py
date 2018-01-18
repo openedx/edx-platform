@@ -260,5 +260,5 @@ urlpatterns += [
     url(r'^500$', handler500),
 ]
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
-urlpatterns.extend(DjangoAppRegistry.get_plugin_url_patterns(ProjectType.CMS))
+from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
+urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))

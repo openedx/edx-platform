@@ -562,8 +562,8 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
 
 ####################### Plugin Settings ##########################
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
-DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.CMS, SettingsType.AWS)
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.AWS)
 
 ########################## Derive Any Derived Settings  #######################
 

@@ -82,7 +82,7 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         self.assertTrue(mock_signal.called)
 
-    @patch('openedx.core.djangoapps.signals.signals.COURSE_START_DATE_CHANGED.send')
+    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send')
     def test_start_changed(self, mock_signal):
         self.assert_changed_signal_sent('start', self.TODAY, self.NEXT_WEEK, mock_signal)
 

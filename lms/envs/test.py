@@ -586,8 +586,8 @@ TEMPLATES[0]['OPTIONS']['debug'] = True
 
 ####################### Plugin Settings ##########################
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
-DjangoAppRegistry.add_plugin_settings(__name__, ProjectType.LMS, SettingsType.TEST)
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
