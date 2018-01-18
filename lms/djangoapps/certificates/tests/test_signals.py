@@ -2,6 +2,7 @@
 Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
+import ddt
 import mock
 
 from certificates import api as certs_api
@@ -11,6 +12,7 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
 )
+from certificates.signals import fire_ungenerated_certificate_task
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -286,3 +288,44 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                         'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
                     }
                 )
+
+
+@ddt.ddt
+class CertificateGenerationTaskTest(ModuleStoreTestCase):
+    """
+    Tests for certificate generation task.
+    """
+
+    def setUp(self):
+        super(CertificateGenerationTaskTest, self).setUp()
+        self.course = CourseFactory.create()
+
+    @ddt.data(
+        ('professional', True),
+        ('verified', True),
+        ('no-id-professional', True),
+        ('credit', True),
+        ('audit', False),
+        ('honor', False),
+    )
+    @ddt.unpack
+    def test_fire_ungenerated_certificate_task_allowed_modes(self, enrollment_mode, should_create):
+        """
+        Test that certificate generation task is fired for only modes that are
+        allowed to generate certificates automatically.
+        """
+        self.user = UserFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode=enrollment_mode
+        )
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
+            with waffle.waffle().override(waffle.AUTO_CERTIFICATE_GENERATION, active=True):
+                fire_ungenerated_certificate_task(self.user, self.course.id)
+                task_created = mock_generate_certificate_apply_async.called
+                self.assertEqual(task_created, should_create)

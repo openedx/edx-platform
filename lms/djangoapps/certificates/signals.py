@@ -16,6 +16,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, LEARNER_NOW_VERIFIED
+from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
 
@@ -81,17 +82,40 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
 
 def fire_ungenerated_certificate_task(user, course_key, expected_verification_status=None):
     """
-    Helper function to fire un-generated certificate tasks
+    Helper function to fire certificate generation task.
+    Auto-generation of certificates is available for following course modes:
+        1- VERIFIED
+        2- CREDIT_MODE
+        3- PROFESSIONAL
+        4- NO_ID_PROFESSIONAL_MODE
 
-    The 'mode_is_verified' query is copied from the GeneratedCertificate model,
-    but is done here in an attempt to reduce traffic to the workers.
-    If the learner is verified and their cert has the 'unverified' status,
-    we regenerate the cert.
+    Certificate generation task is fired to either generate a certificate
+    when there is no generated certificate for user in a particular course or
+    update a certificate if it has 'unverified' status.
+
+    Task is fired to attempt an update to a certificate
+    with 'unverified' status as this method is called when a user is
+    successfully verified, any certificate associated
+    with such user can now be verified.
+
+    NOTE: Purpose of restricting other course modes (HONOR and AUDIT) from auto-generation is to reduce
+    traffic to workers.
     """
+
+    allowed_enrollment_modes_list = [
+        CourseMode.VERIFIED,
+        CourseMode.CREDIT_MODE,
+        CourseMode.PROFESSIONAL,
+        CourseMode.NO_ID_PROFESSIONAL_MODE,
+    ]
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
-    if mode_is_verified and (cert is None or cert.status == 'unverified'):
+
+    generate_learner_certificate = (
+        enrollment_mode in allowed_enrollment_modes_list and (cert is None or cert.status == 'unverified')
+    )
+
+    if generate_learner_certificate:
         kwargs = {
             'student': unicode(user.id),
             'course_key': unicode(course_key)
