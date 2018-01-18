@@ -1,35 +1,23 @@
-(function(define) {
-    'use strict';
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'text!../../../templates/learner_dashboard/certificate_list.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             certificateTpl
-         ) {
-             return Backbone.View.extend({
-                 tpl: _.template(certificateTpl),
+import _ from 'underscore';
+import Backbone from 'backbone';
 
-                 initialize: function(options) {
-                     this.title = options.title || false;
-                     this.render();
-                 },
+import certificateTpl from '../../../templates/learner_dashboard/certificate_list.underscore';
 
-                 render: function() {
-                     var data = {
-                         title: this.title,
-                         certificateList: this.collection.toJSON()
-                     };
+class CertificateListView extends Backbone.View {
+  initialize(options) {
+    this.tpl = _.template(certificateTpl);
+    this.title = options.title || false;
+    this.render();
+  }
 
-                     this.$el.html(this.tpl(data));
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+  render() {
+    const data = {
+      title: this.title,
+      certificateList: this.collection.toJSON(),
+    };
+
+    this.$el.html(this.tpl(data));
+  }
+}
+
+export default CertificateListView;

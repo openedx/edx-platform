@@ -1,12 +1,7 @@
-(function(define) {
-    'use strict';
+import EntitlementUnenrollmentView from './views/entitlement_unenrollment_view';
 
-    define([
-        'js/learner_dashboard/views/entitlement_unenrollment_view'
-    ],
-    function(EntitlementUnenrollmentView) {
-        return function(options) {
-            return new EntitlementUnenrollmentView(options);
-        };
-    });
-}).call(this, define || RequireJS.define);
+function EntitlementUnenrollmentFactory(options) {
+  return new EntitlementUnenrollmentView(options);
+}
+
+export { EntitlementUnenrollmentFactory }; // eslint-disable-line import/prefer-default-export

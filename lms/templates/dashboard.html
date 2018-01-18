@@ -49,7 +49,7 @@ from student.models import CourseEnrollment
       });
     });
   </script>
-  <%static:require_module module_name="js/learner_dashboard/unenrollment_factory" class_name="UnenrollmentFactory">
+  <%static:webpack entry="UnenrollmentFactory">
     UnenrollmentFactory({
       urls: {
         dashboard: "${reverse('dashboard') | n, js_escaped_string}",
@@ -59,8 +59,8 @@ from student.models import CourseEnrollment
       },
       isEdx: false
     });
-  </%static:require_module>
-  <%static:require_module module_name="js/learner_dashboard/entitlement_unenrollment_factory" class_name="EntitlementUnenrollmentFactory">
+  </%static:webpack>
+  <%static:webpack entry="EntitlementUnenrollmentFactory">
     ## Wait until the document is fully loaded before initializing the EntitlementUnenrollmentView
     ## to ensure events are setup correctly.
     $(document).ready(function() {
@@ -69,7 +69,7 @@ from student.models import CourseEnrollment
         signInPath: "${reverse('signin_user') | n, js_escaped_string}"
       });
     });
-  </%static:require_module>
+  </%static:webpack>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();

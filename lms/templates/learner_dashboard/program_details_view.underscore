@@ -1,5 +1,6 @@
 <header class="js-program-header program-header full-width-banner"></header>
-<section class="program-details-content">
+<!-- TODO: consider if article is the most appropriate element here -->
+<article class="program-details-content">
     <div class="program-heading">
             <% if (completedCount === totalCount) { %>
                 <h3 class="program-heading-title"><%- gettext('Congratulations!') %></h3>
@@ -73,5 +74,5 @@
             <% } %>
         </div>
     </div>
-</section>
+</article>
 <aside class="js-program-sidebar program-sidebar"></aside>

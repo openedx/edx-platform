@@ -9,17 +9,17 @@ from openedx.core.djangolib.js_utils import (
 )
 %>
 
+<div class="program-list-wrapper grid-container">
+    <div class="program-cards-container col"></div>
+    <div class="sidebar col col-last"></div>
+</div>
+
 <%block name="js_extra">
-<%static:require_module module_name="js/learner_dashboard/program_list_factory" class_name="ProgramListFactory">
+<%static:webpack entry="ProgramListFactory">
 ProgramListFactory({
     marketingUrl: '${marketing_url | n, js_escaped_string}',
     programsData: ${programs | n, dump_js_escaped_json},
     userProgress: ${progress | n, dump_js_escaped_json}
 });
-</%static:require_module>
+</%static:webpack>
 </%block>
-
-<div class="program-list-wrapper grid-container">
-    <div class="program-cards-container col"></div>
-    <div class="sidebar col col-last"></div>
-</div>

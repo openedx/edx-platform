@@ -33,6 +33,13 @@ module.exports = {
         UpsellExperimentModal: './lms/static/common/js/components/UpsellExperimentModal.jsx',
         PortfolioExperimentUpsellModal: './lms/static/common/js/components/PortfolioExperimentUpsellModal.jsx',
 
+        // Learner Dashboard
+        EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
+        EntitlementUnenrollmentFactory: './lms/static/js/learner_dashboard/entitlement_unenrollment_factory.js',
+        ProgramDetailsFactory: './lms/static/js/learner_dashboard/program_details_factory.js',
+        ProgramListFactory: './lms/static/js/learner_dashboard/program_list_factory.js',
+        UnenrollmentFactory: './lms/static/js/learner_dashboard/unenrollment_factory.js',
+
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
@@ -68,7 +75,8 @@ module.exports = {
             _: 'underscore',
             $: 'jquery',
             jQuery: 'jquery',
-            'window.jQuery': 'jquery'
+            'window.jQuery': 'jquery',
+            Popper: 'popper.js' // used by bootstrap
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
@@ -174,6 +182,7 @@ module.exports = {
             'node_modules',
             'common/static/js/vendor/',
             'cms/static',
+            'common/static/',
             'common/static/js/src'
         ]
     },
