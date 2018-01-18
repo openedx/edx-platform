@@ -2209,6 +2209,17 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         )
     )
 
+    # log the cases where skip activation email flag is set, but email validity check fails
+    if third_party_provider and third_party_provider.skip_email_verification and not valid_email:
+        log.info(
+            '[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
+            'Account activation email sent as user\'s system email differs from SSO email.',
+            user.email,
+            sso_pipeline_email,
+            getattr(third_party_provider, "provider_id", None),
+            getattr(third_party_provider, "identity_provider_type", None)
+        )
+
     return (
         settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
