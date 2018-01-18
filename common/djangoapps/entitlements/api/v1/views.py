@@ -17,10 +17,19 @@ from entitlements.models import CourseEntitlement
 from entitlements.signals import REFUND_ENTITLEMENT
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.core.lib.api.paginators import DefaultPagination
 from student.models import CourseEnrollment
 from student.models import CourseEnrollmentException, AlreadyEnrolledError
 
 log = logging.getLogger(__name__)
+
+
+class EntitlementsPagination(DefaultPagination):
+    """
+    Paginator for entitlements API.
+    """
+    page_size = 50
+    max_page_size = 100
 
 
 class EntitlementViewSet(viewsets.ModelViewSet):
@@ -33,6 +42,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
     serializer_class = CourseEntitlementSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = CourseEntitlementFilter
+    pagination_class = EntitlementsPagination
 
     def get_queryset(self):
         user = self.request.user
