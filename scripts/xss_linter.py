@@ -314,7 +314,7 @@ class RuleViolation(object):
             found.
 
         """
-        pragma_match = re.search(r'xss-lint:\s*disable=([a-zA-Z,-]+)', string)
+        pragma_match = re.search(r'xss-lint:\s*disable=([a-zA-Z,\- ]+)', string)
         if pragma_match is None:
             return
         if scope_start_string:
@@ -324,7 +324,7 @@ class RuleViolation(object):
                 return
 
         for disabled_rule in pragma_match.group(1).split(','):
-            if disabled_rule == self.rule.rule_id:
+            if disabled_rule.strip() == self.rule.rule_id:
                 self.is_disabled = True
                 return
 
