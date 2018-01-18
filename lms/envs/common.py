@@ -595,7 +595,10 @@ CONTEXT_PROCESSORS = [
 
     # Online contextual help
     'help_tokens.context_processor',
-    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
+    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
+
+    # Mobile App processor (Detects if request is from the mobile app)
+    'mobile_api.context_processor.is_from_mobile_app'
 ]
 
 # Django templating
