@@ -3,6 +3,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classNames from 'classnames';
 import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
 import GradeTable from './GradeTable';
@@ -104,7 +105,11 @@ export function LearnerAnalyticsDashboard(props) {
           <Discussions {...discussion_info} profileImages={profile_images} />
         </div>
       </div>
-      <div className="analytics-group sidebar">
+      <div className={classNames(
+             'analytics-group',
+             'sidebar',
+             {'week-streak': week_streak > 0}
+           )}>
         <h2 className="group-heading">Timing</h2>
         <h3 className="section-heading">Course due dates</h3>
         <DueDates dates={schedule} assignmentCounts={assignmentCounts} />

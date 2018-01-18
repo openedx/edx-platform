@@ -8,8 +8,9 @@ class Discussions extends React.Component {
   }
 
   getComparisons() {
+    const experiments = window.experimentVariables || {};
     const {content_authored, profileImages} = this.props;
-    const content_average = 7;
+    const content_average = experiments.learnerAnalyticsDiscussionAverage || 4;
     let average_percent = 1;
     let authored_percent = 0;
 
