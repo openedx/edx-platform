@@ -35,6 +35,7 @@ from openedx.core.djangoapps.course_groups import views as course_groups_views
 from openedx.core.djangoapps.debug import views as openedx_debug_views
 from openedx.core.djangoapps.external_auth import views as external_auth_views
 from openedx.core.djangoapps.lang_pref import views as lang_pref_views
+from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -173,12 +174,6 @@ if settings.FEATURES['ENABLE_OPENBADGES']:
         url(r'^api/badges/v1/', include('badges.api.urls', app_name='badges', namespace='badges_api')),
     ]
 
-js_info_dict = {
-    'domain': 'djangojs',
-    # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
-    'packages': ('openassessment',),
-}
-
 urlpatterns += [
     url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
@@ -218,7 +213,8 @@ if settings.WIKI_ENABLED:
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             course_wiki_views.course_wiki_redirect, name='course_wiki'),
-        url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX), include(wiki_pattern(app_name='course_wiki_do_not_reverse', namespace='course_wiki_do_not_reverse'))),
+        url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX),
+            include(wiki_pattern(app_name='course_wiki_do_not_reverse', namespace='course_wiki_do_not_reverse'))),
     ]
 
 COURSE_URLS = [
@@ -1080,9 +1076,7 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
 # Branch.io Text Me The App
 if settings.BRANCH_IO_KEY:
     urlpatterns += [
-        url(r'^text-me-the-app', 'student.views.text_me_the_app', name='text_me_the_app'),
+        url(r'^text-me-the-app', student_views.text_me_the_app, name='text_me_the_app'),
     ]
 
-
-from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

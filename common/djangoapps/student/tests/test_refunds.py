@@ -16,13 +16,13 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
-from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from certificates.models import CertificateStatuses, GeneratedCertificate
+from certificates.tests.factories import GeneratedCertificateFactory
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
-from student.models import CourseEnrollment, CourseEnrollmentAttribute
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -191,5 +191,5 @@ class RefundableTest(SharedModuleStoreTestCase):
             )
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
-        resp = self.client.post(reverse('student.views.dashboard', args=[]))
+        resp = self.client.post(reverse('dashboard', args=[]))
         self.assertEqual(resp.status_code, 200)
