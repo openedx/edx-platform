@@ -62,6 +62,7 @@ def user_info(request):
         'country': COUNTRIES.get(userprofile.country) if not request.POST.get('country') else request.POST.get('country'),
         'country_of_employment': COUNTRIES.get(user_extended_profile.country_of_employment, '') if not request.POST.get('country_of_employment') else request.POST.get('country_of_employment') ,
         'city': userprofile.city,
+        'level_of_education': userprofile.level_of_education,
         'hours_per_week': user_extended_profile.hours_per_week if user_extended_profile.hours_per_week else '',
         'is_emp_location_different': True if user_extended_profile.country_of_employment else False,
         "function_areas": user_extended_profile.get_user_selected_functions(_type="fields")
@@ -182,7 +183,7 @@ def organization(request):
     initial = {
         'country': COUNTRIES.get(_organization.country),
         'is_org_url_exist': '1' if _organization.url else '0',
-        'partner_networks': _organization.organization_partners.values_list('partner__code', flat=True),
+        'partner_networks': _organization.organization_partners.values_list('partner', flat=True),
     }
 
     if request.method == 'POST':
