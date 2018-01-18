@@ -10,7 +10,8 @@
     height: 100%;
     padding-left: $baseline;
     padding-right: $baseline;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .login-register.border-left {
@@ -18,6 +19,7 @@
     padding-left: ($baseline*1.5);
     padding-right: $baseline;
     margin-left: 0;
+    width: 80%;
   }
 }
 
