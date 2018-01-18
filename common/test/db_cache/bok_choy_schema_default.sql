@@ -121,7 +121,7 @@ CREATE TABLE `assessment_assessmentpart` (
   `feedback` longtext NOT NULL,
   `assessment_id` int(11) NOT NULL,
   `criterion_id` int(11) NOT NULL,
-  `option_id` int(11),
+  `option_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `asses_assessment_id_1d752290138ce479_fk_assessment_assessment_id` (`assessment_id`),
   KEY `assessment_assessmentpart_385b00a3` (`criterion_id`),
@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1053 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1056 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -881,7 +881,6 @@ CREATE TABLE `certificates_certificategenerationcoursesetting` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `course_key` varchar(255) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
   `language_specific_templates_enabled` tinyint(1) NOT NULL,
   `self_generation_enabled` tinyint(1) NOT NULL,
   `include_hours_of_effort` tinyint(1) DEFAULT NULL,
@@ -953,7 +952,7 @@ CREATE TABLE `certificates_certificatetemplate` (
   `course_key` varchar(255) DEFAULT NULL,
   `mode` varchar(125) DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL,
-  `language` varchar(2),
+  `language` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `certificates_certificatete_organization_id_48edf53bc66f8e0c_uniq` (`organization_id`,`course_key`,`mode`,`language`),
   KEY `certificates_certificatetemplate_26b2345e` (`organization_id`),
@@ -969,7 +968,7 @@ CREATE TABLE `certificates_certificatetemplateasset` (
   `modified` datetime(6) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `asset` varchar(255) NOT NULL,
-  `asset_slug` varchar(255),
+  `asset_slug` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `asset_slug` (`asset_slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1117,7 +1116,7 @@ CREATE TABLE `consent_historicaldatasharingconsent` (
   `history_type` varchar(1) NOT NULL,
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
-  `history_change_reason` varchar(100),
+  `history_change_reason` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `consent_histori_history_user_id_305b7992a9839525_fk_auth_user_id` (`history_user_id`),
   KEY `consent_historicaldatasharingconsent_b80bb774` (`id`),
@@ -1462,7 +1461,7 @@ CREATE TABLE `course_overviews_courseoverview` (
   `enrollment_domain` longtext,
   `invitation_only` tinyint(1) NOT NULL,
   `max_student_enrollments_allowed` int(11) DEFAULT NULL,
-  `announcement` datetime(6),
+  `announcement` datetime(6) DEFAULT NULL,
   `catalog_visibility` longtext,
   `course_video_url` longtext,
   `effort` longtext,
@@ -2084,7 +2083,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=350 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=351 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2095,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=382 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=394 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2248,7 +2247,7 @@ CREATE TABLE `djcelery_taskstate` (
   `runtime` double DEFAULT NULL,
   `retries` int(11) NOT NULL,
   `hidden` tinyint(1) NOT NULL,
-  `worker_id` int(11),
+  `worker_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `task_id` (`task_id`),
   KEY `djcelery_taskstate_9ed39e2e` (`state`),
@@ -2557,7 +2556,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `name` varchar(255) NOT NULL,
   `active` tinyint(1) NOT NULL,
   `site_id` int(11) NOT NULL,
-  `catalog` int(10) unsigned,
+  `catalog` int(10) unsigned DEFAULT NULL,
   `enable_data_sharing_consent` tinyint(1) NOT NULL,
   `enforce_data_sharing_consent` varchar(25) NOT NULL,
   `enable_audit_enrollment` tinyint(1) NOT NULL,
@@ -2592,6 +2591,7 @@ CREATE TABLE `enterprise_enterprisecustomercatalog` (
   `content_filter` longtext,
   `title` varchar(20) NOT NULL,
   `enabled_course_modes` longtext NOT NULL,
+  `publish_audit_enrollment_urls` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `D6b10b4c766f4d007227cae59564ac44` (`enterprise_customer_id`),
   CONSTRAINT `D6b10b4c766f4d007227cae59564ac44` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -2644,6 +2644,11 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `initialization_vector` longblob NOT NULL,
   `password` longblob NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `sftp_file_path` varchar(256),
+  `sftp_hostname` varchar(256),
+  `sftp_password` longblob,
+  `sftp_port` int(10) unsigned,
+  `sftp_username` varchar(256),
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `D8a814303f0ffb6d38fe62b75eb3f96b` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -2677,8 +2682,8 @@ CREATE TABLE `enterprise_historicalenrollmentnotificationemailtemplate` (
   `history_date` datetime(6) NOT NULL,
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
-  `enterprise_customer_id` char(32),
-  `history_change_reason` varchar(100),
+  `enterprise_customer_id` char(32) DEFAULT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_1f039ddadc60ca21_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenrollmentnotificationemailtemplate_b80063a` (`id`),
@@ -2699,7 +2704,7 @@ CREATE TABLE `enterprise_historicalenterprisecourseenrollment` (
   `history_type` varchar(1) NOT NULL,
   `enterprise_customer_user_id` int(11) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
-  `history_change_reason` varchar(100),
+  `history_change_reason` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_7f3d211f9d742591_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecourseenrollment_b80bb774` (`id`),
@@ -2719,13 +2724,13 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `history_date` datetime(6) NOT NULL,
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
-  `site_id` int(11),
-  `catalog` int(10) unsigned,
+  `site_id` int(11) DEFAULT NULL,
+  `catalog` int(10) unsigned DEFAULT NULL,
   `enable_data_sharing_consent` tinyint(1) NOT NULL,
   `enforce_data_sharing_consent` varchar(25) NOT NULL,
   `enable_audit_enrollment` tinyint(1) NOT NULL,
   `enable_audit_data_reporting` tinyint(1) NOT NULL,
-  `history_change_reason` varchar(100),
+  `history_change_reason` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_2938dabbace21ece_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_ef7c876f` (`uuid`),
@@ -2748,7 +2753,8 @@ CREATE TABLE `enterprise_historicalenterprisecustomercatalog` (
   `content_filter` longtext,
   `title` varchar(20) NOT NULL,
   `enabled_course_modes` longtext NOT NULL,
-  `history_change_reason` varchar(100),
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `publish_audit_enrollment_urls` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_1f0d4124b2b4b2d8_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomercatalog_ef7c876f` (`uuid`),
@@ -2768,7 +2774,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomerentitlement` (
   `history_type` varchar(1) NOT NULL,
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
-  `history_change_reason` varchar(100),
+  `history_change_reason` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_41b275d5667e3790_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomerentitlement_b80bb774` (`id`),
@@ -2820,11 +2826,29 @@ CREATE TABLE `entitlements_courseentitlement` (
   `order_number` varchar(128) DEFAULT NULL,
   `enrollment_course_run_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
+  `_policy_id` int(11),
   PRIMARY KEY (`id`),
+  UNIQUE KEY `entitlements_courseentitlement_uuid_a690dd005d0695b_uniq` (`uuid`),
   KEY `entitlements_courseentit_user_id_a8df050144d72f8_fk_auth_user_id` (`user_id`),
   KEY `fda6bce9129c5afc395658f36b9d444e` (`enrollment_course_run_id`),
+  KEY `entitlements_courseentitlement_36cddc86` (`_policy_id`),
+  CONSTRAINT `D2cebc0610e28b9b3a821c839e2fe01c` FOREIGN KEY (`_policy_id`) REFERENCES `entitlements_courseentitlementpolicy` (`id`),
   CONSTRAINT `entitlements_courseentit_user_id_a8df050144d72f8_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `fda6bce9129c5afc395658f36b9d444e` FOREIGN KEY (`enrollment_course_run_id`) REFERENCES `student_courseenrollment` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `entitlements_courseentitlementpolicy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `entitlements_courseentitlementpolicy` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `expiration_period` bigint(20) NOT NULL,
+  `refund_period` bigint(20) NOT NULL,
+  `regain_period` bigint(20) NOT NULL,
+  `site_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `entitlements_courseen_site_id_5256b0e7f6e039cc_fk_django_site_id` (`site_id`),
+  CONSTRAINT `entitlements_courseen_site_id_5256b0e7f6e039cc_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `experiments_experimentdata`;
@@ -2927,7 +2951,7 @@ CREATE TABLE `grades_persistentcoursegrade` (
   `grading_policy_hash` varchar(255) NOT NULL,
   `percent_grade` double NOT NULL,
   `letter_grade` varchar(255) NOT NULL,
-  `passed_timestamp` datetime(6),
+  `passed_timestamp` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grades_persistentcoursegrade_course_id_6c83398a6a9c0872_uniq` (`course_id`,`user_id`),
   KEY `grades_persistentcoursegrade_e8701ad4` (`user_id`),
@@ -2966,7 +2990,7 @@ CREATE TABLE `grades_persistentsubsectiongrade` (
   `earned_graded` double NOT NULL,
   `possible_graded` double NOT NULL,
   `visible_blocks_hash` varchar(100) NOT NULL,
-  `first_attempted` datetime(6),
+  `first_attempted` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grades_persistentsubsectiongrade_course_id_5e423f1e9b6c031_uniq` (`course_id`,`user_id`,`usage_key`),
   KEY `grades_persistentsubsectiongrade_2ddf9ac4` (`visible_blocks_hash`),
@@ -3162,7 +3186,7 @@ CREATE TABLE `milestones_coursecontentmilestone` (
   `active` tinyint(1) NOT NULL,
   `milestone_id` int(11) NOT NULL,
   `milestone_relationship_type_id` int(11) NOT NULL,
-  `requirements` varchar(255),
+  `requirements` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `milestones_coursecontentmileston_course_id_68d1457cd52d6dff_uniq` (`course_id`,`content_id`,`milestone_id`),
   KEY `milestones_coursecontentmilestone_ea134da7` (`course_id`),
@@ -3329,7 +3353,7 @@ CREATE TABLE `notify_notification` (
   `is_viewed` tinyint(1) NOT NULL,
   `is_emailed` tinyint(1) NOT NULL,
   `created` datetime(6) NOT NULL,
-  `subscription_id` int(11),
+  `subscription_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `notify_notification_ef42673f` (`subscription_id`),
   CONSTRAINT `D48032390695e0699e92b8d7ccdbff7e` FOREIGN KEY (`subscription_id`) REFERENCES `notify_subscription` (`subscription_id`)
@@ -3405,7 +3429,7 @@ CREATE TABLE `oauth2_client` (
   `client_secret` varchar(255) NOT NULL,
   `client_type` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
-  `logout_uri` varchar(200),
+  `logout_uri` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `oauth2_client_user_id_2b47284bbd512fe1_fk_auth_user_id` (`user_id`),
   CONSTRAINT `oauth2_client_user_id_2b47284bbd512fe1_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
@@ -3955,7 +3979,7 @@ CREATE TABLE `sap_success_factors_historicalsapsuccessfactorsenterprisecus80ad` 
   `sapsf_company_id` varchar(255) NOT NULL,
   `sapsf_user_id` varchar(255) NOT NULL,
   `user_type` varchar(20) NOT NULL,
-  `history_change_reason` varchar(100),
+  `history_change_reason` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `sap_success_fac_history_user_id_2cd9fa0a2a669e26_fk_auth_user_id` (`history_user_id`),
   KEY `sap_success_factors_historicalsapsuccessfactorsenterprisecus4cf7` (`id`),
@@ -4172,9 +4196,9 @@ CREATE TABLE `shoppingcart_courseregistrationcode` (
   `mode_slug` varchar(100) DEFAULT NULL,
   `is_valid` tinyint(1) NOT NULL,
   `created_by_id` int(11) NOT NULL,
-  `invoice_id` int(11),
-  `order_id` int(11),
-  `invoice_item_id` int(11),
+  `invoice_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `invoice_item_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
   KEY `shoppingcart_cour_created_by_id_11125a9667aa01c9_fk_auth_user_id` (`created_by_id`),
@@ -4934,7 +4958,7 @@ CREATE TABLE `submissions_score` (
   `created_at` datetime(6) NOT NULL,
   `reset` tinyint(1) NOT NULL,
   `student_item_id` int(11) NOT NULL,
-  `submission_id` int(11),
+  `submission_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `submissions_score_fde81f11` (`created_at`),
   KEY `submissions_score_02d5e83e` (`student_item_id`),
@@ -5143,7 +5167,6 @@ CREATE TABLE `third_party_auth_ltiproviderconfig` (
   `icon_image` varchar(100) NOT NULL,
   `visible` tinyint(1) NOT NULL,
   `site_id` int(11) NOT NULL,
-  `drop_existing_session` tinyint(1) NOT NULL,
   `max_session_length` int(10) unsigned DEFAULT NULL,
   `skip_hinted_login_dialog` tinyint(1) NOT NULL,
   `send_to_registration_first` tinyint(1) NOT NULL,
@@ -5177,7 +5200,6 @@ CREATE TABLE `third_party_auth_oauth2providerconfig` (
   `visible` tinyint(1) NOT NULL,
   `provider_slug` varchar(30) NOT NULL,
   `site_id` int(11) NOT NULL,
-  `drop_existing_session` tinyint(1) NOT NULL,
   `max_session_length` int(10) unsigned DEFAULT NULL,
   `skip_hinted_login_dialog` tinyint(1) NOT NULL,
   `send_to_registration_first` tinyint(1) NOT NULL,
@@ -5254,7 +5276,6 @@ CREATE TABLE `third_party_auth_samlproviderconfig` (
   `site_id` int(11) NOT NULL,
   `automatic_refresh_enabled` tinyint(1) NOT NULL,
   `identity_provider_type` varchar(128) NOT NULL,
-  `drop_existing_session` tinyint(1) NOT NULL,
   `max_session_length` int(10) unsigned DEFAULT NULL,
   `skip_hinted_login_dialog` tinyint(1) NOT NULL,
   `send_to_registration_first` tinyint(1) NOT NULL,
@@ -5796,9 +5817,9 @@ CREATE TABLE `wiki_article` (
   `group_write` tinyint(1) NOT NULL,
   `other_read` tinyint(1) NOT NULL,
   `other_write` tinyint(1) NOT NULL,
-  `current_revision_id` int(11),
-  `group_id` int(11),
-  `owner_id` int(11),
+  `current_revision_id` int(11) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `current_revision_id` (`current_revision_id`),
   KEY `wiki_article_0e939a4f` (`group_id`),
@@ -5892,7 +5913,7 @@ DROP TABLE IF EXISTS `wiki_revisionplugin`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `wiki_revisionplugin` (
   `articleplugin_ptr_id` int(11) NOT NULL,
-  `current_revision_id` int(11),
+  `current_revision_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`articleplugin_ptr_id`),
   UNIQUE KEY `current_revision_id` (`current_revision_id`),
   CONSTRAINT `D03d76148e98b4bc99e3137189894366` FOREIGN KEY (`current_revision_id`) REFERENCES `wiki_revisionpluginrevision` (`id`),
@@ -5913,8 +5934,8 @@ CREATE TABLE `wiki_revisionpluginrevision` (
   `deleted` tinyint(1) NOT NULL,
   `locked` tinyint(1) NOT NULL,
   `plugin_id` int(11) NOT NULL,
-  `previous_revision_id` int(11),
-  `user_id` int(11),
+  `previous_revision_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `wiki_revisionpluginrevision_b25eaab4` (`plugin_id`),
   KEY `wiki_revisionpluginrevision_e8680b8a` (`previous_revision_id`),
