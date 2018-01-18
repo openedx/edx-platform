@@ -110,7 +110,8 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                                            error_messages={
                                                 'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
                                                     'Level of Education')),
-                                           })
+                                           },
+                                           required=True)
     english_proficiency = forms.ChoiceField(label=ugettext_noop('English Language Proficiency'), label_suffix="*",
                                             choices=ENGLISH_PROFICIENCY_CHOICES,
                                             error_messages={
@@ -223,6 +224,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         userprofile.country = get_country_iso(request.POST['country'])
         userprofile.city = self.cleaned_data['city']
+        userprofile.level_of_education = self.cleaned_data['level_of_education']
         if self.cleaned_data['gender']:
             userprofile.gender = self.cleaned_data['gender']
         userprofile.save()
