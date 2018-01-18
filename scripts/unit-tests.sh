@@ -32,6 +32,11 @@ set -e
 PAVER_ARGS="-v"
 PARALLEL="--processes=-1"
 
+# Skip re-installation of Python prerequisites inside a tox execution.
+if [[ -n "$TOXENV" ]]; then
+    export NO_PREREQ_INSTALL="True"
+fi
+
 case "${TEST_SUITE}" in
 
     "lms-unit")
