@@ -48,7 +48,7 @@ from openedx.features.course_experience import course_home_page_title
     </header>
     <div class="page-content learner-analytics-dashboard-wrapper">
         <div class="learner-analytics-dashboard">
-            % if is_verified:
+            % if has_access:
                 ${static.renderReact(
                   component="LearnerAnalyticsDashboard",
                   id="react-learner-analytics-dashboard",

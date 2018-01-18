@@ -64,6 +64,8 @@ class LearnerAnalyticsView(View):
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
         is_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
+        has_access = is_verified or request.user.is_staff
+
         context = {
             'course': course,
             'course_url': course_url,
@@ -71,9 +73,10 @@ class LearnerAnalyticsView(View):
             'uses_pattern_library': True,
             'is_self_paced': course.self_paced,
             'is_verified': is_verified,
+            'has_access': has_access,
         }
 
-        if (is_verified):
+        if (has_access):
             grading_policy = course.grading_policy
 
             (grade_data, answered_percent) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
