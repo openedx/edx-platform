@@ -171,7 +171,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         # Ensure the certificate was not generated
         self.assertFalse(mock_send.called)
 
-        certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
+        certificate = GeneratedCertificate.objects.get(
             user=self.user_2,
             course_id=self.course.id
         )
@@ -274,7 +274,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
         self.assertEqual(
-            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status,  # pylint: disable=no-member
+            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status,
             expected_status
         )
 

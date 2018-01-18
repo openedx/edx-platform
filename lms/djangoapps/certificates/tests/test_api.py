@@ -199,7 +199,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_generating': False,
                 'is_unverified': False,
                 'download_url': '/certificates/user/{user_id}/course/{course_id}'.format(
-                    user_id=self.student.id,  # pylint: disable=no-member
+                    user_id=self.student.id,
                     course_id=self.course.id,
                 ),
                 'uuid': cert_status['uuid']
@@ -462,7 +462,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             kwargs=dict(certificate_uuid=self.uuid)
         )
         cert_url = certs_api.get_certificate_url(
-            user_id=self.student.id,  # pylint: disable=no-member
+            user_id=self.student.id,
             course_id=self.web_cert_course.id,
             uuid=self.uuid
         )
@@ -471,13 +471,13 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         expected_url = reverse(
             'certificates:html_view',
             kwargs={
-                "user_id": str(self.student.id),  # pylint: disable=no-member
+                "user_id": str(self.student.id),
                 "course_id": unicode(self.web_cert_course.id),
             }
         )
 
         cert_url = certs_api.get_certificate_url(
-            user_id=self.student.id,  # pylint: disable=no-member
+            user_id=self.student.id,
             course_id=self.web_cert_course.id
         )
         self.assertEqual(expected_url, cert_url)
@@ -488,7 +488,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         Test the get_certificate_url with a pdf cert course
         """
         cert_url = certs_api.get_certificate_url(
-            user_id=self.student.id,  # pylint: disable=no-member
+            user_id=self.student.id,
             course_id=self.pdf_cert_course.id,
             uuid=self.uuid
         )
