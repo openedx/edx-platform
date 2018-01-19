@@ -46,7 +46,6 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
             try:
                 obj = self.get_queryset().get(user=self.request.user, experiment_id=experiment_id, key=key)
                 self.kwargs['pk'] = obj.pk
-                self.request.data['id'] = obj.pk
                 return self.update(request, *args, **kwargs)
             except ExperimentData.DoesNotExist:
                 pass
