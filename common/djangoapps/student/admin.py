@@ -149,6 +149,34 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     exclude = ('dashboard_tracking_code',)
 
 
+class CourseEnrollmentForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(CourseEnrollmentForm, self).__init__(*args, **kwargs)
+
+        if self.data.get('course'):
+            try:
+                self.data['course'] = CourseKey.from_string(self.data['course'])
+            except InvalidKeyError:
+                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(self.data['course']))
+
+    def clean_course_id(self):
+        course_id = self.cleaned_data['course']
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(course_id))
+
+        if not modulestore().has_course(course_key):
+            raise forms.ValidationError("Cannot find course with id {} in the modulestore".format(course_id))
+
+        return course_key
+
+    class Meta:
+        model = CourseEnrollment
+        fields = '__all__'
+
+
 @admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
@@ -156,12 +184,10 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     list_filter = ('mode', 'is_active',)
     raw_id_fields = ('user',)
     search_fields = ('course__id', 'mode', 'user__username',)
+    form = CourseEnrollmentForm
 
     def queryset(self, request):
         return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
-
-    class Meta(object):
-        model = CourseEnrollment
 
 
 class UserProfileInline(admin.StackedInline):
