@@ -149,6 +149,18 @@ class StudentModule(models.Model):
     def __unicode__(self):
         return unicode(repr(self))
 
+    @classmethod
+    def get_state_by_params(cls, course_id, module_state_keys, student_id=None):
+        """
+        Return all model instances that correspond to a course and module keys.
+
+        Student ID is optional keyword argument, if provided it narrows down the instances.
+        """
+        module_states = cls.objects.filter(course_id=course_id, module_state_key__in=module_state_keys)
+        if student_id:
+            module_states = module_states.filter(student_id=student_id)
+        return module_states
+
 
 class BaseStudentModuleHistory(models.Model):
     """Abstract class containing most fields used by any class

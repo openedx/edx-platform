@@ -6,6 +6,7 @@ import logging
 from time import time
 
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 
 import dogstats_wrapper as dog_stats_api
@@ -33,19 +34,12 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
-    StudentModule instances are those that match the specified `course_id` and `module_state_key`.
-    If `student_identifier` is not None, it is used as an additional filter to limit the modules to those belonging
-    to that student. If `student_identifier` is None, performs update on modules for all students on the specified
-    problem.
-
-    If a `filter_fcn` is not None, it is applied to the query that has been constructed.  It takes one
-    argument, which is the query being filtered, and returns the filtered version of the query.
-
-    The `update_fcn` is called on each StudentModule that passes the resulting filtering.
-    It is passed four arguments:  the module_descriptor for the module pointed to by the
-    module_state_key, the particular StudentModule to update, the xmodule_instance_args, and the task_input
-    being passed through.  If the value returned by the update function evaluates to a boolean True,
-    the update is successful; False indicates the update on the particular student module failed.
+    The student modules are fetched for update the `update_fcn` is called on each StudentModule
+    that passes the resulting filtering. It is passed four arguments:  the module_descriptor for
+    the module pointed to by the module_state_key, the particular StudentModule to update, the
+    xmodule_instance_args, and the task_input being passed through.  If the value returned by the
+    update function evaluates to a boolean True, the update is successful; False indicates the update
+    on the particular student module failed.
     A raised exception indicates a fatal condition -- that no other student modules should be considered.
 
     The return value is a dict containing the task's results, with the following keys:
@@ -69,6 +63,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     problem_url = task_input.get('problem_url')
     entrance_exam_url = task_input.get('entrance_exam_url')
     student_identifier = task_input.get('student')
+    override_score_task = action_name == ugettext_noop('overridden')
     problems = {}
 
     # if problem_url is present make a usage key from it
@@ -85,27 +80,11 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         problems = get_problems_in_section(entrance_exam_url)
         usage_keys = [UsageKey.from_string(location) for location in problems.keys()]
 
-    # find the modules in question
-    modules_to_update = StudentModule.objects.filter(course_id=course_id, module_state_key__in=usage_keys)
+    modules_to_update = _get_modules_to_update(
+        course_id, usage_keys, student_identifier, filter_fcn, override_score_task
+    )
 
-    # give the option of updating an individual student. If not specified,
-    # then updates all students who have responded to a problem so far
-    student = None
-    if student_identifier is not None:
-        # if an identifier is supplied, then look for the student,
-        # and let it throw an exception if none is found.
-        if "@" in student_identifier:
-            student = User.objects.get(email=student_identifier)
-        elif student_identifier is not None:
-            student = User.objects.get(username=student_identifier)
-
-    if student is not None:
-        modules_to_update = modules_to_update.filter(student_id=student.id)
-
-    if filter_fcn is not None:
-        modules_to_update = filter_fcn(modules_to_update)
-
-    task_progress = TaskProgress(action_name, modules_to_update.count(), start_time)
+    task_progress = TaskProgress(action_name, len(modules_to_update), start_time)
     task_progress.update_task_state()
 
     for module_to_update in modules_to_update:
@@ -406,3 +385,53 @@ def _get_task_id_from_xmodule_args(xmodule_instance_args):
         return UNKNOWN_TASK_ID
     else:
         return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID)
+
+
+def _get_modules_to_update(course_id, usage_keys, student_identifier, filter_fcn, override_score_task=False):
+    """
+    Fetches a StudentModule instances for a given `course_id`, `student` object, and `usage_keys`.
+
+    StudentModule instances are those that match the specified `course_id` and `module_state_key`.
+    If `student_identifier` is not None, it is used as an additional filter to limit the modules to those belonging
+    to that student. If `student_identifier` is None, performs update on modules for all students on the specified
+    problem.
+    The matched instances are then applied `filter_fcn` if not None. It filters out the matched instances.
+    It takes one argument, which is the query being filtered, and returns the filtered version of the query.
+    If `override_score_task` is True and we there were not matching instances of StudentModule, try to create
+    those instances. This is only for override scores and the use case is for learners that have missed the deadline.
+
+    Arguments:
+        course_id(str): The unique identifier for the course.
+        usage_keys(list): List of UsageKey objects
+        student_identifier(str): Identifier for a student or None. The identifier can be either username or email
+        filter_fcn: If it is not None, it is applied to the query that has been constructed.
+        override_score_task (bool): Optional argument which indicates if it is an override score or not.
+    """
+    def get_student():
+        """ Fetches student instance if an identifier is provided, else return None """
+        if student_identifier is None:
+            return None
+
+        student_identifier_type = 'email' if '@' in student_identifier else 'username'
+        student_query_params = {student_identifier_type: student_identifier}
+        return User.objects.get(**student_query_params)
+
+    module_query_params = {'course_id': course_id, 'module_state_keys': usage_keys}
+
+    # give the option of updating an individual student. If not specified,
+    # then updates all students who have responded to a problem so far
+    student = get_student()
+    if student:
+        module_query_params['student_id'] = student.id
+
+    student_modules = StudentModule.get_state_by_params(**module_query_params)
+    if filter_fcn is not None:
+        student_modules = filter_fcn(student_modules)
+
+    can_create_student_modules = (override_score_task and (student_modules.count() == 0) and student is not None)
+    if can_create_student_modules:
+        student_modules = [
+            StudentModule.objects.get_or_create(course_id=course_id, student=student, module_state_key=key)[0]
+            for key in usage_keys
+        ]
+    return student_modules
