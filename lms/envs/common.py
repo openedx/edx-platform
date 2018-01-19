@@ -250,6 +250,11 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
+    # When an non logged in user (Anonymous) goes to the homepage ('/') shoud the user be
+    # redirected to the dashboard - this is default Microsite behaviour for EducateWorkforce.
+    # Set to False to not redirect the user.
+    'ALWAYS_REDIRECT_HOMEPAGE_TO_LOGIN_FOR_UNAUTHENTICATED_USER': False,
+
     # When a user goes to the homepage ('/') the user sees the
     # courses listed in the announcement dates order - this is default Open edX behavior.
     # Set to True to change the course sorting behavior by their start dates, latest first.
