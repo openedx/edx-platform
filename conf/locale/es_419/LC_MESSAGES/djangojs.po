@@ -137,7 +137,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-12-17 20:42+0000\n"
-"PO-Revision-Date: 2018-01-16 19:32+0000\n"
+"PO-Revision-Date: 2018-01-17 19:59+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -319,15 +319,14 @@ msgstr "text_word_{uniqueId}"
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] "%(num_points)s punto posible (calificables, resultados escondidos)"
-msgstr[1] ""
-"%(num_points)s puntos posibles (calificable, resultados escondidos)"
+msgstr[1] "%(num_points)s puntos posibles (calificables, resultados ocultos)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] "%(num_points)s punto posible (calificable, resultados escondidos)"
+msgstr[0] "%(num_points)s punto posible (calificable, resultados ocultos)"
 msgstr[1] ""
-"%(num_points)s puntos posibles (no calificables, resultados escondidos)"
+"%(num_points)s puntos posibles (no calificables, resultados ocultos)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
@@ -345,13 +344,13 @@ msgstr[1] "%(num_points)s puntos posibles (no calificados)"
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] "%(earned)s/%(possible)s punto (calificado)"
-msgstr[1] "%(earned)s/%(possible)s puntos (calificado)"
+msgstr[1] "%(earned)s/%(possible)s puntos (calificados)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] "%(earned)s/%(possible)s punto (no calificado)"
-msgstr[1] "%(earned)s/%(possible)s puntos (no calificado)"
+msgstr[1] "%(earned)s/%(possible)s puntos (no calificados)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -8323,7 +8322,7 @@ msgstr "Arrastre para reorganizar"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Release Status:"
-msgstr "Estado de liberación:"
+msgstr "Estado de Publicación:"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -8885,7 +8884,7 @@ msgstr "Borrador (Cambios no publicados)"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Release:"
-msgstr "Liberación:"
+msgstr "Publicación:"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publishing Status"
@@ -8940,23 +8939,24 @@ msgstr "Ocultar a los estudiantes"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
-msgstr "Nota: No oculte tareas calificadas después de que han sido liberadas."
+msgstr ""
+"Nota: No oculte las tareas calificadas después de que han sido publicadas."
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
-msgstr "Fecha y hora de liberación"
+msgstr "Fecha y hora de publicación"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date:"
-msgstr "Fecha de liberación:"
+msgstr "Fecha de publicación:"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Time in UTC:"
-msgstr "Hora de liberación en UTC:"
+msgstr "Hora de publicación en UTC:"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Clear Release Date/Time"
-msgstr "Borrar la fecha y hora de liberación"
+msgstr "Borrar la fecha y hora de publicación"
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Assessment Results Visibility"
@@ -9128,7 +9128,7 @@ msgid ""
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
 "Si hace este %(xblockType)s visible a los estudiantes, podrán ver su "
-"contenido a partir de la fecha de liberación siempre que haya publicado la "
+"contenido a partir de la fecha de publicación siempre que haya publicado la "
 "unidad. Sólo las unidades que están ocultos explícitamente permanecerán "
 "ocultas después de quitar esta opción para %(xblockType)s."
 

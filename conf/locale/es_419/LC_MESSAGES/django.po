@@ -34,7 +34,7 @@
 # Laura Silva <lingison@edx.org>, 2015-2017
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
-# Marina Pastor <mpastor@edx.org>, 2017
+# Marina Pastor <mpastor@edx.org>, 2017-2018
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # MarnyLopez, 2014
 # Natalia, 2013
@@ -1096,8 +1096,9 @@ msgid ""
 "enrolled in. Sign In to continue."
 msgstr ""
 "{html_start}¡Éxito! Ha activado su cuenta.{html_end}Ahora recibirá "
-"actualizaciones y notificaciones de nosotros por correo con relación a los "
-"cursos en los cuales Ud. está inscrito/a. Inicie Sesión para proceder."
+"actualizaciones y notificaciones nuestras por correo electrónico con "
+"relación a los cursos en los cuales está inscrito/a. Inicie Sesión para "
+"continuar."
 
 #: common/djangoapps/student/views.py
 #, python-brace-format
@@ -1132,7 +1133,7 @@ msgstr[0] ""
 "políticas de seguridad, debe dejar transcurrir al menos {num} día antes de "
 "hacer otra solicitud."
 msgstr[1] ""
-"Está solicitando cambiar de contraseña con demasiada frecuencia. Por "
+"Está solicitando cambiar de contraseña con demasiada frecuencia. Debido a  "
 "políticas de seguridad, debe dejar transcurrir al menos {num} días antes de "
 "hacer otra solicitud."
 
@@ -2829,9 +2830,9 @@ msgid ""
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
 "the start date that you have set for this course is used."
 msgstr ""
-"Introduzca el texto que quiere usar como el periodo de tiempo de inicio "
-"publicado para este curso, como \"Invierno 2018\". Si Ud. marca este valor "
-"con \"nulo,\" se usa la fecha de inicio que ha establecido para este curso."
+"Ingrese el texto que quiere usar como el periodo de tiempo de inicio "
+"publicado para este curso, como \"Invierno 2018\". Si marca este valor como "
+"\"nulo,\" se usará la fecha de inicio que ha establecido para este curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -5768,7 +5769,7 @@ msgstr "Acerca de los logros en {platform_name}"
 #. for the certificate
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Issued On:"
-msgstr "Emitido el:"
+msgstr "Emitido en:"
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
 #. each individual certificate
@@ -8694,8 +8695,8 @@ msgid ""
 "The issuing bank has questions about the request. Possible fix: retry with "
 "another form of payment"
 msgstr ""
-"El Banco emisor tiene preguntas sobre la solicitud.  Posible solución: "
-"intente con otra forma de pago."
+"El Banco emisor tiene dudas sobre la solicitud.  Posible solución: intente "
+"con otra forma de pago."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -9995,7 +9996,7 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at %(platform_name)s."
 msgstr ""
-"Ud. ha recibido este correo porque pidió reestablecer su contraseña para su "
+"Ha recibido este correo porque solicitó restablecer su contraseña para su "
 "cuenta de usuario en %(platform_name)s."
 
 #: lms/templates/registration/password_reset_email.html
@@ -11573,7 +11574,7 @@ msgstr "Recordarme"
 #. below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "This is what you will use to login."
-msgstr "Esto es lo que Ud. usará para iniciar sesión."
+msgstr "Esto es lo que usará para iniciar sesión."
 
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
@@ -11586,7 +11587,7 @@ msgstr "Confirmar Correo Electrónico"
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "This name will be used on any certificates that you earn."
-msgstr "Este nombre aparecerá en cualquier certificado que Ud. obtenga."
+msgstr "Este nombre aparecerá en cualquier certificado que obtenga."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
@@ -11606,8 +11607,8 @@ msgstr "Nombre público de usuario "
 msgid ""
 "The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
-"El nombre bajo el cual Ud. se presentará en sus cursos. No puede ser "
-"cambiado luego."
+"El nombre bajo el cual usted se presentará en sus cursos no puede ser "
+"cambiado después."
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -13718,8 +13719,8 @@ msgstr "Ahora estás viendo el curso como {i_start}{user_name}{i_end}."
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] "Usted ha realizado {num_used} de {num_total} intento"
-msgstr[1] "Tu has realizado {num_used} de {num_total} intentos"
+msgstr[0] "Ha realizado {num_used} de {num_total} intento"
+msgstr[1] "Ha realizado {num_used} de {num_total} intentos"
 
 #: lms/templates/problem.html
 msgid ""
@@ -14177,7 +14178,8 @@ msgstr "Calificar el envío del estudiante nuevamente"
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Score Improves"
-msgstr "Puntuar de nuevo solamente si se mejora la calificación"
+msgstr ""
+"Calificar de nuevo. Solamente si mejora la calificación del estudiante"
 
 #: lms/templates/staff_problem_info.html
 msgid "Override Score"
@@ -17129,9 +17131,9 @@ msgid ""
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
 msgstr ""
-"Su envío de verificación no fue aprobado. Para recibir un certificado "
-"verificado, hay que enviar las fotos de Ud. y de su identificación "
-"nuevamente antes de la fecha límite de verificación de su curso."
+"El envío de verificación no fue aceptado. Para recibir un certificado "
+"verificado, debe nuevamente enviar una foto suya y de su identificación "
+"antes de la fecha límite de verificación de su curso."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Your verification was denied for the following reasons:"
@@ -19992,7 +19994,7 @@ msgid ""
 "Show the status for the rescoring tasks that you submitted for this learner "
 "and problem."
 msgstr ""
-"Mostrar el estado de tareas de recalificación que Ud. inició para este "
+"Mostrar el estado de tareas de recalificación que usted inició para este "
 "estudiante y problema."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -20054,8 +20056,8 @@ msgid ""
 "Show the status for the rescoring tasks that you submitted for this learner "
 "and entrance exam."
 msgstr ""
-"Mostrar el estado de tareas de recalificación que Ud. inició para este "
-"estudiante y examen de entrada."
+"Mostrar el estado de tareas de recalificación que usted inició para este "
+"estudiante y el examen de admisión.."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust all enrolled learners' grades for a specific problem"
@@ -20085,7 +20087,7 @@ msgstr "Recalificar solamente si se mejora la nota"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
-msgstr "Mostrar el estado de las tareas que Ud. inició para este problema."
+msgstr "Mostrar el estado de las tareas que usted inició para este problema."
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -21210,8 +21212,8 @@ msgid ""
 "website. If you continue browsing this site, we understand that you accept "
 "the use of cookies."
 msgstr ""
-"Esta página web usa cookies para que Ud. tenga la mejor experiencia en "
-"nuestro sitio web."
+"Esta página web usa cookies para que tenga la mejor experiencia en nuestro "
+"sitio web."
 
 #: lms/templates/widgets/cookie-consent.html
 msgid "Got it!"
@@ -22385,7 +22387,7 @@ msgstr "Ritmo del curso"
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
-msgstr "Ritmo propio."
+msgstr "A ritmo propio."
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Instructor-Paced"
@@ -22425,7 +22427,7 @@ msgstr "Aprenda más sobre la estructura del curso"
 
 #: cms/templates/course_outline.html
 msgid "Setting release dates and grading policies"
-msgstr "Configurar fechas de liberación y políticas de calificaciones"
+msgstr "Configurar fechas de publicación y políticas de calificaciones"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -22433,9 +22435,9 @@ msgid ""
 "date. When you configure a subsection, you can also set the grading policy "
 "and due date."
 msgstr ""
-"Selecciones el icono de configuración para una sección o subsección para "
-"definir su fecha de liberación. Al configurar una subsección, también puede "
-"definir la política de calificación y la fecha límite de entrega."
+"Seleccione el icono de configuración para una sección o subsección para "
+"definir su fecha de publicación. Al configurar una subsección, también puede"
+" definir la política de calificación y la fecha límite de entrega."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about grading policy settings"
@@ -24822,8 +24824,8 @@ msgid ""
 "assignments."
 msgstr ""
 "Los cursos que van al ritmo del instructor avanzan de acuerdo con las fechas"
-" establecidas por el autor. Usted puede configurar las fechas de liberación "
-"para el contenido del curso, así como para las tareas y actividades."
+" establecidas por el autor. Usted puede configurar las fechas de publicación"
+" para el contenido del curso, así como para las tareas y actividades."
 
 #: cms/templates/settings.html
 msgid ""
@@ -24831,7 +24833,7 @@ msgid ""
 " for assignments. Learners can complete course material at any time before "
 "the course end date."
 msgstr ""
-"Los cursos que van a ritmo propio no tienen fechas de liberación para el "
+"Los cursos que van a ritmo propio no tienen fechas de publicación para el "
 "contenido ni fechas límites para las tareas.  Los estudiantes pueden "
 "completar los materiales y actividades en cualquier momento antes de la "
 "fecha de fin del curso."
@@ -25011,7 +25013,7 @@ msgid ""
 msgstr ""
 "Puede usar la barra de desplazamiento bajo el rango general de "
 "calificaciones para especificar si su curso tiene la estructura de aprobado "
-"/ no aprobado o si se califica por letras y para establecer umbrales para "
+"/ no aprobado o si se califica por letras y para establecer límites para "
 "cada una de las calificaciones posibles."
 
 #: cms/templates/settings_graders.html
