@@ -48,6 +48,7 @@ def get_footer(is_secure=True):
     Example:
     >>> get_footer()
     {
+        "platform_name": "EducateWorkforce",
         "copyright": "(c) 2015 EdX Inc",
         "logo_image": "http://www.example.com/logo.png",
         "social_links": [
@@ -94,6 +95,7 @@ def get_footer(is_secure=True):
 
     """
     return {
+        "platform_name": _footer_platform_name(),
         "copyright": _footer_copyright(),
         "logo_image": _footer_logo_img(is_secure),
         "social_links": _footer_social_links(),
@@ -108,6 +110,10 @@ def get_footer(is_secure=True):
     }
 
 
+def _footer_platform_name():
+    return _(u"{org_name}").format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
+
+
 def _footer_copyright():
     """Return the copyright to display in the footer.
 
@@ -117,10 +123,10 @@ def _footer_copyright():
     return _(
         # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
-        u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"EdX, Open edX and their respective logos are trademarks "
-        u"or registered trademarks of edX Inc."
-    ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
+        u"Copyright {copyright_year} {org_name}. \u007C "
+        u"A resource for technical colleges. \u007C "
+        u"All Rights Reserved"
+    ).format(copyright_year=configuration_helpers.get_value('COPYRIGHT_YEAR', settings.COPYRIGHT_YEAR),org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
 def _footer_openedx_link():
