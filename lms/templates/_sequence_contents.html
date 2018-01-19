@@ -1,0 +1,12 @@
+<%page args="items" expression_filter="h"/>
+
+<div class="sr-is-focusable" tabindex="-1"></div>
+    % for idx, item in enumerate(items):
+    <div id="seq_contents_${idx}"
+        aria-labelledby="tab_${idx}"
+        aria-hidden="true"
+        class="seq_contents tex2jax_ignore asciimath2jax_ignore">
+    ${item['content']}
+    </div>
+    % endfor
+<div id="seq_content" role="tabpanel"></div>

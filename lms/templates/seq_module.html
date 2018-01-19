@@ -1,7 +1,10 @@
 <%page expression_filter="h"/>
-<%! from django.utils.translation import ugettext as _ %>
+<%! 
+from django.utils.translation import ugettext as _ 
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" data-next-url="${next_url}" data-prev-url="${prev_url}">
+<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" data-next-url="${next_url}" data-prev-url="${prev_url}" data-gate-content="${gate_content}" data-prereq-url="${prereq_url}" data-prereq-section-name="${prereq_section_name}" data-unit-name="${unit_name}" data-score-reached="${score_reached}" data-calculate-score="${calculate_score}">
   % if banner_text:
     <div class="pattern-library-shim alert alert-information subsection-header" tabindex="-1">
       <span class="pattern-library-shim icon alert-icon fa fa-bullhorn" aria-hidden="true"></span>
@@ -21,44 +24,17 @@
       <span class="sequence-nav-button-label">${_('Next')}</span>
       <span class="icon fa fa-chevron-next" aria-hidden="true"></span>
     </button>
-    <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
-      <ol id="sequence-list" role="tablist">
-        % for idx, item in enumerate(items):
-        <li role="presentation">
-          <button class="seq_${item['type']} inactive nav-item tab"
-            role="tab"
-            tabindex="-1"
-            aria-selected="false"
-            aria-expanded="false"
-            aria-controls="seq_content"
-            data-index="${idx}"
-            data-id="${item['id']}"
-            data-element="${idx+1}"
-            data-page-title="${item['page_title']}"
-            data-path="${item['path']}"
-            id="tab_${idx}"
-            ${"disabled=disabled" if disable_navigation else ""}>
-            <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
-            <span class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></span>
-            <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
-          </button>
-        </li>
-        % endfor
-      </ol>
-    </nav>
+    
+    <%include file="_sequence_list.html" args="items=items, gate_content=gate_content, disable_navigation=disable_navigation"/>
   </div>
 
-  <div class="sr-is-focusable" tabindex="-1"></div>
-
-  % for idx, item in enumerate(items):
-  <div id="seq_contents_${idx}"
-    aria-labelledby="tab_${idx}"
-    aria-hidden="true"
-    class="seq_contents tex2jax_ignore asciimath2jax_ignore">
-    ${item['content']}
+  <div id="main-content">
+    % if gate_content:
+      <%include file="_gated_content.html" args="gate_content=gate_content, prereq_url=prereq_url, prereq_section_name=prereq_section_name, unit_name=unit_name, score_reached=score_reached, calculate_score=calculate_score"/>
+    % else:
+      <%include file="_sequence_contents.html" args="items=items"/>
+    % endif
   </div>
-  % endfor
-  <div id="seq_content" role="tabpanel"></div>
 
   <nav class="sequence-bottom" aria-label="${_('Section')}">
     <button class="sequence-nav-button button-previous">
