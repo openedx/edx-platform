@@ -21,8 +21,9 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
     """
     A transformer that handles both milestones and special (timed) exams.
 
-    It excludes all blocks with unfulfilled milestones from the student view.  An entrance exam is considered a
-    milestone, and is not considered a "special exam".
+    It includes or excludes all unfulfilled milestones from the student view based on the value of `include_gated_sections`.
+
+    An entrance exam is considered a milestone, and is not considered a "special exam".
 
     It also includes or excludes all special (timed) exams (timed, proctored, practice proctored) in/from the
     student view, based on the value of `include_special_exams`.
@@ -35,8 +36,9 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
     def name(cls):
         return "milestones"
 
-    def __init__(self, include_special_exams=True):
+    def __init__(self, include_special_exams=True, include_gated_sections=True):
         self.include_special_exams = include_special_exams
+        self.include_gated_sections = include_gated_sections
 
     @classmethod
     def collect(cls, block_structure):
@@ -66,9 +68,9 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
 
             if usage_info.has_staff_access:
                 return False
-            elif self.has_pending_milestones_for_user(block_key, usage_info):
-                return True
             elif self.gated_by_required_content(block_key, block_structure, required_content):
+                return True
+            elif not self.include_gated_sections and self.has_pending_milestones_for_user(block_key, usage_info):
                 return True
             elif (settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                   (self.is_special_exam(block_key, block_structure) and

@@ -150,9 +150,13 @@ class GatingTest(UniqueCourseTest):
         """
         Given that I am a student
         When I visit the LMS Courseware
-        Then I cannot see a gated subsection
+        Then I can see a gated subsection
+            The gated subsection should have a lock icon
+            and be in the format: "<Subsection Title> (Prerequisite Required)"
         When I fulfill the gating Prerequisite
         Then I can see the gated subsection
+            Now the gated subsection should have an unlock icon
+            and screen readers should read the section as: "<Subsection Title> Unlocked"
         """
         self._setup_prereq()
         self._setup_gated_subsection()
@@ -160,7 +164,7 @@ class GatingTest(UniqueCourseTest):
         self._auto_auth(self.STUDENT_USERNAME, self.STUDENT_EMAIL, False)
 
         self.course_home_page.visit()
-        self.assertEqual(self.course_home_page.outline.num_subsections, 1)
+        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
 
         # Fulfill prerequisite and verify that gated subsection is shown
         self.courseware_page.visit()
@@ -175,7 +179,9 @@ class GatingTest(UniqueCourseTest):
         Then I can see all gated subsections
         Displayed along with notification banners
         Then if I masquerade as a student
-        Then I cannot see a gated subsection
+        Then I can see a gated subsection
+            The gated subsection should have a lock icon
+            and be in the format: "<Subsection Title> (Prerequisite Required)"
         When I fufill the gating prerequisite
         Then I can see the gated subsection (without a banner)
         """
@@ -204,10 +210,11 @@ class GatingTest(UniqueCourseTest):
 
         self.course_home_page.visit()
         self.course_home_page.preview.set_staff_view_mode('Learner')
-        self.assertEqual(self.course_home_page.outline.num_subsections, 1)
+        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
         self.courseware_page.wait_for_page()
-        self.assertFalse(self.courseware_page.has_banner())
+        # banner displayed informing section is a prereq
+        self.assertTrue(self.courseware_page.has_banner())
 
         self.course_home_page.visit()
         self.course_home_page.preview.set_staff_view_mode_specific_student(self.STUDENT_USERNAME)

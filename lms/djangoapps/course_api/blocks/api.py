@@ -56,10 +56,14 @@ def get_blocks(
         requested_fields = []
     include_completion = 'completion' in requested_fields
     include_special_exams = 'special_exam_info' in requested_fields
+    include_gated_sections = 'show_gated_sections' in requested_fields
 
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS
-        transformers += [MilestonesAndSpecialExamsTransformer(include_special_exams), HiddenContentTransformer()]
+        transformers += [MilestonesAndSpecialExamsTransformer(
+            include_special_exams=include_special_exams,
+            include_gated_sections=include_gated_sections)]
+        transformers += [HiddenContentTransformer()]
     transformers += [
         BlocksAPITransformer(
             block_counts,
