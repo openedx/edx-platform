@@ -1,11 +1,13 @@
+"""
+Grades Service Tests
+"""
+from datetime import datetime
 import ddt
 import pytz
-from datetime import datetime
 from freezegun import freeze_time
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
-from lms.djangoapps.grades.services import GradesService, _get_key
+from lms.djangoapps.grades.services import GradesService
 from mock import patch, call
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -14,7 +16,7 @@ from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
 
 
-class MockWaffleFlag():
+class MockWaffleFlag(object):
     def __init__(self, state):
         self.state = state
 
@@ -27,7 +29,7 @@ class GradesServiceTests(ModuleStoreTestCase):
     """
     Tests for the Grades service
     """
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(GradesServiceTests, self).setUp()
         self.service = GradesService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
@@ -214,20 +216,6 @@ class GradesServiceTests(ModuleStoreTestCase):
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
-
-    @ddt.data(
-        ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],
-        ['course-v1:edX+DemoX+Demo_Course', CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'), CourseKey],
-        [CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'),
-         CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'), CourseKey],
-        ['block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow',
-         UsageKey.from_string('block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'), UsageKey],
-        [UsageKey.from_string('block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'),
-         UsageKey.from_string('block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'), UsageKey],
-    )
-    @ddt.unpack
-    def test_get_key(self, input_key, output_key, key_cls):
-        self.assertEqual(_get_key(input_key, key_cls), output_key)
 
     def test_should_override_grade_on_rejected_exam(self):
         self.assertTrue(self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course'))

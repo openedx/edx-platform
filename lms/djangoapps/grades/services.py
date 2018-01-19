@@ -1,7 +1,11 @@
+"""
+Grade service
+"""
 from datetime import datetime
 
 import pytz
 
+from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
@@ -10,18 +14,6 @@ from .constants import ScoreDatabaseTableEnum
 from .events import SUBSECTION_OVERRIDE_EVENT_TYPE
 from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from .signals.signals import SUBSECTION_OVERRIDE_CHANGED
-
-
-def _get_key(key_or_id, key_cls):
-    """
-    Helper method to get a course/usage key either from a string or a key_cls,
-    where the key_cls (CourseKey or UsageKey) will simply be returned.
-    """
-    return (
-        key_cls.from_string(key_or_id)
-        if isinstance(key_or_id, basestring)
-        else key_or_id
-    )
 
 
 class GradesService(object):
