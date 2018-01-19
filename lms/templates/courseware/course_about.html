@@ -245,7 +245,7 @@ from six import string_types
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
-            % if get_course_about_section(request, course, "end_date") or course.end:
+            % if course.end:
                 <%
                     course_end_date = course.end
                 %>
@@ -253,7 +253,7 @@ from six import string_types
             <li class="important-dates-item">
                 <span class="icon fa fa-calendar" aria-hidden="true"></span>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
-                  % if isinstance(course_end_date, str):
+                  % if isinstance(course_end_date, string_types):
                       <span class="important-dates-item-text final-date">${course_end_date}</span>
                   % else:
                     <%
