@@ -45,7 +45,7 @@ class ChangeEnterpriseUserUsernameCommandTests(TestCase):
         Test that the command updates the user's username when the user is linked to an Enterprise.
         """
         user = User.objects.create(is_active=True, username='old_username', email='test@example.com')
-        site = Site.objects.create(domain='example.com')
+        site, _ = Site.objects.get_or_create(domain='example.com')
         enterprise_customer = EnterpriseCustomer.objects.create(
             name='Test EnterpriseCustomer',
             site=site
