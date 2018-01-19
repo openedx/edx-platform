@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:50+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.506466\n"
+"POT-Creation-Date: 2018-01-19 14:51+0000\n"
+"PO-Revision-Date: 2018-01-19 14:51:48.960155\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -7576,6 +7576,7 @@ msgstr "قثسذخقثي"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks_helper/module_state.py
 msgid "overridden"
 msgstr "خدثققهييثر"
 
@@ -12356,6 +12357,11 @@ msgstr "خقلشرهظشفهخر:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Number:"
 msgstr "ذخعقسث رعوزثق:"
+
+#: cms/templates/index.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Run:"
+msgstr "ذخعقسث قعر:"
 
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -18058,10 +18064,6 @@ msgid "Course Name:"
 msgstr "ذخعقسث رشوث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Display Name:"
-msgstr "ذخعقسث يهسحمشغ رشوث:"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Start Date:"
 msgstr "ذخعقسث سفشقف يشفث:"
 
@@ -23255,10 +23257,6 @@ msgstr "بخق ثطشوحمث, وهفط"
 #: cms/templates/index.html
 msgid "Courses Being Processed"
 msgstr "ذخعقسثس زثهرل حقخذثسسثي"
-
-#: cms/templates/index.html
-msgid "Course Run:"
-msgstr "ذخعقسث قعر:"
 
 #: cms/templates/index.html
 msgid "This course run is currently being created."

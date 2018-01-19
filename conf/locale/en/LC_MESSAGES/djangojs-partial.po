@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:48+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.618385\n"
+"POT-Creation-Date: 2018-01-19 14:49+0000\n"
+"PO-Revision-Date: 2018-01-19 14:51:49.074141\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1859,206 +1859,158 @@ msgstr ""
 msgid "Turn off transcripts"
 msgstr ""
 
-#: common/static/bundles/AssetsPage.bace7aaf2adb48c51598.js
-msgid "end"
-msgstr ""
-
-#: common/static/bundles/CourseGoals.c4996c40fda9d3059c82.js
 #: common/static/bundles/CourseGoals.js
 msgid "Thank you for setting your course goal to "
 msgstr ""
 
-#: common/static/bundles/CourseGoals.c4996c40fda9d3059c82.js
 #: common/static/bundles/CourseGoals.js
 msgid ""
 "There was an error in setting your goal, please reload the page and try "
 "again."
 msgstr ""
 
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "You have successfully updated your goal."
 msgstr ""
 
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
 #: common/static/bundles/CourseHome.js
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
 msgstr ""
 
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
-#: common/static/bundles/CourseHome.js
-msgid "Show more"
+#: common/static/bundles/CourseOrLibraryListing.js
+#: common/static/bundles/StudioIndex.js
+msgid "Organization:"
 msgstr ""
 
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
-#: common/static/bundles/CourseHome.js
-msgid "Show less"
+#: common/static/bundles/CourseOrLibraryListing.js
+#: common/static/bundles/StudioIndex.js
+msgid "Course Number:"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
+#: common/static/bundles/CourseOrLibraryListing.js
+#: common/static/bundles/StudioIndex.js
+msgid "Course Run:"
+msgstr ""
+
+#: common/static/bundles/CourseOrLibraryListing.js
+#: common/static/bundles/StudioIndex.js
+msgid "(Read-only)"
+msgstr ""
+
+#: common/static/bundles/CourseOrLibraryListing.js
+#: common/static/bundles/StudioIndex.js
+msgid "Re-run Course"
+msgstr ""
+
+#: common/static/bundles/CourseOrLibraryListing.js
+#: common/static/bundles/StudioIndex.js
+msgid "View Live"
+msgstr ""
+
 #: common/static/bundles/SingleSupportForm.js
 msgid "Please fix the following errors:"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Files that you upload must be smaller than 5MB in size."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid ""
 "Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
 ".png format."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Something went wrong. Please try again later."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Add Attachment"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "(Optional)"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Remove file"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Course Name"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "What can we help you with, "
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Details"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Submit"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Sign in to "
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Sign in"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Create an "
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Enter a valid email address."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Enter a subject for your support request."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Enter some details for your support request."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Contact Us"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Find answers to the top questions asked by learners."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Go to my Dashboard"
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Go to "
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid ""
 "Thank you for submitting a request! We will contact you within 24 hours."
 msgstr ""
 
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Cancel upload"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Organization:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Course Number:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Course Run:"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "(Read-only)"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Re-run Course"
-msgstr ""
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "View Live"
 msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js

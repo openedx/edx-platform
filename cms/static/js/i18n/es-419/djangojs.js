@@ -40,11 +40,11 @@
     "%(download_link_start)sDownload this image (right-click or option-click, save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to your backpack.</li>": "%(download_link_start)sDescarga esta imagen (haz clic derecho o pulsa opci\u00f3n, guardar como)%(link_end)s y despu\u00e9s %(upload_link_start)ssubirla%(link_end)s a tu mochila.</li>", 
     "%(earned)s/%(possible)s point (graded)": [
       "%(earned)s/%(possible)s punto (calificado)", 
-      "%(earned)s/%(possible)s puntos (calificado)"
+      "%(earned)s/%(possible)s puntos (calificados)"
     ], 
     "%(earned)s/%(possible)s point (ungraded)": [
       "%(earned)s/%(possible)s punto (no calificado)", 
-      "%(earned)s/%(possible)s puntos (no calificado)"
+      "%(earned)s/%(possible)s puntos (no calificados)"
     ], 
     "%(errorCount)s error found in form.": [
       "%(errorCount)s error en el formulario.", 
@@ -63,15 +63,15 @@
     ], 
     "%(num_points)s point possible (graded, results hidden)": [
       "%(num_points)s punto posible (calificables, resultados escondidos)", 
-      "%(num_points)s puntos posibles (calificable, resultados escondidos)"
+      "%(num_points)s puntos posibles (calificables, resultados ocultos)"
     ], 
     "%(num_points)s point possible (ungraded)": [
       "%(num_points)s punto posible (no calificado)", 
       "%(num_points)s puntos posibles (no calificados)"
     ], 
     "%(num_points)s point possible (ungraded, results hidden)": [
-      "%(num_points)s punto posible (calificable, resultados escondidos)", 
-      "%(num_points)s puntos posibles (no calificables, resultados escondidos)"
+      "%(num_points)s punto posible (calificable, resultados ocultos)", 
+      "%(num_points)s puntos posibles (no calificables, resultados ocultos)"
     ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
@@ -366,7 +366,7 @@
     "Clear": "Borrar", 
     "Clear All": "Borrar todo", 
     "Clear Grading Due Date": "Borrar la fecha l\u00edmite de calificaci\u00f3n", 
-    "Clear Release Date/Time": "Borrar la fecha y hora de liberaci\u00f3n", 
+    "Clear Release Date/Time": "Borrar la fecha y hora de publicaci\u00f3n", 
     "Clear Value": "Borrar", 
     "Clear search": "Reiniciar b\u00fasqueda", 
     "Clear search results": "Borrar resultados de b\u00fasqueda", 
@@ -728,7 +728,7 @@
     "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from {platformName} to verify your identity.": "Si no verifica su identidad ahora, de todas formas podr\u00e1 explorar el curso desde su Panel de Control. Recibir\u00e1 recordatorios peri\u00f3dicos de {platformName} para realizar la verificaci\u00f3n de identidad.", 
     "If you leave, you can no longer post in this team's discussions. Your place will be available to another learner.": "Si abandonas este equipo, no podr\u00e1s escribir en las discusiones de este equipo. Tu lugar estar\u00e1 disponible para otro estudiante.", 
     "If you make significant changes, make sure you notify members of the team before making these changes.": "Si haces cambios significativos,  aseg\u00farate de avisarle a los miembros del equipos antes de realizar estos cambios.", 
-    "If you make this %(xblockType)s visible to learners, learners will be able to see its content after the release date has passed and you have published the unit. Only units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.": "Si hace este %(xblockType)s visible a los estudiantes, podr\u00e1n ver su contenido a partir de la fecha de liberaci\u00f3n siempre que haya publicado la unidad. S\u00f3lo las unidades que est\u00e1n ocultos expl\u00edcitamente permanecer\u00e1n ocultas despu\u00e9s de quitar esta opci\u00f3n para %(xblockType)s.", 
+    "If you make this %(xblockType)s visible to learners, learners will be able to see its content after the release date has passed and you have published the unit. Only units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.": "Si hace este %(xblockType)s visible a los estudiantes, podr\u00e1n ver su contenido a partir de la fecha de publicaci\u00f3n siempre que haya publicado la unidad. S\u00f3lo las unidades que est\u00e1n ocultos expl\u00edcitamente permanecer\u00e1n ocultas despu\u00e9s de quitar esta opci\u00f3n para %(xblockType)s.", 
     "If you select an option other than \"%(hide_label)s\", published units in this subsection become available to learners unless they are explicitly hidden.": "Si selecciona esta opci\u00f3n distinta a \"%(hide_label)s\", \nlas unidades publicadas en este subsecci\u00f3n pasar\u00e1n a estar disponible para los estudiantes a menos que est\u00e1n expl\u00edcitamente ocultas.", 
     "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?": "Si utilizas el Editor Avanzado, este problema se convertir\u00e1 a formato XML y no podr\u00e1 retornar al Editor Simple.\n\n\u00bfDeseas pasar al Editor avanzado y convertir el problema a formato XML?", 
     "Image": "Imagen", 
@@ -907,7 +907,7 @@
     "Not in Use": "No esta en uso", 
     "Not selected": "No seleccionado", 
     "Note": "Nota", 
-    "Note: Do not hide graded assignments after they have been released.": "Nota: No oculte tareas calificadas despu\u00e9s de que han sido liberadas.", 
+    "Note: Do not hide graded assignments after they have been released.": "Nota: No oculte las tareas calificadas despu\u00e9s de que han sido publicadas.", 
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: Los estudiantes pueden estar \u00fanicamente en uno solo cohorte. Agregando estudiantes a este grupo sobreescribe cualquier asignaci\u00f3n previa a este grupo.", 
     "Noted in:": "Anotado en:", 
     "Notes": "Notas", 
@@ -1060,11 +1060,11 @@
     "Register through edX": "Registrarse a trav\u00e9s de edX", 
     "Register with Institution/Campus Credentials": "Registrarse con las credenciales de la instituci\u00f3n o el Campus", 
     "Related to: %(courseware_title_linked)s": "Relacionado con: %(courseware_title_linked)s", 
-    "Release Date and Time": "Fecha y hora de liberaci\u00f3n", 
-    "Release Date:": "Fecha de liberaci\u00f3n:", 
-    "Release Status:": "Estado de liberaci\u00f3n:", 
-    "Release Time in UTC:": "Hora de liberaci\u00f3n en UTC:", 
-    "Release:": "Liberaci\u00f3n:", 
+    "Release Date and Time": "Fecha y hora de publicaci\u00f3n", 
+    "Release Date:": "Fecha de publicaci\u00f3n:", 
+    "Release Status:": "Estado de Publicaci\u00f3n:", 
+    "Release Time in UTC:": "Hora de publicaci\u00f3n en UTC:", 
+    "Release:": "Publicaci\u00f3n:", 
     "Released:": "Liberado:", 
     "Remaining": "Restante", 
     "Removal is in progress. To avoid errors, stay on this page until the process is complete.": "La eliminaci\u00f3n est\u00e1 en progreso. Para evitar errores, permanece en esta p\u00e1gina hasta que el proceso haya finalizado.", 
