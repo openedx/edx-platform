@@ -154,13 +154,15 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'added' (set) of newly added (block_type, block_id) tuples
         """
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
-        log_id = uuid4()
-        logger.info(
-            "EDUCATOR-1290: LibraryContentModule.make_selection executing. selected: {0} | log ID: {1}".format(
-                selected,
-                log_id
+        course_is_mit_supply_chain = len(selected) != 0 and "MITx+CTL" in next(iter(selected))[1]  # used for temporary logging for EDUCATOR-1290
+        if course_is_mit_supply_chain:
+            log_id = uuid4()
+            logger.info(
+                "EDUCATOR-1290: LibraryContentModule.make_selection executing. selected: {0} | log ID: {1}".format(
+                    selected,
+                    log_id
+                )
             )
-        )
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
 
@@ -188,17 +190,18 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             else:
                 raise NotImplementedError("Unsupported mode.")
             selected |= added_block_keys
-        logger.info(
-            "EDUCATOR-1290: LibraryContentModule.make_selection executed. "
-            "valid_block_keys: {0} | selected: {1} | invalid: {2} | overlimit: {3} | added: {4} | log ID: {5}".format(
-                valid_block_keys,
-                selected,
-                invalid_block_keys,
-                overlimit_block_keys,
-                added_block_keys,
-                log_id
+        if course_is_mit_supply_chain:
+            logger.info(
+                "EDUCATOR-1290: LibraryContentModule.make_selection executed. "
+                "valid_block_keys: {0} | selected: {1} | invalid: {2} | overlimit: {3} | added: {4} | log ID: {5}".format(
+                    valid_block_keys,
+                    selected,
+                    invalid_block_keys,
+                    overlimit_block_keys,
+                    added_block_keys,
+                    log_id
+                )
             )
-        )
         return {
             'selected': selected,
             'invalid': invalid_block_keys,
