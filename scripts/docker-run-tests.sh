@@ -18,7 +18,8 @@ sudo -S mongod -repair --config /etc/mongod.conf
 sudo -S chown -R mongodb:mongodb /edx/var/mongo/.
 sudo -S service mongod start
 
-sudo apt install locales
+sudo apt-get update
+sudo apt-get install locales
 locale-gen en_US.UTF-8
 
 # dpkg-reconfigure locales
@@ -34,9 +35,6 @@ locale
 
 # Get the latest code
 cd /edx/app/edxapp/edx-platform
-git fetch origin master:refs/remotes/origin/master
-git branch -a 
-echo $BRANCH
 git pull
 git checkout $BRANCH
 
@@ -52,7 +50,7 @@ echo 'Running Tests'
 echo $TEST_SUITE 
 echo $SHARD 
 
-# These variables are becoming unset inside docker container
+# These variables aren't set inside ./scripts/all-tests so we re-export them
 export TEST_SUITE=$TEST_SUITE
 export SHARD=$SHARD
 export CODE_COV_TOKEN=$CODE_COV_TOKEN

@@ -16,8 +16,9 @@ cd /edx/app/edxapp/edx-platform
 export CODE_COV_TOKEN=$CODE_COV_TOKEN
 export TRAVIS=true
 
+git pull
 # Get the diff coverage and html reports for unit tests
-paver coverage
+paver coverage --compare-branch=origin/$TRAVIS_BRANCH
 
 pip install codecov==2.0.5
 codecov --token=$CODE_COV_TOKEN --branch=$BRANCH

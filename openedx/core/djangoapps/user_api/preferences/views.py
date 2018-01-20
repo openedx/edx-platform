@@ -17,6 +17,7 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
+from openedx.core.lib.api.permissions import OAuth2RestrictedApplicatonPermission
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError, PreferenceUpdateError
@@ -87,7 +88,11 @@ class PreferencesView(APIView):
             returned with no additional content.
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsUserInUrlOrStaff,
+        OAuth2RestrictedApplicatonPermission,
+    )
     parser_classes = (MergePatchParser,)
 
     def get(self, request, username):
@@ -196,7 +201,11 @@ class PreferencesDetailView(APIView):
             returned with no additional content.
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsUserInUrlOrStaff,
+        OAuth2RestrictedApplicatonPermission,
+    )
 
     def get(self, request, username, preference_key):
         """

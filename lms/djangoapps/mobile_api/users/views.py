@@ -66,6 +66,12 @@ class UserDetail(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     lookup_field = 'username'
 
+    # needed for passing OAuth2RestrictedApplicatonPermission checks
+    # for RestrictedApplications (only). A RestriectedApplication can
+    # only call this method if it is allowed to receive a 'profile'
+    # scope
+    required_scopes = ['profile']
+
 
 @mobile_view(is_user=True)
 class UserCourseStatus(views.APIView):

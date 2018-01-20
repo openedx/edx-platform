@@ -19,7 +19,7 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.parsers import TypedFileUploadParser
-from openedx.core.lib.api.permissions import IsUserInUrl
+from openedx.core.lib.api.permissions import IsUserInUrl, OAuth2RestrictedApplicatonPermission
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from .exceptions import ImageValidationError
@@ -113,7 +113,11 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
 
     parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
-    permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsUserInUrl,
+        OAuth2RestrictedApplicatonPermission,
+    )
 
     upload_media_types = set(itertools.chain(*(image_type.mimetypes for image_type in IMAGE_TYPES.values())))
 

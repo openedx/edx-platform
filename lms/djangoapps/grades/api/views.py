@@ -16,6 +16,7 @@ from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.permissions import OAuth2RestrictedApplicatonPermission
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 log = logging.getLogger(__name__)
@@ -29,7 +30,13 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthentication,
     )
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, OAuth2RestrictedApplicatonPermission,)
+
+    # needed for passing OAuth2RestrictedApplicatonPermission checks
+    # for RestrictedApplications (only). A RestrictedApplication can
+    # only call this method if it is allowed to receive a 'grades:read'
+    # scope
+    required_scopes = ['grades:read']
 
     def _get_course(self, course_key_string, user, access_action):
         """
@@ -142,6 +149,21 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
                 developer_message='The user requested does not match the logged in user.',
                 error_code='user_mismatch'
             )
+
+        # See if the request has an explicit ORG filter on the request
+        # which limits which OAuth2 clients can see what courses
+        # based on the association with a RestrictedApplication
+        #
+        # For more information on RestrictedApplications and the
+        # permissions model, see openedx/core/lib/api/permissions.py
+        if hasattr(request, 'auth') and hasattr(request.auth, 'org_associations'):
+            course_key = CourseKey.from_string(course_id)
+            if course_key.org not in request.auth.org_associations:
+                return self.make_error_response(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    developer_message='The OAuth2 RestrictedApplication is not associated with org.',
+                    error_code='course_org_not_associated_with_calling_application'
+                )
 
         course = self._get_course(course_id, request.user, 'load')
         if isinstance(course, Response):

@@ -13,6 +13,7 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.permissions import (
     ApiKeyHeaderPermission,
+    OAuth2RestrictedApplicatonPermission
 )
 from rest_framework import status, exceptions
 from rest_framework.response import Response
@@ -54,6 +55,7 @@ class UserView(APIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
+    permission_classes = (OAuth2RestrictedApplicatonPermission, )
 
     def get(self, request, username):
         """Create, read, or update enrollment information for a user.
@@ -173,6 +175,8 @@ class UserMappingView(ListAPIView):
     authentication_classes = (
         OAuth2Authentication,
     )
+
+    permission_classes = (OAuth2RestrictedApplicatonPermission, )
 
     serializer_class = serializers.UserMappingSerializer
     provider = None
