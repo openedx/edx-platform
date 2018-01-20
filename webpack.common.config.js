@@ -83,6 +83,13 @@ module.exports = {
     ],
 
     module: {
+        noParse: [
+            // See sinon/webpack interaction weirdness:
+            // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
+            // (I've tried every other suggestion solution on that page, this
+            // was the only one that worked.)
+            /\/sinon\.js/
+        ],
         rules: [
             {
                 test: namespacedRequireFiles,
@@ -151,7 +158,13 @@ module.exports = {
         alias: {
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
             'jquery.ui': 'jQuery-File-Upload/js/vendor/jquery.ui.widget.js',
-            jquery: 'jquery/src/jquery'  // Use the non-dist form of jQuery for better debugging + optimization
+            jquery: 'jquery/src/jquery',  // Use the non-dist form of jQuery for better debugging + optimization
+
+            // See sinon/webpack interaction weirdness:
+            // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
+            // (I've tried every other suggestion solution on that page, this
+            // was the only one that worked.)
+            sinon: __dirname + '/node_modules/sinon/pkg/sinon.js'
         },
         modules: [
             'node_modules',
