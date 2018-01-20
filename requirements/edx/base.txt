@@ -48,7 +48,7 @@ edx-drf-extensions==1.2.3
 edx-i18n-tools==0.4.2
 edx-lint==0.5.4
 
-# Pin this to test a fix to pylint-django
+# Pin this to test a fix to pylint-django...
 git+https://github.com/cpennington/pylint-django@fix-field-inference-during-monkey-patching#egg=pylint-django==0.0
 
 enum34==1.1.6
