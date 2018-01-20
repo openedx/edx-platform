@@ -167,66 +167,6 @@ class TestGetPrograms(CacheIsolationTestCase):
         self.assertFalse(mock_warning.called)
 
 
-@skip_unless_lms
-@ddt.ddt
-class TestGetProgramsWithType(TestCase):
-    def setUp(self):
-        super(TestGetProgramsWithType, self).setUp()
-        self.site = SiteFactory()
-
-        # We have seen what seem like flaky tests for these, but can't debug them due to the diff being too large.
-        # If you fix the flakiness of the tests this could go away as well.
-        self.maxDiff = None
-
-    @mock.patch(UTILS_MODULE + '.get_programs')
-    @mock.patch(UTILS_MODULE + '.get_program_types')
-    def test_get_programs_with_type(self, mock_get_program_types, mock_get_programs):
-        """Verify get_programs_with_type returns the expected list of programs."""
-        programs_with_program_type = []
-        programs = ProgramFactory.create_batch(2)
-        program_types = []
-
-        for program in programs:
-            program_type = ProgramTypeFactory(name=program['type'])
-            program_types.append(program_type)
-
-            program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_type
-            programs_with_program_type.append(program_with_type)
-
-        mock_get_programs.return_value = programs
-        mock_get_program_types.return_value = program_types
-
-        actual = get_programs_with_type(self.site)
-        self.assertEqual(actual, programs_with_program_type)
-
-    @ddt.data(False, True)
-    @mock.patch(UTILS_MODULE + '.get_programs')
-    @mock.patch(UTILS_MODULE + '.get_program_types')
-    def test_get_programs_with_type_include_hidden(self, include_hidden, mock_get_program_types, mock_get_programs):
-        """Verify get_programs_with_type returns the expected list of programs with include_hidden parameter."""
-        programs_with_program_type = []
-        programs = [ProgramFactory(hidden=False), ProgramFactory(hidden=True)]
-        program_types = []
-
-        for program in programs:
-            if program['hidden'] and not include_hidden:
-                continue
-
-            program_type = ProgramTypeFactory(name=program['type'])
-            program_types.append(program_type)
-
-            program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_type
-            programs_with_program_type.append(program_with_type)
-
-        mock_get_programs.return_value = programs
-        mock_get_program_types.return_value = program_types
-
-        actual = get_programs_with_type(self.site, include_hidden=include_hidden)
-        self.assertEqual(actual, programs_with_program_type)
-
-
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of program types from the catalog service."""
