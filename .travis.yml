@@ -1,5 +1,5 @@
 sudo: required
-group: deprecated-2017Q3
+dist: trusty
 
 language: python
 python:
@@ -17,38 +17,6 @@ env:
   - TEST_SUITE="cms-unit"
   - TEST_SUITE="commonlib-unit"
   - TEST_SUITE="js-unit"
-#  - TEST_SUITE="lms-acceptance"
-#  - TEST_SUITE="cms-acceptance"
-#  - TEST_SUITE="bok-choy" SHARD=1
-#  - TEST_SUITE="bok-choy" SHARD=2
-#  - TEST_SUITE="bok-choy" SHARD=3
-#  - TEST_SUITE="bok-choy" SHARD=4
-#  - TEST_SUITE="bok-choy" SHARD=5
-#  - TEST_SUITE="bok-choy" SHARD=6
-#  - TEST_SUITE="bok-choy" SHARD=7
-#  - TEST_SUITE="bok-choy" SHARD=8
-#  - TEST_SUITE="bok-choy" SHARD=9
-#  - TEST_SUITE="bok-choy" SHARD=10
-#  - TEST_SUITE="bok-choy" SHARD=11
-
-# TODO: Fix and re-enable acceptance testing
-# Removing from build for now to free up Travis queue
-#matrix:
-#  fast_finish: true
-#  allow_failures:
-#    - env: TEST_SUITE="lms-acceptance"
-#    - env: TEST_SUITE="cms-acceptance"
-#    - env: TEST_SUITE="bok-choy" SHARD=1
-#    - env: TEST_SUITE="bok-choy" SHARD=2
-#    - env: TEST_SUITE="bok-choy" SHARD=3
-#    - env: TEST_SUITE="bok-choy" SHARD=4
-#    - env: TEST_SUITE="bok-choy" SHARD=5
-#    - env: TEST_SUITE="bok-choy" SHARD=6
-#    - env: TEST_SUITE="bok-choy" SHARD=7
-#    - env: TEST_SUITE="bok-choy" SHARD=8
-#    - env: TEST_SUITE="bok-choy" SHARD=9
-#    - env: TEST_SUITE="bok-choy" SHARD=10
-#    - env: TEST_SUITE="bok-choy" SHARD=11
 
 branches:
   only:
@@ -61,7 +29,7 @@ branches:
 before_install:
   # Login and fetch container from Azure container registry
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-  - travis_wait docker pull btelnes/devstack
+  - travis_wait 30 docker pull btelnes/devstack
 
 install:
   - docker run -d --name devstack --add-host "localhost preview.localhost":127.0.0.1 --security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -e TEST_SUITE="$TEST_SUITE" -e SHARD="$SHARD" -e CODE_COV_TOKEN="$CODE_COV_TOKEN" -t btelnes/devstack
@@ -79,5 +47,3 @@ script:
 
 after_success:
   - ./scripts/docker-report.sh
-
-dist: trusty

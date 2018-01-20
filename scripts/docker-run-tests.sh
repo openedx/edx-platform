@@ -18,7 +18,8 @@ sudo -S mongod -repair --config /etc/mongod.conf
 sudo -S chown -R mongodb:mongodb /edx/var/mongo/.
 sudo -S service mongod start
 
-sudo apt install locales
+sudo apt-get update
+sudo apt-get install locales
 locale-gen en_US.UTF-8
 
 # dpkg-reconfigure locales
@@ -34,8 +35,6 @@ locale
 
 # Get the latest code
 cd /edx/app/edxapp/edx-platform
-git branch -a 
-echo $BRANCH
 git pull
 git checkout $BRANCH
 
