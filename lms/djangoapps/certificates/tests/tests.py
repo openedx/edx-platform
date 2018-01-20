@@ -8,13 +8,13 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from badges.tests.factories import CourseCompleteImageConfigurationFactory
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
     certificate_info_for_user,
     certificate_status_for_student
 )
-from certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

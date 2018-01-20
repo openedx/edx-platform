@@ -10,7 +10,7 @@ from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 
 
 class Command(BaseCommand):

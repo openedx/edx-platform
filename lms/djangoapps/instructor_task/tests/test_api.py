@@ -6,7 +6,7 @@ from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from certificates.models import CertificateGenerationHistory, CertificateStatuses
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from common.test.utils import normalize_repr
 from courseware.tests.factories import UserFactory
 from lms.djangoapps.instructor_task.api import (

@@ -12,7 +12,7 @@ from collections import Counter
 from celery.states import READY_STATES
 
 from bulk_email.models import CourseEmail
-from certificates.models import CertificateGenerationHistory
+from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
     check_arguments_for_rescoring,
     check_arguments_for_overriding,

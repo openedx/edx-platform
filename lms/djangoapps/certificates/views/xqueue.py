@@ -13,8 +13,8 @@ from opaque_keys.edx.keys import CourseKey
 
 import dogstats_wrapper as dog_stats_api
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
-from certificates.api import generate_user_certificates
-from certificates.models import (
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     ExampleCertificate,
     GeneratedCertificate,

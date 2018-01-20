@@ -8,7 +8,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,

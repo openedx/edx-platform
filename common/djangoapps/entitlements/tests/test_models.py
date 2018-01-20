@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
 
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory

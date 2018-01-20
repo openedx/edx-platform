@@ -5,7 +5,7 @@ import datetime
 import ddt
 import mock
 
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from django.conf import settings
 from django.core.urlresolvers import reverse

@@ -11,9 +11,9 @@ from django.test.utils import override_settings
 from mock import patch
 from pytz import UTC
 
-from certificates.api import get_certificate_url  # pylint: disable=import-error
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.djangoapps.certificates.api import get_certificate_url  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from student.models import LinkedInAddToProfileConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

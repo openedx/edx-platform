@@ -10,8 +10,8 @@ from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from certificates.models import CertificateStatuses
-from certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -108,7 +108,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         resp = self.client.get(self.get_url(self.student.username))
         # gets 404 instead of 403 for security reasons
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(resp.data, {u'detail': u'Not found.'})  # pylint: disable=no-member
+        self.assertEqual(resp.data, {u'detail': u'Not found.'})
         self.client.logout()
 
         # same student of the certificate
@@ -165,9 +165,9 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         self.client.login(username=self.student_no_cert.username, password=USER_PASSWORD)
         resp = self.client.get(self.get_url(self.student_no_cert.username))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
         self.assertEqual(
-            resp.data['error_code'],  # pylint: disable=no-member
+            resp.data['error_code'],
             'no_certificate_for_user'
         )
 
@@ -179,7 +179,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         resp = self.client.get(self.get_url(self.student.username))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            resp.data,  # pylint: disable=no-member
+            resp.data,
             {
                 'username': self.student.username,
                 'status': CertificateStatuses.downloadable,

@@ -14,8 +14,8 @@ from django.test.utils import override_settings
 from mock import patch
 
 import ddt
-from certificates.api import get_certificate_url
-from certificates.models import (
+from lms.djangoapps.certificates.api import get_certificate_url
+from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
@@ -24,7 +24,7 @@ from certificates.models import (
     CertificateTemplateAsset,
     GeneratedCertificate
 )
-from certificates.tests.factories import (
+from lms.djangoapps.certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
@@ -423,7 +423,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn('logo_test1.png', response.content)
 
     @ddt.data(True, False)
-    @patch('certificates.views.webview.get_completion_badge')
+    @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
     @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
         """
@@ -986,7 +986,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     #TEMPLATES WITHOUT LANGUAGE TESTS
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @override_settings(LANGUAGE_CODE='fr')
-    @patch('certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_certificate_custom_template_with_org_mode_and_course_key(self, mock_get_course_run_details):
         """
         Tests custom template search and rendering.
@@ -994,15 +994,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         """
         mock_get_course_run_details.return_value = self.mock_course_run_details
         self._add_course_certificates(count=1, signatory_count=2)
-        self._create_custom_named_template('test_template_1_course', org_id=1, mode='honor', course_key=unicode(self.course.id))
-        self._create_custom_named_template('test_template_2_course', org_id=1, mode='verified', course_key=unicode(self.course.id))
+        self._create_custom_named_template(
+            'test_template_1_course', org_id=1, mode='honor', course_key=unicode(self.course.id),
+        )
+        self._create_custom_named_template(
+            'test_template_2_course', org_id=1, mode='verified', course_key=unicode(self.course.id),
+        )
         self._create_custom_named_template('test_template_3_course', org_id=2, mode='honor')
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
 
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+        with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.side_effect = [1, 2]
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
@@ -1015,7 +1019,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             self.assertContains(response, 'course name: test_template_3_course')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_certificate_custom_template_with_org_and_mode(self, mock_get_course_run_details):
         """
         Tests custom template search if no template matches course_key, but a template does
@@ -1042,14 +1046,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             course_id=unicode(self.course.id)
         )
 
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+        with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.side_effect = [1]
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'course name: test_template_1_course')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_certificate_custom_template_with_org(self, mock_get_course_run_details):
         """
         Tests custom template search when we have a single template for a organization.
@@ -1065,14 +1069,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             course_id=unicode(self.course.id)
         )
 
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+        with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.side_effect = [1]
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'course name: test_template_1_course')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_certificate_custom_template_with_mode(self, mock_get_course_run_details):
         """
         Tests custom template search if we have a single template for a course mode.
@@ -1089,7 +1093,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             course_id=unicode(self.course.id)
         )
 
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+        with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
@@ -1100,9 +1104,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
     #1
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @override_settings(LANGUAGE_CODE='fr')
-    @patch('certificates.views.webview.get_course_run_details')
-    @patch('certificates.api.get_course_organization_id')
-    def test_certificate_custom_language_template_with_org_mode_and_course_key(self, mock_get_org_id, mock_get_course_run_details):
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    def test_certificate_custom_language_template_with_org_mode_and_course_key(
+            self,
+            mock_get_org_id,
+            mock_get_course_run_details,
+    ):
         """
         Tests custom template search and rendering.
         This test should check template matching when org={org}, course={course}, mode={mode}.
@@ -1130,28 +1138,44 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             course_id=unicode(self.course.id)
         )
         #create a org_mode_and_coursekey template language=null
-        self._create_custom_named_template('test_null_lang_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language=None)
+        self._create_custom_named_template(
+            'test_null_lang_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language=None,
+        )
         #verify return template lang = null
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
 
         #create a org_mode_and_coursekey template language=wrong_language
-        self._create_custom_named_template('test_wrong_lang_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language=wrong_language)
+        self._create_custom_named_template(
+            'test_wrong_lang_template',
+            org_id=1,
+            mode='honor',
+            course_key=unicode(self.course.id),
+            language=wrong_language,
+        )
         #verify returns null lang template
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_null_lang_template')
 
         #create an org_mode_and_coursekey template language=''
-        self._create_custom_named_template('test_all_languages_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language='')
+        self._create_custom_named_template(
+            'test_all_languages_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language='',
+        )
         #verify returns null lang template
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'course name: test_all_languages_template')
 
         #create a org_mode_and_coursekey template language=lang
-        self._create_custom_named_template('test_right_lang_template', org_id=1, mode='honor', course_key=unicode(self.course.id), language=right_language)
+        self._create_custom_named_template(
+            'test_right_lang_template',
+            org_id=1,
+            mode='honor',
+            course_key=unicode(self.course.id),
+            language=right_language,
+        )
         # verify return right_language template
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
@@ -1159,8 +1183,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
 
     #2
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
-    @patch('certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
     def test_certificate_custom_language_template_with_org_and_mode(self, mock_get_org_id, mock_get_course_run_details):
         """
         Tests custom template search if no template matches course_key, but a template does
@@ -1218,8 +1242,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
 
     #3
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
-    @patch('certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
     def test_certificate_custom_language_template_with_org(self, mock_get_org_id, mock_get_course_run_details):
         """
         Tests custom template search when we have a single template for a organization.
@@ -1275,8 +1299,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
 
     #4
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
-    @patch('certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
     def test_certificate_custom_language_template_with_mode(self, mock_get_org_id, mock_get_course_run_details):
         """
         Tests custom template search if we have a single template for a course mode.
@@ -1332,9 +1356,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertContains(response, 'course name: test_right_lang_template')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
-    @patch('certificates.api.get_course_organization_id')
-    def test_certificate_custom_language_template_with_locale_language_from_catalogue(self, mock_get_org_id, mock_get_course_run_details):
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    def test_certificate_custom_language_template_with_locale_language_from_catalogue(
+            self,
+            mock_get_org_id,
+            mock_get_course_run_details,
+    ):
         """
         Tests custom template search if we have a single template for a course mode.
         This test should check template matching when org=null, course=Null, mode={mode}.
@@ -1390,9 +1418,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @ddt.data(True, False)
-    @patch('certificates.views.webview.get_course_run_details')
-    @patch('certificates.api.get_course_organization_id')
-    def test_certificate_custom_template_with_hours_of_effort(self, include_effort, mock_get_org_id, mock_get_course_run_details):
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    def test_certificate_custom_template_with_hours_of_effort(
+            self,
+            include_effort,
+            mock_get_org_id,
+            mock_get_course_run_details,
+    ):
         """
         Tests custom template properly retrieves and calculates Hours of Effort when the feature is enabled
         """
@@ -1419,7 +1452,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             self.assertNotIn('hours of effort', response.content)
 
     @ddt.data(True, False)
-    @patch('certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_certificate_custom_template_with_unicode_data(self, custom_certs_enabled, mock_get_course_run_details):
         """
         Tests custom template renders properly with unicode data.
@@ -1442,7 +1475,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             }):
                 with patch('django.http.HttpRequest.build_absolute_uri') as mock_abs_uri:
                     mock_abs_uri.return_value = '='.join(['http://localhost/?param', u'é'])
-                    with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+                    with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
                         mock_get_org_id.return_value = None
                         response = self.client.get(test_url)
                         self.assertEqual(response.status_code, 200)
@@ -1453,7 +1486,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_certificate_asset_by_slug(self, mock_get_course_run_details):
         """
         Tests certificate template asset display by slug using static.certificate_asset_url method.
@@ -1467,7 +1500,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         )
 
         # render certificate without template asset
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+        with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertContains(response, '<img class="custom-logo" src="" />')
@@ -1480,7 +1513,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         template_asset.save()
 
         # render certificate with template asset
-        with patch('certificates.api.get_course_organization_id') as mock_get_org_id:
+        with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertContains(

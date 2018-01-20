@@ -11,10 +11,10 @@ from time import time
 from lazy import lazy
 from pytz import UTC
 
-from certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from courseware.courses import get_course_by_id
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.grades.context import grading_context, grading_context_for_course
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory

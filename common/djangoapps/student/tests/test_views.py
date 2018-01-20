@@ -121,7 +121,10 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def test_cant_unenroll_status(self):
         """ Assert that the dashboard loads when cert_status does not allow for unenrollment"""
-        with patch('certificates.models.certificate_status_for_student', return_value={'status': 'downloadable'}):
+        with patch(
+            'lms.djangoapps.certificates.models.certificate_status_for_student',
+            return_value={'status': 'downloadable'},
+        ):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEqual(response.status_code, 200)

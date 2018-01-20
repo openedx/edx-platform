@@ -16,7 +16,7 @@ from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 
 LOGGER = logging.getLogger(__name__)
 

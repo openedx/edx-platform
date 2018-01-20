@@ -12,9 +12,8 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
-from certificates.models import CertificateStatuses as status
-from certificates.models import (
-    CertificateStatuses,
+from lms.djangoapps.certificates.models import CertificateStatuses as status
+from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     ExampleCertificate,
     GeneratedCertificate,
@@ -309,7 +308,7 @@ class XQueueCertInterface(object):
             mode_is_verified
         )
 
-        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # pylint: disable=no-member
+        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode
         cert.user = student
@@ -356,7 +355,7 @@ class XQueueCertInterface(object):
         # existing audit certs as ineligible.
         cutoff = settings.AUDIT_CERT_CUTOFF_DATE
         if (cutoff and cert.created_date >= cutoff) and not is_eligible_for_certificate:
-            cert.status = CertificateStatuses.audit_passing if passing else CertificateStatuses.audit_notpassing
+            cert.status = status.audit_passing if passing else status.audit_notpassing
             cert.save()
             LOGGER.info(
                 u"Student %s with enrollment mode %s is not eligible for a certificate.",

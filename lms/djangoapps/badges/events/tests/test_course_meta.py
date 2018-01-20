@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from mock import patch
 
 from badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

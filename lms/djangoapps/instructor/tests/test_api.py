@@ -32,8 +32,8 @@ from six import text_type
 import lms.djangoapps.instructor.views.api
 import lms.djangoapps.instructor_task.api
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
-from certificates.models import CertificateStatuses
-from certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import StudentFieldOverride, StudentModule

@@ -2120,16 +2120,13 @@ INSTALLED_APPS = [
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
     'util',
-    'certificates.apps.CertificatesConfig',
+    'lms.djangoapps.certificates.apps.CertificatesConfig',
     'dashboard',
     'lms.djangoapps.instructor.apps.InstructorConfig',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
-
-    # Signals
-    'openedx.core.djangoapps.signals.apps.SignalConfig',
 
     # Student support tools
     'support',
