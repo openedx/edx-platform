@@ -137,7 +137,7 @@ class ActivationEmailTests(TestCase):
         Registration().register(inactive_user)
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
         request.user = inactive_user
-        with patch('edxmako.request_context.get_current_request'):
+        with patch('edxmako.request_context.get_current_request', return_value=request):
             inactive_user_view(request)
             mock_log.info.assert_called_with(
                 "Activation Email has been sent to User {user_email}".format(
