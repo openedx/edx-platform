@@ -6,6 +6,8 @@ from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.db import DatabaseError, transaction
+from django.utils.translation import ugettext_lazy as _
 
 from third_party_auth.provider import Registry
 
@@ -51,6 +53,22 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLProviderConfig """
     form = SAMLProviderConfigForm
 
+    def get_queryset(self, request):
+        """
+        Filter the queryset to exclude the archived records.
+        """
+        queryset = super(SAMLProviderConfigAdmin, self).get_queryset(request).exclude(archived=True)
+        return queryset
+
+    def archive_provider_configuration(self, request, queryset):
+        """
+        Archived the selected provider configurations.
+        """
+        with transaction.atomic():
+            for obj in queryset:
+                self.model.objects.filter(pk=obj.pk).update(archived=True)
+        self.message_user(request, _("Deleted the selected configuration(s)."))
+
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
@@ -59,6 +77,21 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
     list_display_links = None
+
+    def get_actions(self, request):
+        """
+        Get the actions.
+        """
+        actions = super(SAMLProviderConfigAdmin, self).get_actions(request)
+        action_delete = {
+            'archive_provider_configuration': (
+                SAMLProviderConfigAdmin.archive_provider_configuration,
+                'archive_provider_configuration',
+                _('Delete the selected configuration')
+            )
+        }
+        actions.update(action_delete)
+        return actions
 
     def name_with_update_link(self, instance):
         """
