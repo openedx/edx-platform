@@ -814,8 +814,9 @@ def dashboard(request):
 
     if bundles_on_dashboard_flag.is_enabled():
         programs_data = meter.programs
-        if programs_data:
-            meter.programs = [get_programs(request.site, uuid=programs_data[0]['uuid'])]
+        if programs_data and inverted_programs and inverted_programs.values():
+            program_uuid = inverted_programs.values()[0][0]['uuid']
+            meter.programs = [get_programs(request.site, uuid=program_uuid)]
             program_data = meter.programs[0]
             program_data = ProgramDataExtender(program_data, request.user).extend()
 
