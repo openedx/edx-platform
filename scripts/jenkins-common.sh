@@ -62,7 +62,7 @@ echo "npm version is `npm --version`"
 # Manage the npm cache on Jenkins.
 # (In this case, remove it. That ensures from run-to-run, it is a clean npm environment)
 echo "--> Cleaning npm cache"
-npm cache clean
+npm cache clean --force
 
 # Log any paver or ansible command timing
 TIMESTAMP=$(date +%s)
