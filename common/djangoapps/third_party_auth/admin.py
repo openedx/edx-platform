@@ -73,7 +73,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """ Don't show every single field in the admin change list """
         return (
             'name_with_update_link', 'enabled', 'site', 'entity_id', 'metadata_source',
-            'has_data', 'mode', 'change_date', 'changed_by',
+            'has_data', 'mode', 'saml_configuration', 'change_date', 'changed_by',
         )
 
     list_display_links = None
@@ -142,7 +142,7 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Shorten the public/private keys in the change view """
         return (
-            'site', 'change_date', 'changed_by', 'enabled', 'entity_id',
+            'site', 'slug', 'change_date', 'changed_by', 'enabled', 'entity_id',
             'org_info_str', 'key_summary', 'edit_link',
         )
 

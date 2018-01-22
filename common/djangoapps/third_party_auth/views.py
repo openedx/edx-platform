@@ -13,7 +13,7 @@ from social_core.utils import setting_name
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 
-from .models import SAMLConfiguration
+from .models import SAMLConfiguration, SAMLProviderConfig
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
@@ -41,13 +41,19 @@ def saml_metadata_view(request):
     Get the Service Provider metadata for this edx-platform instance.
     You must send this XML to any Shibboleth Identity Provider that you wish to use.
     """
-    if not SAMLConfiguration.is_enabled(request.site):
+    idp_slug = request.GET.get('tpa_hint', None)
+    saml_config = 'default'
+    if idp_slug:
+        idp = SAMLProviderConfig.current(idp_slug)
+        if idp.saml_configuration:
+            saml_config = idp.saml_configuration.slug
+    if not SAMLConfiguration.is_enabled(request.site, saml_config):
         raise Http404
     complete_url = reverse('social:complete', args=("tpa-saml", ))
     if settings.APPEND_SLASH and not complete_url.endswith('/'):
         complete_url = complete_url + '/'  # Required for consistency
     saml_backend = load_backend(load_strategy(request), "tpa-saml", redirect_uri=complete_url)
-    metadata, errors = saml_backend.generate_metadata_xml()
+    metadata, errors = saml_backend.generate_metadata_xml(idp_slug)
 
     if not errors:
         return HttpResponse(content=metadata, content_type='text/xml')
