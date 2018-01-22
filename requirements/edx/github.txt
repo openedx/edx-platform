@@ -29,7 +29,9 @@
 #
 #   * TAG-OR-SHA is the specific commit to install.  It must be a git tag,
 #     or a git SHA commit hash.  Don't use branch names here.  If OWNER is
-#     not an edX organization, then it must be a SHA.
+#     not an edX organization, then it must be a SHA.  If you use a SHA,
+#     please make sure there is a tag associated with it, so the commit can't
+#     be lost during rebase.
 #
 #   * DIST-NAME is the distribution name, the same name you'd use in a
 #     "pip install" command.  It might be different than REPO-NAME. It must
