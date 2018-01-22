@@ -3442,7 +3442,7 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
 ############### Settings for Django Rate limit #####################
 RATELIMIT_ENABLE = True
-RATELIMIT_RATE = '30/m'
+RATELIMIT_RATE = '120/m'
 
 ############## Plugin Django Apps #########################
 
