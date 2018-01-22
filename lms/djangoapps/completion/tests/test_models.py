@@ -6,12 +6,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from opaque_keys.edx.keys import UsageKey, CourseKey
 
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-from .. import models
-from .. import waffle
+from .. import models, waffle
 
 
 class PercentValidatorTestCase(TestCase):
@@ -187,3 +186,64 @@ class SubmitBatchCompletionTestCase(TestCase):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
         model = models.BlockCompletion.objects.first()
         self.assertEqual(model.completion, 1.0)
+
+
+class BatchCompletionMethodTests(TestCase):
+
+    def setUp(self):
+        super(BatchCompletionMethodTests, self).setUp()
+        _overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
+        _overrider.__enter__()
+        self.addCleanup(_overrider.__exit__, None, None, None)
+
+        self.user = UserFactory.create()
+        self.other_user = UserFactory.create()
+        self.course_key = CourseKey.from_string("edX/MOOC101/2049_T2")
+        self.other_course_key = CourseKey.from_string("course-v1:ReedX+Hum110+1904")
+        self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in xrange(5)]
+
+        self.submit_faux_completions()
+
+    def submit_faux_completions(self):
+        # Proper completions for the given runtime
+        for idx, block_key in enumerate(self.block_keys[0:3]):
+            models.BlockCompletion.objects.submit_completion(
+                user=self.user,
+                course_key=self.course_key,
+                block_key=block_key,
+                completion=1.0 - (0.2 * idx),
+            )
+
+        # Wrong user
+        for idx, block_key in enumerate(self.block_keys[2:]):
+            models.BlockCompletion.objects.submit_completion(
+                user=self.other_user,
+                course_key=self.course_key,
+                block_key=block_key,
+                completion=0.9 - (0.2 * idx),
+            )
+
+        # Wrong course
+        models.BlockCompletion.objects.submit_completion(
+            user=self.user,
+            course_key=self.other_course_key,
+            block_key=self.block_keys[4],
+            completion=0.75,
+        )
+
+    def test_get_course_completions(self):
+
+        self.assertEqual(
+            models.BlockCompletion.get_course_completions(self.user, self.course_key),
+            {
+                self.block_keys[0]: 1.0,
+                self.block_keys[1]: 0.8,
+                self.block_keys[2]: 0.6,
+            },
+        )
+
+    def test_get_latest_block_completed(self):
+        self.assertEqual(
+            models.BlockCompletion.get_latest_block_completed(self.user, self.course_key).block_key,
+            self.block_keys[2]
+        )

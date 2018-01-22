@@ -8,13 +8,14 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
 from course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_access
 from courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.commerce.utils import EcommerceService
+# from lms.djangoapps.completion.services import CompletionService
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
@@ -36,6 +37,7 @@ from .course_outline import CourseOutlineFragmentView
 from .course_sock import CourseSockFragmentView
 from .latest_update import LatestUpdateFragmentView
 from .welcome_message import WelcomeMessageFragmentView
+
 
 EMPTY_HANDOUTS_HTML = u'<ol></ol>'
 
@@ -76,30 +78,32 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         Returns a tuple: (has_visited_course, resume_course_url)
             has_visited_course: True if the user has ever visted the course, False otherwise.
-            resume_course_url: The URL of the last accessed block if the user has visited the course,
+            resume_course_url: The URL of the 'resume course' block if the user has visited the course,
                 otherwise the URL of the course root.
 
         """
 
-        def get_last_accessed_block(block):
+        def get_resume_block(block):
             """
-            Gets the deepest block marked as 'last_accessed'.
+            Gets the deepest block marked as 'resume_block'.
+
             """
-            if not block['last_accessed']:
+            if not block['resume_block']:
                 return None
             if not block.get('children'):
                 return block
+
             for child in block['children']:
-                last_accessed_block = get_last_accessed_block(child)
-                if last_accessed_block:
-                    return last_accessed_block
+                resume_block = get_resume_block(child)
+                if resume_block:
+                    return resume_block
             return block
 
         course_outline_root_block = get_course_outline_block_tree(request, course_id)
-        last_accessed_block = get_last_accessed_block(course_outline_root_block) if course_outline_root_block else None
-        has_visited_course = bool(last_accessed_block)
-        if last_accessed_block:
-            resume_course_url = last_accessed_block['lms_web_url']
+        resume_block = get_resume_block(course_outline_root_block) if course_outline_root_block else None
+        has_visited_course = bool(resume_block)
+        if resume_block:
+            resume_course_url = resume_block['lms_web_url']
         else:
             resume_course_url = course_outline_root_block['lms_web_url'] if course_outline_root_block else None
 

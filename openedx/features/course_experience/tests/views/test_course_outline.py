@@ -5,20 +5,25 @@ import datetime
 import json
 
 from django.core.urlresolvers import reverse
-from pyquery import PyQuery as pq
+from mock import Mock, patch
 from six import text_type
-from gating import api as lms_gating_api
-from mock import patch, Mock
 
 from courseware.tests.factories import StaffFactory
+from gating import api as lms_gating_api
+from lms.djangoapps.completion import waffle
+from lms.djangoapps.completion.models import BlockCompletion
+from lms.djangoapps.completion.test_utils import CompletionWaffleTestMixin
+from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.lib.gating import api as gating_api
+from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from waffle.testutils import override_switch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from milestones.tests.utils import MilestonesTestCaseMixin
-from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 
 from .test_course_home import course_home_url
 
@@ -245,7 +250,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         self.assertIn(self.UNLOCKED, subsection.children('.sr').html())
 
 
-class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
+class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Test start course and resume course for the course outline view.
 
@@ -295,6 +300,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         """
         super(TestCourseOutlineResumeCourse, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.override_waffle_switch(False)
 
     def visit_sequential(self, course, chapter, sequential):
         """
@@ -310,6 +316,21 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         )
         self.assertEqual(200, self.client.get(last_accessed_url).status_code)
 
+    def visit_course_home(self, course, start_count=0, resume_count=0):
+        """
+        Helper function to navigates to course home page, test for resume buttons
+
+        :param course: course factory object
+        :param start_count: number of times 'Start Course' should appear
+        :param resume_count: number of times 'Resume Course' should appear
+        :return: response object
+        """
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Start Course', count=start_count)
+        self.assertContains(response, 'Resume Course', count=resume_count)
+        return response
+
     def test_start_course(self):
         """
         Tests that the start course button appears when the course has never been accessed.
@@ -320,13 +341,9 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         """
         course = self.course
 
-        response = self.client.get(course_home_url(course))
-        self.assertEqual(response.status_code, 200)
-
-        self.assertContains(response, 'Start Course', count=1)
-        self.assertContains(response, 'Resume Course', count=0)
-
+        response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
+
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
 
     def test_resume_course(self):
@@ -338,17 +355,74 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
         # first navigate to a sequential to make it the last accessed
         chapter = course.children[0]
         sequential = chapter.children[0]
+        vertical = sequential.children[0]
         self.visit_sequential(course, chapter, sequential)
 
         # check resume course buttons
-        response = self.client.get(course_home_url(course))
-        self.assertEqual(response.status_code, 200)
-
-        self.assertContains(response, 'Start Course', count=0)
-        self.assertContains(response, 'Resume Course', count=2)
-
+        response = self.visit_course_home(course, resume_count=2)
         content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
+
+    @override_switch(
+        '{}.{}'.format(
+            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_VISUAL_PROGRESS
+        ),
+        active=True
+    )
+    @patch('lms.djangoapps.completion.waffle.site_configuration_enabled')
+    def test_resume_course_with_completion_api(self, get_patched_site):
+        """
+        Tests completion API resume button functionality
+        """
+        self.override_waffle_switch(True)
+        get_patched_site.return_value = True
+
+        # Course tree
+        course = self.course
+        course_key = CourseKey.from_string(str(course.id))
+        vertical1 = course.children[0].children[0].children[0]
+        vertical2 = course.children[0].children[1].children[0]
+
+        # Fake a visit to sequence1/vertical1
+        block_key = UsageKey.from_string(unicode(vertical1.location))
+        completion = 1.0
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            course_key=course_key,
+            block_key=block_key,
+            completion=completion
+        )
+
+        # Test for 'resume' link
+        response = self.visit_course_home(course, resume_count=2)
+
+        # Test for 'resume' link URL - should be vertical 1
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical1.url_name))
+
+        # Fake a visit to sequence2/vertical2
+        block_key = UsageKey.from_string(unicode(vertical2.location))
+        completion = 1.0
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            course_key=course_key,
+            block_key=block_key,
+            completion=completion
+        )
+        response = self.visit_course_home(course, resume_count=2)
+
+        # Test for 'resume' link URL - should be vertical 2
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name))
+
+        # visit sequential 1, make sure 'Resume Course' URL is robust against 'Last Visited'
+        # (even though I visited seq1/vert1, 'Resume Course' still points to seq2/vert2)
+        self.visit_sequential(course, course.children[0], course.children[0].children[0])
+
+        # Test for 'resume' link URL - should be vertical 2 (last completed block, NOT last visited)
+        response = self.visit_course_home(course, resume_count=2)
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name))
 
     def test_resume_course_deleted_sequential(self):
         """
@@ -370,11 +444,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
             self.store.delete_item(sequential.location, self.user.id)
 
         # check resume course buttons
-        response = self.client.get(course_home_url(course))
-        self.assertEqual(response.status_code, 200)
-
-        self.assertContains(response, 'Start Course', count=0)
-        self.assertContains(response, 'Resume Course', count=2)
+        response = self.visit_course_home(course, resume_count=2)
 
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential2.url_name))
@@ -399,11 +469,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
                 self.store.delete_item(sequential.location, self.user.id)
 
         # check resume course buttons
-        response = self.client.get(course_home_url(course))
-        self.assertEqual(response.status_code, 200)
-
-        self.assertContains(response, 'Start Course', count=0)
-        self.assertContains(response, 'Resume Course', count=1)
+        self.visit_course_home(course, resume_count=1)
 
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase):

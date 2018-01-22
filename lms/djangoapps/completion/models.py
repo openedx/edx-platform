@@ -167,6 +167,38 @@ class BlockCompletion(TimeStampedModel, models.Model):
 
     objects = BlockCompletionManager()
 
+    @classmethod
+    def get_course_completions(cls, user, course_key):
+        """
+        query all completions for course/user pair
+
+        Return value:
+            dict[BlockKey] = float
+        """
+        course_block_completions = cls.objects.filter(
+            user=user,
+            course_key=course_key,
+        )
+        # will not return if <= 0.0
+        return {completion.block_key: completion.completion for completion in course_block_completions}
+
+    @classmethod
+    def get_latest_block_completed(cls, user, course_key):
+        """
+        query latest completion for course/user pair
+
+        Return value:
+            obj: block completion
+        """
+        try:
+            latest_modified_block_completion = cls.objects.filter(
+                user=user,
+                course_key=course_key,
+            ).latest()
+        except cls.DoesNotExist:
+            return
+        return latest_modified_block_completion
+
     class Meta(object):
         index_together = [
             ('course_key', 'block_type', 'user'),
@@ -176,6 +208,7 @@ class BlockCompletion(TimeStampedModel, models.Model):
         unique_together = [
             ('course_key', 'block_key', 'user')
         ]
+        get_latest_by = 'modified'
 
     def __unicode__(self):
         return 'BlockCompletion: {username}, {course_key}, {block_key}: {completion}'.format(

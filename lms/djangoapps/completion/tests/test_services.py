@@ -64,7 +64,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, TestCase):
                 self.block_keys[1]: 0.8,
                 self.block_keys[2]: 0.6,
                 self.block_keys[3]: 0.0,
-                self.block_keys[4]: 0.0,
+                self.block_keys[4]: 0.0
             },
         )
 
