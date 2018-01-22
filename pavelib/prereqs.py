@@ -132,26 +132,30 @@ def prereq_cache(cache_name, paths, install_func):
         print '{cache} unchanged, skipping...'.format(cache=cache_name)
 
 
+def log_installed_node_prereqs(npm_install_output):
+    """  Logs output of npm install for debugging. """
+    log_file_path = '{}/{}'.format(Env.GEN_LOG_DIR, 'npm_install.log')
+    with open(log_file_path, 'w') as log_file:
+        log_file.write(npm_install_output)
+
+
 def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
     """
-    cb_error_text = "Subprocess return code: 1"
     sh("test `npm config get registry` = \"{reg}\" || "
        "(echo setting registry; npm config set registry"
        " {reg})".format(reg=NPM_REGISTRY))
 
-    # Error handling around a race condition that produces "cb() never called" error. This
-    # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
-    # npm to 3 or higher. TODO: clean this up when we do that.
+    npm_install_output = None
     try:
-        sh('npm install')
+        print "Executing `npm install`"
+        npm_install_output = sh("npm install", capture=True)
     except BuildFailure, error_text:
-        if cb_error_text in error_text:
-            print "npm install error detected. Retrying..."
-            sh('npm install')
-        else:
-            raise BuildFailure(error_text)
+        log_installed_node_prereqs(npm_install_output)
+        raise BuildFailure(error_text)
+
+    log_installed_node_prereqs(npm_install_output)
 
 
 def python_prereqs_installation():
