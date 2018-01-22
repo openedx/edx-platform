@@ -2,7 +2,6 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-import re
 import datetime
 from pytz import UTC
 
@@ -537,14 +536,6 @@ def _get_user_and_profile(username):
     existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
     return existing_user, existing_user_profile
-
-
-def contains_html(value):
-    """
-    Validator method to check whether name contains html tags
-    """
-    regex = re.compile('(<|>)', re.UNICODE)
-    return bool(regex.search(value))
 
 
 def _validate(validation_func, err, *args):

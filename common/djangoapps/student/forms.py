@@ -128,13 +128,21 @@ def validate_username(username):
     validator(username)
 
 
+def contains_html(value):
+    """
+    Validator method to check whether name contains html tags
+    """
+    regex = re.compile('(<|>)', re.UNICODE)
+    return bool(regex.search(value))
+
+
 def validate_name(name):
     """
     Verifies a Full_Name is valid, raises a ValidationError otherwise.
     Args:
         name (unicode): The name to validate.
     """
-    if accounts_settings.api.contains_html(name):
+    if contains_html(name):
         raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
 
 
