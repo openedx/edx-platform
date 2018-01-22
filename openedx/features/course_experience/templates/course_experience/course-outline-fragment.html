@@ -26,7 +26,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     <ol class="outline-item focusable">
                         % for subsection in section.get('children', []):
                             <li
-                                class="subsection ${ 'current' if subsection['last_accessed'] else '' }"
+                                class="subsection ${ 'current' if subsection['resume_block'] else '' }"
                             >
                                 <a
                                     class="outline-item focusable"
@@ -125,7 +125,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                     </div> <!-- /subsection-text -->
                                     <div class="subsection-actions">
                                         ## Resume button (if last visited section)
-                                        % if subsection['last_accessed']:
+                                        % if subsection['resume_block']:
                                             <span class="resume-right">
                                                 <b>${ _("Resume Course") }</b>
                                                 <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
