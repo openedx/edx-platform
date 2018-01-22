@@ -23,7 +23,9 @@ from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 
+from course_modes.models import get_cosmetic_verified_display_price
 from lms.djangoapps.course_api.blocks.api import get_blocks
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.views import create_user_profile_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
@@ -66,7 +68,18 @@ class LearnerAnalyticsView(View):
         is_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
         has_access = is_verified or request.user.is_staff
 
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+
+        upgrade_price = None
+        upgrade_url = None
+
+        if enrollment and enrollment.upgrade_deadline:
+            upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
+            upgrade_price = get_cosmetic_verified_display_price(course)
+
         context = {
+            'upgrade_price': upgrade_price,
+            'upgrade_link': upgrade_url,
             'course': course,
             'course_url': course_url,
             'disable_courseware_js': True,
