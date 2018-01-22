@@ -16,20 +16,20 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
         style="display: none"
         %endif
     >
-        <button type="button" class="btn btn-primary focusable action-toggle-verification-sock">
+        <button type="button" aria-expanded="false" class="btn btn-primary focusable action-toggle-verification-sock">
             ${_('Learn About Verified Certificates')}
         </button>
         <div class="verification-main-panel">
             <div class="verification-desc-panel content-main">
                 <h2>${_('{platform_name} Verified Certificate').format(platform_name=settings.PLATFORM_NAME)}</h2>
-                <h4>${_('Why upgrade?')}</h4>
+                <h3>${_('Why upgrade?')}</h3>
                 <ul>
                     <li>${_('Official proof of completion')}</li>
                     <li>${_('Easily shareable certificate')}</li>
                     <li>${_('Proven motivator to complete the course')}</li>
                     <li>${_('Certificate purchases help {platform_name} continue to offer free courses').format(platform_name=settings.PLATFORM_NAME)}</li>
                 </ul>
-                <h4>${_('How it works')}</h4>
+                <h3>${_('How it works')}</h3>
                 <ul>
                     <li>${_('Pay the Verified Certificate upgrade fee')}</li>
                     <li>${_('Verify your identity with a webcam and government-issued ID')}</li>
@@ -37,7 +37,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
                     <li>${_('Share your certificate with friends, employers, and others')}</li>
                 </ul>
                 % if settings.PLATFORM_NAME == 'edX':
-                    <h4>${_('edX Learner Stories')}</h4>
+                    <h3>${_('edX Learner Stories')}</h3>
                     <div class="learner-story-container">
                         <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote.png')}" />
                         <div class="story-quote">
@@ -57,7 +57,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
                         </div>
                     </div>
                 % endif
-                <img class="mini-cert" src="${static.url('course_experience/images/verified-cert.png')}"/>
+                <img class="mini-cert" alt="Example Certificate Image" src="${static.url('course_experience/images/verified-cert.png')}"/>
                 <a href="${upgrade_url}">
                     <button type="button" class="btn btn-upgrade stuck-top focusable action-upgrade-certificate" data-creative="original_sock" data-position="sock">
                         ${Text(_('Upgrade ({course_price})')).format(course_price=HTML(course_price))}

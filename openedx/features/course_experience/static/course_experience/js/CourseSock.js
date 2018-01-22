@@ -52,8 +52,12 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
     // Open the sock when user clicks to Learn More
     $toggleActionButton.on('click', () => {
       const toggleSpeed = 400;
-      $toggleActionButton.toggleClass('active').toggleClass('aria-expanded');
+      $toggleActionButton.toggleClass('active');
       $verificationSock.slideToggle(toggleSpeed, fixUpgradeButton);
+
+      // Toggle aria-expanded attribute
+      const newAriaExpandedState = $toggleActionButton.attr('aria-expanded') === 'false';
+      $toggleActionButton.attr('aria-expanded', newAriaExpandedState);
 
       // Log open and close events
       const isOpening = $toggleActionButton.hasClass('active');

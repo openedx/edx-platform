@@ -48,6 +48,15 @@
       color: $black-t3;
       position: relative;
 
+      h2 {
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
+
       @media (max-width: 960px) {
         .mini-cert {
           display: none;
@@ -61,16 +70,6 @@
         position: absolute;
         top: $baseline;
         width: ($baseline * 13);
-      }
-
-      h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-
-      h4 {
-        font-size: 1.25rem;
-        font-weight: 600;
       }
 
       .learner-story-container {
