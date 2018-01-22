@@ -438,6 +438,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     module_class = VideoModule
     transcript = module_attr('transcript')
     publish_completion = module_attr('publish_completion')
+    has_custom_completion = module_attr('has_custom_completion')
 
     show_in_read_only_mode = True
 

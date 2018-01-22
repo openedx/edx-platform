@@ -12,7 +12,7 @@
 % for idx, item in enumerate(items):
   <div class="vert vert-${idx}" data-id="${item['id']}" \
     % if item['id'] in watched_completable_blocks:
-      data-completable-by-viewing \
+      data-completable-by-viewing=True \
     % endif
       >
     ${HTML(item['content'])}
