@@ -592,6 +592,21 @@ class TestMakoTemplateLinter(TestLinter):
 
         self.assertEqual(len(results.violations), 0)
 
+    def test_check_mako_expressions_in_html_with_escape_filter(self):
+        """
+        Test _check_mako_file_is_safe results in no violations,
+        when strip_all_tags_but_br filter is applied in html context
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            ${x | n, strip_all_tags_but_br}
+        """)
+
+        linter._check_mako_file_is_safe(mako_template, results)
+        self.assertEqual(len(results.violations), 0)
+
     def test_check_mako_expressions_in_html_without_default(self):
         """
         Test _check_mako_file_is_safe in html context without the page level
