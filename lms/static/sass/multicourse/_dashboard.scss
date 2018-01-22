@@ -125,15 +125,16 @@
           }
 
           .wrapper-course-details {
-            display: block;
-
-            @include float(left);
-
-            width: flex-grid(9);
+            display: flex;
+            flex-flow: row wrap;
             padding: 0;
-            margin: $baseline/2 0;
+            margin-bottom: $baseline/2;
+            justify-content: space-between;
 
             .course-title {
+              flex-basis: 100%;
+              padding-top: $baseline/2;
+
               a, span {
                 @extend %t-title3;
                 @extend %t-regular;
@@ -150,11 +151,6 @@
             }
 
             .course-info {
-              @include float(left);
-
-              display: block;
-              padding: 0;
-
               [class*="info-"] {
                 color: $gray-d1;
 
@@ -195,7 +191,7 @@
               @include margin-right($baseline);
 
               margin-top: $baseline;
-              display: inline-flex;
+              align-self: flex-end;
             }
 
 
