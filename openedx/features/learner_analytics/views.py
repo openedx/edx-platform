@@ -96,6 +96,17 @@ class LearnerAnalyticsView(View):
             schedule_data = self.get_assignments_with_due_date(request, course_key)
             (grade_data, schedule_data) = self.sort_grade_and_schedule_data(grade_data, schedule_data)
 
+            # TODO: LEARNER-3854: Fix hacked defaults with real error handling if implementing Learner Analytics.
+            try:
+                weekly_active_users = self.get_weekly_course_activity_count(course_key)
+                week_streak = self.consecutive_weeks_of_course_activity_for_user(
+                    request.user.username, course_key
+                )
+            except Exception as e:
+                logging.exception(e)
+                weekly_active_users = 134
+                week_streak = 1
+
             context.update({
                 'grading_policy': grading_policy,
                 'assignment_grades': grade_data,
@@ -103,12 +114,10 @@ class LearnerAnalyticsView(View):
                 'assignment_schedule': schedule_data,
                 'profile_image_urls': get_profile_image_urls_for_user(request.user, request),
                 'discussion_info': self.get_discussion_data(request, course_key),
-                'weekly_active_users': self.get_weekly_course_activity_count(course_key),
-                'week_streak': self.consecutive_weeks_of_course_activity_for_user(
-                    request.user.username, course_key
-                ),
                 'passing_grade': math.ceil(100 * course.lowest_passing_grade),
                 'percent_grade': math.ceil(100 * percent_grade),
+                'weekly_active_users': weekly_active_users,
+                'week_streak': week_streak,
             })
 
         return render_to_response('learner_analytics/dashboard.html', context)
