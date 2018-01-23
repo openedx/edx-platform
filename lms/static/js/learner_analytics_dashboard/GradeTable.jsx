@@ -30,35 +30,41 @@ class GradeTable extends React.Component {
         return value;
       }
     });
-    const multipleAssessments = groupData.length > 1;
+    const multipleAssignments = groupData.length > 1;
 
     const rows = groupData.map(({assignment_type, total_possible, total_earned, passing_grade}, index) => {
-      const label = multipleAssessments ? `${assignment_type} ${index + 1}` : assignment_type; 
+      const label = multipleAssignments ? `${assignment_type} ${index + 1}` : assignment_type; 
       return (
         <tr key={index}>
           <td>{label}</td>
           <td>{passing_grade}/{total_possible}</td>
-          <td>{total_earned <= 0 ? '-' : total_earned}/{total_possible}</td>
+          <td>{total_earned}/{total_possible}</td>
        </tr>
       );
     });
 
-    return <tbody className="type-group"
-                  key={groupIndex}>{rows}</tbody>;
+    return <tbody className="type-group" key={groupIndex}>{rows}</tbody>;
   }
   
   render() {
-    const {assignmentTypes} = this.props;
+    const {assignmentTypes, passingGrade, percentGrade} = this.props;
     return (
       <table className="table grade-table">
         <thead className="table-head">
           <tr>
-            <th>Assessment</th>
+            <th>Assignment</th>
             <th>Passing</th>
             <th>You</th>
           </tr>
         </thead>
         {assignmentTypes.map((type, index) => this.getTableGroup(type, index))}
+        <tfoot>
+          <tr className="totals">
+            <td>Totals</td>
+            <td>{passingGrade}%</td>
+            <td>*{percentGrade}%</td>
+          </tr>
+        </tfoot>
        </table>
     )
   }
@@ -66,7 +72,9 @@ class GradeTable extends React.Component {
 
 GradeTable.propTypes = {
   assignmentTypes: PropTypes.array.isRequired,
-  grades: PropTypes.array.isRequired
+  grades: PropTypes.array.isRequired,
+  passingGrade: PropTypes.number.isRequired,
+  percentGrade: PropTypes.number.isRequired
 }
 
 export default GradeTable;

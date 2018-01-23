@@ -51,14 +51,11 @@ function getStreakIcons(count) {
 
 function getStreakString(count) {
   const unit = (count ===1) ? 'week' : 'weeks';
-  return `Logged in ${count} ${unit} in a row`;
+  return `Active ${count} ${unit} in a row`;
 }
 
 export function LearnerAnalyticsDashboard(props) {
-  const {grading_policy, grades, schedule, week_streak, weekly_active_users, discussion_info, profile_images} = props;
-  // temp. for local dev
-  // const week_streak = 3;
-  // const weekly_active_users = 83400;
+  const {grading_policy, grades, schedule, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade} = props;
   const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
     return {
       value: weight,
@@ -96,9 +93,13 @@ export function LearnerAnalyticsDashboard(props) {
             </div>
           }
 
-          <h3 className="section-heading">Graded Assessments</h3>
+          <h3 className="section-heading">Graded Assignments</h3>
           <div className="graded-assessments-wrapper">
-            <GradeTable assignmentTypes={assignmentTypes} grades={grades} />
+            <GradeTable assignmentTypes={assignmentTypes}
+                        grades={grades}
+                        passingGrade={passing_grade}
+                        percentGrade={percent_grade} />
+            <div className="footnote">* Your current grade is calculated based on all assignments, including those you have not yet completed.</div>
           </div>
         </div>
         <div className="analytics-group">
