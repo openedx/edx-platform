@@ -24,7 +24,8 @@ from django.views.decorators.csrf import csrf_exempt
 from path import Path as path
 
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.onboarding.decorators import can_save_org_data
+from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps
+from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES
 from lms.djangoapps.onboarding.models import (
     Organization,
@@ -39,6 +40,7 @@ log = logging.getLogger("edx.onboarding")
 
 
 @login_required
+@can_not_update_onboarding_steps
 @transaction.atomic
 def user_info(request):
     """
@@ -54,6 +56,14 @@ def user_info(request):
     are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
     userprofile = request.user.profile
     is_under_age = False
+
+    template = 'onboarding/tell_us_more_survey.html'
+    next_page_url = reverse('interests')
+    redirect_to_next = True
+
+    if request.path == reverse('additional_information'):
+        redirect_to_next = False
+        template = 'myaccount/additional_information.html'
 
     initial = {
         'year_of_birth': userprofile.year_of_birth,
@@ -90,9 +100,8 @@ def user_info(request):
 
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-            if not are_forms_complete:
-                return redirect(reverse('interests'))
-            return redirect(reverse('user_info'))
+            if not are_forms_complete and redirect_to_next:
+                return redirect(next_page_url)
 
     else:
         form = forms.UserInfoModelForm(instance=user_extended_profile, initial=initial)
@@ -103,14 +112,16 @@ def user_info(request):
         'is_poc': user_extended_profile.is_organization_admin,
         'is_first_user': user_extended_profile.organization.is_first_signup_in_org() \
         if user_extended_profile.organization else False,
-        'google_place_api_key': settings.GOOGLE_PLACE_API_KEY
+        'google_place_api_key': settings.GOOGLE_PLACE_API_KEY,
+
     })
 
     context.update(user_extended_profile.unattended_surveys())
-    return render(request, 'onboarding/tell_us_more_survey.html', context)
+    return render(request, template, context)
 
 
 @login_required
+@can_not_update_onboarding_steps
 @transaction.atomic
 def interests(request):
     """
@@ -122,9 +133,17 @@ def interests(request):
     namely, organization survey.
     """
     user_extended_profile = request.user.extended_profile
-    are_forms_complete = not(bool(user_extended_profile.unattended_surveys()))
+    are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
     is_first_signup_in_org = user_extended_profile.organization.is_first_signup_in_org() \
         if user_extended_profile.organization else False
+
+    template = 'onboarding/interests_survey.html'
+    next_page_url = reverse('organization')
+    redirect_to_next = True
+
+    if request.path == reverse('update_interests'):
+        redirect_to_next = False
+        template = 'myaccount/interests.html'
 
     initial = {
         "interests": user_extended_profile.get_user_selected_interests(_type="fields"),
@@ -143,14 +162,13 @@ def interests(request):
 
         are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-        if (user_extended_profile.is_organization_admin or is_first_signup_in_org) and not are_forms_complete:
-            return redirect(reverse('organization'))
+        if (user_extended_profile.is_organization_admin or is_first_signup_in_org) and not are_forms_complete \
+                and redirect_to_next:
+            return redirect(next_page_url)
 
         if are_forms_complete and not is_action_update:
             update_nodebb_for_user_status(request.user.username)
             return redirect(reverse('recommendations'))
-
-        return redirect(reverse('interests'))
 
     else:
         form = forms.InterestsForm(initial=initial)
@@ -162,11 +180,13 @@ def interests(request):
     context.update(extended_profile.unattended_surveys())
     context['is_poc'] = extended_profile.is_organization_admin
     context['is_first_user'] = is_first_signup_in_org
-    return render(request, 'onboarding/interests_survey.html', context)
+
+    return render(request, template, context)
 
 
 @login_required
 @can_save_org_data
+@can_not_update_onboarding_steps
 @transaction.atomic
 def organization(request):
     """
@@ -179,6 +199,14 @@ def organization(request):
     user_extended_profile = request.user.extended_profile
     _organization = user_extended_profile.organization
     are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
+
+    template = 'onboarding/organization_survey.html'
+    next_page_url = reverse('org_detail_survey')
+    redirect_to_next = True
+
+    if request.path == reverse('update_organization'):
+        redirect_to_next = False
+        template = 'organization/update_organization.html'
 
     initial = {
         'country': COUNTRIES.get(_organization.country),
@@ -194,10 +222,8 @@ def organization(request):
 
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-            if not are_forms_complete:
-                return redirect(reverse('org_detail_survey'))
-
-            return redirect(reverse('organization'))
+            if not are_forms_complete and redirect_to_next:
+                return redirect(next_page_url)
 
     else:
         form = forms.OrganizationInfoForm(instance=_organization, initial=initial)
@@ -212,7 +238,7 @@ def organization(request):
     context['organization_name'] = _organization.label
     context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
 
-    return render(request, 'onboarding/organization_survey.html', context)
+    return render(request, template, context)
 
 
 @login_required
@@ -255,6 +281,7 @@ def get_country_names(request):
 
 @login_required
 @can_save_org_data
+@can_not_update_onboarding_steps
 @transaction.atomic
 def org_detail_survey(request):
     user_extended_profile = request.user.extended_profile
@@ -269,29 +296,36 @@ def org_detail_survey(request):
         "effective_date": datetime.strftime(latest_survey.effective_date, '%d/%m/%Y') if latest_survey else ""
     }
 
-    if request.method == 'POST':
+    template = 'onboarding/organization_detail_survey.html'
+    next_page_url = reverse('oef_survey')
+    org_metric_form = forms.OrganizationMetricModelForm
+    redirect_to_next = True
 
+    if request.path == reverse('update_organization_details'):
+        redirect_to_next = False
+        template = 'organization/update_organization_details.html'
+        org_metric_form = forms.OrganizationMetricModelUpdateForm
+
+    if request.method == 'POST':
         if latest_survey:
-            form = forms.OrganizationMetricModelForm(request.POST, instance=latest_survey, initial=initial)
+            form = org_metric_form(request.POST, instance=latest_survey, initial=initial)
         else:
-            form = forms.OrganizationMetricModelForm(request.POST, initial=initial)
+            form = org_metric_form(request.POST, initial=initial)
 
         if form.is_valid():
             form.save(request)
 
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-            if are_forms_complete:
+            if are_forms_complete and redirect_to_next:
                 update_nodebb_for_user_status(request.user.username)
-                return redirect(reverse('oef_survey'))
-
-            return redirect(reverse('org_detail_survey'))
+                return redirect(next_page_url)
 
     else:
         if latest_survey:
-            form = forms.OrganizationMetricModelForm(instance=latest_survey, initial=initial)
+            form = org_metric_form(instance=latest_survey, initial=initial)
         else:
-            form = forms.OrganizationMetricModelForm()
+            form = org_metric_form()
 
     context = {'form': form, 'are_forms_complete': are_forms_complete}
     context.update(user_extended_profile.unattended_surveys())
@@ -299,7 +333,7 @@ def org_detail_survey(request):
     context['is_first_user'] = user_extended_profile.organization.is_first_signup_in_org() \
         if user_extended_profile.organization else False
     context['organization_name'] = user_extended_profile.organization.label
-    return render(request, 'onboarding/organization_detail_survey.html', context)
+    return render(request, template, context)
 
 
 @csrf_exempt
@@ -351,13 +385,45 @@ def update_account_settings(request):
         )
 
     return render(
-        request, 'onboarding/registration_update.html',
-        {'form': form, 'org_url': reverse('get_user_organizations')}
+        request, 'myaccount/registration_update.html',
+        {'form': form, 'org_url': reverse('get_organizations')}
     )
 
 
+@login_required
+def suggest_org_admin(request):
+    """
+    Suggest a user as administrator of an organization
+    """
+    status = 200
+    if request.method == 'POST':
+        organization = request.POST.get('organization')
+        org_admin_email = request.POST.get('email')
+
+        if organization and org_admin_email:
+
+            try:
+                organization = Organization.objects.get(label__iexact=organization)
+                extended_profile = request.user.extended_profile
+
+                hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, org_admin_email)
+                org_id = extended_profile.organization_id
+                org_name = extended_profile.organization.label
+                organization.unclaimed_org_admin_email = org_admin_email
+
+                send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+            except Organization.DoesNotExist:
+                log.info("Organization does not exists: %s" % organization)
+                status = 400
+            except Exception as ex:
+                log.info(ex.args)
+                status = 400
+
+    return JsonResponse({'status': status})
+
+
 @csrf_exempt
-def get_user_organizations(request):
+def get_organizations(request):
     """
     Get organizations
     """
@@ -370,7 +436,11 @@ def get_user_organizations(request):
         all_organizations = Organization.objects.filter(label__istartswith=query)
 
         for organization in all_organizations:
-            final_result[organization.label] = True if organization.admin else False
+            final_result[organization.label] = {
+                'is_admin_assigned': True if organization.admin else False,
+                'is_current_user_admin': True if organization.admin == request.user else False,
+                'admin_email': organization.admin.email if organization.admin else ''
+            }
 
         if request.user.is_authenticated():
             user_extended_profile = request.user.extended_profile
@@ -378,10 +448,12 @@ def get_user_organizations(request):
 
             if organization:
                 org_label = organization.label
-                admin_email = organization.admin.email if organization.admin else organization.unclaimed_org_admin_email
+                is_poc = True if organization.admin == request.user else False
+                admin_email = organization.admin.email if organization.admin else ''
 
             final_result['user_org_info'] = {
                 'org': org_label,
+                'is_poc': is_poc,
                 'admin_email': admin_email
             }
 

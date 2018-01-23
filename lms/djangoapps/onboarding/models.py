@@ -449,9 +449,9 @@ class UserExtendedProfile(TimeStampedModel):
         return attended_list
 
     def surveys_to_attend(self):
-        surveys_to_attend = self.SURVEYS_LIST
-        if not (self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org())):
-            surveys_to_attend = self.SURVEYS_LIST[:2]
+        surveys_to_attend = self.SURVEYS_LIST[:2]
+        if self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+            surveys_to_attend = self.SURVEYS_LIST
 
         return surveys_to_attend
 
@@ -473,7 +473,7 @@ class UserExtendedProfile(TimeStampedModel):
         if _type == "list":
             return [s for s in surveys_to_attend if s not in self.attended_surveys()]
 
-        return {s: True if s not in self.attended_surveys() else False for s in surveys_to_attend}
+        return {s: True if s in self.attended_surveys() else False for s in surveys_to_attend}
 
     @property
     def is_organization_admin(self):
