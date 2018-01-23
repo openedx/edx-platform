@@ -9,7 +9,8 @@ import json
 import logging
 import os
 
-from datetime import datetime
+import six
+from django.utils.timezone import now
 from webob import Response
 
 from xblock.core import XBlock
@@ -40,6 +41,17 @@ log = logging.getLogger(__name__)
 # Disable no-member warning:
 # pylint: disable=no-member
 
+def to_boolean(value):
+    """
+    Convert a value from a GET or POST request parameter to a bool
+    """
+    if isinstance(value, six.binary_type):
+        value = value.decode('ascii', errors='replace')
+    if isinstance(value, six.text_type):
+        return value.lower() == 'true'
+    else:
+        return bool(value)
+
 
 class VideoStudentViewHandlers(object):
     """
@@ -61,6 +73,8 @@ class VideoStudentViewHandlers(object):
             'auto_advance': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
+            'bumper_last_view_date': to_boolean,
+            'bumper_do_not_show_again': to_boolean,
         }
 
         if dispatch == 'save_user_state':
@@ -72,7 +86,7 @@ class VideoStudentViewHandlers(object):
                         value = data[key]
 
                     if key == 'bumper_last_view_date':
-                        value = datetime.utcnow()
+                        value = now()
 
                     setattr(self, key, value)
 

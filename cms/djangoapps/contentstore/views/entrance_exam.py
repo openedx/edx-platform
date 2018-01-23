@@ -145,7 +145,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     course = modulestore().get_course(course_key)
     metadata = {
         'entrance_exam_enabled': True,
-        'entrance_exam_minimum_score_pct': unicode(entrance_exam_minimum_score_pct),
+        'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct,
         'entrance_exam_id': unicode(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)

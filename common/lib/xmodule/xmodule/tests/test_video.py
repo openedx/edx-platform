@@ -793,7 +793,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         Test XML export handles the unicode characters.
         """
-        self.descriptor.display_name = '这是文'
+        self.descriptor.display_name = u'这是文'
         xml = self.descriptor.definition_to_xml(None)
         self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
 

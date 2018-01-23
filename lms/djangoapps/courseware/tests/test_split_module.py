@@ -178,7 +178,7 @@ class TestSplitTestVert(SplitTestBase):
             parent_location=self.sequential.location,
             category="split_test",
             display_name="Split test",
-            user_partition_id='0',
+            user_partition_id=0,
             group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
@@ -252,7 +252,7 @@ class TestVertSplitTestVert(SplitTestBase):
             parent_location=vert1.location,
             category="split_test",
             display_name="Split test",
-            user_partition_id='0',
+            user_partition_id=0,
             group_id_to_child={"0": c0_url, "1": c1_url},
         )
 

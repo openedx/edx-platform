@@ -1123,7 +1123,7 @@ class TestConditionalContent(TestSubmittingProblems):
             parent_location=self.homework_conditional.location,
             category="split_test",
             display_name="Split test",
-            user_partition_id='0',
+            user_partition_id=0,
             group_id_to_child=group_id_to_child,
         )
 

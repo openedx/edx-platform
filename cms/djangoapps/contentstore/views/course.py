@@ -1137,7 +1137,6 @@ def settings_handler(request, course_key_string):
                             entrance_exam_minimum_score_pct = float(ee_min_score_pct)
                         if entrance_exam_minimum_score_pct.is_integer():
                             entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
-                        entrance_exam_minimum_score_pct = unicode(entrance_exam_minimum_score_pct)
                         # If there's already an entrance exam defined, we'll update the existing one
                         if course_entrance_exam_present:
                             exam_data = {
