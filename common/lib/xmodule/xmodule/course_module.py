@@ -35,6 +35,9 @@ CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
+ENABLE_HTML_DISPLAY_NAME =\
+    settings.FEATURES.get('ENABLE_HTML_DISPLAY_NAME', False)
+    
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
 
@@ -869,7 +872,7 @@ class CourseFields(object):
             "more of the base requirements, such as testing, accessibility, internationalization, and documentation."
         ),
         scope=Scope.settings, default=False
-    )
+    )    
     highlights_enabled_for_messaging = Boolean(
         display_name=_("Highlights Enabled for Messaging"),
         help=_(
@@ -877,6 +880,15 @@ class CourseFields(object):
             "to learners at their scheduled time."
         ),
         scope=Scope.settings, default=False
+    )
+    enable_html_display_name = Boolean(
+        display_name=_("Show display name on all HTML components"),
+        help=_(
+            "By default the HTML components will not show the display name to "
+            "be backwards compatible."
+        ),
+        scope=Scope.settings,
+        default=ENABLE_HTML_DISPLAY_NAME
     )
 
 

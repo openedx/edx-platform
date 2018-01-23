@@ -124,6 +124,9 @@ from lms.envs.common import (
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
+
+    # Set to show or hide display name in HTML components
+    ENABLE_HTML_DISPLAY_NAME,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -285,6 +288,9 @@ FEATURES = {
     # Whether archived courses (courses with end dates in the past) should be
     # shown in Studio in a separate list.
     'ENABLE_SEPARATE_ARCHIVED_COURSES': True,
+
+    # Set to show or hide display name in HTML components
+    'ENABLE_HTML_DISPLAY_NAME': ENABLE_HTML_DISPLAY_NAME,
 }
 
 ENABLE_JASMINE = False
