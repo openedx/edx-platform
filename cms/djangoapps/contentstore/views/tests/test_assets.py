@@ -179,6 +179,16 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_filter_response(
             self.url, 'asset_type', 'Documents,OTHER')
 
+        self.assert_correct_text_search_response(self.url, 'asset-1.txt', 1)
+        self.assert_correct_text_search_response(self.url, 'asset-1', 1)
+        self.assert_correct_text_search_response(self.url, 'AsSeT-1', 1)
+        self.assert_correct_text_search_response(self.url, '.txt', 3)
+        self.assert_correct_text_search_response(self.url, '2', 1)
+        self.assert_correct_text_search_response(self.url, 'asset 2', 1)
+        self.assert_correct_text_search_response(self.url, '2 asset', 1)
+        self.assert_correct_text_search_response(self.url, '*.txt', 0)
+        self.assert_correct_asset_response(self.url + "?text_search=", 0, 4, 4)
+
         #Verify invalid request parameters
         self.assert_invalid_parameters_error(self.url, 'asset_type', 'edX')
         self.assert_invalid_parameters_error(self.url, 'asset_type', 'edX, OTHER')
@@ -299,6 +309,23 @@ class PaginationTestCase(AssetsTestCase):
         resp = self.client.get(
             url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
         self.assertEquals(resp.status_code, 400)
+
+    def assert_correct_text_search_response(self, url, text_search, number_matches):
+        """
+        Get from the url w/ a text_search option and ensure items honor that search query
+        """
+        resp = self.client.get(
+            url + '?text_search=' + text_search, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets_response = json_response['assets']
+        self.assertEquals(text_search, json_response['textSearch'])
+        self.assertEquals(len(assets_response), number_matches)
+
+        text_search_tokens = text_search.split()
+
+        for asset_response in assets_response:
+            for token in text_search_tokens:
+                self.assertTrue(token.lower() in asset_response['display_name'].lower())
 
 
 @ddt
