@@ -129,7 +129,10 @@ def is_fingerprint_in_bucket(fingerprint, bucket_name):
     """
     zipfile_name = '{}.tar.gz'.format(fingerprint)
     conn = boto.connect_s3()
-    bucket = conn.get_bucket(bucket_name)
+    try:
+        bucket = conn.get_bucket(bucket_name)
+    except boto.exception.S3ConnectionError:
+        return False
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
     return key.exists()
 
@@ -208,7 +211,14 @@ def upload_to_s3(file_name, file_path, bucket_name):
     """
     print ("Uploading {} to s3 bucket {}".format(file_name, bucket_name))
     conn = boto.connect_s3()
-    bucket = conn.get_bucket(bucket_name)
+    try:
+        bucket = conn.get_bucket(bucket_name)
+    except boto.exception.S3ConnectionError:
+        print (
+            "Failed to connect to s3 bucket {}. Continuing without "
+            "uploading...".format(bucket_name)
+        )
+        return
     key = boto.s3.key.Key(bucket=bucket, name=file_name)
     bytes_written = key.set_contents_from_filename(file_path, replace=False)
     if bytes_written:
