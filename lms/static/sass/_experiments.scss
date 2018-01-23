@@ -408,8 +408,12 @@
       width: 33%;
       display: block;
 
+      li {
+        margin: 0;
+      }
+
       li > button::before {
-        font-size: 15px;
+        font-size: 32px;
       }
     }
 
@@ -426,17 +430,25 @@
   .upsell-certificate {
     height: 43px;
     position: absolute;
-    left: 40%;
-    margin-top: 29px;
+    margin: 0;
+    bottom: -58px;
+    left: 220px;
   }
 
   .upsell-modal-checkmark-group {
     list-style: none;
-    margin-left: 0;
+    padding-left: 30px;
+    margin-bottom: 15px;
+
+    li {
+      margin-bottom: 15px;
+    }
   }
 
-  .upsell-modal-checkmark::before {
-    content: '✔️\00a0\00a0\00a0\00a0';
+  .upsell-modal-checkmark {
+    left: 10px;
+    position: absolute;
+    color: black;
   }
 
   .js-carousel-nav {
@@ -473,5 +485,11 @@
 
   .my-stats-slide-header {
     padding-bottom: 10px;
+  }
+
+  @media only screen and (max-width: 600px){
+    .slick-slide.carousel-item {
+      min-width: 0;
+    }
   }
 }
