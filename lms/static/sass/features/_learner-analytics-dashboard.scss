@@ -1,6 +1,5 @@
 $mint-green: #92c9d3;
 $slices: #386f77, #1abc9c, $mint-green, #397d1c, #a39d3d, #0a5aaa;
-$border-color: #4a4a4a;
 $table-border: rgba(155, 155, 155, 0.2);
 $font-color: #636c72;
 $heading-color: #292b2c;
@@ -78,7 +77,8 @@ $trophy-gold: #f39c12;
   .grading-weight-wrapper {
     display: flex;
     flex-flow: row wrap;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid $table-border;
+    margin-bottom: 25px;
     .chart-wrapper {
       width: 90px;
       height: 90px;
@@ -191,6 +191,15 @@ $trophy-gold: #f39c12;
           background: rgba(255, 193, 7, 0.15);
           color: #000;
           font-weight: bold;
+        }
+      }
+
+      .totals {
+        font-size: 18px;
+        border-color: $table-border;
+
+        .footer-label {
+          color: black;
         }
       }
     }
