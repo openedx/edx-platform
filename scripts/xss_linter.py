@@ -2272,6 +2272,9 @@ class MakoTemplateLinter(BaseLinter):
                     results.violations.append(ExpressionRuleViolation(
                         Rules.mako_unwanted_html_filter, expression
                     ))
+            elif filters == ['n', 'strip_all_tags_but_br']:
+                # {x | n,  strip_all_tags_but_br} is valid in html context
+                pass
             else:
                 results.violations.append(ExpressionRuleViolation(
                     Rules.mako_invalid_html_filter, expression

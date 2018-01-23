@@ -90,3 +90,12 @@ class FormatHtmlTest(unittest.TestCase):
 
         self.assertIn('<br>', rendered_template)
         self.assertNotIn('<script>', rendered_template)
+
+    def test_strip_all_tags_but_br_returns_html(self):
+        """
+        Verify filter returns HTML Markup safe string object
+        """
+
+        html = strip_all_tags_but_br('{name}<br><script>')
+        html = html.format(name='Rock & Roll')
+        self.assertEqual(html.decode(), u'Rock &amp; Roll<br>')

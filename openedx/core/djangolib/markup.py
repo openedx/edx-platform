@@ -37,7 +37,7 @@ def HTML(html):                                 # pylint: disable=invalid-name
 
 def strip_all_tags_but_br(string_to_strip):
     """
-    Strips all tags from a string except <br/>
+    Strips all tags from a string except <br/> and marks as HTML.
 
     Usage:
         <%page expression_filter="h"/>
@@ -53,4 +53,4 @@ def strip_all_tags_but_br(string_to_strip):
     string_to_strip = decode.utf8(string_to_strip)
     string_to_strip = bleach.clean(string_to_strip, tags=['br'], strip=True)
 
-    return string_to_strip
+    return HTML(string_to_strip)
