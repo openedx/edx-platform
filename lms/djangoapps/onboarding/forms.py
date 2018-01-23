@@ -622,7 +622,7 @@ class RegModelForm(forms.ModelForm):
                         org_name = extended_profile.organization.label
                         organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
-                        send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+                        send_admin_activation_email(first_name, org_id, org_name, org_admin_email, hash_key)
 
                     except Exception as ex:
                         log.info(ex.args)
@@ -671,7 +671,7 @@ class UpdateRegModelForm(RegModelForm):
                     org_name = extended_profile.organization.label
                     organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
-                    send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+                    send_admin_activation_email(first_name, org_id, org_name, org_admin_email, hash_key)
 
                 except Exception as ex:
                     log.info(ex.args)

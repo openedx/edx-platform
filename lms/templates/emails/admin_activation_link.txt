@@ -1,0 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
+% if is_secure:
+  https://${ site }/onboarding/admin_activate/${ org_id }/${ key }
+% else:
+  http://${ site }/onboarding/admin_activate/${ org_id }/${ key }
+% endif
+

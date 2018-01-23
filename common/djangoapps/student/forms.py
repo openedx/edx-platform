@@ -76,9 +76,14 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
             }
+            subject = loader.render_to_string(subject_template_name, context)
+            # Email subject *must not* contain newlines
+            subject = subject.replace('\n', '')
+            email = loader.render_to_string(email_template_name, context)
             password_reset_link = loader.render_to_string('emails/password_reset_email_link.txt', context)
             MandrillClient().send_password_reset_email(user.email, {
-                'password_reset_link': password_reset_link
+                'first_name': user.first_name,
+                'reset_link': password_reset_link,
             })
 
 

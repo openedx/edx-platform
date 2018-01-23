@@ -30,22 +30,41 @@ class MandrillClient(object):
 
     def send_activation_mail(self, user_email, context):
         global_merge_vars = [
-            {'name': 'name', 'content': context['name']},
-            {'name': 'key', 'content': context['key']},
+            {'name': 'first_name', 'content': context['first_name']},
+            {'name': 'activation_link', 'content': context['key']},
         ]
         self.send_template('template-61', user_email, global_merge_vars)
 
+    def send_admin_activation_mail(self, user_email, context):
+        """
+        E-mail is sent only when a user is recommended is and org admin
+        """
+        global_merge_vars = [
+            {'name': 'first_name', 'content': context['first_name']},
+            {'name': 'activation_link', 'content': context['key']},
+            {'name': 'org_id', 'content': context['org_id']},
+            {'name': 'org_name', 'content': context['org_name']},
+            {'name': 'referring_user', 'content': context['referring_user']},
+        ]
+        self.send_template('template-62', user_email, global_merge_vars)
+
+
     def send_password_reset_email(self, user_email, context):
         global_merge_vars = [
-            {'name': 'password_reset_link', 'content': context['password_reset_link']},
+            {'name': 'first_name', 'content': context['first_name']},
+            {'name': 'reset_link', 'content': context['reset_link']},
         ]
         self.send_template('template-60', user_email, global_merge_vars)
 
     def send_course_notification_email(self, user_email, template_name, context):
+        """
+        single function to use for all notifications regarding any course email
+        template_name must be specified
+        """
         global_merge_vars = [
-            {'name': 'course_name', 'content': context['course_name']},
-            {'name': 'course_link', 'content': context['course_link']},
             {'name': 'full_name', 'content': context['full_name']},
+            {'name': 'course_name', 'content': context['course_name']},
+            {'name': 'course_url', 'content': context['course_link']},
         ]
         self.send_template(template_name, user_email, global_merge_vars)
 

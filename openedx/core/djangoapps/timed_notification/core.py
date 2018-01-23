@@ -69,7 +69,7 @@ def send_course_notification_email(course, template_name, context, to_list=None)
             log.info("Getting user email")
             email = current_recipient.email
             log.info("Adding full name in the context")
-            context['full_name'] = current_recipient.extended_profile.first_name + " " + current_recipient.\
+            context["full_name"] = current_recipient.extended_profile.first_name + " " + current_recipient.\
                 extended_profile.last_name
 
             log.info(

@@ -47,7 +47,7 @@ def task_course_notifications():
                     context['course_week'] = course_week
                     log.info('Sending weekly notification email')
                     send_course_notification_email(course=course,
-                                                   mako_template_path='timed_notification/weekly_notification.txt',
+                                                   template_name='weekly',
                                                    context=context)
         else:
             log.info("Course: %s, weekly notification-email sending failed, course end-date missing.", course)
