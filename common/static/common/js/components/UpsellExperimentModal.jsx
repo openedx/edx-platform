@@ -21,9 +21,9 @@ export class UpsellExperimentModal extends React.Component {
                 <div className="my-stats-introduction">My Stats introduces new personalized views that help you track your progress towards completing your course!</div>
                 <div className="my-stats-slide-header">With My Stats you will see your:</div>
                 <ul className="upsell-modal-checkmark-group">
-                    <li className="upsell-modal-checkmark">Course Activity Streak (log in every week to keep your streak alive)</li>
-                    <li className="upsell-modal-checkmark">Grade Progress (see how you're tracking towards a passing grade)</li>
-                    <li className="upsell-modal-checkmark">Discussion Forum Engagements (top learners use the forums - how do you measure up?)</li>
+                    <li><span className="fa fa-check upsell-modal-checkmark" aria-hidden="true" />Course Activity Streak (log in every week to keep your streak alive)</li>
+                    <li><span className="fa fa-check upsell-modal-checkmark" aria-hidden="true" />Grade Progress (see how you're tracking towards a passing grade)</li>
+                    <li><span className="fa fa-check upsell-modal-checkmark" aria-hidden="true" />Discussion Forum Engagements (top learners use the forums - how do you measure up?)</li>
                 </ul>
             </div>),
             (<div>
