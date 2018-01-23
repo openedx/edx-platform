@@ -42,9 +42,6 @@ class MandrillClient(object):
         global_merge_vars = [
             {'name': 'first_name', 'content': context['first_name']},
             {'name': 'activation_link', 'content': context['key']},
-            {'name': 'org_id', 'content': context['org_id']},
-            {'name': 'org_name', 'content': context['org_name']},
-            {'name': 'referring_user', 'content': context['referring_user']},
         ]
         self.send_template('template-62', user_email, global_merge_vars)
 

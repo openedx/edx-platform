@@ -53,12 +53,12 @@ def task_course_notifications():
             log.info("Course: %s, weekly notification-email sending failed, course end-date missing.", course)
 
         # send email when 7 days left to course start
-        if course_start_date - timedelta(days=7) == date_now:
+        if course_start_date - timedelta(days=0) == date_now:
             send_course_notification_email(course=course,
                                            template_name='course-early-welcome',
                                            context=context)
         # send email when 2 days left to course start
-        elif course_start_date - timedelta(days=2) == date_now:
+        elif course_start_date - timedelta(days=0) == date_now:
             send_course_notification_email(course=course,
                                            template_name='course-start-reminder',
                                            context=context)

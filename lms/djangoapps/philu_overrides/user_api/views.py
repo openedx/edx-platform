@@ -350,7 +350,7 @@ def create_account_with_params_custom(request, params):
             'key': registration.activation_key
         })
         context = {
-            'first_name': profile.name,
+            'first_name': user.first_name,
             'key': activation_link,
         }
         MandrillClient().send_activation_mail(dest_addr, context)
