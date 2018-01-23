@@ -606,7 +606,7 @@ def delete_thread(request, course_id, thread_id):
     """
     course_key = CourseKey.from_string(course_id)
     thread = cc.Thread.find(thread_id)
-    involved_users = get_involved_users_in_thread(request, thread.id)
+    involved_users = get_involved_users_in_thread(request, thread)
     thread.delete()
     thread_deleted.send(sender=None, user=request.user, post=thread, involved_users=list(involved_users))
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
