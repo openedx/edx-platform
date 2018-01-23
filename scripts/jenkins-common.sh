@@ -5,7 +5,7 @@ set -e
 source $HOME/jenkins_env
 
 NODE_ENV_DIR=$HOME/nenv
-NODE_VERSION=6.11.1
+NODE_VERSION=8.9.3
 
 NODE_INSTALL_COMMAND="nodeenv --node=$NODE_VERSION --prebuilt $NODE_ENV_DIR --force"
 
@@ -56,13 +56,6 @@ source $NODE_ENV_DIR/bin/activate
 echo "done setting up nodeenv"
 echo "node version is `node --version`"
 echo "npm version is `npm --version`"
-
-# TODO: Provide a cached node_modules/ directory for faster/smaller installs
-
-# Manage the npm cache on Jenkins.
-# (In this case, remove it. That ensures from run-to-run, it is a clean npm environment)
-echo "--> Cleaning npm cache"
-npm cache clean
 
 # Log any paver or ansible command timing
 TIMESTAMP=$(date +%s)
