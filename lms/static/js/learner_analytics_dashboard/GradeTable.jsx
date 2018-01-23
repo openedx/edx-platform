@@ -43,7 +43,7 @@ class GradeTable extends React.Component {
       );
     });
 
-    return <tbody className="type-group" key={groupIndex}>{rows}</tbody>;
+    return rows.length ? <tbody className="type-group" key={groupIndex}>{rows}</tbody> : false;
   }
   
   render() {
@@ -60,7 +60,7 @@ class GradeTable extends React.Component {
         {assignmentTypes.map((type, index) => this.getTableGroup(type, index))}
         <tfoot>
           <tr className="totals">
-            <td>Totals</td>
+            <td className="footer-label">Total</td>
             <td>{passingGrade}%</td>
             <td>*{percentGrade}%</td>
           </tr>
