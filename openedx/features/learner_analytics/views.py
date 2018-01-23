@@ -92,7 +92,7 @@ class LearnerAnalyticsView(View):
         if (has_access):
             grading_policy = course.grading_policy
 
-            (grade_data, answered_percent) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
+            (grade_data, answered_percent, percent_grade) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
             schedule_data = self.get_assignments_with_due_date(request, course_key)
             (grade_data, schedule_data) = self.sort_grade_and_schedule_data(grade_data, schedule_data)
 
@@ -106,7 +106,9 @@ class LearnerAnalyticsView(View):
                 'weekly_active_users': self.get_weekly_course_activity_count(course_key),
                 'week_streak': self.consecutive_weeks_of_course_activity_for_user(
                     request.user.username, course_key
-                )
+                ),
+                'passing_grade': math.ceil(100 * course.lowest_passing_grade),
+                'percent_grade': math.ceil(100 * percent_grade),
             })
 
         return render_to_response('learner_analytics/dashboard.html', context)
@@ -124,6 +126,7 @@ class LearnerAnalyticsView(View):
         grades = []
         total_earned = 0
         total_possible = 0
+        # answered_percent seems to be unused and it does not take into account assignment type weightings
         answered_percent = None
         for (location, subsection_grade) in course_grade.subsection_grades.iteritems():
             if subsection_grade.format is not None:
@@ -147,7 +150,7 @@ class LearnerAnalyticsView(View):
 
         if total_possible > 0:
             answered_percent = float(total_earned) / total_possible
-        return (grades, answered_percent)
+        return (grades, answered_percent, course_grade.percent)
 
     def sort_grade_and_schedule_data(self, grade_data, schedule_data):
         """
