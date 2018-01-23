@@ -188,7 +188,7 @@ class OrganizationPartner(models.Model):
     The model to save the organization partners.
     """
     organization = models.ForeignKey(Organization, related_name='organization_partners')
-    partner = models.ForeignKey(PartnerNetwork, related_name='organization_partners')
+    partner = models.CharField(max_length=10)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
@@ -202,7 +202,7 @@ class OrganizationPartner(models.Model):
         for partner in _partners:
             start_date = datetime.now()
             end_date = start_date + relativedelta(years=100)
-            obj = cls(organization=organization, partner=partner, start_date=start_date, end_date=end_date)
+            obj = cls(organization=organization, partner=partner.code, start_date=start_date, end_date=end_date)
             lst_to_create.append(obj)
 
         cls.objects.bulk_create(lst_to_create)
@@ -297,7 +297,6 @@ class UserExtendedProfile(TimeStampedModel):
     not_listed_gender = models.CharField(max_length=255, null=True, blank=True)
     city_of_employment = models.CharField(max_length=255, null=True)
     english_proficiency = models.CharField(max_length=10, null=True)
-    level_of_education = models.CharField(max_length=10, null=True)
     start_month_year = models.CharField(max_length=100, null=True)
     role_in_org = models.CharField(max_length=10, null=True)
     hours_per_week = models.PositiveIntegerField("Typical Number of Hours Worked per Week*", default=0,
@@ -432,7 +431,7 @@ class UserExtendedProfile(TimeStampedModel):
     def get_normal_user_attend_surveys(self):
         attended_list = []
 
-        if self.level_of_education and self.start_month_year and self.english_proficiency:
+        if self.user.profile.level_of_education and self.start_month_year and self.english_proficiency:
             attended_list.append(self.SURVEYS_LIST[0])
         if self.is_interests_data_submitted:
             attended_list.append(self.SURVEYS_LIST[1])
@@ -450,9 +449,9 @@ class UserExtendedProfile(TimeStampedModel):
         return attended_list
 
     def surveys_to_attend(self):
-        surveys_to_attend = self.SURVEYS_LIST
-        if not (self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org())):
-            surveys_to_attend = self.SURVEYS_LIST[:2]
+        surveys_to_attend = self.SURVEYS_LIST[:2]
+        if self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+            surveys_to_attend = self.SURVEYS_LIST
 
         return surveys_to_attend
 
@@ -474,7 +473,7 @@ class UserExtendedProfile(TimeStampedModel):
         if _type == "list":
             return [s for s in surveys_to_attend if s not in self.attended_surveys()]
 
-        return {s: True if s not in self.attended_surveys() else False for s in surveys_to_attend}
+        return {s: True if s in self.attended_surveys() else False for s in surveys_to_attend}
 
     @property
     def is_organization_admin(self):

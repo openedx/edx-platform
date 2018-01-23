@@ -18,6 +18,14 @@ def oef_dashboard(request):
     user_surveys = UserOefSurvey.objects.filter(user_id=request.user.id)
     surveys = []
     user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
+    user_extended_profile = request.user.extended_profile
+
+    context = {
+        'is_poc': user_extended_profile.is_organization_admin,
+        'is_first_user': user_extended_profile.organization.is_first_signup_in_org()
+        if user_extended_profile.organization else False
+    }
+
     for survey in user_surveys:
         surveys.append({
             'id': survey.id,
@@ -26,7 +34,9 @@ def oef_dashboard(request):
             'status': survey.status
         })
 
-    return render(request, 'oef/oef-org.html', {'surveys': surveys, 'error': user_survey_status['error']})
+    context.update({'surveys': surveys, 'error': user_survey_status['error']})
+
+    return render(request, 'oef/oef-org.html', context)
 
 
 @login_required

@@ -10,12 +10,11 @@ from datetime import datetime
 from itertools import chain
 from django import forms
 from django.utils.encoding import force_unicode
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
 from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict, \
-    get_actual_field_names
+    get_actual_field_names, admin_not_assigned_or_me
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
     Organization,
@@ -110,7 +109,8 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                                            error_messages={
                                                 'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
                                                     'Level of Education')),
-                                           })
+                                           },
+                                           required=True)
     english_proficiency = forms.ChoiceField(label=ugettext_noop('English Language Proficiency'), label_suffix="*",
                                             choices=ENGLISH_PROFICIENCY_CHOICES,
                                             error_messages={
@@ -223,6 +223,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         userprofile.country = get_country_iso(request.POST['country'])
         userprofile.city = self.cleaned_data['city']
+        userprofile.level_of_education = self.cleaned_data['level_of_education']
         if self.cleaned_data['gender']:
             userprofile.gender = self.cleaned_data['gender']
         userprofile.save()
@@ -294,16 +295,25 @@ class InterestsForm(BaseOnboardingForm):
             choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
-    def save(self, request, user_exended_profile):
+    def _clean_fields(self):
+        """
+        Override to prevent 'valid choice options' validations
+        """
+        return True
+
+    def save(self, request, user_extended_profile):
+        """
+        save form selected choices without any validation
+        """
         selected_interests = get_actual_field_names(request.POST.getlist('interests'))
         selected_interested_learners = get_actual_field_names(request.POST.getlist('interested_learners'))
         selected_personal_goals = get_actual_field_names(request.POST.getlist('personal_goals'))
 
-        user_exended_profile.save_user_interests(selected_interests)
-        user_exended_profile.save_user_interested_learners(selected_interested_learners)
-        user_exended_profile.save_user_personal_goals(selected_personal_goals)
-        user_exended_profile.is_interests_data_submitted = True
-        user_exended_profile.save()
+        user_extended_profile.save_user_interests(selected_interests)
+        user_extended_profile.save_user_interested_learners(selected_interested_learners)
+        user_extended_profile.save_user_personal_goals(selected_personal_goals)
+        user_extended_profile.is_interests_data_submitted = True
+        user_extended_profile.save()
 
 
 class OrganizationInfoForm(BaseOnboardingModelForm):
@@ -385,7 +395,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
     def __init__(self,  *args, **kwargs):
         super(OrganizationInfoForm, self).__init__( *args, **kwargs)
         self.fields['city'].required = False
-        self.fields['founding_year'].required = False
+        self.fields['founding_year'].required = True
 
     class Meta:
         """
@@ -419,7 +429,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
 
         error_messages = {
             'founding_year': {
-                'required': ugettext_noop(required_error.format('Founding Year')),
+                'required': ugettext_noop(EMPTY_FIELD_ERROR.format('Founding Year')),
             },
             'country': {
                 'required': ugettext_noop(EMPTY_FIELD_ERROR.format('Country of Organization Headquarters')),
@@ -453,7 +463,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
         if self.errors.get('partner_networks'):
             del self.errors['partner_networks']
 
-        year = cleaned_data['founding_year']
+        year = cleaned_data.get('founding_year', '')
 
         if year:
             if len("{}".format(year)) < 4 or year < 0 or len("{}".format(year)) > 4:
@@ -475,7 +485,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
             OrganizationPartner.update_organization_partners(organization, partners)
 
 
-class RegModelForm(forms.ModelForm):
+class RegModelForm(BaseOnboardingModelForm):
     """
     Model form for extra fields in registration model
     """
@@ -487,6 +497,7 @@ class RegModelForm(forms.ModelForm):
 
     first_name = forms.CharField(
         label=ugettext_noop('First Name'),
+        label_suffix="*",
         widget=forms.TextInput(
             attrs={'placeholder': ugettext_noop('First Name')}
         )
@@ -494,6 +505,7 @@ class RegModelForm(forms.ModelForm):
 
     last_name = forms.CharField(
         label=ugettext_noop('Last Name'),
+        label_suffix="*",
         widget=forms.TextInput(
             attrs={'placeholder': ugettext_noop('Last Name')}
         )
@@ -653,43 +665,26 @@ class UpdateRegModelForm(RegModelForm):
         last_name = self.cleaned_data['last_name']
 
         extended_profile = UserExtendedProfile.objects.get(user=user)
-        prev_org = extended_profile.organization
 
         if organization_name:
             organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
             extended_profile.organization = organization_to_assign
 
-            if user and is_poc == '1':
+            if user and is_poc == '1' and admin_not_assigned_or_me(user, organization_to_assign):
+                Organization.objects.filter(admin=user).update(admin=None)
                 organization_to_assign.unclaimed_org_admin_email = None
                 organization_to_assign.admin = user
 
-            if not is_poc == '1' and org_admin_email:
-                try:
-
-                    hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
-                    org_id = extended_profile.organization_id
-                    org_name = extended_profile.organization.label
-                    organization_to_assign.unclaimed_org_admin_email = org_admin_email
-
-                    send_admin_activation_email(first_name, org_id, org_name, org_admin_email, hash_key)
-
-                except Exception as ex:
-                    log.info(ex.args)
-                    pass
-
-            if prev_org:
-                if organization_to_assign.label != prev_org.label:
-                    prev_org.admin = None
+            if not is_poc == '1':
+                if organization_to_assign.admin == user:
+                    organization_to_assign.admin = None
 
         user.first_name = first_name
         user.last_name = last_name
 
         if commit:
             user.save()
-
             extended_profile.save()
-            if prev_org:
-                prev_org.save()
 
             if extended_profile.organization:
                 extended_profile.organization.save()
@@ -710,6 +705,12 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
     effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
                                      required=False,
                                      label=ugettext_noop('End date of last Fiscal Year'),
+                                     help_text=ugettext_noop("he fiscal year is the period that an organization uses "
+                                                             "for accounting  purposes and preparing financial "
+                                                             "statements. A fiscal year may or may not be the same"
+                                                             " as a calendar year. If the information you are "
+                                                             "giving below is for the last 12 months, please enter "
+                                                             "today's date."),
                                      label_suffix='*')
 
     def __init__(self,  *args, **kwargs):
@@ -740,19 +741,49 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 
         labels = {
             'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
-            'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'),
-            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year*'),
+            'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
+            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
-            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)*'),
-            'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)*'),
-            'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)*'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
+            'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
+            'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)'),
             'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
-                                                    '(Local Currency)*'),
+                                                    '(Local Currency)'),
         }
 
         help_texts = {
-            'effective_date': ugettext_noop("If the data you are providing below is for the last 12 months,"
-                                            " please enter today's date.")
+            "total_clients" : ugettext_noop("A client or direct beneficiary is any person benefiting directly from your "
+                                           "organization's activities through face-to-face contact with program staff, "
+                                           "often in a one-on-one or small-group setting. Please do not include "
+                                           "indirect beneficiaries or people your organization reaches on a lighter "
+                                           "scale, such as through one-time events. If your organization does not "
+                                           "serve people directly because, for example, you work with animals, the "
+                                           "environment, or in arts and culture, please provide a reasonable estimate "
+                                           "for the number of people or animals that benefit from your services."),
+            "total_employees": ugettext_noop("An employee is a member of your staff who is paid for their work. A staff"
+                                             " member working full-time counts as 1 employee; a staff member working "
+                                             "half-time counts as 0.5 of an employee. Please include yourself in your "
+                                             "organization's employee count. We asked a similar question on the last "
+                                             "page, but here we are asking for the number of employees at the end of "
+                                             "your last fiscal year instead of your current number."),
+            "total_revenue": ugettext_noop("Revenue is the total amount of money your organization receives, regardless"
+                                           "of the source of that funding. Sources of revenue may include fees for "
+                                           "services and goods, government contracts, donations, grants, or investment "
+                                           "income."),
+            "total_donations": ugettext_noop("Donations and grants are two different sources of revenue. A donation is"
+                                             " funding given to your organization with nothing or very little "
+                                             "expected in return. An unrestricted cash gift from a private individual"
+                                             " is a donation. A grant is funding given to your organization for a"
+                                             " particular purpose with some obligations, such as reporting.  Revenue"
+                                             " from government sources should also be included in this line."),
+            "total_expenses": ugettext_noop("An expense is money your organization spends in order to deliver its "
+                                            "programs, operate the business, and generate revenue. Expenses may "
+                                            "include. wages and salaries, rent, insurance, travel, or supplies."),
+            "total_program_expenses": ugettext_noop("A program expense is money your organization spends exclusively "
+                                                    "in order to deliver its programs and should not include "
+                                                    "administrative or fundraising expenses. These program expenses"
+                                                    " should also be included in your total annual expenses for last "
+                                                    "fiscal year above."),
         }
 
     def clean_actual_data(self):
@@ -810,6 +841,14 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 
         return total_revenue
 
+    def clean_total_donations(self):
+        total_donations = self.cleaned_data['total_donations']
+
+        if not total_donations:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Donations")))
+
+        return total_donations
+
     def clean_total_expenses(self):
         can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_expenses = self.cleaned_data['total_expenses']
@@ -840,6 +879,143 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                 alphabetic_code=self.cleaned_data['local_currency']).first().alphabetic_code
 
             org_detail.save()
+
+        user_extended_profile.is_organization_metrics_submitted = True
+        user_extended_profile.save()
+
+
+class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
+    effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
+                                     required=False,
+                                     label=ugettext_noop('End date of last Fiscal Year'),
+                                     label_suffix='*')
+
+    def __init__(self,  *args, **kwargs):
+        super(OrganizationMetricModelForm, self).__init__(*args, **kwargs)
+        self.fields['actual_data'].empty_label = None
+        self.fields['actual_data'].required = False
+        self.fields['can_provide_info'].required = False
+
+    class Meta:
+        model = OrganizationMetric
+
+        fields = [
+            'actual_data', 'effective_date', 'total_clients', 'total_employees', 'local_currency',
+            'total_revenue', 'total_donations', 'total_expenses', 'total_program_expenses'
+        ]
+
+        widgets = {
+            'actual_data': RadioSelectNotNull,
+            'effective_date': forms.TextInput,
+            'total_clients': forms.NumberInput,
+            'total_employees': forms.NumberInput,
+            'local_currency': forms.TextInput,
+            'total_revenue': forms.NumberInput,
+            'total_donations': forms.NumberInput,
+            'total_expenses': forms.NumberInput,
+            'total_program_expenses': forms.NumberInput,
+        }
+
+        labels = {
+            'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
+            'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'),
+            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year*'),
+            'local_currency': ugettext_noop('Local Currency Code*'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)*'),
+            'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)*'),
+            'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)*'),
+            'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
+                                                    '(Local Currency)*'),
+        }
+
+        help_texts = {
+            'effective_date': ugettext_noop("If the data you are providing below is for the last 12 months,"
+                                            " please enter today's date.")
+        }
+
+    def clean_actual_data(self):
+        info_accuracy = self.cleaned_data['actual_data']
+
+        if info_accuracy not in [True, False]:
+            raise forms.ValidationError(ugettext_noop("Please select an option for Estimated or Actual Information"))
+
+        return info_accuracy
+
+    def clean_effective_date(self):
+        last_fiscal_year_end_date = self.cleaned_data['effective_date']
+
+        if not last_fiscal_year_end_date:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
+
+        return last_fiscal_year_end_date
+
+    def clean_total_clients(self):
+        total_clients = self.cleaned_data['total_clients']
+
+        if not total_clients:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Client")))
+
+        return total_clients
+
+    def clean_total_employees(self):
+        total_employees = self.cleaned_data['total_employees']
+
+        if not total_employees:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Employees")))
+
+        return total_employees
+
+    def clean_local_currency(self):
+        all_currency_codes = Currency.objects.values_list('alphabetic_code', flat=True)
+        currency_input = self.cleaned_data['local_currency']
+
+        if not currency_input in all_currency_codes:
+            raise forms.ValidationError(ugettext_noop('Please select currency code.'))
+
+        return currency_input
+
+    def clean_total_revenue(self):
+        total_revenue = self.cleaned_data['total_revenue']
+
+        if not total_revenue:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Revenue")))
+
+        return total_revenue
+
+    def clean_total_donations(self):
+        total_donations = self.cleaned_data['total_donations']
+
+        if not total_donations:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Donations")))
+
+        return total_donations
+
+    def clean_total_expenses(self):
+        total_expenses = self.cleaned_data['total_expenses']
+
+        if not total_expenses:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Expenses")))
+
+        return total_expenses
+
+    def clean_total_program_expenses(self):
+        total_program_expenses = self.cleaned_data['total_program_expenses']
+
+        if not total_program_expenses:
+            raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Program Expense")))
+
+        return total_program_expenses
+
+    def save(self, request):
+        user_extended_profile = request.user.extended_profile
+
+        org_detail = super(OrganizationMetricModelForm, self).save(commit=False)
+        org_detail.user = request.user
+        org_detail.org = user_extended_profile.organization
+        org_detail.local_currency = Currency.objects.filter(
+            alphabetic_code=self.cleaned_data['local_currency']).first().alphabetic_code
+
+        org_detail.save()
 
         user_extended_profile.is_organization_metrics_submitted = True
         user_extended_profile.save()
