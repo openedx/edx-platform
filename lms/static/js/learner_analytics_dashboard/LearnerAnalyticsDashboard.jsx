@@ -94,6 +94,7 @@ export function LearnerAnalyticsDashboard(props) {
           }
 
           <h3 className="section-heading">Graded Assignments</h3>
+          {/* TODO: LEARNER-3854: If implementing Learner Analytics, rename to graded-assignments-wrapper. */}
           <div className="graded-assessments-wrapper">
             <GradeTable assignmentTypes={assignmentTypes}
                         grades={grades}
