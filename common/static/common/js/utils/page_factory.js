@@ -8,18 +8,21 @@ define([], function() {
             throw Error(
                 'window.pageFactoryArguments must be initialized before calling invokePageFactory(' +
                 name +
-                '). Use the <%static:require_page> template tag.'
+                '). Use the <%static:require_page> template tag. Available keys are ' +
+                window.pageFactoryArguments.keys()
             );
         }
         args = window.pageFactoryArguments[name];
 
         if (typeof args === 'undefined') {
+            console.log('window.pageFactoryArguments', window.pageFactoryArguments);
             throw Error(
                 'window.pageFactoryArguments["' +
                 name +
                 '"] must be initialized before calling invokePageFactory(' +
                 name +
-                '). Use the <%static:require_page> template tag.'
+                '). Use the <%static:require_page> template tag. Available keys are ' +
+                window.pageFactoryArguments.keys()
             );
         }
         factory.apply(null, window.pageFactoryArguments[name]);
