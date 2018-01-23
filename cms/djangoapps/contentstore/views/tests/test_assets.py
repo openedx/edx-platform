@@ -201,6 +201,10 @@ class PaginationTestCase(AssetsTestCase):
             self.url + "?page_size=2&page=2", 2, 2, 4)
         self.assert_correct_asset_response(
             self.url + "?page_size=3&page=1", 3, 1, 4)
+        self.assert_correct_asset_response(
+            self.url + "?page_size=1&page=5&asset_type=OTHER", 0, 1, 1)
+        self.assert_correct_asset_response(
+            self.url + "?page_size=1&page=5&asset_type=Images", 5, 0, 0)
 
     @mock.patch('xmodule.contentstore.mongo.MongoContentStore.get_all_content_for_course')
     def test_mocked_filtered_response(self, mock_get_all_content_for_course):

@@ -145,7 +145,7 @@ def _assets_json(request, course_key):
 
     assets, total_count = _get_assets_for_page(course_key, query_options)
 
-    if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count:
+    if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count and total_count > 0:
         _update_options_to_requery_final_page(query_options, total_count)
         current_page = query_options['current_page']
         first_asset_to_display_index = _get_first_asset_index(current_page, requested_page_size)
