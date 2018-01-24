@@ -101,6 +101,12 @@
         color: theme-color("inverse");
         background-image: none;
         box-shadow: none;
+        cursor: pointer;
+
+        &:hover {
+          background-color: theme-color("inverse");
+          color: theme-color("success");
+        }
 
         @media (max-width: 960px) {
           & {
