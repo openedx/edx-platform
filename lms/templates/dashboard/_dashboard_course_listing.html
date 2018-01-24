@@ -342,7 +342,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                   ${_('Upgrade All Remaining Courses (')}
                   % if program_data.get('discount_data', {}).get('is_discounted'):
                       <span class='list-price'>
-                        ${_('{"{0:.2f}".format(a)}'.format(program_data['discount_data']['total_incl_tax_excl_discounts'], 2))}
+                        ${' ${price:.2f} '.format(price=program_data.get('discount_data', {}).get('total_incl_tax_excl_discounts'))}
                       </span>
                   % endif
                   ${_(' ${price:.2f} {currency} ) '.format(price=program_data.get('full_program_price'),
