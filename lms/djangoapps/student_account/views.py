@@ -9,9 +9,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.core.mail import send_mail
+from django.core.urlresolvers import resolve, reverse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
+from django.template import loader
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
@@ -217,6 +219,25 @@ def password_change_request_handler(request):
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
             limiter.tick_bad_request_counter(request)
+
+            # If enabled, send an email saying that a password reset was attempted, but that there is
+            # no user associated with the email
+            if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
+                                               settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
+                context = {
+                    'failed': True,
+                    'email_address': email,
+                    'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+
+                }
+                subject = loader.render_to_string('emails/password_reset_subject.txt', context)
+                subject = ''.join(subject.splitlines())
+                message = loader.render_to_string('registration/password_reset_email.html', context)
+                from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+                try:
+                    send_mail(subject, message, from_email, [email])
+                except Exception:  # pylint: disable=broad-except
+                    log.exception(u'Unable to send password reset failure email notification from "%s"', from_email)
         except UserAPIInternalError as err:
             log.exception('Error occured during password change for user {email}: {error}'
                           .format(email=email, error=err))

@@ -58,6 +58,9 @@ from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
 
+FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL = settings.FEATURES.copy()
+FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL['ENABLE_PASSWORD_RESET_FAILURE_EMAIL'] = True
+
 
 @ddt.ddt
 class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
@@ -146,6 +149,28 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
                         side_effect=UserAPIInternalError):
             self._change_password()
             self.assertRaises(UserAPIInternalError)
+
+    @override_settings(FEATURES=FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL)
+    def test_password_reset_failure_email(self):
+        """Test that a password reset failure email notification is sent, when enabled."""
+        # Log the user out
+        self.client.logout()
+
+        bad_email = 'doesnotexist@example.com'
+        response = self._change_password(email=bad_email)
+        self.assertEqual(response.status_code, 200)
+
+        # Check that an email was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the body contains the failed password reset message
+        email_body = mail.outbox[0].body
+        self.assertIn(
+            'However, there is currently no user account associated with your email address: {email}'.format(
+                email=bad_email
+            ),
+            email_body,
+        )
 
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
