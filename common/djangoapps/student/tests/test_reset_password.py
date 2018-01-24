@@ -44,7 +44,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(ResetPasswordTests, self).setUp('student.views.tracker')
+        super(ResetPasswordTests, self).setUp('student.views.management.tracker')
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -56,7 +56,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.user_bad_passwd.password = UNUSABLE_PASSWORD_PREFIX
         self.user_bad_passwd.save()
 
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
         """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD_PREFIX"""
 
@@ -71,7 +71,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
         self.assert_no_events_were_emitted()
 
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
         """Now test the exception cases with of reset_password called with invalid email."""
 
@@ -88,7 +88,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
         self.assert_no_events_were_emitted()
 
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_password_reset_ratelimited(self):
         """ Try (and fail) resetting password 30 times in a row on an non-existant email address """
         cache.clear()
@@ -110,7 +110,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
         """Tests contents of reset password email, and that user is not active"""
 
@@ -310,7 +310,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         self.assertEqual(response.context_data['err_msg'], password_dict['error_message'])
 
-    @patch('student.views.password_reset_confirm')
+    @patch('student.views.management.password_reset_confirm')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_reset_password_good_token_configuration_override(self, reset_confirm):
         """Tests password reset confirmation page for site configuration override."""

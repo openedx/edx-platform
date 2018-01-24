@@ -1,24 +1,55 @@
-"""Helpers for the student app. """
+"""
+Helpers for the student app.
+"""
+import json
 import logging
 import mimetypes
 import urllib
 import urlparse
 from datetime import datetime
 
+import django
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.validators import ValidationError, validate_email
+from django.contrib.auth import authenticate, load_backend, login, logout
+from django.contrib.auth.models import User
+from django.db import IntegrityError, transaction
 from django.utils import http
+from django.utils.translation import ugettext as _
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from pytz import UTC
-
+from six import iteritems, text_type
 import third_party_auth
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.api import (  # pylint: disable=import-error
+    get_certificate_url,
+    has_html_certificates_enabled
+)
+from lms.djangoapps.certificates.models import (  # pylint: disable=import-error
+    CertificateStatuses,
+    certificate_status_for_student
+)
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
+from student.models import (
+    CourseEnrollment,
+    LinkedInAddToProfileConfiguration,
+    PasswordHistory,
+    Registration,
+    UserAttribute,
+    UserProfile,
+    unique_id_for_user
+)
+
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -186,7 +217,7 @@ def check_verify_status_by_course(user, course_enrollments):
                 }
 
     if recent_verification_datetime:
-        for key, value in status_by_course.iteritems():  # pylint: disable=unused-variable
+        for key, value in iteritems(status_by_course):  # pylint: disable=unused-variable
             status_by_course[key]['verification_good_until'] = recent_verification_datetime.strftime("%m/%d/%Y")
 
     return status_by_course
@@ -348,3 +379,304 @@ def destroy_oauth_tokens(user):
     dop_refresh_token.objects.filter(user=user.id).delete()
     dot_access_token.objects.filter(user=user.id).delete()
     dot_refresh_token.objects.filter(user=user.id).delete()
+
+
+def generate_activation_email_context(user, registration):
+    """
+    Constructs a dictionary for use in activation email contexts
+
+    Arguments:
+        user (User): Currently logged-in user
+        registration (Registration): Registration object for the currently logged-in user
+    """
+    return {
+        'name': user.profile.name,
+        'key': registration.activation_key,
+        'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'support_url': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+    }
+
+
+def create_or_set_user_attribute_created_on_site(user, site):
+    """
+    Create or Set UserAttribute indicating the microsite site the user account was created on.
+    User maybe created on 'courses.edx.org', or a white-label site
+    """
+    if site:
+        UserAttribute.set_user_attribute(user, 'created_on_site', site.domain)
+
+
+# TODO: Remove Django 1.11 upgrade shim
+# SHIM: Compensate for behavior change of default authentication backend in 1.10
+if django.VERSION < (1, 10):
+    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.ModelBackend'
+else:
+    # We want to allow inactive users to log in only when their account is first created
+    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
+
+# Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
+# pylint: disable=logging-format-interpolation
+
+
+def authenticate_new_user(request, username, password):
+    """
+    Immediately after a user creates an account, we log them in. They are only
+    logged in until they close the browser. They can't log in again until they click
+    the activation link from the email.
+    """
+    backend = load_backend(NEW_USER_AUTH_BACKEND)
+    user = backend.authenticate(request=request, username=username, password=password)
+    user.backend = NEW_USER_AUTH_BACKEND
+    return user
+
+
+class AccountValidationError(Exception):
+    """
+    Used in account creation views to raise exceptions with details about specific invalid fields
+    """
+    def __init__(self, message, field):
+        super(AccountValidationError, self).__init__(message)
+        self.field = field
+
+
+def cert_info(user, course_overview):
+    """
+    Get the certificate info needed to render the dashboard section for the given
+    student and course.
+
+    Arguments:
+        user (User): A user.
+        course_overview (CourseOverview): A course.
+
+    Returns:
+        dict: A dictionary with keys:
+            'status': one of 'generating', 'downloadable', 'notpassing', 'processing', 'restricted', 'unavailable', or
+                'certificate_earned_but_not_available'
+            'download_url': url, only present if show_download_url is True
+            'show_survey_button': bool
+            'survey_url': url, only if show_survey_button is True
+            'grade': if status is not 'processing'
+            'can_unenroll': if status allows for unenrollment
+    """
+    return _cert_info(
+        user,
+        course_overview,
+        certificate_status_for_student(user, course_overview.id)
+    )
+
+
+def _cert_info(user, course_overview, cert_status):
+    """
+    Implements the logic for cert_info -- split out for testing.
+
+    Arguments:
+        user (User): A user.
+        course_overview (CourseOverview): A course.
+    """
+    # simplify the status for the template using this lookup table
+    template_state = {
+        CertificateStatuses.generating: 'generating',
+        CertificateStatuses.downloadable: 'downloadable',
+        CertificateStatuses.notpassing: 'notpassing',
+        CertificateStatuses.restricted: 'restricted',
+        CertificateStatuses.auditing: 'auditing',
+        CertificateStatuses.audit_passing: 'auditing',
+        CertificateStatuses.audit_notpassing: 'auditing',
+        CertificateStatuses.unverified: 'unverified',
+    }
+
+    certificate_earned_but_not_available_status = 'certificate_earned_but_not_available'
+    default_status = 'processing'
+
+    default_info = {
+        'status': default_status,
+        'show_survey_button': False,
+        'can_unenroll': True,
+    }
+
+    if cert_status is None:
+        return default_info
+
+    status = template_state.get(cert_status['status'], default_status)
+    is_hidden_status = status in ('unavailable', 'processing', 'generating', 'notpassing', 'auditing')
+
+    if (
+        not certificates_viewable_for_course(course_overview) and
+        (status in CertificateStatuses.PASSED_STATUSES) and
+        course_overview.certificate_available_date
+    ):
+        status = certificate_earned_but_not_available_status
+
+    if (
+        course_overview.certificates_display_behavior == 'early_no_info' and
+        is_hidden_status
+    ):
+        return default_info
+
+    status_dict = {
+        'status': status,
+        'mode': cert_status.get('mode', None),
+        'linked_in_url': None,
+        'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
+    }
+
+    if not status == default_status and course_overview.end_of_course_survey_url is not None:
+        status_dict.update({
+            'show_survey_button': True,
+            'survey_url': process_survey_link(course_overview.end_of_course_survey_url, user)})
+    else:
+        status_dict['show_survey_button'] = False
+
+    if status == 'downloadable':
+        # showing the certificate web view button if certificate is downloadable state and feature flags are enabled.
+        if has_html_certificates_enabled(course_overview):
+            if course_overview.has_any_active_web_certificate:
+                status_dict.update({
+                    'show_cert_web_view': True,
+                    'cert_web_view_url': get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
+                })
+            else:
+                # don't show download certificate button if we don't have an active certificate for course
+                status_dict['status'] = 'unavailable'
+        elif 'download_url' not in cert_status:
+            log.warning(
+                u"User %s has a downloadable cert for %s, but no download url",
+                user.username,
+                course_overview.id
+            )
+            return default_info
+        else:
+            status_dict['download_url'] = cert_status['download_url']
+
+            # If enabled, show the LinkedIn "add to profile" button
+            # Clicking this button sends the user to LinkedIn where they
+            # can add the certificate information to their profile.
+            linkedin_config = LinkedInAddToProfileConfiguration.current()
+
+            # posting certificates to LinkedIn is not currently
+            # supported in White Labels
+            if linkedin_config.enabled and not theming_helpers.is_request_in_themed_site():
+                status_dict['linked_in_url'] = linkedin_config.add_to_profile_url(
+                    course_overview.id,
+                    course_overview.display_name,
+                    cert_status.get('mode'),
+                    cert_status['download_url']
+                )
+
+    if status in {'generating', 'downloadable', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+        cert_grade_percent = -1
+        persisted_grade_percent = -1
+        persisted_grade = CourseGradeFactory().read(user, course=course_overview, create_if_needed=False)
+        if persisted_grade is not None:
+            persisted_grade_percent = persisted_grade.percent
+
+        if 'grade' in cert_status:
+            cert_grade_percent = float(cert_status['grade'])
+
+        if cert_grade_percent == -1 and persisted_grade_percent == -1:
+            # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
+            # who need to be regraded (we weren't tracking 'notpassing' at first).
+            # We can add a log.warning here once we think it shouldn't happen.
+            return default_info
+
+        status_dict['grade'] = text_type(max(cert_grade_percent, persisted_grade_percent))
+
+    return status_dict
+
+
+def process_survey_link(survey_link, user):
+    """
+    If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
+    Currently, this is sha1(user.username).  Otherwise, return survey_link.
+    """
+    return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
+
+
+def do_create_account(form, custom_form=None):
+    """
+    Given cleaned post variables, create the User and UserProfile objects, as well as the
+    registration for this user.
+
+    Returns a tuple (User, UserProfile, Registration).
+
+    Note: this function is also used for creating test users.
+    """
+    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
+    if not configuration_helpers.get_value(
+            'ALLOW_PUBLIC_ACCOUNT_CREATION',
+            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+    ):
+        raise PermissionDenied()
+
+    errors = {}
+    errors.update(form.errors)
+    if custom_form:
+        errors.update(custom_form.errors)
+
+    if errors:
+        raise ValidationError(errors)
+
+    user = User(
+        username=form.cleaned_data["username"],
+        email=form.cleaned_data["email"],
+        is_active=False
+    )
+    user.set_password(form.cleaned_data["password"])
+    registration = Registration()
+
+    # TODO: Rearrange so that if part of the process fails, the whole process fails.
+    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
+    try:
+        with transaction.atomic():
+            user.save()
+            if custom_form:
+                custom_model = custom_form.save(commit=False)
+                custom_model.user = user
+                custom_model.save()
+    except IntegrityError:
+        # Figure out the cause of the integrity error
+        # TODO duplicate email is already handled by form.errors above as a ValidationError.
+        # The checks for duplicate email/username should occur in the same place with an
+        # AccountValidationError and a consistent user message returned (i.e. both should
+        # return "It looks like {username} belongs to an existing account. Try again with a
+        # different username.")
+        if len(User.objects.filter(username=user.username)) > 0:
+            raise AccountValidationError(
+                _("An account with the Public Username '{username}' already exists.").format(username=user.username),
+                field="username"
+            )
+        elif len(User.objects.filter(email=user.email)) > 0:
+            raise AccountValidationError(
+                _("An account with the Email '{email}' already exists.").format(email=user.email),
+                field="email"
+            )
+        else:
+            raise
+
+    # add this account creation to password history
+    # NOTE, this will be a NOP unless the feature has been turned on in configuration
+    password_history_entry = PasswordHistory()
+    password_history_entry.create(user)
+
+    registration.register(user)
+
+    profile_fields = [
+        "name", "level_of_education", "gender", "mailing_address", "city", "country", "goals",
+        "year_of_birth"
+    ]
+    profile = UserProfile(
+        user=user,
+        **{key: form.cleaned_data.get(key) for key in profile_fields}
+    )
+    extended_profile = form.cleaned_extended_profile
+    if extended_profile:
+        profile.meta = json.dumps(extended_profile)
+    try:
+        profile.save()
+    except Exception:  # pylint: disable=broad-except
+        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        raise
+
+    return user, profile, registration

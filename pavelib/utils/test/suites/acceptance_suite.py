@@ -37,22 +37,22 @@ def setup_acceptance_db():
     definitions to sync and migrate.
     """
 
-    for db in DBS.keys():
+    for db in DBS:
         if DBS[db].isfile():
             # Since we are using SQLLite, we can reset the database by deleting it on disk.
             DBS[db].remove()
 
     settings = 'acceptance_docker' if Env.USING_DOCKER else 'acceptance'
-    if all(DB_CACHES[cache].isfile() for cache in DB_CACHES.keys()):
+    if all(DB_CACHES[cache].isfile() for cache in DB_CACHES):
         # To speed up migrations, we check for a cached database file and start from that.
         # The cached database file should be checked into the repo
 
         # Copy the cached database to the test root directory
-        for db_alias in DBS.keys():
+        for db_alias in DBS:
             sh("cp {db_cache} {db}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
 
         # Run migrations to update the db, starting from its cached state
-        for db_alias in sorted(DBS.keys()):
+        for db_alias in sorted(DBS):
             # pylint: disable=line-too-long
             sh("./manage.py lms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
             sh("./manage.py cms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))

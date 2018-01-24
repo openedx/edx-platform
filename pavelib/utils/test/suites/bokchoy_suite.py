@@ -1,6 +1,7 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
+import os
 from time import sleep
 from textwrap import dedent
 
@@ -22,8 +23,6 @@ from pavelib.utils.test.bokchoy_options import (
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.timer import timed
 from pavelib.database import update_local_bokchoy_db_from_s3
-
-import os
 
 try:
     from pygments.console import colorize
@@ -142,7 +141,7 @@ def reset_test_database():
     If not, reset the test database and apply migrations
     """
     if os.environ.get('USER', None) == 'jenkins':
-        update_local_bokchoy_db_from_s3()
+        update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
     else:
         sh("{}/scripts/reset-test-db.sh --migrations".format(Env.REPO_ROOT))
 
@@ -238,7 +237,7 @@ class BokChoyTestSuite(TestSuite):
         check_services()
 
         if not self.testsonly:
-            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})  # pylint: disable=no-value-for-parameter
+            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})
         else:
             # load data in db_fixtures
             load_bok_choy_data()  # pylint: disable=no-value-for-parameter

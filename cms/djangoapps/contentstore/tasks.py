@@ -254,7 +254,7 @@ def export_olx(self, user_id, course_key_string, language):
         self.status.set_state(u'Exporting')
         tarball = create_export_tarball(courselike_module, courselike_key, {}, self.status)
         artifact = UserTaskArtifact(status=self.status, name=u'Output')
-        artifact.file.save(name=tarball.name, content=File(tarball))  # pylint: disable=no-member
+        artifact.file.save(name=os.path.basename(tarball.name), content=File(tarball))  # pylint: disable=no-member
         artifact.save()
     # catch all exceptions so we can record useful error messages
     except Exception as exception:  # pylint: disable=broad-except

@@ -63,7 +63,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         self.cert_status = 'processing'
         self.client.login(username=self.user.username, password=PASSWORD)
 
-    def mock_cert(self, _user, _course_overview, _course_mode):
+    def mock_cert(self, _user, _course_overview):
         """ Return a preset certificate status. """
         return {
             'status': self.cert_status,
@@ -86,7 +86,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         """ Assert that the unenroll action is shown or not based on the cert status."""
         self.cert_status = cert_status
 
-        with patch('student.views.cert_info', side_effect=self.mock_cert):
+        with patch('student.views.dashboard.cert_info', side_effect=self.mock_cert):
             response = self.client.get(reverse('dashboard'))
 
             self.assertEqual(pq(response.content)(self.UNENROLL_ELEMENT_ID).length, unenroll_action_count)
@@ -104,7 +104,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         """ Assert that the unenroll method is called or not based on the cert status"""
         self.cert_status = cert_status
 
-        with patch('student.views.cert_info', side_effect=self.mock_cert):
+        with patch('student.views.management.cert_info', side_effect=self.mock_cert):
             with patch('lms.djangoapps.commerce.signals.handle_refund_order') as mock_refund_handler:
                 REFUND_ORDER.connect(mock_refund_handler)
                 response = self.client.post(
@@ -354,8 +354,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertNotIn('<div class="prerequisites">', response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.get_visible_sessions_for_entitlement')
-    @patch('student.views.get_pseudo_session_for_entitlement')
+    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('student.views.dashboard.get_pseudo_session_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_entitlement(self, mock_course_overview, mock_pseudo_session,
                                      mock_course_runs, mock_get_programs):
@@ -411,7 +411,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn('You must select a session to access the course.', response.content)
         self.assertNotIn('To access the course, select a session.', response.content)
 
-    @patch('student.views.get_visible_sessions_for_entitlement')
+    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs):
         """
@@ -504,7 +504,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         # self.assertNotIn(noAvailableSessions, response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.get_visible_sessions_for_entitlement')
+    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     @patch('opaque_keys.edx.keys.CourseKey.from_string')
     def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
@@ -541,7 +541,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn('Related Programs:', response.content)
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('student.views.get_visible_sessions_for_entitlement')
+    @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
     @patch('opaque_keys.edx.keys.CourseKey.from_string')
     def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):

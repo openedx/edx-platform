@@ -287,7 +287,7 @@ def debounce(seconds=1):
 
         @wraps(func)
         def wrapper(*args, **kwargs):  # pylint: disable=missing-docstring
-            def call():  # pylint: disable=missing-docstring
+            def call():
                 func(*args, **kwargs)
                 func.timer = None
             if func.timer:
@@ -347,8 +347,9 @@ class SassWatcher(PatternMatchingEventHandler):
                 paths.extend(glob.glob(dirname))
             else:
                 paths.append(dirname)
-            for dirname in paths:
-                observer.schedule(self, dirname, recursive=True)
+
+            for obs_dirname in paths:
+                observer.schedule(self, obs_dirname, recursive=True)
 
     @debounce()
     def on_any_event(self, event):

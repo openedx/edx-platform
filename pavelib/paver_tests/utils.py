@@ -63,7 +63,7 @@ class MockEnvironment(tasks.Environment):
             self.messages.append(unicode(output))
 
 
-def fail_on_eslint(*args, **kwargs):
+def fail_on_eslint(*args):
     """
     For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.
@@ -75,7 +75,7 @@ def fail_on_eslint(*args, **kwargs):
         return
 
 
-def fail_on_pylint(*args, **kwargs):
+def fail_on_pylint(*args):
     """
     For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.
@@ -87,7 +87,7 @@ def fail_on_pylint(*args, **kwargs):
         return
 
 
-def fail_on_npm_install(*args, **kwargs):
+def fail_on_npm_install(*args):
     """
     For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.
@@ -98,7 +98,7 @@ def fail_on_npm_install(*args, **kwargs):
         return
 
 
-def unexpected_fail_on_npm_install(*args, **kwargs):
+def unexpected_fail_on_npm_install(*args):
     """
     For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.

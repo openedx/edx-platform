@@ -22,37 +22,45 @@ from student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
-    generate_activation_email_context,
-    reactivation_email_for_user,
     validate_new_email
 )
+from student.views import generate_activation_email_context, send_reactivation_email_for_user
 from third_party_auth.views import inactive_user_view
 from util.request import safe_get_host
 from util.testing import EventTestMixin
 
 
 class TestException(Exception):
-    """Exception used for testing that nothing will catch explicitly"""
+    """
+    Exception used for testing that nothing will catch explicitly
+    """
     pass
 
 
 def mock_render_to_string(template_name, context):
-    """Return a string that encodes template_name and context"""
+    """
+    Return a string that encodes template_name and context
+    """
     return str((template_name, sorted(context.iteritems())))
 
 
 def mock_render_to_response(template_name, context):
-    """Return an HttpResponse with content that encodes template_name and context"""
+    """
+    Return an HttpResponse with content that encodes template_name and context
+    """
     # This simulates any db access in the templates.
     UserProfile.objects.exists()
     return HttpResponse(mock_render_to_string(template_name, context))
 
 
 class EmailTestMixin(object):
-    """Adds useful assertions for testing `email_user`"""
+    """
+    Adds useful assertions for testing `email_user`
+    """
 
     def assertEmailUser(self, email_user, subject_template, subject_context, body_template, body_context):
-        """Assert that `email_user` was used to send and email with the supplied subject and body
+        """
+        Assert that `email_user` was used to send and email with the supplied subject and body
 
         `email_user`: The mock `django.contrib.auth.models.User.email_user` function
             to verify
@@ -68,14 +76,18 @@ class EmailTestMixin(object):
         )
 
     def append_allowed_hosts(self, hostname):
-        """ Append hostname to settings.ALLOWED_HOSTS """
+        """
+        Append hostname to settings.ALLOWED_HOSTS
+        """
         settings.ALLOWED_HOSTS.append(hostname)
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ActivationEmailTests(TestCase):
-    """Test sending of the activation email. """
+    """
+    Test sending of the activation email.
+    """
 
     ACTIVATION_SUBJECT = u"Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
 
@@ -100,7 +112,9 @@ class ActivationEmailTests(TestCase):
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
 
     def _create_account(self):
-        """Create an account, triggering the activation email. """
+        """
+        Create an account, triggering the activation email.
+        """
         url = reverse('create_account')
         params = {
             'username': 'test_user',
@@ -120,7 +134,9 @@ class ActivationEmailTests(TestCase):
         )
 
     def _assert_activation_email(self, subject, body_fragments):
-        """Verify that the activation email was sent. """
+        """
+        Verify that the activation email was sent.
+        """
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, subject)
@@ -146,10 +162,12 @@ class ActivationEmailTests(TestCase):
             )
 
 
-@patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('student.views.login.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
 class ReactivationEmailTests(EmailTestMixin, TestCase):
-    """Test sending a reactivation email to a user"""
+    """
+    Test sending a reactivation email to a user
+    """
 
     def setUp(self):
         super(ReactivationEmailTests, self).setUp()
@@ -162,10 +180,12 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         Send the reactivation email to the specified user,
         and return the response as json data.
         """
-        return json.loads(reactivation_email_for_user(user).content)
+        return json.loads(send_reactivation_email_for_user(user).content)
 
     def assertReactivateEmailSent(self, email_user):
-        """Assert that the correct reactivation email has been sent"""
+        """
+        Assert that the correct reactivation email has been sent
+        """
         context = generate_activation_email_context(self.user, self.registration)
 
         self.assertEmailUser(
@@ -222,10 +242,12 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
 
 class EmailChangeRequestTests(EventTestMixin, TestCase):
-    """Test changing a user's email address"""
+    """
+    Test changing a user's email address
+    """
 
     def setUp(self):
-        super(EmailChangeRequestTests, self).setUp('student.views.tracker')
+        super(EmailChangeRequestTests, self).setUp('student.views.management.tracker')
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -237,28 +259,36 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         self.user.email_user = Mock()
 
     def do_email_validation(self, email):
-        """Executes validate_new_email, returning any resulting error message. """
+        """
+        Executes validate_new_email, returning any resulting error message.
+        """
         try:
             validate_new_email(self.request.user, email)
         except ValueError as err:
             return err.message
 
     def do_email_change(self, user, email, activation_key=None):
-        """Executes do_email_change_request, returning any resulting error message. """
+        """
+        Executes do_email_change_request, returning any resulting error message.
+        """
         try:
             do_email_change_request(user, email, activation_key)
         except ValueError as err:
             return err.message
 
     def assertFailedRequest(self, response_data, expected_error):
-        """Assert that `response_data` indicates a failed request that returns `expected_error`"""
+        """
+        Assert that `response_data` indicates a failed request that returns `expected_error`
+        """
         self.assertFalse(response_data['success'])
         self.assertEquals(expected_error, response_data['error'])
         self.assertFalse(self.user.email_user.called)
 
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_duplicate_activation_key(self):
-        """Assert that if two users change Email address simultaneously, no error is thrown"""
+        """
+        Assert that if two users change Email address simultaneously, no error is thrown
+        """
 
         # New emails for the users
         user1_new_email = "valid_user1_email@example.com"
@@ -280,7 +310,9 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
             self.assertEqual(self.do_email_validation(email), 'Valid e-mail address required.')
 
     def test_change_email_to_existing_value(self):
-        """ Test the error message if user attempts to change email to the existing value. """
+        """
+        Test the error message if user attempts to change email to the existing value.
+        """
         self.assertEqual(self.do_email_validation(self.user.email), 'Old email is the same as the new email.')
 
     def test_duplicate_email(self):
@@ -292,9 +324,11 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
 
     @patch('django.core.mail.send_mail')
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_email_failure(self, send_mail):
-        """ Test the return value if sending the email for the user to click fails. """
+        """
+        Test the return value if sending the email for the user to click fails.
+        """
         send_mail.side_effect = [Exception, None]
         self.assertEqual(
             self.do_email_change(self.user, "valid@email.com"),
@@ -303,9 +337,11 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         self.assert_no_events_were_emitted()
 
     @patch('django.core.mail.send_mail')
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_email_success(self, send_mail):
-        """ Test email was sent if no errors encountered. """
+        """
+        Test email was sent if no errors encountered.
+        """
         old_email = self.user.email
         new_email = "valid@example.com"
         registration_key = "test registration key"
@@ -327,10 +363,12 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
 
 
 @patch('django.contrib.auth.models.User.email_user')
-@patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
-@patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
-    """Test that confirmation of email change requests function even in the face of exceptions thrown while sending email"""
+    """
+    Test that confirmation of email change requests function even in the face of exceptions thrown while sending email
+    """
     def setUp(self):
         super(EmailChangeConfirmationTests, self).setUp()
         self.user = UserFactory.create()
@@ -343,18 +381,23 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.key = self.pending_change_request.activation_key
 
     def assertRolledBack(self):
-        """Assert that no changes to user, profile, or pending email have been made to the db"""
+        """
+        Assert that no changes to user, profile, or pending email have been made to the db
+        """
         self.assertEquals(self.user.email, User.objects.get(username=self.user.username).email)
         self.assertEquals(self.profile.meta, UserProfile.objects.get(user=self.user).meta)
         self.assertEquals(1, PendingEmailChange.objects.count())
 
     def assertFailedBeforeEmailing(self, email_user):
-        """Assert that the function failed before emailing a user"""
+        """
+        Assert that the function failed before emailing a user
+        """
         self.assertRolledBack()
         self.assertFalse(email_user.called)
 
     def check_confirm_email_change(self, expected_template, expected_context):
-        """Call `confirm_email_change` and assert that the content was generated as expected
+        """
+        Call `confirm_email_change` and assert that the content was generated as expected
 
         `expected_template`: The name of the template that should have been used
             to generate the content
@@ -368,7 +411,9 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         )
 
     def assertChangeEmailSent(self, email_user):
-        """Assert that the correct email was sent to confirm an email change"""
+        """
+        Assert that the correct email was sent to confirm an email change
+        """
         context = {
             'old_email': self.user.email,
             'new_email': self.pending_change_request.new_email,

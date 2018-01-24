@@ -114,14 +114,14 @@ class TestSuite(object):
 
             for suite in self.subsuites:
                 suite.run_suite_tests()
-                if len(suite.failed_suites) > 0:
+                if suite.failed_suites:
                     self.failed_suites.extend(suite.failed_suites)
 
     def report_test_results(self):
         """
         Writes a list of failed_suites to sys.stderr
         """
-        if len(self.failed_suites) > 0:
+        if self.failed_suites:
             msg = colorize('red', "\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
             msg += colorize('red', '\n* '.join([s.root for s in self.failed_suites]) + '\n\n')
         else:
@@ -140,5 +140,5 @@ class TestSuite(object):
 
         self.report_test_results()
 
-        if len(self.failed_suites) > 0:
+        if self.failed_suites:
             sys.exit(1)

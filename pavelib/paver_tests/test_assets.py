@@ -14,7 +14,7 @@ from ..utils.envs import Env
 from .utils import PaverTestCase
 
 ROOT_PATH = path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-TEST_THEME_DIR = ROOT_PATH / "common/test/test-theme"  # pylint: disable=invalid-name
+TEST_THEME_DIR = ROOT_PATH / "common/test/test-theme"
 
 
 class TestPaverWatchAssetTasks(TestCase):
@@ -162,7 +162,7 @@ class TestCollectAssets(PaverTestCase):
         for i, sys in enumerate(systems):
             msg = self.task_messages[i]
             self.assertTrue(msg.startswith('python manage.py {}'.format(sys)))
-            self.assertIn(' collectstatic '.format(Env.DEVSTACK_SETTINGS), msg)
+            self.assertIn(' collectstatic ', msg)
             self.assertIn('--settings={}'.format(Env.DEVSTACK_SETTINGS), msg)
             self.assertTrue(msg.endswith(' {}'.format(log_location)))
 

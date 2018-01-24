@@ -57,7 +57,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             # a course key may have unicode chars in it
-            course_key = text_type(options['course_key'], 'utf8')
+            try:
+                course_key = text_type(options['course_key'], 'utf8')
+            # May already be decoded to unicode if coming in through tests, this is ok.
+            except TypeError:
+                course_key = text_type(options['course_key'])
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
             raise CommandError('Invalid course_key: {}'.format(options['course_key']))

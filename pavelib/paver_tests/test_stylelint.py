@@ -13,11 +13,6 @@ class TestPaverStylelint(PaverTestCase):
     """
     Tests for Paver's Stylelint tasks.
     """
-
-    def setUp(self):
-        super(TestPaverStylelint, self).setUp()
-        pass
-
     @ddt.data(
         [0, False],
         [99, False],

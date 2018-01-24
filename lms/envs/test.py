@@ -33,14 +33,9 @@ from util.testing import patch_testcase, patch_sessions
 patch_testcase()
 patch_sessions()
 
-# Add some host names used in assorted tests
+# Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = [
-    'localhost',
-    'logistration.testserver',
-    '.testserver.fake',
-    'test-site.testserver',
-    'testserver.fakeother',
-    'edx.org'
+    '*'
 ]
 
 # Silence noisy logs to make troubleshooting easier when tests fail.

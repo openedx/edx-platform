@@ -200,7 +200,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
     @patch('django.core.mail.send_mail')
-    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
         send_mail.side_effect = [Exception, None]

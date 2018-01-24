@@ -8,6 +8,7 @@ import mock
 from django.conf import settings
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
+from six import binary_type, text_type
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
@@ -23,7 +24,7 @@ LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 def make_url_for_lib(key):
     """ Get the RESTful/studio URL for testing the given library """
     if isinstance(key, LibraryLocator):
-        key = unicode(key)
+        key = text_type(key)
     return LIBRARY_REST_URL + key
 
 
@@ -239,11 +240,11 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(response.status_code, 200)
         info = parse_json(response)
         self.assertEqual(info['display_name'], lib.display_name)
-        self.assertEqual(info['library_id'], unicode(lib_key))
+        self.assertEqual(info['library_id'], text_type(lib_key))
         self.assertEqual(info['previous_version'], None)
         self.assertNotEqual(info['version'], None)
         self.assertNotEqual(info['version'], '')
-        self.assertEqual(info['version'], unicode(version))
+        self.assertEqual(info['version'], text_type(version))
 
     def test_get_lib_edit_html(self):
         """
@@ -319,12 +320,12 @@ class UnitTestLibraries(CourseTestCase):
         """
         library = LibraryFactory.create()
         extra_user, _ = self.create_non_staff_user()
-        manage_users_url = reverse_library_url('manage_library_users', unicode(library.location.library_key))
+        manage_users_url = reverse_library_url('manage_library_users', text_type(library.location.library_key))
 
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         # extra_user has not been assigned to the library so should not show up in the list:
-        self.assertNotIn(extra_user.username, response.content)
+        self.assertNotIn(binary_type(extra_user.username), response.content)
 
         # Now add extra_user to the library:
         user_details_url = reverse_course_url(
@@ -337,4 +338,4 @@ class UnitTestLibraries(CourseTestCase):
         # Now extra_user should apear in the list:
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(extra_user.username, response.content)
+        self.assertIn(binary_type(extra_user.username), response.content)

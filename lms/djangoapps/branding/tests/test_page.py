@@ -192,7 +192,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         )
         self.factory = RequestFactory()
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
@@ -216,7 +216,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # make sure we have the special css class on the section
         self.assertIn('<div class="courses no-course-discovery"', response.content)
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
@@ -238,7 +238,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
         self.assertIn('<div class="courses"', response.content)
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
@@ -263,7 +263,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][1].id, self.starting_later.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})

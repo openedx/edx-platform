@@ -134,7 +134,7 @@ def run_pylint(options):
     errors = getattr(options, 'errors', False)
     systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
 
-    num_violations, violations_list = _get_pylint_violations(systems, errors)
+    num_violations, _ = _get_pylint_violations(systems, errors)
 
     # Print number of violations to log
     violations_count_str = "Number of pylint violations: " + str(num_violations)
@@ -496,7 +496,7 @@ def run_xsslint(options):
                         violations_limit=violation_thresholds['rules'][threshold_key],
                     )
 
-    if error_message is not "":
+    if error_message:
         raise BuildFailure(
             "FAILURE: XSSLinter Failed.\n{error_message}\n"
             "See {xsslint_report} or run the following command to hone in on the problem:\n"
@@ -604,7 +604,8 @@ def _get_count_from_last_line(filename, file_type):
     It is returning only the value (as a floating number).
     """
     last_line = _get_report_contents(filename, last_line_only=True).strip()
-    if file_type is "python_complexity":
+
+    if file_type == "python_complexity":
         # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
         regex = r'\d+.\d+'
     else:
@@ -687,6 +688,7 @@ def _get_xsscommitlint_count(filename):
     ("limit=", "l", "Limits for number of acceptable violations - either <upper> or <lower>:<upper>"),
 ])
 @timed
+# pylint: disable=too-many-statements
 def run_quality(options):
     """
     Build the html diff quality reports, and print the reports to the console.
