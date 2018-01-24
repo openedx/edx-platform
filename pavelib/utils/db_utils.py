@@ -128,7 +128,7 @@ def is_fingerprint_in_bucket(fingerprint, bucket_name):
     Test if a zip file matching the given fingerprint is present within an s3 bucket
     """
     zipfile_name = '{}.tar.gz'.format(fingerprint)
-    conn = boto.connect_s3()
+    conn = boto.connect_s3(anon=True)
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
     return key.exists()
@@ -151,7 +151,7 @@ def get_file_from_s3(bucket_name, zipfile_name, path):
     Get the file from s3 and save it to disk.
     """
     print ("Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
-    conn = boto.connect_s3()
+    conn = boto.connect_s3(anon=True)
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
     if not key.exists():
@@ -206,16 +206,26 @@ def upload_to_s3(file_name, file_path, bucket_name):
     """
     Upload the specified files to an s3 bucket.
     """
-    print ("Uploading {} to s3 bucket {}".format(file_name, bucket_name))
-    conn = boto.connect_s3()
-    bucket = conn.get_bucket(bucket_name)
+    print("Uploading {} to s3 bucket {}".format(file_name, bucket_name))
+    try:
+        conn = boto.connect_s3()
+    except boto.exception.NoAuthHandlerFound:
+        print("No AWS credentials found. "
+              "Continuing without uploading the new cache to S3.")
+        return
+    try:
+        bucket = conn.get_bucket(bucket_name)
+    except boto.exception.S3ResponseError:
+        print("Unable to connect to cache bucket with these credentials. "
+              "Continuing without uploading the new cache to S3.")
+        return
     key = boto.s3.key.Key(bucket=bucket, name=file_name)
-    bytes_written = key.set_contents_from_filename(file_path, replace=False)
+    bytes_written = key.set_contents_from_filename(file_path, replace=False, policy='public-read')
     if bytes_written:
         msg = "Wrote {} bytes to {}.".format(bytes_written, key.name)
     else:
         msg = "File {} already existed in bucket {}.".format(key.name, bucket_name)
-    print (msg)
+    print(msg)
 
 
 def upload_db_cache_to_s3(fingerprint, bokchoy_db_files, bucket_name):
