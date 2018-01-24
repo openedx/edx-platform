@@ -547,7 +547,8 @@ class CourseFields(object):
         display_name=_("Certificate Web/HTML View Enabled"),
         help=_("If true, certificate Web/HTML views are enabled for the course."),
         scope=Scope.settings,
-        default=False,
+        default=True,
+        deprecated=True
     )
     cert_html_view_overrides = Dict(
         # Translators: This field is the container for course-specific certificate configuration values

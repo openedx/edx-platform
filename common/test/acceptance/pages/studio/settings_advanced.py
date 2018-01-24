@@ -217,7 +217,6 @@ class AdvancedSettingsPage(CoursePage):
             'annotation_storage_url',
             'social_sharing_url',
             'video_bumper',
-            'cert_html_view_enabled',
             'enable_proctored_exams',
             'allow_proctoring_opt_out',
             'enable_timed_exams',

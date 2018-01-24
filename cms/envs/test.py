@@ -278,6 +278,9 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 # Enable a parental consent age limit for testing
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
+# Enable certificates for the tests
+FEATURES['CERTIFICATES_HTML_VIEW'] = True
+
 # Enable content libraries code for the tests
 FEATURES['ENABLE_CONTENT_LIBRARIES'] = True
 
