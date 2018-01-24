@@ -1463,7 +1463,11 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         Test that XSS attack is prevented
         """
         mock_threads.return_value = [], 1, 1
-        mock_from_django_user.return_value.to_dict.return_value = {}
+        mock_from_django_user.return_value.to_dict.return_value = {
+            'upvoted_ids': [],
+            'downvoted_ids': [],
+            'subscribed_thread_ids': []
+        }
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
         url = reverse('user_profile',
