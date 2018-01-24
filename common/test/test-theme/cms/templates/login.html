@@ -1,3 +1,4 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page expression_filter="h"/>
 
 <%inherit file="base.html" />
@@ -51,8 +52,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 </div>
 </%block>
 
-<%block name="requirejs">
-  require(["js/factories/login"], function(LoginFactory) {
-      LoginFactory("${reverse('homepage') | n, js_escaped_string }");
-  });
+<%block name="requirejs_page">
+  <%static:require_page page_name="js/pages/login" class_name="LoginFactory">
+    "${reverse('homepage') | n, js_escaped_string}"
+  </%static:require_page>
 </%block>
