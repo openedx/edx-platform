@@ -1584,35 +1584,6 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    def test_export_val_data_with_external(self):
-        """
-        Tests exported val data for external video.
-        """
-        external_video_id = '3_yD_cEKoCk'
-        create_or_update_video_transcript(
-            video_id=external_video_id,
-            language_code='ar',
-            metadata={
-                'provider': 'Cielo24',
-                'file_name': 'ext101.srt',
-                'file_format': 'srt'
-            }
-        )
-
-        actual = self.descriptor.definition_to_xml(resource_fs=None)
-        expected_str = """
-            <video url_name="SampleProblem" download_video="false">
-                <video_asset>
-                    <transcripts>
-                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24" video_id="{video_id}"/>
-                    </transcripts>
-                </video_asset>
-            </video>
-        """.format(video_id=external_video_id)
-        parser = etree.XMLParser(remove_blank_text=True)
-        expected = etree.XML(expected_str, parser=parser)
-        self.assertXmlEqual(expected, actual)
-
     def test_export_val_data_not_found(self):
         self.descriptor.edx_video_id = 'nonexistent'
         actual = self.descriptor.definition_to_xml(resource_fs=None)
@@ -1666,33 +1637,6 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertDictEqual(
             get_video_transcript(video.edx_video_id, 'ar'),
             self.get_video_transcript_data('test_edx_video_id')
-        )
-
-    def test_import_val_data_external(self):
-        """
-        Tests video import with external video.
-        """
-        external_video_id = 'external_video_id'
-        module_system = DummySystem(load_error_modules=True)
-
-        xml_data = """
-            <video>
-                <video_asset>
-                    <transcripts>
-                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24" video_id="{video_id}"/>
-                    </transcripts>
-                </video_asset>
-            </video>
-        """.format(video_id=external_video_id)
-
-        id_generator = Mock()
-        id_generator.target_course_id = "test_course_id"
-        self.descriptor.from_xml(xml_data, module_system, id_generator)
-
-        # verify transcript data
-        self.assertDictEqual(
-            get_video_transcript(external_video_id, 'ar'),
-            self.get_video_transcript_data(external_video_id)
         )
 
     def test_import_val_data_invalid(self):
