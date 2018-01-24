@@ -25,6 +25,9 @@ from student.models import (
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
+
 User = get_user_model()  # pylint:disable=invalid-name
 
 
@@ -170,6 +173,11 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = _('User profile')
 
+class UserCreationFormExtended(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super(UserCreationFormExtended, self).__init__(*args, **kwargs)
+        self.fields['email'] = forms.EmailField(label=_("E-mail"), max_length=75)
+
 
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
@@ -197,6 +205,14 @@ class UserAttributeAdmin(admin.ModelAdmin):
     class Meta(object):
         model = UserAttribute
 
+
+UserAdmin.add_form = UserCreationFormExtended
+UserAdmin.add_fieldsets = (
+    (None, {
+        'classes': ('wide',),
+        'fields': ('email', 'username', 'password1', 'password2',)
+    }),
+)
 
 admin.site.register(UserTestGroup)
 admin.site.register(CourseEnrollmentAllowed)
