@@ -24,7 +24,6 @@ class MandrillClient(object):
         except mandrill.Error, e:
             # Mandrill errors are thrown as exceptions
             log.error('A mandrill error occurred: %s - %s' % (e.__class__, e))
-            # A mandrill error occurred: <class 'mandrill.UnknownSubaccountError'> - No subaccount exists with the id 'customer-123'
             raise
         return result
 
