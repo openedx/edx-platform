@@ -63,5 +63,9 @@ class MandrillClient(object):
             {'name': 'course_name', 'content': context['course_name']},
             {'name': 'course_url', 'content': context['course_link']},
         ]
+        if template_name == 'weekly':
+            global_merge_vars.append(
+                {'name': 'course_week', 'content': context['course_week']},
+            )
         self.send_template(template_name, user_email, global_merge_vars)
 
