@@ -38,6 +38,7 @@ module.exports = {
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/asset_index': './cms/static/js/pages/asset_index.js',
+        'js/sock': './cms/static/js/sock.js',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
@@ -158,9 +159,16 @@ module.exports = {
                 use: 'babel-loader'
             },
             {
-                test: /\.coffee$/,
-                exclude: /node_modules/,
-                use: 'coffee-loader'
+                test: path.resolve(__dirname, 'common/static/coffee/src/ajax_prefix.js'),
+                use: [
+                    'babel-loader',
+                    {
+                        loader: 'exports-loader',
+                        options: {
+                            'this.AjaxPrefix': true
+                        }
+                    }
+                ]
             },
             {
                 test: /\.underscore$/,
@@ -170,13 +178,34 @@ module.exports = {
                 // This file is used by both RequireJS and Webpack and depends on window globals
                 // This is a dirty hack and shouldn't be replicated for other files.
                 test: path.resolve(__dirname, 'cms/static/cms/js/main.js'),
-                use: {
-                    loader: 'imports-loader',
-                    options: {
-                        AjaxPrefix:
-                            'exports-loader?this.AjaxPrefix!../../../../common/static/coffee/src/ajax_prefix.coffee'
+                loader: StringReplace.replace(
+                    ['babel-loader'],
+                    {
+                        replacements: [
+                            {
+                                pattern: /\(function\(AjaxPrefix\) {/,
+                                replacement: function() { return ''; }
+                            },
+                            {
+                                pattern: /], function\(domReady, \$, str, Backbone, gettext, NotificationView\) {/,
+                                replacement: function() {
+                                    // eslint-disable-next-line
+                                    return '], function(domReady, $, str, Backbone, gettext, NotificationView, AjaxPrefix) {';
+                                }
+                            },
+                            {
+                                pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
+                                replacement: function() {
+                                    return "'../../common/js/components/views/feedback_notification', 'AjaxPrefix',";
+                                }
+                            },
+                            {
+                                pattern: /}\).call\(this, AjaxPrefix\);/,
+                                replacement: function() { return ''; }
+                            }
+                        ]
                     }
-                }
+                )
             },
             {
                 test: /\.(woff2?|ttf|svg|eot)(\?v=\d+\.\d+\.\d+)?$/,
@@ -186,8 +215,9 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ['.js', '.jsx', '.json', '.coffee'],
+        extensions: ['.js', '.jsx', '.json'],
         alias: {
+            AjaxPrefix: 'ajax_prefix',
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
             'jquery.ui': 'jQuery-File-Upload/js/vendor/jquery.ui.widget.js',
             jquery: 'jquery/src/jquery',  // Use the non-dist form of jQuery for better debugging + optimization
@@ -196,14 +226,21 @@ module.exports = {
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
-            sinon: __dirname + '/node_modules/sinon/pkg/sinon.js'
+            sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
+            'jquery.smoothScroll': 'jquery.smooth-scroll.min',
+            'jquery.timepicker': 'timepicker/jquery.timepicker',
+            datepair: 'timepicker/datepair',
+            accessibility: 'accessibility_tools',
+            ieshim: 'ie_shim'
         },
         modules: [
             'node_modules',
-            'common/static/js/vendor/',
             'cms/static',
+            'common/static',
             'common/static/js/src',
-            'common/static/js/vendor/jQuery-File-Upload/js/'
+            'common/static/js/vendor/',
+            'common/static/js/vendor/jQuery-File-Upload/js/',
+            'common/static/coffee/src'
         ]
     },
 
