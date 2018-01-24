@@ -698,7 +698,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     def test_start_date_filter(self):
         now = datetime.datetime.now()
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=self.later)
+        self.create_discussion("Chapter 1", u"Discussion 2 обсуждение", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)

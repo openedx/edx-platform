@@ -638,7 +638,7 @@ class MiscCourseTests(ContentStoreTestCase):
                 "youtube_id_1_25": "AKqURZnYqpk",
                 "youtube_id_1_5": "DYpADpL7jAY",
                 "name": "truncated_video",
-                "end_time": 10.0,
+                "end_time": timedelta(hours=10),
             }
         )
         self.store.create_child(

@@ -5,10 +5,11 @@ import json
 import os
 import tempfile
 import textwrap
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import ddt
 import freezegun
+from django.utils.timezone import now
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from webob import Request, Response
@@ -175,10 +176,10 @@ class TestVideo(BaseTestXmodule):
         self.item_descriptor.handle_ajax('save_user_state', {'bumper_do_not_show_again': True})
         self.assertEqual(self.item_descriptor.bumper_do_not_show_again, True)
 
-        with freezegun.freeze_time(datetime.now()):
+        with freezegun.freeze_time(now()):
             self.assertEqual(self.item_descriptor.bumper_last_view_date, None)
             self.item_descriptor.handle_ajax('save_user_state', {'bumper_last_view_date': True})
-            self.assertEqual(self.item_descriptor.bumper_last_view_date, datetime.utcnow())
+            self.assertEqual(self.item_descriptor.bumper_last_view_date, now())
 
         response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)

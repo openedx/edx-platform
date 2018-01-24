@@ -311,10 +311,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @ddt.data(
         (True, True, True),
         (True, False, False),
-        (True, None, False),
         (False, True, False),
         (False, False, False),
-        (False, None, False),
     )
     @ddt.unpack
     def test_ccx_coaches_option_on_admin_list_management_instructor(

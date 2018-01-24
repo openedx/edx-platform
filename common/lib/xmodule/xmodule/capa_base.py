@@ -190,8 +190,8 @@ class CapaFields(object):
     # enforce_type is set to False here because this field is saved as a dict in the database.
     score = ScoreField(help=_("Dictionary with the current student score"), scope=Scope.user_state, enforce_type=False)
     has_saved_answers = Boolean(help=_("Whether or not the answers have been saved since last submit"),
-                                scope=Scope.user_state)
-    done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
+                                scope=Scope.user_state, default=False)
+    done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state, default=False)
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
     submission_wait_seconds = Integer(

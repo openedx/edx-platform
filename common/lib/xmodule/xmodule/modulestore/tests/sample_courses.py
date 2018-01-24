@@ -58,7 +58,7 @@ TOY_BLOCK_INFO_TREE = [
                     ),
                     BlockInfo(
                         "toyjumpto", "html", {
-                            "data": "<a href=\"/jump_to_id/vertical_test\">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>\n",
+                            "data": u"<a href=\"/jump_to_id/vertical_test\">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>\n",
                             "xml_attributes": {"filename": ["html/toyjumpto.xml", "html/toyjumpto.xml"]}
                         }, []),
                     BlockInfo(
@@ -120,7 +120,7 @@ TOY_BLOCK_INFO_TREE = [
         "poll_test", "chapter", {}, [
             BlockInfo(
                 "T1_changemind_poll_foo", "poll_question", {
-                    "question": "<p>Have you changed your mind? ’</p>",
+                    "question": u"<p>Have you changed your mind? ’</p>",
                     "answers": [{"text": "Yes", "id": "yes"}, {"text": "No", "id": "no"}],
                     "xml_attributes": {"reset": "false", "filename": ["", None]},
                     "display_name": "Change your answer"
@@ -168,7 +168,7 @@ TOY_BLOCK_INFO_TREE = [
                         }, []),
                 ]),
                 BlockInfo("unicode", "html", {
-                    "data": "…", "xml_attributes": {"filename": ["", None]}
+                    "data": u"…", "xml_attributes": {"filename": ["", None]}
                 }, [])
             ]),
         ]
