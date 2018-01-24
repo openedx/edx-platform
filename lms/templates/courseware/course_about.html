@@ -8,6 +8,7 @@ from six import text_type
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
+from six import string_types
 %>
 
 <%inherit file="../main.html" />
@@ -227,12 +228,12 @@ from openedx.core.lib.courses import course_image_url
           <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
               <%
-                  course_start_date = course.start
+                  course_start_date = course.advertised_start or course.start
               %>
             <li class="important-dates-item">
               <span class="icon fa fa-calendar" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Classes Start")}</p>
-              % if isinstance(course_start_date, str):
+              % if isinstance(course_start_date, string_types):
                   <span class="important-dates-item-text start-date">${course_start_date}</span>
               % else:
                   <%
