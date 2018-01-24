@@ -20,7 +20,7 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     type = 'discussion'
     title = ugettext_noop('Discussion')
     priority = None
-    view_name = 'discussion.views.forum_form_discussion'
+    view_name = 'forum_form_discussion'
     fragment_view_name = 'discussion.views.DiscussionBoardFragmentView'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
     is_default = False
