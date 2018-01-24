@@ -842,9 +842,10 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
         return total_revenue
 
     def clean_total_donations(self):
+        can_provide_info = int(self.data.get('can_provide_info')) if self.data.get('can_provide_info') else False
         total_donations = self.cleaned_data['total_donations']
 
-        if not total_donations:
+        if can_provide_info and not total_donations:
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("Total Donations")))
 
         return total_donations
