@@ -5,8 +5,8 @@ Tests for Blocks api.py
 from itertools import product
 
 import ddt
+import django
 from django.test.client import RequestFactory
-
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
 from student.tests.factories import UserFactory
@@ -161,8 +161,20 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
         with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
+
+            if with_storage_backing:
+                # TODO: Remove Django 1.11 upgrade shim
+                # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
+                # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
+                if django.VERSION >= (1, 11):
+                    num_sql_queries = 16
+                else:
+                    num_sql_queries = 14
+            else:
+                num_sql_queries = 6
+
             self._get_blocks(
                 course,
                 expected_mongo_queries,
-                expected_sql_queries=14 if with_storage_backing else 6,
+                expected_sql_queries=num_sql_queries,
             )
