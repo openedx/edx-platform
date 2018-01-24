@@ -9,7 +9,6 @@ from opaque_keys.edx.keys import CourseKey
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
-from notes.utils import notes_enabled_for_course
 from static_replace import replace_static_urls
 from xmodule.annotator_token import retrieve_token
 
@@ -147,7 +146,6 @@ def html_index(request, course_id, book_index, chapter=None):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = bool(has_access(request.user, 'staff', course))
-    notes_enabled = notes_enabled_for_course(course)
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.html_textbooks):
@@ -171,8 +169,5 @@ def html_index(request, course_id, book_index, chapter=None):
             'chapter': chapter,
             'student': student,
             'staff_access': staff_access,
-            'notes_enabled': notes_enabled,
-            'storage': course.annotation_storage_url,
-            'token': retrieve_token(student.email, course.annotation_token_secret),
         },
     )
