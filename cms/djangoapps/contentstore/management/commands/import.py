@@ -3,7 +3,7 @@ Script for importing courseware from XML format
 """
 from django.core.management.base import BaseCommand
 from django_comment_common.utils import are_permissions_roles_seeded, seed_permissions_roles
-from lms.djangoapps.dashboard.git_import import DEFAULT_COURSE_CODE_LIB_FILENAME
+from lms.djangoapps.dashboard.git_import import DEFAULT_PYTHON_LIB_FILENAME
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -24,15 +24,15 @@ class Command(BaseCommand):
         parser.add_argument('--nostatic',
                             action='store_true',
                             help='Skip import of static content')
-        parser.add_argument('--nocodelib',
+        parser.add_argument('--nopythonlib',
                             action='store_true',
                             help=(
                                 'Skip import of custom code library if it exists'
                                 '(NOTE: If static content is imported, the code library will also '
                                 'be imported and this flag will be ignored)'
                             )),
-        parser.add_argument('--code-lib-filename',
-                            default=DEFAULT_COURSE_CODE_LIB_FILENAME,
+        parser.add_argument('--python-lib-filename',
+                            default=DEFAULT_PYTHON_LIB_FILENAME,
                             help='Filename of the course code library (if it exists)')
 
     def handle(self, *args, **options):
@@ -41,8 +41,8 @@ class Command(BaseCommand):
         if len(source_dirs) == 0:
             source_dirs = None
         do_import_static = not options.get('nostatic', False)
-        do_import_code_lib = not options.get('nocodelib', False)
-        course_code_lib_filename = options.get('code_lib_filename')
+        do_import_python_lib = not options.get('nopythonlib', False)
+        python_lib_filename = options.get('python_lib_filename')
 
         self.stdout.write("Importing.  Data_dir={data}, source_dirs={courses}\n".format(
             data=data_dir,
@@ -53,9 +53,9 @@ class Command(BaseCommand):
         course_items = import_course_from_xml(
             mstore, ModuleStoreEnum.UserID.mgmt_command, data_dir, source_dirs, load_error_modules=False,
             static_content_store=contentstore(), verbose=True,
-            do_import_static=do_import_static, do_import_code_lib=do_import_code_lib,
+            do_import_static=do_import_static, do_import_python_lib=do_import_python_lib,
             create_if_not_present=True,
-            python_lib_filename=course_code_lib_filename,
+            python_lib_filename=python_lib_filename,
         )
 
         for course in course_items:
