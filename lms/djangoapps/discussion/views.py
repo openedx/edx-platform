@@ -564,7 +564,8 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': context['annotated_content_info'],
             })
         else:
-            return render_to_response('discussion/discussion_profile_page.html', context)
+            tab_view = CourseTabView()
+            return tab_view.get(request, unicode(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
         raise Http404
     except ValueError:
@@ -655,7 +656,15 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
     """
-    def render_to_fragment(self, request, course_id=None, discussion_id=None, thread_id=None, **kwargs):
+    def render_to_fragment(
+        self,
+        request,
+        course_id=None,
+        discussion_id=None,
+        thread_id=None,
+        profile_page_context=None,
+        **kwargs
+    ):
         """
         Render the discussion board to a fragment.
 
@@ -668,8 +677,8 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         Returns:
             Fragment: The fragment representing the discussion board
         """
-        course_key = CourseKey.from_string(course_id)
         try:
+            course_key = CourseKey.from_string(course_id)
             base_context = _create_base_discussion_view_context(request, course_key)
             # Note:
             #   After the thread is rendered in this fragment, an AJAX
@@ -689,11 +698,15 @@ class DiscussionBoardFragmentView(EdxFragmentView):
                 else None
             )
             context = _create_discussion_board_context(request, base_context, thread=thread)
-            html = render_to_string('discussion/discussion_board_fragment.html', context)
-            inline_js = render_to_string('discussion/discussion_board_js.template', context)
+            if profile_page_context:
+                # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
+                html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)
+            else:
+                html = render_to_string('discussion/discussion_board_fragment.html', context)
 
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
+            inline_js = render_to_string('discussion/discussion_board_js.template', context)
             fragment.add_javascript(inline_js)
             if not settings.REQUIRE_DEBUG:
                 fragment.add_javascript_url(staticfiles_storage.url('discussion/js/discussion_board_factory.js'))
