@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="accomplishment-base.html" />
 <%! from django.utils.translation import ugettext as _ %>
 
@@ -8,7 +9,7 @@
 
 <%include file="_accomplishment-rendering.html" />
 <div class="wrapper-about">
-    <aside role="complementary" class="about" aria-label="About edX Certificates">
+    <aside role="complementary" class="about" aria-label=${_("About edX Certificates")}>
         <%include file="_about-edx.html" />
         <%include file="_about-accomplishments.html" />
     </aside>
