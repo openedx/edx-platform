@@ -784,6 +784,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
         for lang_code, text in langs.items():
+            self.video.scroll_to_button("transcript_button")
             self.assertTrue(self.video.select_language(lang_code))
             unicode_text = text.decode('utf-8')
             self.assertIn(unicode_text, self.video.captions_text)

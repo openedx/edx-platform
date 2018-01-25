@@ -737,9 +737,6 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
-        if 'BOK_CHOY_HOSTNAME' not in os.environ:
-            # Hack until we upgrade Firefox and install geckodriver in Vagrant and Jenkins
-            DesiredCapabilities.FIREFOX['marionette'] = False
         super(AcceptanceTest, self).__init__(*args, **kwargs)
 
         # Use long messages so that failures show actual and expected values
