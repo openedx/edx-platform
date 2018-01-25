@@ -8,7 +8,7 @@ UserCourseTag model.
 """
 
 from collections import defaultdict
-from request_cache import get_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from ..models import UserCourseTag
 
 # Scopes

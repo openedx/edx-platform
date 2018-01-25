@@ -8,7 +8,7 @@ from six import text_type
 
 from config_models.models import ConfigurationModel
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache.middleware import request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 
 
 class WaffleFlagCourseOverrideModel(ConfigurationModel):

@@ -5,7 +5,7 @@ This is meant to simplify the process of sending user preferences (espec. time_z
 to the templates without having to append every view file.
 
 """
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 
@@ -25,7 +25,7 @@ def user_timezone_locale_prefs(request):
     system/browser set time_zones and languages
 
     """
-    cached_value = request_cache.get_cache(CACHE_NAME)
+    cached_value = get_cache(CACHE_NAME)
     if not cached_value:
         user_prefs = {
             'user_timezone': None,

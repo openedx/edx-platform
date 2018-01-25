@@ -37,7 +37,7 @@ from lms.djangoapps.ccx.views import get_date
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory

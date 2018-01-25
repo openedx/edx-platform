@@ -12,7 +12,7 @@ from django.utils import six, timezone
 from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 
 log = logging.getLogger(__name__)

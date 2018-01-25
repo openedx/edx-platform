@@ -3,7 +3,7 @@ This module contains various configuration settings via
 waffle switches for the Block Structure framework.
 """
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from request_cache.middleware import request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 
 from .models import BlockStructureConfiguration
 

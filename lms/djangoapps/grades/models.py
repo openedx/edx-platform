@@ -22,7 +22,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
-from request_cache import get_cache
+from openedx.core.djangoapps.request_cache import get_cache
 
 import events
 

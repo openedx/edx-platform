@@ -22,7 +22,7 @@ Methods for creating RequestContext for using with Mako templates.
 from crum import get_current_request
 from django.template import RequestContext
 
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from util.request import safe_get_host
 
 
@@ -38,7 +38,7 @@ def get_template_request_context(request=None):
     if request is None:
         return None
 
-    request_cache_dict = request_cache.get_cache('edxmako')
+    request_cache_dict = get_cache('edxmako')
     cache_key = "request_context"
     if cache_key in request_cache_dict:
         return request_cache_dict[cache_key]

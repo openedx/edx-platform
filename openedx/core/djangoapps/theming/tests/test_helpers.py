@@ -12,7 +12,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
     get_themes, Theme, get_theme_base_dir
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 
 class TestHelpers(TestCase):

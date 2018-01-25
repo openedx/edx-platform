@@ -10,7 +10,7 @@ from course_modes.models import CourseMode
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
 from courseware.date_summary import verified_upgrade_deadline_link
-from request_cache import get_request
+from openedx.core.djangoapps.request_cache import get_request
 
 
 class VerifiedUpgradeTool(CourseTool):

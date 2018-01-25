@@ -5,7 +5,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from request_cache.middleware import request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
 
 

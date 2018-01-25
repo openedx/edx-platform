@@ -19,7 +19,7 @@ from django.core.cache import caches
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 
 class CacheIsolationMixin(object):

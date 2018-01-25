@@ -54,7 +54,7 @@ import six
 from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active
 
-from request_cache import get_cache as get_request_cache
+from openedx.core.djangoapps.request_cache import get_cache as get_request_cache
 
 log = logging.getLogger(__name__)
 

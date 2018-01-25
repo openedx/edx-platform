@@ -6,7 +6,6 @@ forums, and to the cohort admin views.
 import logging
 import random
 
-import request_cache
 from courseware import courses
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -17,7 +16,8 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from eventtracking import tracker
-from request_cache.middleware import request_cached
+from openedx.core.djangoapps.request_cache import clear_cache, get_cache
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
 
 from .models import (
@@ -175,8 +175,8 @@ def bulk_cache_cohorts(course_key, users):
     """
     # before populating the cache with another bulk set of data,
     # remove previously cached entries to keep memory usage low.
-    request_cache.clear_cache(COHORT_CACHE_NAMESPACE)
-    cache = request_cache.get_cache(COHORT_CACHE_NAMESPACE)
+    clear_cache(COHORT_CACHE_NAMESPACE)
+    cache = get_cache(COHORT_CACHE_NAMESPACE)
 
     if is_course_cohorted(course_key):
         cohorts_by_user = {
@@ -215,7 +215,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
-    cache = request_cache.get_cache(COHORT_CACHE_NAMESPACE)
+    cache = get_cache(COHORT_CACHE_NAMESPACE)
     cache_key = _cohort_cache_key(user.id, course_key)
 
     if use_cached and cache_key in cache:
@@ -514,7 +514,7 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     use_cached=True to use the cached value instead of fetching from the
     database.
     """
-    cache = request_cache.get_cache(u"cohorts.get_group_info_for_cohort")
+    cache = get_cache(u"cohorts.get_group_info_for_cohort")
     cache_key = unicode(cohort.id)
 
     if use_cached and cache_key in cache:

@@ -9,7 +9,7 @@ from functools import wraps
 
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
 
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 
 OUTER_ATOMIC_CACHE_NAME = 'db.outer_atomic'
 
@@ -160,7 +160,7 @@ def enable_named_outer_atomic(*names):
     if len(names) == 0:
         raise ValueError("At least one name must be specified.")
 
-    cache = request_cache.get_cache(OUTER_ATOMIC_CACHE_NAME)
+    cache = get_cache(OUTER_ATOMIC_CACHE_NAME)
 
     for name in names:
         cache[name] = True
@@ -187,7 +187,7 @@ class OuterAtomic(transaction.Atomic):
 
         connection = transaction.get_connection(self.using)
 
-        cache = request_cache.get_cache(OUTER_ATOMIC_CACHE_NAME)
+        cache = get_cache(OUTER_ATOMIC_CACHE_NAME)
 
         # By default it is enabled.
         enable = True

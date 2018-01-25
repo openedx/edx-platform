@@ -11,7 +11,7 @@ from milestones.services import MilestonesService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 
@@ -359,7 +359,7 @@ def get_course_content_milestones(course_id, content_id=None, relationship='requ
     if user_id is None:
         return milestones_api.get_course_content_milestones(course_id, content_id, relationship)
 
-    request_cache_dict = request_cache.get_cache(REQUEST_CACHE_NAME)
+    request_cache_dict = get_cache(REQUEST_CACHE_NAME)
     if user_id not in request_cache_dict:
         request_cache_dict[user_id] = {}
 

@@ -1267,7 +1267,7 @@ else:
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
-    'request_cache.middleware.RequestCache',
+    'openedx.core.djangoapps.request_cache.middleware.RequestCache',
     'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringCustomMetrics',
 
     'mobile_api.middleware.AppVersionUpgrade',
@@ -3332,7 +3332,7 @@ AUDIT_CERT_CUTOFF_DATE = None
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
-WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
+WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "openedx.core.djangoapps.request_cache.middleware.RequestCache"
 
 # Settings for Comprehensive Theming app
 

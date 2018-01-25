@@ -11,7 +11,7 @@ from django_comment_common.models import CourseDiscussionSettings, all_permissio
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.teams.models import CourseTeam
 from lms.lib.comment_client import Thread
-from request_cache.middleware import RequestCache, request_cached
+from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
 
 
 def has_permission(user, permission, course_id=None):

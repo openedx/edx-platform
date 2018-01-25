@@ -12,7 +12,7 @@ from lms.djangoapps.completion.services import CompletionService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService

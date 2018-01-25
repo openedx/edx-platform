@@ -8,8 +8,8 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock
 
-from request_cache import get_request_or_stub
-from request_cache.middleware import RequestCache, request_cached
+from openedx.core.djangoapps.request_cache import get_request_or_stub
+from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
 from xmodule.modulestore.django import modulestore
 
 

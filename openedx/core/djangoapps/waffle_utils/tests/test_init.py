@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from waffle.testutils import override_flag
 
 from .. import CourseWaffleFlag, WaffleFlagNamespace

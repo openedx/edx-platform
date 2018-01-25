@@ -10,7 +10,7 @@ from collections import defaultdict
 from django.contrib.auth.models import User
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache import get_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from student.models import CourseAccessRole
 
 log = logging.getLogger(__name__)
