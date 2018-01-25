@@ -823,7 +823,7 @@ class DiscussionLinkTestCase(TabTestCase):
         """Custom reverse function"""
         def reverse_discussion_link(viewname, args):
             """reverse lookup for discussion link"""
-            if viewname == "discussion.views.forum_form_discussion" and args == [unicode(course.id)]:
+            if viewname == "forum_form_discussion" and args == [unicode(course.id)]:
                 return "default_discussion_link"
         return reverse_discussion_link
 
