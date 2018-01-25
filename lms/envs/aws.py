@@ -1096,6 +1096,9 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
 
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
+
 ############################### Plugin Settings ###############################
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants

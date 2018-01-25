@@ -3467,6 +3467,11 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
 
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = [
+    'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
+]
+
 ############## Plugin Django Apps #########################
 
 from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
