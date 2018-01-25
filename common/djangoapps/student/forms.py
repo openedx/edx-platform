@@ -81,7 +81,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
             subject = subject.replace('\n', '')
             email = loader.render_to_string(email_template_name, context)
             password_reset_link = loader.render_to_string('emails/password_reset_email_link.txt', context)
-            MandrillClient().send_password_reset_email(user.email, {
+            MandrillClient().send_mail(MandrillClient.PASSWORD_RESET_TEMPLATE, user.email, {
                 'first_name': user.first_name,
                 'reset_link': password_reset_link,
             })

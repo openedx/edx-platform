@@ -25,11 +25,11 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
     }
     admin_activation_link = render_to_string('emails/admin_activation_link.txt', message_context)
 
-    message_context["key"] = admin_activation_link
+    message_context["activation_link"] = admin_activation_link
 
     while max_retries > 0:
         try:
-            MandrillClient().send_admin_activation_mail(dest_addr, message_context)
+            MandrillClient().send_mail(MandrillClient.ORG_ADMIN_ACTIVATION_TEMPLATE, dest_addr, message_context)
             max_retries = 0
         except:
             max_retries -= 1

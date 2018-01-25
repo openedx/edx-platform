@@ -80,7 +80,7 @@ def send_course_notification_email(course, template_name, context, to_list=None)
                 email
             )
             log.info("Just before sending email")
-            MandrillClient().send_course_notification_email(email, template_name, context)
+            MandrillClient().send_email(template_name, email, context)
             log.info("After sending email")
 
             recipients_info[email] += 1

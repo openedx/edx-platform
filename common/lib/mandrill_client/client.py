@@ -6,10 +6,33 @@ from django.conf import settings
 log = logging.getLogger(__name__)
 
 class MandrillClient(object):
+    PASSWORD_RESET_TEMPLATE = 'template-60'
+    USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
+    ORG_ADMIN_ACTIVATION_TEMPLATE = 'template-62'
+    ENROLLMENT_CONFIRMATION_TEMPLATE = 'enrollment-confirmation'
+    COURSE_WELCOME_TEMPLATE = 'course_welcome'
+    COURSE_EARLY_WELCOME_TEMPLATE = 'course-early-welcome'
+    COURSE_START_REMINDER_TEMPLATE = 'course-start-reminder'
+    COURSE_COMPLETION_TEMPLATE = 'course-completion'
+    WEEKLY_TEMPLATE = 'weekly'
+
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def send_template(self, template_name, user_email, global_merge_vars):
+    def send_mail(self, template_name, user_email, context):
+        """
+        calls the mandrill API for the specific template and email
+
+        arguments:
+        template_name: the slug/identifier of the mandrill email template
+        user_email: the email of the receiver
+        context: the data which is passed to the template. must be a dict
+        """
+        global_merge_vars = []
+        for key in context:
+            global_merge_vars.append(
+                { 'name': key, 'content': context[key] }
+            )
         try:
             result = self.mandrill_client.messages.send_template(
                 template_name=template_name,
@@ -26,45 +49,4 @@ class MandrillClient(object):
             log.error('A mandrill error occurred: %s - %s' % (e.__class__, e))
             raise
         return result
-
-    def send_activation_mail(self, user_email, context):
-        global_merge_vars = [
-            {'name': 'first_name', 'content': context['first_name']},
-            {'name': 'activation_link', 'content': context['key']},
-        ]
-        self.send_template('template-61', user_email, global_merge_vars)
-
-    def send_admin_activation_mail(self, user_email, context):
-        """
-        E-mail is sent only when a user is recommended is and org admin
-        """
-        global_merge_vars = [
-            {'name': 'first_name', 'content': context['first_name']},
-            {'name': 'activation_link', 'content': context['key']},
-        ]
-        self.send_template('template-62', user_email, global_merge_vars)
-
-
-    def send_password_reset_email(self, user_email, context):
-        global_merge_vars = [
-            {'name': 'first_name', 'content': context['first_name']},
-            {'name': 'reset_link', 'content': context['reset_link']},
-        ]
-        self.send_template('template-60', user_email, global_merge_vars)
-
-    def send_course_notification_email(self, user_email, template_name, context):
-        """
-        single function to use for all notifications regarding any course email
-        template_name must be specified
-        """
-        global_merge_vars = [
-            {'name': 'full_name', 'content': context['full_name']},
-            {'name': 'course_name', 'content': context['course_name']},
-            {'name': 'course_url', 'content': context['course_link']},
-        ]
-        if template_name == 'weekly':
-            global_merge_vars.append(
-                {'name': 'course_week', 'content': context['course_week']},
-            )
-        self.send_template(template_name, user_email, global_merge_vars)
 

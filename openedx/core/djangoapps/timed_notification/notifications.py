@@ -17,8 +17,8 @@ def enrollment_confirmation(sender, event=None, user=None, **kwargs):
             'full_name': user.extended_profile.first_name + " " + user.\
                 extended_profile.last_name
         }
-        MandrillClient().send_course_notification_email(
+        MandrillClient().send_email(
+            MandrillClient.ENROLLMENT_CONFIRMATION_TEMPLATE,
             user.email,
-            template_name='enrollment-confirmation',
-            context=context
+            context
         )
