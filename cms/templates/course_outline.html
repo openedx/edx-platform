@@ -31,6 +31,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
+<%static:optional_include_mako file="course_outline_header_extras_post.html" />
 </%block>
 
 <%block name="page_alert">
