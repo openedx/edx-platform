@@ -244,7 +244,7 @@ $trophy-gold: #f39c12;
     color: $font-color;
 
     .streak-icon-wrapper {
-      margin-bottom: 10px;
+      margin: 10px 0;
     }
 
     .fa-trophy {
@@ -255,6 +255,14 @@ $trophy-gold: #f39c12;
 
     .section-heading {
       margin-bottom: 0;
+    }
+
+    .streak-encouragement {
+      margin-bottom: 5px;
+    }
+
+    .streak-criteria {
+      margin-bottom: 20px;
     }
   }
 
