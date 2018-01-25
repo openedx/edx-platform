@@ -1,7 +1,0 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
-% if is_secure:
-  https://${ site }/activate/${ key }
-% else:
-  http://${ site }/activate/${ key }
-% endif

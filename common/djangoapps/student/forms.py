@@ -5,6 +5,7 @@ from importlib import import_module
 import re
 
 from django import forms
+from django.core.urlresolvers import reverse
 from django.forms import widgets
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -19,6 +20,7 @@ from django.template import loader
 from django.conf import settings
 from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import validate_password_strength
+from util.request import safe_get_host
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.lib.mandrill_client.client import MandrillClient
 
@@ -80,7 +82,13 @@ class PasswordResetFormNoActive(PasswordResetForm):
             # Email subject *must not* contain newlines
             subject = subject.replace('\n', '')
             email = loader.render_to_string(email_template_name, context)
-            password_reset_link = loader.render_to_string('emails/password_reset_email_link.txt', context)
+
+            password_reset_link = context['protocol'] +\
+                '://' +\
+                site_name +\
+                reverse('student.views.password_reset_confirm_wrapper',
+                        kwargs={ 'uidb36': int_to_base36(user.id), 'token': context['token'] })
+
             MandrillClient().send_mail(MandrillClient.PASSWORD_RESET_TEMPLATE, user.email, {
                 'first_name': user.first_name,
                 'reset_link': password_reset_link,
@@ -188,19 +196,19 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
-                elif field_name == 'data_sharing_consent':
-                    if field_value == "required":
-                        self.fields[field_name] = TrueField(
-                            error_messages={
-                                "required": _(
-                                    "You must consent to data sharing to register."
-                                )
-                            }
-                        )
-                    elif field_value == 'optional':
-                        self.fields[field_name] = forms.BooleanField(
-                            required=False
-                        )
+                    elif field_name == 'data_sharing_consent':
+                        if field_value == "required":
+                            self.fields[field_name] = TrueField(
+                                error_messages={
+                                    "required": _(
+                                        "You must consent to data sharing to register."
+                                    )
+                                }
+                            )
+                        elif field_value == 'optional':
+                            self.fields[field_name] = forms.BooleanField(
+                                required=False
+                            )
                 else:
                     required = field_value == "required"
                     min_length = 1 if field_name in ("gender", "level_of_education") else 2

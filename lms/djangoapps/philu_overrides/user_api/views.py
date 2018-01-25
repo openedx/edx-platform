@@ -12,6 +12,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.views import RegistrationView
 from util.json_request import JsonResponse
+from util.request import safe_get_host
 from common.djangoapps.student.views import AccountValidationError, social_utils, REGISTER_USER, \
     _enroll_user_in_pending_courses, record_registration_attributions
 from django.core.validators import validate_email, ValidationError
@@ -346,9 +347,13 @@ def create_account_with_params_custom(request, params):
     )
     if send_email:
         dest_addr = user.email
-        activation_link = render_to_string('emails/activation_link.txt', {
-            'key': registration.activation_key
-        })
+        site = safe_get_host(request)
+        key = registration.activation_key
+        if request.is_secure():
+            activation_link = 'https://' + site + '/activate/' + key
+        else:
+            activation_link = 'http://' + site + '/activate/' + key
+
         context = {
             'first_name': user.first_name,
             'activation_link': activation_link,
@@ -405,13 +410,13 @@ class RegistrationViewCustom(RegistrationView):
         events that the user registered while enrolling in a particular course.
 
         Arguments:
-            request (HTTPRequest)
+        request (HTTPRequest)
 
         Returns:
-            HttpResponse: 200 on success
-            HttpResponse: 400 if the request is not valid.
-            HttpResponse: 409 if an account with the given username or email
-                address already exists
+        HttpResponse: 200 on success
+        HttpResponse: 400 if the request is not valid.
+        HttpResponse: 409 if an account with the given username or email
+        address already exists
         """
         data = request.POST.copy()
 

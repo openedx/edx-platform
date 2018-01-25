@@ -2,6 +2,7 @@ import base64
 
 from django.core import mail
 from django.conf import settings
+from util.request import safe_get_host
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from smtplib import SMTPException
@@ -23,7 +24,12 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
         "org_name": org_name,
         "referring_user": hash_key.suggested_by.username,
     }
-    admin_activation_link = render_to_string('emails/admin_activation_link.txt', message_context)
+
+    site = safe_get_host(request)
+    if request.is_secure():
+        admin_activation_link = 'https://' + site + '/onboarding/admin_activate/' + encoded_org_id + '/' + hash_key.activation_hash
+    else:
+        admin_activation_link = 'http://' + site + '/onboarding/admin_activate/' + encoded_org_id + '/' + hash_key.activation_hash
 
     message_context["activation_link"] = admin_activation_link
 
