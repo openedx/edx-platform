@@ -194,7 +194,7 @@ class ImportManager(object):
             default_class='xmodule.raw_module.RawDescriptor',
             load_error_modules=True, static_content_store=None,
             target_id=None, verbose=False,
-            do_import_static=True, do_import_code_lib=True,
+            do_import_static=True, do_import_python_lib=True,
             create_if_not_present=False, raise_on_failure=False,
             static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
             python_lib_filename='python_lib.zip',
@@ -210,7 +210,7 @@ class ImportManager(object):
         self.static_content_subdir = static_content_subdir
         self.python_lib_filename = python_lib_filename
         self.do_import_static = do_import_static
-        self.do_import_code_lib = do_import_code_lib
+        self.do_import_python_lib = do_import_python_lib
         self.create_if_not_present = create_if_not_present
         self.raise_on_failure = raise_on_failure
         self.xml_module_store = self.store_class(
@@ -247,10 +247,10 @@ class ImportManager(object):
                 "Skipping import of static content, "
                 "since do_import_static=%s", self.do_import_static
             )
-            if self.do_import_code_lib:
+            if self.do_import_python_lib:
                 log.debug(
                     "Importing code library anyway "
-                    "since do_import_code_lib=%s", self.do_import_code_lib
+                    "since do_import_python_lib=%s", self.do_import_python_lib
                 )
 
         if self.static_content_store is not None:
@@ -259,7 +259,7 @@ class ImportManager(object):
                 static_content_importer.import_static_content_directory(
                     content_subdir=self.static_content_subdir, verbose=self.verbose
                 )
-            elif self.do_import_code_lib and self.python_lib_filename:
+            elif self.do_import_python_lib and self.python_lib_filename:
                 python_lib_dir_path = data_path / self.static_content_subdir
                 python_lib_full_path = python_lib_dir_path / self.python_lib_filename
                 if os.path.isfile(python_lib_full_path):
