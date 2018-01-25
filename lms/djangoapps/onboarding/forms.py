@@ -888,6 +888,12 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
     effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
                                      required=False,
+                                     help_text=ugettext_noop("he fiscal year is the period that an organization uses "
+                                                             "for accounting  purposes and preparing financial "
+                                                             "statements. A fiscal year may or may not be the same"
+                                                             " as a calendar year. If the information you are "
+                                                             "giving below is for the last 12 months, please enter "
+                                                             "today's date."),
                                      label=ugettext_noop('End date of last Fiscal Year'),
                                      label_suffix='*')
 
@@ -918,20 +924,50 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
         }
 
         labels = {
-            'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
-            'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year*'),
-            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year*'),
+            'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?'),
+            'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
+            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
-            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)*'),
-            'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)*'),
-            'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)*'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
+            'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
+            'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)'),
             'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
-                                                    '(Local Currency)*'),
+                                                    '(Local Currency)'),
         }
 
         help_texts = {
-            'effective_date': ugettext_noop("If the data you are providing below is for the last 12 months,"
-                                            " please enter today's date.")
+            "total_clients": ugettext_noop("A client or direct beneficiary is any person benefiting directly from your "
+                                           "organization's activities through face-to-face contact with program staff, "
+                                           "often in a one-on-one or small-group setting. Please do not include "
+                                           "indirect beneficiaries or people your organization reaches on a lighter "
+                                           "scale, such as through one-time events. If your organization does not "
+                                           "serve people directly because, for example, you work with animals, the "
+                                           "environment, or in arts and culture, please provide a reasonable estimate "
+                                           "for the number of people or animals that benefit from your services."),
+            "total_employees": ugettext_noop("An employee is a member of your staff who is paid for their work. A staff"
+                                             " member working full-time counts as 1 employee; a staff member working "
+                                             "half-time counts as 0.5 of an employee. Please include yourself in your "
+                                             "organization's employee count. We asked a similar question on the last "
+                                             "page, but here we are asking for the number of employees at the end of "
+                                             "your last fiscal year instead of your current number."),
+            "total_revenue": ugettext_noop("Revenue is the total amount of money your organization receives, regardless"
+                                           "of the source of that funding. Sources of revenue may include fees for "
+                                           "services and goods, government contracts, donations, grants, or investment "
+                                           "income."),
+            "total_donations": ugettext_noop("Donations and grants are two different sources of revenue. A donation is"
+                                             " funding given to your organization with nothing or very little "
+                                             "expected in return. An unrestricted cash gift from a private individual"
+                                             " is a donation. A grant is funding given to your organization for a"
+                                             " particular purpose with some obligations, such as reporting.  Revenue"
+                                             " from government sources should also be included in this line."),
+            "total_expenses": ugettext_noop("An expense is money your organization spends in order to deliver its "
+                                            "programs, operate the business, and generate revenue. Expenses may "
+                                            "include. wages and salaries, rent, insurance, travel, or supplies."),
+            "total_program_expenses": ugettext_noop("A program expense is money your organization spends exclusively "
+                                                    "in order to deliver its programs and should not include "
+                                                    "administrative or fundraising expenses. These program expenses"
+                                                    " should also be included in your total annual expenses for last "
+                                                    "fiscal year above."),
         }
 
     def clean_actual_data(self):
