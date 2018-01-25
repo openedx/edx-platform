@@ -182,8 +182,18 @@ class ImportManager(object):
             time the course is loaded. Static content for some courses may also be
             served directly by nginx, instead of going through django.
 
+        do_import_python_lib: if True, import a courselike's python lib file into static_content_store
+            if it exists. This can be useful if the static content import needs to be skipped
+            (e.g.: for performance reasons), but the python lib still needs to be imported. If static
+            content is imported, then the python lib file will be imported regardless of this value.
+
         create_if_not_present: If True, then a new courselike is created if it doesn't already exist.
             Otherwise, it throws an InvalidLocationError if the courselike does not exist.
+
+        static_content_subdir: The subdirectory that contains static content.
+
+        python_lib_filename: The filename of the courselike's python library. Course authors can optionally
+            create this file to implement custom logic in their course.
 
         default_class, load_error_modules: are arguments for constructing the XMLModuleStore (see its doc)
     """
@@ -237,38 +247,36 @@ class ImportManager(object):
         """
         Import all static items into the content store.
         """
+        if self.static_content_store is None:
+            log.warning("Static content store is None. Skipping static content import...")
+            return
+
         static_content_importer = StaticContentImporter(
             self.static_content_store,
             course_data_path=data_path,
             target_id=dest_id
         )
-        if self.verbose and not self.do_import_static:
-            log.debug(
-                "Skipping import of static content, "
-                "since do_import_static=%s", self.do_import_static
+        if self.do_import_static:
+            if self.verbose:
+                log.debug("Importing static content and python library")
+            # first pass to find everything in the static content directory
+            static_content_importer.import_static_content_directory(
+                content_subdir=self.static_content_subdir, verbose=self.verbose
             )
-            if self.do_import_python_lib:
-                log.debug(
-                    "Importing code library anyway "
-                    "since do_import_python_lib=%s", self.do_import_python_lib
+        elif self.do_import_python_lib and self.python_lib_filename:
+            if self.verbose:
+                log.debug("Skipping static content import, still importing python library")
+            python_lib_dir_path = data_path / self.static_content_subdir
+            python_lib_full_path = python_lib_dir_path / self.python_lib_filename
+            if os.path.isfile(python_lib_full_path):
+                static_content_importer.import_static_file(
+                    python_lib_full_path, base_dir=python_lib_dir_path
                 )
+        else:
+            if self.verbose:
+                log.debug("Skipping import of static content and python library")
 
-        if self.static_content_store is not None:
-            if self.do_import_static:
-                # first pass to find everything in the static content directory
-                static_content_importer.import_static_content_directory(
-                    content_subdir=self.static_content_subdir, verbose=self.verbose
-                )
-            elif self.do_import_python_lib and self.python_lib_filename:
-                python_lib_dir_path = data_path / self.static_content_subdir
-                python_lib_full_path = python_lib_dir_path / self.python_lib_filename
-                if os.path.isfile(python_lib_full_path):
-                    static_content_importer.import_static_file(
-                        python_lib_full_path, base_dir=python_lib_dir_path
-                    )
-
-        # no matter what do_import_static is, import "static_import" directory
-
+        # No matter what do_import_static is, import "static_import" directory.
         # This is needed because the "about" pages (eg "overview") are
         # loaded via load_extra_content, and do not inherit the lms
         # metadata from the course module, and thus do not get
@@ -279,6 +287,8 @@ class ImportManager(object):
 
         simport = 'static_import'
         if os.path.exists(data_path / simport):
+            if self.verbose:
+                log.debug("Importing %s directory", simport)
             static_content_importer.import_static_content_directory(
                 content_subdir=simport, verbose=self.verbose
             )

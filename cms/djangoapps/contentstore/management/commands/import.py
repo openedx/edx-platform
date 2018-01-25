@@ -27,10 +27,10 @@ class Command(BaseCommand):
         parser.add_argument('--nopythonlib',
                             action='store_true',
                             help=(
-                                'Skip import of custom code library if it exists'
-                                '(NOTE: If static content is imported, the code library will also '
-                                'be imported and this flag will be ignored)'
-                            )),
+                                'Skip import of course python library if it exists '
+                                '(NOTE: If the static content import is not skipped, the python library '
+                                'will be imported and this flag will be ignored)'
+                            ))
         parser.add_argument('--python-lib-filename',
                             default=DEFAULT_PYTHON_LIB_FILENAME,
                             help='Filename of the course code library (if it exists)')
@@ -41,13 +41,23 @@ class Command(BaseCommand):
         if len(source_dirs) == 0:
             source_dirs = None
         do_import_static = not options.get('nostatic', False)
-        do_import_python_lib = not options.get('nopythonlib', False)
+        # If the static content is not skipped, the python lib should be imported regardless
+        # of the 'nopythonlib' flag.
+        do_import_python_lib = do_import_static or not options.get('nopythonlib', False)
         python_lib_filename = options.get('python_lib_filename')
 
-        self.stdout.write("Importing.  Data_dir={data}, source_dirs={courses}\n".format(
+        output = (
+            "Importing...\n"
+            "    data_dir={data}, source_dirs={courses}\n"
+            "    Importing static content? {import_static}\n"
+            "    Importing python lib? {import_python_lib}"
+        ).format(
             data=data_dir,
             courses=source_dirs,
-        ))
+            import_static=do_import_static,
+            import_python_lib=do_import_python_lib
+        )
+        self.stdout.write(output)
         mstore = modulestore()
 
         course_items = import_course_from_xml(
