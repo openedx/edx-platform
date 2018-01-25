@@ -478,8 +478,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.click_button('translation_add')
         self.video.select_translation_language('zh')
         self.video.click_button('translation_add')
-        self.video.select_translation_language('zh')
-        self.assertEqual(self.video.translations(), [u'zh', u''])
+        self.assertTrue(self.video.is_language_disabled('zh'))
 
     def test_table_of_contents(self):
         """

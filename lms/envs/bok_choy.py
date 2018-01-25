@@ -157,12 +157,14 @@ FEATURES['ENTRANCE_EXAMS'] = True
 
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
+
+YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
 YOUTUBE['TEST_TIMEOUT'] = 5000
-YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
-YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
-YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['API'] = "http://{0}:{1}/get_youtube_api/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
+YOUTUBE['METADATA_URL'] = "http://{0}:{1}/test_youtube/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "{0}:{1}/test_transcripts_youtube/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
 
 ############################# SECURITY SETTINGS ################################
 # Default to advanced security in common.py, so tests can reset here to use

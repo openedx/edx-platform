@@ -8,6 +8,7 @@ from bok_choy.promise import EmptyPromise, Promise
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.utils import HelpMixin, type_in_codemirror
+from common.test.acceptance.tests.helpers import click_and_wait_for_window
 
 
 class ContainerPage(PageObject, HelpMixin):
@@ -177,6 +178,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Returns the link for publishing a unit.
         """
+        self.scroll_to_element('.action-publish')
         return self.q(css='.action-publish').first
 
     def publish(self):
@@ -224,7 +226,7 @@ class ContainerPage(PageObject, HelpMixin):
 
         Switches the browser to the newly opened LMS window.
         """
-        self.q(css='.button-view').first.click()
+        click_and_wait_for_window(self, self.q(css='.button-view').first)
         self._switch_to_lms()
 
     def verify_publish_title(self, expected_title):
