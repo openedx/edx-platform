@@ -25,6 +25,15 @@ from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, CourseWaffleFlag
+
+namespace = WaffleFlagNamespace(name='transcripts')
+phase_two_flag = CourseWaffleFlag(
+    namespace,
+    'is_phase_two_enabled',
+    flag_undefined_default=False
+)
+
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
@@ -212,6 +221,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return track_url, transcript_language, sorted_languages
 
     def get_html(self):
+
+        if phase_two_flag.is_enabled(self.course_id):
+            log.warning('GOT IT GOT IT KJASHDKJAHDKJAHDKSLAKLJSKDJLASLKDJJKLASD')
+        else:
+            log.error('GOT IT GOT IT nnnnnnnnnnn!')
+
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
         sources = filter(None, self.html5_sources)
