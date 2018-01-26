@@ -1,40 +1,39 @@
 """
 Views for on-boarding app.
 """
+import base64
 import json
 import logging
 from datetime import datetime
-import base64
 
 import os
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
-
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
-from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from path import Path as path
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps
-from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
+from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys)
+from lms.djangoapps.onboarding.models import UserExtendedProfile
 from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
-from onboarding import forms
-from lms.djangoapps.onboarding.models import UserExtendedProfile
 from nodebb.helpers import update_nodebb_for_user_status
+from onboarding import forms
 
 log = logging.getLogger("edx.onboarding")
 
@@ -400,18 +399,24 @@ def suggest_org_admin(request):
         organization = request.POST.get('organization')
         org_admin_email = request.POST.get('email')
 
-        if organization and org_admin_email:
-
+        if organization:
             try:
                 organization = Organization.objects.get(label__iexact=organization)
                 extended_profile = request.user.extended_profile
 
-                hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, org_admin_email)
-                org_id = extended_profile.organization_id
-                org_name = extended_profile.organization.label
-                organization.unclaimed_org_admin_email = org_admin_email
+                if org_admin_email:
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, org_admin_email)
+                    org_id = extended_profile.organization_id
+                    org_name = extended_profile.organization.label
+                    organization.unclaimed_org_admin_email = org_admin_email
 
-                send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email, hash_key)
+                    send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email, hash_key)
+                else:
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, request.user.email)
+                    send_admin_update_email(organization.id, organization.label, organization.admin.email,
+                                            hash_key, request.user.email, request.user.username
+                                            )
+
             except Organization.DoesNotExist:
                 log.info("Organization does not exists: %s" % organization)
                 status = 400
@@ -489,7 +494,8 @@ def recommendations(request):
 
 
 @csrf_exempt
-def admin_activation(request, org_id, activation_key):
+@transaction.atomic
+def admin_activation(request, activation_key):
     """
         When clicked on link sent in email to make user admin.
 
@@ -502,23 +508,41 @@ def admin_activation(request, org_id, activation_key):
 
     """
     context = {}
-    hash_key_obj = None
+    admin_activation = True if request.GET.get('admin_activation') == 'True' else False
 
     try:
-        hash_key_obj = OrganizationAdminHashKeys.objects.get(activation_hash=activation_key)
-        user_extended_profile = UserExtendedProfile.objects.get(user__email=hash_key_obj.suggested_admin_email)
+        hash_key = OrganizationAdminHashKeys.objects.get(activation_hash=activation_key)
+        admin_change_confirmation = True if request.GET.get('confirm') == 'True' else False
+        user_extended_profile = UserExtendedProfile.objects.get(user__email=hash_key.suggested_admin_email)
+        user = user_extended_profile.user
 
-        context['key'] = hash_key_obj.activation_hash
-        if hash_key_obj.is_hash_consumed:
+        context['key'] = hash_key.activation_hash
+        if hash_key.is_hash_consumed:
             activation_status = 2
         else:
+            hash_key.is_hash_consumed = True
+            hash_key.save()
             activation_status = 4
 
-        if request.method == "POST":
-            hash_key_obj.organization.admin = user_extended_profile.user
-            hash_key_obj.organization.unclaimed_org_admin_email = None
-            hash_key_obj.organization.save()
-            activation_status = 1
+        if request.method == 'POST':
+            if admin_activation or admin_change_confirmation:
+                hash_key.organization.unclaimed_org_admin_email = None
+                hash_key.organization.admin = user
+                hash_key.organization.save()
+                activation_status = 1
+            else:
+                if admin_change_confirmation:
+                    if user_extended_profile.organization.admin == user:
+                        user_extended_profile.organization.admin = None
+                        user_extended_profile.organization.save()
+
+                    user_extended_profile.organization = hash_key.organization
+                    user_extended_profile.save()
+
+                activation_status = 1
+                send_admin_update_confirmation_email(hash_key.organization.label, user.email,
+                                                     confirm=1 if admin_change_confirmation else None)
+                return HttpResponseRedirect('/myaccount/settings/')
 
     except OrganizationAdminHashKeys.DoesNotExist:
         activation_status = 3
@@ -526,15 +550,22 @@ def admin_activation(request, org_id, activation_key):
     except UserExtendedProfile.DoesNotExist:
         activation_status = 5
 
-    if activation_status == 5:
+    if activation_status == 5 and admin_activation:
         url = reverse('register_user', kwargs={
             'initial_mode': 'register',
-            'org_name': base64.b64encode(str(hash_key_obj.organization.label)),
-            'admin_email': base64.b64encode(str(hash_key_obj.suggested_admin_email))})
+            'org_name': base64.b64encode(str(hash_key.organization.label)),
+            'admin_email': base64.b64encode(str(hash_key.suggested_admin_email))})
 
         messages.add_message(request, messages.INFO,
-                             _('Please signup here to become admin for %s' % hash_key_obj.organization.label))
+                             _('Please signup here to become admin for %s' % hash_key.organization.label))
         return HttpResponseRedirect(url)
 
     context['activation_status'] = activation_status
-    return render_to_response('onboarding/admin_activation.html', context)
+
+    if admin_activation:
+        return render_to_response('onboarding/admin_activation.html', context)
+
+    context['username'] = user.username if user else None
+    return render_to_response('onboarding/admin_change_confirmation.html', context)
+
+
