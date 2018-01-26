@@ -24,18 +24,11 @@ import django.dispatch
 import django.utils
 from django.utils.translation import get_language, to_locale
 
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
-
-try:
-    # We may not always have the request_cache module available
-    from request_cache.middleware import RequestCache
-
-    HAS_REQUEST_CACHE = True
-except ImportError:
-    HAS_REQUEST_CACHE = False
 
 # We also may not always have the current request user (crum) module available
 try:
@@ -256,10 +249,7 @@ def create_modulestore_instance(
         if key in _options and isinstance(_options[key], basestring):
             _options[key] = load_function(_options[key])
 
-    if HAS_REQUEST_CACHE:
-        request_cache = RequestCache.get_request_cache()
-    else:
-        request_cache = None
+    request_cache = RequestCache.get_request_cache()
 
     try:
         metadata_inheritance_cache = caches['mongo_metadata_inheritance']

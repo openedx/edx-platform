@@ -457,7 +457,7 @@ else:
 
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
-    'request_cache.middleware.RequestCache',
+    'openedx.core.djangoapps.request_cache.middleware.RequestCache',
 
     'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
 

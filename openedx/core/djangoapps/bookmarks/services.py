@@ -5,7 +5,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

@@ -14,7 +14,7 @@ from uuid import uuid4
 
 import psutil
 
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 log = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ class MonitoringCustomMetrics(object):
         Get a reference to the part of the request cache wherein we store New
         Relic custom metrics related to the current request.
         """
-        return request_cache.get_cache(name=REQUEST_CACHE_KEY)
+        return get_cache(name=REQUEST_CACHE_KEY)
 
     @classmethod
     def accumulate_metric(cls, name, value):
@@ -108,7 +108,7 @@ class MonitoringMemoryMiddleware(object):
         """
         Namespaced request cache for tracking memory usage.
         """
-        return request_cache.get_cache(name='monitoring_memory')
+        return get_cache(name='monitoring_memory')
 
     def _log_prefix(self, prefix, request):
         """

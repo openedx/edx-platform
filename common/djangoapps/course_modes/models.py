@@ -17,7 +17,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache.middleware import RequestCache, ns_request_cached
+from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
 
 Mode = namedtuple('Mode',
                   [

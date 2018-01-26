@@ -11,7 +11,7 @@ from elasticsearch.exceptions import ConnectionError
 from search.search_engine_base import SearchEngine
 
 from lms.djangoapps.teams.models import CourseTeam
-from request_cache import get_request_or_stub
+from openedx.core.djangoapps.request_cache import get_request_or_stub
 
 from .errors import ElasticSearchConnectionError
 from .serializers import CourseTeamSerializer

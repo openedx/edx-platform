@@ -23,7 +23,7 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache.middleware import RequestCache, ns_request_cached
+from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)

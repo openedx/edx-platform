@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from pytz import UTC
 
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from mobile_api.mobile_platform import MobilePlatform
 from mobile_api.models import AppVersionConfig
 from mobile_api.utils import parsed_version
@@ -52,7 +52,7 @@ class AppVersionUpgrade(object):
                 2. EDX-APP-VERSION-LAST-SUPPORTED-DATE; if user app version < min supported version and
                    timestamp < expiry of that version
         """
-        request_cache_dict = request_cache.get_cache(self.REQUEST_CACHE_NAME)
+        request_cache_dict = get_cache(self.REQUEST_CACHE_NAME)
         if request_cache_dict:
             last_supported_date = request_cache_dict[self.LAST_SUPPORTED_DATE_HEADER]
             if last_supported_date != self.NO_LAST_SUPPORTED_DATE:
@@ -92,7 +92,7 @@ class AppVersionUpgrade(object):
         if user_agent:
             platform = self._get_platform(request, user_agent)
             if platform:
-                request_cache_dict = request_cache.get_cache(self.REQUEST_CACHE_NAME)
+                request_cache_dict = get_cache(self.REQUEST_CACHE_NAME)
                 request_cache_dict[self.USER_APP_VERSION] = platform.version
                 last_supported_date_cache_key = self._get_cache_key_name(
                     self.LAST_SUPPORTED_DATE_HEADER,

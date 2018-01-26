@@ -11,7 +11,7 @@ from django.conf import settings
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 
-from request_cache.middleware import request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 from openedx.core.djangoapps.theming.helpers import get_template as themed_template
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path
 

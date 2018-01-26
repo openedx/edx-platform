@@ -5,7 +5,7 @@ to configure flags related to persistent grading.
 from contextlib import contextmanager
 
 from lms.djangoapps.grades.config.models import CoursePersistentGradesFlag, PersistentGradesEnabledFlag
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 
 @contextmanager

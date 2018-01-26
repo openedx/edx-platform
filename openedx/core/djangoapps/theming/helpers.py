@@ -19,7 +19,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_dirs,
     get_themes_unchecked
 )
-from request_cache.middleware import RequestCache, request_cached
+from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 

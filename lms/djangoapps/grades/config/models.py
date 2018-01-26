@@ -8,7 +8,7 @@ from django.db.models import BooleanField, IntegerField, TextField
 from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache.middleware import request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 
 
 class PersistentGradesEnabledFlag(ConfigurationModel):
