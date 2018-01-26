@@ -154,7 +154,7 @@ source, template_path = Loader(engine).load_template_source(path)
     </script>
 </%def>
 
-<%def name="require_page(page_name, class_name)">
+<%def name="invoke_page_bundle(page_name, class_name)">
     <%doc>
       Loads Javascript onto your page synchronously.
       Uses RequireJS in development and a plain script tag in production.
