@@ -28,11 +28,8 @@ class MandrillClient(object):
         user_email: the email of the receiver
         context: the data which is passed to the template. must be a dict
         """
-        global_merge_vars = []
-        for key in context:
-            global_merge_vars.append(
-                { 'name': key, 'content': context[key] }
-            )
+        global_merge_vars = [{'name': key, 'content': context[key]} for key in context]
+
         try:
             result = self.mandrill_client.messages.send_template(
                 template_name=template_name,
