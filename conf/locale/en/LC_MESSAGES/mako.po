@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:43+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.801536\n"
+"POT-Creation-Date: 2018-01-26 11:20+0000\n"
+"PO-Revision-Date: 2018-01-26 11:27:12.644870\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -34,9 +34,9 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/certificates.html
-#: cms/templates/container.html cms/templates/course_outline.html
-#: cms/templates/group_configurations.html
+#: cms/templates/asset_index.html cms/templates/asset_index.html
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html cms/templates/library.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
@@ -131,6 +131,11 @@ msgstr ""
 #: cms/templates/index.html cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Number:"
+msgstr ""
+
+#: cms/templates/index.html cms/templates/index.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Run:"
 msgstr ""
 
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
@@ -342,10 +347,12 @@ msgstr ""
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Help"
 msgstr ""
@@ -503,10 +510,6 @@ msgid "Discussion thread list"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "Discussion - {course_number}"
-msgstr ""
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr ""
@@ -539,6 +542,21 @@ msgstr ""
 
 #: lms/djangoapps/teams/templates/teams/teams.html
 msgid "Teams"
+msgstr ""
+
+#: lms/templates/_gated_content.html lms/templates/_gated_content.html
+#: lms/templates/seq_module.html
+msgid "Content Locked"
+msgstr ""
+
+#: lms/templates/_gated_content.html
+msgid ""
+"You must complete the section '{prereq_section_name}' with the required "
+"score before you are able to view this content."
+msgstr ""
+
+#: lms/templates/_gated_content.html
+msgid "Go to Prerequisite Section"
 msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -985,23 +1003,23 @@ msgstr ""
 msgid "Note: only instructors may annotate."
 msgstr ""
 
-#. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
-msgid "Welcome to the Open edX{registered_trademark} platform!"
-msgstr ""
-
-#. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
-msgid "It works! This is the default homepage for this Open edX instance."
-msgstr ""
-
 #: lms/templates/index.html lms/templates/index.html
 #: lms/templates/courseware/courses.html lms/templates/courseware/courses.html
 #: themes/stanford-style/lms/templates/index.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
+msgstr ""
+
+#. Translators: 'Open edX' is a registered trademark, please keep this
+#. untranslated. See http://open.edx.org for more information.
+#: lms/templates/index_overlay.html
+msgid "Welcome to the Open edX{registered_trademark} platform!"
+msgstr ""
+
+#. Translators: 'Open edX' is a registered trademark, please keep this
+#. untranslated. See http://open.edx.org for more information.
+#: lms/templates/index_overlay.html
+msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 
 #: lms/templates/invalid_email_key.html
@@ -1638,6 +1656,10 @@ msgstr ""
 msgid ""
 "You have re-enabled forum notification emails from {platform_name}. You may "
 "{dashboard_link_start}return to your dashboard{link_end}."
+msgstr ""
+
+#: lms/templates/seq_module.html
+msgid "Important!"
 msgstr ""
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
@@ -3142,6 +3164,10 @@ msgstr ""
 msgid "Supported by the following organizations"
 msgstr ""
 
+#: lms/templates/certificates/_accomplishment-rendering.html
+msgid "Awarded to:"
+msgstr ""
+
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
 "For tips and tricks on printing your certificate, view the {link_start}Web "
@@ -3159,6 +3185,10 @@ msgid ""
 "If you are sure that the URL or ID number is correct, contact support."
 msgstr ""
 
+#: lms/templates/certificates/invalid.html
+msgid "About {platform_name} Certificates"
+msgstr ""
+
 #: lms/templates/certificates/server-error.html
 msgid "Invalid Certificate Configuration."
 msgstr ""
@@ -3174,7 +3204,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
-msgid "The institution&#39;s logo."
+msgid "The institution's logo."
 msgstr ""
 
 #: lms/templates/certificates/server-error.html
@@ -3189,6 +3219,10 @@ msgstr ""
 msgid ""
 "If all of the information is correct and the problem persists, contact "
 "technical support."
+msgstr ""
+
+#: lms/templates/certificates/valid.html
+msgid "About edX Certificates"
 msgstr ""
 
 #: lms/templates/commerce/checkout_cancel.html
@@ -4176,10 +4210,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade All Remaining Courses ("
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{\"{0:.2f}\".format(a)}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -5626,10 +5656,6 @@ msgid "Course Name:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Display Name:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Start Date:"
 msgstr ""
 
@@ -6630,10 +6656,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TAs are members of the community who help course teams moderate "
-"discussions. They can see posts by all learners, and can edit or delete "
-"posts, clear flags, close or re-open threads, and endorse responses. Their "
-"posts are marked as 'Community TA'. Only enrolled learners can be added as "
-"Community TAs."
+"discussions. They can see posts by learners in their assigned cohort or "
+"enrollment track, and can edit or delete posts, clear flags, close or re-"
+"open threads, and endorse responses. Their posts are marked as 'Community "
+"TA'. Only enrolled learners can be added as Community TAs."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -8278,6 +8304,14 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Unlocked"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "(Prerequisite required)"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html

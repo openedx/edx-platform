@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:44+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.926347\n"
+"POT-Creation-Date: 2018-01-26 11:20+0000\n"
+"PO-Revision-Date: 2018-01-26 11:27:12.761931\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -36,27 +36,6 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js common/static/bundles/Import.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Thïs mäý ßé häppénïng ßéçäüsé öf än érrör wïth öür sérvér ör ýöür ïntérnét "
-"çönnéçtïön. Trý réfréshïng thé pägé ör mäkïng süré ýöü äré önlïné. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
-
-#: cms/static/cms/js/main.js common/static/bundles/Import.js
-msgid "Studio's having trouble saving your work"
-msgstr ""
-"Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -144,77 +123,6 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error during the upload process."
-msgstr ""
-"Théré wäs än érrör dürïng thé üplöäd pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-"Théré wäs än érrör whïlé ünpäçkïng thé fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-"Théré wäs än érrör whïlé vérïfýïng thé fïlé ýöü süßmïttéd. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Choose new file"
-msgstr "Çhöösé néw fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-"Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä {ext} éxténsïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-"Théré wäs än érrör whïlé ïmpörtïng thé néw lïßrärý tö öür dätäßäsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Your import has failed."
-msgstr "Ýöür ïmpört häs fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-"Ýöür ïmpört ïs ïn prögréss; nävïgätïng äwäý wïll äßört ït. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Error importing course"
-msgstr "Érrör ïmpörtïng çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error with the upload"
-msgstr ""
-"Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
@@ -2146,244 +2054,6 @@ msgstr "Türn ön tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Türn öff tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/static/bundles/AssetsPage.bace7aaf2adb48c51598.js
-msgid "end"
-msgstr "énd Ⱡ'σяєм#"
-
-#: common/static/bundles/CourseGoals.c4996c40fda9d3059c82.js
-#: common/static/bundles/CourseGoals.js
-msgid "Thank you for setting your course goal to "
-msgstr ""
-"Thänk ýöü för séttïng ýöür çöürsé göäl tö  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/static/bundles/CourseGoals.c4996c40fda9d3059c82.js
-#: common/static/bundles/CourseGoals.js
-msgid ""
-"There was an error in setting your goal, please reload the page and try "
-"again."
-msgstr ""
-"Théré wäs än érrör ïn séttïng ýöür göäl, pléäsé rélöäd thé pägé änd trý "
-"ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-"Ýöü hävé süççéssfüllý üpdätéd ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-"Théré wäs än érrör üpdätïng ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
-#: common/static/bundles/CourseHome.js
-msgid "Show more"
-msgstr "Shöw möré Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/static/bundles/CourseHome.8f43ec4ffa54018648ac.js
-#: common/static/bundles/CourseHome.js
-msgid "Show less"
-msgstr "Shöw léss Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Please fix the following errors:"
-msgstr ""
-"Pléäsé fïx thé föllöwïng érrörs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Files that you upload must be smaller than 5MB in size."
-msgstr ""
-"Fïlés thät ýöü üplöäd müst ßé smällér thän 5MB ïn sïzé. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
-".png format."
-msgstr ""
-"Fïlés thät ýöü üplöäd müst ßé PDFs ör ïmägé fïlés ïn .gïf, .jpg, .jpég, ör "
-".png förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Something went wrong. Please try again later."
-msgstr ""
-"Söméthïng wént wröng. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Add Attachment"
-msgstr "Àdd Àttäçhmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "(Optional)"
-msgstr "(Öptïönäl) Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Remove file"
-msgstr "Rémövé fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Course Name"
-msgstr "Çöürsé Nämé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "What can we help you with, "
-msgstr "Whät çän wé hélp ýöü wïth,  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Details"
-msgstr "Détäïls Ⱡ'σяєм ιρѕυм #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr ""
-"Thé möré ýöü téll üs, thé möré qüïçklý änd hélpfüllý wé çän réspönd! Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
-msgid "Submit"
-msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Sign in to "
-msgstr "Sïgn ïn tö  Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Create an "
-msgstr "Çréäté än  Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Enter a valid email address."
-msgstr "Éntér ä välïd émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Enter a subject for your support request."
-msgstr ""
-"Éntér ä süßjéçt för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Enter some details for your support request."
-msgstr ""
-"Éntér sömé détäïls för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Contact Us"
-msgstr "Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Find answers to the top questions asked by learners."
-msgstr ""
-"Fïnd änswérs tö thé töp qüéstïöns äskéd ßý léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Go to my Dashboard"
-msgstr "Gö tö mý Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Go to "
-msgstr "Gö tö  Ⱡ'σяєм ιρѕυ#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr ""
-"Thänk ýöü för süßmïttïng ä réqüést! Wé wïll çöntäçt ýöü wïthïn 24 höürs. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/static/bundles/SingleSupportForm.24c3e19077ebd20ce989.js
-#: common/static/bundles/SingleSupportForm.js
-msgid "Cancel upload"
-msgstr "Çänçél üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Organization:"
-msgstr "Örgänïzätïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Course Number:"
-msgstr "Çöürsé Nümßér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Course Run:"
-msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "(Read-only)"
-msgstr "(Réäd-önlý) Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-msgid "Re-run Course"
-msgstr "Ré-rün Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/static/bundles/StudioIndex.06cf9a104f002c871bbd.js
-#: common/static/bundles/StudioIndex.js
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -5155,6 +4825,10 @@ msgstr ""
 " téçhnïçäl süppört ïf thé prößlém pérsïsts. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "Sént Bý Ⱡ'σяєм ιρѕυм #"
 
@@ -6087,6 +5761,18 @@ msgstr "Övéräll Sçöré Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Bookmark this page"
 msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+"Ýöü hävé süççéssfüllý üpdätéd ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr ""
+"Théré wäs än érrör üpdätïng ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -6188,6 +5874,27 @@ msgstr "Àççömplïshménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+"Thïs mäý ßé häppénïng ßéçäüsé öf än érrör wïth öür sérvér ör ýöür ïntérnét "
+"çönnéçtïön. Trý réfréshïng thé pägé ör mäkïng süré ýöü äré önlïné. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт #"
+
+#: cms/static/cms/js/main.js
+msgid "Studio's having trouble saving your work"
+msgstr ""
+"Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -6354,6 +6061,66 @@ msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 "Ýöü hävé ünsävéd çhängés. Dö ýöü réällý wänt tö léävé thïs pägé? Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error during the upload process."
+msgstr ""
+"Théré wäs än érrör dürïng thé üplöäd pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+"Théré wäs än érrör whïlé ünpäçkïng thé fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+"Théré wäs än érrör whïlé vérïfýïng thé fïlé ýöü süßmïttéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Choose new file"
+msgstr "Çhöösé néw fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/static/js/features/import/factories/import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+"Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä {ext} éxténsïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+"Théré wäs än érrör whïlé ïmpörtïng thé néw lïßrärý tö öür dätäßäsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Your import has failed."
+msgstr "Ýöür ïmpört häs fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/static/js/features/import/views/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+"Ýöür ïmpört ïs ïn prögréss; nävïgätïng äwäý wïll äßört ït. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/features/import/views/import.js
+msgid "Error importing course"
+msgstr "Érrör ïmpörtïng çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/static/js/features/import/views/import.js
+msgid "There was an error with the upload"
+msgstr ""
+"Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -8084,6 +7851,20 @@ msgstr "pöst änönýmöüslý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously to classmates"
 msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
+msgid "Submit"
+msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
@@ -9896,6 +9677,13 @@ msgstr ""
 #: test_root/staticfiles/templates/student_account/form_field.underscore
 msgid "Forgot password?"
 msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+#: test_root/staticfiles/templates/student_account/hinted_login.underscore
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: test_root/staticfiles/templates/student_account/hinted_login.underscore
@@ -12415,6 +12203,10 @@ msgid ""
 msgstr ""
 "Ìf thé süßséçtïön döés nöt hävé ä düé däté, léärnérs älwäýs séé théïr sçörés"
 " whén théý süßmït änswérs tö ässéssménts. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore

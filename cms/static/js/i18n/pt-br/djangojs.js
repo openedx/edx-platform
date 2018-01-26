@@ -912,7 +912,6 @@
     "The following warnings were generated:": "Os seguintes avisos foram gerados:", 
     "The grading process is still running. Refresh the page to see updates.": "O processo de corre\u00e7\u00e3o ainda est\u00e1 em execu\u00e7\u00e3o. Atualize a p\u00e1gina para ver as atualiza\u00e7\u00f5es.", 
     "The language that team members primarily use to communicate with each other.": "O idioma principal que os membros da equipe usam para se comunicar.", 
-    "The language used throughout this site. This site is currently available in a limited number of languages.": "O idioma usado neste site. Este site atualmente suporta um n\u00famero limitado de idiomas.", 
     "The minimum grade for course credit is not set.": "A nota m\u00ednima para obter cr\u00e9ditos para o curso n\u00e3o est\u00e1 especificada.", 
     "The name of this signatory as it should appear on certificates.": "O nome deste signat\u00e1rio conforme deve aparecer nos certificados.", 
     "The organization that this signatory belongs to, as it should appear on certificates.": "A organiza\u00e7\u00e3o a qual este signat\u00e1rio pertence, conforme deve aparecer nos certificados.", 

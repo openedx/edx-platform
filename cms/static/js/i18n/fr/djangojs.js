@@ -930,7 +930,6 @@
     "The following warnings were generated:": "Les avertissements suivants ont \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9s:", 
     "The grading process is still running. Refresh the page to see updates.": "Le processus d'\u00e9valuation est toujours en cours. Rafra\u00eechir la page pour mettre \u00e0 jour.", 
     "The language that team members primarily use to communicate with each other.": "La langue principalement utilis\u00e9e par les membres de l'\u00e9quipe pour communiquer entre eux.", 
-    "The language used throughout this site. This site is currently available in a limited number of languages.": "La langue utilis\u00e9e au travers du site. Le site est actuellement disponible dans un nombre limit\u00e9 de langues.", 
     "The minimum grade for course credit is not set.": "La note minimale d'obtention d'un cr\u00e9dit pour ce cours n'est pas fix\u00e9e.", 
     "The minimum score percentage must be a whole number between 0 and 100.": "Le score minimum en pourcentage doit-\u00eatre un nombre entier compris entre 0 et 100.", 
     "The page \"{route}\" could not be found.": "Page \"{route}\" non trouv\u00e9e.", 

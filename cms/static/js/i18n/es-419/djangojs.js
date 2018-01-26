@@ -40,11 +40,11 @@
     "%(download_link_start)sDownload this image (right-click or option-click, save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to your backpack.</li>": "%(download_link_start)sDescarga esta imagen (haz clic derecho o pulsa opci\u00f3n, guardar como)%(link_end)s y despu\u00e9s %(upload_link_start)ssubirla%(link_end)s a tu mochila.</li>", 
     "%(earned)s/%(possible)s point (graded)": [
       "%(earned)s/%(possible)s punto (calificado)", 
-      "%(earned)s/%(possible)s puntos (calificado)"
+      "%(earned)s/%(possible)s puntos (calificados)"
     ], 
     "%(earned)s/%(possible)s point (ungraded)": [
       "%(earned)s/%(possible)s punto (no calificado)", 
-      "%(earned)s/%(possible)s puntos (no calificado)"
+      "%(earned)s/%(possible)s puntos (no calificados)"
     ], 
     "%(errorCount)s error found in form.": [
       "%(errorCount)s error en el formulario.", 
@@ -63,15 +63,15 @@
     ], 
     "%(num_points)s point possible (graded, results hidden)": [
       "%(num_points)s punto posible (calificables, resultados escondidos)", 
-      "%(num_points)s puntos posibles (calificable, resultados escondidos)"
+      "%(num_points)s puntos posibles (calificables, resultados ocultos)"
     ], 
     "%(num_points)s point possible (ungraded)": [
       "%(num_points)s punto posible (no calificado)", 
       "%(num_points)s puntos posibles (no calificados)"
     ], 
     "%(num_points)s point possible (ungraded, results hidden)": [
-      "%(num_points)s punto posible (calificable, resultados escondidos)", 
-      "%(num_points)s puntos posibles (no calificables, resultados escondidos)"
+      "%(num_points)s punto posible (calificable, resultados ocultos)", 
+      "%(num_points)s puntos posibles (no calificables, resultados ocultos)"
     ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
@@ -358,7 +358,6 @@
     "Choose One": "Elegir uno", 
     "Choose a .csv file": "Elije un fichero .cxv", 
     "Choose a content group to associate": "Elija un grupo de contenido para asociar", 
-    "Choose a course run:": "Seleccionar una sesi\u00f3n de curso:", 
     "Choose a location to move your component to": "Escoge una ubicaci\u00f3n para mover tu componente a", 
     "Choose mode": "Elegir modo", 
     "Choose one": "Elegir uno", 
@@ -366,7 +365,7 @@
     "Clear": "Borrar", 
     "Clear All": "Borrar todo", 
     "Clear Grading Due Date": "Borrar la fecha l\u00edmite de calificaci\u00f3n", 
-    "Clear Release Date/Time": "Borrar la fecha y hora de liberaci\u00f3n", 
+    "Clear Release Date/Time": "Borrar la fecha y hora de publicaci\u00f3n", 
     "Clear Value": "Borrar", 
     "Clear search": "Reiniciar b\u00fasqueda", 
     "Clear search results": "Borrar resultados de b\u00fasqueda", 
@@ -401,6 +400,7 @@
     "Confirm Timed Transcript": "Confirmar la transcripci\u00f3n", 
     "Congratulations!": "\u00a1Felicitaciones!", 
     "Congratulations! You are now verified on %(platformName)s!": "Felicitaciones! Ya se encuentra verificado en %(platformName)s!", 
+    "Contact Us": "Contacta con nosotros", 
     "Contains staff only content": "Contiene solo contenido del equipo del curso", 
     "Contains {count} group": [
       "Contiene {count} grupo", 
@@ -436,6 +436,7 @@
     "Course ID": "Id de Curso", 
     "Course Index": "Indice de Curso", 
     "Course Key": "Llave del curso", 
+    "Course Name": "Nombre del curso", 
     "Course Number": "C\u00f3digo del curso", 
     "Course Number Override": "Reemplazo para el n\u00famero de curso", 
     "Course Outline": "Estructura del curso", 
@@ -498,6 +499,7 @@
     "Deprecated": "Descontinuado", 
     "Description": "Descripci\u00f3n", 
     "Description of the certificate": "Descripci\u00f3n del certificado", 
+    "Details": "Detalles", 
     "Discard Changes": "Descartar cambios", 
     "Discarding Changes": "Descartar cambios", 
     "Discussion": "Discusi\u00f3n", 
@@ -578,9 +580,11 @@
     "Enter Due Date and Time": "Ingresa fecha y hora l\u00edmites", 
     "Enter Start Date and Time": "Ingrese fecha y hora", 
     "Enter a student's username or email address.": "Ingresa un nombre de usuario o email de estudiante.", 
+    "Enter a subject for your support request.": "Introduzca el tema de tu mensaje al equipo de soporte.", 
     "Enter a username or email.": "Ingresa el nombre de usuario o el correo electr\u00f3nico.", 
     "Enter email addresses and/or usernames, separated by new lines or commas, for the learners you want to add. *": "Ingrese correos electr\u00f3nicos y/o nombres de usuarios, separados por nuevas l\u00edneas o comas, de los estudiantes que quieras agregar.*", 
     "Enter information to describe your team. You cannot change these details after you create the team.": "Ingrese la descripci\u00f3n de su equipo. No podr\u00e1 cambiar esta informaci\u00f3n despu\u00e9s de crear el equipo.", 
+    "Enter some details for your support request.": "Describe los detalles de tu solicitud de ayuda.", 
     "Enter team description.": "Ingresa la descripci\u00f3n del equipo.", 
     "Enter team name.": "Ingresa el nombre del equipo.", 
     "Enter the enrollment code.": "Ingresa el c\u00f3digo de inscripci\u00f3n.", 
@@ -658,6 +662,7 @@
     "Financial Assistance": "Asistencia financiera", 
     "Financial Assistance Application": "Solicitud de asistencia financiera", 
     "Find a course": "Busca un curso", 
+    "Find answers to the top questions asked by learners.": "Encuentra respuestas a las preguntas m\u00e1s comunes de nuestros estudiantes.", 
     "Find discussions": "Encontrar discusiones", 
     "First time here?": "Primera vez aqu\u00ed?", 
     "Follow": "Seguir", 
@@ -728,7 +733,7 @@
     "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from {platformName} to verify your identity.": "Si no verifica su identidad ahora, de todas formas podr\u00e1 explorar el curso desde su Panel de Control. Recibir\u00e1 recordatorios peri\u00f3dicos de {platformName} para realizar la verificaci\u00f3n de identidad.", 
     "If you leave, you can no longer post in this team's discussions. Your place will be available to another learner.": "Si abandonas este equipo, no podr\u00e1s escribir en las discusiones de este equipo. Tu lugar estar\u00e1 disponible para otro estudiante.", 
     "If you make significant changes, make sure you notify members of the team before making these changes.": "Si haces cambios significativos,  aseg\u00farate de avisarle a los miembros del equipos antes de realizar estos cambios.", 
-    "If you make this %(xblockType)s visible to learners, learners will be able to see its content after the release date has passed and you have published the unit. Only units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.": "Si hace este %(xblockType)s visible a los estudiantes, podr\u00e1n ver su contenido a partir de la fecha de liberaci\u00f3n siempre que haya publicado la unidad. S\u00f3lo las unidades que est\u00e1n ocultos expl\u00edcitamente permanecer\u00e1n ocultas despu\u00e9s de quitar esta opci\u00f3n para %(xblockType)s.", 
+    "If you make this %(xblockType)s visible to learners, learners will be able to see its content after the release date has passed and you have published the unit. Only units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.": "Si hace este %(xblockType)s visible a los estudiantes, podr\u00e1n ver su contenido a partir de la fecha de publicaci\u00f3n siempre que haya publicado la unidad. S\u00f3lo las unidades que est\u00e1n ocultos expl\u00edcitamente permanecer\u00e1n ocultas despu\u00e9s de quitar esta opci\u00f3n para %(xblockType)s.", 
     "If you select an option other than \"%(hide_label)s\", published units in this subsection become available to learners unless they are explicitly hidden.": "Si selecciona esta opci\u00f3n distinta a \"%(hide_label)s\", \nlas unidades publicadas en este subsecci\u00f3n pasar\u00e1n a estar disponible para los estudiantes a menos que est\u00e1n expl\u00edcitamente ocultas.", 
     "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?": "Si utilizas el Editor Avanzado, este problema se convertir\u00e1 a formato XML y no podr\u00e1 retornar al Editor Simple.\n\n\u00bfDeseas pasar al Editor avanzado y convertir el problema a formato XML?", 
     "Image": "Imagen", 
@@ -907,7 +912,7 @@
     "Not in Use": "No esta en uso", 
     "Not selected": "No seleccionado", 
     "Note": "Nota", 
-    "Note: Do not hide graded assignments after they have been released.": "Nota: No oculte tareas calificadas despu\u00e9s de que han sido liberadas.", 
+    "Note: Do not hide graded assignments after they have been released.": "Nota: No oculte las tareas calificadas despu\u00e9s de que han sido publicadas.", 
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: Los estudiantes pueden estar \u00fanicamente en uno solo cohorte. Agregando estudiantes a este grupo sobreescribe cualquier asignaci\u00f3n previa a este grupo.", 
     "Noted in:": "Anotado en:", 
     "Notes": "Notas", 
@@ -1060,11 +1065,11 @@
     "Register through edX": "Registrarse a trav\u00e9s de edX", 
     "Register with Institution/Campus Credentials": "Registrarse con las credenciales de la instituci\u00f3n o el Campus", 
     "Related to: %(courseware_title_linked)s": "Relacionado con: %(courseware_title_linked)s", 
-    "Release Date and Time": "Fecha y hora de liberaci\u00f3n", 
-    "Release Date:": "Fecha de liberaci\u00f3n:", 
-    "Release Status:": "Estado de liberaci\u00f3n:", 
-    "Release Time in UTC:": "Hora de liberaci\u00f3n en UTC:", 
-    "Release:": "Liberaci\u00f3n:", 
+    "Release Date and Time": "Fecha y hora de publicaci\u00f3n", 
+    "Release Date:": "Fecha de publicaci\u00f3n:", 
+    "Release Status:": "Estado de Publicaci\u00f3n:", 
+    "Release Time in UTC:": "Hora de publicaci\u00f3n en UTC:", 
+    "Release:": "Publicaci\u00f3n:", 
     "Released:": "Liberado:", 
     "Remaining": "Restante", 
     "Removal is in progress. To avoid errors, stay on this page until the process is complete.": "La eliminaci\u00f3n est\u00e1 en progreso. Para evitar errores, permanece en esta p\u00e1gina hasta que el proceso haya finalizado.", 
@@ -1285,6 +1290,7 @@
     "Textbook information": "Informaci\u00f3n del libro de texto", 
     "Textbook name is required": "Se requiere el nombre del texto", 
     "Thank you %(full_name)s! We have received your payment for %(course_name)s.": "Gracias %(full_name)s! Hemos recibido su pago para el curso %(course_name)s.", 
+    "Thank you for submitting a request! We will contact you within 24 hours.": "Gracias por mandarnos un mensaje. Te contactaremos dentro de 24 horas.", 
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "Gracias por enviar tu aplicaci\u00f3n de financiamiento para {course_name}!. Espera una respuesta de 2-4 dias h\u00e1biles.", 
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Gracias por enviar sus fotos. Las revisaremos pronto. Ahora puede registrarse para cualquier curso de %(platformName)s que ofrezca Certficados Verificados. La verificaci\u00f3n es v\u00e1lida por un a\u00f1o. Despu\u00e9s de este periodo, deber\u00e1 volver a enviar fotograf\u00edas para una nueva verificaci\u00f3n.", 
     "Thank you! We have received your payment for {courseName}.": "\u00a1Gracias! Hemos recibido tu pago para {courseName}.", 
@@ -1315,9 +1321,9 @@
     "The general category for this type of assignment, for example, Homework or Midterm Exam. This name is visible to learners.": "La categor\u00eda general para este tipo de asignaci\u00f3n, por ejemplo, Tareas o Examen trimestral. Este nombre es visible a los estudiantes.", 
     "The grading process is still running. Refresh the page to see updates.": "El proceso de calificaci\u00f3n todav\u00eda est\u00e1 corriendo. Recarga la p\u00e1gina para ver las actualizaciones.", 
     "The language that team members primarily use to communicate with each other.": "El idioma que usan los miembros del equipo para comunicarse.", 
-    "The language used throughout this site. This site is currently available in a limited number of languages.": "El idioma que se usar\u00e1 para el sitio. Actualmente solo hay disponibilidad de usar un n\u00famero limitado de idiomas.", 
     "The minimum grade for course credit is not set.": "La calificaci\u00f3n m\u00ednima para obtener cr\u00e9ditos por el curso no est\u00e1 definida.", 
     "The minimum score percentage must be a whole number between 0 and 100.": "La nota m\u00ednima para aprobar debe ser un n\u00famero entero entre 0 y 100.", 
+    "The more you tell us, the more quickly and helpfully we can respond!": "Cuanto m\u00e1s nos digas, mejor podemos ayudar.", 
     "The name of this signatory as it should appear on certificates.": "El nombre de este signatario como debe aparecer en los certificados.", 
     "The number of assignments of this type that will be dropped. The lowest scoring assignments are dropped first.": "El n\u00famero de asignaciones de este tipo que ser\u00e1n descartados. Las asignaciones con calificaciones m\u00e1s bajas ser\u00e1n las primeras en ser descartadas.", 
     "The number of subsections in the course that contain problems of this assignment type.": "El n\u00famero de subdivisiones del curso que contiene problemas de este tipo de asignaci\u00f3n.", 
@@ -1617,6 +1623,7 @@
     "Webcam": "C\u00e1mara web", 
     "Weight of Total Grade": "Peso en la calificaci\u00f3n total", 
     "What You Need for Verification": "Lo que necesita para la verificaci\u00f3n", 
+    "What can we help you with, ": "\u00bfEn qu\u00e9 podemos ayudarte,", 
     "What does %(platformName)s do with this photo?": "\u00bfQu\u00e9 hace %(platformName)s con esta imagen?", 
     "What does this mean?": "\u00bfQu\u00e9 significa esto?", 
     "What's Your Next Accomplishment?": "\u00bfQu\u00e9 ser\u00e1 tu pr\u00f3ximo logro?", 

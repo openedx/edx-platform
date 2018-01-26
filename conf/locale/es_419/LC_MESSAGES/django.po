@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -34,7 +34,7 @@
 # Laura Silva <lingison@edx.org>, 2015-2017
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
-# Marina Pastor <mpastor@edx.org>, 2017
+# Marina Pastor <mpastor@edx.org>, 2017-2018
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # MarnyLopez, 2014
 # Natalia, 2013
@@ -55,7 +55,7 @@
 # José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2017 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -89,7 +89,7 @@
 # Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -163,7 +163,7 @@
 # José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -203,7 +203,7 @@
 # Valeria Freire <valtodopds@hotmail.com>, 2015
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2017 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -216,7 +216,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-12-17 20:42+0000\n"
+"POT-Creation-Date: 2018-01-25 11:41+0000\n"
 "PO-Revision-Date: 2018-01-15 15:42+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -602,7 +602,8 @@ msgstr "No ha llenado uno o más campos requeridos"
 msgid "Username and password fields cannot match"
 msgstr "Los campos de usuario y contraseña no concuerdan"
 
-#: common/djangoapps/student/forms.py common/djangoapps/student/views.py
+#: common/djangoapps/student/forms.py
+#: common/djangoapps/student/views/management.py
 msgid "Password: "
 msgstr "Contraseña:"
 
@@ -618,6 +619,16 @@ msgid ""
 msgstr ""
 "Al parecer {email} ya está asociado a una cuenta existente. Intente "
 "nuevamente con un correo electrónico diferente."
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Public Username '{username}' already exists."
+msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Email '{email}' already exists."
+msgstr "Ya existe una cuenta con el correo electrónico '{email}'."
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
@@ -864,81 +875,106 @@ msgstr "Nombre de este atributo de usuario."
 msgid "Value of this user attribute."
 msgstr "Valor de este atributo de usuario."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
+msgid " and "
+msgstr "y"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Photos are mismatched"
+msgstr "Las fotos no son iguales"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name missing from ID photo"
+msgstr "La foto del ID falta su nombre"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo not provided"
+msgstr "No se proporcionó una foto de la ID"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID is invalid"
+msgstr "La ID no es válida"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo is blurry"
+msgstr "La foto del estudiante está borrosa"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name on ID does not match name on account"
+msgstr "El nombre en la ID no es igual al nombre en la cuenta de usuario"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo not provided"
+msgstr "No se proporcionó una foto del estudiante"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo is blurry"
+msgstr "La foto de la ID está borrosa"
+
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr "El curso que está buscando comienza el {date}."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "El curso que busca está cerrado desde {date}."
 
-#: common/djangoapps/student/views.py
-msgid "Photos are mismatched"
-msgstr "Las fotos no son iguales"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+"Ha iniciado sesión exitosamente en su cuenta de {provider_name}, pero está "
+"cuenta no está vinculada aún con una cuenta de {platform_name}."
 
-#: common/djangoapps/student/views.py
-msgid "Name missing from ID photo"
-msgstr "La foto del ID falta su nombre"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+"Utilice su nombre de usuario y contraseña de {platform_name} para iniciar "
+"sesión en {platform_name} y después vincule su cuenta de  {platform_name} "
+"con la cuenta de {provider_name} desde su panel de control."
 
-#: common/djangoapps/student/views.py
-msgid "ID photo not provided"
-msgstr "No se proporcionó una foto de la ID"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
+msgstr ""
+"Si aun no tiene una cuenta en {platform_name}, haga clic en "
+"<strong>Registrarse</strong> en la parte superior de la página."
 
-#: common/djangoapps/student/views.py
-msgid "ID is invalid"
-msgstr "La ID no es válida"
+#: common/djangoapps/student/views/login.py
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+"Ocurrió un error en la recepción de su información de ingreso. Por favor "
+"escríbanos al correo electrónico."
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo is blurry"
-msgstr "La foto del estudiante está borrosa"
+#: common/djangoapps/student/views/login.py
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr ""
+"Esta cuenta ha sido bloqueada temporalmente debido a un exceso de intentos "
+"fallidos de ingreso. Intente nuevamente más tarde."
 
-#: common/djangoapps/student/views.py
-msgid "Name on ID does not match name on account"
-msgstr "El nombre en la ID no es igual al nombre en la cuenta de usuario"
+#: common/djangoapps/student/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"Su contraseña ha expirado de acuerdo con las políticas establecidas al "
+"respecto. Para poder reingresar, elija una nueva contraseña presionando el "
+"vínculo \"Olvidé mi contraseña\" en esta misma página."
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo not provided"
-msgstr "No se proporcionó una foto del estudiante"
-
-#: common/djangoapps/student/views.py
-msgid "ID photo is blurry"
-msgstr "La foto de la ID está borrosa"
-
-#: common/djangoapps/student/views.py
-msgid " and "
-msgstr "y"
-
-#: common/djangoapps/student/views.py
-msgid "Course id not specified"
-msgstr "No se especificó el ID del curso"
-
-#: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
-msgid "Invalid course id"
-msgstr "La ID del curso no es válida"
-
-#: common/djangoapps/student/views.py
-msgid "Course id is invalid"
-msgstr "El ID del curso no es válido"
-
-#: common/djangoapps/student/views.py
-msgid "Could not enroll"
-msgstr "No se ha podido inscribir"
-
-#: common/djangoapps/student/views.py
-msgid "You are not enrolled in this course"
-msgstr "Usted no está inscrito en este curso"
-
-#: common/djangoapps/student/views.py
-msgid "Your certificate prevents you from unenrolling from this course"
-msgstr "Su certificado no permite que usted se desinscriba de este curso."
-
-#: common/djangoapps/student/views.py
-msgid "Enrollment action is invalid"
-msgstr "La inscripción es inválida"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -951,128 +987,104 @@ msgstr ""
 "correo electrónico, revise tu bandeja de spam o <a "
 "href=\"{support_url}\">contáctate con {platform} Soporte</a>."
 
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"Ha iniciado sesión exitosamente en su cuenta de {provider_name}, pero está "
-"cuenta no está vinculada aún con una cuenta de {platform_name}."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-"Utilice su nombre de usuario y contraseña de {platform_name} para iniciar "
-"sesión en {platform_name} y después vincule su cuenta de  {platform_name} "
-"con la cuenta de {provider_name} desde su panel de control."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"<strong>Register</strong> at the top of the page."
-msgstr ""
-"Si aun no tiene una cuenta en {platform_name}, haga clic en "
-"<strong>Registrarse</strong> en la parte superior de la página."
-
-#: common/djangoapps/student/views.py
-msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-"Ocurrió un error en la recepción de su información de ingreso. Por favor "
-"escríbanos al correo electrónico."
-
-#: common/djangoapps/student/views.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr ""
-"Esta cuenta ha sido bloqueada temporalmente debido a un exceso de intentos "
-"fallidos de ingreso. Intente nuevamente más tarde."
-
-#: common/djangoapps/student/views.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"Su contraseña ha expirado de acuerdo con las políticas establecidas al "
-"respecto. Para poder reingresar, elija una nueva contraseña presionando el "
-"vínculo \"Olvidé mi contraseña\" en esta misma página."
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Demasiados intentos fallidos de inicio de sesión. Inténtelo de nuevo más "
 "tarde."
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Correo electrónico o contraseña incorrectos."
 
-#: common/djangoapps/student/views.py
-msgid "Please enter a username"
-msgstr "Por favor ingrese un nombre de usuario"
-
-#: common/djangoapps/student/views.py
-msgid "Please choose an option"
-msgstr "Por favor seleccione una opción"
-
-#: common/djangoapps/student/views.py
-msgid "User with username {} does not exist"
-msgstr "El nombre de usuario {} no existe."
-
-#: common/djangoapps/student/views.py
-msgid "Successfully disabled {}'s account"
-msgstr "Se deshabilitó correctamente la cuenta de {}"
-
-#: common/djangoapps/student/views.py
-msgid "Successfully reenabled {}'s account"
-msgstr "Se rehabilitó correctamente la cuenta de {}"
-
-#: common/djangoapps/student/views.py
-msgid "Unexpected account status"
-msgstr "Estado de cuenta inesperado"
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Public Username '{username}' already exists."
-msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Email '{email}' already exists."
-msgstr "Ya existe una cuenta con el correo electrónico '{email}'."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "Registration using {provider} has timed out."
-msgstr "Inscripción usando {provider} ha expirado."
-
-#: common/djangoapps/student/views.py
-msgid "An access_token is required when passing value ({}) for provider."
+#: common/djangoapps/student/views/login.py
+msgid "No inactive user with this e-mail exists"
 msgstr ""
-"Se requiere un access_token cuando se pasa el valor ({}) al proveedor."
+"No existe un usuario inactivo con esta dirección de correo electrónico"
 
-#: common/djangoapps/student/views.py
-msgid "The provided access_token is already associated with another user."
-msgstr "El access_token ingresado ya está asociado con otro usuario."
+#: common/djangoapps/student/views/login.py
+msgid "Unable to send reactivation email"
+msgstr "No fue posible enviar el correo de reactivación"
 
-#: common/djangoapps/student/views.py
-msgid "The provided access_token is not valid."
-msgstr "El access_token suministrado no es válido."
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Account creation not allowed."
 msgstr "Creación de cuenta no permitida."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
+msgid "Course id not specified"
+msgstr "No se especificó el ID del curso"
+
+#: common/djangoapps/student/views/management.py
+#: lms/djangoapps/support/views/refund.py
+msgid "Invalid course id"
+msgstr "La ID del curso no es válida"
+
+#: common/djangoapps/student/views/management.py
+msgid "Course id is invalid"
+msgstr "El ID del curso no es válido"
+
+#: common/djangoapps/student/views/management.py
+msgid "Could not enroll"
+msgstr "No se ha podido inscribir"
+
+#: common/djangoapps/student/views/management.py
+msgid "You are not enrolled in this course"
+msgstr "Usted no está inscrito en este curso"
+
+#: common/djangoapps/student/views/management.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr "Su certificado no permite que usted se desinscriba de este curso."
+
+#: common/djangoapps/student/views/management.py
+msgid "Enrollment action is invalid"
+msgstr "La inscripción es inválida"
+
+#: common/djangoapps/student/views/management.py
+msgid "Please enter a username"
+msgstr "Por favor ingrese un nombre de usuario"
+
+#: common/djangoapps/student/views/management.py
+msgid "Please choose an option"
+msgstr "Por favor seleccione una opción"
+
+#: common/djangoapps/student/views/management.py
+msgid "User with username {} does not exist"
+msgstr "El nombre de usuario {} no existe."
+
+#: common/djangoapps/student/views/management.py
+msgid "Successfully disabled {}'s account"
+msgstr "Se deshabilitó correctamente la cuenta de {}"
+
+#: common/djangoapps/student/views/management.py
+msgid "Successfully reenabled {}'s account"
+msgstr "Se rehabilitó correctamente la cuenta de {}"
+
+#: common/djangoapps/student/views/management.py
+msgid "Unexpected account status"
+msgstr "Estado de cuenta inesperado"
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr "Inscripción usando {provider} ha expirado."
+
+#: common/djangoapps/student/views/management.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr ""
+"Se requiere un access_token cuando se pasa el valor ({}) al proveedor."
+
+#: common/djangoapps/student/views/management.py
+msgid "The provided access_token is already associated with another user."
+msgstr "El access_token ingresado ya está asociado con otro usuario."
+
+#: common/djangoapps/student/views/management.py
+msgid "The provided access_token is not valid."
+msgstr "El access_token suministrado no es válido."
+
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
@@ -1083,12 +1095,12 @@ msgstr ""
 "favor, <a href=\"{support_url}\">contáctese con soporte</a> para resolver "
 "esto."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr "{html_start}Éxito{html_end} Su cuenta ha sido activada."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
@@ -1096,15 +1108,16 @@ msgid ""
 "enrolled in. Sign In to continue."
 msgstr ""
 "{html_start}¡Éxito! Ha activado su cuenta.{html_end}Ahora recibirá "
-"actualizaciones y notificaciones de nosotros por correo con relación a los "
-"cursos en los cuales Ud. está inscrito/a. Inicie Sesión para proceder."
+"actualizaciones y notificaciones nuestras por correo electrónico con "
+"relación a los cursos en los cuales está inscrito/a. Inicie Sesión para "
+"continuar."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
 msgstr "{html_start}Esta cuenta ya se ha activado.{html_end}"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
@@ -1119,7 +1132,7 @@ msgstr[1] ""
 "Está reutilizando una contraseña usada recientemente. Debe utilizar al menos"
 " {num} contraseñas diferentes antes de reutilizar la misma."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
@@ -1132,40 +1145,31 @@ msgstr[0] ""
 "políticas de seguridad, debe dejar transcurrir al menos {num} día antes de "
 "hacer otra solicitud."
 msgstr[1] ""
-"Está solicitando cambiar de contraseña con demasiada frecuencia. Por "
+"Está solicitando cambiar de contraseña con demasiada frecuencia. Debido a  "
 "políticas de seguridad, debe dejar transcurrir al menos {num} días antes de "
 "hacer otra solicitud."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "El cambio de contraseña no ha sido exitoso"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
 msgstr "Error al resetear su contraseña. Por favor intente nuevamente."
 
-#: common/djangoapps/student/views.py
-msgid "No inactive user with this e-mail exists"
-msgstr ""
-"No existe un usuario inactivo con esta dirección de correo electrónico"
-
-#: common/djangoapps/student/views.py
-msgid "Unable to send reactivation email"
-msgstr "No fue posible enviar el correo de reactivación"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr "Se requiere una dirección de correo electrónico válida."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr "El correo electrónico nuevo es igual al anterior."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "An account with this e-mail already exists."
 msgstr "Ya existe una cuenta con esta dirección de correo electrónico."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 "Imposible enviar el email de activación. Por favor intentelo de nuevo más "
@@ -1227,17 +1231,6 @@ msgstr ""
 "Si no se selecciona esta opción, los usuarios no tendrán al proveedor como "
 "una opción para autenticarse con en la pantalla de inicio de sesión, pero la"
 " autenticación manual mediante el enlace correcto es todavía posible."
-
-#: common/djangoapps/third_party_auth/models.py
-msgid ""
-"Whether to drop an existing session when accessing a view decorated with "
-"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
-"URL query parameter mapping to this provider is included in the request."
-msgstr ""
-"Ya sea para eliminar una sesión existente al acceder a una vista decorada "
-"con third_party_auth.decorators.tpa_hint_ends_existing_session cuando se "
-"incluye una asignación de parámetros de consulta URL tpa_hint a este "
-"proveedor en la solicitud."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -2829,9 +2822,9 @@ msgid ""
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
 "the start date that you have set for this course is used."
 msgstr ""
-"Introduzca el texto que quiere usar como el periodo de tiempo de inicio "
-"publicado para este curso, como \"Invierno 2018\". Si Ud. marca este valor "
-"con \"nulo,\" se usa la fecha de inicio que ha establecido para este curso."
+"Ingrese el texto que quiere usar como el periodo de tiempo de inicio "
+"publicado para este curso, como \"Invierno 2018\". Si marca este valor como "
+"\"nulo,\" se usará la fecha de inicio que ha establecido para este curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -3758,6 +3751,34 @@ msgstr "General"
 msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
 msgstr "{assignment_type} = {weighted_percent:.2%} de un posible {weight:.2%}"
 
+#: common/lib/xmodule/xmodule/graders.py
+msgid "Generated"
+msgstr ""
+
+#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
+#. released for viewing.
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} {index} Unreleased - 0% (?/?)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "The lowest {drop_count} {section_type} scores are dropped."
+msgstr ""
+
+#. Translators: "Homework Average = 0%"
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} Average = {percent:.0%}"
+msgstr ""
+
+#. Translators: Avg is short for Average
+#: common/lib/xmodule/xmodule/graders.py
+#, python-brace-format
+msgid "{short_label} Avg"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
 msgstr "Texto"
@@ -4433,6 +4454,17 @@ msgstr ""
 "para videos HTML5."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video auto-advance"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify whether to show an auto-advance button in videos. If the student "
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Video Pre-Roll"
 msgstr "Video previo"
 
@@ -4639,6 +4671,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
+"This section is a prerequisite. You must complete this section in order to "
+"unlock additional content."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 "Una lista que resuma lo que los estudiantes deberían esperar en esta "
@@ -4760,6 +4798,7 @@ msgstr "Inicio"
 #: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
@@ -5083,6 +5122,12 @@ msgid "The default speed for the video."
 msgstr "Velocidad por defecto del video"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether to advance automatically to the next unit when the video "
+"ends."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
 msgstr "Especificar si YouTube está disponible para el usuario."
 
@@ -5383,7 +5428,7 @@ msgstr "Contacto"
 msgid "Careers"
 msgstr "Carreras"
 
-#: lms/djangoapps/branding/api.py
+#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid "Terms of Service & Honor Code"
 msgstr "Términos del servicio y código de honor"
@@ -5745,12 +5790,6 @@ msgstr "Todos los derechos reservados."
 msgid "Invalid Certificate"
 msgstr "Certificado inválido"
 
-#. Translators: The &amp; characters represent an ampersand character and can
-#. be ignored
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Terms of Service &amp; Honor Code"
-msgstr "Términos del servicio &amp; código de honor"
-
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
 #: lms/djangoapps/certificates/views/webview.py
@@ -5768,7 +5807,7 @@ msgstr "Acerca de los logros en {platform_name}"
 #. for the certificate
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Issued On:"
-msgstr "Emitido el:"
+msgstr "Emitido en:"
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
 #. each individual certificate
@@ -5995,7 +6034,7 @@ msgstr ""
 "Aprobar automáticamente las solicitudes de reembolso válidas, sin "
 "procesamiento manual"
 
-#: lms/djangoapps/commerce/signals.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -6004,7 +6043,8 @@ msgstr ""
 "Se ha solicitado una devolución para {username} ({email}). Para procesar "
 "esta solicitud, visite el vínculo(s) a continuación."
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
 msgstr "[Refund] Devolución solicitada por el usuario"
 
@@ -6055,6 +6095,34 @@ msgid ""
 msgstr ""
 "Si su curso no aparece en el panel de control, contacte a "
 "{payment_support_link}."
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid ""
+"BlockCompletion.objects.submit_batch_completion should not be called when "
+"the feature is disabled."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Key '{key}' not found."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "Invalid course key: {}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "User is not enrolled in course."
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+#, python-brace-format
+msgid "Block with key: '{key}' is not in course {course}"
+msgstr ""
+
+#: lms/djangoapps/completion/api/v1/views.py
+msgid "ok"
+msgstr ""
 
 #: lms/djangoapps/completion/models.py
 #, python-brace-format
@@ -6296,6 +6364,7 @@ msgstr "Cambia a la opción con Certificado Verificado ({upgrade_price})"
 #: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr "Aprender más"
 
@@ -7120,7 +7189,7 @@ msgstr "Respuestas al problema"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not find problem with this location."
-msgstr "No se pudo encontrar un problema con este localizador."
+msgstr "No se pudo encontrar el problema con este identificador."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7892,6 +7961,7 @@ msgstr "re calificado"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks_helper/module_state.py
 msgid "overridden"
 msgstr "cambiado a mano"
 
@@ -8694,8 +8764,8 @@ msgid ""
 "The issuing bank has questions about the request. Possible fix: retry with "
 "another form of payment"
 msgstr ""
-"El Banco emisor tiene preguntas sobre la solicitud.  Posible solución: "
-"intente con otra forma de pago."
+"El Banco emisor tiene dudas sobre la solicitud.  Posible solución: intente "
+"con otra forma de pago."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -9502,6 +9572,16 @@ msgstr "Exito"
 msgid "You do not have permission to view this page."
 msgstr "Usted no tiene permisos para ver esta página"
 
+#: lms/djangoapps/student_account/test/test_views.py
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
+msgstr ""
+
 #: lms/djangoapps/student_account/views.py
 msgid "Some error occured during password change. Please try again"
 msgstr ""
@@ -9515,11 +9595,6 @@ msgstr "No se especificó una dirección de correo electrónico."
 #: lms/djangoapps/student_account/views.py
 msgid "Create Account"
 msgstr "Crear cuenta"
-
-#: lms/djangoapps/student_account/views.py
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Continue"
-msgstr "Continuar"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
@@ -9535,6 +9610,13 @@ msgstr "Estado/Provincia/Región"
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Company"
 msgstr "Empresa"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
+msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
@@ -9917,12 +9999,11 @@ msgstr "Bienvenido/a a {platform_name}."
 #, python-brace-format
 msgid ""
 "{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to offer you high-quality learning "
-"opportunities from the world's best universities."
+"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
+"quality learning programs to help you advance your knowledge and your "
+"career. {line_break}Please continue with registration, or log in if you are "
+"an existing user, and press continue to start learning."
 msgstr ""
-"{start_bold}{enterprise_name}{end_bold} ha colaborado con "
-"{start_bold}{platform_name}{end_bold} para ofrecerle oportunidades de "
-"aprendizaje de mayor calidad de las universidades mejores del mundo."
 
 #: lms/templates/emails/password_reset_subject.txt
 #, python-format
@@ -9995,8 +10076,19 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at %(platform_name)s."
 msgstr ""
-"Ud. ha recibido este correo porque pidió reestablecer su contraseña para su "
+"Ha recibido este correo porque solicitó restablecer su contraseña para su "
 "cuenta de usuario en %(platform_name)s."
+
+#: lms/templates/registration/password_reset_email.html
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -11573,7 +11665,7 @@ msgstr "Recordarme"
 #. below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "This is what you will use to login."
-msgstr "Esto es lo que Ud. usará para iniciar sesión."
+msgstr "Esto es lo que usará para iniciar sesión."
 
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
@@ -11586,7 +11678,7 @@ msgstr "Confirmar Correo Electrónico"
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "This name will be used on any certificates that you earn."
-msgstr "Este nombre aparecerá en cualquier certificado que Ud. obtenga."
+msgstr "Este nombre aparecerá en cualquier certificado que obtenga."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
@@ -11606,8 +11698,8 @@ msgstr "Nombre público de usuario "
 msgid ""
 "The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
-"El nombre bajo el cual Ud. se presentará en sus cursos. No puede ser "
-"cambiado luego."
+"El nombre bajo el cual usted se presentará en sus cursos no puede ser "
+"cambiado después."
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -11911,6 +12003,18 @@ msgstr ""
 #, python-brace-format
 msgid "Enrollment in {course_name} was not complete."
 msgstr "La inscripción en {course_name} no se completó."
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"Thank you for joining {platform_name}. Just a couple steps before you start "
+"learning!"
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Continue"
+msgstr "Continuar"
 
 #: openedx/features/learner_profile/views/learner_profile.py
 #, python-brace-format
@@ -12355,6 +12459,26 @@ msgstr "Acceso restringido a: {list_of_groups}"
 msgid "The information you entered is incorrect."
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid "A transcript file is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
 msgstr "El video entrante está vacío."
@@ -12711,6 +12835,11 @@ msgstr "Organización:"
 msgid "Course Number:"
 msgstr "Número de curso:"
 
+#: cms/templates/index.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Run:"
+msgstr ""
+
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
@@ -13006,6 +13135,20 @@ msgid ""
 msgstr ""
 "Los foros de discusión están en proceso de mantenimiento. Estarán nuevamente"
 " en línea pronto!"
+
+#: lms/templates/_gated_content.html lms/templates/seq_module.html
+msgid "Content Locked"
+msgstr ""
+
+#: lms/templates/_gated_content.html
+msgid ""
+"You must complete the section '{prereq_section_name}' with the required "
+"score before you are able to view this content."
+msgstr ""
+
+#: lms/templates/_gated_content.html
+msgid "Go to Prerequisite Section"
+msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -13405,24 +13548,24 @@ msgstr ""
 msgid "Note: only instructors may annotate."
 msgstr "Nota: Solo los instructores pueden realizar anotaciones."
 
+#: lms/templates/index.html lms/templates/courseware/courses.html
+#: themes/stanford-style/lms/templates/index.html
+msgid "Search for a course"
+msgstr "Buscar curso"
+
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to the Open edX{registered_trademark} platform!"
 msgstr "Bienvenido a la plataforma de Open edX{registered_trademark}!"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
+#: lms/templates/index_overlay.html
 msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 "Funciona! Esta es la página de inicio por defecto para esta instancia de "
 "Open edX."
-
-#: lms/templates/index.html lms/templates/courseware/courses.html
-#: themes/stanford-style/lms/templates/index.html
-msgid "Search for a course"
-msgstr "Buscar curso"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -13718,8 +13861,8 @@ msgstr "Ahora estás viendo el curso como {i_start}{user_name}{i_end}."
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] "Usted ha realizado {num_used} de {num_total} intento"
-msgstr[1] "Tu has realizado {num_used} de {num_total} intentos"
+msgstr[0] "Ha realizado {num_used} de {num_total} intento"
+msgstr[1] "Ha realizado {num_used} de {num_total} intentos"
 
 #: lms/templates/problem.html
 msgid ""
@@ -14044,6 +14187,10 @@ msgstr ""
 "volver al panel de control. "
 
 #: lms/templates/seq_module.html
+msgid "Important!"
+msgstr ""
+
+#: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Anterior"
 
@@ -14113,7 +14260,7 @@ msgstr "Grupos inactivos"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
-msgstr "Información de depuración para el personal de soporte"
+msgstr "Información detallada para el personal de soporte"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission history"
@@ -14149,7 +14296,7 @@ msgstr "Añadir comentario"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug:"
-msgstr "Depuración para personal:"
+msgstr "Información para depuración:"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -14177,7 +14324,8 @@ msgstr "Calificar el envío del estudiante nuevamente"
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Score Improves"
-msgstr "Puntuar de nuevo solamente si se mejora la calificación"
+msgstr ""
+"Calificar de nuevo. Solamente si mejora la calificación del estudiante"
 
 #: lms/templates/staff_problem_info.html
 msgid "Override Score"
@@ -15816,6 +15964,10 @@ msgstr "Anotado por"
 msgid "Supported by the following organizations"
 msgstr "Con el apoyo de las siguientes organizaciones"
 
+#: lms/templates/certificates/_accomplishment-rendering.html
+msgid "Awarded to:"
+msgstr ""
+
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
 "For tips and tricks on printing your certificate, view the {link_start}Web "
@@ -15857,8 +16009,8 @@ msgstr ""
 "siguiente información es correcta."
 
 #: lms/templates/certificates/server-error.html
-msgid "The institution&#39;s logo."
-msgstr "El logo de la institución."
+msgid "The institution's logo."
+msgstr ""
 
 #: lms/templates/certificates/server-error.html
 msgid "The institution that is linked to the course."
@@ -15876,6 +16028,10 @@ msgid ""
 msgstr ""
 "Si toda la información es correcta y el problema persiste, contacta a "
 "soporte técnico."
+
+#: lms/templates/certificates/valid.html
+msgid "About edX Certificates"
+msgstr ""
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
@@ -16231,6 +16387,7 @@ msgstr "Refinar su búsqueda"
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "{course_number} Courseware"
 msgstr "Material del curso {course_number}"
 
@@ -16822,12 +16979,6 @@ msgid "Starts - {date}"
 msgstr "Inicia - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer select a session, your final day to select a session was "
-"{entitlement_expired_at}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 
@@ -16836,7 +16987,7 @@ msgid "You must select a session to access the course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Change Session"
+msgid "Change or Leave Session"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16882,12 +17033,25 @@ msgid "Available Actions"
 msgstr "Acciones disponibles"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr "Configuración de email"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "Programas relacionados"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Buy all remaining courses in this program and save 10%"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Upgrade All Remaining Courses ("
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid " ${price:.2f} {currency} ) "
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -17129,9 +17293,9 @@ msgid ""
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
 msgstr ""
-"Su envío de verificación no fue aprobado. Para recibir un certificado "
-"verificado, hay que enviar las fotos de Ud. y de su identificación "
-"nuevamente antes de la fecha límite de verificación de su curso."
+"El envío de verificación no fue aceptado. Para recibir un certificado "
+"verificado, debe nuevamente enviar una foto suya y de su identificación "
+"antes de la fecha límite de verificación de su curso."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Your verification was denied for the following reasons:"
@@ -18507,10 +18671,6 @@ msgid "Course Name:"
 msgstr "Nombre del curso:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Display Name:"
-msgstr "Nombre para mostrar del curso:"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Start Date:"
 msgstr "Fecha de inicio del curso:"
 
@@ -18668,12 +18828,12 @@ msgid ""
 "enter the location of the problem (from its Staff Debug Info)."
 msgstr ""
 "Para descargar un archivo CSV con la lista de respuestas de los estudiantes "
-"a un problema dado, ingrese el localizador del problema (puede obtener el "
-"localizador en la información de depuración)"
+"a un problema dado, ingrese el identificador del problema (puede obtener el "
+"identificador en la información detallada para el personal de depuración)"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Problem location: "
-msgstr "Localizador del problema:"
+msgstr "Identificador del problema:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
@@ -19628,19 +19788,11 @@ msgstr "Agregar como Profesor Asistente"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TAs are members of the community who help course teams moderate "
-"discussions. They can see posts by all learners, and can edit or delete "
-"posts, clear flags, close or re-open threads, and endorse responses. Their "
-"posts are marked as 'Community TA'. Only enrolled learners can be added as "
-"Community TAs."
+"discussions. They can see posts by learners in their assigned cohort or "
+"enrollment track, and can edit or delete posts, clear flags, close or re-"
+"open threads, and endorse responses. Their posts are marked as 'Community "
+"TA'. Only enrolled learners can be added as Community TAs."
 msgstr ""
-"Los Profesores Asistentes son miembros de la comunidad quienes ayudan a los "
-"equipos del curso a moderar las discusiones. Los Profesores Asistentes "
-"únicamente pueden ver las publicaciones hechas por los estudiantes en sus "
-"grupos asignados. Pueden editar o eliminar publicaciones, borrar reportes, "
-"cerrar o re-abrir discusiones, aprobar respuestas, pero únicamente para "
-"publicaciones hechas por estudiantes en su grupo. Sus publicaciones son "
-"marcadas como \"Profesores Asistentes\".  Únicamente estudiantes inscritos "
-"pueden ser agregados como Profesores Asistentes."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -19992,7 +20144,7 @@ msgid ""
 "Show the status for the rescoring tasks that you submitted for this learner "
 "and problem."
 msgstr ""
-"Mostrar el estado de tareas de recalificación que Ud. inició para este "
+"Mostrar el estado de tareas de recalificación que usted inició para este "
 "estudiante y problema."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -20054,8 +20206,8 @@ msgid ""
 "Show the status for the rescoring tasks that you submitted for this learner "
 "and entrance exam."
 msgstr ""
-"Mostrar el estado de tareas de recalificación que Ud. inició para este "
-"estudiante y examen de entrada."
+"Mostrar el estado de tareas de recalificación que usted inició para este "
+"estudiante y el examen de admisión.."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust all enrolled learners' grades for a specific problem"
@@ -20085,7 +20237,7 @@ msgstr "Recalificar solamente si se mejora la nota"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
-msgstr "Mostrar el estado de las tareas que Ud. inició para este problema."
+msgstr "Mostrar el estado de las tareas que usted inició para este problema."
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -21210,8 +21362,8 @@ msgid ""
 "website. If you continue browsing this site, we understand that you accept "
 "the use of cookies."
 msgstr ""
-"Esta página web usa cookies para que Ud. tenga la mejor experiencia en "
-"nuestro sitio web."
+"Esta página web usa cookies para que tenga la mejor experiencia en nuestro "
+"sitio web."
 
 #: lms/templates/widgets/cookie-consent.html
 msgid "Got it!"
@@ -21292,40 +21444,6 @@ msgid "Important Course Dates"
 msgstr "Fechas importantes del curso"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show/Hide"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Show less"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid ""
-"Sample verified certificate with your name, the course title, the logo of "
-"the institution and the signatures of the instructors for this course."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Official proof of completion"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Easily shareable certificate"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Proven motivator to complete the course"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Certificate purchases help us continue to offer free courses"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Upgrade ({price})"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
 msgstr "Meta:"
 
@@ -21333,9 +21451,101 @@ msgstr "Meta:"
 msgid "Edit your course goal:"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Pursue a verified certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid "Upgrade ({price})"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Unlocked"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "(Prerequisite required)"
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} fecha límite {{date}}"
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Learn About Verified Certificates"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{platform_name} Verified Certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Why upgrade?"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Official proof of completion"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Easily shareable certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Proven motivator to complete the course"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"Certificate purchases help {platform_name} continue to offer free courses"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "How it works"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Pay the Verified Certificate upgrade fee"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Verify your identity with a webcam and government-issued ID"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Study hard and pass the course"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Share your certificate with friends, employers, and others"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "edX Learner Stories"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"My certificate has helped me showcase my knowledge on my"
+"                             resume - I feel like this certificate could "
+"really help me land                             my dream job!"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "{learner_name}, edX Learner"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid ""
+"I wanted to include a verified certificate on my resume and my profile to"
+"                             illustrate that I am working towards this goal "
+"I have and that I have                             achieved something while "
+"I was unemployed."
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
+msgid "Upgrade ({course_price})"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
@@ -21352,6 +21562,10 @@ msgstr "Última actualización"
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "Resultados de búsqueda"
+
+#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
+msgid "Learner Analytics"
+msgstr ""
 
 #. Translators: this section lists all the third-party authentication
 #. providers
@@ -22385,7 +22599,7 @@ msgstr "Ritmo del curso"
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Self-Paced"
-msgstr "Ritmo propio."
+msgstr "A ritmo propio."
 
 #: cms/templates/course_outline.html cms/templates/settings.html
 msgid "Instructor-Paced"
@@ -22425,7 +22639,7 @@ msgstr "Aprenda más sobre la estructura del curso"
 
 #: cms/templates/course_outline.html
 msgid "Setting release dates and grading policies"
-msgstr "Configurar fechas de liberación y políticas de calificaciones"
+msgstr "Configurar fechas de publicación y políticas de calificaciones"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -22433,9 +22647,9 @@ msgid ""
 "date. When you configure a subsection, you can also set the grading policy "
 "and due date."
 msgstr ""
-"Selecciones el icono de configuración para una sección o subsección para "
-"definir su fecha de liberación. Al configurar una subsección, también puede "
-"definir la política de calificación y la fecha límite de entrega."
+"Seleccione el icono de configuración para una sección o subsección para "
+"definir su fecha de publicación. Al configurar una subsección, también puede"
+" definir la política de calificación y la fecha límite de entrega."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about grading policy settings"
@@ -23759,10 +23973,6 @@ msgid "Courses Being Processed"
 msgstr "Cursos que están siendo procesados"
 
 #: cms/templates/index.html
-msgid "Course Run:"
-msgstr "Impartición del Curso:"
-
-#: cms/templates/index.html
 msgid "This course run is currently being created."
 msgstr "Esta instancia del curso está actualmente siendo creada."
 
@@ -24822,8 +25032,8 @@ msgid ""
 "assignments."
 msgstr ""
 "Los cursos que van al ritmo del instructor avanzan de acuerdo con las fechas"
-" establecidas por el autor. Usted puede configurar las fechas de liberación "
-"para el contenido del curso, así como para las tareas y actividades."
+" establecidas por el autor. Usted puede configurar las fechas de publicación"
+" para el contenido del curso, así como para las tareas y actividades."
 
 #: cms/templates/settings.html
 msgid ""
@@ -24831,7 +25041,7 @@ msgid ""
 " for assignments. Learners can complete course material at any time before "
 "the course end date."
 msgstr ""
-"Los cursos que van a ritmo propio no tienen fechas de liberación para el "
+"Los cursos que van a ritmo propio no tienen fechas de publicación para el "
 "contenido ni fechas límites para las tareas.  Los estudiantes pueden "
 "completar los materiales y actividades en cualquier momento antes de la "
 "fecha de fin del curso."
@@ -25011,7 +25221,7 @@ msgid ""
 msgstr ""
 "Puede usar la barra de desplazamiento bajo el rango general de "
 "calificaciones para especificar si su curso tiene la estructura de aprobado "
-"/ no aprobado o si se califica por letras y para establecer umbrales para "
+"/ no aprobado o si se califica por letras y para establecer límites para "
 "cada una de las calificaciones posibles."
 
 #: cms/templates/settings_graders.html
