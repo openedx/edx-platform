@@ -6,6 +6,7 @@ module.exports = {
         path.resolve(__dirname, '../common/static/common/js/components/views/feedback_notification.js'),
         path.resolve(__dirname, '../common/static/common/js/components/views/feedback_prompt.js'),
         path.resolve(__dirname, '../common/static/common/js/components/views/feedback.js'),
+        path.resolve(__dirname, '../common/static/common/js/components/views/feedback_alert.js'),
         path.resolve(__dirname, '../common/static/common/js/components/views/paging_footer.js'),
         path.resolve(__dirname, '../cms/static/js/views/paging.js'),
         path.resolve(__dirname, '../common/static/common/js/components/utils/view_utils.js')
@@ -104,6 +105,8 @@ module.exports = {
             'openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js'
         ),
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/section_two_tab.js'),
-        path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/share_modal_view.js')
+        path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/share_modal_view.js'),
+        path.resolve(__dirname, '../node_modules/edx-ui-toolkit/src/js/dropdown-menu/dropdown-menu-view.js'),
+        path.resolve(__dirname, '../node_modules/edx-ui-toolkit/src/js/breadcrumbs/breadcrumbs-view.js')
     ]
 };

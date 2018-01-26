@@ -9,8 +9,15 @@ var StringReplace = require('string-replace-webpack-plugin');
 
 var files = require('./webpack-config/file-lists.js');
 
-var defineHeader = /\(function ?\(define(, require)?\) ?\{/;
-var defineFooter = /\}\)\.call\(this, define \|\| RequireJS\.define(, require \|\| RequireJS\.require)?\);/;
+var filesWithRequireJSBlocks = [
+    path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
+];
+
+var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
+var defineCallFooter = /\}\)\.call\(this, ((define|require)( \|\| RequireJS\.(define|require))?(, )?)+?\);/;
+var defineDirectFooter = /\}\(((window\.)?(RequireJS\.)?(requirejs|define|require|jQuery)(, )?)+\)\);/;
+var defineFancyFooter = /\}\).call\(\s*this(\s|.)*define(\s|.)*\);/;
+var defineFooter = new RegExp('(' + defineCallFooter.source + ')|(' + defineDirectFooter.source + ')|(' + defineFancyFooter.source + ')', 'm');
 
 module.exports = {
     context: __dirname,
@@ -21,6 +28,7 @@ module.exports = {
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
+        'js/pages/container': './cms/static/js/pages/container.js',
         'js/sock': './cms/static/js/sock.js',
 
         // LMS
@@ -80,7 +88,8 @@ module.exports = {
             $: 'jquery',
             jQuery: 'jquery',
             'window.jQuery': 'jquery',
-            Popper: 'popper.js' // used by bootstrap
+            Popper: 'popper.js', // used by bootstrap
+            CodeMirror: 'codemirror',
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
@@ -105,11 +114,11 @@ module.exports = {
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
-            /\/sinon\.js/
+            /\/sinon\.js|codemirror-compressed\.js/
         ],
         rules: [
             {
-                test: files.namespacedRequire,
+                test: files.namespacedRequire.concat(files.textBangUnderscore, filesWithRequireJSBlocks),
                 loader: StringReplace.replace(
                     ['babel-loader'],
                     {
@@ -121,20 +130,24 @@ module.exports = {
                             {
                                 pattern: defineFooter,
                                 replacement: function() { return ''; }
-                            }
-                        ]
-                    }
-                )
-            },
-            {
-                test: files.textBangUnderscore,
-                loader: StringReplace.replace(
-                    ['babel-loader'],
-                    {
-                        replacements: [
+                            },
                             {
-                                pattern: /text!(.*\.underscore)/,
+                                pattern: /(\/\* RequireJS) \*\//g,
                                 replacement: function(match, p1) { return p1; }
+                            },
+                            {
+                                pattern: /\/\* Webpack/g,
+                                replacement: function(match) { return match + ' */'; }
+                            },
+                            {
+                                pattern: /text!(.*?\.underscore)/g,
+                                replacement: function(match, p1) { return p1; }
+                            },
+                            {
+                                pattern: /RequireJS.require/g,
+                                replacement: function() {
+                                    return 'require';
+                                }
                             }
                         ]
                     }
@@ -145,7 +158,8 @@ module.exports = {
                 exclude: [
                     /node_modules/,
                     files.namespacedRequire,
-                    files.textBangUnderscore
+                    files.textBangUnderscore,
+                    filesWithRequireJSBlocks
                 ],
                 use: 'babel-loader'
             },
@@ -212,6 +226,22 @@ module.exports = {
             {
                 test: /\.svg$/,
                 loader: 'svg-inline-loader'
+            },
+            {
+                test: /xblock\/core/,
+                loader: 'exports-loader?this.XBlock!imports-loader?jquery,jquery.immediateDescendents'
+            },
+            {
+                test: /xblock\/runtime.v1/,
+                loader: 'exports-loader?XBlock!imports-loader?XBlock=xblock/core'
+            },
+            {
+                test: /codemirror/,
+                loader: 'exports-loader?window.CodeMirror'
+            },
+            {
+                test: /tinymce/,
+                loader: 'imports-loader?this=>window'
             }
         ]
     },
@@ -220,9 +250,19 @@ module.exports = {
         extensions: ['.js', '.jsx', '.json'],
         alias: {
             AjaxPrefix: 'ajax_prefix',
+            accessibility: 'accessibility_tools',
+            codemirror: 'codemirror-compressed',
+            datepair: 'timepicker/datepair',
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
-            'jquery.ui': 'jQuery-File-Upload/js/vendor/jquery.ui.widget.js',
-            jquery: 'jquery/src/jquery',  // Use the non-dist form of jQuery for better debugging + optimization
+            ieshim: 'ie_shim',
+            jquery: 'jquery/src/jquery',  // Use the non-diqst form of jQuery for better debugging + optimization
+            'jquery.flot': 'flot/jquery.flot.min',
+            'jquery.ui': 'jquery-ui.min',
+            'jquery.tinymce': 'tinymce/jquery.tinymce.min',
+            'jquery.inputnumber': 'html5-input-polyfills/number-polyfill',
+            'jquery.qtip': 'jquery.qtip.min',
+            'jquery.smoothScroll': 'jquery.smooth-scroll.min',
+            'jquery.timepicker': 'timepicker/jquery.timepicker',
             'backbone.associations': 'backbone-associations/backbone-associations-min',
 
             // See sinon/webpack interaction weirdness:
@@ -230,19 +270,24 @@ module.exports = {
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
             sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
-            'jquery.smoothScroll': 'jquery.smooth-scroll.min',
-            'jquery.timepicker': 'timepicker/jquery.timepicker',
-            datepair: 'timepicker/datepair',
-            accessibility: 'accessibility_tools',
-            ieshim: 'ie_shim'
+            WordCloudMain: 'xmodule/assets/word_cloud/public/js/word_cloud_main',
         },
         modules: [
-            'node_modules',
+            'cms/djangoapps/pipeline_js/js',
             'cms/static',
+            'cms/static/cms/js',
+            'common/lib/xmodule',
+            'common/lib/xmodule/xmodule/js/src',
             'common/static',
+            'common/static/coffee/src',
+            'common/static/common/js',
+            'common/static/common/js/vendor/',
             'common/static/js/src',
             'common/static/js/vendor/',
-            'common/static/js/vendor/jQuery-File-Upload/js/'
+            'common/static/js/vendor/jQuery-File-Upload/js/',
+            'common/static/js/vendor/tinymce/js/tinymce',
+            'node_modules',
+            'common/static/xmodule',
         ]
     },
 
@@ -259,7 +304,9 @@ module.exports = {
         jquery: 'jQuery',
         logger: 'Logger',
         underscore: '_',
-        URI: 'URI'
+        URI: 'URI',
+        XModule: 'XModule',
+        XBlockToXModuleShim: 'XBlockToXModuleShim',
     },
 
     watchOptions: {

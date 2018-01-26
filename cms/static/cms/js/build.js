@@ -19,7 +19,6 @@
         modules: getModulesList([
             'js/factories/asset_index',
             'js/factories/base',
-            'js/factories/container',
             'js/factories/course_create_rerun',
             'js/factories/course_info',
             'js/factories/edit_tabs',
