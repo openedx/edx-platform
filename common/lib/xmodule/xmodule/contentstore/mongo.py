@@ -259,28 +259,29 @@ class MongoContentStore(ContentStore):
             query.update(filter_params)
         pipeline_stages.append({'$match': query})
 
-        sort = dict(sort)
-        if 'displayname' in sort:
-            pipeline_stages.append({
-                '$project': {
-                    'contentType': 1,
-                    'locked': 1,
-                    'chunkSize': 1,
-                    'content_son': 1,
-                    'displayname': 1,
-                    'filename': 1,
-                    'length': 1,
-                    'import_path': 1,
-                    'uploadDate': 1,
-                    'thumbnail_location': 1,
-                    'md5': 1,
-                    'insensitive_displayname': {
-                        '$toLower': '$displayname'
+        if sort:
+            sort = dict(sort)
+            if 'displayname' in sort:
+                pipeline_stages.append({
+                    '$project': {
+                        'contentType': 1,
+                        'locked': 1,
+                        'chunkSize': 1,
+                        'content_son': 1,
+                        'displayname': 1,
+                        'filename': 1,
+                        'length': 1,
+                        'import_path': 1,
+                        'uploadDate': 1,
+                        'thumbnail_location': 1,
+                        'md5': 1,
+                        'insensitive_displayname': {
+                            '$toLower': '$displayname'
+                        }
                     }
-                }
-            })
-            sort = {'insensitive_displayname': sort['displayname']}
-        pipeline_stages.append({'$sort': sort})
+                })
+                sort = {'insensitive_displayname': sort['displayname']}
+            pipeline_stages.append({'$sort': sort})
 
         # This is another hack to get the total query result count, but only the Nth page of actual documents
         # See: https://stackoverflow.com/a/39784851/6620612
