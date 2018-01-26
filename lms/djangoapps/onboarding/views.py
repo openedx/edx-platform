@@ -410,12 +410,13 @@ def suggest_org_admin(request):
                     org_name = extended_profile.organization.label
                     organization.unclaimed_org_admin_email = org_admin_email
 
-                    send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+                    send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email, hash_key)
                 else:
                     hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, request.user.email)
                     send_admin_update_email(organization.id, organization.label, organization.admin.email,
                                             hash_key, request.user.email, request.user.username
                                             )
+
             except Organization.DoesNotExist:
                 log.info("Organization does not exists: %s" % organization)
                 status = 400

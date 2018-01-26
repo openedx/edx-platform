@@ -15,6 +15,7 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESIllegalAddressError,
 )
+from common.lib.mandrill_client.client import MandrillClient
 
 log = logging.getLogger('edx.celery.task')
 
@@ -28,14 +29,14 @@ SINGLE_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def send_course_notification_email(course, mako_template_path, context, to_list=None):
+def send_course_notification_email(course, template_name, context, to_list=None):
 
     """
     Sends an email to a list of recipients.
 
     Inputs are:
       * `course`: notification about this course.
-      * `mako_template_path`: Mako template path.
+      * `template_name`: slug of the Mandrill template which is to be used.
       * `context`: context for template
       * `to_list`: list of recipients, if list is not provided then the email will be send to all enrolled students.
 
@@ -67,76 +68,21 @@ def send_course_notification_email(course, mako_template_path, context, to_list=
             recipient_num += 1
             log.info("Getting user email")
             email = current_recipient.email
-            log.info("Setting up subject of the email")
-            subject = settings.NOTIFICATION_EMAIL_SUBJECT
             log.info("Adding full name in the context")
-            context['full_name'] = current_recipient.extended_profile.first_name + " " + current_recipient.\
+            context["full_name"] = current_recipient.extended_profile.first_name + " " + current_recipient.\
                 extended_profile.last_name
-            log.info("Constructing email template")
-            template = render_to_string(mako_template_path, context)
-            log.info("Instantiating email message")
-            email_msg = EmailMultiAlternatives(
-                subject=subject,
-                body=template,
-                from_email=settings.NOTIFICATION_FROM_EMAIL,
-                to=[email],
-                connection=connection
+
+            log.info(
+            "TimedNotification ==> Recipient num: %s/%s, Recipient name: %s, Email address: %s",
+                recipient_num,
+                total_recipients,
+                current_recipient.username,
+                email
             )
-            log.info("Adding html template")
-            email_msg.attach_alternative(template, 'text/html')
+            log.info("Just before sending email")
+            MandrillClient().send_email(template_name, email, context)
+            log.info("After sending email")
 
-            try:
-                log.info(
-                    "TimedNotification ==> Recipient num: %s/%s, Recipient name: %s, Email address: %s",
-                    recipient_num,
-                    total_recipients,
-                    current_recipient.username,
-                    email
-                )
-                log.info("Just before sending email")
-                connection.send_messages([email_msg])
-                log.info("After sending email")
-
-            except SMTPDataError as exc:
-                # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure.
-                total_recipients_failed += 1
-                log.error(
-                    "TimedNotification ==> Status: Failed(SMTPDataError), Recipient num: %s/%s, Email address: %s",
-                    recipient_num,
-                    total_recipients,
-                    email
-                )
-                if exc.smtp_code >= 400 and exc.smtp_code < 500:
-                    raise exc
-                else:
-                    # This will fall through and not retry the message.
-                    log.warning(
-                        'TimedNotification ==> Recipient num: %s/%s, Email not delivered to %s due to error %s',
-                        recipient_num,
-                        total_recipients,
-                        email,
-                        exc.smtp_error
-                    )
-
-            except SINGLE_EMAIL_FAILURE_ERRORS as exc:
-                # This will fall through and not retry the message.
-                total_recipients_failed += 1
-                log.error(
-                    "TimedNotification ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Recipient num: %s/%s, \
-                    Email address: %s, Exception: %s",
-                    recipient_num,
-                    total_recipients,
-                    email,
-                    exc
-                )
-            else:
-                total_recipients_successful += 1
-                log.info(
-                    "TimedNotification ==> Status: Success, Recipient num: %s/%s, Email address: %s,",
-                    recipient_num,
-                    total_recipients,
-                    email
-                )
             recipients_info[email] += 1
 
         log.info(
