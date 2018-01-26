@@ -143,7 +143,7 @@ FEATURES = {
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs
-    'SQUELCH_PII_IN_LOGS': False,
+    'SQUELCH_PII_IN_LOGS': True,
 
     # Toggles the embargo functionality, which blocks users
     # based on their location.
