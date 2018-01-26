@@ -1,8 +1,10 @@
 """Get log settings."""
 
+import logging
 import os
 import platform
 import sys
+import warnings
 from logging.handlers import SysLogHandler
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
@@ -161,3 +163,15 @@ def get_logger_config(log_dir,
         })
 
     return logger_config
+
+
+def log_python_warnings():
+    """
+    Stop ignoring DeprecationWarning, ImportWarning, and PendingDeprecationWarning;
+    log all Python warnings to the main log file.
+
+    Not used in test runs, so pytest can collect the warnings triggered for
+    each test case.
+    """
+    warnings.simplefilter('default')
+    logging.captureWarnings(True)
