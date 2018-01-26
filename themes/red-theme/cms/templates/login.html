@@ -51,7 +51,7 @@ from django.utils.translation import ugettext as _
 </div>
 </%block>
 
-<%block name="requirejs_page">
+<%block name="page_bundle">
   <%static:require_page page_name="js/pages/login" class_name="LoginFactory">
     "${reverse('homepage') | n, js_escaped_string}"
   </%static:require_page>

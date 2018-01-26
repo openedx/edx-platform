@@ -9,8 +9,13 @@ var StringReplace = require('string-replace-webpack-plugin');
 
 var namespacedRequireFiles = [
     path.resolve(__dirname, 'common/static/common/js/components/views/feedback_notification.js'),
-    path.resolve(__dirname, 'common/static/common/js/components/views/feedback.js')
+    path.resolve(__dirname, 'common/static/common/js/components/views/feedback_prompt.js'),
+    path.resolve(__dirname, 'common/static/common/js/components/views/feedback.js'),
+    path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js')
 ];
+
+var defineHeader = /\(function ?\(define(, require)?\) ?\{/;
+var defineFooter = /\}\)\.call\(this, define \|\| RequireJS\.define(, require \|\| RequireJS\.require)?\);/;
 
 module.exports = {
     context: __dirname,
@@ -21,6 +26,7 @@ module.exports = {
         Import: './cms/static/js/features/import/factories/import.js',
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
         AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
+        'js/pages/login': './cms/static/js/pages/login.js',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
@@ -98,11 +104,11 @@ module.exports = {
                     {
                         replacements: [
                             {
-                                pattern: /\(function ?\(define\) ?\{/,
+                                pattern: defineHeader,
                                 replacement: function() { return ''; }
                             },
                             {
-                                pattern: /\}\)\.call\(this, define \|\| RequireJS\.define\);/,
+                                pattern: defineFooter,
                                 replacement: function() { return ''; }
                             }
                         ]
@@ -168,7 +174,9 @@ module.exports = {
         },
         modules: [
             'node_modules',
-            'common/static/js/vendor/'
+            'common/static/js/vendor/',
+            'cms/static',
+            'common/static/js/src'
         ]
     },
 
