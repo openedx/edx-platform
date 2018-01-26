@@ -92,9 +92,15 @@ class LearnerAnalyticsView(View):
         if (has_access):
             grading_policy = course.grading_policy
 
-            (grade_data, answered_percent, percent_grade) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
-            schedule_data = self.get_assignments_with_due_date(request, course_key)
-            (grade_data, schedule_data) = self.sort_grade_and_schedule_data(grade_data, schedule_data)
+            (raw_grade_data, answered_percent, percent_grade) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
+            raw_schedule_data = self.get_assignments_with_due_date(request, course_key)
+
+            # TODO: LEARNER-3854: Removed assignment schedule and grade sorting code.
+            #  The original code had several problems:
+            #    - It dropped one of the surveys from course-v1:Microsoft+DAT206x+1T2018.
+            #    - It was dependent on due dates which are not available for self-paced yet.
+            grade_data = raw_grade_data
+            schedule_data = []
 
             # TODO: LEARNER-3854: Fix hacked defaults with real error handling if implementing Learner Analytics.
             try:
@@ -112,6 +118,7 @@ class LearnerAnalyticsView(View):
                 'assignment_grades': grade_data,
                 'answered_percent': answered_percent,
                 'assignment_schedule': schedule_data,
+                'assignment_schedule_raw': raw_schedule_data,
                 'profile_image_urls': get_profile_image_urls_for_user(request.user, request),
                 'discussion_info': self.get_discussion_data(request, course_key),
                 'passing_grade': math.ceil(100 * course.lowest_passing_grade),
@@ -229,9 +236,9 @@ class LearnerAnalyticsView(View):
         )
         assignment_blocks = []
         for (location, block) in all_blocks['blocks'].iteritems():
-            if block.get('graded', False) and block.get('due') is not None:
+            if block.get('graded', False):
                 assignment_blocks.append(block)
-                block['due'] = block['due'].isoformat()
+                block['due'] = block['due'].isoformat() if block.get('due') is not None else None
                 block['location'] = unicode(location)
 
         return assignment_blocks

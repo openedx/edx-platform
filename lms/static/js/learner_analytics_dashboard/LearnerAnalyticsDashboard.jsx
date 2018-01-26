@@ -61,7 +61,7 @@ function getStreakString(count) {
 }
 
 export function LearnerAnalyticsDashboard(props) {
-  const {grading_policy, grades, schedule, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade} = props;
+  const {grading_policy, grades, schedule, schedule_raw, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade} = props;
   const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
     return {
       value: weight,
@@ -74,6 +74,9 @@ export function LearnerAnalyticsDashboard(props) {
   const assignments = gradeBreakdown.map(value => value['label']);
   const assignmentTypes = [...new Set(assignments)];
   const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
+
+  console.log(schedule_raw);
+  console.log(grades);
 
   return (
     <div className="learner-analytics-wrapper">
@@ -115,8 +118,6 @@ export function LearnerAnalyticsDashboard(props) {
       </div>
       <div className="analytics-group sidebar week-streak">
         <h2 className="group-heading">Timing</h2>
-        <h3 className="section-heading">Course due dates</h3>
-        <DueDates dates={schedule} assignmentCounts={assignmentCounts} />
         <div className="week-streak-wrapper">
           <h3 className="section-heading">Week streak</h3>
           {week_streak > 0 && 

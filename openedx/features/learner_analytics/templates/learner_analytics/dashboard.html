@@ -39,8 +39,7 @@ from openedx.features.course_experience import course_home_page_title
                             <a href="${course_url}">${course_home_page_title(course)}</a>
                         </span>
                         <span class="icon fa fa-angle-right" aria-hidden="true"></span>
-                        <span class="nav-item">${_('Learner Analytics')}</span>
-
+                        <span class="nav-item">${_('(Beta) My Stats')}</span>
                     </div>
                 </div>
             </nav>
@@ -54,6 +53,7 @@ from openedx.features.course_experience import course_home_page_title
                   id="react-learner-analytics-dashboard",
                   props={
                     'schedule': assignment_schedule,
+                    'schedule_raw': assignment_schedule_raw,
                     'grading_policy': grading_policy,
                     'grades': assignment_grades,
                     'discussion_info': discussion_info,
