@@ -2,6 +2,7 @@ import base64
 
 from django.core import mail
 from django.conf import settings
+from crum import get_current_request
 from util.request import safe_get_host
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -13,8 +14,8 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
     """
     Send an admin activation email.
     """
+    request = get_current_request()
     max_retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
-    subject = "Admin Activation."
     encoded_org_id = base64.b64encode(str(org_id))
 
     message_context = {
@@ -25,11 +26,12 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
         "referring_user": hash_key.suggested_by.username,
     }
 
-    site = safe_get_host(request)
-    if request.is_secure():
-        admin_activation_link = 'https://' + site + '/onboarding/admin_activate/' + encoded_org_id + '/' + hash_key.activation_hash
-    else:
-        admin_activation_link = 'http://' + site + '/onboarding/admin_activate/' + encoded_org_id + '/' + hash_key.activation_hash
+    admin_activation_link = '{protocol}://{site}/onboarding/admin_activate/{org_id}/{activation_key}'.format(
+        protocol='https' if request.is_secure() else 'http',
+        site=safe_get_host(request),
+        org_id=encoded_org_id,
+        activation_key=hash_key.activation_hash
+    )
 
     message_context["activation_link"] = admin_activation_link
 
