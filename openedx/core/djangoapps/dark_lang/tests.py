@@ -110,7 +110,7 @@ class DarkLangMiddlewareTests(TestCase):
 
     def test_accept_multiple_released_langs(self):
         DarkLangConfig(
-            released_languages=('rel, unrel'),
+            released_languages='rel, unrel',
             changed_by=self.user,
             enabled=True
         ).save()
@@ -166,7 +166,7 @@ class DarkLangMiddlewareTests(TestCase):
     def test_partial_match_es419(self, accept_header, expected):
         # Release es-419
         DarkLangConfig(
-            released_languages=('es-419, en'),
+            released_languages='es-419, en',
             changed_by=self.user,
             enabled=True
         ).save()
@@ -179,7 +179,7 @@ class DarkLangMiddlewareTests(TestCase):
     def test_partial_match_esar_es(self):
         # If I release 'es', 'es-AR' should get 'es', not English
         DarkLangConfig(
-            released_languages=('es, en'),
+            released_languages='es, en',
             changed_by=self.user,
             enabled=True
         ).save()
@@ -199,7 +199,7 @@ class DarkLangMiddlewareTests(TestCase):
     def test_exact_match_gets_priority(self, accept_header, expected):
         # Release 'es-419, es, es-es'
         DarkLangConfig(
-            released_languages=('es-419, es, es-es'),
+            released_languages='es-419, es, es-es',
             changed_by=self.user,
             enabled=True
         ).save()
@@ -220,7 +220,7 @@ class DarkLangMiddlewareTests(TestCase):
         # If I release 'es, es-419'
         # Latin American codes should get es-419
         DarkLangConfig(
-            released_languages=('es, es-419'),
+            released_languages='es, es-419',
             changed_by=self.user,
             enabled=True
         ).save()
@@ -243,7 +243,10 @@ class DarkLangMiddlewareTests(TestCase):
         """
         Sends a post request to set the preview language
         """
-        return self.client.post('/update_lang/', {'preview_language': preview_language, 'action': 'set_preview_language'})
+        return self.client.post(
+            '/update_lang/',
+            {'preview_language': preview_language, 'action': 'set_preview_language'}
+        )
 
     def _post_clear_preview_lang(self):
         """
@@ -351,12 +354,12 @@ class DarkLangMiddlewareTests(TestCase):
 
     def test_accept_chinese_language_codes(self):
         DarkLangConfig(
-            released_languages=('zh-cn, zh-hk, zh-tw'),
+            released_languages='zh-hans, zh-hk, zh-tw',
             changed_by=self.user,
             enabled=True
         ).save()
 
         self.assertAcceptEquals(
-            'zh-cn;q=1.0, zh-tw;q=0.5, zh-hk;q=0.3',
+            'zh-hans;q=1.0, zh-tw;q=0.5, zh-hk;q=0.3',
             self.process_middleware_request(accept='zh-Hans;q=1.0, zh-Hant-TW;q=0.5, zh-HK;q=0.3')
         )

@@ -18,16 +18,15 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 # If django 1.7 or higher is used, the right-side can be updated with new-style codes.
 CHINESE_LANGUAGE_CODE_MAP = {
     # The following are the new-style language codes for chinese language
-    'zh-hans': 'zh-CN',  # Chinese (Simplified),
-    'zh-hans-cn': 'zh-CN',  # Chinese (Simplified, China)
-    'zh-hans-sg': 'zh-CN',  # Chinese (Simplified, Singapore)
+    'zh-hans-cn': 'zh-Hans',  # Chinese (Simplified, China)
+    'zh-hans-sg': 'zh-Hans',  # Chinese (Simplified, Singapore)
     'zh-hant': 'zh-TW',  # Chinese (Traditional)
     'zh-hant-hk': 'zh-HK',  # Chinese (Traditional, Hongkong)
     'zh-hant-mo': 'zh-TW',  # Chinese (Traditional, Macau)
     'zh-hant-tw': 'zh-TW',  # Chinese (Traditional, Taiwan)
     # The following are the old-style language codes that django does not recognize
     'zh-mo': 'zh-TW',  # Chinese (Traditional, Macau)
-    'zh-sg': 'zh-CN',  # Chinese (Simplified, Singapore)
+    'zh-sg': 'zh-Hans',  # Chinese (Simplified, Singapore)
 }
 
 

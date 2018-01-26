@@ -36,7 +36,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         # student's language is French, so the emails should all be sent in
         # French.
         self.instructor = InstructorFactory(course_key=self.course.id)
-        set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
+        set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-hans')
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory.create()
