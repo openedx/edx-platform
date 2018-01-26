@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:50+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.506466\n"
+"POT-Creation-Date: 2018-01-26 11:27+0000\n"
+"PO-Revision-Date: 2018-01-26 11:27:12.402749\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -417,7 +417,8 @@ msgstr "غخع شقث وهسسهرل خرث خق وخقث قثضعهقثي به�
 msgid "Username and password fields cannot match"
 msgstr "عسثقرشوث شري حشسسصخقي بهثميس ذشررخف وشفذا"
 
-#: common/djangoapps/student/forms.py common/djangoapps/student/views.py
+#: common/djangoapps/student/forms.py
+#: common/djangoapps/student/views/management.py
 msgid "Password: "
 msgstr "حشسسصخقي: "
 
@@ -433,6 +434,16 @@ msgid ""
 msgstr ""
 "هف مخخنس مهنث {email} زثمخرلس فخ شر ثطهسفهرل شذذخعرف. فقغ شلشهر صهفا ش "
 "يهببثقثرف ثوشهم شييقثسس."
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Public Username '{username}' already exists."
+msgstr "شر شذذخعرف صهفا فاث حعزمهذ عسثقرشوث '{username}' شمقثشيغ ثطهسفس."
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Email '{email}' already exists."
+msgstr "شر شذذخعرف صهفا فاث ثوشهم '{email}' شمقثشيغ ثطهسفس."
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
@@ -675,81 +686,104 @@ msgstr "رشوث خب فاهس عسثق شففقهزعفث."
 msgid "Value of this user attribute."
 msgstr "دشمعث خب فاهس عسثق شففقهزعفث."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
+msgid " and "
+msgstr " شري "
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Photos are mismatched"
+msgstr "حاخفخس شقث وهسوشفذاثي"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name missing from ID photo"
+msgstr "رشوث وهسسهرل بقخو هي حاخفخ"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo not provided"
+msgstr "هي حاخفخ رخف حقخدهيثي"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID is invalid"
+msgstr "هي هس هردشمهي"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo is blurry"
+msgstr "مثشقرثق حاخفخ هس زمعققغ"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name on ID does not match name on account"
+msgstr "رشوث خر هي يخثس رخف وشفذا رشوث خر شذذخعرف"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo not provided"
+msgstr "مثشقرثق حاخفخ رخف حقخدهيثي"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo is blurry"
+msgstr "هي حاخفخ هس زمعققغ"
+
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr "فاث ذخعقسث غخع شقث مخخنهرل بخق يخثس رخف سفشقف عرفهم {date}."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "فاث ذخعقسث غخع شقث مخخنهرل بخق هس ذمخسثي بخق ثرقخمموثرف شس خب {date}."
 
-#: common/djangoapps/student/views.py
-msgid "Photos are mismatched"
-msgstr "حاخفخس شقث وهسوشفذاثي"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+"غخع'دث سعذذثسسبعممغ مخللثي هرفخ غخعق {provider_name} شذذخعرف, زعف فاهس "
+"شذذخعرف هسر'ف مهرنثي صهفا شر {platform_name} شذذخعرف غثف."
 
-#: common/djangoapps/student/views.py
-msgid "Name missing from ID photo"
-msgstr "رشوث وهسسهرل بقخو هي حاخفخ"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+"عسث غخعق {platform_name} عسثقرشوث شري حشسسصخقي فخ مخل هرفخ {platform_name} "
+"زثمخص, شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو "
+"غخعق يشسازخشقي."
 
-#: common/djangoapps/student/views.py
-msgid "ID photo not provided"
-msgstr "هي حاخفخ رخف حقخدهيثي"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
+msgstr ""
+"هب غخع يخر'ف اشدث شر {platform_name} شذذخعرف غثف, ذمهذن "
+"<strong>قثلهسفثق</strong> شف فاث فخح خب فاث حشلث."
 
-#: common/djangoapps/student/views.py
-msgid "ID is invalid"
-msgstr "هي هس هردشمهي"
+#: common/djangoapps/student/views/login.py
+msgid "There was an error receiving your login information. Please email us."
+msgstr "فاثقث صشس شر ثققخق قثذثهدهرل غخعق مخلهر هربخقوشفهخر. حمثشسث ثوشهم عس."
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo is blurry"
-msgstr "مثشقرثق حاخفخ هس زمعققغ"
+#: common/djangoapps/student/views/login.py
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr ""
+"فاهس شذذخعرف اشس زثثر فثوحخقشقهمغ مخذنثي يعث فخ ثطذثسسهدث مخلهر بشهمعقثس. "
+"فقغ شلشهر مشفثق."
 
-#: common/djangoapps/student/views.py
-msgid "Name on ID does not match name on account"
-msgstr "رشوث خر هي يخثس رخف وشفذا رشوث خر شذذخعرف"
+#: common/djangoapps/student/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"غخعق حشسسصخقي اشس ثطحهقثي يعث فخ حشسسصخقي حخمهذغ خر فاهس شذذخعرف. غخع وعسف "
+"قثسثف غخعق حشسسصخقي زثبخقث غخع ذشر مخل هر شلشهر. حمثشسث ذمهذن فاث \"بخقلخف "
+"حشسسصخقي\" مهرن خر فاهس حشلث فخ قثسثف غخعق حشسسصخقي زثبخقث مخللهرل هر شلشهر."
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo not provided"
-msgstr "مثشقرثق حاخفخ رخف حقخدهيثي"
-
-#: common/djangoapps/student/views.py
-msgid "ID photo is blurry"
-msgstr "هي حاخفخ هس زمعققغ"
-
-#: common/djangoapps/student/views.py
-msgid " and "
-msgstr " شري "
-
-#: common/djangoapps/student/views.py
-msgid "Course id not specified"
-msgstr "ذخعقسث هي رخف سحثذهبهثي"
-
-#: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
-msgid "Invalid course id"
-msgstr "هردشمهي ذخعقسث هي"
-
-#: common/djangoapps/student/views.py
-msgid "Course id is invalid"
-msgstr "ذخعقسث هي هس هردشمهي"
-
-#: common/djangoapps/student/views.py
-msgid "Could not enroll"
-msgstr "ذخعمي رخف ثرقخمم"
-
-#: common/djangoapps/student/views.py
-msgid "You are not enrolled in this course"
-msgstr "غخع شقث رخف ثرقخممثي هر فاهس ذخعقسث"
-
-#: common/djangoapps/student/views.py
-msgid "Your certificate prevents you from unenrolling from this course"
-msgstr "غخعق ذثقفهبهذشفث حقثدثرفس غخع بقخو عرثرقخممهرل بقخو فاهس ذخعقسث"
-
-#: common/djangoapps/student/views.py
-msgid "Enrollment action is invalid"
-msgstr "ثرقخمموثرف شذفهخر هس هردشمهي"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -762,123 +796,100 @@ msgstr ""
 "شر ثوشهم, ذاثذن غخعق سحشو بخميثقس خق <a href=\"{support_url}\">ذخرفشذف "
 "{platform} سعححخقف</a>."
 
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"غخع'دث سعذذثسسبعممغ مخللثي هرفخ غخعق {provider_name} شذذخعرف, زعف فاهس "
-"شذذخعرف هسر'ف مهرنثي صهفا شر {platform_name} شذذخعرف غثف."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-"عسث غخعق {platform_name} عسثقرشوث شري حشسسصخقي فخ مخل هرفخ {platform_name} "
-"زثمخص, شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو "
-"غخعق يشسازخشقي."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"<strong>Register</strong> at the top of the page."
-msgstr ""
-"هب غخع يخر'ف اشدث شر {platform_name} شذذخعرف غثف, ذمهذن "
-"<strong>قثلهسفثق</strong> شف فاث فخح خب فاث حشلث."
-
-#: common/djangoapps/student/views.py
-msgid "There was an error receiving your login information. Please email us."
-msgstr "فاثقث صشس شر ثققخق قثذثهدهرل غخعق مخلهر هربخقوشفهخر. حمثشسث ثوشهم عس."
-
-#: common/djangoapps/student/views.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr ""
-"فاهس شذذخعرف اشس زثثر فثوحخقشقهمغ مخذنثي يعث فخ ثطذثسسهدث مخلهر بشهمعقثس. "
-"فقغ شلشهر مشفثق."
-
-#: common/djangoapps/student/views.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"غخعق حشسسصخقي اشس ثطحهقثي يعث فخ حشسسصخقي حخمهذغ خر فاهس شذذخعرف. غخع وعسف "
-"قثسثف غخعق حشسسصخقي زثبخقث غخع ذشر مخل هر شلشهر. حمثشسث ذمهذن فاث \"بخقلخف "
-"حشسسصخقي\" مهرن خر فاهس حشلث فخ قثسثف غخعق حشسسصخقي زثبخقث مخللهرل هر شلشهر."
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلشهر مشفثق."
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "ثوشهم خق حشسسصخقي هس هرذخققثذف."
 
-#: common/djangoapps/student/views.py
-msgid "Please enter a username"
-msgstr "حمثشسث ثرفثق ش عسثقرشوث"
+#: common/djangoapps/student/views/login.py
+msgid "No inactive user with this e-mail exists"
+msgstr "رخ هرشذفهدث عسثق صهفا فاهس ث-وشهم ثطهسفس"
 
-#: common/djangoapps/student/views.py
-msgid "Please choose an option"
-msgstr "حمثشسث ذاخخسث شر خحفهخر"
+#: common/djangoapps/student/views/login.py
+msgid "Unable to send reactivation email"
+msgstr "عرشزمث فخ سثري قثشذفهدشفهخر ثوشهم"
 
-#: common/djangoapps/student/views.py
-msgid "User with username {} does not exist"
-msgstr "عسثق صهفا عسثقرشوث {} يخثس رخف ثطهسف"
-
-#: common/djangoapps/student/views.py
-msgid "Successfully disabled {}'s account"
-msgstr "سعذذثسسبعممغ يهسشزمثي {}'س شذذخعرف"
-
-#: common/djangoapps/student/views.py
-msgid "Successfully reenabled {}'s account"
-msgstr "سعذذثسسبعممغ قثثرشزمثي {}'س شذذخعرف"
-
-#: common/djangoapps/student/views.py
-msgid "Unexpected account status"
-msgstr "عرثطحثذفثي شذذخعرف سفشفعس"
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Public Username '{username}' already exists."
-msgstr "شر شذذخعرف صهفا فاث حعزمهذ عسثقرشوث '{username}' شمقثشيغ ثطهسفس."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Email '{email}' already exists."
-msgstr "شر شذذخعرف صهفا فاث ثوشهم '{email}' شمقثشيغ ثطهسفس."
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "Registration using {provider} has timed out."
-msgstr "قثلهسفقشفهخر عسهرل {provider} اشس فهوثي خعف."
-
-#: common/djangoapps/student/views.py
-msgid "An access_token is required when passing value ({}) for provider."
-msgstr "شر شذذثسس_فخنثر هس قثضعهقثي صاثر حشسسهرل دشمعث ({}) بخق حقخدهيثق."
-
-#: common/djangoapps/student/views.py
-msgid "The provided access_token is already associated with another user."
-msgstr "فاث حقخدهيثي شذذثسس_فخنثر هس شمقثشيغ شسسخذهشفثي صهفا شرخفاثق عسثق."
-
-#: common/djangoapps/student/views.py
-msgid "The provided access_token is not valid."
-msgstr "فاث حقخدهيثي شذذثسس_فخنثر هس رخف دشمهي."
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Account creation not allowed."
 msgstr "شذذخعرف ذقثشفهخر رخف شممخصثي."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
+msgid "Course id not specified"
+msgstr "ذخعقسث هي رخف سحثذهبهثي"
+
+#: common/djangoapps/student/views/management.py
+#: lms/djangoapps/support/views/refund.py
+msgid "Invalid course id"
+msgstr "هردشمهي ذخعقسث هي"
+
+#: common/djangoapps/student/views/management.py
+msgid "Course id is invalid"
+msgstr "ذخعقسث هي هس هردشمهي"
+
+#: common/djangoapps/student/views/management.py
+msgid "Could not enroll"
+msgstr "ذخعمي رخف ثرقخمم"
+
+#: common/djangoapps/student/views/management.py
+msgid "You are not enrolled in this course"
+msgstr "غخع شقث رخف ثرقخممثي هر فاهس ذخعقسث"
+
+#: common/djangoapps/student/views/management.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr "غخعق ذثقفهبهذشفث حقثدثرفس غخع بقخو عرثرقخممهرل بقخو فاهس ذخعقسث"
+
+#: common/djangoapps/student/views/management.py
+msgid "Enrollment action is invalid"
+msgstr "ثرقخمموثرف شذفهخر هس هردشمهي"
+
+#: common/djangoapps/student/views/management.py
+msgid "Please enter a username"
+msgstr "حمثشسث ثرفثق ش عسثقرشوث"
+
+#: common/djangoapps/student/views/management.py
+msgid "Please choose an option"
+msgstr "حمثشسث ذاخخسث شر خحفهخر"
+
+#: common/djangoapps/student/views/management.py
+msgid "User with username {} does not exist"
+msgstr "عسثق صهفا عسثقرشوث {} يخثس رخف ثطهسف"
+
+#: common/djangoapps/student/views/management.py
+msgid "Successfully disabled {}'s account"
+msgstr "سعذذثسسبعممغ يهسشزمثي {}'س شذذخعرف"
+
+#: common/djangoapps/student/views/management.py
+msgid "Successfully reenabled {}'s account"
+msgstr "سعذذثسسبعممغ قثثرشزمثي {}'س شذذخعرف"
+
+#: common/djangoapps/student/views/management.py
+msgid "Unexpected account status"
+msgstr "عرثطحثذفثي شذذخعرف سفشفعس"
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr "قثلهسفقشفهخر عسهرل {provider} اشس فهوثي خعف."
+
+#: common/djangoapps/student/views/management.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr "شر شذذثسس_فخنثر هس قثضعهقثي صاثر حشسسهرل دشمعث ({}) بخق حقخدهيثق."
+
+#: common/djangoapps/student/views/management.py
+msgid "The provided access_token is already associated with another user."
+msgstr "فاث حقخدهيثي شذذثسس_فخنثر هس شمقثشيغ شسسخذهشفثي صهفا شرخفاثق عسثق."
+
+#: common/djangoapps/student/views/management.py
+msgid "The provided access_token is not valid."
+msgstr "فاث حقخدهيثي شذذثسس_فخنثر هس رخف دشمهي."
+
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
@@ -889,12 +900,12 @@ msgstr ""
 "صقخرل, حمثشسث <a href=\"{support_url}\">ذخرفشذف سعححخقف</a> فخ قثسخمدث فاهس "
 "هسسعث."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr "{html_start}سعذذثسس{html_end} غخع اشدث شذفهدشفثي غخعق شذذخعرف."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
@@ -905,12 +916,12 @@ msgstr ""
 "قثذثهدث ثوشهم عحيشفثس شري شمثقفس بقخو عس قثمشفثي فخ فاث ذخعقسثس غخع شقث "
 "ثرقخممثي هر. سهلر هر فخ ذخرفهرعث."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
 msgstr "{html_start}فاهس شذذخعرف اشس شمقثشيغ زثثر شذفهدشفثي.{html_end}"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
@@ -925,7 +936,7 @@ msgstr[1] ""
 "غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
 " يهسفهرذف حشسسصخقيس زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
@@ -940,35 +951,27 @@ msgstr[1] ""
 "غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
 "يشغس وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "حشسسصخقي قثسثف عرسعذذثسسبعم"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
 msgstr "ثققخق هر قثسثففهرل غخعق حشسسصخقي. حمثشسث فقغ شلشهر."
 
-#: common/djangoapps/student/views.py
-msgid "No inactive user with this e-mail exists"
-msgstr "رخ هرشذفهدث عسثق صهفا فاهس ث-وشهم ثطهسفس"
-
-#: common/djangoapps/student/views.py
-msgid "Unable to send reactivation email"
-msgstr "عرشزمث فخ سثري قثشذفهدشفهخر ثوشهم"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr "دشمهي ث-وشهم شييقثسس قثضعهقثي."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr "خمي ثوشهم هس فاث سشوث شس فاث رثص ثوشهم."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "An account with this e-mail already exists."
 msgstr "شر شذذخعرف صهفا فاهس ث-وشهم شمقثشيغ ثطهسفس."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr "عرشزمث فخ سثري ثوشهم شذفهدشفهخر مهرن. حمثشسث فقغ شلشهر مشفثق."
 
@@ -4375,6 +4378,14 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
+"This section is a prerequisite. You must complete this section in order to "
+"unlock additional content."
+msgstr ""
+"فاهس سثذفهخر هس ش حقثقثضعهسهفث. غخع وعسف ذخوحمثفث فاهس سثذفهخر هر خقيثق فخ "
+"عرمخذن شييهفهخرشم ذخرفثرف."
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 "ش مهسف سعووشقهظهرل صاشف سفعيثرفس ساخعمي مخخن بخقصشقي فخ هر فاهس سثذفهخر."
@@ -5096,7 +5107,7 @@ msgstr "ذخرفشذف"
 msgid "Careers"
 msgstr "ذشقثثقس"
 
-#: lms/djangoapps/branding/api.py
+#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid "Terms of Service & Honor Code"
 msgstr "فثقوس خب سثقدهذث & اخرخق ذخيث"
@@ -5455,12 +5466,6 @@ msgstr "شمم قهلافس قثسثقدثي"
 msgid "Invalid Certificate"
 msgstr "هردشمهي ذثقفهبهذشفث"
 
-#. Translators: The &amp; characters represent an ampersand character and can
-#. be ignored
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Terms of Service &amp; Honor Code"
-msgstr "فثقوس خب سثقدهذث &amp; اخرخق ذخيث"
-
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
 #: lms/djangoapps/certificates/views/webview.py
@@ -5487,6 +5492,7 @@ msgid "Certificate ID Number"
 msgstr "ذثقفهبهذشفث هي رعوزثق"
 
 #: lms/djangoapps/certificates/views/webview.py
+#: lms/templates/certificates/invalid.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "شزخعف {platform_name} ذثقفهبهذشفثس"
@@ -5700,7 +5706,11 @@ msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 "شعفخوشفهذشممغ شححقخدث دشمهي قثبعري قثضعثسفس, صهفاخعف وشرعشم حقخذثسسهرل"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/commerce/utils.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[قثبعري] عسثق-قثضعثسفثي قثبعري"
+
+#: lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5708,11 +5718,6 @@ msgid ""
 msgstr ""
 "ش قثبعري قثضعثسف اشس زثثر هرهفهشفثي بخق {username} ({email}). فخ حقخذثسس "
 "فاهس قثضعثسف, حمثشسث دهسهف فاث مهرن(س) زثمخص."
-
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[قثبعري] عسثق-قثضعثسفثي قثبعري"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -7576,6 +7581,7 @@ msgstr "قثسذخقثي"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks_helper/module_state.py
 msgid "overridden"
 msgstr "خدثققهييثر"
 
@@ -9665,6 +9671,19 @@ msgid ""
 msgstr ""
 "غخع'قث قثذثهدهرل فاهس ث-وشهم زثذشعسث غخع قثضعثسفثي ش حشسسصخقي قثسثف بخق غخعق"
 " عسثق شذذخعرف شف %(platform_name)s."
+
+#: lms/templates/registration/password_reset_email.html
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+"اخصثدثق, فاثقث هس ذعققثرفمغ رخ عسثق شذذخعرف شسسخذهشفثي صهفا غخعق ثوشهم "
+"شييقثسس: %(email_address)s."
+
+#: lms/templates/registration/password_reset_email.html
+msgid "If you did not request this change, you can ignore this email."
+msgstr "هب غخع يهي رخف قثضعثسف فاهس ذاشرلث, غخع ذشر هلرخقث فاهس ثوشهم."
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -12357,6 +12376,11 @@ msgstr "خقلشرهظشفهخر:"
 msgid "Course Number:"
 msgstr "ذخعقسث رعوزثق:"
 
+#: cms/templates/index.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Run:"
+msgstr "ذخعقسث قعر:"
+
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
@@ -12626,10 +12650,6 @@ msgid "Discussion thread list"
 msgstr "يهسذعسسهخر فاقثشي مهسف"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "Discussion - {course_number}"
-msgstr "يهسذعسسهخر - {course_number}"
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s discussion started"
@@ -12656,6 +12676,22 @@ msgid ""
 msgstr ""
 "فاث يهسذعسسهخرس شقث ذعققثرفمغ عريثقلخهرل وشهرفثرشرذث. صث'مم اشدث فاثو زشذن "
 "عح ساخقفمغ!"
+
+#: lms/templates/_gated_content.html lms/templates/seq_module.html
+msgid "Content Locked"
+msgstr "ذخرفثرف مخذنثي"
+
+#: lms/templates/_gated_content.html
+msgid ""
+"You must complete the section '{prereq_section_name}' with the required "
+"score before you are able to view this content."
+msgstr ""
+"غخع وعسف ذخوحمثفث فاث سثذفهخر '{prereq_section_name}' صهفا فاث قثضعهقثي "
+"سذخقث زثبخقث غخع شقث شزمث فخ دهثص فاهس ذخرفثرف."
+
+#: lms/templates/_gated_content.html
+msgid "Go to Prerequisite Section"
+msgstr "لخ فخ حقثقثضعهسهفث سثذفهخر"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -13051,22 +13087,22 @@ msgstr ""
 msgid "Note: only instructors may annotate."
 msgstr "رخفث: خرمغ هرسفقعذفخقس وشغ شررخفشفث."
 
+#: lms/templates/index.html lms/templates/courseware/courses.html
+#: themes/stanford-style/lms/templates/index.html
+msgid "Search for a course"
+msgstr "سثشقذا بخق ش ذخعقسث"
+
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to the Open edX{registered_trademark} platform!"
 msgstr "صثمذخوث فخ فاث خحثر ثيط{registered_trademark} حمشفبخقو!"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
+#: lms/templates/index_overlay.html
 msgid "It works! This is the default homepage for this Open edX instance."
 msgstr "هف صخقنس! فاهس هس فاث يثبشعمف اخوثحشلث بخق فاهس خحثر ثيط هرسفشرذث."
-
-#: lms/templates/index.html lms/templates/courseware/courses.html
-#: themes/stanford-style/lms/templates/index.html
-msgid "Search for a course"
-msgstr "سثشقذا بخق ش ذخعقسث"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -13670,6 +13706,10 @@ msgid ""
 msgstr ""
 "غخع اشدث قث-ثرشزمثي بخقعو رخفهبهذشفهخر ثوشهمس بقخو {platform_name}. غخع وشغ "
 "{dashboard_link_start}قثفعقر فخ غخعق يشسازخشقي{link_end}."
+
+#: lms/templates/seq_module.html
+msgid "Important!"
+msgstr "هوحخقفشرف!"
 
 #: lms/templates/seq_module.html
 msgid "Previous"
@@ -15395,6 +15435,10 @@ msgstr "رخفثي زغ"
 msgid "Supported by the following organizations"
 msgstr "سعححخقفثي زغ فاث بخممخصهرل خقلشرهظشفهخرس"
 
+#: lms/templates/certificates/_accomplishment-rendering.html
+msgid "Awarded to:"
+msgstr "شصشقيثي فخ:"
+
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
 "For tips and tricks on printing your certificate, view the {link_start}Web "
@@ -15434,8 +15478,8 @@ msgstr ""
 "بخممخصهرل هربخقوشفهخر هس ذخققثذف."
 
 #: lms/templates/certificates/server-error.html
-msgid "The institution&#39;s logo."
-msgstr "فاث هرسفهفعفهخر&#39;س مخلخ."
+msgid "The institution's logo."
+msgstr "فاث هرسفهفعفهخر'س مخلخ."
 
 #: lms/templates/certificates/server-error.html
 msgid "The institution that is linked to the course."
@@ -15452,6 +15496,10 @@ msgid ""
 msgstr ""
 "هب شمم خب فاث هربخقوشفهخر هس ذخققثذف شري فاث حقخزمثو حثقسهسفس, ذخرفشذف "
 "فثذارهذشم سعححخقف."
+
+#: lms/templates/certificates/valid.html
+msgid "About edX Certificates"
+msgstr "شزخعف ثيط ذثقفهبهذشفثس"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
@@ -16470,10 +16518,6 @@ msgstr "زعغ شمم قثوشهرهرل ذخعقسثس هر فاهس حقخلق
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade All Remaining Courses ("
 msgstr "عحلقشيث شمم قثوشهرهرل ذخعقسثس ("
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{\"{0:.2f}\".format(a)}"
-msgstr "{\"{0:.2f}\".بخقوشف(ش)}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid " ${price:.2f} {currency} ) "
@@ -18058,10 +18102,6 @@ msgid "Course Name:"
 msgstr "ذخعقسث رشوث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Display Name:"
-msgstr "ذخعقسث يهسحمشغ رشوث:"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Start Date:"
 msgstr "ذخعقسث سفشقف يشفث:"
 
@@ -19137,16 +19177,16 @@ msgstr "شيي لقخعح ذخووعرهفغ فش"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TAs are members of the community who help course teams moderate "
-"discussions. They can see posts by all learners, and can edit or delete "
-"posts, clear flags, close or re-open threads, and endorse responses. Their "
-"posts are marked as 'Community TA'. Only enrolled learners can be added as "
-"Community TAs."
+"discussions. They can see posts by learners in their assigned cohort or "
+"enrollment track, and can edit or delete posts, clear flags, close or re-"
+"open threads, and endorse responses. Their posts are marked as 'Community "
+"TA'. Only enrolled learners can be added as Community TAs."
 msgstr ""
 "ذخووعرهفغ فشس شقث وثوزثقس خب فاث ذخووعرهفغ صاخ اثمح ذخعقسث فثشوس وخيثقشفث "
-"يهسذعسسهخرس. فاثغ ذشر سثث حخسفس زغ شمم مثشقرثقس, شري ذشر ثيهف خق يثمثفث "
-"حخسفس, ذمثشق بمشلس, ذمخسث خق قث-خحثر فاقثشيس, شري ثريخقسث قثسحخرسثس. فاثهق "
-"حخسفس شقث وشقنثي شس 'ذخووعرهفغ فش'. خرمغ ثرقخممثي مثشقرثقس ذشر زث شييثي شس "
-"ذخووعرهفغ فشس."
+"يهسذعسسهخرس. فاثغ ذشر سثث حخسفس زغ مثشقرثقس هر فاثهق شسسهلرثي ذخاخقف خق "
+"ثرقخمموثرف فقشذن, شري ذشر ثيهف خق يثمثفث حخسفس, ذمثشق بمشلس, ذمخسث خق قث-"
+"خحثر فاقثشيس, شري ثريخقسث قثسحخرسثس. فاثهق حخسفس شقث وشقنثي شس 'ذخووعرهفغ "
+"فش'. خرمغ ثرقخممثي مثشقرثقس ذشر زث شييثي شس ذخووعرهفغ فشس."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -20780,6 +20820,14 @@ msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
 msgstr "عحلقشيث ({price})"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Unlocked"
+msgstr "عرمخذنثي"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "(Prerequisite required)"
+msgstr "(حقثقثضعهسهفث قثضعهقثي)"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
@@ -23255,10 +23303,6 @@ msgstr "بخق ثطشوحمث, وهفط"
 #: cms/templates/index.html
 msgid "Courses Being Processed"
 msgstr "ذخعقسثس زثهرل حقخذثسسثي"
-
-#: cms/templates/index.html
-msgid "Course Run:"
-msgstr "ذخعقسث قعر:"
 
 #: cms/templates/index.html
 msgid "This course run is currently being created."

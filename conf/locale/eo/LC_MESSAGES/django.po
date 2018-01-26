@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:50+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.506466\n"
+"POT-Creation-Date: 2018-01-26 11:27+0000\n"
+"PO-Revision-Date: 2018-01-26 11:27:12.402749\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -463,7 +463,8 @@ msgstr ""
 "Ûsérnämé änd pässwörd fïélds çännöt mätçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: common/djangoapps/student/forms.py common/djangoapps/student/views.py
+#: common/djangoapps/student/forms.py
+#: common/djangoapps/student/views/management.py
 msgid "Password: "
 msgstr "Pässwörd:  Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -479,6 +480,20 @@ msgid ""
 msgstr ""
 "Ìt lööks lïké {email} ßélöngs tö än éxïstïng äççöünt. Trý ägäïn wïth ä "
 "dïfférént émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Public Username '{username}' already exists."
+msgstr ""
+"Àn äççöünt wïth thé Püßlïç Ûsérnämé '{username}' älréädý éxïsts. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Email '{email}' already exists."
+msgstr ""
+"Àn äççöünt wïth thé Émäïl '{email}' älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
@@ -762,90 +777,119 @@ msgstr "Nämé öf thïs üsér ättrïßüté. Ⱡ'σяєм ιρѕυм ∂σł�
 msgid "Value of this user attribute."
 msgstr "Välüé öf thïs üsér ättrïßüté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
+msgid " and "
+msgstr " änd  Ⱡ'σяєм ιρѕ#"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Photos are mismatched"
+msgstr "Phötös äré mïsmätçhéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name missing from ID photo"
+msgstr "Nämé mïssïng fröm ÌD phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo not provided"
+msgstr "ÌD phötö nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID is invalid"
+msgstr "ÌD ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo is blurry"
+msgstr "Léärnér phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name on ID does not match name on account"
+msgstr ""
+"Nämé ön ÌD döés nöt mätçh nämé ön äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo not provided"
+msgstr "Léärnér phötö nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo is blurry"
+msgstr "ÌD phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
 "Thé çöürsé ýöü äré löökïng för döés nöt stärt üntïl {date}. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr ""
 "Thé çöürsé ýöü äré löökïng för ïs çlöséd för énröllmént äs öf {date}. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/djangoapps/student/views.py
-msgid "Photos are mismatched"
-msgstr "Phötös äré mïsmätçhéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/djangoapps/student/views.py
-msgid "Name missing from ID photo"
-msgstr "Nämé mïssïng fröm ÌD phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/student/views.py
-msgid "ID photo not provided"
-msgstr "ÌD phötö nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/djangoapps/student/views.py
-msgid "ID is invalid"
-msgstr "ÌD ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/djangoapps/student/views.py
-msgid "Learner photo is blurry"
-msgstr "Léärnér phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/djangoapps/student/views.py
-msgid "Name on ID does not match name on account"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
 msgstr ""
-"Nämé ön ÌD döés nöt mätçh nämé ön äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"Ýöü'vé süççéssfüllý löggéd ïntö ýöür {provider_name} äççöünt, ßüt thïs "
+"äççöünt ïsn't lïnkéd wïth än {platform_name} äççöünt ýét. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт α#"
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo not provided"
-msgstr "Léärnér phötö nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/student/views.py
-msgid "ID photo is blurry"
-msgstr "ÌD phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/djangoapps/student/views.py
-msgid " and "
-msgstr " änd  Ⱡ'σяєм ιρѕ#"
-
-#: common/djangoapps/student/views.py
-msgid "Course id not specified"
-msgstr "Çöürsé ïd nöt spéçïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
-msgid "Invalid course id"
-msgstr "Ìnvälïd çöürsé ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/djangoapps/student/views.py
-msgid "Course id is invalid"
-msgstr "Çöürsé ïd ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/djangoapps/student/views.py
-msgid "Could not enroll"
-msgstr "Çöüld nöt énröll Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/djangoapps/student/views.py
-msgid "You are not enrolled in this course"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
 msgstr ""
-"Ýöü äré nöt énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Ûsé ýöür {platform_name} üsérnämé änd pässwörd tö lög ïntö {platform_name} "
+"ßélöw, änd thén lïnk ýöür {platform_name} äççöünt wïth {provider_name} fröm "
+"ýöür däshßöärd. Ⱡ'σяєм ιρѕυм #"
 
-#: common/djangoapps/student/views.py
-msgid "Your certificate prevents you from unenrolling from this course"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
 msgstr ""
-"Ýöür çértïfïçäté prévénts ýöü fröm ünénröllïng fröm thïs çöürsé Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Ìf ýöü dön't hävé än {platform_name} äççöünt ýét, çlïçk "
+"<strong>Régïstér</strong> ät thé töp öf thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тє#"
 
-#: common/djangoapps/student/views.py
-msgid "Enrollment action is invalid"
-msgstr "Énröllmént äçtïön ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+#: common/djangoapps/student/views/login.py
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+"Théré wäs än érrör réçéïvïng ýöür lögïn ïnförmätïön. Pléäsé émäïl üs. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr ""
+"Thïs äççöünt häs ßéén témpörärïlý löçkéd düé tö éxçéssïvé lögïn fäïlürés. "
+"Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/djangoapps/student/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"Ýöür pässwörd häs éxpïréd düé tö pässwörd pölïçý ön thïs äççöünt. Ýöü müst "
+"rését ýöür pässwörd ßéföré ýöü çän lög ïn ägäïn. Pléäsé çlïçk thé \"Förgöt "
+"Pässwörd\" lïnk ön thïs pägé tö rését ýöür pässwörd ßéföré löggïng ïn ägäïn."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
+
+#: common/djangoapps/student/views/login.py
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -863,150 +907,120 @@ msgstr ""
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
 "σ¢¢αє¢αт ¢υρι∂αтαт #"
 
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"Ýöü'vé süççéssfüllý löggéd ïntö ýöür {provider_name} äççöünt, ßüt thïs "
-"äççöünt ïsn't lïnkéd wïth än {platform_name} äççöünt ýét. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт α#"
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-"Ûsé ýöür {platform_name} üsérnämé änd pässwörd tö lög ïntö {platform_name} "
-"ßélöw, änd thén lïnk ýöür {platform_name} äççöünt wïth {provider_name} fröm "
-"ýöür däshßöärd. Ⱡ'σяєм ιρѕυм #"
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"<strong>Register</strong> at the top of the page."
-msgstr ""
-"Ìf ýöü dön't hävé än {platform_name} äççöünt ýét, çlïçk "
-"<strong>Régïstér</strong> ät thé töp öf thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/student/views.py
-msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-"Théré wäs än érrör réçéïvïng ýöür lögïn ïnförmätïön. Pléäsé émäïl üs. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/views.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr ""
-"Thïs äççöünt häs ßéén témpörärïlý löçkéd düé tö éxçéssïvé lögïn fäïlürés. "
-"Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/student/views.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"Ýöür pässwörd häs éxpïréd düé tö pässwörd pölïçý ön thïs äççöünt. Ýöü müst "
-"rését ýöür pässwörd ßéföré ýöü çän lög ïn ägäïn. Pléäsé çlïçk thé \"Förgöt "
-"Pässwörd\" lïnk ön thïs pägé tö rését ýöür pässwörd ßéföré löggïng ïn ägäïn."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Töö mäný fäïléd lögïn ättémpts. Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Émäïl ör pässwörd ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
+msgid "No inactive user with this e-mail exists"
+msgstr ""
+"Nö ïnäçtïvé üsér wïth thïs é-mäïl éxïsts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: common/djangoapps/student/views/login.py
+msgid "Unable to send reactivation email"
+msgstr ""
+"Ûnäßlé tö sénd réäçtïvätïön émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Account creation not allowed."
+msgstr "Àççöünt çréätïön nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/djangoapps/student/views/management.py
+msgid "Course id not specified"
+msgstr "Çöürsé ïd nöt spéçïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/djangoapps/student/views/management.py
+#: lms/djangoapps/support/views/refund.py
+msgid "Invalid course id"
+msgstr "Ìnvälïd çöürsé ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/djangoapps/student/views/management.py
+msgid "Course id is invalid"
+msgstr "Çöürsé ïd ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/djangoapps/student/views/management.py
+msgid "Could not enroll"
+msgstr "Çöüld nöt énröll Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/djangoapps/student/views/management.py
+msgid "You are not enrolled in this course"
+msgstr ""
+"Ýöü äré nöt énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/views/management.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr ""
+"Ýöür çértïfïçäté prévénts ýöü fröm ünénröllïng fröm thïs çöürsé Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/views/management.py
+msgid "Enrollment action is invalid"
+msgstr "Énröllmént äçtïön ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/djangoapps/student/views/management.py
 msgid "Please enter a username"
 msgstr "Pléäsé éntér ä üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Please choose an option"
 msgstr "Pléäsé çhöösé än öptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "User with username {} does not exist"
 msgstr ""
 "Ûsér wïth üsérnämé {} döés nöt éxïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Successfully disabled {}'s account"
 msgstr ""
 "Süççéssfüllý dïsäßléd {}'s äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Successfully reenabled {}'s account"
 msgstr ""
 "Süççéssfüllý réénäßléd {}'s äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Unexpected account status"
 msgstr "Ûnéxpéçtéd äççöünt stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
-"Àn äççöünt wïth thé Püßlïç Ûsérnämé '{username}' älréädý éxïsts. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Email '{email}' already exists."
-msgstr ""
-"Àn äççöünt wïth thé Émäïl '{email}' älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
 msgstr ""
 "Régïsträtïön üsïng {provider} häs tïméd öüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "An access_token is required when passing value ({}) for provider."
 msgstr ""
 "Àn äççéss_tökén ïs réqüïréd whén pässïng välüé ({}) för prövïdér. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "The provided access_token is already associated with another user."
 msgstr ""
 "Thé prövïdéd äççéss_tökén ïs älréädý ässöçïätéd wïth änöthér üsér. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "The provided access_token is not valid."
 msgstr ""
 "Thé prövïdéd äççéss_tökén ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: common/djangoapps/student/views.py
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Account creation not allowed."
-msgstr "Àççöünt çréätïön nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
@@ -1017,14 +1031,14 @@ msgstr ""
 "wröng, pléäsé <a href=\"{support_url}\">çöntäçt süppört</a> tö résölvé thïs "
 "ïssüé. Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr ""
 "{html_start}Süççéss{html_end} Ýöü hävé äçtïvätéd ýöür äççöünt. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
@@ -1041,14 +1055,14 @@ msgstr ""
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
 "σƒƒι¢ια#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
 msgstr ""
 "{html_start}Thïs äççöünt häs älréädý ßéén äçtïvätéd.{html_end} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
@@ -1063,7 +1077,7 @@ msgstr[1] ""
 "Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
 " dïstïnçt pässwörds ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σ#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
@@ -1078,44 +1092,33 @@ msgstr[1] ""
 "Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
 "däýs müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "Pässwörd rését ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
 msgstr ""
 "Érrör ïn réséttïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views.py
-msgid "No inactive user with this e-mail exists"
-msgstr ""
-"Nö ïnäçtïvé üsér wïth thïs é-mäïl éxïsts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/student/views.py
-msgid "Unable to send reactivation email"
-msgstr ""
-"Ûnäßlé tö sénd réäçtïvätïön émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr "Välïd é-mäïl äddréss réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr ""
 "Öld émäïl ïs thé sämé äs thé néw émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "An account with this e-mail already exists."
 msgstr ""
 "Àn äççöünt wïth thïs é-mäïl älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 "Ûnäßlé tö sénd émäïl äçtïvätïön lïnk. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм "
@@ -5082,6 +5085,14 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
+"This section is a prerequisite. You must complete this section in order to "
+"unlock additional content."
+msgstr ""
+"Thïs séçtïön ïs ä préréqüïsïté. Ýöü müst çömplété thïs séçtïön ïn ördér tö "
+"ünlöçk äddïtïönäl çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 "À lïst sümmärïzïng whät stüdénts shöüld löök förwärd tö ïn thïs séçtïön. "
@@ -5944,7 +5955,7 @@ msgstr "Çöntäçt Ⱡ'σяєм ιρѕυм #"
 msgid "Careers"
 msgstr "Çäréérs Ⱡ'σяєм ιρѕυм #"
 
-#: lms/djangoapps/branding/api.py
+#: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid "Terms of Service & Honor Code"
 msgstr "Térms öf Sérvïçé & Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
@@ -6370,13 +6381,6 @@ msgstr "Àll rïghts résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 msgid "Invalid Certificate"
 msgstr "Ìnvälïd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#. Translators: The &amp; characters represent an ampersand character and can
-#. be ignored
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Terms of Service &amp; Honor Code"
-msgstr ""
-"Térms öf Sérvïçé &amp; Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
 #: lms/djangoapps/certificates/views/webview.py
@@ -6404,6 +6408,7 @@ msgid "Certificate ID Number"
 msgstr "Çértïfïçäté ÌD Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/certificates/views/webview.py
+#: lms/templates/certificates/invalid.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "Àßöüt {platform_name} Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
@@ -6652,7 +6657,11 @@ msgstr ""
 "Àütömätïçällý äpprövé välïd réfünd réqüésts, wïthöüt mänüäl pröçéssïng "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/commerce/utils.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Réfünd] Ûsér-Réqüéstéd Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -6660,11 +6669,6 @@ msgid ""
 msgstr ""
 "À réfünd réqüést häs ßéén ïnïtïätéd för {username} ({email}). Tö pröçéss "
 "thïs réqüést, pléäsé vïsït thé lïnk(s) ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Réfünd] Ûsér-Réqüéstéd Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -8822,6 +8826,7 @@ msgstr "résçöréd Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks_helper/module_state.py
 msgid "overridden"
 msgstr "övérrïddén Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -11151,6 +11156,21 @@ msgid ""
 msgstr ""
 "Ýöü'ré réçéïvïng thïs é-mäïl ßéçäüsé ýöü réqüéstéd ä pässwörd rését för ýöür"
 " üsér äççöünt ät %(platform_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/registration/password_reset_email.html
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+"Höwévér, théré ïs çürréntlý nö üsér äççöünt ässöçïätéd wïth ýöür émäïl "
+"äddréss: %(email_address)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/registration/password_reset_email.html
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
+"Ìf ýöü dïd nöt réqüést thïs çhängé, ýöü çän ïgnöré thïs émäïl. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -14241,6 +14261,11 @@ msgstr "Örgänïzätïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Course Number:"
 msgstr "Çöürsé Nümßér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
+#: cms/templates/index.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Course Run:"
+msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
@@ -14525,10 +14550,6 @@ msgid "Discussion thread list"
 msgstr "Dïsçüssïön thréäd lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "Discussion - {course_number}"
-msgstr "Dïsçüssïön - {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s discussion started"
@@ -14555,6 +14576,22 @@ msgid ""
 msgstr ""
 "Thé dïsçüssïöns äré çürréntlý ündérgöïng mäïnténänçé. Wé'll hävé thém ßäçk "
 "üp shörtlý! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/_gated_content.html lms/templates/seq_module.html
+msgid "Content Locked"
+msgstr "Çöntént Löçkéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/_gated_content.html
+msgid ""
+"You must complete the section '{prereq_section_name}' with the required "
+"score before you are able to view this content."
+msgstr ""
+"Ýöü müst çömplété thé séçtïön '{prereq_section_name}' wïth thé réqüïréd "
+"sçöré ßéföré ýöü äré äßlé tö vïéw thïs çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/_gated_content.html
+msgid "Go to Prerequisite Section"
+msgstr "Gö tö Préréqüïsïté Séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -15003,9 +15040,14 @@ msgstr ""
 "Nöté: önlý ïnstrüçtörs mäý ännötäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: lms/templates/index.html lms/templates/courseware/courses.html
+#: themes/stanford-style/lms/templates/index.html
+msgid "Search for a course"
+msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to the Open edX{registered_trademark} platform!"
 msgstr ""
 "Wélçömé tö thé Öpén édX{registered_trademark} plätförm! Ⱡ'σяєм ιρѕυм ∂σłσя "
@@ -15013,16 +15055,11 @@ msgstr ""
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index.html
+#: lms/templates/index_overlay.html
 msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 "Ìt wörks! Thïs ïs thé défäült hömépägé för thïs Öpén édX ïnstänçé. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/index.html lms/templates/courseware/courses.html
-#: themes/stanford-style/lms/templates/index.html
-msgid "Search for a course"
-msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -15736,6 +15773,10 @@ msgstr ""
 "Ýöü hävé ré-énäßléd förüm nötïfïçätïön émäïls fröm {platform_name}. Ýöü mäý "
 "{dashboard_link_start}rétürn tö ýöür däshßöärd{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢#"
+
+#: lms/templates/seq_module.html
+msgid "Important!"
+msgstr "Ìmpörtänt! Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/seq_module.html
 msgid "Previous"
@@ -17603,6 +17644,10 @@ msgstr ""
 "Süppörtéd ßý thé föllöwïng örgänïzätïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: lms/templates/certificates/_accomplishment-rendering.html
+msgid "Awarded to:"
+msgstr "Àwärdéd tö: Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
 "For tips and tricks on printing your certificate, view the {link_start}Web "
@@ -17650,8 +17695,8 @@ msgstr ""
 "föllöwïng ïnförmätïön ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/certificates/server-error.html
-msgid "The institution&#39;s logo."
-msgstr "Thé ïnstïtütïön&#39;s lögö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "The institution's logo."
+msgstr "Thé ïnstïtütïön's lögö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/certificates/server-error.html
 msgid "The institution that is linked to the course."
@@ -17672,6 +17717,10 @@ msgid ""
 msgstr ""
 "Ìf äll öf thé ïnförmätïön ïs çörréçt änd thé prößlém pérsïsts, çöntäçt "
 "téçhnïçäl süppört. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/certificates/valid.html
+msgid "About edX Certificates"
+msgstr "Àßöüt édX Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
@@ -18829,10 +18878,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade All Remaining Courses ("
 msgstr "Ûpgrädé Àll Rémäïnïng Çöürsés ( Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{\"{0:.2f}\".format(a)}"
-msgstr "{\"{0:.2f}\".förmät(ä)} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid " ${price:.2f} {currency} ) "
@@ -20711,10 +20756,6 @@ msgid "Course Name:"
 msgstr "Çöürsé Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Display Name:"
-msgstr "Çöürsé Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Start Date:"
 msgstr "Çöürsé Stärt Däté: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
@@ -21963,18 +22004,17 @@ msgstr "Àdd Gröüp Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TAs are members of the community who help course teams moderate "
-"discussions. They can see posts by all learners, and can edit or delete "
-"posts, clear flags, close or re-open threads, and endorse responses. Their "
-"posts are marked as 'Community TA'. Only enrolled learners can be added as "
-"Community TAs."
+"discussions. They can see posts by learners in their assigned cohort or "
+"enrollment track, and can edit or delete posts, clear flags, close or re-"
+"open threads, and endorse responses. Their posts are marked as 'Community "
+"TA'. Only enrolled learners can be added as Community TAs."
 msgstr ""
 "Çömmünïtý TÀs äré mémßérs öf thé çömmünïtý whö hélp çöürsé téäms mödéräté "
-"dïsçüssïöns. Théý çän séé pösts ßý äll léärnérs, änd çän édït ör délété "
-"pösts, çléär flägs, çlösé ör ré-öpén thréäds, änd éndörsé réspönsés. Théïr "
-"pösts äré märkéd äs 'Çömmünïtý TÀ'. Önlý énrölléd léärnérs çän ßé äddéd äs "
-"Çömmünïtý TÀs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм,#"
+"dïsçüssïöns. Théý çän séé pösts ßý léärnérs ïn théïr ässïgnéd çöhört ör "
+"énröllmént träçk, änd çän édït ör délété pösts, çléär flägs, çlösé ör ré-"
+"öpén thréäds, änd éndörsé réspönsés. Théïr pösts äré märkéd äs 'Çömmünïtý "
+"TÀ'. Önlý énrölléd léärnérs çän ßé äddéd äs Çömmünïtý TÀs. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -23830,6 +23870,14 @@ msgstr "Pürsüé ä vérïfïéd çértïfïçäté Ⱡ'σяєм ιρѕυм ∂
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
 msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Unlocked"
+msgstr "Ûnlöçkéd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "(Prerequisite required)"
+msgstr "(Préréqüïsïté réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
@@ -26781,10 +26829,6 @@ msgstr "För éxämplé, MÌTx Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє
 #: cms/templates/index.html
 msgid "Courses Being Processed"
 msgstr "Çöürsés Béïng Pröçésséd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/templates/index.html
-msgid "Course Run:"
-msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/index.html
 msgid "This course run is currently being created."

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-17 13:44+0000\n"
-"PO-Revision-Date: 2018-01-17 13:50:33.406043\n"
+"POT-Creation-Date: 2018-01-26 11:21+0000\n"
+"PO-Revision-Date: 2018-01-26 11:27:12.309740\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -348,7 +348,8 @@ msgstr ""
 msgid "Username and password fields cannot match"
 msgstr ""
 
-#: common/djangoapps/student/forms.py common/djangoapps/student/views.py
+#: common/djangoapps/student/forms.py
+#: common/djangoapps/student/views/management.py
 msgid "Password: "
 msgstr ""
 
@@ -361,6 +362,16 @@ msgstr ""
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
 "different email address."
+msgstr ""
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Public Username '{username}' already exists."
+msgstr ""
+
+#: common/djangoapps/student/helpers.py
+#, python-brace-format
+msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
 #: common/djangoapps/student/management/commands/manage_group.py
@@ -589,81 +600,92 @@ msgstr ""
 msgid "Value of this user attribute."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
+msgid " and "
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Photos are mismatched"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name missing from ID photo"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo is blurry"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Name on ID does not match name on account"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "Learner photo not provided"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+msgid "ID photo is blurry"
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Photos are mismatched"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Name missing from ID photo"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "ID photo not provided"
+#: common/djangoapps/student/views/login.py
+#, python-brace-format
+msgid ""
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "ID is invalid"
+#: common/djangoapps/student/views/login.py
+msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo is blurry"
+#: common/djangoapps/student/views/login.py
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Name on ID does not match name on account"
+#: common/djangoapps/student/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Learner photo not provided"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "ID photo is blurry"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid " and "
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Course id not specified"
-msgstr ""
-
-#: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
-msgid "Invalid course id"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Course id is invalid"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Could not enroll"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "You are not enrolled in this course"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Your certificate prevents you from unenrolling from this course"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Enrollment action is invalid"
-msgstr ""
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -672,111 +694,101 @@ msgid ""
 "{platform} Support</a>."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"<strong>Register</strong> at the top of the page."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Please enter a username"
+#: common/djangoapps/student/views/login.py
+msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "Please choose an option"
+#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/login.py
+msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "User with username {} does not exist"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Successfully disabled {}'s account"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Successfully reenabled {}'s account"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "Unexpected account status"
-msgstr ""
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "An account with the Email '{email}' already exists."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-#, python-brace-format
-msgid "Registration using {provider} has timed out."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "An access_token is required when passing value ({}) for provider."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "The provided access_token is already associated with another user."
-msgstr ""
-
-#: common/djangoapps/student/views.py
-msgid "The provided access_token is not valid."
-msgstr ""
-
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Account creation not allowed."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
+msgid "Course id not specified"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#: lms/djangoapps/support/views/refund.py
+msgid "Invalid course id"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Course id is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Could not enroll"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "You are not enrolled in this course"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Your certificate prevents you from unenrolling from this course"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Enrollment action is invalid"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Please enter a username"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Please choose an option"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "User with username {} does not exist"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Successfully disabled {}'s account"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Successfully reenabled {}'s account"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "Unexpected account status"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "The provided access_token is already associated with another user."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "The provided access_token is not valid."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
@@ -784,12 +796,12 @@ msgid ""
 "issue."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
@@ -797,12 +809,12 @@ msgid ""
 "enrolled in. Sign In to continue."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
@@ -813,7 +825,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
@@ -824,35 +836,27 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
 msgstr ""
 
-#: common/djangoapps/student/views.py
-msgid "No inactive user with this e-mail exists"
-msgstr ""
-
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
-msgid "Unable to send reactivation email"
-msgstr ""
-
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 
@@ -3861,6 +3865,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
+"This section is a prerequisite. You must complete this section in order to "
+"unlock additional content."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 
@@ -4470,6 +4480,7 @@ msgid "Careers"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/certificates/views/webview.py
 msgid "Terms of Service & Honor Code"
 msgstr ""
 
@@ -4793,12 +4804,6 @@ msgstr ""
 msgid "Invalid Certificate"
 msgstr ""
 
-#. Translators: The &amp; characters represent an ampersand character and can
-#. be ignored
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Terms of Service &amp; Honor Code"
-msgstr ""
-
 #. Translators: This line appears as a byline to a header image and describes
 #. the purpose of the page
 #: lms/djangoapps/certificates/views/webview.py
@@ -5021,16 +5026,15 @@ msgstr ""
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/commerce/utils.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr ""
+
+#: lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
-msgstr ""
-
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
 msgstr ""
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
@@ -6749,6 +6753,7 @@ msgstr ""
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks_helper/module_state.py
 msgid "overridden"
 msgstr ""
 
@@ -8545,6 +8550,17 @@ msgstr ""
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at %(platform_name)s."
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+
+#: lms/templates/registration/password_reset_email.html
+msgid "If you did not request this change, you can ignore this email."
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html

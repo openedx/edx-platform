@@ -779,7 +779,6 @@
     "The following warnings were generated:": "\u51fa\u73b0\u4ee5\u4e0b\u8b66\u544a\uff1a", 
     "The grading process is still running. Refresh the page to see updates.": "\u8bc4\u5206\u8fc7\u7a0b\u4ecd\u5728\u8fdb\u884c\uff0c\u8bf7\u5237\u65b0\u9875\u9762\u67e5\u770b\u66f4\u65b0\u3002", 
     "The language that team members primarily use to communicate with each other.": "\u56e2\u961f\u6210\u5458\u4e3b\u8981\u4f7f\u7528\u7684\u4ea4\u6d41\u8bed\u8a00\u3002", 
-    "The language used throughout this site. This site is currently available in a limited number of languages.": "\u6574\u4e2a\u7f51\u7ad9\u663e\u793a\u7684\u8bed\u8a00\u3002\u76ee\u524d\u4ec5\u9650\u4e8e\u51e0\u79cd\u8bed\u8a00\u3002", 
     "The photo of your face matches the photo on your ID.": "\u60a8\u7684\u9762\u90e8\u7167\u7247\u4e0e\u60a8\u8eab\u4efd\u8bc1\u4ef6\u4e0a\u7684\u7167\u7247\u76f8\u7b26\u3002", 
     "The raw error message is:": "\u539f\u59cb\u7684\u9519\u8bef\u4fe1\u606f\u662f\uff1a", 
     "The selected content group does not exist": "\u9009\u53d6\u7684\u5185\u5bb9\u7ec4\u4e0d\u5b58\u5728\u3002", 
