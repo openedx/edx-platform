@@ -26,23 +26,13 @@ from openedx.features.course_experience import course_home_page_title
 
 <%block name="content">
 <div class="course-view page-content-container" id="course-container">
-    <header class="page-header has-secondary">
+    <header class="page-header has-secondary learner-analytics-header">
         ## TODO: LEARNER-3854: Clean-up after Learner Analytics test.
         ##   May not need/want breadcrumbs?  Can maybe kill course_url and course_home_page_title
         ##   from the context?
         ## Breadcrumb navigation
         <div class="page-header-main">
-            <nav aria-label="${_('Learner Analytics')}" class="sr-is-focusable" tabindex="-1">
-                <div class="has-breadcrumbs">
-                    <div class="breadcrumbs">
-                        <span class="nav-item">
-                            <a href="${course_url}">${course_home_page_title(course)}</a>
-                        </span>
-                        <span class="icon fa fa-angle-right" aria-hidden="true"></span>
-                        <span class="nav-item">${_('(Beta) My Stats')}</span>
-                    </div>
-                </div>
-            </nav>
+            <h2 class="title"><span class="fa ${'fa-unlock-alt' if has_access else 'fa-lock'} lock-icon" aria-hidden="true"></span> ${_('My Stats (Beta)')}</h2>
         </div>
     </header>
     <div class="page-content learner-analytics-dashboard-wrapper">
