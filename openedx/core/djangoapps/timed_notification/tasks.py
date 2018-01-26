@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timedelta, date
 from pytz import utc
 
-from core import send_course_notification_email, get_course_link
+from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link
 from lms.djangoapps.branding import get_visible_courses
 from common.lib.mandrill_client.client import MandrillClient
 
