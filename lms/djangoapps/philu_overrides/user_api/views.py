@@ -346,19 +346,17 @@ def create_account_with_params_custom(request, params):
         )
     )
     if send_email:
-        dest_addr = user.email
-        site = safe_get_host(request)
-        key = registration.activation_key
-        if request.is_secure():
-            activation_link = 'https://' + site + '/activate/' + key
-        else:
-            activation_link = 'http://' + site + '/activate/' + key
+        activation_link = '{protocol}://{site}/activate/{key}'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=safe_get_host(request),
+            key=registration.activation_key
+        )
 
         context = {
             'first_name': user.first_name,
             'activation_link': activation_link,
         }
-        MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, dest_addr, context)
+        MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
