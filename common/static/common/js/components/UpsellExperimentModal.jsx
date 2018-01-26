@@ -77,8 +77,7 @@ export class UpsellExperimentModal extends React.Component {
                         label={"Upgrade ($100 USD)"}
                         display={"Upgrade ($100 USD)"}
                         buttonType="success"
-                        // unfortunately, Button components don't have an href component
-                        onClick={() => window.location = buttonDestinationURL}
+                        onClick={() => {}}
                     />),
                 ]}
             />
