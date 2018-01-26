@@ -2,17 +2,17 @@
 Model form for the surveys.
 """
 import json
-
 import logging
-import os
 from datetime import datetime
-
 from itertools import chain
+
+import os
 from django import forms
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
+from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
 from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict, \
     get_actual_field_names, admin_not_assigned_or_me
 from lms.djangoapps.onboarding.models import (
@@ -20,7 +20,6 @@ from lms.djangoapps.onboarding.models import (
     Organization,
     OrganizationAdminHashKeys, EducationLevel, EnglishProficiency, RoleInsideOrg, OperationLevel,
     FocusArea, TotalEmployee, OrgSector, PartnerNetwork, OrganizationPartner, OrganizationMetric, Currency)
-from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
 
 NO_OPTION_SELECT_ERROR = 'Please select an option for {}'
 EMPTY_FIELD_ERROR = 'Please enter your {}'
@@ -601,6 +600,11 @@ class RegModelForm(BaseOnboardingModelForm):
     def clean_org_admin_email(self):
         org_admin_email = self.cleaned_data['org_admin_email']
 
+        already_an_admin = Organization.objects.filter(admin__email=org_admin_email).first()
+        if already_an_admin:
+            raise forms.ValidationError(ugettext_noop('%s is already as admin of organiztaion %s'
+                                                      % (org_admin_email, already_an_admin.label)))
+
         already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
             suggested_admin_email=org_admin_email).first()
         if already_suggested_as_admin:
@@ -634,7 +638,7 @@ class RegModelForm(BaseOnboardingModelForm):
                         org_name = extended_profile.organization.label
                         organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
-                        send_admin_activation_email(org_id, org_name, org_admin_email, hash_key)
+                        send_admin_activation_email(first_name, org_id, org_name, org_admin_email, hash_key)
 
                     except Exception as ex:
                         log.info(ex.args)

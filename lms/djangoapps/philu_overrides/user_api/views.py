@@ -1,6 +1,5 @@
 import datetime
 import json
-
 import logging
 
 from django.contrib.auth.models import User
@@ -13,6 +12,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.views import RegistrationView
 from util.json_request import JsonResponse
+from util.request import safe_get_host
 from common.djangoapps.student.views import AccountValidationError, social_utils, REGISTER_USER, \
     _enroll_user_in_pending_courses, record_registration_attributions
 from django.core.validators import validate_email, ValidationError
@@ -34,7 +34,7 @@ from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from student.forms import AccountCreationForm, get_registration_extension_form
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from social.exceptions import AuthException, AuthAlreadyAssociated
-from student.tasks import send_activation_email
+from common.lib.mandrill_client.client import MandrillClient
 from edxmako.shortcuts import render_to_string
 from student.models import Registration, create_comments_service_user, PasswordHistory, UserProfile
 
@@ -346,27 +346,17 @@ def create_account_with_params_custom(request, params):
         )
     )
     if send_email:
-        dest_addr = user.email
-        context = {
-            'name': profile.name,
-            'key': registration.activation_key,
-        }
-
-        # composes activation email
-        subject = render_to_string('emails/activation_email_subject.txt', context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email.txt', context)
-
-        from_address = configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL
+        activation_link = '{protocol}://{site}/activate/{key}'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=safe_get_host(request),
+            key=registration.activation_key
         )
-        if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-            dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                       '-' * 80 + '\n\n' + message)
-        send_activation_email.delay(subject, message, from_address, dest_addr)
+
+        context = {
+            'first_name': user.first_name,
+            'activation_link': activation_link,
+        }
+        MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
@@ -418,13 +408,13 @@ class RegistrationViewCustom(RegistrationView):
         events that the user registered while enrolling in a particular course.
 
         Arguments:
-            request (HTTPRequest)
+        request (HTTPRequest)
 
         Returns:
-            HttpResponse: 200 on success
-            HttpResponse: 400 if the request is not valid.
-            HttpResponse: 409 if an account with the given username or email
-                address already exists
+        HttpResponse: 200 on success
+        HttpResponse: 400 if the request is not valid.
+        HttpResponse: 409 if an account with the given username or email
+        address already exists
         """
         data = request.POST.copy()
 

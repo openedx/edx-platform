@@ -93,6 +93,9 @@ class PartnerNetwork(models.Model):
     """
     Specifies about the partner network being used in an organization.
     """
+
+    NON_PROFIT_ORG_TYPE_CODE = "NPORG"
+
     order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=255)
@@ -179,6 +182,11 @@ class Organization(TimeStampedModel):
     def is_first_signup_in_org(self):
         return UserExtendedProfile.objects.filter(organization=self).count() == 1
 
+    @staticmethod
+    def is_non_profit(user_extended_profile):
+        return True if user_extended_profile.organization and \
+            user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE else False
+
     def __str__(self):
         return self.label
 
@@ -235,7 +243,7 @@ class OrganizationAdminHashKeys(TimeStampedModel):
     activation_hash = models.CharField(max_length=32)
 
     def __str__(self):
-        return "%s-%s" % (self.suggested_admin_email, self.activation_key_for_admin)
+        return "%s-%s" % (self.suggested_admin_email, self.activation_hash)
 
     @classmethod
     def assign_hash(cls, organization, suggested_by, suggested_admin_email):
@@ -347,7 +355,7 @@ class UserExtendedProfile(TimeStampedModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.user
+        return str(self.user)
 
     def get_user_selected_functions(self, _type="labels"):
         if _type == "labels":
@@ -443,14 +451,23 @@ class UserExtendedProfile(TimeStampedModel):
 
         if self.is_organization_data_filled():
             attended_list.append(self.SURVEYS_LIST[2])
-        if self.is_organization_details_filled():
+        if self.is_organization_details_filled() \
+                and self.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE:
             attended_list.append(self.SURVEYS_LIST[3])
 
         return attended_list
 
     def surveys_to_attend(self):
+        """
+        :return: List of survey for a user to attend depending on the user type (admin/first user in org/non-admin)
+        """
         surveys_to_attend = self.SURVEYS_LIST[:2]
         if self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+            surveys_to_attend = self.SURVEYS_LIST[:3]
+
+        if self.organization and \
+                self.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE and \
+                (self.is_organization_admin or self.organization.is_first_signup_in_org()):
             surveys_to_attend = self.SURVEYS_LIST
 
         return surveys_to_attend
