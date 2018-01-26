@@ -439,6 +439,12 @@
           background: url('#{$static-path}/images/link-icon.png') left center no-repeat;
         }
       }
+
+      &.about-sidebar-html {
+        padding: 0 10px;
+        box-shadow: none;
+        border: none;
+      }
     }
 
     header {

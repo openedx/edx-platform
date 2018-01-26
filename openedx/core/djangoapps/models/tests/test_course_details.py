@@ -72,6 +72,11 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).intro_video,
                 jsondetails.intro_video, "After set intro_video"
             )
+            jsondetails.about_sidebar_html = "About Sidebar HTML"
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).about_sidebar_html,
+                jsondetails.about_sidebar_html, "After set about_sidebar_html"
+            )
             jsondetails.effort = "effort"
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).effort,

@@ -16,6 +16,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    'change select': 'updateModel',
                    'click .remove-course-introduction-video': 'removeVideo',
                    'focus #course-overview': 'codeMirrorize',
+                   'focus #course-about-sidebar-html': 'codeMirrorize',
                    'mouseover .timezone': 'updateTime',
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
                    'focus :input': 'inputFocus',
@@ -97,6 +98,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#' + this.fieldToSelectorMap.description).val(this.model.get('description'));
 
                    this.$el.find('#' + this.fieldToSelectorMap.short_description).val(this.model.get('short_description'));
+                   this.$el.find('#' + this.fieldToSelectorMap.about_sidebar_html).val(
+                       this.model.get('about_sidebar_html')
+                   );
+                   this.codeMirrorize(null, $('#course-about-sidebar-html')[0]);
 
                    this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
                    this.$el.find('#' + this.fieldToSelectorMap.intro_video).val(this.model.get('intro_video') || '');
@@ -163,6 +168,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    subtitle: 'course-subtitle',
                    duration: 'course-duration',
                    description: 'course-description',
+                   about_sidebar_html: 'course-about-sidebar-html',
                    short_description: 'course-short-description',
                    intro_video: 'course-introduction-video',
                    effort: 'course-effort',
@@ -363,7 +369,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                            }
                        });
                        cmTextArea = this.codeMirrors[thisTarget.id].getInputField();
-                       cmTextArea.setAttribute('id', 'course-overview-cm-textarea');
+                       cmTextArea.setAttribute('id', thisTarget.id + '-cm-textarea');
                    }
                },
 
