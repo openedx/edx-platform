@@ -570,6 +570,14 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
 
+####################### Enterprise Settings ######################
+# A shared secret to be used for encrypting passwords passed from the enterprise api
+# to the enteprise reporting script.
+ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
+    'ENTERPRISE_REPORTING_SECRET',
+    ENTERPRISE_REPORTING_SECRET
+)
+
 ####################### Plugin Settings ##########################
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
