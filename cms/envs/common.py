@@ -416,8 +416,6 @@ LMS_BASE = None
 LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
-ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
@@ -1244,10 +1242,6 @@ OPTIONAL_APPS = (
 
     # Organizations App (http://github.com/edx/edx-organizations)
     ('organizations', None),
-
-    # Enterprise App (http://github.com/edx/edx-enterprise)
-    ('enterprise', None),
-    ('consent', None),
 )
 
 
@@ -1450,12 +1444,6 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
-
-############## Settings for the Enterprise App ######################
-
-ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
-ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
-ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for the Discovery App ######################
 
