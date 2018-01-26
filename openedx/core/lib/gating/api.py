@@ -1,6 +1,7 @@
 """
 API for the gating djangoapp
 """
+import json
 import logging
 
 from django.contrib.auth.models import User
