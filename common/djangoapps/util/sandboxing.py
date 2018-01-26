@@ -1,9 +1,7 @@
 import re
 
 from django.conf import settings
-
-# We'll make assets named this be importable by Python code in the sandbox.
-PYTHON_LIB_ZIP = "python_lib.zip"
+from lms.djangoapps.dashboard.git_import import DEFAULT_PYTHON_LIB_FILENAME
 
 
 def can_execute_unsafe_code(course_id):
@@ -32,8 +30,9 @@ def can_execute_unsafe_code(course_id):
 
 
 def get_python_lib_zip(contentstore, course_id):
-    """Return the bytes of the python_lib.zip file, if any."""
-    asset_key = course_id.make_asset_key("asset", PYTHON_LIB_ZIP)
+    """Return the bytes of the course code library file, if it exists."""
+    python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+    asset_key = course_id.make_asset_key("asset", python_lib_filename)
     zip_lib = contentstore().find(asset_key, throw_on_not_found=False)
     if zip_lib is not None:
         return zip_lib.data
