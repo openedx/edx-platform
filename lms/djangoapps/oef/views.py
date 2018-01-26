@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from rest_framework import status
 
 from lms.djangoapps.oef.helpers import *
+from lms.djangoapps.onboarding.models import Organization
 
 
 @login_required
@@ -22,6 +23,7 @@ def oef_dashboard(request):
 
     context = {
         'is_poc': user_extended_profile.is_organization_admin,
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_first_user': user_extended_profile.organization.is_first_signup_in_org()
         if user_extended_profile.organization else False
     }
