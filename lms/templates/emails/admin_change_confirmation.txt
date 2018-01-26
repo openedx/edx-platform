@@ -1,0 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
+${_("Dear,")}
+
+% if confirm:
+${_("Your claim of being admin of {org_name} has been accepted. You are now the "
+    "new admin. "
+    ).format(org_name=org_name)}
+
+% else:
+${_("Your claim of being admin of {org_name} has been rejected. "
+    ).format(org_name=org_name)}
+% endif
+
+${_("If you need assistance, please "
+      "do not reply to this email message. Check the help section of the "
+      "{platform_name} website.").format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))}

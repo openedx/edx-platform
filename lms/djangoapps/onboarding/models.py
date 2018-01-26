@@ -235,7 +235,7 @@ class OrganizationAdminHashKeys(TimeStampedModel):
     activation_hash = models.CharField(max_length=32)
 
     def __str__(self):
-        return "%s-%s" % (self.suggested_admin_email, self.activation_key_for_admin)
+        return "%s-%s" % (self.suggested_admin_email, self.activation_hash)
 
     @classmethod
     def assign_hash(cls, organization, suggested_by, suggested_admin_email):
@@ -347,7 +347,7 @@ class UserExtendedProfile(TimeStampedModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.user
+        return str(self.user)
 
     def get_user_selected_functions(self, _type="labels"):
         if _type == "labels":
