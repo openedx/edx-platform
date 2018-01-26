@@ -23,7 +23,11 @@ def can_not_update_onboarding_steps(function):
         are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
         if are_forms_complete and request.path in [reverse('user_info'), reverse('interests'), reverse('organization'),
                                                    reverse('org_detail_survey')]:
-            return redirect(reverse('update_account_settings'))
+            if request.path == reverse('org_detail_survey'):
+                redirect_url = reverse('recommendations')
+            else:
+                redirect_url = reverse('update_account_settings')
+            return redirect(redirect_url)
 
         return function(request, *args, **kwargs)
 

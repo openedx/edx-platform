@@ -28,7 +28,7 @@ from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, s
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES
 from lms.djangoapps.onboarding.models import (
     Organization,
-    Currency, OrganizationMetric, OrganizationAdminHashKeys)
+    Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
 from lms.djangoapps.onboarding.models import UserExtendedProfile
 from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
@@ -108,6 +108,7 @@ def user_info(request):
     context.update({
         'form': form,
         'is_under_age': is_under_age,
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
         'is_first_user': user_extended_profile.organization.is_first_signup_in_org() \
         if user_extended_profile.organization else False,
@@ -177,8 +178,12 @@ def interests(request):
     user = request.user
     extended_profile = user.extended_profile
     context.update(extended_profile.unattended_surveys())
-    context['is_poc'] = extended_profile.is_organization_admin
-    context['is_first_user'] = is_first_signup_in_org
+
+    context.update({
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
+        'is_poc': extended_profile.is_organization_admin,
+        'is_first_user': is_first_signup_in_org,
+    })
 
     return render(request, template, context)
 
@@ -200,7 +205,7 @@ def organization(request):
     are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
 
     template = 'onboarding/organization_survey.html'
-    next_page_url = reverse('org_detail_survey')
+    next_page_url = reverse('recommendations')
     redirect_to_next = True
 
     if request.path == reverse('update_organization'):
@@ -221,7 +226,10 @@ def organization(request):
 
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-            if not are_forms_complete and redirect_to_next:
+            if user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE:
+                next_page_url = reverse('org_detail_survey')
+
+            if redirect_to_next:
                 return redirect(next_page_url)
 
     else:
@@ -231,11 +239,15 @@ def organization(request):
 
     organization = user_extended_profile.organization
     context.update(user_extended_profile.unattended_surveys())
-    context['is_poc'] = user_extended_profile.is_organization_admin
-    context['is_first_user'] = organization.is_first_signup_in_org() if user_extended_profile.organization else False
-    context['org_admin_id'] =  organization.admin_id if user_extended_profile.organization else None
-    context['organization_name'] = _organization.label
-    context['google_place_api_key'] = settings.GOOGLE_PLACE_API_KEY
+
+    context.update({
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
+        'is_poc': user_extended_profile.is_organization_admin,
+        'is_first_user': organization.is_first_signup_in_org() if user_extended_profile.organization else False,
+        'org_admin_id': organization.admin_id if user_extended_profile.organization else None,
+        'organization_name': _organization.label,
+        'google_place_api_key': settings.GOOGLE_PLACE_API_KEY
+    })
 
     return render(request, template, context)
 
@@ -328,10 +340,15 @@ def org_detail_survey(request):
 
     context = {'form': form, 'are_forms_complete': are_forms_complete}
     context.update(user_extended_profile.unattended_surveys())
-    context['is_poc'] = user_extended_profile.is_organization_admin
-    context['is_first_user'] = user_extended_profile.organization.is_first_signup_in_org() \
-        if user_extended_profile.organization else False
-    context['organization_name'] = user_extended_profile.organization.label
+
+    context.update({
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
+        'is_poc': user_extended_profile.is_organization_admin,
+        'is_first_user': user_extended_profile.organization.is_first_signup_in_org()\
+            if user_extended_profile.organization else False,
+        'organization_name': user_extended_profile.organization.label,
+    })
+
     return render(request, template, context)
 
 
