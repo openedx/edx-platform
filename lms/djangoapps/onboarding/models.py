@@ -465,7 +465,9 @@ class UserExtendedProfile(TimeStampedModel):
         if self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org()):
             surveys_to_attend = self.SURVEYS_LIST[:3]
 
-        if self.organization and self.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE and (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+        if self.organization and \
+                self.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE and \
+                (self.is_organization_admin or self.organization.is_first_signup_in_org()):
             surveys_to_attend = self.SURVEYS_LIST
 
         return surveys_to_attend
