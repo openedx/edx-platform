@@ -31,6 +31,12 @@ class Discussions extends React.Component {
   }
 
   getCountChart(count, percent, label, img = false) {
+    var percentWidth;
+    if (percent === 0) {
+        percentWidth = '2px';
+    } else {
+      percentWidth = 'calc((100% - 40px) * ' + percent + ')';
+    }
     return (
       <div className="count-chart">
         <div className={classNames(
@@ -43,7 +49,7 @@ class Discussions extends React.Component {
         <div className="chart-display">
           <div className="chart-bar"
                aria-hidden="true"
-               style={{width: `calc((100% - 40px) * ${percent})`}}></div>
+               style={{width: `${percentWidth}`}}></div>
           <span className="user-count">{count}</span>
         </div>
       </div>
