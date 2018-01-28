@@ -44,7 +44,7 @@
                         self.trigger('search');
                     },
                     error: function(self, response) {
-                        self.errorMessage = response.responseJSON.error;
+                        self.errorMessage = response.responseJSON ? response.responseJSON.error: '';
                         self.trigger('error');
                     }
                 });
@@ -62,11 +62,12 @@
                     },
                     type: 'POST',
                     success: function(self) {
+                        self.errorMessage = '';
                         self.page += 1;  // eslint-disable-line no-param-reassign
                         self.trigger('next');
                     },
                     error: function(self, response) {
-                        self.errorMessage = response.responseJSON.error;
+                        self.errorMessage = response.responseJSON ? response.responseJSON.error: '';
                         self.trigger('error');
                     },
                     add: true,
