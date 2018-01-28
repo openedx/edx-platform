@@ -40,9 +40,11 @@
                     },
                     type: 'POST',
                     success: function(self) {
+                        self.errorMessage = '';
                         self.trigger('search');
                     },
-                    error: function(self) {
+                    error: function(self, response) {
+                        self.errorMessage = response.responseJSON.error;
                         self.trigger('error');
                     }
                 });
@@ -63,7 +65,8 @@
                         self.page += 1;  // eslint-disable-line no-param-reassign
                         self.trigger('next');
                     },
-                    error: function(self) {
+                    error: function(self, response) {
+                        self.errorMessage = response.responseJSON.error;
                         self.trigger('error');
                     },
                     add: true,
