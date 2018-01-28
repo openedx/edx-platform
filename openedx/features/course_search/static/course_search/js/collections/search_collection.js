@@ -40,11 +40,16 @@
                     },
                     type: 'POST',
                     success: function(self) {
-                        self.errorMessage = '';
+                        self.errorMessage = '';  // eslint-disable-line no-param-reassign
                         self.trigger('search');
                     },
                     error: function(self, response) {
-                        self.errorMessage = response.responseJSON ? response.responseJSON.error: '';
+                        if (response.responseJSON && response.responseJSON.error) {
+                            self.errorMessage = response.responseJSON.error || '';  // eslint-disable-line no-param-reassign
+                        } else {
+                            self.errorMessage = '';  // eslint-disable-line no-param-reassign
+                        }
+
                         self.trigger('error');
                     }
                 });
@@ -62,12 +67,17 @@
                     },
                     type: 'POST',
                     success: function(self) {
-                        self.errorMessage = '';
+                        self.errorMessage = '';  // eslint-disable-line no-param-reassign
                         self.page += 1;  // eslint-disable-line no-param-reassign
                         self.trigger('next');
                     },
                     error: function(self, response) {
-                        self.errorMessage = response.responseJSON ? response.responseJSON.error: '';
+                        if (response.responseJSON && response.responseJSON.error) {
+                            self.errorMessage = response.responseJSON.error || '';  // eslint-disable-line no-param-reassign
+                        } else {
+                            self.errorMessage = '';  // eslint-disable-line no-param-reassign
+                        }
+
                         self.trigger('error');
                     },
                     add: true,
