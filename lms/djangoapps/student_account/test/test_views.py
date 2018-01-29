@@ -764,7 +764,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             "errorMessage": None,
             "registerFormSubmitButtonText": "Create Account",
             "syncLearnerProfileData": False,
-            "pipeline_user_details": {"email": "test@test.com"} if add_user_details else None
+            "pipeline_user_details": {"email": "test@test.com"} if add_user_details else {}
         }
         if expected_ec is not None:
             # If we set an EnterpriseCustomer, third-party auth providers ought to be hidden.
