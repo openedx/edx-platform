@@ -13,6 +13,7 @@ from .usage_info import CourseUsageInfo
 COURSE_BLOCK_ACCESS_TRANSFORMERS = [
     library_content.ContentLibraryTransformer(),
     start_date.StartDateTransformer(),
+    start_date.StartDateFieldTransformer(),
     user_partitions.UserPartitionTransformer(),
     visibility.VisibilityTransformer(),
 ]

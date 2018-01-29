@@ -3,6 +3,7 @@ Course API Block Transformers
 """
 
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
+from lms.djangoapps.course_blocks.transformers.start_date import StartDateFieldTransformer
 from .student_view import StudentViewTransformer
 from .block_counts import BlockCountsTransformer
 from .navigation import BlockNavigationTransformer
@@ -40,6 +41,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('due'),
+    SupportedFieldType('start', StartDateFieldTransformer),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
