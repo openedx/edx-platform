@@ -14,8 +14,8 @@ def is_course_run_entitlement_fullfillable(course_run_id, entitlement, compare_d
 
     Arguments:
         course_run_id (String): The id of the Course run that is being checked.
-        compare_date: The date and time that we are comparing against.  Generally the current date and time.
         entitlement: The Entitlement that we are checking against.
+        compare_date: The date and time that we are comparing against.  Defaults to timezone.now()
 
     Returns:
         bool: True if the Course Run is fullfillable for the CourseEntitlement.

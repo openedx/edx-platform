@@ -64,7 +64,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert is_course_run_entitlement_fullfillable(course_overview.id, now(), entitlement)
+        assert is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
 
     def test_course_run_not_fullfillable_run_ended(self):
         course_overview = self.create_course(
@@ -76,7 +76,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
+        assert not is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
 
     def test_course_run_not_fullfillable_enroll_period_ended(self):
         course_overview = self.create_course(
@@ -88,7 +88,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
+        assert not is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
 
     def test_course_run_fullfillable_user_enrolled(self):
         course_overview = self.create_course(
@@ -102,7 +102,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
         # Enroll User in the Course, but do not update the entitlement
         CourseEnrollmentFactory.create(user=entitlement.user, course_id=course_overview.id)
 
-        assert is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
+        assert is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
 
     def test_course_run_not_fullfillable_upgrade_ended(self):
         course_overview = self.create_course(
@@ -115,4 +115,4 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
+        assert not is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
