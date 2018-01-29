@@ -1,14 +1,11 @@
 import logging
 
 from student.models import CourseEnrollment
-from edxmako.shortcuts import render_to_string
-
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 
 from collections import Counter
-from smtplib import SMTPDataError
 from boto.ses.exceptions import (
     SESAddressBlacklistedError,
     SESDomainEndsWithDotError,
@@ -17,7 +14,7 @@ from boto.ses.exceptions import (
 )
 from common.lib.mandrill_client.client import MandrillClient
 
-log = logging.getLogger('edx.celery.task')
+log = logging.getLogger('timed_notifications')
 
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.
@@ -48,8 +45,6 @@ def send_course_notification_email(course, template_name, context, to_list=None)
     log.info("Users list %s", to_list)
     total_recipients = len(to_list)
     recipient_num = 0
-    total_recipients_successful = 0
-    total_recipients_failed = 0
     log.info("Setting up reference of user information")
     recipients_info = Counter()
 
@@ -59,18 +54,13 @@ def send_course_notification_email(course, template_name, context, to_list=None)
     )
 
     try:
-        log.info("Getting email connection")
-        connection = get_connection()
-        log.info("Opening email connection")
-        connection.open()
         log.info("Before loop through to the user-list")
         for current_recipient in to_list:
             recipient_num += 1
             log.info("Getting user email")
             email = current_recipient.email
             log.info("Adding full name in the context")
-            context["full_name"] = current_recipient.extended_profile.first_name + " " + current_recipient.\
-                extended_profile.last_name
+            context["full_name"] = current_recipient.first_name + " " + current_recipient.last_name
 
             log.info(
             "TimedNotification ==> Recipient num: %s/%s, Recipient name: %s, Email address: %s",
@@ -80,18 +70,11 @@ def send_course_notification_email(course, template_name, context, to_list=None)
                 email
             )
             log.info("Just before sending email")
-            MandrillClient().send_email(template_name, email, context)
+            MandrillClient().send_mail(template_name, email, context)
             log.info("After sending email")
 
             recipients_info[email] += 1
 
-        log.info(
-            "TimedNotification ==> Total Successful Recipients: %s/%s, Failed Recipients: %s/%s",
-            total_recipients_successful,
-            total_recipients,
-            total_recipients_failed,
-            total_recipients
-        )
         duplicate_recipients = ["{0} ({1})".format(email, repetition)
                                 for email, repetition in recipients_info.most_common() if repetition > 1]
         if duplicate_recipients:
@@ -100,8 +83,8 @@ def send_course_notification_email(course, template_name, context, to_list=None)
                 len(duplicate_recipients),
                 ', '.join(duplicate_recipients)
             )
-        connection.close()
-    except Exception:
+    except Exception as e:
+        log.info(e.message)
         log.info('Email send failed!')
 
 

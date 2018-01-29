@@ -32,7 +32,7 @@ def task_course_notifications():
         # Email-template context
         context = {
             'course_name': course.display_name,
-            'course_link': get_course_link(course_id=course.id),
+            'course_url': get_course_link(course_id=course.id),
         }
 
         # if course end-date is missing then we can't guess the course week
