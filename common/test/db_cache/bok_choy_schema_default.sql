@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=396 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2383,15 +2383,17 @@ CREATE TABLE `edxval_videotranscript` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
-  `video_id` varchar(255) NOT NULL,
   `transcript` varchar(255) DEFAULT NULL,
   `language_code` varchar(50) NOT NULL,
   `provider` varchar(30) NOT NULL,
   `file_format` varchar(20) NOT NULL,
+  `video_id` int(11),
   PRIMARY KEY (`id`),
   UNIQUE KEY `edxval_videotranscript_video_id_729fab369c0f7028_uniq` (`video_id`,`language_code`),
   KEY `edxval_videotranscript_60716c2f` (`language_code`),
-  KEY `edxval_videotranscript_e1be1ad3` (`file_format`)
+  KEY `edxval_videotranscript_e1be1ad3` (`file_format`),
+  KEY `edxval_videotranscript_b58b747e` (`video_id`),
+  CONSTRAINT `edxval_videotranscr_video_id_2578e231c810d058_fk_edxval_video_id` FOREIGN KEY (`video_id`) REFERENCES `edxval_video` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `email_marketing_emailmarketingconfiguration`;
