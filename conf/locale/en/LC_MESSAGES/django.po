@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-26 11:27+0000\n"
-"PO-Revision-Date: 2018-01-26 11:27:12.402749\n"
+"POT-Creation-Date: 2018-01-29 09:35+0000\n"
+"PO-Revision-Date: 2018-01-29 09:35:12.337942\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -18814,7 +18814,7 @@ msgid "Search Results"
 msgstr ""
 
 #: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
-msgid "Learner Analytics"
+msgid "My Stats (Beta)"
 msgstr ""
 
 #. Translators: this section lists all the third-party authentication

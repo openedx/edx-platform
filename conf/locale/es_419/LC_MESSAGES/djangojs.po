@@ -3369,11 +3369,11 @@ msgstr "Problemas con los archivos cargados. Haz clic en \"+\" para ver."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
-msgstr "alumnos fueron agregados a la lista de excepciones"
+msgstr "estudiantes fueron agregados a la lista de excepciones"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is successfully added to the exception list"
-msgstr "alumno fue agregado a la lista de excepción"
+msgstr "el estudiante fue agregado a la lista de excepción"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format and not added to the exception list"
@@ -3908,7 +3908,8 @@ msgstr "¿Evitar que estudiantes generen certificados para este curso ?"
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start generating certificates for all students in this course?"
 msgstr ""
-"¿Comenzar a generar los certificados para todos los alumnos de este curso?"
+"¿Comenzar a generar los certificados para todos los estudiantes de este "
+"curso?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while generating certificates. Please try again."
