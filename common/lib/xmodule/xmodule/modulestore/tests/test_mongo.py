@@ -846,9 +846,11 @@ def _build_requested_filter(requested_filter):
         ],
     }
     requested_file_types = all_filters.get(requested_filter, None)
-    where = ["JSON.stringify(this.contentType).toUpperCase() == JSON.stringify('{}').toUpperCase()".format(
-        req_filter) for req_filter in requested_file_types]
     filter_params = {
-        "$where": ' || '.join(where),
+        '$or': [{
+            'contentType': {
+                '$in': requested_file_types,
+            },
+        }]
     }
     return filter_params
