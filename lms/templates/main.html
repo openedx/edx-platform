@@ -56,9 +56,11 @@ from pipeline_mako import render_require_js_path_overrides
 
   <%
     jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    ie11_fix_path = "js/ie11_find_array.js"
   %>
 
   <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+  <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
