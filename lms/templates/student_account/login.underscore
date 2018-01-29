@@ -9,7 +9,7 @@
 <% } %>
 
 <% if (context.enterpriseName) { %>
-    <% if (context.pipelineUserDetails.email) { %>
+    <% if (context.pipelineUserDetails && context.pipelineUserDetails.email) { %>
         <h2><%- gettext("Sign in to continue learning as {email}").replace("{email}", context.pipelineUserDetails.email) %></h2>
     <% } else { %>
         <h2><%- gettext("Sign in to continue learning") %></h2>
