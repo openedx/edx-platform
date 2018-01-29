@@ -935,6 +935,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             xml (lxml object): xml representation of video to be imported
             course_id (str): course id
         """
+        edx_video_id = ''
         if self.edx_video_id is not None:
             edx_video_id = self.edx_video_id.strip()
 
