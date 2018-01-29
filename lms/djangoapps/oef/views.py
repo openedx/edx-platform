@@ -6,10 +6,11 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from rest_framework import status
 
+from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
 from lms.djangoapps.onboarding.models import Organization
 
-
+@can_take_oef
 @login_required
 def oef_dashboard(request):
     """
