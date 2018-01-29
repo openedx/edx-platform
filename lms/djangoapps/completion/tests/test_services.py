@@ -2,9 +2,10 @@
 Tests of completion xblock runtime services
 """
 import ddt
-from django.test import TestCase
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import BlockCompletion
 from ..services import CompletionService
@@ -12,20 +13,58 @@ from ..test_utils import CompletionWaffleTestMixin
 
 
 @ddt.ddt
-class CompletionServiceTestCase(CompletionWaffleTestMixin, TestCase):
+class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTestCase):
     """
     Test the data returned by the CompletionService.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(CompletionServiceTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        with cls.store.bulk_operations(cls.course.id):
+            cls.chapter = ItemFactory.create(
+                parent=cls.course,
+                category="chapter",
+            )
+            cls.sequence = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+            )
+            cls.vertical = ItemFactory.create(
+                parent=cls.sequence,
+                category='vertical',
+            )
+            cls.problem = ItemFactory.create(
+                parent=cls.vertical,
+                category="problem",
+            )
+            cls.problem2 = ItemFactory.create(
+                parent=cls.vertical,
+                category="problem",
+            )
+            cls.problem3 = ItemFactory.create(
+                parent=cls.vertical,
+                category="problem",
+            )
+            cls.problem4 = ItemFactory.create(
+                parent=cls.vertical,
+                category="problem",
+            )
+            cls.problem5 = ItemFactory.create(
+                parent=cls.vertical,
+                category="problem",
+            )
+            cls.store.update_item(cls.course, UserFactory().id)
+        cls.problems = [cls.problem, cls.problem2, cls.problem3, cls.problem4, cls.problem5]
 
     def setUp(self):
         super(CompletionServiceTestCase, self).setUp()
         self.override_waffle_switch(True)
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()
-        self.course_key = CourseKey.from_string("edX/MOOC101/2049_T2")
+        self.course_key = self.course.id
         self.other_course_key = CourseKey.from_string("course-v1:ReedX+Hum110+1904")
-        self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in xrange(5)]
-
+        self.block_keys = [problem.location for problem in self.problems]
         self.completion_service = CompletionService(self.user, self.course_key)
 
         # Proper completions for the given runtime
@@ -72,3 +111,38 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, TestCase):
     def test_enabled_honors_waffle_switch(self, enabled):
         self.override_waffle_switch(enabled)
         self.assertEqual(self.completion_service.completion_tracking_enabled(), enabled)
+
+    def test_vertical_completion(self):
+        self.assertEqual(
+            self.completion_service.vertical_is_complete(self.vertical),
+            False,
+        )
+
+        for block_key in self.block_keys:
+            BlockCompletion.objects.submit_completion(
+                user=self.user,
+                course_key=self.course_key,
+                block_key=block_key,
+                completion=1.0
+            )
+
+        self.assertEqual(
+            self.completion_service.vertical_is_complete(self.vertical),
+            True,
+        )
+
+    def test_vertical_partial_completion(self):
+        block_keys_count = len(self.block_keys)
+        for i in range(block_keys_count - 1):
+            # Mark all the child blocks completed except the last one
+            BlockCompletion.objects.submit_completion(
+                user=self.user,
+                course_key=self.course_key,
+                block_key=self.block_keys[i],
+                completion=1.0
+            )
+
+        self.assertEqual(
+            self.completion_service.vertical_is_complete(self.vertical),
+            False,
+        )

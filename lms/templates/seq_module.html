@@ -13,6 +13,7 @@
       </div>
     </div>
   % endif
+
   <div class="sequence-nav">
     <button class="sequence-nav-button button-previous">
       <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
@@ -29,7 +30,7 @@
           <button class="active nav-item tab" title="${_('Content Locked')}" id="tab_0" role="tab" tabindex="-1" aria-selected="true" aria-expanded="true" aria-controls="content_locked" disabled>
             <span class="icon fa fa-lock" aria-hidden="true"></span>
           </button>
-        </li> 
+        </li>
         % else:
         % for idx, item in enumerate(items):
         <li role="presentation">
@@ -47,6 +48,13 @@
             id="tab_${idx}"
             ${"disabled=disabled" if disable_navigation else ""}>
             <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
+            % if 'complete' in item:
+              <span 
+                class="fa fa-check-circle check-circle ${"is-hidden" if not item['complete'] else ""}" 
+                style="color:green"
+                aria-hidden="true"
+              ></span>
+            % endif
             <span class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></span>
             <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
           </button>
@@ -56,7 +64,6 @@
       </ol>
     </nav>
   </div>
-
   % if gated_content['gated']:
     <%include file="_gated_content.html" args="prereq_url=gated_content['prereq_url'], prereq_section_name=gated_content['prereq_section_name'], gated_section_name=gated_content['gated_section_name']"/>
   % else:

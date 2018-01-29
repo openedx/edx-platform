@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models, transaction, connection
+from django.db import models, transaction
 from django.utils.translation import ugettext as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -161,11 +161,25 @@ class BlockCompletion(TimeStampedModel, models.Model):
     id = BigAutoField(primary_key=True)  # pylint: disable=invalid-name
     user = models.ForeignKey(User)
     course_key = CourseKeyField(max_length=255)
+
+    # note: this usage key may not have the run filled in for
+    # old mongo courses.  Use the full_block_key property
+    # instead when you want to use/compare the usage_key.
     block_key = UsageKeyField(max_length=255)
     block_type = models.CharField(max_length=64)
     completion = models.FloatField(validators=[validate_percent])
 
     objects = BlockCompletionManager()
+
+    @property
+    def full_block_key(self):
+        """
+        Returns the "correct" usage key value with the run filled in.
+        """
+        if self.block_key.run is None:
+            return self.block_key.replace(course_key=self.course_key)  # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+        else:
+            return self.block_key
 
     @classmethod
     def get_course_completions(cls, user, course_key):

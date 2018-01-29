@@ -2,6 +2,8 @@
 Tests for sequence module.
 """
 # pylint: disable=no-member
+import json
+
 from datetime import timedelta
 from django.utils.timezone import now
 from freezegun import freeze_time
@@ -72,6 +74,9 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self._set_up_module_system(block)
 
         block.xmodule_runtime._services['bookmarks'] = Mock()  # pylint: disable=protected-access
+        block.xmodule_runtime._services['completion'] = Mock(  # pylint: disable=protected-access
+            return_value=Mock(vertical_is_complete=Mock(return_value=True))
+        )
         block.xmodule_runtime._services['user'] = StubUserService()  # pylint: disable=protected-access
         block.xmodule_runtime.xmodule_instance = getattr(block, '_xmodule', None)  # pylint: disable=protected-access
         block.parent = parent.location
@@ -121,6 +126,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("'gated': False", html)
         self.assertIn("'next_url': 'NextSequential'", html)
         self.assertIn("'prev_url': 'PrevSequential'", html)
+        self.assertNotIn("fa fa-check-circle check-circle is-hidden", html)
 
     def test_student_view_first_child(self):
         html = self._get_rendered_student_view(self.sequence_3_1, requested_child='first')
@@ -273,3 +279,34 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         # assert content shown as normal
         self._assert_ungated(html, self.sequence_1_2)
+
+    def test_handle_ajax_get_completion_disabled(self):
+        """
+        Test when completion service is turned off by waffle, the ajax call returns correct
+        None value
+        """
+        completion_waffle_mock = Mock()
+        completion_waffle_mock.return_value.visual_progress_enabled.return_value = False
+        self.sequence_3_1.xmodule_runtime._services['completion'] = completion_waffle_mock  # pylint: disable=protected-access
+        for child in self.sequence_3_1.get_children():
+            usage_key = unicode(child.location)
+            completion_return = self.sequence_3_1.handle_ajax(
+                'get_completion',
+                {'usage_key': usage_key}
+            )
+            self.assertIs(completion_return, None)
+
+    def test_handle_ajax_get_completion_success(self):
+        """
+        Test that the completion data is returned successfully on
+        targeted vertical through ajax call
+        """
+        for child in self.sequence_3_1.get_children():
+            usage_key = unicode(child.location)
+            completion_return = json.loads(self.sequence_3_1.handle_ajax(
+                'get_completion',
+                {'usage_key': usage_key}
+            ))
+            self.assertIsNot(completion_return, None)
+            self.assertTrue('complete' in completion_return)
+            self.assertEqual(completion_return['complete'], True)

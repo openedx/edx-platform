@@ -120,7 +120,7 @@ $seq-nav-height: 50px;
         overflow: visible; // for tooltip - IE11 uses 'hidden' by default if width/height is specified
 
         .icon {
-          display: block;
+          display: inline-block;
           line-height: 100%; // This matches the height of the <a> its within (the parent) to get vertical centering.
           font-size: 110%;
           color: $seq-nav-icon-color-muted;
