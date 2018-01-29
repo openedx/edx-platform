@@ -550,6 +550,41 @@ data-url='/problem/quiz/'> \
     });
   });
 
+  describe('show problem with column in id', function() {
+    beforeEach(function () {
+      this.problem = new Problem($('.xblock-student_view'));
+      this.problem.el.prepend('<div id="answer_1_1:11" /><div id="answer_1_2:12" />');
+    });
+
+    it('log the problem_show event', function() {
+      this.problem.show();
+      expect(Logger.log).toHaveBeenCalledWith('problem_show',
+          {problem: 'i4x://edX/101/problem/Problem1'});
+    });
+
+    it('fetch the answers', function() {
+      spyOn($, 'postWithPrefix');
+      this.problem.show();
+      expect($.postWithPrefix).toHaveBeenCalledWith('/problem/Problem1/problem_show',
+          jasmine.any(Function));
+    });
+
+    it('show the answers', function() {
+      spyOn($, 'postWithPrefix').and.callFake(
+        (url, callback) => callback({answers: {'1_1:11': 'One', '1_2:12': 'Two'}})
+      );
+      this.problem.show();
+      expect($("#answer_1_1\\:11")).toHaveHtml('One');
+      expect($("#answer_1_2\\:12")).toHaveHtml('Two');
+    });
+
+    it('disables the show answer button', function() {
+      spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({answers: {}}));
+      this.problem.show();
+      expect(this.problem.el.find('.show').attr('disabled')).toEqual('disabled');
+    });
+  });
+
   describe('show', function() {
     beforeEach(function() {
       this.problem = new Problem($('.xblock-student_view'));
