@@ -10,15 +10,21 @@ by passing the --settings flag, you can specify what environment specific settin
 
 Any arguments not understood by this manage.py will be passed to django-admin.py
 """
+# pylint: disable=wrong-import-order, wrong-import-position
+from __future__ import absolute_import, print_function
+
+from openedx.core.lib.logsettings import log_python_warnings
+log_python_warnings()
 
 # Patch the xml libs before anything else.
 from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
+import importlib
 import os
 import sys
-import importlib
 from argparse import ArgumentParser
+
 import contracts
 
 
@@ -82,8 +88,8 @@ def parse_args():
     edx_args, django_args = parser.parse_known_args()
 
     if edx_args.help:
-        print "edX:"
-        print edx_args.help_string
+        print("edX:")
+        print(edx_args.help_string)
 
     return edx_args, django_args
 
@@ -104,7 +110,7 @@ if __name__ == "__main__":
         contracts.disable_all()
 
     if edx_args.help:
-        print "Django:"
+        print("Django:")
         # This will trigger django-admin.py to print out its help
         django_args.append('--help')
 
