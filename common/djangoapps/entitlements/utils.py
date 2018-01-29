@@ -1,6 +1,5 @@
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment
 
 
 def is_course_run_entitlement_fullfillable(course_run_id, compare_date, entitlement):
