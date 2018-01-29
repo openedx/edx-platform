@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 %>
 <%namespace file="sock_links.html" import="get_sock_links" />
+<%namespace file="sock_links_extra.html" import="get_sock_links_extra" />
 
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
@@ -17,10 +18,15 @@ from django.utils.translation import ugettext as _
 
   <div class="wrapper-inner wrapper">
     <section class="sock" id="sock" aria-labelledby="sock-heading">
-        <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <%
+        links = get_sock_links()
+        links_extra = get_sock_links_extra()
+        links.extend(links_extra)
+      %>
       <div class="support">
         <ul class="list-actions">
-          % for link in get_sock_links():
+          % for link in links:
             % if link['condition']:
               <li class="action-item">
                 <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
