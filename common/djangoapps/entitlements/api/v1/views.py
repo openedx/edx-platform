@@ -332,11 +332,11 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             )
 
         # Verify that the run is fullfillable
-        if not is_course_run_entitlement_fullfillable(course_run_key, datetime.datetime.now(UTC), entitlement):
+        if not is_course_run_entitlement_fullfillable(course_run_key, entitlement):
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
-                    'message': 'The User is unable to enroll in Course Run {course_id} it is not available.'.format(
+                    'message': 'The User is unable to enroll in Course Run {course_id}, it is not available.'.format(
                         course_id=course_run_id
                     )
                 }

@@ -321,11 +321,11 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     enrollable_sessions = []
 
     # Only show published course runs that can still be enrolled and upgraded
-    now = datetime.datetime.now(UTC)
+    search_time = datetime.datetime.now(UTC)
     for course_run in course_runs:
         course_id = CourseKey.from_string(course_run.get('key'))
         is_enrolled = CourseEnrollment.is_enrolled(entitlement.user, str(course_id))
-        if is_course_run_entitlement_fullfillable(course_id, now, entitlement) and not is_enrolled:
+        if is_course_run_entitlement_fullfillable(course_id, entitlement, search_time) and not is_enrolled:
             enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
