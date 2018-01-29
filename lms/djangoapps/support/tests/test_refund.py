@@ -87,7 +87,7 @@ class RefundTests(ModuleStoreTestCase):
 
     def test_bad_courseid(self):
         response = self.client.post('/support/refund/', {'course_id': 'foo', 'user': self.student.email})
-        self.assertContains(response, 'Invalid course id')
+        self.assertContains(response, 'Course id invalid')
 
     def test_bad_user(self):
         response = self.client.post('/support/refund/', {'course_id': str(self.course_id), 'user': 'unknown@foo.com'})

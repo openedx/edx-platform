@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.lib.courses import clean_course_id
 from student.models import (
     CourseAccessRole,
     CourseEnrollment,
@@ -41,23 +42,10 @@ class CourseAccessRoleForm(forms.ModelForm):
 
     def clean_course_id(self):
         """
-        Checking course-id format and course exists in module store.
-        This field can be null.
+        Validate the course id
         """
         if self.cleaned_data['course_id']:
-            course_id = self.cleaned_data['course_id']
-
-            try:
-                course_key = CourseKey.from_string(course_id)
-            except InvalidKeyError:
-                raise forms.ValidationError(u"Invalid CourseID. Please check the format and re-try.")
-
-            if not modulestore().has_course(course_key):
-                raise forms.ValidationError(u"Cannot find course with id {} in the modulestore".format(course_id))
-
-            return course_key
-
-        return None
+            return clean_course_id(self)
 
     def clean_org(self):
         """If org and course-id exists then Check organization name

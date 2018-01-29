@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -18,6 +19,7 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # but the test suite for Studio will fail because
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
+from openedx.core.lib.courses import clean_course_id
 from util.date_utils import get_time_display
 from xmodule.modulestore.django import modulestore
 
@@ -51,10 +53,23 @@ class CourseModeForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
+        # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
+        if len(args) > 0 and 'course' in args[0] and isinstance(args[0], QueryDict):
+            args_copy = args[0].copy()
+            args_copy['course'] = CourseKey.from_string(args_copy['course'])
+            args = [args_copy]
+
         super(CourseModeForm, self).__init__(*args, **kwargs)
 
-        if self.data.get('course'):
-            self.data['course'] = CourseKey.from_string(self.data['course'])
+        try:
+            if self.data.get('course'):
+                self.data['course'] = CourseKey.from_string(self.data['course'])
+        except AttributeError:
+            # Change the course ID string to a CourseLocator.
+            # On a POST request, self.data is a QueryDict and is immutable - so this code will fail.
+            # However, the args copy above before the super() call handles this case.
+            pass
 
         default_tz = timezone(settings.TIME_ZONE)
 
@@ -78,16 +93,10 @@ class CourseModeForm(forms.ModelForm):
             )
 
     def clean_course_id(self):
-        course_id = self.cleaned_data['course']
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(course_id))
-
-        if not modulestore().has_course(course_key):
-            raise forms.ValidationError("Cannot find course with id {} in the modulestore".format(course_id))
-
-        return course_key
+        """
+        Validate the course id
+        """
+        return clean_course_id(self)
 
     def clean__expiration_datetime(self):
         """

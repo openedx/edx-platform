@@ -1,7 +1,8 @@
 """
 Django Rest Framework Authentication classes for cross-domain end-points.
 """
-
+import django
+from django.middleware.csrf import CsrfViewMiddleware
 from rest_framework import authentication
 
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
@@ -23,6 +24,12 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
     Since this subclass overrides only the `enforce_csrf()` method,
     it can be mixed in with other `SessionAuthentication` subclasses.
     """
+    # TODO: Remove Django 1.11 upgrade shim
+    # SHIM: Call new process_request in Django 1.11 to process CSRF token in cookie.
+    def _process_enforce_csrf(self, request):
+        if django.VERSION >= (1, 11):
+            CsrfViewMiddleware().process_request(request)
+        return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)
 
     def enforce_csrf(self, request):
         """
@@ -30,6 +37,6 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
         """
         if is_cross_domain_request_allowed(request):
             with skip_cross_domain_referer_check(request):
-                return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)
+                return self._process_enforce_csrf(request)
         else:
-            return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)
+            return self._process_enforce_csrf(request)

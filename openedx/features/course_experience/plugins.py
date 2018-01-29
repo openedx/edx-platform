@@ -6,13 +6,13 @@ This includes any locally defined CourseTools.
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from course_tools import CourseTool
 from courseware.courses import get_course_by_id
 from student.models import CourseEnrollment
-from views.course_reviews import CourseReviewsModuleFragmentView
-from views.course_updates import CourseUpdatesFragmentView
 
 from . import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
+from .course_tools import CourseTool
+from .views.course_reviews import CourseReviewsModuleFragmentView
+from .views.course_updates import CourseUpdatesFragmentView
 
 
 class CourseUpdatesTool(CourseTool):

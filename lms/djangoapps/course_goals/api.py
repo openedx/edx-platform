@@ -2,6 +2,7 @@
 Course Goals Python API
 """
 import models
+from six import text_type
 
 from opaque_keys.edx.keys import CourseKey
 from django.conf import settings
@@ -22,7 +23,7 @@ def add_course_goal(user, course_id, goal_key):
         goal_key (string): The goal key for the new goal.
 
     """
-    course_key = CourseKey.from_string(str(course_id))
+    course_key = CourseKey.from_string(text_type(course_id))
     current_goal = get_course_goal(user, course_key)
     if current_goal:
         # If a course goal already exists, simply update it.
