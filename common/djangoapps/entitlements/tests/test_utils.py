@@ -90,7 +90,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         assert not is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
 
-    def test_course_run_not_fullfillable_user_enrolled(self):
+    def test_course_run_fullfillable_user_enrolled(self):
         course_overview = self.create_course(
             start_from_now=-3,
             end_from_now=2,
@@ -102,7 +102,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
         # Enroll User in the Course, but do not update the entitlement
         CourseEnrollmentFactory.create(user=entitlement.user, course_id=course_overview.id)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
+        assert is_course_run_entitlement_fullfillable(course_overview.id, now() + timedelta(days=3), entitlement)
 
     def test_course_run_not_fullfillable_upgrade_ended(self):
         course_overview = self.create_course(

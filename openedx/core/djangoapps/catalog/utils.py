@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fullfillable
+from student.models import CourseEnrollment
 from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -315,11 +316,6 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     """
     Takes a list of course runs and returns only the course runs, sorted by start date, that:
 
-    1) Are currently running or start in the future
-    2) A user can enroll in
-    3) A user can upgrade to the entitlement mode
-    4) Are not already currently enrolled in a session
-
     These are the only sessions that can be selected for an entitlement.
     """
     enrollable_sessions = []
@@ -328,7 +324,8 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     now = datetime.datetime.now(UTC)
     for course_run in course_runs:
         course_id = CourseKey.from_string(course_run.get('key'))
-        if is_course_run_entitlement_fullfillable(course_id, now, entitlement):
+        is_enrolled = CourseEnrollment.is_enrolled(entitlement.user, str(course_id))
+        if is_course_run_entitlement_fullfillable(course_id, now, entitlement) and not is_enrolled:
             enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))

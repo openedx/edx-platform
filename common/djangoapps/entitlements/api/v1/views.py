@@ -34,6 +34,7 @@ class EntitlementsPagination(DefaultPagination):
     page_size = 50
     max_page_size = 100
 
+
 @transaction.atomic
 def _unenroll_entitlement(course_entitlement, course_run_key):
     """
@@ -41,6 +42,7 @@ def _unenroll_entitlement(course_entitlement, course_run_key):
     """
     CourseEnrollment.unenroll(course_entitlement.user, course_run_key, skip_refund=True)
     course_entitlement.set_enrollment(None)
+
 
 @transaction.atomic
 def _process_revoke_and_unenroll_entitlement(course_entitlement, is_refund=False):
@@ -341,7 +343,6 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             )
 
         # Determine if this is a Switch session or a simple enroll and handle both.
-
         if entitlement.enrollment_course_run is None:
             response = self._enroll_entitlement(
                 entitlement=entitlement,

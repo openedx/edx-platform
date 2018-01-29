@@ -350,6 +350,20 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
         self.course2 = CourseFactory.create(org='edX', number='DemoX2', display_name='Demo_Course 2')
 
+        self.course_mode = CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=now() + timedelta(days=1)
+        )
+
+        self.course_mode = CourseModeFactory(
+            course_id=self.course2.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=now() + timedelta(days=1)
+        )
+
         self.return_values = [
             {'key': str(self.course.id)},
             {'key': str(self.course2.id)}
@@ -473,9 +487,6 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
 
         assert response.status_code == 201
-        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
-
-        course_entitlement.refresh_from_db()
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is not None
 
