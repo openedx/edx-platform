@@ -305,5 +305,5 @@ def get_actual_field_names(fields):
     return [f.split("=")[1] for f in fields]
 
 
-def admin_not_assigned_or_me(user, organization_to_assign):
-    return not organization_to_assign.admin or organization_to_assign.admin == user
+def admin_not_assigned_or_me(user, organization):
+    return not organization.admin or organization.admin == user
