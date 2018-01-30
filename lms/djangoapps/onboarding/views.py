@@ -23,7 +23,8 @@ from django.views.decorators.csrf import csrf_exempt
 from path import Path as path
 
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps
+from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
+    can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES
 from lms.djangoapps.onboarding.models import (
@@ -291,7 +292,7 @@ def get_country_names(request):
 
 
 @login_required
-@can_save_org_data
+@can_save_org_details
 @can_not_update_onboarding_steps
 @transaction.atomic
 def org_detail_survey(request):
@@ -388,6 +389,10 @@ def update_account_settings(request):
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
             user_extended_profile = form.save(user=user_extended_profile.user, commit=True)
+            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+
+            if not are_forms_complete :
+                return redirect(reverse('organization'))
 
     else:
         form = forms.UpdateRegModelForm(
@@ -469,15 +474,19 @@ def get_organizations(request):
             organization = user_extended_profile.organization
 
             if organization:
-                org_label = organization.label
-                is_poc = True if organization.admin == request.user else False
-                admin_email = organization.admin.email if organization.admin else ''
+                _result = {
+                    'org': organization.label,
+                    'is_poc': True if organization.admin == request.user else False,
+                    'admin_email': organization.admin.email if organization.admin else ''
+                }
+            else:
+                _result = {
+                    'org': '',
+                    'is_poc': False,
+                    'admin_email': ''
+                }
 
-            final_result['user_org_info'] = {
-                'org': org_label,
-                'is_poc': is_poc,
-                'admin_email': admin_email
-            }
+            final_result['user_org_info'] = _result
 
     return JsonResponse(final_result)
 

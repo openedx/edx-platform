@@ -10,6 +10,7 @@ from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
 from lms.djangoapps.onboarding.models import Organization
 
+
 @can_take_oef
 @login_required
 def oef_dashboard(request):
@@ -42,6 +43,7 @@ def oef_dashboard(request):
     return render(request, 'oef/oef-org.html', context)
 
 
+@can_take_oef
 @login_required
 def oef_instructions(request):
     """
@@ -52,6 +54,7 @@ def oef_instructions(request):
     return render(request, 'oef/oef-instructional.html', {'oef_url': oef_url})
 
 
+@can_take_oef
 @login_required
 def get_survey_by_id(request, user_survey_id):
     """
@@ -70,6 +73,7 @@ def get_survey_by_id(request, user_survey_id):
                                                    })
 
 
+@can_take_oef
 @login_required
 def fetch_survey(request):
     """
@@ -92,7 +96,7 @@ def fetch_survey(request):
                                                    'date': uos.started_on.strftime('%m/%d/%Y')
                                                    })
 
-
+@can_take_oef
 @login_required
 def save_answer(request):
     """
