@@ -8,6 +8,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.tests.factories import UserFactory
+from lms.djangoapps.completion.models import BlockCompletion
 
 class CompletionTraverser:
 
@@ -28,10 +29,10 @@ class CompletionTraverser:
 
 
     def _compute_completion_at_block(self, current_block_name):
-        if self._block_is_visited(current_block_name):
-            return
+        # if self._block_is_visited(current_block_name):
+        #     return
 
-        self._mark_block_as_visited(current_block_name)
+        # self._mark_block_as_visited(current_block_name)
 
         current_block = self._get_block(current_block_name)
         names_of_children = current_block.get('children', None)
@@ -76,7 +77,7 @@ class Command(BaseCommand):
         # Course has same contents as MIT's 6.001x:
         # https://www.edx.org/course/introduction-computer-science-mitx-6-00-1x-11
         course_name = 'course-v1:wert+qw4tqw4t+qertqert'
-        course_name = 'course-v1:MITx+8.Mech+Spring2018'
+        course_name = 'course-v1:Sandro+8.Mech+Spring2018'
         course_usage_key = self._create_course_usage_key(course_name)
 
         user = UserFactory.create(
@@ -85,15 +86,19 @@ class Command(BaseCommand):
             )
         site = SiteFactory.create()
 
-
         with emulate_http_request(site, user) as request:
-            import cProfile
+
+            completion_value_ORM = BlockCompletion.objects.filter(
+                user=user,
+                course_key=CourseKey.from_string(course_name)
+                )
+            all_values = completion_value_ORM[:]
 
             api_raw_course_data = get_blocks(
                 request, 
                 course_usage_key,
                 user=user,
-                requested_fields=['completion', 'children']
+                requested_fields=[ 'children']
             )
             name_of_course_root = api_raw_course_data['root']
             course_blocks = api_raw_course_data['blocks']
