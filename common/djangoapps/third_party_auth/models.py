@@ -430,6 +430,7 @@ class SAMLProviderConfig(ProviderConfig):
             'in the "Identity Provider Type" field, may make use of the information stored '
             'in this field for additional configuration.'
         ))
+    archived = models.BooleanField(default=False)
 
     def clean(self):
         """ Standardize and validate fields """
