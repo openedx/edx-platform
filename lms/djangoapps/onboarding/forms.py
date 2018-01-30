@@ -619,10 +619,11 @@ class RegModelForm(BaseOnboardingModelForm):
         org_admin_email = self.cleaned_data['org_admin_email']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
+        is_currently_unemployed = self.cleaned_data['is_currently_employed']
 
         extended_profile = UserExtendedProfile.objects.create(user=user)
 
-        if organization_name:
+        if not is_currently_unemployed and organization_name:
             organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
             extended_profile.organization = organization_to_assign
             if is_created:
@@ -664,15 +665,19 @@ class UpdateRegModelForm(RegModelForm):
     def save(self, user=None, commit=True):
         organization_name = self.cleaned_data.get('organization_name', '').strip()
         is_poc = self.cleaned_data['is_poc']
-        org_admin_email = self.cleaned_data['org_admin_email']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
+        is_currently_unemployed = self.cleaned_data['is_currently_employed']
 
         extended_profile = UserExtendedProfile.objects.get(user=user)
 
-        if organization_name:
+        if not is_currently_unemployed and organization_name:
             organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            prev_org = extended_profile.organization
             extended_profile.organization = organization_to_assign
+
+            if not prev_org == organization_to_assign:
+                extended_profile.is_organization_metrics_submitted = False
 
             if user and is_poc == '1' and admin_not_assigned_or_me(user, organization_to_assign):
                 Organization.objects.filter(admin=user).update(admin=None)
@@ -682,6 +687,14 @@ class UpdateRegModelForm(RegModelForm):
             if not is_poc == '1':
                 if organization_to_assign.admin == user:
                     organization_to_assign.admin = None
+
+        elif is_currently_unemployed:
+            if extended_profile.organization and extended_profile.organization.admin == user:
+                extended_profile.organization.admin = None
+                extended_profile.organization.save()
+
+            extended_profile.organization = None
+            extended_profile.is_organization_metrics_submitted = False
 
         user.first_name = first_name
         user.last_name = last_name
