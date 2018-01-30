@@ -8,7 +8,7 @@ define([], function() {
             throw Error(
                 'window.pageFactoryArguments must be initialized before calling invokePageFactory(' +
                 name +
-                '). Use the <%static:require_page> template tag.'
+                '). Use the <%static:invoke_page_bundle> template tag.'
             );
         }
         args = window.pageFactoryArguments[name];
@@ -19,7 +19,7 @@ define([], function() {
                 name +
                 '"] must be initialized before calling invokePageFactory(' +
                 name +
-                '). Use the <%static:require_page> template tag.'
+                '). Use the <%static:invoke_page_bundle> template tag.'
             );
         }
         factory.apply(null, window.pageFactoryArguments[name]);

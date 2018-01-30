@@ -121,29 +121,30 @@ from openedx.core.djangolib.markup import HTML
     <%block name="modal_placeholder"></%block>
 
     <%block name="jsextra"></%block>
-    <script type="text/javascript">
-      require(['js/factories/base'], function () {
-          require(['js/models/course'], function(Course) {
-              % if context_course:
-                  window.course = new Course({
-                      id: "${context_course.id | n, js_escaped_string}",
-                      name: "${context_course.display_name_with_default | n, js_escaped_string}",
-                      url_name: "${context_course.location.block_id | n, js_escaped_string}",
-                      org: "${context_course.location.org | n, js_escaped_string}",
-                      num: "${context_course.location.course | n, js_escaped_string}",
-                      display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
-                      revision: "${context_course.location.branch | n, js_escaped_string}",
-                      self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
-                  });
-              % endif
-              % if user.is_authenticated():
-                  require(['js/sock']);
-              % endif
-              <%block name='requirejs'></%block>
-          });
-      });
+    <%block name="page_bundle">
+        <script type="text/javascript">
+        require(['js/factories/base'], function () {
+            require(['js/models/course'], function(Course) {
+                % if context_course:
+                    window.course = new Course({
+                        id: "${context_course.id | n, js_escaped_string}",
+                        name: "${context_course.display_name_with_default | n, js_escaped_string}",
+                        url_name: "${context_course.location.block_id | n, js_escaped_string}",
+                        org: "${context_course.location.org | n, js_escaped_string}",
+                        num: "${context_course.location.course | n, js_escaped_string}",
+                        display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
+                        revision: "${context_course.location.branch | n, js_escaped_string}",
+                        self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
+                    });
+                % endif
+                % if user.is_authenticated():
+                    require(['js/sock']);
+                % endif
+                <%block name='requirejs'></%block>
+            });
+        });
     </script>
-    <%block name='requirejs_page'></%block>
+    </%block>
     <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
   </body>
