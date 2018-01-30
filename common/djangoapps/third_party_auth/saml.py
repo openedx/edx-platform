@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
 from django_countries import countries
+from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
 
@@ -37,6 +38,62 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return self._config.get_setting(name)
         except KeyError:
             return self.strategy.setting(name, default, backend=self)
+
+    def get_idp_setting(self, idp, name, default=None):
+        try:
+            return idp.saml_sp_configuration.get_setting(name)
+        except KeyError:
+            return self.setting(name, default)
+
+    def generate_saml_config(self, idp=None):
+        """
+        Override of SAMLAuth.generate_saml_config to use an idp's configured saml_sp_configuration if given.
+        """
+        if idp:
+            abs_completion_url = self.redirect_uri
+            config = {
+                'contactPerson': {
+                    'technical': self.get_idp_setting(idp, 'TECHNICAL_CONTACT'),
+                    'support': self.get_idp_setting(idp, 'SUPPORT_CONTACT')
+                },
+                'debug': True,
+                'idp': idp.saml_config_dict if idp else {},
+                'organization': self.get_idp_setting(idp, 'ORG_INFO'),
+                'security': {
+                    'metadataValidUntil': '',
+                    'metadataCacheDuration': 'P10D',  # metadata valid for ten days
+                },
+                'sp': {
+                    'assertionConsumerService': {
+                        'url': abs_completion_url,
+                        # python-saml only supports HTTP-POST
+                        'binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
+                    },
+                    'entityId': self.get_idp_setting(idp, 'SP_ENTITY_ID'),
+                    'x509cert': self.get_idp_setting(idp, 'SP_PUBLIC_CERT'),
+                    'privateKey': self.get_idp_setting(idp, 'SP_PRIVATE_KEY'),
+                },
+                'strict': True,  # We must force strict mode - for security
+            }
+            config["security"].update(self.get_idp_setting(idp, "SECURITY_CONFIG", {}))
+            config["sp"].update(self.get_idp_setting(idp, "SP_EXTRA", {}))
+            return config
+        else:
+            return super(SAMLAuthBackend, self).generate_saml_config()
+
+    def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
+        """
+        Override of SAMLAuth.generate_metadata_xml to accept an optional idp parameter.
+        """
+        idp = self.get_idp(idp_name) if idp_name else None
+        config = self.generate_saml_config(idp)
+        saml_settings = OneLogin_Saml2_Settings(
+            config,
+            sp_validation_only=True
+        )
+        metadata = saml_settings.get_sp_metadata()
+        errors = saml_settings.validate_metadata(metadata)
+        return metadata, errors
 
     def auth_url(self):
         """
@@ -98,7 +155,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
     @cached_property
     def _config(self):
         from .models import SAMLConfiguration
-        return SAMLConfiguration.current(Site.objects.get_current(get_current_request()))
+        return SAMLConfiguration.current(Site.objects.get_current(get_current_request()), 'default')
 
 
 class EdXSAMLIdentityProvider(SAMLIdentityProvider):
@@ -119,6 +176,11 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
             for field in extra_field_definitions
         })
         return details
+
+    @property
+    def saml_sp_configuration(self):
+        """Get the SAMLConfiguration for this IdP"""
+        return self.conf['saml_sp_configuration']
 
 
 class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):

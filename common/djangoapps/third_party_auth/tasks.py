@@ -52,12 +52,13 @@ def fetch_saml_metadata():
     url_map = {}
     for idp_slug in saml_providers:
         config = SAMLProviderConfig.current(idp_slug)
+        saml_config_slug = config.saml_configuration.slug if config.saml_configuration else 'default'
 
         # Skip SAML provider configurations which do not qualify for fetching
         if any([
             not config.enabled,
             not config.automatic_refresh_enabled,
-            not SAMLConfiguration.is_enabled(config.site)
+            not SAMLConfiguration.is_enabled(config.site, saml_config_slug)
         ]):
             num_skipped += 1
             continue

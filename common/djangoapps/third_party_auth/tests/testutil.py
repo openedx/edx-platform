@@ -86,7 +86,7 @@ class ThirdPartyAuthTestMixin(object):
     def configure_saml_provider(self, **kwargs):
         """ Update the settings for a SAML-based third party auth provider """
         self.assertTrue(
-            SAMLConfiguration.is_enabled(Site.objects.get_current()),
+            SAMLConfiguration.is_enabled(Site.objects.get_current(), 'default'),
             "SAML Provider Configuration only works if SAML is enabled."
         )
         obj = SAMLProviderConfig(**kwargs)
