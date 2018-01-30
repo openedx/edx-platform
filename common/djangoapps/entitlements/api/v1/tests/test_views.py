@@ -350,20 +350,6 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
         self.course2 = CourseFactory.create(org='edX', number='DemoX2', display_name='Demo_Course 2')
 
-        self.course_mode = CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.VERIFIED,
-            # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=now() + timedelta(days=1)
-        )
-
-        self.course_mode = CourseModeFactory(
-            course_id=self.course2.id,
-            mode_slug=CourseMode.VERIFIED,
-            # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=now() + timedelta(days=1)
-        )
-
         self.return_values = [
             {'key': str(self.course.id)},
             {'key': str(self.course2.id)}
@@ -371,7 +357,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_can_enroll(self, mock_get_course_runs):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -395,7 +381,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_can_unenroll(self, mock_get_course_runs):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
 
         url = reverse(
@@ -430,7 +416,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_can_switch(self, mock_get_course_runs):
         mock_get_course_runs.return_value = self.return_values
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
 
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -467,7 +453,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_already_enrolled(self, mock_get_course_runs):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
 
         url = reverse(
@@ -488,13 +474,16 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
         assert response.status_code == 201
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+
+        course_entitlement.refresh_from_db()
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is not None
 
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_cannot_enroll_in_unknown_course_run_id(self, mock_get_course_runs):
         fake_course_str = str(self.course.id) + 'fake'
         fake_course_key = CourseKey.from_string(fake_course_str)
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
 
         url = reverse(
@@ -519,7 +508,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     def test_user_can_revoke_and_refund(self, mock_get_course_runs, mock_refund_entitlement):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
 
         url = reverse(
@@ -566,7 +555,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
             mock_refund_entitlement,
             mock_is_refundable
     ):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
 
         url = reverse(
@@ -610,7 +599,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
             mock_refund_entitlement,
             mock_is_refundable
     ):
-        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user)
         mock_get_course_runs.return_value = self.return_values
 
         url = reverse(

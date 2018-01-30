@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from django.db import IntegrityError, transaction
@@ -7,7 +6,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from rest_framework import permissions, viewsets, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
@@ -16,7 +14,6 @@ from entitlements.api.v1.filters import CourseEntitlementFilter
 from entitlements.api.v1.permissions import IsAdminOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import CourseEntitlementSerializer
 from entitlements.models import CourseEntitlement
-from entitlements.utils import is_course_run_entitlement_fullfillable
 from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -321,8 +318,9 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                 }
             )
 
+        # Determine if this is a Switch session or a simple enroll and handle both.
         try:
-            course_run_key = CourseKey.from_string(course_run_id)
+            course_run_string = CourseKey.from_string(course_run_id)
         except InvalidKeyError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
@@ -330,23 +328,10 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
                     'message': 'Invalid {course_id}'.format(course_id=course_run_id)
                 }
             )
-
-        # Verify that the run is fullfillable
-        if not is_course_run_entitlement_fullfillable(course_run_key, entitlement):
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={
-                    'message': 'The User is unable to enroll in Course Run {course_id}, it is not available.'.format(
-                        course_id=course_run_id
-                    )
-                }
-            )
-
-        # Determine if this is a Switch session or a simple enroll and handle both.
         if entitlement.enrollment_course_run is None:
             response = self._enroll_entitlement(
                 entitlement=entitlement,
-                course_run_key=course_run_key,
+                course_run_key=course_run_string,
                 user=request.user
             )
             if response:
@@ -358,7 +343,7 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             )
             response = self._enroll_entitlement(
                 entitlement=entitlement,
-                course_run_key=course_run_key,
+                course_run_key=course_run_string,
                 user=request.user
             )
             if response:
