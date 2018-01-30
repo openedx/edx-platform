@@ -194,7 +194,7 @@ class LearnerAnalyticsView(View):
         """
         try:
             context = create_user_profile_context(request, course_key, request.user.id)
-        except CommentClient500Error:
+        except Exception as e:
             # TODO: LEARNER-3854: Clean-up error handling if continuing support.
             return {
                 'content_authored': 0,
