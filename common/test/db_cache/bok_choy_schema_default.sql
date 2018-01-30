@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=399 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2387,7 +2387,7 @@ CREATE TABLE `edxval_videotranscript` (
   `language_code` varchar(50) NOT NULL,
   `provider` varchar(30) NOT NULL,
   `file_format` varchar(20) NOT NULL,
-  `video_id` int(11),
+  `video_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `edxval_videotranscript_video_id_729fab369c0f7028_uniq` (`video_id`,`language_code`),
   KEY `edxval_videotranscript_60716c2f` (`language_code`),
@@ -2643,8 +2643,8 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `day_of_month` smallint(6) DEFAULT NULL,
   `day_of_week` smallint(6) DEFAULT NULL,
   `hour_of_day` smallint(6) NOT NULL,
-  `initialization_vector` longblob NOT NULL,
-  `password` longblob NOT NULL,
+  `initialization_vector` longblob,
+  `password` longblob,
   `enterprise_customer_id` char(32) NOT NULL,
   `sftp_file_path` varchar(256) DEFAULT NULL,
   `sftp_hostname` varchar(256) DEFAULT NULL,
@@ -5284,6 +5284,7 @@ CREATE TABLE `third_party_auth_samlproviderconfig` (
   `skip_hinted_login_dialog` tinyint(1) NOT NULL,
   `send_to_registration_first` tinyint(1) NOT NULL,
   `sync_learner_profile_data` tinyint(1) NOT NULL,
+  `archived` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_508190ecd0b0e845_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_samlproviderconfig_098674f1` (`idp_slug`),
