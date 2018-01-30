@@ -128,6 +128,7 @@
             'tooltip_manager': 'js/src/tooltip_manager',
             'draggabilly': 'js/vendor/draggabilly',
             'hls': 'common/js/vendor/hls',
+            'lang_edx': 'js/src/lang_edx',
 
             // externally hosted files
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
