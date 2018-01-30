@@ -21,15 +21,15 @@
 </%block>
 
 % if not waffle_flag_enabled:
-<%block name="requirejs">
-    require(["js/factories/asset_index"], function (AssetIndexFactory) {
-        AssetIndexFactory({
-          assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
-          uploadChunkSizeInMBs: ${chunk_size_in_mbs|n, dump_js_escaped_json},
-          maxFileSizeInMBs: ${max_file_size_in_mbs|n, dump_js_escaped_json},
-          maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
-        });
-    });
+<%block name="requirejs_page">
+    <%static:require_page page_name="js/pages/asset_index" class_name="AssetIndexFactory">
+        {
+            assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
+            uploadChunkSizeInMBs: ${ chunk_size_in_mbs| n, dump_js_escaped_json },
+            maxFileSizeInMBs: ${ max_file_size_in_mbs| n, dump_js_escaped_json },
+            maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
+        }
+    </%static:require_page>
 </%block>
 % endif
 

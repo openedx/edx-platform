@@ -17,7 +17,7 @@
          * done.
          */
         modules: getModulesList([
-            'js/factories/asset_index',
+            'js/pages/asset_index',
             'js/factories/base',
             'js/factories/container',
             'js/factories/course_create_rerun',
@@ -37,7 +37,8 @@
             'js/factories/settings_graders',
             'js/factories/textbooks',
             'js/factories/videos_index',
-            'js/factories/xblock_validation'
+            'js/factories/xblock_validation',
+            'js/sock'
         ]),
         /**
          * By default all the configuration for optimization happens from the command
