@@ -12,7 +12,6 @@ LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
 def get_logger_config(log_dir,
                       logging_env="no_env",
-                      syslog_addr=None,
                       local_loglevel='INFO',
                       console_loglevel=None,
                       service_variant=""):
@@ -42,9 +41,6 @@ def get_logger_config(log_dir,
                                              hostname=hostname)
 
     handlers = ['console', 'local']
-    if syslog_addr:
-        handlers.append('syslogger-remote')
-
     logger_config = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -92,15 +88,6 @@ def get_logger_config(log_dir,
             },
         }
     }
-    if syslog_addr:
-        logger_config['handlers'].update({
-            'syslogger-remote': {
-                'level': 'INFO',
-                'class': 'logging.handlers.SysLogHandler',
-                'address': syslog_addr,
-                'formatter': 'syslog_format',
-            },
-        })
 
     # for production environments we will only
     # log INFO and up
