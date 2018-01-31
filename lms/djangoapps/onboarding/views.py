@@ -218,17 +218,21 @@ def organization(request):
         'is_org_url_exist': '1' if _organization.url else '0',
         'partner_networks': _organization.organization_partners.values_list('partner', flat=True),
     }
-
+    old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
     if request.method == 'POST':
         form = forms.OrganizationInfoForm(request.POST, instance=_organization, initial=initial)
 
         if form.is_valid():
             form.save(request)
-
+            old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
             if user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE:
+                # redirect to organization detail page
                 next_page_url = reverse('org_detail_survey')
+            else:
+                #update nodebb for user profile completion
+                update_nodebb_for_user_status(request.user.username)
 
             if redirect_to_next:
                 return redirect(next_page_url)
@@ -236,7 +240,7 @@ def organization(request):
     else:
         form = forms.OrganizationInfoForm(instance=_organization, initial=initial)
 
-    context = {'form': form, 'are_forms_complete': are_forms_complete}
+    context = {'form': form, 'are_forms_complete': are_forms_complete, 'old_url': old_url}
 
     organization = user_extended_profile.organization
     context.update(user_extended_profile.unattended_surveys())
