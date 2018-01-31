@@ -6,7 +6,8 @@ import logging
 from urlparse import urlparse, urlunparse
 
 from django.db import models, transaction
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField, \
+    CharField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
 
@@ -43,7 +44,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 4
+    VERSION = 5
 
     # Cache entry versioning.
     version = IntegerField()
@@ -97,6 +98,7 @@ class CourseOverview(TimeStampedModel):
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
+    language = CharField(max_length=255, null=True)
 
     @classmethod
     def _create_from_course(cls, course):
@@ -181,6 +183,7 @@ class CourseOverview(TimeStampedModel):
             effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
             course_video_url=CourseDetails.fetch_video_url(course.id),
             self_paced=course.self_paced,
+            language=course.language,
         )
 
     @classmethod
