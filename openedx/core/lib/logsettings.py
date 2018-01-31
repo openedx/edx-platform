@@ -36,7 +36,6 @@ def get_logger_config(log_dir,
                                              logging_env=logging_env,
                                              hostname=hostname)
 
-    handlers = ['console', 'local']
     logger_config = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -87,7 +86,7 @@ def get_logger_config(log_dir,
                 'propagate': False,
             },
             '': {
-                'handlers': handlers,
+                'handlers': ['console', 'local'],
                 'level': 'INFO',
                 'propagate': False
             },
