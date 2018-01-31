@@ -16,7 +16,6 @@ def get_logger_config(log_dir,
                       edx_filename="edx.log",
                       dev_env=False,
                       syslog_addr=None,
-                      debug=False,
                       local_loglevel='INFO',
                       console_loglevel=None,
                       service_variant=None):
@@ -42,7 +41,7 @@ def get_logger_config(log_dir,
         local_loglevel = 'INFO'
 
     if console_loglevel is None or console_loglevel not in LOG_LEVELS:
-        console_loglevel = 'DEBUG' if debug else 'INFO'
+        console_loglevel = 'INFO'
 
     if service_variant is None:
         # default to a blank string so that if SERVICE_VARIANT is not

@@ -345,7 +345,6 @@ local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             local_loglevel=local_loglevel,
-                            debug=False,
                             service_variant=SERVICE_VARIANT)
 
 COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
