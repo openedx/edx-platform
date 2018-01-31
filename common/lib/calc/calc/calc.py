@@ -349,10 +349,19 @@ class ParseAugmenter(object):
         # Predefine recursive variables.
         expr = Forward()
 
-        # Handle variables passed in. They must start with letters/underscores
-        # and may contain numbers afterward.
-        inner_varname = Word(alphas + "_", alphanums + "_")
-        varname = Group(inner_varname)("variable")
+        # Handle variables passed in. They must start with a letter
+        # and may contain numbers and underscores afterward.
+        inner_varname = Combine(Word(alphas, alphanums + "_") + ZeroOrMore("'"))
+        # Alternative variable name in tensor format
+        # Tensor name must start with a letter, continue with alphanums
+        # Indices may be alphanumeric
+        # e.g., U_{ijk}^{123}
+        upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
+        lower_indices = Literal("_{") + Word(alphanums) + Literal("}")
+        tensor_lower = Combine(Word(alphas, alphanums) + lower_indices + ZeroOrMore("'"))
+        tensor_mixed = Combine(Word(alphas, alphanums) + Optional(lower_indices) + upper_indices + ZeroOrMore("'"))
+        # Test for mixed tensor first, then lower tensor alone, then generic variable name
+        varname = Group(tensor_mixed | tensor_lower | inner_varname)("variable")
         varname.setParseAction(self.variable_parse_action)
 
         # Same thing for functions.
