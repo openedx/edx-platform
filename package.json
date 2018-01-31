@@ -40,6 +40,7 @@
     "react": "15.6.2",
     "react-dom": "15.6.2",
     "react-slick": "0.16.0",
+    "react-websocket": "^2.0.0",
     "requirejs": "2.3.5",
     "rtlcss": "2.2.1",
     "sass-loader": "6.0.6",
