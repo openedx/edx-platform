@@ -13,7 +13,6 @@ LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 def get_logger_config(log_dir,
                       logging_env="no_env",
                       local_loglevel='INFO',
-                      console_loglevel=None,
                       service_variant=""):
 
     """
@@ -28,9 +27,6 @@ def get_logger_config(log_dir,
     # Revert to INFO if an invalid string is passed in
     if local_loglevel not in LOG_LEVELS:
         local_loglevel = 'INFO'
-
-    if console_loglevel is None or console_loglevel not in LOG_LEVELS:
-        console_loglevel = 'INFO'
 
     hostname = platform.node().split(".")[0]
     syslog_format = ("[service_variant={service_variant}]"
@@ -59,7 +55,7 @@ def get_logger_config(log_dir,
         },
         'handlers': {
             'console': {
-                'level': console_loglevel,
+                'level': 'INFO',
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
                 'stream': sys.stderr,
