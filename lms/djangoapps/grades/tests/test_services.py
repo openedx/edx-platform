@@ -217,6 +217,25 @@ class GradesServiceTests(ModuleStoreTestCase):
             )
         )
 
+    @freeze_time('2018-01-01')
+    def test_undo_override_subsection_grade_without_grade(self):
+        """
+        Test exception handling of `undo_override_subsection_grade` when PersistentSubsectionGrade
+        does not exist.
+        """
+
+        self.grade.delete()
+        try:
+            self.service.undo_override_subsection_grade(
+                user_id=self.user.id,
+                course_key_or_id=self.course.id,
+                usage_key_or_id=self.subsection.location,
+            )
+        except PersistentSubsectionGrade.DoesNotExist:
+            assert False, 'Exception raised unexpectedly'
+
+        self.assertFalse(self.mock_signal.called)
+
     def test_should_override_grade_on_rejected_exam(self):
         self.assertTrue(self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course'))
         self.mock_waffle_flags.return_value = {
