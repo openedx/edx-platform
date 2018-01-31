@@ -1,35 +1,27 @@
-(function(define) {
-    'use strict';
+import 'jquery';
+import MessageBannerView from 'js/views/message_banner';
+import BookmarksCollection from 'collections/bookmarks';
+import BookmarksListView from 'views/bookmarks_list';
 
-    define(
-        [
-            'jquery',
-            'js/views/message_banner',
-            'course_bookmarks/js/collections/bookmarks',
-            'course_bookmarks/js/views/bookmarks_list'
-        ],
-        function($, MessageBannerView, BookmarksCollection, BookmarksListView) {
-            return function(options) {
-                var courseId = options.courseId,
-                    bookmarksApiUrl = options.bookmarksApiUrl,
-                    bookmarksCollection = new BookmarksCollection([],
-                        {
-                            course_id: courseId,
-                            url: bookmarksApiUrl
-                        }
-                    );
-                var bookmarksView = new BookmarksListView(
-                    {
-                        $el: options.$el,
-                        collection: bookmarksCollection,
-                        loadingMessageView: new MessageBannerView({el: $('#loading-message')}),
-                        errorMessageView: new MessageBannerView({el: $('#error-message')})
-                    }
+function CourseBookmarksFactory(options) {
+  let courseId = options.courseId;
+  let bookmarksApiUrl = options.bookmarksApiUrl;
+  let bookmarksCollection = new BookmarksCollection([], {
+    course_id: courseId,
+    url: bookmarksApiUrl,
+      }
+  );
+  const bookmarksView = new BookmarksListView(
+    {
+      $el: options.$el,
+      collection: bookmarksCollection,
+      loadingMessageView: new MessageBannerView({ el: $('#loading-message') }),
+      errorMessageView: new MessageBannerView({ el: $('#error-message') }),
+    },
                 );
-                bookmarksView.render();
-                bookmarksView.showBookmarks();
-                return bookmarksView;
-            };
-        }
-    );
-}).call(this, define || RequireJS.define);
+  bookmarksView.render();
+  bookmarksView.showBookmarks();
+  return bookmarksView;
+}
+
+export { CourseBookmarksFactory as default };
