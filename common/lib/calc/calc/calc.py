@@ -30,6 +30,11 @@ from pyparsing import (
 
 import functions
 
+# Functions available by default
+# We use scimath variants which give complex results when needed. For example:
+#   np.sqrt(-4+0j) = 2j
+#   np.sqrt(-4) = nan, but
+#   np.lib.scimath.sqrt(-4) = 2j
 DEFAULT_FUNCTIONS = {
     'sin': numpy.sin,
     'cos': numpy.cos,
@@ -37,13 +42,13 @@ DEFAULT_FUNCTIONS = {
     'sec': functions.sec,
     'csc': functions.csc,
     'cot': functions.cot,
-    'sqrt': numpy.sqrt,
-    'log10': numpy.log10,
-    'log2': numpy.log2,
-    'ln': numpy.log,
+    'sqrt': numpy.lib.scimath.sqrt,
+    'log10': numpy.lib.scimath.log10,
+    'log2': numpy.lib.scimath.log2,
+    'ln': numpy.lib.scimath.log,
     'exp': numpy.exp,
-    'arccos': numpy.arccos,
-    'arcsin': numpy.arcsin,
+    'arccos': numpy.lib.scimath.arccos,
+    'arcsin': numpy.lib.scimath.arcsin,
     'arctan': numpy.arctan,
     'arcsec': functions.arcsec,
     'arccsc': functions.arccsc,
@@ -59,11 +64,12 @@ DEFAULT_FUNCTIONS = {
     'coth': functions.coth,
     'arcsinh': numpy.arcsinh,
     'arccosh': numpy.arccosh,
-    'arctanh': numpy.arctanh,
+    'arctanh': numpy.lib.scimath.arctanh,
     'arcsech': functions.arcsech,
     'arccsch': functions.arccsch,
     'arccoth': functions.arccoth
 }
+
 DEFAULT_VARIABLES = {
     'i': numpy.complex(0, 1),
     'j': numpy.complex(0, 1),
