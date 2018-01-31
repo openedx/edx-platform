@@ -102,3 +102,10 @@ site_status_msg = get_site_status_msg(course_id)
         </form>
     % endif
 % endif
+
+% if uses_bootstrap:
+    ${static.renderReact(
+      component="LMSHeader",
+      id="header-container",
+    )}
+% endif

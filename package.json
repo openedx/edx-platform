@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@edx/edx-bootstrap": "0.4.3",
+    "@edx/header": "arizzitano/header",
     "@edx/paragon": "1.7.1",
     "@edx/studio-frontend": "0.8.6",
     "babel-core": "6.26.0",
