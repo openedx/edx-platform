@@ -87,8 +87,7 @@
                             viewLabel: gettext('Profile')
                         });
 
-                        this.tabbedView.render();
-                        this.$el.find('.account-settings-container').append(this.tabbedView.el);
+                        this.$el.find('.wrapper-profile-bio').html(this.tabbedView.render().el);
 
                         if (this.firstRender) {
                             this.router.on('route:loadTab', _.bind(this.setActiveTab, this));
