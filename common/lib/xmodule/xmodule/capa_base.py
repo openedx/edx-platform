@@ -554,7 +554,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                     url=cgi.escape(text_type(self.location)))
             )
             msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(text_type(err)))
-            msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
+            msg += u'<p><pre>{tb}</pre></p>'.format(tb=traceback.format_exc())
             html = msg
 
         else:
@@ -1238,17 +1238,17 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # the full exception, including traceback,
             # in the response
             if self.runtime.user_is_staff:
-                msg = u"Staff debug info: {tb}".format(tb=cgi.escape(traceback.format_exc()))
+                msg = u"Staff debug info: {tb}".format(tb=traceback.format_exc())
 
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                escaped_message = cgi.escape(inst.args[0])
+                full_error = inst.args[0]
                 try:
                     # only return the error value of the exception
-                    msg = escaped_message.split("\\n")[-2].split(": ", 1)[1]
+                    msg = full_error.split("\\n")[-2].split(": ", 1)[1]
                 except IndexError:
-                    msg = escaped_message
+                    msg = full_error
 
             return {'success': msg}
 
