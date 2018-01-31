@@ -20,9 +20,7 @@ from django.utils.translation import ugettext as _
     <section class="sock" id="sock" aria-labelledby="sock-heading">
       <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
       <%
-        links = get_sock_links()
-        links_extra = get_sock_links_extra()
-        links.extend(links_extra)
+        links = get_sock_links() + get_sock_links_extra()
       %>
       <div class="support">
         <ul class="list-actions">
