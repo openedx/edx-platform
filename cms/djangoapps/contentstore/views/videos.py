@@ -6,6 +6,7 @@ import json
 import logging
 from contextlib import closing
 from datetime import datetime, timedelta
+from pytz import UTC
 from uuid import uuid4
 
 import rfc6266
@@ -505,7 +506,11 @@ def convert_video_status(video):
         *   `YouTube Duplicate` if status is `invalid_token`
         *   user-friendly video status
     """
-    now = datetime.now(video['created'].tzinfo)
+    try:
+        # Protect against legacy incomplete edx-val edx_video_id records.
+        now = datetime.now(video['created'].tzinfo)
+    except AttributeError:
+        now = datetime.now().replace(tzinfo=UTC)
     if video['status'] == 'upload' and (now - video['created']) > timedelta(hours=MAX_UPLOAD_HOURS):
         new_status = 'upload_failed'
         status = StatusDisplayStrings.get(new_status)
