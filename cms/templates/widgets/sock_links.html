@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext as _
 %>
+<%namespace file="sock_links_extra.html" import="get_sock_links_extra" />
 
 <%def name="get_sock_links()">
     <%
@@ -35,6 +36,8 @@ from django.utils.translation import ugettext as _
                 'condition': bool(partner_email)
             }
         ]
+        links_extra = get_sock_links_extra()
+        links += links_extra
         return links
     %>
 </%def>

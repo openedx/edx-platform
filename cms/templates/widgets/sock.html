@@ -4,7 +4,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 %>
 <%namespace file="sock_links.html" import="get_sock_links" />
-<%namespace file="sock_links_extra.html" import="get_sock_links_extra" />
 
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
@@ -20,7 +19,7 @@ from django.utils.translation import ugettext as _
     <section class="sock" id="sock" aria-labelledby="sock-heading">
       <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
       <%
-        links = get_sock_links() + get_sock_links_extra()
+        links = get_sock_links()
       %>
       <div class="support">
         <ul class="list-actions">
