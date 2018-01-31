@@ -70,11 +70,11 @@ END
 }
 
 if [[ $DJANGO_VERSION == '1.11' ]]; then
-    TOX="tox -e py27-django111 --"
+    TOX="tox -r -e py27-django111 --"
 elif [[ $DJANGO_VERSION == '1.10' ]]; then
-    TOX="tox -e py27-django110 --"
+    TOX="tox -r -e py27-django110 --"
 elif [[ $DJANGO_VERSION == '1.9' ]]; then
-    TOX="tox -e py27-django19 --"
+    TOX="tox -r -e py27-django19 --"
 else
     TOX=""
 fi
