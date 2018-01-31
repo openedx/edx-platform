@@ -14,7 +14,6 @@ def get_logger_config(log_dir,
                       logging_env="no_env",
                       tracking_filename="tracking.log",
                       edx_filename="edx.log",
-                      dev_env=False,
                       syslog_addr=None,
                       local_loglevel='INFO',
                       console_loglevel=None,
@@ -27,9 +26,6 @@ def get_logger_config(log_dir,
     this way instead of registering directly is because I didn't want to worry
     about resetting the logging state if this is called multiple times when
     settings are extended.
-
-    If dev_env is set to true logging will not be done via local rsyslogd,
-    instead, tracking and application logs will be dropped in log_dir.
 
     "tracking_filename" and "edx_filename" are ignored unless dev_env
     is set to true since otherwise logging is handled by rsyslogd.
@@ -112,49 +108,27 @@ def get_logger_config(log_dir,
             },
         })
 
-    if dev_env:
-        tracking_file_loc = os.path.join(log_dir, tracking_filename)
-        edx_file_loc = os.path.join(log_dir, edx_filename)
-        logger_config['handlers'].update({
-            'local': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'level': local_loglevel,
-                'formatter': 'standard',
-                'filename': edx_file_loc,
-                'maxBytes': 1024 * 1024 * 2,
-                'backupCount': 5,
-            },
-            'tracking': {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': tracking_file_loc,
-                'formatter': 'raw',
-                'maxBytes': 1024 * 1024 * 2,
-                'backupCount': 5,
-            },
-        })
-    else:
-        # for production environments we will only
-        # log INFO and up
-        logger_config['loggers']['']['level'] = 'INFO'
-        # requests is so loud at INFO (logs every connection) that we force it to warn in production environments
-        logger_config['loggers']['requests.packages.urllib3'] = {'level': 'WARN'}
-        logger_config['handlers'].update({
-            'local': {
-                'level': local_loglevel,
-                'class': 'logging.handlers.SysLogHandler',
-                'address': '/dev/log',
-                'formatter': 'syslog_format',
-                'facility': SysLogHandler.LOG_LOCAL0,
-            },
-            'tracking': {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.SysLogHandler',
-                'address': '/dev/log',
-                'facility': SysLogHandler.LOG_LOCAL1,
-                'formatter': 'raw',
-            },
-        })
+    # for production environments we will only
+    # log INFO and up
+    logger_config['loggers']['']['level'] = 'INFO'
+    # requests is so loud at INFO (logs every connection) that we force it to warn in production environments
+    logger_config['loggers']['requests.packages.urllib3'] = {'level': 'WARN'}
+    logger_config['handlers'].update({
+        'local': {
+            'level': local_loglevel,
+            'class': 'logging.handlers.SysLogHandler',
+            'address': '/dev/log',
+            'formatter': 'syslog_format',
+            'facility': SysLogHandler.LOG_LOCAL0,
+        },
+        'tracking': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'address': '/dev/log',
+            'facility': SysLogHandler.LOG_LOCAL1,
+            'formatter': 'raw',
+        },
+    })
 
     return logger_config
 
