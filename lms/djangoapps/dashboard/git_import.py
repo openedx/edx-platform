@@ -33,7 +33,7 @@ class GitImportError(Exception):
 
     def __init__(self, message=None):
         if message is None:
-            message = self.message
+            message = self.MESSAGE
         super(GitImportError, self).__init__(message)
 
 

@@ -15,6 +15,7 @@ from pytz import UTC
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
+from six import text_type
 
 import util.file
 from util.file import (
@@ -95,7 +96,7 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Helper method to verify exception text.
         """
-        self.assertEqual(expected_message, error.exception.message)
+        self.assertEqual(expected_message, text_type(error.exception))
 
     def test_error_conditions(self):
         """

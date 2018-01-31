@@ -18,6 +18,7 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
+from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -574,8 +575,8 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                             value = field.from_json(value)
                         except ValueError as verr:
                             reason = _("Invalid data")
-                            if verr.message:
-                                reason = _("Invalid data ({details})").format(details=verr.message)
+                            if text_type(verr):
+                                reason = _("Invalid data ({details})").format(details=text_type(verr))
                             return JsonResponse({"error": reason}, 400)
 
                         field.write_to(xblock, value)

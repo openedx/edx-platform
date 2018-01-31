@@ -958,7 +958,7 @@ def create_account(request, post_override=None):
     try:
         user = create_account_with_params(request, post_override or request.POST)
     except AccountValidationError as exc:
-        return JsonResponse({'success': False, 'value': exc.message, 'field': exc.field}, status=400)
+        return JsonResponse({'success': False, 'value': text_type(exc), 'field': exc.field}, status=400)
     except ValidationError as exc:
         field, error_list = next(iteritems(exc.message_dict))
         return JsonResponse(

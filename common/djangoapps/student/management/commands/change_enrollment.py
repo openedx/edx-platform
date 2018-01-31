@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from student.models import CourseEnrollment, User
 
@@ -135,4 +136,4 @@ class Command(BaseCommand):
         if len(error_users) > 0:
             logger.info('The following %i user(s) not saved:', len(error_users))
             for user, error in error_users:
-                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, error.message)
+                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, text_type(error))

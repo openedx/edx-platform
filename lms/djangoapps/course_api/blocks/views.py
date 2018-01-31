@@ -7,6 +7,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from six import text_type
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -215,7 +216,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 )
             )
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(exception.message))
+            raise Http404("Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes()

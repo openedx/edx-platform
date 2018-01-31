@@ -11,6 +11,7 @@ from rest_framework import status
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
+from six import text_type
 
 from lms.djangoapps.completion.models import BlockCompletion
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
@@ -126,11 +127,11 @@ class CompletionBatchView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         except ObjectDoesNotExist as exc:
             return Response({
-                "detail": exc.message,
+                "detail": text_type(exc),
             }, status=status.HTTP_404_NOT_FOUND)
         except DatabaseError as exc:
             return Response({
-                "detail": exc.message,
+                "detail": text_type(exc),
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"detail": _("ok")}, status=status.HTTP_200_OK)

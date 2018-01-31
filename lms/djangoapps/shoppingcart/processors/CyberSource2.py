@@ -35,6 +35,7 @@ from textwrap import dedent
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
+from six import text_type
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -503,7 +504,7 @@ def _get_processor_exception_html(exception):
                 u"The specific error message is: {msg} "
                 u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
             ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
@@ -514,7 +515,7 @@ def _get_processor_exception_html(exception):
                 u"The specific error message is: {msg}. "
                 u"Your credit card has probably been charged. Contact us with payment-specific questions at {email}."
             ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
@@ -527,7 +528,7 @@ def _get_processor_exception_html(exception):
                 u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
                 u"Your credit card may possibly have been charged. Contact us with payment-specific questions at {email}."
             ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )

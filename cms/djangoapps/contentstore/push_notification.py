@@ -6,6 +6,7 @@ from logging import exception as log_exception
 from uuid import uuid4
 
 from django.conf import settings
+from six import text_type
 
 from contentstore.models import PushNotificationConfig
 from contentstore.tasks import push_course_update_task
@@ -80,4 +81,4 @@ def send_push_course_update(course_key_string, course_subscription_id, course_di
             )
 
         except ParseError as error:
-            log_exception(error.message)
+            log_exception(text_type(error))

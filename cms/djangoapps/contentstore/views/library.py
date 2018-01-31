@@ -17,6 +17,7 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from six import text_type
 
 from contentstore.utils import add_instructor, reverse_library_url
 from contentstore.views.item import create_xblock_info
@@ -164,12 +165,12 @@ def _create_library(request):
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=error.message)
+            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=text_type(error))
         })
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=error.message)
+            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))
         })
     except DuplicateCourseError:
         log.exception("Unable to create library - one already exists with the same key.")

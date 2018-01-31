@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
+from six import text_type
 
 import accounts
 from django_comment_common.models import Role
@@ -150,7 +151,7 @@ class RegistrationView(APIView):
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {
-                err.field: [{"user_message": err.message}]
+                err.field: [{"user_message": text_type(err)}]
             }
             return JsonResponse(errors, status=409)
         except ValidationError as err:

@@ -8,6 +8,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware import courses
@@ -54,7 +55,7 @@ class BasketsView(APIView):
             courses.get_course(course_key)
         except (InvalidKeyError, ValueError)as ex:
             log.exception(u'Unable to locate course matching %s.', course_id)
-            return False, None, ex.message
+            return False, None, text_type(ex)
 
         return True, course_key, None
 

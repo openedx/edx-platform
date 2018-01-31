@@ -12,6 +12,7 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import clone_request
 from rest_framework.response import Response
+from six import text_type
 
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
@@ -66,7 +67,7 @@ class DeveloperErrorViewMixin(object):
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):
-            return self.make_error_response(404, exc.message or "Not found.")
+            return self.make_error_response(404, text_type(exc) or "Not found.")
         elif isinstance(exc, ValidationError):
             return self.make_validation_error_response(exc)
         else:

@@ -10,6 +10,7 @@ from django.http import Http404
 from django.utils.functional import cached_property
 from django_countries import countries
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
+from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
 
@@ -337,7 +338,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             url=transaction_data['endpoint_url'],
             company_id=transaction_data['company_id'],
             user_id=transaction_data['user_id'],
-            err_msg=err.message,
+            err_msg=text_type(err),
             sys_msg=sys_msg,
             headers=headers,
             token_data=token_data,

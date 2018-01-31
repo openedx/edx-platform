@@ -33,6 +33,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
+from six import text_type
 
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from contentstore.views.assets import delete_asset
@@ -423,7 +424,7 @@ def certificates_list_handler(request, course_key_string):
                 try:
                     new_certificate = CertificateManager.deserialize_certificate(course, request.body)
                 except CertificateValidationError as err:
-                    return JsonResponse({"error": err.message}, status=400)
+                    return JsonResponse({"error": text_type(err)}, status=400)
                 if course.certificates.get('certificates') is None:
                     course.certificates['certificates'] = []
                 course.certificates['certificates'].append(new_certificate.certificate_data)
@@ -480,7 +481,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
         try:
             new_certificate = CertificateManager.deserialize_certificate(course, request.body)
         except CertificateValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
+            return JsonResponse({"error": text_type(err)}, status=400)
 
         serialized_certificate = CertificateManager.serialize_certificate(new_certificate)
         cert_event_type = 'created'

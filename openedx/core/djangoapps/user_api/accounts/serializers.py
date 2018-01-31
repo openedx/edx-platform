@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from six import text_type
 
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -313,8 +314,8 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
                 # If we have encountered any validation errors, return them to the user.
                 raise errors.AccountValidationError({
                     'social_links': {
-                        "developer_message": u"Error thrown from adding new social link: '{}'".format(err.message),
-                        "user_message": err.message
+                        "developer_message": u"Error thrown from adding new social link: '{}'".format(text_type(err)),
+                        "user_message": text_type(err)
                     }
                 })
 

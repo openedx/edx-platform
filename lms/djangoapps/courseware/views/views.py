@@ -1518,7 +1518,7 @@ def financial_assistance_request(request):
         return HttpResponseBadRequest(u'Could not parse request course key.')
     except KeyError as err:
         # Thrown if fields are missing
-        return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
+        return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
 
     zendesk_submitted = _record_feedback_in_zendesk(
         legal_name,

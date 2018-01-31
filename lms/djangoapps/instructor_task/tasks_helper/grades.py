@@ -10,6 +10,7 @@ from time import time
 
 from lazy import lazy
 from pytz import UTC
+from six import text_type
 
 from courseware.courses import get_course_by_id
 from instructor_analytics.basic import list_problem_responses
@@ -435,7 +436,7 @@ class CourseGradeReport(object):
             ):
                 if not course_grade:
                     # An empty gradeset means we failed to grade a student.
-                    error_rows.append([user.id, user.username, error.message])
+                    error_rows.append([user.id, user.username, text_type(error)])
                 else:
                     success_rows.append(
                         [user.id, user.email, user.username] +
@@ -485,7 +486,7 @@ class ProblemGradeReport(object):
             task_progress.attempted += 1
 
             if not course_grade:
-                err_msg = error.message
+                err_msg = text_type(error)
                 # There was an error grading this student.
                 if not err_msg:
                     err_msg = u'Unknown error'

@@ -880,7 +880,7 @@ class CapaModuleTest(unittest.TestCase):
                         '  File "<string>", line 65, in check_func\\n'
                         'Exception: test error\\n\' with status code: 1',)
                 except ResponseError as err:
-                    mock_grade.side_effect = exception_class(err.message)
+                    mock_grade.side_effect = exception_class(six.text_type(err))
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 

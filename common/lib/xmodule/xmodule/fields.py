@@ -5,6 +5,7 @@ import time
 
 import dateutil.parser
 from pytz import UTC
+from six import text_type
 from xblock.fields import JSONField
 from xblock.scorable import Score
 
@@ -175,7 +176,7 @@ class RelativeTime(JSONField):
         except ValueError as e:
             raise ValueError(
                 "Incorrect RelativeTime value {!r} was set in XML or serialized. "
-                "Original parse message is {}".format(value, e.message)
+                "Original parse message is {}".format(value, text_type(e))
             )
         return datetime.timedelta(
             hours=obj_time.tm_hour,

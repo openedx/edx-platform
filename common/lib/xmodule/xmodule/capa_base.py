@@ -544,7 +544,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         `err` is the Exception encountered while rendering the problem HTML.
         """
-        log.exception(err.message)
+        log.exception(text_type(err))
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
@@ -553,7 +553,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 u'Failed to generate HTML for problem {url}</font>'.format(
                     url=cgi.escape(text_type(self.location)))
             )
-            msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
+            msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(text_type(err)))
             msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
             html = msg
 
@@ -1258,7 +1258,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.set_score(self.score_from_lcp())
 
             if self.runtime.DEBUG:
-                msg = u"Error checking problem: {}".format(err.message)
+                msg = u"Error checking problem: {}".format(text_type(err))
                 msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise

@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.utils import translation
 
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
 from student.forms import AccountCreationForm
 from student.models import CourseEnrollment, create_comments_service_user
 from student.views import _do_create_account, AccountValidationError
@@ -81,7 +83,7 @@ class Command(TrackedCommand):
             reg.save()
             create_comments_service_user(user)
         except AccountValidationError as e:
-            print(e.message)
+            print(text_type(e))
             user = User.objects.get(email=options['email'])
 
         if course:

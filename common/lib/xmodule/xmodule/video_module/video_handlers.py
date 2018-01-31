@@ -291,7 +291,7 @@ class VideoStudentViewHandlers(object):
             except (TypeError, TranscriptException, NotFoundError) as ex:
                 # Catching `TranscriptException` because its also getting raised at places
                 # when transcript is not found in contentstore.
-                log.debug(ex.message)
+                log.debug(six.text_type(ex))
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 response = self.get_static_transcript(request, transcripts)
@@ -313,7 +313,7 @@ class VideoStudentViewHandlers(object):
 
                 return response
             except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
-                log.info(ex.message)
+                log.info(six.text_type(ex))
                 response = Response(status=404)
             else:
                 response = Response(transcript, headerlist=[('Content-Language', language)])

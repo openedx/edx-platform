@@ -14,6 +14,7 @@ from pkg_resources import (
     resource_string,
     resource_isdir,
 )
+from six import text_type
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -420,8 +421,8 @@ class XModuleMixin(XModuleFields, XBlock):
                     result[field.name] = field.read_json(self)
                 except TypeError as exception:
                     exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
-                        message=exception.message,
-                        location=unicode(self.location),
+                        message=text_type(exception),
+                        location=text_type(self.location),
                         field_name=field.name
                     )
                     raise TypeError(exception_message)

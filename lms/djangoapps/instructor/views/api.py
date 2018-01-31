@@ -2091,7 +2091,7 @@ def rescore_problem(request, course_id):
                 only_if_higher,
             )
         except NotImplementedError as exc:
-            return HttpResponseBadRequest(exc.message)
+            return HttpResponseBadRequest(text_type(exc))
 
     elif all_students:
         try:
@@ -2101,7 +2101,7 @@ def rescore_problem(request, course_id):
                 only_if_higher,
             )
         except NotImplementedError as exc:
-            return HttpResponseBadRequest(exc.message)
+            return HttpResponseBadRequest(text_type(exc))
     else:
         return HttpResponseBadRequest()
 
@@ -2157,10 +2157,10 @@ def override_problem_score(request, course_id):
             score,
         )
     except NotImplementedError as exc:  # if we try to override the score of a non-scorable block, catch it here
-        return _create_error_response(request, exc.message)
+        return _create_error_response(request, text_type(exc))
 
     except ValueError as exc:
-        return _create_error_response(request, exc.message)
+        return _create_error_response(request, text_type(exc))
 
     response_payload['task'] = TASK_SUBMISSION_OK
     return JsonResponse(response_payload)
@@ -2951,14 +2951,14 @@ def certificate_exception_view(request, course_id):
     try:
         certificate_exception, student = parse_request_data_and_get_user(request, course_key)
     except ValueError as error:
-        return JsonResponse({'success': False, 'message': error.message}, status=400)
+        return JsonResponse({'success': False, 'message': text_type(error)}, status=400)
 
     # Add new Certificate Exception for the student passed in request data
     if request.method == 'POST':
         try:
             exception = add_certificate_exception(course_key, student, certificate_exception)
         except ValueError as error:
-            return JsonResponse({'success': False, 'message': error.message}, status=400)
+            return JsonResponse({'success': False, 'message': text_type(error)}, status=400)
         return JsonResponse(exception)
 
     # Remove Certificate Exception for the student passed in request data
@@ -2966,7 +2966,7 @@ def certificate_exception_view(request, course_id):
         try:
             remove_certificate_exception(course_key, student)
         except ValueError as error:
-            return JsonResponse({'success': False, 'message': error.message}, status=400)
+            return JsonResponse({'success': False, 'message': text_type(error)}, status=400)
 
         return JsonResponse({}, status=204)
 
@@ -3264,14 +3264,14 @@ def certificate_invalidation_view(request, course_id):
         certificate_invalidation_data = parse_request_data(request)
         certificate = validate_request_data_and_get_certificate(certificate_invalidation_data, course_key)
     except ValueError as error:
-        return JsonResponse({'message': error.message}, status=400)
+        return JsonResponse({'message': text_type(error)}, status=400)
 
     # Invalidate certificate of the given student for the course course
     if request.method == 'POST':
         try:
             certificate_invalidation = invalidate_certificate(request, certificate, certificate_invalidation_data)
         except ValueError as error:
-            return JsonResponse({'message': error.message}, status=400)
+            return JsonResponse({'message': text_type(error)}, status=400)
         return JsonResponse(certificate_invalidation)
 
     # Re-Validate student certificate for the course course
@@ -3279,7 +3279,7 @@ def certificate_invalidation_view(request, course_id):
         try:
             re_validate_certificate(request, course_key, certificate)
         except ValueError as error:
-            return JsonResponse({'message': error.message}, status=400)
+            return JsonResponse({'message': text_type(error)}, status=400)
 
         return JsonResponse({}, status=204)
 

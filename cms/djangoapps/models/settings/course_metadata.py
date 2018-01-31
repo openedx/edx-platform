@@ -3,6 +3,7 @@ Django module for Course Metadata class -- manages advanced settings and related
 """
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from six import text_type
 from xblock.fields import Scope
 
 from xblock_django.models import XBlockStudioConfigurationFlag
@@ -176,7 +177,7 @@ class CourseMetadata(object):
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
                 raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(
-                    name=model['display_name'], detailed_message=err.message))
+                    name=model['display_name'], detailed_message=text_type(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)
 
@@ -211,7 +212,7 @@ class CourseMetadata(object):
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
                 did_validate = False
-                errors.append({'message': err.message, 'model': model})
+                errors.append({'message': text_type(err), 'model': model})
 
         # If did validate, go ahead and update the metadata
         if did_validate:

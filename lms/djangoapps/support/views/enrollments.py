@@ -11,6 +11,7 @@ from django.views.generic import View
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
+from six import text_type
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -89,7 +90,7 @@ class EnrollmentSupportListView(GenericAPIView):
             if new_mode == CourseMode.CREDIT_MODE:
                 return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
         except KeyError as err:
-            return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
+            return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
         except InvalidKeyError:
             return HttpResponseBadRequest(u'Could not parse course key.')
         except (CourseEnrollment.DoesNotExist, User.DoesNotExist):
@@ -113,7 +114,7 @@ class EnrollmentSupportListView(GenericAPIView):
                 )
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
-            return HttpResponseBadRequest(err.message)
+            return HttpResponseBadRequest(text_type(err))
 
     @staticmethod
     def include_verified_mode_info(enrollment_data, course_key):

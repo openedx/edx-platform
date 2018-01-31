@@ -50,6 +50,7 @@ import bleach
 import html5lib
 import pyparsing
 from lxml import etree
+from six import text_type
 
 import xqueue_interface
 from calc.preview import latex_preview
@@ -251,7 +252,7 @@ class InputTypeBase(object):
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
             msg = u"Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=err.message)
+                x=etree.tostring(xml), err=text_type(err))
             raise Exception, msg, sys.exc_info()[2]
 
     @classmethod

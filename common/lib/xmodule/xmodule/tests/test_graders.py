@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import ddt
 from pytz import UTC
 from lms.djangoapps.grades.scores import compute_percent
+from six import text_type
 from xmodule import graders
 from xmodule.graders import (
     AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
@@ -321,7 +322,7 @@ class GraderTest(unittest.TestCase):
     def test_grader_with_invalid_conf(self, invalid_conf, expected_error_message):
         with self.assertRaises(ValueError) as error:
             graders.grader_from_conf([invalid_conf])
-        self.assertIn(expected_error_message, error.exception.message)
+        self.assertIn(expected_error_message, text_type(error.exception))
 
 
 @ddt.ddt

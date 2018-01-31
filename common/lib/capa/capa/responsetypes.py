@@ -1601,14 +1601,14 @@ class NumericalResponse(LoncapaResponse):
         except UndefinedVariable as undef_var:
             raise StudentInputError(
                 _(u"You may not use variables ({bad_variables}) in numerical problems.").format(
-                    bad_variables=undef_var.message,
+                    bad_variables=text_type(undef_var),
                 )
             )
         except ValueError as val_err:
-            if 'factorial' in val_err.message:
+            if 'factorial' in text_type(val_err):
                 # This is thrown when fact() or factorial() is used in an answer
                 #   that evaluates on negative and/or non-integer inputs
-                # ve.message will be: `factorial() only accepts integral values` or
+                # text_type(ve) will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise StudentInputError(
                     _("Factorial function evaluated outside its domain:"
@@ -2038,7 +2038,7 @@ class StringResponse(LoncapaResponse):
             except Exception as err:
                 msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
-                    message=err.message
+                    message=text_type(err)
                 )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)
@@ -2511,7 +2511,7 @@ class CustomResponse(LoncapaResponse):
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise ResponseError(err.message, traceback_obj)
+        raise ResponseError(text_type(err), traceback_obj)
 
 #-----------------------------------------------------------------------------
 
@@ -3106,13 +3106,13 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=err.message)
+                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=text_type(err))
                 )
             except ValueError as err:
-                if 'factorial' in err.message:
+                if 'factorial' in text_type(err):
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # err.message will be: `factorial() only accepts integral values` or
+                    # text_type(err) will be: `factorial() only accepts integral values` or
                     # `factorial() not defined for negative values`
                     log.debug(
                         ('formularesponse: factorial function used in response '

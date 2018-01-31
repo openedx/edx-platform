@@ -9,6 +9,7 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from six import text_type
 
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
@@ -140,7 +141,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_confirm_email_doesnt_equal_email(self, confirm_email):
         self.assertValidationDecision(
             {'email': 'user@email.com', 'confirm_email': confirm_email},
-            {'email': '', 'confirm_email': accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG}
+            {'email': '', 'confirm_email': text_type(accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG)}
         )
 
     @ddt.data(
@@ -150,7 +151,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_username_bad_length_validation_decision(self, username):
         self.assertValidationDecision(
             {'username': username},
-            {'username': accounts.USERNAME_BAD_LENGTH_MSG}
+            {'username': text_type(accounts.USERNAME_BAD_LENGTH_MSG)}
         )
 
     @unittest.skipUnless(settings.FEATURES.get("ENABLE_UNICODE_USERNAME"), "Unicode usernames disabled.")
@@ -158,7 +159,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_username_invalid_unicode_validation_decision(self, username):
         self.assertValidationDecision(
             {'username': username},
-            {'username': accounts.USERNAME_INVALID_CHARS_UNICODE}
+            {'username': text_type(accounts.USERNAME_INVALID_CHARS_UNICODE)}
         )
 
     @unittest.skipIf(settings.FEATURES.get("ENABLE_UNICODE_USERNAME"), "Unicode usernames enabled.")
@@ -166,31 +167,31 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_username_invalid_ascii_validation_decision(self, username):
         self.assertValidationDecision(
             {'username': username},
-            {"username": accounts.USERNAME_INVALID_CHARS_ASCII}
+            {"username": text_type(accounts.USERNAME_INVALID_CHARS_ASCII)}
         )
 
     def test_password_empty_validation_decision(self):
         self.assertValidationDecision(
             {'password': ''},
-            {"password": accounts.PASSWORD_EMPTY_MSG}
+            {"password": text_type(accounts.PASSWORD_EMPTY_MSG)}
         )
 
     def test_password_bad_min_length_validation_decision(self):
         password = 'p' * (accounts.PASSWORD_MIN_LENGTH - 1)
         self.assertValidationDecision(
             {'password': password},
-            {"password": accounts.PASSWORD_BAD_MIN_LENGTH_MSG}
+            {"password": text_type(accounts.PASSWORD_BAD_MIN_LENGTH_MSG)}
         )
 
     def test_password_bad_max_length_validation_decision(self):
         password = 'p' * (accounts.PASSWORD_MAX_LENGTH + 1)
         self.assertValidationDecision(
             {'password': password},
-            {"password": accounts.PASSWORD_BAD_MAX_LENGTH_MSG}
+            {"password": text_type(accounts.PASSWORD_BAD_MAX_LENGTH_MSG)}
         )
 
     def test_password_equals_username_validation_decision(self):
         self.assertValidationDecision(
             {"username": "somephrase", "password": "somephrase"},
-            {"username": "", "password": accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG}
+            {"username": "", "password": text_type(accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG)}
         )

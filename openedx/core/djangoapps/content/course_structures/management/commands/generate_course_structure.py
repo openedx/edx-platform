@@ -51,6 +51,6 @@ class Command(BaseCommand):
                 update_course_structure.apply(args=[text_type(course_key)])
             except Exception as ex:
                 log.exception('An error occurred while generating course structure for %s: %s',
-                              text_type(course_key), ex.message)
+                              text_type(course_key), text_type(ex))
 
         log.info('Finished generating course structures.')

@@ -14,6 +14,8 @@ from django.utils.translation import ugettext_noop
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from pytz import common_timezones, common_timezones_set, country_timezones
+from six import text_type
+
 from student.models import User, UserProfile
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
@@ -266,7 +268,7 @@ def update_email_opt_in(user, org, opt_in):
         if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
             _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
-        log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
+        log.warning(u"Could not update organization wide preference due to IntegrityError: {}".format(text_type(err)))
 
 
 def _track_update_email_opt_in(user_id, organization, opt_in):
