@@ -4,7 +4,7 @@ Storage backend for course import and export.
 from __future__ import absolute_import
 
 from django.conf import settings
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import get_storage_class, FileSystemStorage
 from storages.backends.s3boto import S3BotoStorage
 from storages.utils import setting
 
@@ -20,3 +20,17 @@ class ImportExportS3Storage(S3BotoStorage):  # pylint: disable=abstract-method
 
 # pylint: disable=invalid-name
 course_import_export_storage = get_storage_class(settings.COURSE_IMPORT_EXPORT_STORAGE)()
+
+class LocalVideoStorage(FileSystemStorage):
+    """
+    Locally stored course videos.
+
+    This is where videos which are found inside an uploaded course tarball (via
+    course import) get saved as part of course import handling.
+    """
+
+    def __init__(self):
+        super(FileSystemStorage, self).__init__(
+            location=settings.VIDEO_STORAGE_ROOT,
+            base_url=settings.Video_STORAGE_URL,
+        )

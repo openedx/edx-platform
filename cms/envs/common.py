@@ -948,6 +948,17 @@ VIDEO_UPLOAD_PIPELINE = {
     'CONCURRENT_UPLOAD_LIMIT': 4,
 }
 
+############################# EDX-IN-A-BOX SETTINGS #############################
+
+# This is where videos which are found inside an uploaded course tarball (via
+# course import) get saved as part of course import handling.  It should point
+# to a path which is mounted as a docker volume, so that it persists docker
+# reboot.
+VIDEO_STORAGE_ROOT = '/edx/videos'
+
+# This URL prefix is where course videos are served.
+VIDEO_STORAGE_URL = '/localvideos/'
+
 ############################ APPS #####################################
 
 # The order of INSTALLED_APPS is important, when adding new apps here

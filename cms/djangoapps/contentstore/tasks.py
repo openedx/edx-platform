@@ -32,7 +32,7 @@ from user_tasks.tasks import UserTask
 
 import dogstats_wrapper as dog_stats_api
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
-from contentstore.storage import course_import_export_storage
+from contentstore.storage import course_import_export_storage, LocalVideoStorage
 from contentstore.utils import initialize_permissions, reverse_usage_url
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
@@ -508,6 +508,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 settings.GITHUB_REPO_ROOT, [dirpath],
                 load_error_modules=False,
                 static_content_store=contentstore(),
+                video_store=LocalVideoStorage(),
                 target_id=courselike_key
             )
 
