@@ -1,35 +1,40 @@
-from opaque_keys.edx.keys import CourseKey
-
+from crum import get_current_request
 from lms.djangoapps.course_api.blocks.api import get_blocks
-from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
-from django.http import HttpRequest
+from .services import CompletionService
 
 
 def roll_up(user, course_key):
-    print("BF course_key roll_up", course_key)
+
     course_usage_key = modulestore().make_course_usage_key(course_key)
-    print("BF course_usage_key roll_up", course_usage_key)
+    request = get_current_request()
 
-    # all_blocks = get_blocks(
-    #     request,
-    #     course_usage_key,
-    #     user=request.user,
-    #     nav_depth=3,
-    #     requested_fields=['children', 'display_name', 'type', 'due', 'graded', 'special_exam_info', 'show_gated_sections', 'format'],
-    #     block_types_filter=['course', 'chapter', 'sequential']
-    # )
-    # print("BF all_blocks", all_blocks)
-    
-    # completion_service.CompletionService(user, course_key)
+    # get all the blocks for the course that are tracked by the completion API
+    # NOTE block_types_filter used here is not complete list
+    completion_blocks = get_blocks(
+        request,
+        course_usage_key,
+        user=request.user,
+        requested_fields=['id'],
+        return_type='list',
+        block_types_filter=['discussion', 'html', 'problem', 'video', 'poll', 'poll_question', 'openassessment', 'survey']
+    )
 
-    # Get all of the xblocks that are "completable" for the given course
-    #course_blocks = get_course_blocks(self._user, self._course_key)
+    print("completion_blocks", completion_blocks)
+    block_usage_list = set()
+    for block in completion_blocks:
+        block_usage_list.add(UsageKey.from_string(block['id']))
 
-    # Pass the list to the completion_service.get_comletions
-    #results = completion_service.get_completions(course_blocks)
+    # Ask CompletionService if the course blocks have been completed yet
+    completion_service = CompletionService(user, course_key)
+    completions = completion_service.get_completions(block_usage_list)
 
-    # determine percentage complete
+    num_completed = sum(completions.values())
+    total_blocks = len(completions)
+    percent_completed = float(num_completed) / float(total_blocks)
 
+    print("roll_up total_blocks", total_blocks)
+    print("roll_up num_completed", num_completed)
+    print("roll_up percent_completed", percent_completed)
     # fire event to websocket
