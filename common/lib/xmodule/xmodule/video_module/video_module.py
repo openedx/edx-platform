@@ -235,7 +235,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # stream.
         if self.edx_video_id and edxval_api:
             try:
-                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4", "mobile_low"]
 
                 if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
                     val_profiles.append('hls')
@@ -246,6 +246,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # VAL will always give us the keys for the profiles we asked for, but
                 # if it doesn't have an encoded video entry for that Video + Profile, the
                 # value will map to `None`
+
+                # Fallback to the mobile encoding since we sometimes export
+                # courses with only mobile video encodings (to keep the export size down).
+                desktop_profile_exists = bool(val_profiles["desktop_mp4"])
+                if not desktop_profile_exists:
+                    val_profiles["desktop_mp4"] = val_profiles["mobile_low"]
 
                 # add the non-youtube urls to the list of alternative sources
                 # use the last non-None non-youtube non-hls url as the link to download the video
