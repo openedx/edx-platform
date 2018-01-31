@@ -201,7 +201,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         If locator is None, returns the first (ordered) store as the default
         """
-        import pudb; pu.db
+        # import pudb; pu.db
 
         if locator is not None:
             locator = self._clean_locator_for_mapping(locator)

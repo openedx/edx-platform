@@ -1989,7 +1989,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Internal code for creating a course or library
         """
-        import pudb; pu.db;
+        # import pudb; pu.db;
 
         index = self.get_course_index(locator, ignore_case=True)
         if index is not None:
