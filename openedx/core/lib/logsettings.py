@@ -65,6 +65,20 @@ def get_logger_config(log_dir,
                 'filters': ['require_debug_false'],
                 'class': 'django.utils.log.AdminEmailHandler'
             },
+            'local': {
+                'level': local_loglevel,
+                'class': 'logging.handlers.SysLogHandler',
+                'address': '/dev/log',
+                'formatter': 'syslog_format',
+                'facility': SysLogHandler.LOG_LOCAL0,
+            },
+            'tracking': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.SysLogHandler',
+                'address': '/dev/log',
+                'facility': SysLogHandler.LOG_LOCAL1,
+                'formatter': 'raw',
+            },
         },
         'loggers': {
             'tracking': {
@@ -74,7 +88,7 @@ def get_logger_config(log_dir,
             },
             '': {
                 'handlers': handlers,
-                'level': 'DEBUG',
+                'level': 'INFO',
                 'propagate': False
             },
             'django.request': {
@@ -82,30 +96,13 @@ def get_logger_config(log_dir,
                 'level': 'ERROR',
                 'propagate': True,
             },
+            # requests is so loud at INFO (logs every connection) that we
+            # force it to warn in production environments
+            'requests.packages.urllib3': {
+                'level': 'WARN'
+            }
         }
     }
-
-    # for production environments we will only
-    # log INFO and up
-    logger_config['loggers']['']['level'] = 'INFO'
-    # requests is so loud at INFO (logs every connection) that we force it to warn in production environments
-    logger_config['loggers']['requests.packages.urllib3'] = {'level': 'WARN'}
-    logger_config['handlers'].update({
-        'local': {
-            'level': local_loglevel,
-            'class': 'logging.handlers.SysLogHandler',
-            'address': '/dev/log',
-            'formatter': 'syslog_format',
-            'facility': SysLogHandler.LOG_LOCAL0,
-        },
-        'tracking': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.SysLogHandler',
-            'address': '/dev/log',
-            'facility': SysLogHandler.LOG_LOCAL1,
-            'formatter': 'raw',
-        },
-    })
 
     return logger_config
 
