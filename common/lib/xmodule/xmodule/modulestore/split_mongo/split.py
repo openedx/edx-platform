@@ -1138,9 +1138,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Gets the course descriptor for the course identified by the locator
         """
-        if not isinstance(course_id, CourseLocator) or course_id.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_id)
+        # if not isinstance(course_id, CourseLocator) or course_id.deprecated:
+        #     # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #     raise ItemNotFoundError(course_id)
         return self._get_structure(course_id, depth, **kwargs)
 
     def get_library(self, library_id, depth=0, head_validation=True, **kwargs):
@@ -1963,14 +1963,29 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             search_targets, root_category, root_block_id, **kwargs
         )
 
+    def create_course_with_key(self, course_key, user_id, fields, master_branch, extra_branches, skip_auto_publish):
+        courselike = self._create_courselike(
+            course_key,
+            user_id,
+            master_branch,
+            extra_branches=extra_branches,
+            fields=fields,
+            skip_auto_publish=skip_auto_publish
+        )
+        print "Courselike: {}".format(courselike)
+
+        return courselike
+
     def _create_courselike(
         self, locator, user_id, master_branch, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
-        root_block_id=None, **kwargs
+        root_block_id=None, extra_branches=tuple(), **kwargs
     ):
         """
         Internal code for creating a course or library
         """
+        import pudb; pu.db;
+
         index = self.get_course_index(locator, ignore_case=True)
         if index is not None:
             raise DuplicateCourseError(locator, index)
@@ -2002,6 +2017,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 versions_dict = {master_branch: new_id}
             else:
                 versions_dict[master_branch] = new_id
+
+            # Extra branches to set to also point at the new structure
+            for extra_branch in extra_branches:
+                versions_dict[extra_branch] = new_id
 
         elif block_fields or definition_fields:  # pointing to existing course w/ some overrides
             # just get the draft_version structure
