@@ -97,6 +97,9 @@ def add_email_marketing_cookies(sender, response=None, user=None,
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
         return response
+    except Exception:
+        log.error("Exception Connecting to celery task for %s", user.email)
+        return response
 
     if not cookie:
         log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
