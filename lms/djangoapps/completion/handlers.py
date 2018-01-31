@@ -14,7 +14,7 @@ from xblock.core import XBlock
 
 from .models import BlockCompletion
 from . import waffle
-
+from .utils import roll_up
 
 @receiver(PROBLEM_WEIGHTED_SCORE_CHANGED)
 def scorable_block_completion(sender, **kwargs):  # pylint: disable=unused-argument
@@ -41,3 +41,4 @@ def scorable_block_completion(sender, **kwargs):  # pylint: disable=unused-argum
         block_key=block_key,
         completion=completion,
     )
+    roll_up(user, course_key)
