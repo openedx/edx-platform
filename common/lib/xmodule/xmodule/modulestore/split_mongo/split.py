@@ -1161,12 +1161,17 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Note: we return the course_id instead of a boolean here since the found course may have
            a different id than the given course_id when ignore_case is True.
         """
-        if not isinstance(course_id, CourseLocator) or course_id.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            return False
+        # if not isinstance(course_id, CourseLocator) or course_id.deprecated:
+        #     # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #     return False
+
 
         course_index = self.get_course_index(course_id, ignore_case)
-        return CourseLocator(course_index['org'], course_index['course'], course_index['run'], course_id.branch) if course_index else None
+
+        # TODO: Is this safe? Why do we allow ignore_case? That can't possibly work the way we want it to. Wah.
+#        return CourseLocator(course_index['org'], course_index['course'], course_index['run'], course_id.branch) if course_index else None
+        return course_id
+
 
     def has_library(self, library_id, ignore_case=False, **kwargs):
         """
@@ -1213,9 +1218,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
-            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(usage_key)
+#        if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
+#            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+#            raise ItemNotFoundError(usage_key)
 
         with self.bulk_operations(usage_key.course_key):
             course = self._lookup_course(usage_key.course_key)
