@@ -12,8 +12,6 @@ LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
 def get_logger_config(log_dir,
                       logging_env="no_env",
-                      tracking_filename="tracking.log",
-                      edx_filename="edx.log",
                       syslog_addr=None,
                       local_loglevel='INFO',
                       console_loglevel=None,
@@ -26,10 +24,6 @@ def get_logger_config(log_dir,
     this way instead of registering directly is because I didn't want to worry
     about resetting the logging state if this is called multiple times when
     settings are extended.
-
-    "tracking_filename" and "edx_filename" are ignored unless dev_env
-    is set to true since otherwise logging is handled by rsyslogd.
-
     """
 
     # Revert to INFO if an invalid string is passed in
