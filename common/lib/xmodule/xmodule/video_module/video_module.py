@@ -705,7 +705,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 category=self.category,
                 pathname=pathname
             )
-            resource_fs.makedir(directory_path, recursive=True, allow_recreate=True)
+            resource_fs.makedirs(directory_path, recreate=True)
             for source in self.html5_sources:
                 # TODO: download the video content from the HTML5 location
                 # and add it to the output directory.
@@ -739,6 +739,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             external, video_ids = get_video_ids_info(self.edx_video_id, self.youtube_id_1_0, self.html5_sources)
             if video_ids:
                 try:
+                    pathname = name_to_pathname(self.url_name)
+                    directory_path = u'{category}/{pathname}_encodings'.format(
+                        category=self.category,
+                        pathname=pathname
+                    )
+                    resource_fs.makedirs(directory_path, recreate=True)
                     xml.append(
                         # TODO: pass to edxval the directory into which it should
                         # download the video content.
@@ -749,7 +755,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                         edxval_api.export_to_xml(
                             video_ids,
                             unicode(self.runtime.course_id.for_branch(None)),
-                            external=external
+                            external=external,
+                            video_download_dir=directory_path,
+                            resource_fs=resource_fs
                         )
                     )
                 except edxval_api.ValVideoNotFoundError:

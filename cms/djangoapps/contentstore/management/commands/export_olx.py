@@ -28,7 +28,7 @@ from path import Path as path
 
 from request_cache import get_request_or_stub
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, contentstore
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 
 
@@ -101,7 +101,7 @@ def export_course_to_directory(course_key, root_dir):
     course_dir = replacement_char.join([course.id.org, course.id.course, course.id.run])
     course_dir = re.sub(r'[^\w\.\-]', replacement_char, course_dir)
 
-    export_course_to_xml(store, None, course.id, root_dir, course_dir)
+    export_course_to_xml(store, contentstore(), course.id, root_dir, course_dir)
 
     export_dir = path(root_dir) / course_dir
     return export_dir
