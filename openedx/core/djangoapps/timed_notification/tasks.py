@@ -7,13 +7,10 @@ from openedx.core.djangoapps.timed_notification.core import send_course_notifica
 from lms.djangoapps.branding import get_visible_courses
 from common.lib.mandrill_client.client import MandrillClient
 
-from celery.task import periodic_task
-from celery.schedules import crontab
 
 log = logging.getLogger('edx.celery.task')
 
 
-@periodic_task(run_every=crontab(minute=1, hour=0))
 def task_course_notifications():
     log.info('Getting courses')
     courses = get_visible_courses()
