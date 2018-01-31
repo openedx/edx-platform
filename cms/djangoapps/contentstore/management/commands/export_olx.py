@@ -26,10 +26,14 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 
-from request_cache import get_request_or_stub
+from request_cache import get_cache
 
 from xmodule.modulestore.django import modulestore, contentstore
-from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_exporter import (
+    export_course_to_xml,
+    EXPORTER_REQUEST_CACHE_NAME,
+    OFFLINE_EXPORT_CACHE_KEY,
+)
 
 
 class Command(BaseCommand):
@@ -60,8 +64,8 @@ class Command(BaseCommand):
             filename = mktemp()
             pipe_results = True
 
-        request = get_request_or_stub()
-        request.export_for_offline = options['export_for_offline']
+        cache = get_cache(EXPORTER_REQUEST_CACHE_NAME)
+        cache[OFFLINE_EXPORT_CACHE_KEY] = options['export_for_offline']
 
         export_course_to_tarfile(course_key, filename)
 

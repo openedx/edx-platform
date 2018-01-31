@@ -24,6 +24,9 @@ from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
 
+EXPORTER_REQUEST_CACHE_NAME = 'course_export'
+OFFLINE_EXPORT_CACHE_KEY = 'export_for_offline'
+
 DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
 
 

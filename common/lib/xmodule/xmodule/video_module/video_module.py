@@ -28,7 +28,7 @@ from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
-from request_cache import get_request_or_stub
+from request_cache import get_cache
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -36,6 +36,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.modulestore.xml_exporter import EXPORTER_REQUEST_CACHE_NAME, OFFLINE_EXPORT_CACHE_KEY
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.video_module import manage_video_subtitles_save
@@ -698,8 +699,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', source)
             xml.append(ele)
 
-        request = get_request_or_stub()
-        if hasattr(request, 'export_for_offline'):
+        cache = get_cache(EXPORTER_REQUEST_CACHE_NAME)
+        if cache.get(OFFLINE_EXPORT_CACHE_KEY):
             pathname = name_to_pathname(self.url_name)
             directory_path = u'{category}/{pathname}_encodings'.format(
                 category=self.category,
@@ -739,25 +740,25 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             external, video_ids = get_video_ids_info(self.edx_video_id, self.youtube_id_1_0, self.html5_sources)
             if video_ids:
                 try:
-                    pathname = name_to_pathname(self.url_name)
-                    directory_path = u'{category}/{pathname}_encodings'.format(
-                        category=self.category,
-                        pathname=pathname
-                    )
-                    resource_fs.makedirs(directory_path, recreate=True)
+                    download_videos_kargs = {}
+                    if cache.get(OFFLINE_EXPORT_CACHE_KEY):
+                        pathname = name_to_pathname(self.url_name)
+                        directory_path = u'{category}/{pathname}_encodings'.format(
+                            category=self.category,
+                            pathname=pathname
+                        )
+                        resource_fs.makedirs(directory_path, recreate=True)
+                        download_videos_kargs = {
+                            'video_download_dir': directory_path,
+                            'resource_fs': resource_fs
+                        }
+
                     xml.append(
-                        # TODO: pass to edxval the directory into which it should
-                        # download the video content.
-                        # Update edxval's implementation of export_to_xml so
-                        # it downloads each of the encoded_video from the
-                        # encoded_video's url - only if export_for_offline
-                        # is set.
                         edxval_api.export_to_xml(
                             video_ids,
                             unicode(self.runtime.course_id.for_branch(None)),
                             external=external,
-                            video_download_dir=directory_path,
-                            resource_fs=resource_fs
+                            **download_videos_kargs
                         )
                     )
                 except edxval_api.ValVideoNotFoundError:
