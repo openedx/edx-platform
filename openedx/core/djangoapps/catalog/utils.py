@@ -2,21 +2,22 @@
 import copy
 import datetime
 import logging
-import pycountry
 
-from dateutil.parser import parse as datetime_parse
+import pycountry
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
+from entitlements.utils import is_course_run_entitlement_fullfillable
+from student.models import CourseEnrollment
 from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 
@@ -315,48 +316,16 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     """
     Takes a list of course runs and returns only the course runs, sorted by start date, that:
 
-    1) Are currently running or in the future
-    2) A user can enroll in
-    3) A user can upgrade in
-    4) Are published
-    5) Are not enrolled in already for an active session
-
     These are the only sessions that can be selected for an entitlement.
     """
-
     enrollable_sessions = []
 
-    enrollments_for_user = CourseEnrollment.enrollments_for_user(entitlement.user).filter(mode=entitlement.mode)
-    enrolled_sessions = frozenset([str(e.course_id) for e in enrollments_for_user])
-
     # Only show published course runs that can still be enrolled and upgraded
-    now = datetime.datetime.now(UTC)
+    search_time = datetime.datetime.now(UTC)
     for course_run in course_runs:
-
-        # Only courses that have not ended will be displayed
-        run_start = course_run.get('start')
-        run_end = course_run.get('end')
-        is_running = run_start and (not run_end or datetime_parse(run_end) > now)
-
-        # Only courses that can currently be enrolled in will be displayed
-        enrollment_start = course_run.get('enrollment_start')
-        enrollment_end = course_run.get('enrollment_end')
-        can_enroll = ((not enrollment_start or datetime_parse(enrollment_start) < now)
-                      and (not enrollment_end or datetime_parse(enrollment_end) > now)
-                      and course_run.get('key') not in enrolled_sessions)
-
-        # Only upgrade-able courses will be displayed
-        can_upgrade = False
-        for seat in course_run.get('seats', []):
-            if seat.get('type') == entitlement.mode:
-                upgrade_deadline = seat.get('upgrade_deadline', None)
-                can_upgrade = not upgrade_deadline or (datetime_parse(upgrade_deadline) > now)
-                break
-
-        # Only published courses will be displayed
-        is_published = course_run.get('status') == 'published'
-
-        if is_running and can_upgrade and can_enroll and is_published:
+        course_id = CourseKey.from_string(course_run.get('key'))
+        is_enrolled = CourseEnrollment.is_enrolled(entitlement.user, course_id)
+        if is_course_run_entitlement_fullfillable(course_id, entitlement, search_time) and not is_enrolled:
             enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
