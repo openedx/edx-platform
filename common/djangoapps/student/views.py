@@ -2476,12 +2476,18 @@ def do_email_change_request(user, new_email, activation_key=None):
     # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
     # But because changing the email address is multi-step, we also emit an event here so that we can
     # track where the request was initiated.
+    old_email = context['old_email']
+    new_email = context['new_email']
+    if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+        old_email = ''
+        new_email = ''
+
     tracker.emit(
         SETTING_CHANGE_INITIATED,
         {
             "setting": "email",
-            "old": context['old_email'],
-            "new": context['new_email'],
+            "old": old_email,
+            "new": new_email,
             "user_id": user.id,
         }
     )

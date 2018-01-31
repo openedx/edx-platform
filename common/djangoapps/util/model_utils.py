@@ -150,6 +150,11 @@ def emit_setting_changed_event(user, db_table, setting_name, old_value, new_valu
     truncated_fields['user_id'] = user.id
     truncated_fields['table'] = db_table
 
+    if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+        if setting_name == 'name' or setting_name == 'email':
+            truncated_fields['old'] = ''
+            truncated_fields['new'] = ''
+
     tracker.emit(
         USER_SETTINGS_CHANGED_EVENT_NAME,
         truncated_fields

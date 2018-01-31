@@ -1,6 +1,8 @@
 """
 Bookmarks Python API.
 """
+import string
+
 from eventtracking import tracker
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS
 from xmodule.modulestore.django import modulestore
@@ -159,12 +161,19 @@ def _track_event(event_name, bookmark):
         event_name: name of event to track
         bookmark: Bookmark object
     """
-    tracker.emit(
-        event_name,
-        {
-            'course_id': unicode(bookmark.course_key),
-            'bookmark_id': bookmark.resource_id,
-            'component_type': bookmark.usage_key.block_type,
-            'component_usage_id': unicode(bookmark.usage_key),
-        }
-    )
+    context_override = tracker.get_tracker().resolve_context()
+    bookmark_id = bookmark.resource_id
+
+    if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+        bookmark_id = string.replace(bookmark.resource_id, bookmark.user.username, str(bookmark.user.id))
+
+    with tracker.get_tracker().context(event_name, context_override):
+        tracker.emit(
+            event_name,
+            {
+                'course_id': unicode(bookmark.course_key),
+                'bookmark_id': bookmark_id,
+                'component_type': bookmark.usage_key.block_type,
+                'component_usage_id': unicode(bookmark.usage_key),
+            }
+        )

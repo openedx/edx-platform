@@ -62,8 +62,18 @@ class TrackMiddleware(object):
             # We should manually confirm no passwords make it into log
             # files when we change this.
 
+            # "student_password" - username/full name gets logged on delete/create/download/check repair site/user through SYSADMIN
             censored_strings = ['password', 'newpassword', 'new_password',
-                                'oldpassword', 'old_password', 'new_password1', 'new_password2']
+                                'oldpassword', 'old_password', 'new_password1', 'new_password2', 'student_password']
+
+            # "unique_student_identifier" - username logged on problem rescore/reset/delete and get a user's progress and listing instructor tasks
+            # "identifiers" - usernames logged as  on batch course enrollments/unenrollments
+            # "users" - usernames logged as  upon assigning users to cohorts
+            # "owner_username" - username logged as wiki owner
+            # "student_uname" + "student_fullname" - username/full name gets logged on delete/create/download/check repair site/user through SYSADMIN
+            # "username" + "name" + "email" - username/full name/email address gets logged during registration
+            user_identifying_tags = ['unique_student_identifier', 'identifiers', 'users', 'owner_username', 'student_uname', 'student_fullname', 'username', 'name', 'email']
+
             post_dict = dict(request.POST)
             get_dict = dict(request.GET)
             for string in censored_strings:
@@ -71,6 +81,13 @@ class TrackMiddleware(object):
                     post_dict[string] = '*' * 8
                 if string in get_dict:
                     get_dict[string] = '*' * 8
+
+            if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+                for string in user_identifying_tags:
+                    if string in post_dict:
+                        post_dict[string] = ''
+                    if string in get_dict:
+                        get_dict[string] = ''
 
             event = {
                 'GET': dict(get_dict),
