@@ -213,8 +213,6 @@ if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
     # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
     SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
 
-LOG_DIR = ENV_TOKENS['LOG_DIR']
-
 CACHES = ENV_TOKENS['CACHES']
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
@@ -340,7 +338,9 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
+
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
+LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
