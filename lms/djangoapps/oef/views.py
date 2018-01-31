@@ -65,8 +65,10 @@ def get_survey_by_id(request, user_survey_id):
     topics = get_survey_topics(uos, survey.id)
     levels = get_option_levels()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "description": survey.description,
                                                    "is_completed": uos.status == 'completed',
                                                    "topics": topics,
+                                                   "instructions": get_oef_instructions(),
                                                    "levels": levels,
                                                    'organization': request.user.extended_profile.organization.label,
                                                    'date': uos.started_on.strftime('%m/%d/%Y')
@@ -89,8 +91,10 @@ def fetch_survey(request):
     topics = get_survey_topics(uos, survey.id)
     levels = get_option_levels()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "description": survey.description,
                                                    "topics": topics,
                                                    "levels": levels,
+                                                   "instructions": get_oef_instructions(),
                                                    'is_completed': uos.status == 'completed',
                                                    'organization': request.user.extended_profile.organization.label,
                                                    'date': uos.started_on.strftime('%m/%d/%Y')

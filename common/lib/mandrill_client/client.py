@@ -10,6 +10,8 @@ class MandrillClient(object):
     PASSWORD_RESET_TEMPLATE = 'template-60'
     USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
     ORG_ADMIN_ACTIVATION_TEMPLATE = 'template-62'
+    ORG_ADMIN_CHANGE_TEMPLATE = 'org-admin-change'
+    ORG_ADMIN_CLAIM_CONFIRMATION = 'org-admin-update-confirmation'
     ENROLLMENT_CONFIRMATION_TEMPLATE = 'enrollment-confirmation'
     COURSE_WELCOME_TEMPLATE = 'course_welcome'
     COURSE_EARLY_WELCOME_TEMPLATE = 'course-early-welcome'
