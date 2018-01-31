@@ -1194,9 +1194,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         the course or the block w/in the course do not exist for the given version.
         raises InsufficientSpecificationError if the usage_key does not id a block
         """
-        if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
-            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            return False
+        #if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
+        #    # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    return False
 
         if usage_key.block_id is None:
             raise InsufficientSpecificationError(usage_key)
@@ -1257,9 +1257,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 False - if we want only those items which are in the course tree. This would ensure no orphans are
                 fetched.
         """
-        if not isinstance(course_locator, CourseKey) or course_locator.deprecated:
-            # The supplied courselike key is of the wrong type, so it can't possibly be stored in this modulestore.
-            return []
+        #if not isinstance(course_locator, CourseKey) or course_locator.deprecated:
+        #    # The supplied courselike key is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    return []
 
         course = self._lookup_course(course_locator)
         items = []
@@ -1396,9 +1396,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param locator: BlockUsageLocator restricting search scope
         """
-        if not isinstance(locator, BlockUsageLocator) or locator.deprecated:
-            # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(locator)
+        #if not isinstance(locator, BlockUsageLocator) or locator.deprecated:
+        #    # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(locator)
 
         course = self._lookup_course(locator.course_key)
         all_parent_ids = self._get_parents_from_structure(BlockKey.from_usage_key(locator), course.structure)
@@ -1458,9 +1458,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': when the course was originally created
         }
         """
-        if not isinstance(course_key, CourseLocator) or course_key.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_key)
+        #if not isinstance(course_key, CourseLocator) or course_key.deprecated:
+        #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(course_key)
 
         if not (course_key.course and course_key.run and course_key.org):
             return None
@@ -1479,9 +1479,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': when the change was made
         }
         """
-        if not isinstance(course_key, CourseLocator) or course_key.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_key)
+        #if not isinstance(course_key, CourseLocator) or course_key.deprecated:
+        #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(course_key)
 
         course = self._lookup_course(course_key).structure
         return {
@@ -1501,9 +1501,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': when the change was made
         }
         """
-        if not isinstance(definition_locator, DefinitionLocator) or definition_locator.deprecated:
-            # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(definition_locator)
+        #if not isinstance(definition_locator, DefinitionLocator) or definition_locator.deprecated:
+        #    # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(definition_locator)
 
         definition = self.db_connection.get_definition(definition_locator.definition_id, course_context)
         if definition is None:
@@ -1517,9 +1517,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         next versions, these do include those created for other courses.
         :param course_locator:
         """
-        if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_locator)
+        #if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
+        #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(course_locator)
 
         if version_history_depth < 1:
             return None
@@ -1977,8 +1977,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             fields=fields,
             skip_auto_publish=skip_auto_publish
         )
-        print "Courselike: {}".format(courselike)
-
         return courselike
 
     def _create_courselike(
@@ -2677,9 +2675,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        if not isinstance(usage_locator, BlockUsageLocator) or usage_locator.deprecated:
-            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(usage_locator)
+        #if not isinstance(usage_locator, BlockUsageLocator) or usage_locator.deprecated:
+        #    # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(usage_locator)
 
         with self.bulk_operations(usage_locator.course_key):
             original_structure = self._lookup_course(usage_locator.course_key).structure

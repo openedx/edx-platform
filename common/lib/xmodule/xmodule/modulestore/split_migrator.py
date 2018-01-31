@@ -35,6 +35,7 @@ class SplitMigrator(object):
             raise ItemNotFoundError(unicode(course_key))
 
         with self.split_modulestore.bulk_operations(course_key):
+            # Create the course (copies the root node)
             new_course = self.split_modulestore.create_course_with_key(
                 course_key,
                 user_id,
@@ -43,7 +44,14 @@ class SplitMigrator(object):
                 extra_branches=[ModuleStoreEnum.BranchName.draft],
                 skip_auto_publish=True,
             )
-            print new_course
+
+#        with self.split_modulestore.bulk_operations(course_key):
+            self._copy_published_modules_to_course_same_course_key(
+                new_course, course_key, user_id,
+            )
+
+        import pudb; pu.db
+        self.split_modulestore.publish(new_course.location, user_id)
 
 
     def _get_fields(self, block):
@@ -52,6 +60,46 @@ class SplitMigrator(object):
             for field_name, field in block.fields.items()
             if field.is_set_on(block)
         }
+
+
+    def _copy_published_modules_to_course_same_course_key(self, new_course, course_key, user_id, **kwargs):
+        """
+        Copy all of the modules from the 'direct' version of the course to the new split course.
+        """
+        course_version_locator = new_course.id.version_agnostic()
+
+        for module in self.source_modulestore.get_items(
+            course_key, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs
+        ):
+            # Don't copy the root course node again.
+            if module.location.block_type != 'course':
+                # create split_xblock using split.create_item
+                # NOTE: the below auto populates the children when it migrates the parent; so,
+                # it doesn't need the parent as the first arg. That is, it translates and populates
+                # the 'children' field as it goes.
+                _new_module = self.split_modulestore.create_item(
+                    user_id,
+                    course_version_locator,
+                    module.location.block_type,
+                    block_id=module.location.block_id,
+                    fields = self._get_fields(module),
+                    #fields=self._get_fields(
+                    #    module, course_version_locator, new_course.location.block_id
+                    #),
+                    skip_auto_publish=True,
+                    **kwargs
+                )
+        # after done w/ published items, add version for DRAFT pointing to the published structure
+        index_info = self.split_modulestore.get_course_index_info(course_version_locator)
+        versions = index_info['versions']
+        versions[ModuleStoreEnum.BranchName.draft] = versions[ModuleStoreEnum.BranchName.published]
+        self.split_modulestore.update_course_index(course_version_locator, index_info)
+
+        # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
+        # children which meant some pointers were to non-existent locations in 'direct'
+        # self.split_modulestore.fix_not_found(course_version_locator, user_id)
+
+        # self.split_modulestore.publish(course)
 
 
     def migrate_mongo_course(
