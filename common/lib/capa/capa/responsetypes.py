@@ -40,7 +40,7 @@ import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
 import dogstats_wrapper as dog_stats_api
 # specific library imports
-from calc import UndefinedVariable, evaluator
+from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from cmath import isnan
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -1604,6 +1604,10 @@ class NumericalResponse(LoncapaResponse):
                     bad_variables=text_type(undef_var),
                 )
             )
+        except UnmatchedParenthesis as err:
+            raise StudentInputError(
+                err.args[0]
+            )
         except ValueError as val_err:
             if 'factorial' in text_type(val_err):
                 # This is thrown when fact() or factorial() is used in an answer
@@ -1770,7 +1774,7 @@ class NumericalResponse(LoncapaResponse):
         try:
             evaluator(dict(), dict(), answer)
             return True
-        except (StudentInputError, UndefinedVariable):
+        except (StudentInputError, UndefinedVariable, UnmatchedParenthesis):
             return False
 
     def get_answers(self):
@@ -3107,6 +3111,14 @@ class FormulaResponse(LoncapaResponse):
                 )
                 raise StudentInputError(
                     _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=text_type(err))
+                )
+            except UnmatchedParenthesis as err:
+                log.debug(
+                    'formularesponse: unmatched parenthesis in formula=%s',
+                    cgi.escape(answer)
+                )
+                raise StudentInputError(
+                    err.args[0]
                 )
             except ValueError as err:
                 if 'factorial' in text_type(err):
