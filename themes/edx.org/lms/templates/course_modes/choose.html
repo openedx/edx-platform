@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.learner_analytics import ENABLE_DASHBOARD_TAB
+from openedx.features.learner_analytics import INCLUDE_UPSELL_MODAL
 %>
 
 <%namespace name='static' file='/static_content.html'/>
@@ -85,8 +85,7 @@ from openedx.features.learner_analytics import ENABLE_DASHBOARD_TAB
 
     <div id="currency_data" value="${currency_data}"></div>
     <div class="container">
-       <% course_key = CourseKey.from_string('course-v1:Fake+Course+Key') %>
-       % if ENABLE_DASHBOARD_TAB.is_enabled(course_key):
+       % if INCLUDE_UPSELL_MODAL.is_enabled():
             ${static.renderReact(
               component="UpsellExperimentModal",
               id="upsell-modal",
