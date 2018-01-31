@@ -5,6 +5,7 @@ from django.conf import settings
 
 log = logging.getLogger(__name__)
 
+
 class MandrillClient(object):
     PASSWORD_RESET_TEMPLATE = 'template-60'
     USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
