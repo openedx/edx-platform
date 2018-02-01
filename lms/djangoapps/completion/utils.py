@@ -1,4 +1,6 @@
 from crum import get_current_request
+from channels import Group
+import json
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
@@ -37,4 +39,11 @@ def roll_up(user, course_key):
     print("roll_up total_blocks", total_blocks)
     print("roll_up num_completed", num_completed)
     print("roll_up percent_completed", percent_completed)
+
     # fire event to websocket
+    Group('completion').send(
+        {'text': json.dumps({
+            'course_id': str(course_key),
+            'percent_complete': round(percent_completed * 100, 2),
+        })}
+    )

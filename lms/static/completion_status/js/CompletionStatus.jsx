@@ -14,7 +14,7 @@ class CompletionStatus extends React.Component {
         super(props);
         this.state = {
             course_id: '',
-            percent_complete: 100,
+            percent_complete: 0,
         };
 
         // TODO: do we need to send anything?
@@ -30,9 +30,6 @@ class CompletionStatus extends React.Component {
     handleData(data) {
         //receives messages from the connected websocket
         let result = JSON.parse(data);
-
-        if (result.percent_complete === 100) {
-        }
 
         // we've received an updated completion status event
         this.setState(result);
