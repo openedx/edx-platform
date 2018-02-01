@@ -304,6 +304,12 @@ class MongoConnection(object):
         self.structures = self.database[collection + '.structures']
         self.definitions = self.database[collection + '.definitions']
 
+        # We'll sometimes receive requests for courses without a run because
+        # we're handling courses that have been migrated from the old
+        # modulestore. We use this collection to fill in the run info since in
+        # Split it's otherwise ambiguous.
+        self.old_mongo_mapping = self.database[collection + '.old_mongo_mapping']
+
     def heartbeat(self):
         """
         Check that the db is reachable.
@@ -451,6 +457,19 @@ class MongoConnection(object):
                     for key_attr in ('org', 'course', 'run')
                 }
             return self.course_index.find_one(query)
+
+    def get_course_key_with_run(self, course_key_without_run):
+        return course_key_without_run.replace(run='2018')
+
+#        if course_key_without_run.run is not None:
+#            return course_key_without_run
+#
+#        query = {
+#            'org' = course_key_without_run.org,
+#            'course' = course_key_without_run.course,
+#        }
+#        mapping_entry = self.old_mongo_mapping.find_one(query)
+#        return course_key_without_run.replace(run=mapping_entry['run'])
 
     def find_matching_course_indexes(
             self,

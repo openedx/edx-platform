@@ -203,6 +203,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if course_key is None:
             return self._bulk_ops_record_type()
 
+        course_key = self.fill_in_run(course_key)
+
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError(u'{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
         # handle version_guid based retrieval locally
@@ -223,6 +225,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError('{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
 
+        course_key = self.fill_in_run(course_key)
+
         if course_key.org and course_key.course and course_key.run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
@@ -234,6 +238,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Begin a bulk write operation on course_key.
         """
+        course_key = self.fill_in_run(course_key)
         bulk_write_record.initial_index = self.db_connection.get_course_index(course_key, ignore_case=ignore_case)
         # Ensure that any edits to the index don't pollute the initial_index
         bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
@@ -287,6 +292,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Return the index for course_key.
         """
+        course_key = self.fill_in_run(course_key)
         if self._is_in_bulk_operation(course_key, ignore_case):
             return self._get_bulk_ops_record(course_key, ignore_case).index
         else:
@@ -296,12 +302,14 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Delete the course index from cache and the db
         """
+        course_key = self.fill_in_run(course_key)
         if self._is_in_bulk_operation(course_key, False):
             self._clear_bulk_ops_record(course_key)
 
         self.db_connection.delete_course_index(course_key)
 
     def insert_course_index(self, course_key, index_entry):
+        course_key = self.fill_in_run(course_key)
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.index = index_entry
@@ -316,6 +324,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         Does not return anything useful.
         """
+        course_key = self.fill_in_run(course_key)
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
@@ -345,6 +354,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         Update a course structure, respecting the current bulk operation status
         (no data will be written to the database if a bulk operation is active.)
         """
+        course_key = self.fill_in_run(course_key)
         self._clear_cache(structure['_id'])
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
@@ -730,6 +740,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         self.signal_handler = signal_handler
 
+    def fill_in_run(self, course_key):
+        if course_key.run is not None:
+            return course_key
+        return course_key.replace(run='2018')
+
     def close_connections(self):
         """
         Closes any open connections to the underlying databases
@@ -879,6 +894,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param course_key: any subclass of CourseLocator
         """
+        # Maybe need this?
+        # if course_key.run is None:
+        #     course_key = self.db_connection.get_course_key_with_run(course_key)
+
         if not course_key.version_guid:
             head_validation = True
         if head_validation and course_key.org and course_key.course and course_key.run:
@@ -1152,25 +1171,34 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise ItemNotFoundError(library_id)
         return self._get_structure(library_id, depth, head_validation=head_validation, **kwargs)
 
-    def has_course(self, course_id, ignore_case=False, **kwargs):
+    def has_course(self, course_key, ignore_case=False, **kwargs):
         """
         Does this course exist in this modulestore. This method does not verify that the branch &/or
-        version in the course_id exists. Use get_course_index_info to check that.
+        version in the course_key exists. Use get_course_index_info to check that.
 
-        Returns the course_id of the course if it was found, else None
-        Note: we return the course_id instead of a boolean here since the found course may have
-           a different id than the given course_id when ignore_case is True.
+        Returns the course_key of the course if it was found, else None
+        Note: we return the course_key instead of a boolean here since the found course may have
+           a different id than the given course_key when ignore_case is True.
         """
-        # if not isinstance(course_id, CourseLocator) or course_id.deprecated:
+        # if not isinstance(course_key, CourseLocator) or course_key.deprecated:
         #     # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
         #     return False
 
+        # if course_key.run is None:
+        #     # Check to see if it exists -- return None if it doesn't
+        #     course_key = self.db_connection.get_course_key_with_run(course_key)
+        if course_key.run is None:
+            course_key = self.fill_in_run(course_key)
 
-        course_index = self.get_course_index(course_id, ignore_case)
+        course_index = self.get_course_index(course_key, ignore_case)
+        if not course_index:
+            return None
 
-        # TODO: Is this safe? Why do we allow ignore_case? That can't possibly work the way we want it to. Wah.
-#        return CourseLocator(course_index['org'], course_index['course'], course_index['run'], course_id.branch) if course_index else None
-        return course_id
+        # This replace is so that the right casing gets put in the event
+        # ignore_case was True and we need to return a slightly different key.
+        return course_key.replace(
+            org=course_index['org'], course=course_index['course'], run=course_index['run'],
+        )
 
 
     def has_library(self, library_id, ignore_case=False, **kwargs):
@@ -1461,7 +1489,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         #if not isinstance(course_key, CourseLocator) or course_key.deprecated:
         #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
         #    raise ItemNotFoundError(course_key)
-
+        course_key = self.fill_in_run(course_key)
         if not (course_key.course and course_key.run and course_key.org):
             return None
         index = self.get_course_index(course_key)
