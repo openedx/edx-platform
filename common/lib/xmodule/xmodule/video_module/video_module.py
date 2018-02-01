@@ -213,11 +213,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
-    def _convert_local_url(self, url):
-        if url.startswith('local-video'):
-            return url.replace('local-video', settings.VIDEO_STORAGE_URL)
-        return url
-
     def get_html(self):
 
         track_status = (self.download_track and self.track)
@@ -262,7 +257,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # use the last non-None non-youtube non-hls url as the link to download the video
                 for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
                     if url:
-                        url = self._convert_local_url(url)
+                        url = _convert_local_url(url)
 
                         if url not in sources:
                             sources.append(url)
@@ -836,7 +831,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # override the source_url with it.
         if self.edx_video_id and edxval_api:
 
-            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
+            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4', 'mobile_low']
             if HLSPlaybackEnabledFlag.feature_enabled(self.runtime.course_id.for_branch(None)):
                 val_profiles.append('hls')
 
@@ -846,6 +841,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             # VAL's youtube source has greater priority over external youtube source.
             if val_video_encodings.get('youtube'):
                 source_url = self.create_youtube_url(val_video_encodings['youtube'])
+
+            # Fallback to the mobile encoding since we sometimes export
+            # courses with only mobile video encodings (to keep the export size down).
+            desktop_profile_exists = bool(val_video_encodings["desktop_mp4"])
+            if not desktop_profile_exists:
+                val_video_encodings["desktop_mp4"] = val_video_encodings["mobile_low"]
 
             # If no youtube source is provided externally or in VAl, update source_url in order: hls > mp4 and webm
             if not source_url:
@@ -1123,7 +1124,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         if encoded_videos:
             for encoded_video in encoded_videos:
-                encoded_video["url"] = self._convert_local_url(encoded_video["url"])
+                encoded_video["url"] = _convert_local_url(encoded_video["url"])
 
         return {
             "only_on_web": self.only_on_web,
@@ -1132,3 +1133,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "encoded_videos": encoded_videos,
             "all_sources": all_sources,
         }
+
+
+def _convert_local_url(url):
+    if url.startswith('local-video'):
+        return url.replace('local-video', settings.VIDEO_STORAGE_URL)
+    return url
+
