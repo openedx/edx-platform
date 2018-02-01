@@ -34,6 +34,9 @@ module.exports = {
         LearnerAnalyticsDashboard: './lms/static/js/learner_analytics_dashboard/LearnerAnalyticsDashboard.jsx',
         UpsellExperimentModal: './lms/static/common/js/components/UpsellExperimentModal.jsx',
 
+        // Course Bookmarks
+        CourseBookmarksFactory: './openedx/features/course_bookmarks/static/course_bookmarks/js/course_bookmarks_factory.js'
+
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
