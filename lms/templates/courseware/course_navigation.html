@@ -67,6 +67,7 @@ if course is not None:
                     <%block name="extratabs" />
                 </ol>
             </div>
+            % if active_page is 'courseware':
             <span>
             ${static.renderReact(
                 component="CompletionStatus",
@@ -77,6 +78,7 @@ if course is not None:
                 }
             )}
             </span>
+            % endif
         </nav>
     % endif
 %endif
