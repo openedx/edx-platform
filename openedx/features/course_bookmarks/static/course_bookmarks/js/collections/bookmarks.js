@@ -1,28 +1,26 @@
-(function(define) {
-    'use strict';
-    define([
-        'backbone',
-        'edx-ui-toolkit/js/pagination/paging-collection',
-        'course_bookmarks/js/models/bookmark'
-    ], function(Backbone, PagingCollection, BookmarkModel) {
-        return PagingCollection.extend({
-            model: BookmarkModel,
+import PagingCollection from 'edx-ui-toolkit/js/pagination/paging-collection';
+import BookmarkModel from 'course_bookmarks/js/models/bookmark';
 
-            queryParams: {
-                course_id: function() { return this.options.course_id; },
-                fields: function() { return 'display_name,path'; }
-            },
+class Bookmark extends PagingCollection {
+  constructor(models, options) {
+    this.queryParams = { // eslint-disable-line no-this-before-super
+      course_id() { return this.options.course_id; },
+      fields() { return 'display_name,path'; },
+    };
 
-            url: function() {
-                return this.url;
-            },
+    const defaults = {
+      model: BookmarkModel,
 
-            constructor: function(models, options) {
-                this.options = options;
-                this.url = options.url;
-                PagingCollection.prototype.constructor.call(this, models, options);
-            }
-        });
-    });
-}(define || RequireJS.define));
+    };
+    super(models, Object.assign(defaults, options));
+    this.options = options;
+    this.url = options.url;
+  }
 
+  url() {
+    return this.url;
+  }
+
+}
+
+export { Bookmark as default };

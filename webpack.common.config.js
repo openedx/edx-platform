@@ -176,7 +176,8 @@ module.exports = {
             'node_modules',
             'common/static/js/vendor/',
             'cms/static',
-            'common/static/js/src'
+            'lms/static',
+            'common/static/js/src',
             'common/static'
         ]
     },

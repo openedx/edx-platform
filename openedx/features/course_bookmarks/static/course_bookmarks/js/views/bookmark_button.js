@@ -1,117 +1,121 @@
-(function(define) {
-    'use strict';
+import gettext from 'gettext';
+import $ from 'jquery';
+import _ from 'underscore';
+import Backbone from 'backbone';
+import MessageBannerView from 'js/views/message_banner';
 
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message_banner'],
-        function(gettext, $, _, Backbone, MessageBannerView) {
-            return Backbone.View.extend({
-                errorMessage: gettext('An error has occurred. Please try again.'),
 
-                bookmarkText: gettext('Bookmark this page'),
-                bookmarkedText: gettext('Bookmarked'),
+function BookmarkButton() {
+  return Backbone.View.extend({
+    errorMessage: gettext('An error has occurred. Please try again.'),
 
-                events: {
-                    click: 'toggleBookmark'
-                },
+    bookmarkText: gettext('Bookmark this page'),
+    bookmarkedText: gettext('Bookmarked'),
 
-                showBannerInterval: 5000,   // time in ms
+    events: {
+      click: 'toggleBookmark',
+    },
 
-                initialize: function(options) {
-                    this.apiUrl = options.apiUrl;
-                    this.bookmarkId = options.bookmarkId;
-                    this.bookmarked = options.bookmarked;
-                    this.usageId = options.usageId;
-                    this.setBookmarkState(this.bookmarked);
-                },
+    showBannerInterval: 5000,   // time in ms
 
-                toggleBookmark: function(event) {
-                    event.preventDefault();
+    initialize(options) {
+      this.apiUrl = options.apiUrl;
+      this.bookmarkId = options.bookmarkId;
+      this.bookmarked = options.bookmarked;
+      this.usageId = options.usageId;
+      this.setBookmarkState(this.bookmarked);
+    },
 
-                    this.$el.prop('disabled', true);
+    toggleBookmark(event) {
+      event.preventDefault();
 
-                    if (this.$el.hasClass('bookmarked')) {
-                        this.removeBookmark();
-                    } else {
-                        this.addBookmark();
-                    }
-                },
+      this.$el.prop('disabled', true);
 
-                addBookmark: function() {
-                    var view = this;
-                    $.ajax({
-                        data: {usage_id: view.usageId},
-                        type: 'POST',
-                        url: view.apiUrl,
-                        dataType: 'json',
-                        success: function() {
-                            view.$el.trigger('bookmark:add');
-                            view.setBookmarkState(true);
-                        },
-                        error: function(jqXHR) {
-                            var response, userMessage;
-                            try {
-                                response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
-                                userMessage = response ? response.user_message : '';
-                                view.showError(userMessage);
-                            } catch (err) {
-                                view.showError();
-                            }
-                        },
-                        complete: function() {
-                            view.$el.prop('disabled', false);
-                            view.$el.focus();
-                        }
-                    });
-                },
+      if (this.$el.hasClass('bookmarked')) {
+        this.removeBookmark();
+      } else {
+        this.addBookmark();
+      }
+    },
 
-                removeBookmark: function() {
-                    var view = this;
-                    var deleteUrl = view.apiUrl + view.bookmarkId + '/';
+    addBookmark() {
+      const view = this;
+      $.ajax({
+        data: { usage_id: view.usageId },
+        type: 'POST',
+        url: view.apiUrl,
+        dataType: 'json',
+        success() {
+          view.$el.trigger('bookmark:add');
+          view.setBookmarkState(true);
+        },
+        error(jqXHR) {
+          let response;
+          let userMessage;
+          try {
+            response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
+            userMessage = response ? response.user_message : '';
+            view.showError(userMessage);
+          } catch (err) {
+            view.showError();
+          }
+        },
+        complete() {
+          view.$el.prop('disabled', false);
+          view.$el.focus();
+        },
+      });
+    },
 
-                    $.ajax({
-                        type: 'DELETE',
-                        url: deleteUrl,
-                        success: function() {
-                            view.$el.trigger('bookmark:remove');
-                            view.setBookmarkState(false);
-                        },
-                        error: function() {
-                            view.showError();
-                        },
-                        complete: function() {
-                            view.$el.prop('disabled', false);
-                            view.$el.focus();
-                        }
-                    });
-                },
+    removeBookmark() {
+      const view = this;
+      const deleteUrl = `${view.apiUrl + view.bookmarkId}/`;
 
-                setBookmarkState: function(bookmarked) {
-                    if (bookmarked) {
-                        this.$el.addClass('bookmarked');
-                        this.$el.attr('aria-pressed', 'true');
-                        this.$el.find('.bookmark-text').text(this.bookmarkedText);
-                    } else {
-                        this.$el.removeClass('bookmarked');
-                        this.$el.attr('aria-pressed', 'false');
-                        this.$el.find('.bookmark-text').text(this.bookmarkText);
-                    }
-                },
+      $.ajax({
+        type: 'DELETE',
+        url: deleteUrl,
+        success() {
+          view.$el.trigger('bookmark:remove');
+          view.setBookmarkState(false);
+        },
+        error() {
+          view.showError();
+        },
+        complete() {
+          view.$el.prop('disabled', false);
+          view.$el.focus();
+        },
+      });
+    },
 
-                showError: function(errorText) {
-                    var errorMsg = errorText || this.errorMessage;
+    setBookmarkState(bookmarked) {
+      if (bookmarked) {
+        this.$el.addClass('bookmarked');
+        this.$el.attr('aria-pressed', 'true');
+        this.$el.find('.bookmark-text').text(this.bookmarkedText);
+      } else {
+        this.$el.removeClass('bookmarked');
+        this.$el.attr('aria-pressed', 'false');
+        this.$el.find('.bookmark-text').text(this.bookmarkText);
+      }
+    },
 
-                    if (!this.messageView) {
-                        this.messageView = new MessageBannerView({
-                            el: $('.message-banner'),
-                            type: 'error'
-                        });
-                    }
-                    this.messageView.showMessage(errorMsg);
+    showError(errorText) {
+      const errorMsg = errorText || this.errorMessage;
+
+      if (!this.messageView) {
+        this.messageView = new MessageBannerView({
+          el: $('.message-banner'),
+          type: 'error',
+        });
+      }
+      this.messageView.showMessage(errorMsg);
 
                     // Hide message automatically after some interval
-                    setTimeout(_.bind(function() {
-                        this.messageView.hideMessage();
-                    }, this), this.showBannerInterval);
-                }
-            });
-        });
-}).call(this, define || RequireJS.define);
+      setTimeout(_.bind(() => {
+        this.messageView.hideMessage();
+      }, this), this.showBannerInterval);
+    },
+  });
+}
+export default BookmarkButton;

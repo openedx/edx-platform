@@ -1,15 +1,15 @@
 import 'jquery';
 import MessageBannerView from 'js/views/message_banner';
-import BookmarksCollection from 'collections/bookmarks';
-import BookmarksListView from 'views/bookmarks_list';
+import BookmarksCollection from './collections/bookmarks';
+import BookmarksListView from './views/bookmarks_list';
 
 function CourseBookmarksFactory(options) {
-  let courseId = options.courseId;
-  let bookmarksApiUrl = options.bookmarksApiUrl;
-  let bookmarksCollection = new BookmarksCollection([], {
+  const courseId = options.courseId;
+  const bookmarksApiUrl = options.bookmarksApiUrl;
+  const bookmarksCollection = new BookmarksCollection([], {
     course_id: courseId,
     url: bookmarksApiUrl,
-      }
+  },
   );
   const bookmarksView = new BookmarksListView(
     {
@@ -24,4 +24,4 @@ function CourseBookmarksFactory(options) {
   return bookmarksView;
 }
 
-export { CourseBookmarksFactory as default };
+export default CourseBookmarksFactory;
