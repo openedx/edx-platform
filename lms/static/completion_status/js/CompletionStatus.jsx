@@ -16,12 +16,12 @@ class CompletionStatus extends React.Component {
         this.state = {
             course_id: this.props.course_id || '',
             percent_complete: this.props.percentComplete || 0,
-            modalIsOpen: false,
+            isCelebrating: false,
         };
 
         this.sendSocketMessage = this.sendSocketMessage.bind(this);
-        this.openModal = this.openModal.bind(this);
-        this.closeModal = this.closeModal.bind(this);
+        this.startCelebration = this.startCelebration.bind(this);
+        this.stopCelebration = this.stopCelebration.bind(this);
     }
 
     componentDidMount() {
@@ -36,7 +36,7 @@ class CompletionStatus extends React.Component {
         let result = JSON.parse(data);
 
         if (result.percent_complete === 100) {
-            this.openModal();
+            this.startCelebration();
         }
 
         // we've received an updated completion status event
@@ -49,12 +49,12 @@ class CompletionStatus extends React.Component {
        socket.state.ws.send(JSON.stringify(message))
     }
 
-    openModal() {
-        this.setState({modalIsOpen: true});
+    startCelebration() {
+        this.setState({isCelebrating: true});
     }
 
-    closeModal() {
-        this.setState({modalIsOpen: false});
+    stopCelebration() {
+        this.setState({isCelebrating: false});
     }
 
     render() {
@@ -68,10 +68,10 @@ class CompletionStatus extends React.Component {
                 <label>Completion: </label><progress max="100" value={this.state.percent_complete}></progress><span>{this.state.percent_complete}%</span>
                 {isComplete &&
                     <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}>
-                        <Confetti width={this.props.width} height={this.props.height}/>
+                        <Confetti width={this.props.width} height={this.props.height} run={this.state.isCelebrating}/>
                     </div>
                 }
-                <Modal isOpen={this.state.modalIsOpen}
+                <Modal isOpen={this.state.isCelebrating}
                             style={{
                                 overlay: {
                                   position: 'fixed',
@@ -109,7 +109,7 @@ class CompletionStatus extends React.Component {
                         <li><a href="#">Essential Mathematics for Artificial Intelligence</a></li>
                         <li><a href="#">Foundations of Data Structures</a></li>
                     </ul>
-                    <button onClick={this.closeModal} style={{float: 'right'}}>OK</button>
+                    <button onClick={this.stopCelebration} style={{float: 'right'}}>OK</button>
                 </Modal>
             </div>
         )
