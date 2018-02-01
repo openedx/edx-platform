@@ -19,9 +19,7 @@ from openedx.core.lib.logsettings import get_logger_config
 STATIC_GRAB = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log",
-                            logging_env="dev",
-                            tracking_filename="tracking.log",
-                            debug=False)
+                            logging_env="dev")
 
 DATABASES = {
     'default': {

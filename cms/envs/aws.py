@@ -256,7 +256,6 @@ WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
-                            debug=False,
                             service_variant=SERVICE_VARIANT)
 
 #theming start:
