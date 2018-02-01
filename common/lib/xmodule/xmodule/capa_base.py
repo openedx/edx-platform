@@ -1623,6 +1623,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         event_info['orig_score'] = orig_score.raw_earned
         event_info['orig_total'] = orig_score.raw_possible
         try:
+            self.update_correctness()
             calculated_score = self.calculate_score()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -1673,14 +1674,20 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         return self.score
 
+    def update_correctness(self):
+        """
+        Updates correct map of the LCP.
+        Operates by creating a new correctness map based on the current
+        state of the LCP, and updating the old correctness map of the LCP.
+        """
+        new_cmap = self.lcp.get_grade_from_current_answers(None)
+        self.lcp.correct_map.update(new_cmap)
+
     def calculate_score(self):
         """
         Returns the score calculated from the current problem state.
-        Operates by creating a new correctness map based on the current
-        state of the LCP, and having the LCP generate a score from that.
         """
-        new_correctness = self.lcp.get_grade_from_current_answers(None)
-        new_score = self.lcp.calculate_score(new_correctness)
+        new_score = self.lcp.calculate_score()
         return Score(raw_earned=new_score['score'], raw_possible=new_score['total'])
 
     def score_from_lcp(self):
