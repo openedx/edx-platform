@@ -8,10 +8,12 @@ manipulate storage but use existing api's.
 '''
 import logging
 
+from opaque_keys.edx.locator import CourseLocator
+
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +27,32 @@ class SplitMigrator(object):
         super(SplitMigrator, self).__init__()
         self.split_modulestore = split_modulestore
         self.source_modulestore = source_modulestore
+
+    def migrate_with_same_course_key(self, course_key, user_id):
+        """Migrate data into Split, but keep the same course key (and usage keys)."""
+        original_course = self.source_modulestore.get_course(course_key)
+        if original_course is None:
+            raise ItemNotFoundError(unicode(course_key))
+
+        with self.split_modulestore.bulk_operations(course_key):
+            new_course = self.split_modulestore.create_course_with_key(
+                course_key,
+                user_id,
+                fields=self._get_fields(original_course),
+                master_branch=ModuleStoreEnum.BranchName.published,
+                extra_branches=[ModuleStoreEnum.BranchName.draft],
+                skip_auto_publish=True,
+            )
+            print new_course
+
+
+    def _get_fields(self, block):
+        return {
+            field_name: field.read_from(block)
+            for field_name, field in block.fields.items()
+            if field.is_set_on(block)
+        }
+
 
     def migrate_mongo_course(
             self, source_course_key, user_id, new_org=None, new_course=None, new_run=None, fields=None, **kwargs
