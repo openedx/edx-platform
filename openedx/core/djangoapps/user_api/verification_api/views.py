@@ -1,9 +1,11 @@
 """ Verification API v1 views. """
 from django.http import Http404
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.authentication import (
+    JwtAuthentication,
+    BearerAuthentication
+)
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveAPIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.user_api.serializers import SoftwareSecurePhotoVerificationSerializer
@@ -12,7 +14,7 @@ from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 class PhotoVerificationStatusView(RetrieveAPIView):
     """ PhotoVerificationStatus detail endpoint. """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
     permission_classes = (IsStaffOrOwner,)
     serializer_class = SoftwareSecurePhotoVerificationSerializer
 

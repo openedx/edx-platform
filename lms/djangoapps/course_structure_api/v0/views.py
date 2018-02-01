@@ -4,14 +4,16 @@ import logging
 
 from django.conf import settings
 from django.http import Http404
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.authentication import (
+    JwtAuthentication,
+    BearerAuthentication
+)
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_oauth.authentication import OAuth2Authentication
 from xmodule.modulestore.django import modulestore
 
 from course_structure_api.v0 import serializers
@@ -29,7 +31,7 @@ class CourseViewMixin(object):
     Mixin for views dealing with course content. Also handles authorization and authentication.
     """
     lookup_field = 'course_id'
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get_course_or_404(self):
