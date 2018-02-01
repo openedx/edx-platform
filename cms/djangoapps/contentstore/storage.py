@@ -32,5 +32,5 @@ class LocalVideoStorage(FileSystemStorage):
     def __init__(self):
         super(FileSystemStorage, self).__init__(
             location=settings.VIDEO_STORAGE_ROOT,
-            base_url=settings.Video_STORAGE_URL,
+            base_url=settings.VIDEO_STORAGE_URL,
         )
