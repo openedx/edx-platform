@@ -27,6 +27,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.completion.services import CompletionService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
@@ -362,6 +363,7 @@ class CoursewareIndex(View):
         """
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
+        percent_complete = CompletionService(request.user, self.course.id).get_percent_completed(request)
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -382,6 +384,7 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'percent_complete': percent_complete
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

@@ -14,8 +14,8 @@ class CompletionStatus extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            course_id: '',
-            percent_complete: 0,
+            course_id: this.props.course_id || '',
+            percent_complete: this.props.percentComplete || 0,
             modalIsOpen: false,
         };
 
@@ -24,7 +24,8 @@ class CompletionStatus extends React.Component {
         this.closeModal = this.closeModal.bind(this);
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+    }
 
     componentWillUnmount() {
         this.serverRequest.abort();
@@ -116,7 +117,8 @@ class CompletionStatus extends React.Component {
 }
 
 CompletionStatus.propTypes = {
-    socketPath: React.PropTypes.string
+    socketPath: React.PropTypes.string,
+    percentComplete: React.PropTypes.number
 };
 
 // windowSize is a HOC that sets props.windowHeight and props.windowWidth

@@ -13,6 +13,6 @@ def roll_up(user, course_key):
     Group('completion').send(
         {'text': json.dumps({
             'course_id': str(course_key),
-            'percent_complete': round(percent_completed * 100, 2),
+            'percent_complete': percent_completed
         })}
     )

@@ -72,6 +72,7 @@ if course is not None:
                 component="CompletionStatus",
                 id="completion-status",
                 props={
+                    "percentComplete": percent_complete,
                     "socketPath": "completion_status"
                 }
             )}
