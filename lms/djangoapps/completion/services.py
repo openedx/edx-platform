@@ -97,4 +97,4 @@ class CompletionService(object):
         print("roll_up num_completed", num_completed)
         print("roll_up percent_completed", percent_completed)
 
-        return round(percent_completed * 100, 2)
+        return round(percent_completed * 100)

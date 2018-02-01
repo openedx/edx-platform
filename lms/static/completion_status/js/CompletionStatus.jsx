@@ -65,7 +65,7 @@ class CompletionStatus extends React.Component {
             <div>
                 <Websocket ref="socket" url={socketUrl}
                     onMessage={this.handleData.bind(this)} reconnect={true}/>
-                <label>Completion: </label><progress max="100" value={this.state.percent_complete}></progress><span>{this.state.percent_complete}%</span>
+                <label>Completion: </label><progress max="100" value={this.state.percent_complete}></progress><span>&nbsp;{this.state.percent_complete}%</span>
                 {isComplete &&
                     <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}>
                         <Confetti width={this.props.width} height={this.props.height} run={this.state.isCelebrating}/>
