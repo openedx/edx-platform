@@ -504,19 +504,24 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             tags=[u"courselike:{}".format(courselike_key)]
         ):
             # Copy videos into the local video storage backend.
+            LOGGER.info(u'Starting to copy videos from course tarball')
             video_store = LocalVideoStorage()
             # list of paths to video encoding subdirs, one element per edx video
-            olx_video_dirs = (
-                d for d in os.listdir(os.path.join(course_dir, 'course', 'video'))
-                if os.path.isdir(d)
-            )
+            top_olx_video_dir = os.path.join(course_dir, 'course', 'video')
+            olx_video_dirs = [
+                os.path.join(top_olx_video_dir, d) for d in os.listdir(top_olx_video_dir)
+                if os.path.isdir(os.path.join(top_olx_video_dir, d))
+            ]
+            LOGGER.info(u'found videos: %s', olx_video_dirs)
             for single_video_dir in olx_video_dirs:
                 for video_filename in os.listdir(single_video_dir):
                     if video_filename.endswith('.mp4'):
-                        # video_filename looks like "/path/to/<course-id>/video/<video-id>/<encoded-video-filename>.mp4"
-                        # backend_name looks like "<video-id>/<encoded-video-filename>.mp4"
-                        backend_store_name = os.path.relpath(video_filename, os.path.join(course_dir, 'course', 'video'))
-                        with open(video_filename, 'r') as video_file:
+                        video_file_path = os.path.join(single_video_dir, video_filename)
+                        # video_file_path looks like "/path/to/<course-id>/video/<video-id>/<encoded-video-filename>.mp4"
+                        # backend_store_name looks like "<video-id>/<encoded-video-filename>.mp4"
+                        backend_store_name = os.path.relpath(video_file_path, top_olx_video_dir)
+                        LOGGER.info(u'copying video "%s" into "%s"', video_file_path, backend_store_name)
+                        with open(video_file_path, 'r') as video_file:
                             video_store.save(backend_store_name, video_file)
             # import course into modulestore/contentstore
             courselike_items = import_func(
