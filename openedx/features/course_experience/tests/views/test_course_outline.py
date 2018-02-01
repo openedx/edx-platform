@@ -4,9 +4,14 @@ Tests for the Course Outline view and supporting views.
 import datetime
 import json
 
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from pyquery import PyQuery as pq
 from six import text_type
+from waffle.testutils import override_switch
 
 from courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
@@ -14,13 +19,10 @@ from lms.djangoapps.completion import waffle
 from lms.djangoapps.completion.models import BlockCompletion
 from lms.djangoapps.completion.test_utils import CompletionWaffleTestMixin
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
-from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.lib.gating import api as gating_api
-from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from waffle.testutils import override_switch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -273,6 +275,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
+        cls.site = Site.objects.get_current()
+        SiteConfiguration.objects.get_or_create(
+            site=cls.site,
+            enabled=True,
+            values={waffle.ENABLE_SITE_VISUAL_PROGRESS: True}
+        )
 
     @classmethod
     def create_test_course(cls):
@@ -369,13 +377,14 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         ),
         active=True
     )
-    @patch('lms.djangoapps.completion.waffle.site_configuration_enabled')
-    def test_resume_course_with_completion_api(self, get_patched_site):
+    @patch('lms.djangoapps.completion.waffle.get_current_site')
+    def test_resume_course_with_completion_api(self, get_patched_current_site):
         """
         Tests completion API resume button functionality
         """
+        get_patched_current_site
         self.override_waffle_switch(True)
-        get_patched_site.return_value = True
+        get_patched_current_site.return_value = self.site
 
         # Course tree
         course = self.course

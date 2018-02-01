@@ -71,7 +71,11 @@ def visual_progress_enabled(course_key):
     if not waffle().is_enabled(ENABLE_COMPLETION_TRACKING):
         return
 
-    if not site_configuration_enabled():
+    current_site = get_current_site()
+    try:
+        if not current_site.configuration.get_value(ENABLE_SITE_VISUAL_PROGRESS, False):
+            return
+    except SiteConfiguration.DoesNotExist:
         return
 
     # Site-aware global override
@@ -79,18 +83,4 @@ def visual_progress_enabled(course_key):
         # Course enabled
         return waffle_flag()[ENABLE_COURSE_VISUAL_PROGRESS].is_enabled(course_key)
 
-    return True
-
-
-def site_configuration_enabled():
-    """
-    Helper function to return site-aware feature switch
-    :return: bool -> True if site enabled for visual progress tracking
-    """
-    try:
-        current_site = get_current_site()
-        if not current_site.configuration.get_value(ENABLE_SITE_VISUAL_PROGRESS, False):
-            return
-    except SiteConfiguration.DoesNotExist:
-        return
     return True
