@@ -747,6 +747,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         self.db_connection.delete_old_mongo_mapping(course_key)
 
     def fill_in_run(self, course_key):
+        """We try to fill in the run, but if we return without a run, it means
+        we don't have it in the old mongo mapping."""
         if course_key.run is not None:
             return course_key
 
@@ -2816,7 +2818,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
 
-        import pudb; pu.db
+        # import pudb; pu.db
         self.delete_course_index(course_key)
         if course_key.deprecated:
             self.delete_old_mongo_mapping(course_key)

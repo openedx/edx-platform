@@ -201,22 +201,21 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         If locator is None, returns the first (ordered) store as the default
         """
-        # import pudb; pu.db
-
         if locator is not None:
             locator = self._clean_locator_for_mapping(locator)
-            mapping = self.mappings.get(locator, None)
-            if mapping is not None:
-                return mapping
+            # mapping = self.mappings.get(locator, None)
+            # if mapping is not None:
+            #     return mapping
+            # else:
+
+            if isinstance(locator, LibraryLocator):
+                has_locator = lambda store: hasattr(store, 'has_library') and store.has_library(locator)
             else:
-                if isinstance(locator, LibraryLocator):
-                    has_locator = lambda store: hasattr(store, 'has_library') and store.has_library(locator)
-                else:
-                    has_locator = lambda store: store.has_course(locator)
-                for store in self.modulestores:
-                    if has_locator(store):
-                        self.mappings[locator] = store
-                        return store
+                has_locator = lambda store: store.has_course(locator)
+            for store in self.modulestores:
+                if has_locator(store):
+                    # self.mappings[locator] = store
+                    return store
 
         # return the default store
         return self.default_modulestore
@@ -391,6 +390,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         :param course_key: must be a CourseKey
         """
+        # import pudb; pu.db
+
         assert isinstance(course_key, CourseKey)
         store = self._get_modulestore_for_courselike(course_key)
         try:
@@ -822,6 +823,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(location.course_key, 'revert_to_published')
         return store.revert_to_published(location, user_id)
+
 
     def close_all_connections(self):
         """

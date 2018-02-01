@@ -320,15 +320,6 @@ class MongoConnection(object):
             }
         )
 
-#    def has_old_mongo_mapping(self, course_key):
-#        if not course_key.deprecated:
-#            return False
-#
-#        query = {
-#
-#        }
-
-
     def delete_old_mongo_mapping(self, course_key):
         query = {
             'org': course_key.org,
