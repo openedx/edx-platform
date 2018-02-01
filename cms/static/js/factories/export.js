@@ -4,22 +4,31 @@ define([
     'use strict';
     return function(courselikeHomeUrl, library, statusUrl) {
         var $submitBtn = $('.action-export'),
+            $videosCheckbox = $('.action-include-videos'),
             unloading = false,
             previousExport = Export.storedExport(courselikeHomeUrl);
 
         var onComplete = function() {
             $submitBtn.show();
+            $videosCheckbox.show();
         };
 
         var startExport = function(e) {
+            var checkboxName = $videosCheckbox.find('input').attr('name');
+            var checkboxVal = $videosCheckbox.find('input').is(':checked');
+            var data = {};
+            if (checkboxVal) {
+                data[checkboxName] = checkboxVal;
+            }
             e.preventDefault();
             $submitBtn.hide();
+            $videosCheckbox.hide();
             Export.reset(library);
             Export.start(statusUrl).then(onComplete);
             $.ajax({
                 type: 'POST',
                 url: window.location.pathname,
-                data: {},
+                data: data,
                 success: function(result, textStatus, xhr) {
                     if (xhr.status === 200) {
                         setTimeout(function() { Export.pollStatus(result); }, 1000);
@@ -45,6 +54,7 @@ define([
         if (previousExport) {
             if (previousExport.completed !== true) {
                 $submitBtn.hide();
+                $videosCheckbox.hide();
             }
             Export.resume(library).then(onComplete);
         }
