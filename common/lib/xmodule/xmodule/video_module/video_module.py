@@ -213,6 +213,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
+    def _update_local_url(self, url):
+        if url.startswith('local-video'):
+            return url.replace('local-video', settings.VIDEO_STORAGE_URL)
+
     def get_html(self):
 
         track_status = (self.download_track and self.track)
@@ -249,16 +253,15 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
                 # Fallback to the mobile encoding since we sometimes export
                 # courses with only mobile video encodings (to keep the export size down).
-                desktop_profile_exists = bool(val_profiles["desktop_mp4"])
+                desktop_profile_exists = bool(val_video_urls["desktop_mp4"])
                 if not desktop_profile_exists:
-                    val_profiles["desktop_mp4"] = val_profiles["mobile_low"]
+                    val_video_urls["desktop_mp4"] = val_video_urls["mobile_low"]
 
                 # add the non-youtube urls to the list of alternative sources
                 # use the last non-None non-youtube non-hls url as the link to download the video
                 for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
                     if url:
-                        if url.startswith('local-video'):
-                            url = url.replace('local-video', settings.VIDEO_STORAGE_URL)
+                        url = self._update_local_url(url)
 
                         if url not in sources:
                             sources.append(url)
