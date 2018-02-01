@@ -1080,3 +1080,7 @@ if settings.BRANCH_IO_KEY:
     ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
+
+# edX-in-a-box videos served in development mode via django itself
+if not settings.VIDEO_STORAGE_URL.startswith('http'):
+    urlpatterns += static(settings.VIDEO_STORAGE_URL, document_root=settings.VIDEO_STORAGE_ROOT)
