@@ -31,7 +31,7 @@ class RenderForm extends React.Component {
   }
 
   submitForm() {
-    const url = this.props.context.zendeskProxyUrl,
+    const url = this.props.context.submitFormUrl,
       $userInfo = $('.user-info'),
       request = new XMLHttpRequest(),
       $course = $('#course'),
@@ -40,7 +40,7 @@ class RenderForm extends React.Component {
         comment: {
           body: $('#message').val(),
         },
-        tags: this.props.context.zendeskTags,
+        tags: this.props.context.tags,
       };
 
     let course;
@@ -116,7 +116,7 @@ class RenderForm extends React.Component {
     if (this.props.context.user) {
       userElement = (<LoggedInUser
         userInformation={this.props.context.user}
-        zendeskProxyUrl={this.props.context.zendeskProxyUrl}
+        submitFormUrl={this.props.context.submitFormUrl}
         setErrorState={this.setErrorState}
         submitForm={this.submitForm}
       />);

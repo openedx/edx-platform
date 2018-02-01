@@ -92,7 +92,7 @@ LoggedInUser.propTypes = {
   setErrorState: PropTypes.func.isRequired,
   submitForm: PropTypes.func.isRequired,
   userInformation: PropTypes.arrayOf(PropTypes.object).isRequired,
-  zendeskProxyUrl: PropTypes.string.isRequired,
+  submitFormUrl: PropTypes.string.isRequired,
 };
 
 export default LoggedInUser;
