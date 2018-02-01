@@ -93,7 +93,11 @@
             },
 
             showErrorMessage: function() {
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.errorTemplate)({errorMessage: this.collection.errorMessage}));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.template(this.errorTemplate)({
+                        errorMessage: this.collection.errorMessage
+                    }));
                 this.showResults();
             },
 
