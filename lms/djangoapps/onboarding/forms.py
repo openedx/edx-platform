@@ -629,24 +629,24 @@ class RegModelForm(BaseOnboardingModelForm):
         if not is_currently_unemployed and organization_name:
             organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
             extended_profile.organization = organization_to_assign
-            if is_created:
-                if user and is_poc == '1':
-                    organization_to_assign.unclaimed_org_admin_email = None
-                    organization_to_assign.admin = user
 
-                if not is_poc == '1' and org_admin_email:
-                    try:
+            if user and is_poc == '1':
+                organization_to_assign.unclaimed_org_admin_email = None
+                organization_to_assign.admin = user
 
-                        hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
-                        org_id = extended_profile.organization_id
-                        org_name = extended_profile.organization.label
-                        organization_to_assign.unclaimed_org_admin_email = org_admin_email
+            if not is_poc == '1' and org_admin_email:
+                try:
 
-                        send_admin_activation_email(first_name, org_id, org_name, org_admin_email, hash_key)
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
+                    org_id = extended_profile.organization_id
+                    org_name = extended_profile.organization.label
+                    organization_to_assign.unclaimed_org_admin_email = org_admin_email
 
-                    except Exception as ex:
-                        log.info(ex.args)
-                        pass
+                    send_admin_activation_email(first_name, org_id, org_name, org_admin_email, hash_key)
+
+                except Exception as ex:
+                    log.info(ex.args)
+                    pass
 
         user.first_name = first_name
         user.last_name = last_name
