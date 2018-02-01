@@ -256,8 +256,8 @@ def _handle_instructor_task_failure(instructor_task, error):
     """
     Do required operations if task creation was not complete.
     """
-    log.info("instructor task (%s) failed, result: %s", instructor_task.task_id, error.message)
-    _update_instructor_task_state(instructor_task, FAILURE, error.message)
+    log.info("instructor task (%s) failed, result: %s", instructor_task.task_id, text_type(error))
+    _update_instructor_task_state(instructor_task, FAILURE, text_type(error))
 
     raise QueueConnectionError()
 

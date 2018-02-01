@@ -8,6 +8,8 @@ from django.conf import settings
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
+from six import text_type
+
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -342,7 +344,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         with self.assertNumQueries(4):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
-            {student: all_errors[student].message for student in all_errors},
+            {student: text_type(all_errors[student]) for student in all_errors},
             {
                 student3: "Error for student3.",
                 student4: "Error for student4.",

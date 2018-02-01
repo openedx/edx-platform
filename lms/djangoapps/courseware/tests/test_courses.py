@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.courses import (
     course_open_for_self_enrollment,
@@ -78,7 +79,7 @@ class CoursesTest(ModuleStoreTestCase):
 
         with self.assertRaises(CoursewareAccessException) as error:
             course_access_func(user, 'load', course.id)
-        self.assertEqual(error.exception.message, "Course not found.")
+        self.assertEqual(text_type(error.exception), "Course not found.")
         self.assertEqual(error.exception.access_response.error_code, "not_visible_to_user")
         self.assertFalse(error.exception.access_response.has_access)
 

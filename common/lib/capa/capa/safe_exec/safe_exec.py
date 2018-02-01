@@ -5,6 +5,7 @@ from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import json_safe, SafeExecException
 from . import lazymod
 from dogapi import dog_stats_api
+from six import text_type
 
 import hashlib
 
@@ -143,7 +144,7 @@ def safe_exec(
             python_path=python_path, extra_files=extra_files, slug=slug,
         )
     except SafeExecException as e:
-        emsg = e.message
+        emsg = text_type(e)
     else:
         emsg = None
 

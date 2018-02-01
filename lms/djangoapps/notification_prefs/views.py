@@ -19,6 +19,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
+from six import text_type
 
 from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
@@ -185,7 +186,7 @@ def set_subscription(request, token, subscribe):  # pylint: disable=unused-argum
     except UnicodeDecodeError:
         raise Http404("base64url")
     except UsernameDecryptionException as exn:
-        raise Http404(exn.message)
+        raise Http404(text_type(exn))
     except User.DoesNotExist:
         raise Http404("username")
 

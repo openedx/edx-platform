@@ -296,7 +296,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.VERIFIED)
 
     @ddt.data(
-        ({}, r"The field '\w+' is required."),
+        ({}, r"The field \"'\w+'\" is required."),  # The double quoting goes away in Django 2.0.1
         ({'course_id': 'bad course key'}, 'Could not parse course key.'),
         ({
             'course_id': 'course-v1:TestX+T101+2015',

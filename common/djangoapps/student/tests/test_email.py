@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.test import override_settings, TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
+from six import text_type
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -266,7 +267,7 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         try:
             validate_new_email(self.request.user, email)
         except ValueError as err:
-            return err.message
+            return text_type(err)
 
     def do_email_change(self, user, email, activation_key=None):
         """
@@ -275,7 +276,7 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         try:
             do_email_change_request(user, email, activation_key)
         except ValueError as err:
-            return err.message
+            return text_type(err)
 
     def assertFailedRequest(self, response_data, expected_error):
         """

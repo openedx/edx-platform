@@ -12,6 +12,7 @@ import urllib
 
 import mock
 from oauthlib.oauth1 import Client
+from six import text_type
 from webob import Response
 from xblock.core import XBlock
 
@@ -290,8 +291,8 @@ class LTI20ModuleMixin(object):
         try:
             self.verify_oauth_body_sign(request, content_type=LTI_2_0_JSON_CONTENT_TYPE)
         except (ValueError, LTIError) as err:
-            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(err.message))
-            raise LTIError(err.message)
+            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(text_type(err)))
+            raise LTIError(text_type(err))
 
     def parse_lti_2_0_result_json(self, json_str):
         """
@@ -360,7 +361,7 @@ class LTI20ModuleMixin(object):
                 log.info("[LTI] {}".format(msg))
                 raise LTIError(msg)
         except (TypeError, ValueError) as err:
-            msg = "Could not convert resultScore to float: {}".format(err.message)
+            msg = "Could not convert resultScore to float: {}".format(text_type(err))
             log.info("[LTI] {}".format(msg))
             raise LTIError(msg)
 

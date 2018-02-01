@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from courseware.courses import get_course_with_access
 from courseware.model_data import FieldDataCache
@@ -165,7 +166,7 @@ def notes(request, course_id):
             text=text
         )
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
-        return JsonResponseBadRequest({"error": err.message}, status=500)
+        return JsonResponseBadRequest({"error": text_type(err)}, status=500)
 
     return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")
 

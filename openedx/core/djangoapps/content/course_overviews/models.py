@@ -13,6 +13,7 @@ from django.template import defaultfilters
 
 from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
+from six import text_type
 
 from config_models.models import ConfigurationModel
 from lms.djangoapps import django_comment_client
@@ -528,7 +529,7 @@ class CourseOverview(TimeStampedModel):
                 log.exception(
                     'An error occurred while generating course overview for %s: %s',
                     unicode(course_key),
-                    ex.message,
+                    text_type(ex),
                 )
 
         log.info('Finished generating course overviews.')

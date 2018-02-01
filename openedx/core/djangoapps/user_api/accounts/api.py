@@ -13,6 +13,7 @@ from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError, AccountValidationError
+from six import text_type
 
 from student.models import User, UserProfile, Registration
 from student import forms as student_forms
@@ -168,8 +169,8 @@ def update_account_settings(requesting_user, update, username=None):
             student_views.validate_new_email(existing_user, new_email)
         except ValueError as err:
             field_errors["email"] = {
-                "developer_message": u"Error thrown from validate_new_email: '{}'".format(err.message),
-                "user_message": err.message
+                "developer_message": u"Error thrown from validate_new_email: '{}'".format(text_type(err)),
+                "user_message": text_type(err)
             }
 
     # If the user asked to change full name, validate it
@@ -245,7 +246,7 @@ def update_account_settings(requesting_user, update, username=None):
         raise err
     except Exception as err:
         raise errors.AccountUpdateError(
-            u"Error thrown when saving account updates: '{}'".format(err.message)
+            u"Error thrown when saving account updates: '{}'".format(text_type(err))
         )
 
     # And try to send the email change request if necessary.
@@ -256,8 +257,8 @@ def update_account_settings(requesting_user, update, username=None):
             student_views.do_email_change_request(existing_user, new_email)
         except ValueError as err:
             raise errors.AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(err.message),
-                user_message=err.message
+                u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
+                user_message=text_type(err)
             )
 
 
@@ -552,7 +553,7 @@ def _validate(validation_func, err, *args):
     try:
         validation_func(*args)
     except err as validation_err:
-        return validation_err.message
+        return text_type(validation_err)
     return ''
 
 
@@ -582,8 +583,10 @@ def _validate_username(username):
             # `validate_username` provides a proper localized message, however the API needs only the English
             # message by convention.
             student_forms.validate_username(username)
-    except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength, ValidationError) as username_err:
-        raise errors.AccountUsernameInvalid(username_err.message)
+    except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as username_err:
+        raise errors.AccountUsernameInvalid(text_type(username_err))
+    except ValidationError as validation_err:
+        raise errors.AccountUsernameInvalid(validation_err.message)
 
 
 def _validate_email(email):
@@ -605,8 +608,10 @@ def _validate_email(email):
         _validate_length(email, accounts.EMAIL_MIN_LENGTH, accounts.EMAIL_MAX_LENGTH, accounts.EMAIL_BAD_LENGTH_MSG)
         validate_email.message = accounts.EMAIL_INVALID_MSG.format(email=email)
         validate_email(email)
-    except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength, ValidationError) as invalid_email_err:
-        raise errors.AccountEmailInvalid(invalid_email_err.message)
+    except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as invalid_email_err:
+        raise errors.AccountEmailInvalid(text_type(invalid_email_err))
+    except ValidationError as validation_err:
+        raise errors.AccountEmailInvalid(validation_err.message)
 
 
 def _validate_confirm_email(confirm_email, email):
@@ -650,7 +655,7 @@ def _validate_password(password, username=None):
 
         _validate_password_works_with_username(password, username)
     except (errors.AccountDataBadType, errors.AccountDataBadLength) as invalid_password_err:
-        raise errors.AccountPasswordInvalid(invalid_password_err.message)
+        raise errors.AccountPasswordInvalid(text_type(invalid_password_err))
 
 
 def _validate_country(country):

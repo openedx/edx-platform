@@ -67,6 +67,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
+from six import text_type
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -186,7 +187,7 @@ class SafeCookieData(object):
             log.error(
                 "SafeCookieData signature error for cookie data {0!r}: {1}".format(  # pylint: disable=logging-format-interpolation
                     unicode(self),
-                    sig_error.message,
+                    text_type(sig_error),
                 )
             )
         return False

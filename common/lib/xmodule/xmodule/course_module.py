@@ -16,6 +16,7 @@ from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByD
 from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
+from six import text_type
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
@@ -943,7 +944,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=err.message, course_id=unicode(self.id)))
+            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=unicode(self.id)))
 
         self.set_default_certificate_available_date()
 

@@ -24,6 +24,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from six import text_type
 
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -812,7 +813,7 @@ def _create_or_rerun_course(request):
                     'course_key': unicode(new_course.id),
                 })
             except ValidationError as ex:
-                return JsonResponse({'error': ex.message}, status=400)
+                return JsonResponse({'error': text_type(ex)}, status=400)
     except DuplicateCourseError:
         return JsonResponse({
             'ErrMsg': _(
@@ -829,7 +830,7 @@ def _create_or_rerun_course(request):
         })
     except InvalidKeyError as error:
         return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=error.message)}
+            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
         )
 
 
@@ -1297,7 +1298,7 @@ def advanced_settings_handler(request, course_key_string):
                             # update the course tabs if required by any setting changes
                             _refresh_course_tabs(request, course_module)
                         except InvalidTabsException as err:
-                            log.exception(err.message)
+                            log.exception(text_type(err))
                             response_message = [
                                 {
                                     'message': _('An error occurred while trying to save your tabs'),
@@ -1316,7 +1317,7 @@ def advanced_settings_handler(request, course_key_string):
                 # Handle all errors that validation doesn't catch
                 except (TypeError, ValueError, InvalidTabsException) as err:
                     return HttpResponseBadRequest(
-                        django.utils.html.escape(err.message),
+                        django.utils.html.escape(text_type(err)),
                         content_type="text/plain"
                     )
 
@@ -1418,7 +1419,7 @@ def textbooks_list_handler(request, course_key_string):
             try:
                 textbooks = validate_textbooks_json(request.body)
             except TextbookValidationError as err:
-                return JsonResponse({"error": err.message}, status=400)
+                return JsonResponse({"error": text_type(err)}, status=400)
 
             tids = set(t["id"] for t in textbooks if "id" in t)
             for textbook in textbooks:
@@ -1437,7 +1438,7 @@ def textbooks_list_handler(request, course_key_string):
             try:
                 textbook = validate_textbook_json(request.body)
             except TextbookValidationError as err:
-                return JsonResponse({"error": err.message}, status=400)
+                return JsonResponse({"error": text_type(err)}, status=400)
             if not textbook.get("id"):
                 tids = set(t["id"] for t in course.pdf_textbooks if "id" in t)
                 textbook["id"] = assign_textbook_id(textbook, tids)
@@ -1491,7 +1492,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
             try:
                 new_textbook = validate_textbook_json(request.body)
             except TextbookValidationError as err:
-                return JsonResponse({"error": err.message}, status=400)
+                return JsonResponse({"error": text_type(err)}, status=400)
             new_textbook["id"] = textbook_id
             if textbook:
                 i = course_module.pdf_textbooks.index(textbook)
@@ -1621,7 +1622,7 @@ def group_configurations_list_handler(request, course_key_string):
                 try:
                     new_configuration = GroupConfiguration(request.body, course).get_user_partition()
                 except GroupConfigurationsValidationError as err:
-                    return JsonResponse({"error": err.message}, status=400)
+                    return JsonResponse({"error": text_type(err)}, status=400)
 
                 course.user_partitions.append(new_configuration)
                 response = JsonResponse(new_configuration.to_json(), status=201)
@@ -1664,7 +1665,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             try:
                 new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
             except GroupConfigurationsValidationError as err:
-                return JsonResponse({"error": err.message}, status=400)
+                return JsonResponse({"error": text_type(err)}, status=400)
 
             if configuration:
                 index = course.user_partitions.index(configuration)

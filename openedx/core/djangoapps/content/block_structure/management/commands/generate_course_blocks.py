@@ -4,6 +4,7 @@ Command to load course blocks.
 import logging
 
 from django.core.management.base import BaseCommand
+from six import text_type
 from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
@@ -136,7 +137,7 @@ class Command(BaseCommand):
                 log.exception(
                     u'BlockStructure: An error occurred while generating course blocks for %s: %s',
                     unicode(course_key),
-                    ex.message,
+                    text_type(ex),
                 )
 
     def _generate_for_course(self, options, course_key):

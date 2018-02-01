@@ -30,6 +30,7 @@ from textwrap import dedent
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from six import text_type
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -283,7 +284,7 @@ def get_processor_exception_html(exception):
         )
         formatted = msg.format(
             error_message='<span class="exception_msg">{msg}</span>'.format(
-                msg=exception.message,
+                msg=text_type(exception),
             ),
             email=payment_support_email,
         )
@@ -298,7 +299,7 @@ def get_processor_exception_html(exception):
         )
         formatted = msg.format(
             error_message='<span class="exception_msg">{msg}</span>'.format(
-                msg=exception.message,
+                msg=text_type(exception),
             ),
             email=payment_support_email,
         )
@@ -316,7 +317,7 @@ def get_processor_exception_html(exception):
         )
         formatted = msg.format(
             error_message='<span class="exception_msg">{msg}</span>'.format(
-                msg=exception.message,
+                msg=text_type(exception),
             ),
             email=payment_support_email,
         )

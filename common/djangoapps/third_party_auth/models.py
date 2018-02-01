@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from provider.oauth2.models import Client
 from provider.utils import long_token
+from six import text_type
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
@@ -60,7 +61,7 @@ def clean_json(value, of_type):
     try:
         value_python = json.loads(value)
     except ValueError as err:
-        raise ValidationError("Invalid JSON: {}".format(err.message))
+        raise ValidationError("Invalid JSON: {}".format(text_type(err)))
     if not isinstance(value_python, of_type):
         raise ValidationError("Expected a JSON {}".format(of_type))
     return json.dumps(value_python, indent=4)

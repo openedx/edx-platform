@@ -15,6 +15,7 @@ import zipfile
 
 import mock
 from pytz import UTC
+from six import text_type
 import requests
 
 from capa.tests.helpers import new_loncapa_problem, test_capa_system, load_fixture
@@ -798,7 +799,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['?\\d?'])
         with self.assertRaises(Exception) as cm:
             self.assert_grade(problem, "a3", "correct")
-        exception_message = cm.exception.message
+        exception_message = text_type(cm.exception)
         self.assertIn("nothing to repeat", exception_message)
 
     def test_hints(self):

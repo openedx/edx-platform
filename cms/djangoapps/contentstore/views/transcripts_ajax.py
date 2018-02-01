@@ -18,6 +18,7 @@ from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from six import text_type
 
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
@@ -133,7 +134,7 @@ def upload_transcripts(request):
             response['subs'] = item.sub
             response['status'] = 'Success'
         except Exception as ex:
-            return error_response(response, ex.message)
+            return error_response(response, text_type(ex))
     else:
         return error_response(response, 'Empty video sources.')
 
@@ -242,7 +243,7 @@ def check_transcripts(request):
     try:
         __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
-        return error_response(transcripts_presence, e.message)
+        return error_response(transcripts_presence, text_type(e))
 
     transcripts_presence['status'] = 'Success'
 
@@ -400,7 +401,7 @@ def choose_transcripts(request):
     try:
         data, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
-        return error_response(response, e.message)
+        return error_response(response, text_type(e))
 
     html5_id = data.get('html5_id')  # html5_id chosen by user
 
@@ -433,7 +434,7 @@ def replace_transcripts(request):
     try:
         __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
-        return error_response(response, e.message)
+        return error_response(response, text_type(e))
 
     youtube_id = videos['youtube']
     if not youtube_id:
@@ -442,7 +443,7 @@ def replace_transcripts(request):
     try:
         download_youtube_subs(youtube_id, item, settings)
     except GetTranscriptsFromYouTubeException as e:
-        return error_response(response, e.message)
+        return error_response(response, text_type(e))
 
     item.sub = youtube_id
     item.save_with_metadata(request.user)
@@ -504,7 +505,7 @@ def rename_transcripts(request):
     try:
         __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
-        return error_response(response, e.message)
+        return error_response(response, text_type(e))
 
     old_name = item.sub
 

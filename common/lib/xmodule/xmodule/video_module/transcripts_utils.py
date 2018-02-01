@@ -12,6 +12,7 @@ from pysrt import SubRipTime, SubRipItem, SubRipFile
 from pysrt.srtexc import Error
 from lxml import etree
 from HTMLParser import HTMLParser
+from six import text_type
 
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
@@ -226,7 +227,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         srt_subs_obj = SubRipFile.from_string(subs_filedata)
     except Exception as ex:
         msg = _("Something wrong with SubRip transcripts file during parsing. Inner message is {error_message}").format(
-            error_message=ex.message
+            error_message=text_type(ex)
         )
         raise TranscriptsGenerationException(msg)
     if not srt_subs_obj:
@@ -459,7 +460,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
         srt_transcripts = contentstore().find(Transcript.asset_location(item.location, user_filename))
     except NotFoundError as ex:
         raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(
-            exception_message=ex.message,
+            exception_message=text_type(ex),
             user_filename=user_filename
         ))
 
@@ -612,7 +613,7 @@ class Transcript(object):
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
-                    raise TranscriptsGenerationException(ex.message)
+                    raise TranscriptsGenerationException(text_type(ex))
 
                 return generate_sjson_from_srt(srt_subs)
 

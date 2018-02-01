@@ -6,6 +6,7 @@ import logging
 
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from enrollment.errors import (
     CourseEnrollmentClosedError,
@@ -125,14 +126,14 @@ def create_course_enrollment(username, course_id, mode, is_active):
         enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
-        raise CourseNotFoundError(err.message)
+        raise CourseNotFoundError(text_type(err))
     except EnrollmentClosedError as err:
-        raise CourseEnrollmentClosedError(err.message)
+        raise CourseEnrollmentClosedError(text_type(err))
     except CourseFullError as err:
-        raise CourseEnrollmentFullError(err.message)
+        raise CourseEnrollmentFullError(text_type(err))
     except AlreadyEnrolledError as err:
         enrollment = get_course_enrollment(username, course_id)
-        raise CourseEnrollmentExistsError(err.message, enrollment)
+        raise CourseEnrollmentExistsError(text_type(err), enrollment)
 
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):

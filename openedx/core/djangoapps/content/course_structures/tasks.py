@@ -6,6 +6,8 @@ import logging
 
 from celery.task import task
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
 from xmodule.modulestore.django import modulestore
 
 
@@ -78,7 +80,7 @@ def update_course_structure(course_key):
     try:
         structure = _generate_course_structure(course_key)
     except Exception as ex:
-        log.exception('An error occurred while generating course structure: %s', ex.message)
+        log.exception('An error occurred while generating course structure: %s', text_type(ex))
         raise
 
     structure_json = json.dumps(structure['structure'])

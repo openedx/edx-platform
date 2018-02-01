@@ -13,6 +13,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
+from six import text_type
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -402,7 +403,7 @@ def _upload_asset(request, course_key):
     try:
         content = update_course_run_asset(course_key, upload_file)
     except AssetSizeTooLargeException as exception:
-        return JsonResponse({'error': exception.message}, status=413)
+        return JsonResponse({'error': text_type(exception)}, status=413)
 
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)

@@ -12,6 +12,8 @@ from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
+
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -720,7 +722,7 @@ class TestCohorts(ModuleStoreTestCase):
         with self.assertRaises(ValueError) as value_error:
             cohorts.set_course_cohorted(course.id, 'not a boolean')
 
-        self.assertEqual("Cohorted must be a boolean", value_error.exception.message)
+        self.assertEqual("Cohorted must be a boolean", text_type(value_error.exception))
 
 
 @attr(shard=2)

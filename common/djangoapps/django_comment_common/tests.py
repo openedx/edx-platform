@@ -1,6 +1,7 @@
 from django.test import TestCase
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
 from django_comment_common.models import Role
 from models import CourseDiscussionSettings
@@ -131,6 +132,6 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
                 set_course_discussion_settings(self.course.id, **{field['name']: invalid_value})
 
             self.assertEqual(
-                value_error.exception.message,
+                text_type(value_error.exception),
                 exception_msg_template.format(field['name'], field['type'].__name__)
             )
