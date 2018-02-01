@@ -310,6 +310,53 @@ class MongoConnection(object):
         # Split it's otherwise ambiguous.
         self.old_mongo_mapping = self.database[collection + '.old_mongo_mapping']
 
+    def add_old_mongo_mapping(self, course_key):
+        """This course_key needs to have run information"""
+        self.old_mongo_mapping.insert(
+            {
+                'org': course_key.org,
+                'course': course_key.course,
+                'run': course_key.run,
+            }
+        )
+
+#    def has_old_mongo_mapping(self, course_key):
+#        if not course_key.deprecated:
+#            return False
+#
+#        query = {
+#
+#        }
+
+
+    def delete_old_mongo_mapping(self, course_key):
+        query = {
+            'org': course_key.org,
+            'course': course_key.course,
+        }
+        self.old_mongo_mapping.remove(query)
+
+    def fill_in_run_from_old_mongo_mapping(self, course_key_without_run):
+        """Returns CourseKey with run info if it's possible to do, otherwise return None"""
+        if course_key_without_run.run is not None:
+            course_key = course_key_without_run
+            return course_key
+
+        query = {
+            'org': course_key_without_run.org,
+            'course': course_key_without_run.course,
+        }
+        mapping_doc = self.old_mongo_mapping.find_one(query)
+        if mapping_doc is None:
+            return None  # No mapping exists
+
+        return course_key_without_run.replace(run=mapping_doc['run'])
+
+        # Old stub
+        #return course_key_without_run.replace(run='2018')
+
+
+
     def heartbeat(self):
         """
         Check that the db is reachable.
@@ -458,19 +505,6 @@ class MongoConnection(object):
                 }
             return self.course_index.find_one(query)
 
-    def get_course_key_with_run(self, course_key_without_run):
-        return course_key_without_run.replace(run='2018')
-
-#        if course_key_without_run.run is not None:
-#            return course_key_without_run
-#
-#        query = {
-#            'org' = course_key_without_run.org,
-#            'course' = course_key_without_run.course,
-#        }
-#        mapping_entry = self.old_mongo_mapping.find_one(query)
-#        return course_key_without_run.replace(run=mapping_entry['run'])
-
     def find_matching_course_indexes(
             self,
             branch=None,
@@ -614,6 +648,15 @@ class MongoConnection(object):
             ],
             unique=True,
             background=True
+        )
+        create_collection_index(
+            self.old_mongo_mapping,
+            [
+                ('org', pymongo.ASCENDING),
+                ('course', pymongo.ASCENDING),
+            ],
+            unique=True,
+            background=True,
         )
 
     def close_connections(self):

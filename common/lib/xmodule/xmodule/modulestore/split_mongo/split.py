@@ -740,9 +740,25 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         self.signal_handler = signal_handler
 
+    def add_old_mongo_mapping(self, course_key):
+        self.db_connection.add_old_mongo_mapping(course_key)
+
+    def delete_old_mongo_mapping(self, course_key):
+        self.db_connection.delete_old_mongo_mapping(course_key)
+
     def fill_in_run(self, course_key):
         if course_key.run is not None:
             return course_key
+
+        course_key_with_run = self.db_connection.fill_in_run_from_old_mongo_mapping(course_key)
+        if course_key_with_run:
+            return course_key_with_run
+
+        # We can't fill in the run info. This is probably an error, but just
+        # pass it back for now.
+        return course_key
+
+        # This was our stub
         return course_key.replace(run='2018')
 
     def close_connections(self):
@@ -1189,6 +1205,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         #     course_key = self.db_connection.get_course_key_with_run(course_key)
         if course_key.run is None:
             course_key = self.fill_in_run(course_key)
+
+        # If we've gotten a course_key without a run and we don't know how to
+        # fill in the value, then we don't have the mapping for it, and it
+        # doesn't exist in this modulestore.
+        if course_key.run is None:
+            return None
 
         course_index = self.get_course_index(course_key, ignore_case)
         if not course_index:
@@ -2793,12 +2815,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
+
+        import pudb; pu.db
         self.delete_course_index(course_key)
+        if course_key.deprecated:
+            self.delete_old_mongo_mapping(course_key)
 
         # We do NOT call the super class here since we need to keep the assets
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
-
         self._emit_course_deleted_signal(course_key)
 
     @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)

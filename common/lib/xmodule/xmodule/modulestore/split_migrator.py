@@ -44,13 +44,11 @@ class SplitMigrator(object):
                 extra_branches=[ModuleStoreEnum.BranchName.draft],
                 skip_auto_publish=True,
             )
-
-#        with self.split_modulestore.bulk_operations(course_key):
             self._copy_published_modules_to_course_same_course_key(
                 new_course, course_key, user_id,
             )
 
-        import pudb; pu.db
+#        import pudb; pu.db
         self.split_modulestore.publish(new_course.location, user_id)
 
 
@@ -93,7 +91,9 @@ class SplitMigrator(object):
         index_info = self.split_modulestore.get_course_index_info(course_version_locator)
         versions = index_info['versions']
         versions[ModuleStoreEnum.BranchName.draft] = versions[ModuleStoreEnum.BranchName.published]
+
         self.split_modulestore.update_course_index(course_version_locator, index_info)
+        self.split_modulestore.add_old_mongo_mapping(course_key)
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'
