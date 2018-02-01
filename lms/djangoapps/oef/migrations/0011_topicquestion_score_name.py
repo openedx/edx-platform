@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oef', '0004_auto_20171211_0510'),
+        ('oef', '0010_load_instructions'),
     ]
 
     operations = [
