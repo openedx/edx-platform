@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oef', '0005_topicquestion_score_name'),
+        ('oef', '0005_topicquestion_order_number'),
     ]
 
     operations = [

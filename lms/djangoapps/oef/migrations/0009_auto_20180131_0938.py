@@ -9,7 +9,7 @@ import model_utils.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oef', '0005_topicquestion_order_number'),
+        ('oef', '0008_auto_20180108_0401'),
     ]
 
     operations = [

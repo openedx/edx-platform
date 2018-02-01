@@ -9,7 +9,7 @@ import model_utils.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oef', '0006_auto_20180131_0938'),
+        ('oef', '0009_auto_20180131_0938'),
     ]
 
     def insert_instructions(apps, schema_editor):
