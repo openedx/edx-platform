@@ -1123,7 +1123,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         }
 
         if encoded_videos:
-            for encoded_video in encoded_videos:
+            for encoded_video in encoded_videos.itervalues():
                 encoded_video["url"] = _convert_local_url(encoded_video["url"])
 
         return {
