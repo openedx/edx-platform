@@ -484,6 +484,8 @@
 
             it('renders and removes search alerts', function() {
                 var bar, foo;
+                testAlertMessages(['There are no posts in this topic yet.']);
+                this.view.clearSearchAlerts();
                 testAlertMessages([]);
                 foo = this.view.addSearchAlert('foo');
                 testAlertMessages(['foo']);
@@ -497,6 +499,8 @@
 
             it('renders search alert with custom class', function() {
                 var messages;
+                testAlertMessages(['There are no posts in this topic yet.']);
+                this.view.clearSearchAlerts();
                 testAlertMessages([]);
 
                 this.view.addSearchAlert('foo', 'custom-class');
@@ -517,6 +521,7 @@
 
 
             it('clears all search alerts', function() {
+                this.view.clearSearchAlerts();
                 this.view.addSearchAlert('foo');
                 this.view.addSearchAlert('bar');
                 this.view.addSearchAlert('baz');
@@ -553,13 +558,13 @@
 
             it('adds a search alert when an alternate term was searched', function() {
                 testCorrection(this.view, 'foo');
-                expect(this.view.addSearchAlert.calls.count()).toEqual(1);
+                expect(this.view.addSearchAlert.calls.count()).toEqual(2);
                 return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/foo/);
             });
 
             it('does not add a search alert when no alternate term was searched', function() {
                 testCorrection(this.view, null);
-                expect(this.view.addSearchAlert.calls.count()).toEqual(1);
+                expect(this.view.addSearchAlert.calls.count()).toEqual(2);
                 return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no posts matched/i);
             });
 
