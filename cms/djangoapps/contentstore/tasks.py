@@ -52,6 +52,9 @@ LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
 
+# Filename extensions of valid edX encoded videos.  This helps identify videos inside course tarballs.
+VIDEO_SUFFIXES = ('.mp4', '.webm')
+
 
 def clone_instance(instance, field_values):
     """ Clones a Django model instance.
@@ -503,27 +506,37 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             u'courselike_import.time',
             tags=[u"courselike:{}".format(courselike_key)]
         ):
-            # Copy videos into the local video storage backend.
+            ### Copy videos from the course tarball into the local video storage backend ###
             LOGGER.info(u'Starting to copy videos from course tarball')
             video_store = LocalVideoStorage()
-            # list of paths to video encoding subdirs, one element per edx video
             top_olx_video_dir = os.path.join(course_dir, 'course', 'video')
-            olx_video_dirs = [
-                os.path.join(top_olx_video_dir, d) for d in os.listdir(top_olx_video_dir)
-                if os.path.isdir(os.path.join(top_olx_video_dir, d))
-            ]
-            LOGGER.info(u'found videos: %s', olx_video_dirs)
-            for single_video_dir in olx_video_dirs:
-                for video_filename in os.listdir(single_video_dir):
-                    if video_filename.endswith('.mp4'):
-                        video_file_path = os.path.join(single_video_dir, video_filename)
-                        # video_file_path looks like "/path/to/<course-id>/video/<video-id>/<encoded-video-filename>.mp4"
-                        # backend_store_name looks like "<video-id>/<encoded-video-filename>.mp4"
+            # list of paths to video subdirs, one element per edx course video
+            course_video_dirs = filter(os.path.isdir, [
+                os.path.join(top_olx_video_dir, f)
+                for f in os.listdir(top_olx_video_dir)
+            ])
+            LOGGER.info(u'Found %d videos inside the course tarball.', len(course_video_dirs))
+            for video_dir in course_video_dirs:
+                for encoded_video_filename in os.listdir(video_dir):
+                    # Whitelist video file suffixes/extensions
+                    if encoded_video_filename.endswith(VIDEO_SUFFIXES):
+                        # Make an absolute path to the encoded video file, which will look like:
+                        # "/path/to/<course-id>/video/<video-id>/<encoded-video-filename>.mp4"
+                        video_file_path = os.path.join(video_dir, encoded_video_filename)
+                        # The backend_store_name is the name that we're asking the storage backend to give the file.  It
+                        # will look like: "<video-id>/<encoded-video-filename>.mp4"
                         backend_store_name = os.path.relpath(video_file_path, top_olx_video_dir)
-                        LOGGER.info(u'copying video "%s" into "%s"', video_file_path, backend_store_name)
+                        LOGGER.info(u'Copying video "%s" into "%s"', video_file_path, backend_store_name)
+                        # Delete any existing conflicting file in the storage backend first, because Django's
+                        # FileSystemStorage never overwrites files.
+                        # Related: https://code.djangoproject.com/ticket/28144
+                        if video_store.exists(backend_store_name):
+                            LOGGER.info(u'Deleting pre-existing video from the backend: "%s"', video_file_path, backend_store_name)
+                            video_store.delete(backend_store_name)
                         with open(video_file_path, 'r') as video_file:
                             video_store.save(backend_store_name, video_file)
-            # import course into modulestore/contentstore
+
+            ### Import course into modulestore/contentstore ###
             courselike_items = import_func(
                 modulestore(), user.id,
                 settings.GITHUB_REPO_ROOT, [dirpath],
