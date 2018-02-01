@@ -3,16 +3,14 @@ import logging
 from datetime import datetime, timedelta, date
 from pytz import utc
 
-from core import send_course_notification_email, get_course_link
+from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link
 from lms.djangoapps.branding import get_visible_courses
+from common.lib.mandrill_client.client import MandrillClient
 
-from celery.task import periodic_task
-from celery.schedules import crontab
 
 log = logging.getLogger('edx.celery.task')
 
 
-@periodic_task(run_every=crontab(minute=1, hour=0))
 def task_course_notifications():
     log.info('Getting courses')
     courses = get_visible_courses()
@@ -31,7 +29,7 @@ def task_course_notifications():
         # Email-template context
         context = {
             'course_name': course.display_name,
-            'course_link': get_course_link(course_id=course.id),
+            'course_url': get_course_link(course_id=course.id),
         }
 
         # if course end-date is missing then we can't guess the course week
@@ -47,7 +45,7 @@ def task_course_notifications():
                     context['course_week'] = course_week
                     log.info('Sending weekly notification email')
                     send_course_notification_email(course=course,
-                                                   mako_template_path='timed_notification/weekly_notification.txt',
+                                                   template_name=MandrillClient.WEEKLY_TEMPLATE,
                                                    context=context)
         else:
             log.info("Course: %s, weekly notification-email sending failed, course end-date missing.", course)
@@ -55,23 +53,23 @@ def task_course_notifications():
         # send email when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
             send_course_notification_email(course=course,
-                                           mako_template_path='timed_notification/course_early_welcome.txt',
+                                           template_name=MandrillClient.COURSE_EARLY_WELCOME_TEMPLATE,
                                            context=context)
         # send email when 2 days left to course start
         elif course_start_date - timedelta(days=2) == date_now:
             send_course_notification_email(course=course,
-                                           mako_template_path='timed_notification/course_start_reminder.txt',
+                                           template_name=MandrillClient.COURSE_START_REMINDER_TEMPLATE,
                                            context=context)
         # send email the day the course starts
         elif course_start_date == date_now:
             send_course_notification_email(course=course,
-                                           mako_template_path='timed_notification/course_welcome.txt',
+                                           template_name=MandrillClient.COURSE_WELCOME_TEMPLATE,
                                            context=context)
 
         log.info('CELERY-TASK: date_now: %s, course_start_date: %s',
-                 date_now,
-                 course_start_date,
-                 )
+            date_now,
+            course_start_date,
+            )
 
         if course.end:
             log.info('CELERY-TASK: course_end_date: %s', course.end.date())

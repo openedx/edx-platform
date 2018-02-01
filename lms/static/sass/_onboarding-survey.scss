@@ -133,3 +133,18 @@
     color: #B20610;
     overflow: inherit !important;
 }
+
+.website-url {
+    position: relative;
+
+    &:before {
+        content: 'https://';
+        position: absolute;
+        left: 30px;
+        top: 21px;
+    }
+
+    input {
+        padding-left: 63px !important;
+    }
+}

@@ -178,6 +178,7 @@ def create_update_groupchat_on_nodebb(sender, instance, created, **kwargs):
         else:
             log.info("Successfully updated group for course %s" % instance.course_id)
 
+
 def _get_group_data(instance, is_created=True):
     group_info = {
         'team': [],
@@ -191,6 +192,7 @@ def _get_group_data(instance, is_created=True):
         group_info.update({'courseName': course.display_name})
 
     return group_info
+
 
 @receiver(pre_delete, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.delete_groupchat_on_nodebb")
 def delete_groupchat_on_nodebb(sender, instance, **kwargs):

@@ -6,9 +6,12 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from rest_framework import status
 
+from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
+from lms.djangoapps.onboarding.models import Organization
 
 
+@can_take_oef
 @login_required
 def oef_dashboard(request):
     """
@@ -18,6 +21,15 @@ def oef_dashboard(request):
     user_surveys = OrganizationOefScore.objects.filter(user_id=request.user.id)
     surveys = []
     user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
+    user_extended_profile = request.user.extended_profile
+
+    context = {
+        'is_poc': user_extended_profile.is_organization_admin,
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
+        'is_first_user': user_extended_profile.organization.is_first_signup_in_org()
+        if user_extended_profile.organization else False
+    }
+
     for survey in user_surveys:
         surveys.append({
             'id': survey.id,
@@ -26,9 +38,12 @@ def oef_dashboard(request):
             'status': 'Draft' if not survey.finish_date else 'Finished'
         })
 
-    return render(request, 'oef/oef-org.html', {'surveys': surveys, 'error': user_survey_status['error']})
+    context.update({'surveys': surveys, 'error': user_survey_status['error']})
+
+    return render(request, 'oef/oef-org.html', context)
 
 
+@can_take_oef
 @login_required
 def oef_instructions(request):
     """
@@ -39,6 +54,7 @@ def oef_instructions(request):
     return render(request, 'oef/oef-instructional.html', {'oef_url': oef_url})
 
 
+@can_take_oef
 @login_required
 def get_survey_by_id(request, user_survey_id):
     """
@@ -51,11 +67,16 @@ def get_survey_by_id(request, user_survey_id):
     levels = get_option_levels()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
                                                    "is_completed": bool(uos.finish_date),
+                                                   "description": survey.description,
                                                    "topics": topics,
-                                                   "levels": levels
+                                                   "instructions": get_oef_instructions(),
+                                                   "levels": levels,
+                                                   'organization': request.user.extended_profile.organization.label,
+                                                   'date': uos.started_on.strftime('%m/%d/%Y')
                                                    })
 
 
+@can_take_oef
 @login_required
 def fetch_survey(request):
     """
@@ -71,12 +92,16 @@ def fetch_survey(request):
     topics = get_survey_topics(uos, survey.id)
     levels = get_option_levels()
     return render(request, 'oef/oef_survey.html', {"survey_id": survey.id,
+                                                   "description": survey.description,
                                                    "topics": topics,
                                                    "levels": levels,
                                                    'is_completed': False,
+                                                   "instructions": get_oef_instructions(),
+                                                   'organization': request.user.extended_profile.organization.label,
+                                                   'date': uos.started_on.strftime('%m/%d/%Y')
                                                    })
 
-
+@can_take_oef
 @login_required
 def save_answer(request):
     """

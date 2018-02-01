@@ -5,6 +5,7 @@ from importlib import import_module
 import re
 
 from django import forms
+from django.core.urlresolvers import reverse
 from django.forms import widgets
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -19,8 +20,9 @@ from django.template import loader
 from django.conf import settings
 from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import validate_password_strength
+from util.request import safe_get_host
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+from common.lib.mandrill_client.client import MandrillClient
 
 class PasswordResetFormNoActive(PasswordResetForm):
     error_messages = {
@@ -76,11 +78,18 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            subject = loader.render_to_string(subject_template_name, context)
-            # Email subject *must not* contain newlines
-            subject = subject.replace('\n', '')
-            email = loader.render_to_string(email_template_name, context)
-            send_mail(subject, email, from_email, [user.email])
+
+            password_reset_link = '{protocol}://{site_name}{reset_link}'.format(
+                protocol=context['protocol'],
+                site_name=site_name,
+                reset_link=reverse('student.views.password_reset_confirm_wrapper',
+                                   kwargs={'uidb36': int_to_base36(user.id), 'token': context['token']})
+            )
+
+            MandrillClient().send_mail(MandrillClient.PASSWORD_RESET_TEMPLATE, user.email, {
+                'first_name': user.first_name,
+                'reset_link': password_reset_link,
+            })
 
 
 class TrueCheckbox(widgets.CheckboxInput):

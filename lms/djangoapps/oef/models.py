@@ -8,6 +8,7 @@ from student.models import User
 class OefSurvey(TimeStampedModel):
     title = models.CharField(max_length=256)
     is_enabled = models.BooleanField(default=False)
+    description = models.TextField()
 
     def __str__(self):
         return self.title
@@ -27,6 +28,7 @@ class TopicQuestion(TimeStampedModel):
     title = models.TextField()
     score_name = models.CharField(max_length=50)
     description = models.TextField()
+    order_number = models.IntegerField()
 
     def __str__(self):
         return self.title
@@ -58,3 +60,14 @@ class OrganizationOefScore(TimeStampedModel):
     program_design_score = models.PositiveIntegerField(null=True, blank=True)
     external_relations_score = models.PositiveIntegerField(null=True, blank=True)
     systems_score = models.PositiveIntegerField(null=True, blank=True)
+
+    
+class Instruction(TimeStampedModel):
+    question_index = models.IntegerField()
+    question = models.TextField()
+    answer = models.TextField()
+    is_enabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.question_index)
+
