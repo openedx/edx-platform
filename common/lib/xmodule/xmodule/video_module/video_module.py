@@ -213,9 +213,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
-    def _update_local_url(self, url):
+    def _convert_local_url(self, url):
         if url.startswith('local-video'):
             return url.replace('local-video', settings.VIDEO_STORAGE_URL)
+        return url
 
     def get_html(self):
 
@@ -261,7 +262,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # use the last non-None non-youtube non-hls url as the link to download the video
                 for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
                     if url:
-                        url = self._update_local_url(url)
+                        url = self._convert_local_url(url)
 
                         if url not in sources:
                             sources.append(url)
@@ -1119,6 +1120,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations
         }
+
+        if encoded_videos:
+            for encoded_video in encoded_videos:
+                encoded_video["url"] = self._convert_local_url(encoded_video["url"])
 
         return {
             "only_on_web": self.only_on_web,
