@@ -40,6 +40,7 @@ class TestHeader(TestCase):
 
 
 class TestFooter(TestCase):
+    maxDiff = None
     """Test retrieving the footer. """
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
     @mock.patch.dict('django.conf.settings.MKTG_URLS', {
@@ -76,7 +77,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
                 {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
-                {'url': 'https://edx.org/contact', 'name': 'contact', 'title': 'Contact'},
+                {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
             ],
@@ -102,7 +103,7 @@ class TestFooter(TestCase):
             ],
             'connect_links': [
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
-                {'url': 'https://edx.org/contact', 'name': 'contact', 'title': 'Contact Us'},
+                {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact Us'},
                 {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
