@@ -40,6 +40,7 @@
     "react": "15.6.2",
     "react-confetti": "^2.0.2",
     "react-dom": "15.6.2",
+    "react-modal": "^3.1.11",
     "react-slick": "0.16.0",
     "react-websocket": "^2.0.0",
     "react-window-dimensions": "^1.0.1",
