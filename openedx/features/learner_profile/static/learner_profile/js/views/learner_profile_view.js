@@ -42,6 +42,8 @@
 
                 render: function() {
                     var tabs,
+                        $tabbedViewElement,
+                        $wrapperProfileBioElement = this.$el.find('.wrapper-profile-bio'),
                         self = this;
 
                     this.sectionTwoView = new SectionTwoTab({
@@ -87,8 +89,11 @@
                             viewLabel: gettext('Profile')
                         });
 
-                        this.tabbedView.render();
-                        this.$el.find('.account-settings-container').append(this.tabbedView.el);
+                        $tabbedViewElement = this.tabbedView.render().el;
+                        HtmlUtils.setHtml(
+                            $wrapperProfileBioElement,
+                            HtmlUtils.HTML($tabbedViewElement)
+                        );
 
                         if (this.firstRender) {
                             this.router.on('route:loadTab', _.bind(this.setActiveTab, this));
@@ -103,7 +108,7 @@
                         }
                     } else {
                         // xss-lint: disable=javascript-jquery-html
-                        this.$el.find('.wrapper-profile-bio').html(this.sectionTwoView.render().el);
+                        $wrapperProfileBioElement.html(this.sectionTwoView.render().el);
                     }
                     return this;
                 },
