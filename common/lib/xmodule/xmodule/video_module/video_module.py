@@ -1137,6 +1137,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
 def _convert_local_url(url):
     if url.startswith('local-video'):
-        return url.replace('local-video', settings.VIDEO_STORAGE_URL)
+        return url.replace('local-video://video/', settings.VIDEO_STORAGE_URL)
     return url
 
