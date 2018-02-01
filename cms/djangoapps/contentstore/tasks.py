@@ -503,14 +503,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             u'courselike_import.time',
             tags=[u"courselike:{}".format(courselike_key)]
         ):
-            courselike_items = import_func(
-                modulestore(), user.id,
-                settings.GITHUB_REPO_ROOT, [dirpath],
-                load_error_modules=False,
-                static_content_store=contentstore(),
-                target_id=courselike_key
-            )
-
             # Copy videos into the local video storage backend.
             video_store = LocalVideoStorage()
             # list of paths to video encoding subdirs, one element per edx video
@@ -526,6 +518,14 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                         backend_store_name = os.path.relpath(video_filename, os.path.join(course_dir, 'video'))
                         with open(video_filename, 'r') as video_file:
                             video_store.save(backend_store_name, video_file)
+            # import course into modulestore/contentstore
+            courselike_items = import_func(
+                modulestore(), user.id,
+                settings.GITHUB_REPO_ROOT, [dirpath],
+                load_error_modules=False,
+                static_content_store=contentstore(),
+                target_id=courselike_key
+            )
 
         new_location = courselike_items[0].location
         LOGGER.debug(u'new course at %s', new_location)
