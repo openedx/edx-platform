@@ -35,7 +35,6 @@ import os
 
 import django
 from path import Path as path
-from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.theming.helpers_dirs import (
@@ -1248,11 +1247,6 @@ FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
 
 # Credit api notification cache timeout
 CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
-
-################################# Deprecation warnings #####################
-
-# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
-simplefilter('ignore')
 
 ################################# Middleware ###################################
 

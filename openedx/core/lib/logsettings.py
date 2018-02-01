@@ -115,4 +115,6 @@ def log_python_warnings():
     each test case.
     """
     warnings.simplefilter('default')
+    warnings.filterwarnings('ignore', 'Setting _field_data is deprecated')
+    warnings.filterwarnings('ignore', 'Setting _field_data via the constructor is deprecated')
     logging.captureWarnings(True)
