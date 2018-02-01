@@ -550,26 +550,40 @@ def admin_activation(request, activation_key):
         if hash_key.is_hash_consumed:
             activation_status = 2
         else:
-            hash_key.is_hash_consumed = True
-            hash_key.save()
             activation_status = 4
 
-        if request.method == 'POST':
+        # Proceed only if hash_key is not already consumed
+        if request.method == 'POST' and activation_status != 2:
+            hash_key.is_hash_consumed = True
+            hash_key.save()
+            # Consume all entries of hash keys where suggested_admin_email = hash_key.suggested_admin_email,
+            # so he can not use those links in future
+            unconsumed_hash_keys = OrganizationAdminHashKeys.objects.filter(
+                is_hash_consumed=False, suggested_admin_email=hash_key.suggested_admin_email
+            )
+            if unconsumed_hash_keys:
+                unconsumed_hash_keys.update(is_hash_consumed=True)
+
+            # Change the admin of the organization if admin is being activated or updated on user confirmation[True]
             if admin_activation or admin_change_confirmation:
                 hash_key.organization.unclaimed_org_admin_email = None
                 hash_key.organization.admin = user
                 hash_key.organization.save()
                 activation_status = 1
-            else:
-                if admin_change_confirmation:
-                    if user_extended_profile.organization.admin == user:
-                        user_extended_profile.organization.admin = None
-                        user_extended_profile.organization.save()
 
-                    user_extended_profile.organization = hash_key.organization
-                    user_extended_profile.save()
+            if admin_change_confirmation:
+                # On admin update confirmation, If claimer's is admin of some other organization remove his privileges
+                # for that organization as he can only be an admin of single organization
+                if user_extended_profile.organization.admin == user:
+                    user_extended_profile.organization.admin = None
+                    user_extended_profile.organization.save()
 
-                activation_status = 1
+                # Update the claimer's organization if current admin confirms through the updation link
+                user_extended_profile.organization = hash_key.organization
+                user_extended_profile.save()
+
+            if not admin_activation:
+                # Send an email to claimer, on admin updation depending upon whether user accepts or rejects the request
                 send_admin_update_confirmation_email(hash_key.organization.label, user.email,
                                                      confirm=1 if admin_change_confirmation else None)
                 return HttpResponseRedirect('/myaccount/settings/')

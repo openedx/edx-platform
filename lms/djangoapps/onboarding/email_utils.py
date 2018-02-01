@@ -23,7 +23,7 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
         "referring_user": hash_key.suggested_by.username,
     }
 
-    admin_activation_link = '{protocol}://{site}/onboarding/admin_activate/{org_id}/{activation_key}'.format(
+    admin_activation_link = '{protocol}://{site}/onboarding/admin_activate/{activation_key}?admin_activation=True'.format(
         protocol='https' if request.is_secure() else 'http',
         site=safe_get_host(request),
         org_id=encoded_org_id,
