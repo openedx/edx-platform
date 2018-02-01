@@ -1,7 +1,10 @@
 """
 Runtime service for communicating completion information to the xblock system.
 """
-
+from crum import get_current_request
+from lms.djangoapps.course_api.blocks.api import get_blocks
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from xmodule.modulestore.django import modulestore
 from .models import BlockCompletion
 from . import waffle
 
@@ -59,3 +62,39 @@ class CompletionService(object):
             if candidate not in completions:
                 completions[candidate] = 0.0
         return completions
+
+    def get_percent_completed(self, request=None):
+
+        course_usage_key = modulestore().make_course_usage_key(self._course_key)
+
+        if not request:
+            request = get_current_request()
+
+        # get all the blocks for the course that are tracked by the completion API
+        # NOTE block_types_filter used here is not complete list
+        completion_blocks = get_blocks(
+            request,
+            course_usage_key,
+            user=self._user,
+            requested_fields=['id'],
+            return_type='list',
+            block_types_filter=['discussion', 'html', 'problem', 'video', 'poll', 'poll_question', 'openassessment', 'survey']
+        )
+
+        print("completion_blocks", completion_blocks)
+        block_usage_list = set()
+        for block in completion_blocks:
+            block_usage_list.add(UsageKey.from_string(block['id']))
+
+        # Ask CompletionService if the course blocks have been completed yet
+        completions = self.get_completions(block_usage_list)
+
+        num_completed = sum(completions.values())
+        total_blocks = len(completions)
+        percent_completed = float(num_completed) / float(total_blocks)
+
+        print("roll_up total_blocks", total_blocks)
+        print("roll_up num_completed", num_completed)
+        print("roll_up percent_completed", percent_completed)
+
+        return percent_completed
