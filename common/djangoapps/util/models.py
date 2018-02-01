@@ -3,12 +3,16 @@ import cStringIO
 import gzip
 import logging
 
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.text import compress_string
+from enterprise.models import EnterpriseCustomer
 
-from config_models.models import ConfigurationModel
+from simple_history import register
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+# register(EnterpriseCustomer, app='common.djangoapps.util', table_name='enterprise_historicalenterprisecustomer')
 
 
 class RateLimitConfiguration(ConfigurationModel):
@@ -20,6 +24,7 @@ class RateLimitConfiguration(ConfigurationModel):
     When enabled, it will disable rate limiting on any view decorated
     with the `can_disable_rate_limit` class decorator.
     """
+
     class Meta(ConfigurationModel.Meta):
         app_label = "util"
 
