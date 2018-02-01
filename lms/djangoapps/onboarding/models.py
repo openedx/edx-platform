@@ -238,7 +238,7 @@ class OrganizationAdminHashKeys(TimeStampedModel):
     """
     organization = models.ForeignKey(Organization, related_name='suggested_admins')
     suggested_by = models.ForeignKey(User)
-    suggested_admin_email = models.EmailField(unique=True)
+    suggested_admin_email = models.EmailField()
     is_hash_consumed = models.BooleanField(default=False)
     activation_hash = models.CharField(max_length=32)
 
