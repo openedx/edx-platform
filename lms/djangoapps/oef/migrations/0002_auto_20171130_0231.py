@@ -45,16 +45,16 @@ LEVELS = [
 ]
 
 TOPICS = [
-    'Human Resource Management',
-    'Leadership & Governance',
-    'Financial Management',
-    'Fundraising & Resource Mobilization',
-    'Measurement, Evaluation & Learning',
-    'Marketing Communications & PR',
-    'Strategy & Planning',
-    'Program Design & Delivery',
-    'External Relations & Partnerships',
-    'System Tools & Processes',
+    {'title': 'Human Resource Management', 'score_name': 'human_resource_score'},
+    {'title': 'Leadership & Governance', 'score_name': 'leadership_score'},
+    {'title': 'Financial Management', 'score_name': 'financial_management_score'},
+    {'title': 'Fundraising & Resource Mobilization', 'score_name': 'fundraising_score'},
+    {'title': 'Measurement, Evaluation & Learning', 'score_name': 'measurement_score'},
+    {'title': 'Marketing Communications & PR', 'score_name': 'marketing_score'},
+    {'title': 'Strategy & Planning', 'score_name': 'strategy_score'},
+    {'title': 'Program Design & Delivery', 'score_name': 'program_design_score'},
+    {'title': 'External Relations & Partnerships', 'score_name': 'external_relations_score'},
+    {'title': 'System Tools & Processes', 'score_name': 'systems_score'},
 ]
 
 TOPIC_TEXT = 'This section of the organization effectiveness will test how strong is your organization %s skill.' \
@@ -72,7 +72,8 @@ def create_topics(apps, survey, levels):
     topic_question = apps.get_model('oef', 'TopicQuestion')
     option = apps.get_model('oef', 'Option')
     for t in TOPICS:
-        tq = topic_question(survey=survey, title=t, description=TOPIC_TEXT % t)
+        tq = topic_question(survey=survey, title=t['title'], description=TOPIC_TEXT % t['title'],
+                            score_name=t['score_name'])
         tq.save()
         opt = option(topic=tq, text=FIRST_OPTION, level=levels[0]).save()
         option(topic=tq, text=SECOND_OPTION, level=levels[2]).save()
