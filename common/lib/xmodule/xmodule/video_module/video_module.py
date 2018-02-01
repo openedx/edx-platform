@@ -257,6 +257,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # use the last non-None non-youtube non-hls url as the link to download the video
                 for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
                     if url:
+                        if url.startswith('local-video'):
+                            url = url.replace('local-video', settings.VIDEO_STORAGE_URL)
+
                         if url not in sources:
                             sources.append(url)
                         # don't include hls urls for download
