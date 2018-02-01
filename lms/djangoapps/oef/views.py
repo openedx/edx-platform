@@ -72,7 +72,7 @@ def get_survey_by_id(request, user_survey_id):
                                                    "instructions": get_oef_instructions(),
                                                    "levels": levels,
                                                    'organization': request.user.extended_profile.organization.label,
-                                                   'date': uos.started_on.strftime('%m/%d/%Y')
+                                                   'date': uos.start_date.strftime('%m/%d/%Y')
                                                    })
 
 
@@ -98,7 +98,7 @@ def fetch_survey(request):
                                                    'is_completed': False,
                                                    "instructions": get_oef_instructions(),
                                                    'organization': request.user.extended_profile.organization.label,
-                                                   'date': uos.started_on.strftime('%m/%d/%Y')
+                                                   'date': uos.start_date.strftime('%m/%d/%Y')
                                                    })
 
 @can_take_oef

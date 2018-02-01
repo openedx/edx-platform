@@ -73,7 +73,6 @@ def get_user_survey(user, latest_survey):
     return uos
 
 
-
 def get_survey_topics(uos, survey_id):
     topics = TopicQuestion.objects.filter(survey_id=survey_id).order_by("order_number")
     parsed_topics = []
@@ -94,6 +93,7 @@ def get_survey_topics(uos, survey_id):
 
 def get_option_levels():
     return OptionLevel.objects.order_by('value')
+
 
 def get_oef_instructions():
     return Instruction.objects.filter(is_enabled=True).order_by('question_index')
