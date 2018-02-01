@@ -67,6 +67,15 @@ if course is not None:
                     <%block name="extratabs" />
                 </ol>
             </div>
+            <span>
+            ${static.renderReact(
+                component="CompletionStatus",
+                id="completion-status",
+                props={
+                    "socketPath": "completion_status"
+                }
+            )}
+            </span>
         </nav>
     % endif
 %endif
