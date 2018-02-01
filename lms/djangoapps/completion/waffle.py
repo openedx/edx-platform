@@ -91,6 +91,6 @@ def site_configuration_enabled():
         current_site = get_current_site()
         if not current_site.configuration.get_value(ENABLE_SITE_VISUAL_PROGRESS, False):
             return
-    except SiteConfiguration.DoesNotExist:
+    except SiteConfiguration.DoesNotExist:  # pylint: disable=no-member
         return
     return True
