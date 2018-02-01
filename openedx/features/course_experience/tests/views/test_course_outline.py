@@ -6,12 +6,8 @@ import json
 
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from pyquery import PyQuery as pq
 from six import text_type
-from waffle.testutils import override_switch
 
 from courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
@@ -19,10 +15,14 @@ from lms.djangoapps.completion import waffle
 from lms.djangoapps.completion.models import BlockCompletion
 from lms.djangoapps.completion.test_utils import CompletionWaffleTestMixin
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.lib.gating import api as gating_api
+from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from waffle.testutils import override_switch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
