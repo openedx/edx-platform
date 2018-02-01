@@ -507,7 +507,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             video_store = LocalVideoStorage()
             # list of paths to video encoding subdirs, one element per edx video
             olx_video_dirs = (
-                d for d in os.listdir(os.path.join(course_dir, 'video'))
+                d for d in os.listdir(os.path.join(course_dir, 'course', 'video'))
                 if os.path.isdir(d)
             )
             for single_video_dir in olx_video_dirs:
@@ -515,7 +515,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                     if video_filename.endswith('.mp4'):
                         # video_filename looks like "/path/to/<course-id>/video/<video-id>/<encoded-video-filename>.mp4"
                         # backend_name looks like "<video-id>/<encoded-video-filename>.mp4"
-                        backend_store_name = os.path.relpath(video_filename, os.path.join(course_dir, 'video'))
+                        backend_store_name = os.path.relpath(video_filename, os.path.join(course_dir, 'course', 'video'))
                         with open(video_filename, 'r') as video_file:
                             video_store.save(backend_store_name, video_file)
             # import course into modulestore/contentstore
