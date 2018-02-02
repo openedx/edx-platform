@@ -11,8 +11,8 @@ from lms.djangoapps.oef.helpers import *
 from lms.djangoapps.onboarding.models import Organization
 
 
-@can_take_oef
 @login_required
+@can_take_oef
 def oef_dashboard(request):
     """
     View for OEF dashboard
@@ -43,8 +43,8 @@ def oef_dashboard(request):
     return render(request, 'oef/oef-org.html', context)
 
 
-@can_take_oef
 @login_required
+@can_take_oef
 def oef_instructions(request):
     """
     View for instructions page of OEF
@@ -54,8 +54,8 @@ def oef_instructions(request):
     return render(request, 'oef/oef-instructional.html', {'oef_url': oef_url})
 
 
-@can_take_oef
 @login_required
+@can_take_oef
 def get_survey_by_id(request, user_survey_id):
     """
     Get a particular survey by its id
@@ -76,8 +76,8 @@ def get_survey_by_id(request, user_survey_id):
                                                    })
 
 
-@can_take_oef
 @login_required
+@can_take_oef
 def fetch_survey(request):
     """
     Fetch appropriate survey for the user
@@ -101,8 +101,9 @@ def fetch_survey(request):
                                                    'date': uos.start_date.strftime('%m/%d/%Y')
                                                    })
 
-@can_take_oef
+
 @login_required
+@can_take_oef
 def save_answer(request):
     """
     Save answers submitted by user
