@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=399 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=402 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2643,12 +2643,9 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `day_of_month` smallint(6) DEFAULT NULL,
   `day_of_week` smallint(6) DEFAULT NULL,
   `hour_of_day` smallint(6) NOT NULL,
-  `initialization_vector` longblob,
-  `password` longblob,
   `enterprise_customer_id` char(32) NOT NULL,
   `sftp_file_path` varchar(256) DEFAULT NULL,
   `sftp_hostname` varchar(256) DEFAULT NULL,
-  `sftp_password` longblob,
   `sftp_port` int(10) unsigned DEFAULT NULL,
   `sftp_username` varchar(256) DEFAULT NULL,
   `decrypted_password` longblob,
@@ -5243,9 +5240,11 @@ CREATE TABLE `third_party_auth_samlconfiguration` (
   `other_config_str` longtext NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
   `site_id` int(11) NOT NULL,
+  `slug` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_67a92ed1a69a5d1f_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_samlconfiguration_9365d6e7` (`site_id`),
+  KEY `third_party_auth_samlconfiguration_2dbcba41` (`slug`),
   CONSTRAINT `third_party_auth__changed_by_id_67a92ed1a69a5d1f_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `third_party_auth_saml_site_id_108365f249ed6aac_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -5285,10 +5284,13 @@ CREATE TABLE `third_party_auth_samlproviderconfig` (
   `send_to_registration_first` tinyint(1) NOT NULL,
   `sync_learner_profile_data` tinyint(1) NOT NULL,
   `archived` tinyint(1) NOT NULL,
+  `saml_configuration_id` int(11),
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_508190ecd0b0e845_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_samlproviderconfig_098674f1` (`idp_slug`),
   KEY `third_party_auth_samlproviderconfig_9365d6e7` (`site_id`),
+  KEY `third_party_auth_samlproviderconfig_8b3b795c` (`saml_configuration_id`),
+  CONSTRAINT `D2557cd97215f74bd67f5ef02c1487e6` FOREIGN KEY (`saml_configuration_id`) REFERENCES `third_party_auth_samlconfiguration` (`id`),
   CONSTRAINT `third_party_auth__changed_by_id_508190ecd0b0e845_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `third_party_auth_saml_site_id_625158ae0a405970_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
