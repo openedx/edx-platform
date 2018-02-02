@@ -13,7 +13,7 @@ class MandrillClient(object):
     ORG_ADMIN_CHANGE_TEMPLATE = 'org-admin-change'
     ORG_ADMIN_CLAIM_CONFIRMATION = 'org-admin-update-confirmation'
     ENROLLMENT_CONFIRMATION_TEMPLATE = 'enrollment-confirmation'
-    COURSE_WELCOME_TEMPLATE = 'course_welcome'
+    COURSE_WELCOME_TEMPLATE = 'course-welcome'
     COURSE_EARLY_WELCOME_TEMPLATE = 'course-early-welcome'
     COURSE_START_REMINDER_TEMPLATE = 'course-start-reminder'
     COURSE_COMPLETION_TEMPLATE = 'course-completion'
@@ -39,7 +39,7 @@ class MandrillClient(object):
                 template_content=[],
                 message={
                     'from_email': settings.NOTIFICATION_FROM_EMAIL,
-                    'to': [{ 'email': user_email }],
+                    'to': [{'email': user_email}],
                     'global_merge_vars': global_merge_vars
                 },
             )
