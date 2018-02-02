@@ -1,6 +1,7 @@
 import six
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
@@ -34,6 +35,15 @@ class CourseRunScheduleSerializer(serializers.Serializer):
 
 class CourseRunTeamSerializer(serializers.Serializer):
     def to_internal_value(self, data):
+        """Overriding this to support deserialization, for write operations."""
+        for member in data:
+            try:
+                User.objects.get(username=member['user'])
+            except User.DoesNotExist:
+                raise serializers.ValidationError(
+                    _('Course team user does not exist')
+                )
+
         return CourseAccessRoleSerializer(data=data, many=True).to_internal_value(data)
 
     def to_representation(self, instance):
