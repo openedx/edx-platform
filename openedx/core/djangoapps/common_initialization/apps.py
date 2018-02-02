@@ -14,7 +14,8 @@ class CommonInitializationConfig(AppConfig):
         from . import checks
         self._add_mimetypes()
 
-    def _add_mimetypes(self):
+    @staticmethod
+    def _add_mimetypes():
         """
         Add extra mimetypes. Used in xblock_resource.
         """

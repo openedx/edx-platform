@@ -132,7 +132,6 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
-from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -440,11 +439,6 @@ XQUEUE_INTERFACE = {
                     'password': 'local'},
     'basic_auth': None,
 }
-
-################################# Deprecation warnings #####################
-
-# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
-simplefilter('ignore')
 
 ################################# Middleware ###################################
 
