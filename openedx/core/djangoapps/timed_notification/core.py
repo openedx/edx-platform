@@ -13,6 +13,9 @@ from boto.ses.exceptions import (
     SESIllegalAddressError,
 )
 from common.lib.mandrill_client.client import MandrillClient
+from crum import get_current_request
+from util.request import safe_get_host
+
 
 log = logging.getLogger('timed_notifications')
 
@@ -89,6 +92,10 @@ def send_course_notification_email(course, template_name, context, to_list=None)
 
 
 def get_course_link(course_id):
-    course_link = reverse('about_course', args=[course_id])
-    course_full_link = settings.LMS_BASE_URL + course_link
+    request = get_current_request()
+    course_full_link = '{protocol}://{site}{course_link}'.format(
+        protocol='https' if request.is_secure() else 'http',
+        site=safe_get_host(request),
+        course_link=reverse('about_course', args=[course_id]),
+    )
     return course_full_link
