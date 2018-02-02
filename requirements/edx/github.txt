@@ -53,7 +53,6 @@ git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6
 -e git+https://github.com/edx/django-wiki.git@v0.0.16#egg=django-wiki
 git+https://github.com/edx/django-openid-auth.git@0.14#egg=django-openid-auth==0.14
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
-git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
@@ -72,9 +71,6 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
 git+https://github.com/edx/lettuce.git@31b0dfd865766243e9b563ec65fae9122edf7975#egg=lettuce==0.2.23+edx.1
-
-# Why a DRF fork? See: https://openedx.atlassian.net/browse/PLAT-1581
-git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 
 # Why a drf-oauth fork? To add Django 1.11 compatibility to the abandoned repo.
 # This dependency will be removed by this work: https://openedx.atlassian.net/browse/PLAT-1660
