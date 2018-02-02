@@ -4,6 +4,14 @@ set -e
 
 source $HOME/jenkins_env
 
+#####
+
+export SELENIUM_BROWSER='firefox'
+export SELENIUM_PORT='4444'
+export SELENIUM_HOST='localhost'
+
+#####
+
 NODE_ENV_DIR=$HOME/nenv
 NODE_VERSION=8.9.3
 
