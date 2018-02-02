@@ -275,6 +275,7 @@ if FEATURES.get('AUTH_USE_CAS'):
 # Specific setting for the File Upload Service to store media in a bucket.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
 FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)
+AWS_LOCATION = ENV_TOKENS.get('AWS_LOCATION', FILE_UPLOAD_STORAGE_PREFIX)
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
