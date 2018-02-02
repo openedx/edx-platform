@@ -41,7 +41,6 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion.utils import roll_up
 from lms.djangoapps.completion import waffle as completion_waffle
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -526,7 +525,6 @@ def get_module_system_for_user(
                 block_key=block.scope_ids.usage_id,
                 completion=event['completion'],
             )
-            roll_up(user, course_id)
 
     def handle_grade_event(block, event):
         """
@@ -570,7 +568,6 @@ def get_module_system_for_user(
                     block_key=block.scope_ids.usage_id,
                     completion=1.0,
                 )
-                roll_up(user, course_id)
 
     def rebind_noauth_module_to_user(module, real_user):
         """

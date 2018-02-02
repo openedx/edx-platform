@@ -4,17 +4,22 @@ Signal handlers to trigger completion updates.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from crum import get_current_request
+from channels import Group
 from django.contrib.auth.models import User
 from django.dispatch import receiver
+from django.db.models.signals import post_delete, post_save
 
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 
-from .models import BlockCompletion
 from . import waffle
-from .utils import roll_up
+from .models import BlockCompletion
+from .services import CompletionService
+import json
+
 
 @receiver(PROBLEM_WEIGHTED_SCORE_CHANGED)
 def scorable_block_completion(sender, **kwargs):  # pylint: disable=unused-argument
@@ -41,4 +46,23 @@ def scorable_block_completion(sender, **kwargs):  # pylint: disable=unused-argum
         block_key=block_key,
         completion=completion,
     )
-    roll_up(user, course_key)
+
+
+@receiver(post_save, sender=BlockCompletion)
+@receiver(post_delete, sender=BlockCompletion)
+def completion_changed(sender, **kwargs):
+
+    block_completion = kwargs['instance']
+    print('\nBF got complete_changed signal for block=', block_completion)
+    
+    if block_completion:
+        completion_service = CompletionService(block_completion.user, block_completion.course_key)
+        percent_completed = completion_service.get_percent_completed(get_current_request())
+
+        # fire event to websocket
+        Group('completion').send(
+            {'text': json.dumps({
+                'course_id': str(block_completion.course_key),
+                'percent_complete': percent_completed
+            })}
+        )
