@@ -6,7 +6,6 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.fields import String, Scope, ScopeIds, List
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import (
@@ -141,7 +140,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
 
         # Explicitly set the content and settings fields
         self.xblock.test_content_field = "Explicitly set"
@@ -180,13 +179,13 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock_default_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
 
         # Do NOT set any values, so the fields should use the defaults
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
+        target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
         new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
@@ -214,11 +213,11 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock_inherited_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
+        target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
         new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
@@ -242,7 +241,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         # TypeError.
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
         # Explicitly set the content field
         self.xblock.test_content_field = ['Explicitly set']
         self.xblock.save()
@@ -305,7 +304,7 @@ class UpdateLocationTest(ModuleStoreNoSettings):
     def test_update_locations_native_xblock(self):
         """ Update locations updates location and keeps values and "is_set_on" status """
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
 
         # Explicitly set the content, settings and children fields
         self.xblock.test_content_field = 'Explicitly set'

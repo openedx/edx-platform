@@ -12,7 +12,7 @@ from pytz import UTC
 from six import text_type
 
 from xmodule.xml_module import is_pointer_tag
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LibraryXMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
@@ -482,12 +482,14 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
 
-        location_tab_syllabus = Location("edX", "toy", "2012_Fall", "static_tab", "syllabus", None)
+        location_tab_syllabus = BlockUsageLocator(CourseLocator("edX", "toy", "2012_Fall", deprecated=True),
+                                                  "static_tab", "syllabus", deprecated=True)
         toy_tab_syllabus = modulestore.get_item(location_tab_syllabus)
         self.assertEqual(toy_tab_syllabus.display_name, 'Syllabus')
         self.assertEqual(toy_tab_syllabus.course_staff_only, False)
 
-        location_tab_resources = Location("edX", "toy", "2012_Fall", "static_tab", "resources", None)
+        location_tab_resources = BlockUsageLocator(CourseLocator("edX", "toy", "2012_Fall", deprecated=True),
+                                                   "static_tab", "resources", deprecated=True)
         toy_tab_resources = modulestore.get_item(location_tab_resources)
         self.assertEqual(toy_tab_resources.display_name, 'Resources')
         self.assertEqual(toy_tab_resources.course_staff_only, True)
@@ -502,9 +504,11 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy', 'two_toys'])
 
-        location = Location("edX", "toy", "2012_Fall", "video", "Welcome", None)
+        location = BlockUsageLocator(CourseLocator("edX", "toy", "2012_Fall", deprecated=True),
+                                     "video", "Welcome", deprecated=True)
         toy_video = modulestore.get_item(location)
-        location_two = Location("edX", "toy", "TT_2012_Fall", "video", "Welcome", None)
+        location_two = BlockUsageLocator(CourseLocator("edX", "toy", "TT_2012_Fall", deprecated=True),
+                                         "video", "Welcome", deprecated=True)
         two_toy_video = modulestore.get_item(location_two)
         self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.youtube_id_1_0, "p2Q6BrNhdh9")

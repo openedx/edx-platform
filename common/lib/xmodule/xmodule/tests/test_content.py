@@ -9,7 +9,7 @@ from path import Path as path
 from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.locator import AssetLocator, CourseLocator
 from xmodule.static_content import _write_js, _list_descriptors
 
 SAMPLE_STRING = """
@@ -118,11 +118,12 @@ class ContentTest(unittest.TestCase):
     @ddt.unpack
     def test_generate_thumbnail_image(self, original_filename, thumbnail_filename):
         content_store = ContentStore()
-        content = Content(AssetLocation(u'mitX', u'800', u'ignore_run', u'asset', original_filename), None)
+        content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', original_filename),
+                          None)
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
         self.assertIsNone(thumbnail_content)
         self.assertEqual(
-            AssetLocation(u'mitX', u'800', u'ignore_run', u'thumbnail', thumbnail_filename),
+            AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename),
             thumbnail_file_location
         )
 
@@ -134,7 +135,8 @@ class ContentTest(unittest.TestCase):
         image_class_mock.open.return_value = mock_image
 
         content_store = ContentStore()
-        content = Content(AssetLocation(u'mitX', u'800', u'ignore_run', u'asset', "monsters.jpg"), "image/jpeg")
+        content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', "monsters.jpg"),
+                          "image/jpeg")
         content.data = 'mock data'
         content_store.generate_thumbnail(content)
         self.assertTrue(image_class_mock.open.called, "Image.open not called")
@@ -146,12 +148,13 @@ class ContentTest(unittest.TestCase):
         content_store = ContentStore()
         content_store.save = Mock()
         thumbnail_filename = u'test.svg'
-        content = Content(AssetLocation(u'mitX', u'800', u'ignore_run', u'asset', u'test.svg'), 'image/svg+xml')
+        content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', u'test.svg'),
+                          'image/svg+xml')
         content.data = 'mock svg file'
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
         self.assertEqual(thumbnail_content.data.read(), b'mock svg file')
         self.assertEqual(
-            AssetLocation(u'mitX', u'800', u'ignore_run', u'thumbnail', thumbnail_filename),
+            AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'thumbnail', thumbnail_filename),
             thumbnail_file_location
         )
 
@@ -162,14 +165,16 @@ class ContentTest(unittest.TestCase):
             CourseKey.from_string('mitX/400/ignore'), 'subs__1eo_jXvZnE .srt.sjson'
         )
         self.assertEqual(
-            AssetLocation(u'mitX', u'400', u'ignore', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None),
+            AssetLocator(CourseLocator(u'mitX', u'400', u'ignore', deprecated=True),
+                         u'asset', u'subs__1eo_jXvZnE_.srt.sjson'),
             asset_location
         )
 
     def test_get_location_from_path(self):
         asset_location = StaticContent.get_location_from_path(u'/c4x/a/b/asset/images_course_image.jpg')
         self.assertEqual(
-            AssetLocation(u'a', u'b', None, u'asset', u'images_course_image.jpg', None),
+            AssetLocator(CourseLocator(u'a', u'b', None, deprecated=True),
+                         u'asset', u'images_course_image.jpg', deprecated=True),
             asset_location
         )
 

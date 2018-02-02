@@ -20,7 +20,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope, Integer
 from xblock.test.tools import blocks_are_equivalent
 
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR
@@ -171,10 +171,10 @@ class TestEdxJsonEncoder(unittest.TestCase):
         self.null_utc_tz = NullTZ()
 
     def test_encode_location(self):
-        loc = Location('org', 'course', 'run', 'category', 'name', None)
+        loc = BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', 'name')
         self.assertEqual(text_type(loc), self.encoder.default(loc))
 
-        loc = Location('org', 'course', 'run', 'category', 'name', 'version')
+        loc = BlockUsageLocator(CourseLocator('org', 'course', 'run', branch='version'), 'category', 'name')
         self.assertEqual(text_type(loc), self.encoder.default(loc))
 
     def test_encode_naive_datetime(self):

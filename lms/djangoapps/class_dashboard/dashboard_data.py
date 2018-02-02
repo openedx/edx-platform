@@ -6,7 +6,7 @@ import json
 from django.db.models import Count
 from django.utils.translation import ugettext as _
 
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 
 from courseware import models
@@ -435,7 +435,7 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-    module_state_key = Location.from_string(request.GET.get('module_id'))
+    module_state_key = BlockUsageLocator.from_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "opened a subsection" students
@@ -487,7 +487,7 @@ def get_students_problem_grades(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames, grades, percents for CSV download.
     """
-    module_state_key = Location.from_string(request.GET.get('module_id'))
+    module_state_key = BlockUsageLocator.from_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "problem grades" students

@@ -27,7 +27,6 @@ from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator
 
 from xblock.field_data import DictFieldData
@@ -106,8 +105,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Things to try to get a name, in order  (key, cleaning function, remove key after reading?)
                 lookups = [('url_name', id, False),
                            ('slug', id, True),
-                           ('name', Location.clean, False),
-                           ('display_name', Location.clean, False)]
+                           ('name', BlockUsageLocator.clean, False),
+                           ('display_name', BlockUsageLocator.clean, False)]
 
                 url_name = None
                 for key, clean, remove in lookups:
@@ -533,7 +532,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         )
                     )
 
-                    url_name = Location.clean(course_data.get('name'))
+                    url_name = BlockUsageLocator.clean(course_data.get('name'))
                     tracker("'name' is deprecated for module xml.  Please use "
                             "display_name and url_name.")
                 else:
