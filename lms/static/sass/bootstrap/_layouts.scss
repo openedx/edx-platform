@@ -42,6 +42,8 @@
 
   &.container-fluid {
     max-width: map-get($container-max-widths, xl);
+
+    @extend %ui-print-excluded;
   }
 }
 

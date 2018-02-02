@@ -295,6 +295,8 @@
           background-color: $staff-color;
           color: $white;
         }
+
+       @extend %ui-print-excluded;
       }
     }
   }

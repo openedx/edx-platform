@@ -223,6 +223,8 @@
   .wrapper-footer footer {
     width: 960px;
 
+    @extend %ui-print-excluded;
+
     .colophon-about img {
       margin-top: ($baseline*1.5);
     }

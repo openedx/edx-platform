@@ -145,10 +145,11 @@
 
 .courseware-search-bar {
   width: flex-grid(7);
+
+  @extend %ui-print-excluded;
 }
 
-
-.dashboard-search-bar  {
+.dashboard-search-bar {
   margin: 0 0 $baseline;
   display: block;
 

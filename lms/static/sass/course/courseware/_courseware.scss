@@ -41,7 +41,9 @@ html.video-fullscreen {
     border-radius: ($baseline/4);
     background-color: $light-gray1;
     color: $staff-color;
-    text-transform: uppercase; 
+    text-transform: uppercase;
+
+    @extend %ui-print-excluded;
 
     &:hover {
       background-color: $staff-color;
@@ -480,6 +482,11 @@ html.video-fullscreen {
       margin-top: -($baseline);
       margin-bottom: $baseline;
       color: $gray;
+
+      @media print {
+        margin-top: -12px !important;
+        margin-bottom: 2px !important;
+      }
     }
 
     div#seq_content {
@@ -578,6 +585,12 @@ html.video-fullscreen {
         display: none;
         border-bottom: 0;
         margin-bottom: 0;
+      }
+
+      @media print {
+        > .xblock-student_view {
+          padding: 0 !important;
+        }
       }
     }
 

@@ -27,6 +27,8 @@
     border: 1px solid $border-color-2;
     background: $container-bg;
     box-shadow: 0 1px 2px $shadow-l2;
+
+    @extend %ui-print-excluded;
   }
 }
 
@@ -55,12 +57,21 @@ table {
 }
 
 .xblock table {
-  table-layout: auto
+  table-layout: auto;
 }
 
 a {
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     text-decoration: none !important;
+  }
+
+  @media print {
+    text-decoration: underline !important;
+
+    &:visited {
+      text-decoration: underline !important;
+    }
   }
 }
 

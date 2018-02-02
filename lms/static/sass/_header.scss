@@ -313,6 +313,10 @@
   .hidden {
     display: none !important;
   }
+
+  @media print {
+    border-bottom: 1px solid $gray-500 !important;
+  }
 }
 
 /*
