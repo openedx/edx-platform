@@ -54,7 +54,7 @@ def completion_changed(sender, **kwargs):
 
     block_completion = kwargs['instance']
     print('\nBF got complete_changed signal for block=', block_completion)
-    
+
     if block_completion:
         completion_service = CompletionService(block_completion.user, block_completion.course_key)
         percent_completed = completion_service.get_percent_completed(get_current_request())
