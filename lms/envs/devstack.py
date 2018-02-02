@@ -95,7 +95,6 @@ def should_show_debug_toolbar(request):
 
 ########################### PIPELINE #################################
 
-PIPELINE_ENABLED = False
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
@@ -105,13 +104,19 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
+
+PIPELINE_ENABLED = False
 # Disable JavaScript compression in development
 PIPELINE_JS_COMPRESSOR = None
+PIPELINE_SASS_ARGUMENTS = '--debug-info'
+
+PIPELINE['PIPELINE_ENABLED'] = PIPELINE_ENABLED
+PIPELINE['JS_COMPRESSOR'] = PIPELINE_JS_COMPRESSOR
+PIPELINE['SASS_ARGUMENTS'] = PIPELINE_SASS_ARGUMENTS
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info'
 
 # Load development webpack donfiguration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'

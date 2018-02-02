@@ -152,6 +152,9 @@ STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None
 
+PIPELINE['JS_COMPRESSOR'] = PIPELINE_JS_COMPRESSOR
+
+
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
