@@ -218,8 +218,9 @@ def organization(request):
         'is_org_url_exist': '1' if _organization.url else '0',
         'partner_networks': _organization.organization_partners.values_list('partner', flat=True),
     }
-    old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
+
     if request.method == 'POST':
+        old_url = request.POST.get('url', '').replace('http://', 'https://', 1)
         form = forms.OrganizationInfoForm(request.POST, instance=_organization, initial=initial)
 
         if form.is_valid():
@@ -238,6 +239,7 @@ def organization(request):
                 return redirect(next_page_url)
 
     else:
+        old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
         form = forms.OrganizationInfoForm(instance=_organization, initial=initial)
 
     context = {'form': form, 'are_forms_complete': are_forms_complete, 'old_url': old_url}
