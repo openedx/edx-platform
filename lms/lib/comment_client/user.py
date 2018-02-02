@@ -2,6 +2,11 @@
 import settings
 
 import models
+import time
+
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from django.contrib.auth.models import User as django_user
 
 from .utils import CommentClientPaginatedResult, CommentClientRequestError, merge_dict, perform_request
 
@@ -166,6 +171,16 @@ class User(models.Model):
             else:
                 raise
         self._update_from_response(response)
+
+    def delete(self):
+        hash = hex(int(time.time()))[2:]
+        self.username = "{0}_{1}".format(self.username, hash)
+        self.save()
+
+@receiver(pre_delete, sender=django_user)
+def user_delete_handler(sender, **kwargs):
+    forum_user = User.from_django_user(kwargs['instance'])
+    forum_user.delete()
 
 
 def _url_for_vote_comment(comment_id):
