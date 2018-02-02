@@ -105,7 +105,11 @@ class GradesService(object):
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
-        override = self.get_subsection_grade_override(user_id, course_key, usage_key)
+        try:
+            override = self.get_subsection_grade_override(user_id, course_key, usage_key)
+        except PersistentSubsectionGrade.DoesNotExist:
+            return
+
         # Older rejected exam attempts that transition to verified might not have an override created
         if override is not None:
             override.delete()
