@@ -22,6 +22,8 @@ module.exports = {
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
         'js/sock': './cms/static/js/sock.js',
+        AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
+        NoTextbooks: './cms/static/js/features_jsx/studio/NoTextbooks.jsx',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
