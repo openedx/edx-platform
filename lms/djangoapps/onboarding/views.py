@@ -571,18 +571,17 @@ def admin_activation(request, activation_key):
                 hash_key.organization.unclaimed_org_admin_email = None
                 hash_key.organization.admin = user
                 hash_key.organization.save()
-                activation_status = 1
 
-            if admin_change_confirmation:
-                # On admin update confirmation, If claimer's is admin of some other organization remove his privileges
+                # If claimer's is admin of some other organization remove his privileges
                 # for that organization as he can only be an admin of single organization
                 if user_extended_profile.organization.admin == user:
                     user_extended_profile.organization.admin = None
                     user_extended_profile.organization.save()
 
-                # Update the claimer's organization if current admin confirms through the updation link
+                # Update the claimer's organization if a user confirms
                 user_extended_profile.organization = hash_key.organization
                 user_extended_profile.save()
+                activation_status = 1
 
             if not admin_activation:
                 # Send an email to claimer, on admin updation depending upon whether user accepts or rejects the request
@@ -597,6 +596,9 @@ def admin_activation(request, activation_key):
         activation_status = 5
 
     if activation_status == 5 and admin_activation:
+        hash_key.is_hash_consumed = True
+        hash_key.save()
+
         url = reverse('register_user', kwargs={
             'initial_mode': 'register',
             'org_name': base64.b64encode(str(hash_key.organization.label)),

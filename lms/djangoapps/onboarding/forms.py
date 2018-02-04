@@ -609,7 +609,7 @@ class RegModelForm(BaseOnboardingModelForm):
                                                       % (org_admin_email, already_an_admin.label)))
 
         already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
-            suggested_admin_email=org_admin_email).first()
+            suggested_admin_email=org_admin_email, is_hash_consumed=False).first()
         if already_suggested_as_admin:
             raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of some other organiztaion'
                                                       % org_admin_email))
