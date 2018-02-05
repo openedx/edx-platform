@@ -10,7 +10,6 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 
 # Namespace
 WAFFLE_NAMESPACE = 'completion'
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='completion')
 
 # Switches
 # Full name: completion.enable_completion_tracking
@@ -84,10 +83,3 @@ def visual_progress_enabled(course_key):
         return waffle_flag()[ENABLE_COURSE_VISUAL_PROGRESS].is_enabled(course_key)
 
     return True
-
-
-def site_configuration_enabled():
-    """
-    Helper function to return site-aware feature switch
-    :return: bool -> True if site enabled for visual progress tracking
-    """

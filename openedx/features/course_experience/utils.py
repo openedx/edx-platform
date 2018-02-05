@@ -119,6 +119,26 @@ def get_course_outline_block_tree(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
+    if visual_progress_enabled(course_key=course_key):
+        # Deeper query for course tree traversing/marking complete
+        # and last completed block
+        block_types_filter = [
+            'course',
+            'chapter',
+            'sequential',
+            'vertical',
+            'html',
+            'problem',
+            'video',
+            'discussion'
+        ]
+    else:
+        # Shallower query is sufficient for last accessed block
+        block_types_filter = [
+            'course',
+            'chapter',
+            'sequential'
+        ]
     all_blocks = get_blocks(
         request,
         course_usage_key,
@@ -134,16 +154,7 @@ def get_course_outline_block_tree(request, course_id):
             'show_gated_sections',
             'format'
         ],
-        block_types_filter=[
-            'course',
-            'chapter',
-            'sequential',
-            'vertical',
-            'html',
-            'problem',
-            'video',
-            'discussion'
-        ]
+        block_types_filter=block_types_filter
     )
 
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
