@@ -12,9 +12,9 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from provider.utils import short_token
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from openedx.core.djangolib.fields import CharNullField
 
 log = logging.getLogger("edx.lti_provider")

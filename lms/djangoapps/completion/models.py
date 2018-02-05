@@ -9,9 +9,9 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction, connection
 from django.utils.translation import ugettext as _
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from . import waffle
 
 # pylint: disable=ungrouped-imports

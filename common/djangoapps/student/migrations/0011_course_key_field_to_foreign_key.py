@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
-import openedx.core.djangoapps.xmodule_django.models
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 # This should only be used for migrations that have be verified to have a net-neutral sql
@@ -28,12 +28,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseenrollment',
             name='course_id',
-            field=openedx.core.djangoapps.xmodule_django.models.CourseKeyField(max_length=255, db_index=True, db_column='course_id'),
+            field=CourseKeyField(max_length=255, db_index=True, db_column='course_id'),
         ),
         migrations.AlterField(
             model_name='historicalcourseenrollment',
             name='course_id',
-            field=openedx.core.djangoapps.xmodule_django.models.CourseKeyField(max_length=255, db_index=True, db_column='course_id'),
+            field=CourseKeyField(max_length=255, db_index=True, db_column='course_id'),
         ),
 
         # Rename the fields in Django to the new names that we want them to have

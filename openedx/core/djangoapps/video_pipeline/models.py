@@ -5,8 +5,7 @@ from config_models.models import ConfigurationModel
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class VideoPipelineIntegration(ConfigurationModel):

@@ -25,7 +25,7 @@ from model_utils.models import TimeStampedModel
 from six import text_type
 
 import coursewarehistoryextended
-from openedx.core.djangoapps.xmodule_django.models import BlockTypeKeyField, CourseKeyField, LocationKeyField
+from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
 
 log = logging.getLogger("edx.courseware")
 
@@ -91,7 +91,7 @@ class StudentModule(models.Model):
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
-    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = UsageKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
 
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -285,7 +285,7 @@ class XModuleUserStateSummaryField(XBlockFieldBase):
         unique_together = (('usage_id', 'field_name'),)
 
     # The definition id for the module
-    usage_id = LocationKeyField(max_length=255, db_index=True)
+    usage_id = UsageKeyField(max_length=255, db_index=True)
 
 
 class XModuleStudentPrefsField(XBlockFieldBase):
@@ -362,7 +362,7 @@ class StudentFieldOverride(TimeStampedModel):
     overrides of xblock fields on a per user basis.
     """
     course_id = CourseKeyField(max_length=255, db_index=True)
-    location = LocationKeyField(max_length=255, db_index=True)
+    location = UsageKeyField(max_length=255, db_index=True)
     student = models.ForeignKey(User, db_index=True)
 
     class Meta(object):

@@ -21,8 +21,8 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"

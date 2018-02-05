@@ -8,9 +8,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_noop
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
+
+from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

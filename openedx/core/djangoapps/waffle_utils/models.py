@@ -4,10 +4,10 @@ Models for configuring waffle utils.
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from config_models.models import ConfigurationModel
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangoapps.request_cache.middleware import request_cached
 
 

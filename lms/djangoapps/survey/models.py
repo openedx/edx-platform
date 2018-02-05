@@ -9,8 +9,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from lxml import etree
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import User
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 

@@ -7,9 +7,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import UsageKey
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -44,7 +44,7 @@ class Bookmark(TimeStampedModel):
     """
     user = models.ForeignKey(User, db_index=True)
     course_key = CourseKeyField(max_length=255, db_index=True)
-    usage_key = LocationKeyField(max_length=255, db_index=True)
+    usage_key = UsageKeyField(max_length=255, db_index=True)
     _path = JSONField(db_column='path', help_text='Path in course tree to the block')
 
     xblock_cache = models.ForeignKey('bookmarks.XBlockCache')
@@ -192,7 +192,7 @@ class XBlockCache(TimeStampedModel):
     """
 
     course_key = CourseKeyField(max_length=255, db_index=True)
-    usage_key = LocationKeyField(max_length=255, db_index=True, unique=True)
+    usage_key = UsageKeyField(max_length=255, db_index=True, unique=True)
 
     display_name = models.CharField(max_length=255, default='')
     _paths = JSONField(

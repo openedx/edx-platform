@@ -9,7 +9,7 @@ import django.utils.timezone
 from badges.models import validate_badge_image
 from django.conf import settings
 from lms.djangoapps.certificates import models as cert_models
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):

@@ -5,7 +5,7 @@ from django.db import migrations, models
 import django_countries.fields
 import django.db.models.deletion
 from django.conf import settings
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):

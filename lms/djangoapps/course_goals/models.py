@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 from model_utils import Choices
 
 from .api import add_course_goal, remove_course_goal

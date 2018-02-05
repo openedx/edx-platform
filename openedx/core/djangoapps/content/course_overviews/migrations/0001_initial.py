@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.utils.timezone
 import model_utils.fields
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
 
 class Migration(migrations.Migration):

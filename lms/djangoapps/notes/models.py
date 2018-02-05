@@ -5,9 +5,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.html import strip_tags
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Note(models.Model):

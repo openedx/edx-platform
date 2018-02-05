@@ -6,7 +6,7 @@ import django.utils.timezone
 from django.conf import settings
 import model_utils.fields
 import django.core.validators
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
