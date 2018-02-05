@@ -16,6 +16,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
 from openedx.features.learner_analytics import ENABLE_DASHBOARD_TAB
+from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
 %>
 
 <%block name="header_extras">
@@ -30,6 +31,14 @@ from openedx.features.learner_analytics import ENABLE_DASHBOARD_TAB
           component="UpsellExperimentModal",
           id="upsell-modal",
           props={},
+        )}
+    % endif
+
+    % if INCLUDE_PORTFOLIO_UPSELL_MODAL.is_enabled():
+        ${static.renderReact(
+            component="PortfolioExperimentUpsellModal",
+            id="portfolio-experiment-upsell-modal",
+            props={}
         )}
     % endif
 
