@@ -428,7 +428,7 @@ class MongoContentStore(ContentStore):
 
     def ensure_indexes(self):
         # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
-        # which can be `uploadDate`, `display_name`,
+        # which can be `uploadDate`, `displayname`,
         create_collection_index(
             self.fs_files,
             [
@@ -485,7 +485,7 @@ class MongoContentStore(ContentStore):
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
-                ('display_name', pymongo.ASCENDING)
+                ('displayname', pymongo.ASCENDING)
             ],
             sparse=True,
             background=True
@@ -505,7 +505,7 @@ class MongoContentStore(ContentStore):
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
-                ('display_name', pymongo.ASCENDING)
+                ('displayname', pymongo.ASCENDING)
             ],
             sparse=True,
             background=True
