@@ -506,11 +506,8 @@ def convert_video_status(video):
         *   `YouTube Duplicate` if status is `invalid_token`
         *   user-friendly video status
     """
-    try:
-        # Protect against legacy incomplete edx-val edx_video_id records.
-        now = datetime.now(video['created'].tzinfo)
-    except AttributeError:
-        now = datetime.now().replace(tzinfo=UTC)
+    now = datetime.now(video.get('created', datetime.now().replace(tzinfo=UTC)).tzinfo)
+
     if video['status'] == 'upload' and (now - video['created']) > timedelta(hours=MAX_UPLOAD_HOURS):
         new_status = 'upload_failed'
         status = StatusDisplayStrings.get(new_status)
