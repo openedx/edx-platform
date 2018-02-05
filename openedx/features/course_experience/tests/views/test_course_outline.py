@@ -380,13 +380,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         # first navigate to a sequential to make it the last accessed
         chapter = course.children[0]
         sequential = chapter.children[0]
-        vertical = sequential.children[0]
         self.visit_sequential(course, chapter, sequential)
 
         # check resume course buttons
         response = self.visit_course_home(course, resume_count=2)
         content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential.url_name))
 
     @override_switch(
         '{}.{}'.format(
@@ -394,7 +393,6 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         ),
         active=True
     )
-    # @patch('lms.djangoapps.completion.waffle.site_configuration_enabled')
     @patch('lms.djangoapps.completion.waffle.get_current_site')
     def test_resume_course_with_completion_api(self, get_patched_current_site):
         """
