@@ -25,7 +25,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.core import XBlock
 
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
@@ -188,7 +188,7 @@ class LeafDescriptorFactory(Factory):
 
     @lazy_attribute
     def location(self):
-        return Location('org', 'course', 'run', 'category', self.url_name, None)
+        return BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', self.url_name)
 
     @lazy_attribute
     def block_type(self):

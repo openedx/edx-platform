@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
 from web_fragments.fragment import Fragment
@@ -2106,7 +2106,7 @@ class TestComponentHandler(TestCase):
         self.descriptor = self.modulestore.return_value.get_item.return_value
 
         self.usage_key_string = unicode(
-            Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
+            BlockUsageLocator(CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name')
         )
 
         self.user = UserFactory()

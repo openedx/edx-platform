@@ -26,8 +26,7 @@ from contracts import contract, new_contract
 from fs.osfs import OSFS
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
-from opaque_keys.edx.locations import Location, BlockUsageLocator
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
 from xblock.core import XBlock
@@ -716,7 +715,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # now go through the results and order them by the location url
         for result in resultset:
             # manually pick it apart b/c the db has tag and we want as_published revision regardless
-            location = as_published(Location._from_deprecated_son(result['_id'], course_id.run))
+            location = as_published(BlockUsageLocator._from_deprecated_son(result['_id'], course_id.run))
 
             location_url = unicode(location)
             if location_url in results_by_url:
@@ -860,7 +859,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             children = []
             for item in to_process:
                 self._clean_item_data(item)
-                item_location = Location._from_deprecated_son(item['location'], course_key.run)
+                item_location = BlockUsageLocator._from_deprecated_son(item['location'], course_key.run)
                 item_children = item.get('definition', {}).get('children', [])
                 children.extend(item_children)
                 for item_child in item_children:
@@ -908,7 +907,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for_parent (:class:`XBlock`): The parent of the XBlock being loaded.
         """
         course_key = self.fill_in_run(course_key)
-        location = Location._from_deprecated_son(item['location'], course_key.run)
+        location = BlockUsageLocator._from_deprecated_son(item['location'], course_key.run)
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
         resource_fs = _OSFS_INSTANCE.setdefault(root, OSFS(root, create=True))
@@ -1611,7 +1610,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         bulk_record = self._get_bulk_ops_record(location.course_key)
 
         for parent in parents:
-            parent_loc = Location._from_deprecated_son(parent['_id'], location.course_key.run)
+            parent_loc = BlockUsageLocator._from_deprecated_son(parent['_id'], location.course_key.run)
 
             # travel up the tree for orphan validation
             ancestor_loc = parent_loc
@@ -1685,7 +1684,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     return cache_and_return(non_orphan_parents[0].replace(run=location.course_key.run))
             else:
                 # return the single PUBLISHED parent
-                return cache_and_return(Location._from_deprecated_son(parents[0]['_id'], location.course_key.run))
+                return cache_and_return(BlockUsageLocator._from_deprecated_son(parents[0]['_id'],
+                                                                               location.course_key.run))
         else:
             # there could be 2 different parents if
             #   (1) the draft item was moved or
@@ -1705,7 +1705,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             found_id = all_parents[0]['_id']
             # don't disclose revision outside modulestore
-            return cache_and_return(Location._from_deprecated_son(found_id, location.course_key.run))
+            return cache_and_return(BlockUsageLocator._from_deprecated_son(found_id, location.course_key.run))
 
     def get_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs):
         '''
@@ -1750,7 +1750,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if item['_id']['category'] != 'course':
                 # It would be nice to change this method to return UsageKeys instead of the deprecated string.
                 item_locs.add(
-                    unicode(as_published(Location._from_deprecated_son(item['_id'], course_key.run)))
+                    unicode(as_published(BlockUsageLocator._from_deprecated_son(item['_id'], course_key.run)))
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable
@@ -1768,7 +1768,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         # the course's run == its name. It's the only xblock for which that's necessarily true.
         return [
-            Location._from_deprecated_son(course['_id'], course['_id']['name']).course_key
+            BlockUsageLocator._from_deprecated_son(course['_id'], course['_id']['name']).course_key
             for course in courses
         ]
 

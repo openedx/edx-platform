@@ -21,7 +21,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from six import text_type
@@ -1371,7 +1371,7 @@ def assign_textbook_id(textbook, used_ids=()):
     Return an ID that can be assigned to a textbook
     and doesn't match the used_ids
     """
-    tid = Location.clean(textbook["tab_title"])
+    tid = BlockUsageLocator.clean(textbook["tab_title"])
     if not tid[0].isdigit():
         # stick a random digit in front
         tid = random.choice(string.digits) + tid

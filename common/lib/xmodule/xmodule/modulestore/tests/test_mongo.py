@@ -25,12 +25,10 @@ from xblock.exceptions import InvalidScopeError
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
-from opaque_keys.edx.locations import AssetLocation
-from opaque_keys.edx.locator import LibraryLocator, CourseLocator
+from opaque_keys.edx.locator import AssetLocator, BlockUsageLocator, CourseLocator, LibraryLocator
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
@@ -320,15 +318,18 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
     def test_loads(self):
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall'))
+            self.draft_store.get_item(BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                                        'course', '2012_Fall', deprecated=True))
         )
 
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store.get_item(BlockUsageLocator(CourseLocator('edX', 'simple', '2012_Fall', deprecated=True),
+                                                        'course', '2012_Fall', deprecated=True)),
         )
 
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store.get_item(BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                                        'video', 'Welcome', deprecated=True)),
         )
 
     def test_unicode_loads(self):
@@ -336,30 +337,43 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         Test that getting items from the test_unicode course works
         """
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store.get_item(
+                BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                                  'course', '2012_Fall', deprecated=True)),
         )
         # All items with ascii-only filenames should load properly.
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store.get_item(
+                BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                                  'video', 'Welcome', deprecated=True)),
         )
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store.get_item(
+                BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                                  'video', 'Welcome', deprecated=True)),
         )
         assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'chapter', 'Overview')),
+            self.draft_store.get_item(
+                BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                                  'chapter', 'Overview', deprecated=True)),
         )
 
     def test_find_one(self):
         assert_not_none(
-            self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store._find_one(
+                BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                  'course', '2012_Fall', deprecated=True)),
         )
 
         assert_not_none(
-            self.draft_store._find_one(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
+            self.draft_store._find_one(
+                BlockUsageLocator(CourseLocator('edX', 'simple', '2012_Fall', deprecated=True),
+                                  'course', '2012_Fall', deprecated=True)),
         )
 
         assert_not_none(
-            self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
+            self.draft_store._find_one(BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                                         'video', 'Welcome', deprecated=True)),
         )
 
     def test_xlinter(self):
@@ -381,7 +395,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.
         """
-        location = Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')
+        location = BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                     'course', '2012_Fall', deprecated=True)
         course_content, __ = self.content_store.get_all_content_for_course(location.course_key)
         assert_true(len(course_content) > 0)
         filter_params = _build_requested_filter('Images')
@@ -391,7 +406,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         # a bit overkill, could just do for content[0]
         for content in course_content:
             assert not content.get('locked', False)
-            asset_key = AssetLocation._from_deprecated_son(content.get('content_son', content['_id']), location.run)
+            asset_key = AssetLocator._from_deprecated_son(content.get('content_son', content['_id']), location.run)
             assert not self.content_store.get_attr(asset_key, 'locked', False)
             attrs = self.content_store.get_attrs(asset_key)
             assert_in('uploadDate', attrs)
@@ -404,7 +419,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             self.content_store.set_attrs(asset_key, {'miscel': 99})
             assert_equals(self.content_store.get_attr(asset_key, 'miscel'), 99)
 
-        asset_key = AssetLocation._from_deprecated_son(
+        asset_key = AssetLocator._from_deprecated_son(
             course_content[0].get('content_son', course_content[0]['_id']),
             location.run
         )
@@ -418,26 +433,27 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         )
         assert_raises(
             NotFoundError, self.content_store.get_attr,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'),
             'displayname'
         )
         assert_raises(
             NotFoundError, self.content_store.set_attr,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'),
             'displayname', 'hello'
         )
         assert_raises(
             NotFoundError, self.content_store.get_attrs,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus')
+            BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus')
         )
         assert_raises(
             NotFoundError, self.content_store.set_attrs,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'),
             {'displayname': 'hello'}
         )
         assert_raises(
             NotFoundError, self.content_store.set_attrs,
-            Location('bogus', 'bogus', 'bogus', 'asset', None),
+            BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus', deprecated=True),
+                              'asset', None, deprecated=True),
             {'displayname': 'hello'}
         )
 
@@ -626,11 +642,16 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             self.draft_store.create_course(org, course, run, user_id)
 
             locations = {
-                'grandparent': Location(org, course, run, 'chapter', 'grandparent'),
-                'parent_sibling': Location(org, course, run, 'sequential', 'parent_sibling'),
-                'parent': Location(org, course, run, 'sequential', 'parent'),
-                'child_sibling': Location(org, course, run, 'vertical', 'child_sibling'),
-                'child': Location(org, course, run, 'vertical', 'child'),
+                'grandparent': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                                 'chapter', 'grandparent', deprecated=True),
+                'parent_sibling': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                                    'sequential', 'parent_sibling', deprecated=True),
+                'parent': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                            'sequential', 'parent', deprecated=True),
+                'child_sibling': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                                   'vertical', 'child_sibling', deprecated=True),
+                'child': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                           'vertical', 'child', deprecated=True),
             }
 
             for key in locations:
@@ -660,7 +681,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
 
         # Insert the test block directly into the module store
-        location = Location('edX', 'migration', '2012_Fall', 'html', 'test_html')
+        location = BlockUsageLocator(CourseLocator('edX', 'migration', '2012_Fall', deprecated=True),
+                                     'html', 'test_html', deprecated=True)
         published_date = datetime(1970, 1, 1, tzinfo=UTC)
         published_by = 123
         self.draft_store._update_single_item(

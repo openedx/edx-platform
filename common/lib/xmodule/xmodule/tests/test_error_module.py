@@ -5,8 +5,7 @@ import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
 from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.locator import CourseLocator
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader
@@ -129,7 +128,8 @@ class TestErrorModuleConstruction(unittest.TestCase):
         self.descriptor = BrokenDescriptor(
             TestRuntime(Mock(spec=IdReader), field_data),
             field_data,
-            ScopeIds(None, None, None, Location('org', 'course', 'run', 'broken', 'name', None))
+            ScopeIds(None, None, None,
+                     BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'broken', 'name'))
         )
         self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor

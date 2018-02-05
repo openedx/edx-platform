@@ -18,7 +18,7 @@ from mock import patch
 from nose.tools import assert_less_equal, assert_greater_equal
 import dogstats_wrapper as dog_stats_api
 
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
@@ -116,7 +116,7 @@ class CourseFactory(XModuleFactory):
         # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
-        name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
+        name = kwargs.get('name', kwargs.get('run', BlockUsageLocator.clean(kwargs.get('display_name'))))
         run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         emit_signals = kwargs.pop('emit_signals', False)
