@@ -1082,7 +1082,7 @@ INSTALLED_APPS = [
     'courseware',
     'survey',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
-    'lms.djangoapps.completion.apps.CompletionAppConfig',
+    'completion',
 
     # Microsite configuration application
     'microsite_configuration',

@@ -11,6 +11,8 @@ import ddt
 import pytest
 import pytz
 from bson import ObjectId
+from completion.models import BlockCompletion
+from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
@@ -46,8 +48,6 @@ from courseware.module_render import get_module_for_descriptor, hash_resource
 from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from courseware.tests.tests import LoginEnrollmentTestCase
-from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion import waffle as completion_waffle
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
@@ -664,7 +664,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 content_type='application/json',
             )
             request.user = self.mock_user
-            with patch('lms.djangoapps.completion.models.BlockCompletionManager.submit_completion') as mock_complete:
+            with patch('completion.models.BlockCompletionManager.submit_completion') as mock_complete:
                 render.handle_xblock_callback(
                     request,
                     unicode(course.id),

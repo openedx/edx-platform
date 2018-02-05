@@ -98,7 +98,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.7#egg=lti_consumer-xbloc
 # This is here because all of the other XBlocks are located here. However, it is published to PyPI and will be installed that way
 xblock-review==1.1.4
 
-
 # Third Party XBlocks
 
 git+https://github.com/mitodl/edx-sga.git@d019b8a050c056db535e3ff13c93096145a932de#egg=edx-sga==0.7.1

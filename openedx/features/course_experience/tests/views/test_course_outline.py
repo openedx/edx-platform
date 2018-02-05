@@ -4,6 +4,9 @@ Tests for the Course Outline view and supporting views.
 import datetime
 import json
 
+from completion import waffle
+from completion.models import BlockCompletion
+from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from mock import Mock, patch
@@ -11,9 +14,6 @@ from six import text_type
 
 from courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
-from lms.djangoapps.completion import waffle
-from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion.test_utils import CompletionWaffleTestMixin
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -325,7 +325,6 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         """
         super(TestCourseOutlineResumeCourse, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self.override_waffle_switch(False)
 
     def visit_sequential(self, course, chapter, sequential):
         """
@@ -393,7 +392,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         ),
         active=True
     )
-    @patch('lms.djangoapps.completion.waffle.get_current_site')
+    @patch('completion.waffle.get_current_site')
     def test_resume_course_with_completion_api(self, get_patched_current_site):
         """
         Tests completion API resume button functionality

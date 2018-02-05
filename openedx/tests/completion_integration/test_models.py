@@ -4,15 +4,17 @@ Test models, managers, and validators.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from completion import models, waffle
+from completion.test_utils import CompletionWaffleTestMixin
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-from .. import models, waffle
 
-
+@skip_unless_lms
 class PercentValidatorTestCase(TestCase):
     """
     Test that validate_percent only allows floats (and ints) between 0.0 and 1.0.
@@ -26,7 +28,10 @@ class PercentValidatorTestCase(TestCase):
             self.assertRaises(ValidationError, models.validate_percent, value)
 
 
-class CompletionSetUpMixin(object):
+class CompletionSetUpMixin(CompletionWaffleTestMixin):
+    """
+    Mixin that provides helper to create test BlockCompletion object.
+    """
     def set_up_completion(self):
         self.user = UserFactory()
         self.block_key = UsageKey.from_string(u'block-v1:edx+test+run+type@video+block@doggos')
@@ -39,6 +44,7 @@ class CompletionSetUpMixin(object):
         )
 
 
+@skip_unless_lms
 class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
     """
     Test that BlockCompletion.objects.submit_completion has the desired
@@ -46,9 +52,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
     """
     def setUp(self):
         super(SubmitCompletionTestCase, self).setUp()
-        _overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
-        _overrider.__enter__()
-        self.addCleanup(_overrider.__exit__, None, None, None)
+        self.override_waffle_switch(True)
         self.set_up_completion()
 
     def test_changed_value(self):
@@ -114,22 +118,17 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
 
 
+@skip_unless_lms
 class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super(CompletionDisabledTestCase, cls).setUpClass()
-        cls.overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, False)
-        cls.overrider.__enter__()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.overrider.__exit__(None, None, None)
-        super(CompletionDisabledTestCase, cls).tearDownClass()
-
+    """
+    Tests that completion API is not called when the feature is disabled.
+    """
     def setUp(self):
         super(CompletionDisabledTestCase, self).setUp()
+        # insert one completion record...
         self.set_up_completion()
+        # ...then disable the feature.
+        self.override_waffle_switch(False)
 
     def test_cannot_call_submit_completion(self):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
@@ -143,17 +142,15 @@ class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
 
 
-class SubmitBatchCompletionTestCase(TestCase):
+@skip_unless_lms
+class SubmitBatchCompletionTestCase(CompletionWaffleTestMixin, TestCase):
     """
     Test that BlockCompletion.objects.submit_batch_completion has the desired
     semantics.
     """
-
     def setUp(self):
         super(SubmitBatchCompletionTestCase, self).setUp()
-        _overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
-        _overrider.__enter__()
-        self.addCleanup(_overrider.__exit__, None, None, None)
+        self.override_waffle_switch(True)
 
         self.block_key = UsageKey.from_string('block-v1:edx+test+run+type@video+block@doggos')
         self.course_key_obj = CourseKey.from_string('course-v1:edx+test+run')
@@ -188,13 +185,14 @@ class SubmitBatchCompletionTestCase(TestCase):
         self.assertEqual(model.completion, 1.0)
 
 
-class BatchCompletionMethodTests(TestCase):
-
+@skip_unless_lms
+class BatchCompletionMethodTests(CompletionWaffleTestMixin, TestCase):
+    """
+    Tests for the classmethods that retrieve course/block completion data.
+    """
     def setUp(self):
         super(BatchCompletionMethodTests, self).setUp()
-        _overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
-        _overrider.__enter__()
-        self.addCleanup(_overrider.__exit__, None, None, None)
+        self.override_waffle_switch(True)
 
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()
@@ -202,11 +200,13 @@ class BatchCompletionMethodTests(TestCase):
         self.other_course_key = CourseKey.from_string("course-v1:ReedX+Hum110+1904")
         self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in xrange(5)]
 
-        self.submit_faux_completions()
+        self.submit_fake_completions()
 
-    def submit_faux_completions(self):
-        # Proper completions for the given runtime
-        for idx, block_key in enumerate(self.block_keys[0:3]):
+    def submit_fake_completions(self):
+        """
+        Submit completions for given runtime, run at setup
+        """
+        for idx, block_key in enumerate(self.block_keys[:3]):
             models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 course_key=self.course_key,
@@ -214,8 +214,7 @@ class BatchCompletionMethodTests(TestCase):
                 completion=1.0 - (0.2 * idx),
             )
 
-        # Wrong user
-        for idx, block_key in enumerate(self.block_keys[2:]):
+        for idx, block_key in enumerate(self.block_keys[2:]):  # Wrong user
             models.BlockCompletion.objects.submit_completion(
                 user=self.other_user,
                 course_key=self.course_key,
@@ -223,23 +222,23 @@ class BatchCompletionMethodTests(TestCase):
                 completion=0.9 - (0.2 * idx),
             )
 
-        # Wrong course
-        models.BlockCompletion.objects.submit_completion(
+        models.BlockCompletion.objects.submit_completion(  # Wrong course
             user=self.user,
             course_key=self.other_course_key,
             block_key=self.block_keys[4],
             completion=0.75,
         )
 
-    def test_get_course_completions(self):
+    def test_get_course_completions_missing_runs(self):
+        actual_completions = models.BlockCompletion.get_course_completions(self.user, self.course_key)
+        expected_block_keys = [key.replace(course_key=self.course_key) for key in self.block_keys[:3]]
+        expected_completions = dict(zip(expected_block_keys, [1.0, 0.8, 0.6]))
+        self.assertEqual(expected_completions, actual_completions)
 
+    def test_get_course_completions_empty_result_set(self):
         self.assertEqual(
-            models.BlockCompletion.get_course_completions(self.user, self.course_key),
-            {
-                self.block_keys[0]: 1.0,
-                self.block_keys[1]: 0.8,
-                self.block_keys[2]: 0.6,
-            },
+            models.BlockCompletion.get_course_completions(self.other_user, self.other_course_key),
+            {}
         )
 
     def test_get_latest_block_completed(self):
@@ -247,3 +246,6 @@ class BatchCompletionMethodTests(TestCase):
             models.BlockCompletion.get_latest_block_completed(self.user, self.course_key).block_key,
             self.block_keys[2]
         )
+
+    def test_get_latest_completed_none_exist(self):
+        self.assertIsNone(models.BlockCompletion.get_latest_block_completed(self.other_user, self.other_course_key))

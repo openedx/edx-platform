@@ -2,20 +2,22 @@
 """
 Test models, managers, and validators.
 """
-
+from completion import waffle
+from completion.test_utils import CompletionWaffleTestMixin
 import ddt
 from django.core.urlresolvers import reverse
-from rest_framework.test import APIClient, force_authenticate
+from rest_framework.test import APIClient
 
-from completion import waffle
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt
-class CompletionBatchTestCase(ModuleStoreTestCase):
+@skip_unless_lms
+class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
     """
     Test that BlockCompletion.objects.submit_batch_completion has the desired
     semantics.
@@ -33,9 +35,7 @@ class CompletionBatchTestCase(ModuleStoreTestCase):
         self.url = reverse('completion_api:v1:completion-batch')
 
         # Enable the waffle flag for all tests
-        _overrider = waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, True)
-        _overrider.__enter__()
-        self.addCleanup(_overrider.__exit__, None, None, None)
+        self.override_waffle_switch(True)
 
         # Create course
         self.course = CourseFactory.create(org='TestX', number='101', display_name='Test')

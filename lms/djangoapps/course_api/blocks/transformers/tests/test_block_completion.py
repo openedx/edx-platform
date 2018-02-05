@@ -1,11 +1,11 @@
 """
 Tests for BlockCompletionTransformer.
 """
+from completion.models import BlockCompletion
+from completion.test_utils import CompletionWaffleTestMixin
 from xblock.core import XBlock
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
 
-from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion.test_utils import CompletionWaffleTestMixin
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase, TransformerRegistryTestMixin
 from student.tests.factories import UserFactory
@@ -39,7 +39,7 @@ class StubCompletableXBlock(XBlock, CompletableXBlockMixin):
     pass
 
 
-class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
+class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, CompletionWaffleTestMixin, ModuleStoreTestCase):
     """
     Tests behaviour of BlockCompletionTransformer
     """
@@ -49,6 +49,7 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, ModuleSto
     def setUp(self):
         super(BlockCompletionTransformerTestCase, self).setUp()
         self.user = UserFactory.create(password='test')
+        # Set ENABLE_COMPLETION_TRACKING waffle switch to True
         self.override_waffle_switch(True)
 
     @XBlock.register_temp_plugin(StubAggregatorXBlock, identifier='aggregator')

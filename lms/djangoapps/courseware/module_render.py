@@ -8,6 +8,8 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
+from completion.models import BlockCompletion
+from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -40,8 +42,6 @@ from courseware.masquerade import (
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
-from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion import waffle as completion_waffle
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
