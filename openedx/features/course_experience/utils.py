@@ -1,12 +1,12 @@
 """
 Common utilities for the course experience, including course outline.
 """
-from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion.waffle import visual_progress_enabled
+from completion.models import BlockCompletion
+from completion.waffle import visual_progress_enabled
+
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.djangoapps.request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
 
@@ -50,7 +50,6 @@ def get_course_outline_block_tree(request, course_id):
         Mark 'most recent completed block as 'resume_block'
 
         """
-
         last_completed_child_position = BlockCompletion.get_latest_block_completed(user, course_key)
 
         if last_completed_child_position:
@@ -76,11 +75,11 @@ def get_course_outline_block_tree(request, course_id):
         :return:
             block: course_outline_root_block block object or child block
         """
-        locatable_block_string = BlockUsageLocator.from_string(block['id'])
+        block_key = block.serializer.instance
 
-        if course_block_completions.get(locatable_block_string):
+        if course_block_completions.get(block_key):
             block['complete'] = True
-            if locatable_block_string == latest_completion.block_key:
+            if block_key == latest_completion.full_block_key:
                 block['resume_block'] = True
 
         if block.get('children'):

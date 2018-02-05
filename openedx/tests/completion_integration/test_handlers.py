@@ -1,24 +1,22 @@
 """
-Test signal handlers.
+Test signal handlers for completion.
 """
 
 from datetime import datetime
 
+from completion import handlers
+from completion.models import BlockCompletion
+from completion.test_utils import CompletionSetUpMixin
 import ddt
 from django.test import TestCase
 from mock import patch
-from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 import six
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
-from student.tests.factories import UserFactory
-
-from .. import handlers
-from ..models import BlockCompletion
-from ..test_utils import CompletionWaffleTestMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class CustomScorableBlock(XBlock):
@@ -40,17 +38,16 @@ class ExcludedScorableBlock(XBlock):
 
 
 @ddt.ddt
-class ScorableCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
+@skip_unless_lms
+class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     """
     Test the signal handler
     """
+    COMPLETION_SWITCH_ENABLED = True
 
     def setUp(self):
         super(ScorableCompletionHandlerTestCase, self).setUp()
-        self.course_key = CourseKey.from_string('edx/course/beta')
-        self.scorable_block_key = self.course_key.make_usage_key(block_type='problem', block_id='red')
-        self.user = UserFactory.create()
-        self.override_waffle_switch(True)
+        self.block_key = self.course_key.make_usage_key(block_type='problem', block_id='red')
 
     def call_scorable_block_completion_handler(self, block_key, score_deleted=None):
         """
@@ -81,11 +78,11 @@ class ScorableCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
     )
     @ddt.unpack
     def test_handler_submits_completion(self, score_deleted, expected_completion):
-        self.call_scorable_block_completion_handler(self.scorable_block_key, score_deleted)
+        self.call_scorable_block_completion_handler(self.block_key, score_deleted)
         completion = BlockCompletion.objects.get(
             user=self.user,
             course_key=self.course_key,
-            block_key=self.scorable_block_key,
+            block_key=self.block_key,
         )
         self.assertEqual(completion.completion, expected_completion)
 
@@ -112,14 +109,12 @@ class ScorableCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
         self.assertFalse(completion.exists())
 
     def test_signal_calls_handler(self):
-        user = UserFactory.create()
-
-        with patch('lms.djangoapps.completion.handlers.scorable_block_completion') as mock_handler:
+        with patch('completion.handlers.scorable_block_completion') as mock_handler:
             PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
                 sender=self,
-                user_id=user.id,
+                user_id=self.user.id,
                 course_id=six.text_type(self.course_key),
-                usage_id=six.text_type(self.scorable_block_key),
+                usage_id=six.text_type(self.block_key),
                 weighted_earned=0.0,
                 weighted_possible=3.0,
                 modified=datetime.utcnow().replace(tzinfo=utc),
@@ -128,17 +123,17 @@ class ScorableCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
         mock_handler.assert_called()
 
 
-class DisabledCompletionHandlerTestCase(CompletionWaffleTestMixin, TestCase):
+@skip_unless_lms
+class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     """
     Test that disabling the ENABLE_COMPLETION_TRACKING waffle switch prevents
     the signal handler from submitting a completion.
     """
+    COMPLETION_SWITCH_ENABLED = False
+
     def setUp(self):
         super(DisabledCompletionHandlerTestCase, self).setUp()
-        self.user = UserFactory.create()
-        self.course_key = CourseKey.from_string("course-v1:a+valid+course")
-        self.block_key = self.course_key.make_usage_key(block_type="video", block_id="mah-video")
-        self.override_waffle_switch(False)
+        self.block_key = self.course_key.make_usage_key(block_type='problem', block_id='red')
 
     def test_disabled_handler_does_not_submit_completion(self):
         handlers.scorable_block_completion(

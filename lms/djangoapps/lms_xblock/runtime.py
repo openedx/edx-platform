@@ -1,14 +1,14 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
-import xblock.reference.plugins
+from completion.services import CompletionService
 from django.conf import settings
 from django.core.urlresolvers import reverse
+import xblock.reference.plugins
 
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from lms.djangoapps.completion.services import CompletionService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
