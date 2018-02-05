@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.utils.http import urlquote_plus
+from django.utils.timezone import now
 from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
@@ -96,7 +97,7 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
                     org='edX',
                     number='test',
                     display_name='Test Course',
-                    start=datetime.now(UTC) - timedelta(days=30),
+                    start=now() - timedelta(days=30),
                 )
                 with cls.store.bulk_operations(cls.course.id):
                     chapter = ItemFactory.create(
@@ -122,7 +123,7 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
         """
         return CourseFactory.create(
             display_name='Test Future Course',
-            start=specific_date if specific_date else datetime.now(UTC) + timedelta(days=30),
+            start=specific_date if specific_date else now() + timedelta(days=30),
         )
 
 
@@ -487,9 +488,9 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         super(CourseHomeFragmentViewTests, self).setUp()
         CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
 
-        end = datetime.now(UTC) + timedelta(days=30)
+        end = now() + timedelta(days=30)
         self.course = CourseFactory(
-            start=datetime.now(UTC) - timedelta(days=30),
+            start=now() - timedelta(days=30),
             end=end,
         )
         self.url = course_home_url(self.course)
@@ -535,7 +536,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assert_upgrade_message_not_displayed()
 
     def test_no_upgrade_message_if_upgrade_deadline_passed(self):
-        self.verified_mode.expiration_datetime = datetime.now(UTC) - timedelta(days=20)
+        self.verified_mode.expiration_datetime = now() - timedelta(days=20)
         self.verified_mode.save()
         self.assert_upgrade_message_not_displayed()
 

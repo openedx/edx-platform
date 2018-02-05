@@ -9,6 +9,7 @@ from django.test import TestCase
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
 from bulk_email.models import (
     SEND_TO_COHORT,
@@ -74,8 +75,8 @@ class CourseEmailTest(ModuleStoreTestCase):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
 
     @ddt.data(
-        datetime.datetime(1999, 1, 1),
-        datetime.datetime(datetime.MAXYEAR, 1, 1),
+        datetime.datetime(1999, 1, 1, tzinfo=UTC),
+        datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=UTC),
     )
     def test_track_target(self, expiration_datetime):
         """
