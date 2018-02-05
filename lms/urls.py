@@ -676,6 +676,14 @@ urlpatterns += [
         ),
         include('openedx.features.learner_analytics.urls'),
     ),
+
+    # Portfolio project experiment
+    url(
+        r'^courses/{}/xfeature/portfolio/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.portfolio_project.urls'),
+    ),
 ]
 
 if settings.FEATURES['ENABLE_TEAMS']:

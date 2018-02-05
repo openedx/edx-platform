@@ -2360,6 +2360,7 @@ INSTALLED_APPS = [
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
     'openedx.features.learner_analytics',
+    'openedx.features.portfolio_project',
 
     'experiments',
 
