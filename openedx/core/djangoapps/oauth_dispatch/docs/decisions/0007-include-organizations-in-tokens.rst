@@ -1,5 +1,5 @@
-7. Include Organization in Tokens
----------------------------------
+7. Include Organizations in Tokens
+----------------------------------
 
 Status
 ------
@@ -74,7 +74,7 @@ embedded in the scopes.
 
 * Create a configurable Application-specific "available organizations"
   setting, which is akin to Application-specific "available scopes"
-  (as described in 0006-enforce-scopes-in-LMS-APIs_.
+  (as described in 0006-enforce-scopes-in-LMS-APIs_).
 
 * Introduce a new data model that associates available organizations
   with DOT Applications.
@@ -112,7 +112,7 @@ embedded in the scopes.
 When the interstitial authorization approval form is presented to the
 user for granting access to a DOT Application, if the Application is
 associated with an Organization, the Organization value(s) should be
-presented to the user. This will make it clear to the user that the
+presented to the user. This makes it clear to the user that the
 granted access is limited to the Organization's affiliations.
 
 4. Embed Organization Limitation Types in Scopes
@@ -164,7 +164,7 @@ single user (via Authorization Code).
 Consequences
 ------------
 
-* By associating Organizations with DOT Applications and not Restricted
+* By associating organizations with DOT Applications and not Restricted
   Applications, we can eventually eliminate Restricted Applications
   altogether.
 
