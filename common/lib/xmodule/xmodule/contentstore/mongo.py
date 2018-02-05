@@ -253,6 +253,7 @@ class MongoContentStore(ContentStore):
         # `insensitive_displayname`, a lowercase version of `displayname` that is sorted on instead.
         # Mongo 3.4 does not require this hack. When upgraded, change this aggregation back to a find and specifiy
         # a collation based on user's language locale instead.
+        # See: https://openedx.atlassian.net/browse/EDUCATOR-2221
         pipeline_stages = []
         query = query_for_course(course_key, 'asset' if not get_thumbnails else 'thumbnail')
         if filter_params:
