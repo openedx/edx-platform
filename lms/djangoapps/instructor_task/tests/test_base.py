@@ -352,7 +352,7 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
 
             if ignore_other_columns:
                 csv_rows = [
@@ -372,5 +372,5 @@ class TestReportMixin(object):
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
-            rows = unicodecsv.reader(csv_file, encoding='utf-8')
+            rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
             return rows.next()
