@@ -236,7 +236,7 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
-msgstr "Conversación"
+msgstr "Discusión"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -342,7 +342,7 @@ msgstr "Verificación de ID pendiente"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as a verified student"
-msgstr "Estás inscrito como un estudiante verificado"
+msgstr "Usted está inscrito como un estudiante verificado"
 
 #: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -355,7 +355,7 @@ msgstr "ID de la insignia o medalla verificada"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as an honor code student"
-msgstr "Usted está inscrito como estudiante de código de honor"
+msgstr "Usted está inscrito como estudiante con código de honor"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/api.py
@@ -6481,8 +6481,8 @@ msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
 "not include a certificate."
 msgstr ""
-"Usted está inscrito en el curso como asistente. Esta ruta no incluye la "
-"obtención de un certificado."
+"Usted está inscrito en el curso como asistente. Este modo de tomar el curso "
+"no incluye la obtención de un certificado."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
@@ -6541,14 +6541,14 @@ msgid ""
 "You must be enrolled in the course to see course content."
 "                             {enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
-"Tienes que estar inscrito en el curso para poder ver su contenido."
-"                             {enroll_link_start}Inscríbete "
-"ahora{enroll_link_end}."
+"Tiene que estar inscrito en el curso para poder ver su contenido."
+"                             {enroll_link_start} Inscríbase ahora "
+"{enroll_link_end}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid "You must be enrolled in the course to see course content."
-msgstr "Debes estar inscrito en el curso para ver el contenido del curso."
+msgstr "Debe estar inscrito en el curso para ver el contenido del curso."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
@@ -6909,7 +6909,7 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "View discussion"
-msgstr "Ver conversación"
+msgstr "Ver discusión"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
@@ -7588,8 +7588,8 @@ msgstr ""
 msgid ""
 "{user} is not enrolled in this course. Please check your spelling and retry."
 msgstr ""
-"{user} no está inscrito al curso. Por favor revise su escritura e intente "
-"nuevamente."
+"{user} no está inscrito en el curso. Por favor revise si escribió el nombre "
+"de usuario de manera correcta e intente nuevamente."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid data, generate_for must be \"new\" or \"all\"."
@@ -11302,8 +11302,8 @@ msgid ""
 "forums. What do you want to do to keep learning?"
 msgstr ""
 "Muchos estudiantes de %(platform_name)s en <strong>%(course_name)s</strong> "
-"completan problemas cada semana y participan en los foros de conversación. "
-"¿Qué quieres hacer para continuar aprendiendo?"
+"completan problemas cada semana y participan en los foros de discusión. ¿Qué"
+" quieres hacer para continuar aprendiendo?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -12728,8 +12728,8 @@ msgid ""
 "point to the draft branch, effectively force publishing the course. This "
 "view dry runs the force publish command"
 msgstr ""
-"A veces las versiones borrador y publicadas de un curso pueden perder la "
-"sincronización. El comando Force publish course, configura la versión "
+"Algunas veces las versiones borrador y publicadas de un curso pueden perder "
+"la sincronización. El comando Force publish course, configura la versión "
 "publicada como la versión borrador, obligando efectivamente la publicación "
 "del curso. Esta vista realiza la ejecución del comando Force publish course"
 
@@ -13094,7 +13094,7 @@ msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
-msgstr "Añadir un comentario"
+msgstr "Añadir una publicación"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "New topic form"
@@ -13199,7 +13199,7 @@ msgstr "Panel de control"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
-msgstr "No te encuentras inscrito en ningún curso aún."
+msgstr "No está inscrito en ningún curso aún."
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -15696,7 +15696,7 @@ msgstr "Política de Calificaciones"
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
-msgstr "Inscripciones en lote"
+msgstr "Inscripciones por lotes"
 
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/student_admin.html
 msgid "Student Grades"
@@ -15709,7 +15709,7 @@ msgstr "Por favor ingresa un nombre CCX válido."
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Email Addresses/Usernames"
-msgstr "Casilla de Correo electrónico/Nombres de usuario"
+msgstr "Ingrese aquí los Correos electrónicos/Nombres de usuario"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -15740,7 +15740,8 @@ msgid ""
 "registered for {platform_name} will be automatically enrolled."
 msgstr ""
 "Si esta opción está {em_start}marcada{em_end}, los usuarios que aún no se "
-"han registrado en {platform_name} serán inscritos automáticamente."
+"han registrado en el sitio {platform_name} serán inscritos automáticamente "
+"en el curso."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -15750,8 +15751,8 @@ msgid ""
 "enroll once they make an account."
 msgstr ""
 "Si esta opción está {em_start}sin marcar{em_end}, los usuarios que aún no se"
-" han registrado en {platform_name} no serán inscritos, pero se les permitirá"
-" la inscripción al curso una vez hayan creado su cuenta."
+" han registrado en el sitio {platform_name} no serán inscritos, pero se les "
+"permitirá la inscripción al curso una vez hayan creado su cuenta."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -15784,7 +15785,7 @@ msgstr "Mensaje de respuesta del administrador de lista de estudiantes CCX"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Revoke access"
-msgstr "Quitar el acceso"
+msgstr "Remover el acceso"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
@@ -16246,7 +16247,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
-msgstr "Tu estás inscrito en este curso"
+msgstr "Usted está inscrito en este curso:"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16447,14 +16448,14 @@ msgstr "{course_number} Información del curso"
 
 #: lms/templates/courseware/info.html
 msgid "You are not enrolled yet"
-msgstr "No estás inscrito aún."
+msgstr "Todavía no está inscrito"
 
 #: lms/templates/courseware/info.html
 msgid ""
 "You are not currently enrolled in this course. {link_start}Enroll "
 "now!{link_end}"
 msgstr ""
-"No estás inscrito/a en este curso actualmente. {link_start}Inscríbete "
+"No está inscrito actualmente en este curso. {link_start} Inscríbase "
 "ahora!{link_end}"
 
 #: lms/templates/courseware/info.html
@@ -16620,7 +16621,8 @@ msgstr "Ver las calificaciones en Studio"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
-msgstr "Progreso del curso para el estudiante '{username}' ({email})"
+msgstr ""
+"Progreso del curso para el estudiante '{username}' con el correo ({email})"
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"
@@ -18258,7 +18260,7 @@ msgstr ""
 
 #: lms/templates/emails/unenroll_email_subject.txt
 msgid "You have been un-enrolled from {course_name}"
-msgstr "Usted ha sido des inscrito del curso {course_name}"
+msgstr "Usted ha sido desinscrito del curso {course_name}"
 
 #: lms/templates/embargo/default_courseware.html
 #: lms/templates/embargo/default_enrollment.html
@@ -18532,8 +18534,8 @@ msgid ""
 "You must successfully generate example certificates before you enable "
 "student-generated certificates."
 msgstr ""
-"Debe generar exitosamente certificados de ejemplo antes de que pueda "
-"habilitar la generación de certificados por estudiantes."
+"Debe generar exitosamente certificados de ejemplo antes de habilitar la "
+"opción para que los estudiantes generen certificados."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Certificates"
@@ -18607,18 +18609,18 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit passing state. ({count})"
 msgstr ""
-"Regenerar para estudiantes con estado de aprobación en la ruta gratuita. "
-"({count})"
+"Regenerar los certificados para estudiantes con estado de aprobación en la "
+"ruta gratuita. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit not passing state. ({count})"
 msgstr ""
-"Regenerar para estudiantes en la ruta gratuita sin estado de aprobación. "
-"({count})"
+"Regenerar los certificados para estudiantes en la ruta gratuita sin estado "
+"de aprobación. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
-msgstr "Regenerar certificados para los estudiantes con error. ({count})"
+msgstr "Regenerar los certificados para los estudiantes con error. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Certificate Generation History"
@@ -18745,8 +18747,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
 msgstr ""
-"Obtener un archivo separado por comas CVS con los ID de estudiantes de forma"
-" anónima."
+"Obtener un archivo de forma anónima en formato CVS con los ID de los "
+"estudiantes. Archivo separado por comas"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -18764,8 +18766,8 @@ msgstr ""
 "Para los cursos más grandes, la generación de algunos reportes puede tomar "
 "varias horas. Cuando un reporte haya sido generado, un vínculo con la fecha "
 "y la hora de generación aparecerá en la tabla a continuación. Estos reportes"
-" se generan en segundo plano, así que puede salirse de esta página mientra "
-"el reporte es generado."
+" se generan en segundo plano, así que puede salir de esta página o visitar "
+"otras paginas mientras el reporte es generado."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -19661,11 +19663,11 @@ msgid ""
 "Insights. You can only give course team roles to enrolled users."
 msgstr ""
 "Los miembros del equipo del curso con rol de funcionarios, pueden ayudarle a"
-" gestionar algunos aspectos de su curso. Pueden registrar y dar de baja a "
-"los estudiantes, así como modificar sus calificaciones y ver todos los datos"
-" del curso. Los funcionarios también tendrán acceso por Studio e Insights. "
-"Usted solo puede asignar privilegios de equipo del curso a usuarios que "
-"estén inscritos."
+" gestionar algunos aspectos de su curso. Pueden inscribir y desinscribir "
+"estudiantes, así como modificar sus calificaciones y ver todos los datos del"
+" curso. Los funcionarios también tendrán acceso por Studio e Insights. Usted"
+" solo puede asignar privilegios de equipo del curso a usuarios que estén "
+"inscritos."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
@@ -19917,7 +19919,7 @@ msgstr "Cohorte:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "(Learners not explicitly assigned to a cohort)"
-msgstr "(Estudiantes no asignados explícitamente a una cohorte)"
+msgstr "(Estudiantes que no han sido asignados claramente a una cohorte)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Learners in the {track_name} Track"
@@ -19957,8 +19959,8 @@ msgid ""
 "When you select Send Email, your email message is added to the queue for "
 "sending, and cannot be cancelled."
 msgstr ""
-"Cuando selecciona Enviar Email, su mensaje de correo se añade a la cola para"
-" ser enviado y no se puede cancelar."
+"Cuando selecciona Enviar correo electrónico, su mensaje de correo se añade a"
+" la cola para ser enviado y no se puede cancelar."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
@@ -20018,11 +20020,11 @@ msgstr "Definir precio"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Allowance Section"
-msgstr "Sección de asignaciones"
+msgstr "Sección de concesiones"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
-msgstr "Intentos de estudiantes para examenes especiales."
+msgstr "Registro de intentos de los estudiantes en los exámenes especiales."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View gradebook for enrolled learners"
@@ -20051,7 +20053,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
-msgstr "Dirección de email o nombre de usuario del estudiante"
+msgstr "Dirección de correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
@@ -20059,7 +20061,7 @@ msgstr "Ver página de progreso"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust a learner's grade for a specific problem"
-msgstr "Ajustar la calificación del estudiante para una pregunta específica"
+msgstr "Ajustar la calificación del estudiante para un problema específico"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Location of problem in course"
@@ -20081,8 +20083,8 @@ msgstr "Intentos"
 msgid ""
 "Allow a learner who has used up all attempts to work on the problem again."
 msgstr ""
-"Permitir que un estudiante que ha usado todos sus intentos trabaje en la "
-"pregunta de nuevo."
+"Permitir que un estudiante que ha usado todos sus intentos trabaje en el "
+"problema de nuevo."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset Attempts to Zero"
@@ -21993,7 +21995,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
-msgstr "Archivos y cargas"
+msgstr "Administración de archivos"
 
 #: cms/templates/asset_index.html
 msgid "Upload New File"
@@ -22639,7 +22641,7 @@ msgstr "Aprenda más sobre la estructura del curso"
 
 #: cms/templates/course_outline.html
 msgid "Setting release dates and grading policies"
-msgstr "Configurar fechas de publicación y políticas de calificaciones"
+msgstr "Configurar fechas de liberación y políticas de calificaciones"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -22648,8 +22650,8 @@ msgid ""
 "and due date."
 msgstr ""
 "Seleccione el icono de configuración para una sección o subsección para "
-"definir su fecha de publicación. Al configurar una subsección, también puede"
-" definir la política de calificación y la fecha límite de entrega."
+"definir su fecha de liberación. Al configurar una subsección, también puede "
+"definir la política de calificación y la fecha límite de entrega."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about grading policy settings"
@@ -23450,7 +23452,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Release-On Date Publishing"
-msgstr "Publicación de revisión en fecha"
+msgstr "Fecha de publicación de la liberación"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -23751,7 +23753,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Learn more about importing a library"
-msgstr "Aprenda más sobre la importación de una Librería"
+msgstr "Aprenda más sobre el proceso de importar una Librería"
 
 #: cms/templates/import.html
 msgid "Why import a course?"
@@ -24166,7 +24168,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Getting Started with {studio_name}"
-msgstr "Empezando a utilizar {studio_name}"
+msgstr "Comenzando a usar{studio_name}"
 
 #: cms/templates/index.html
 msgid "Can I create courses in {studio_name}?"

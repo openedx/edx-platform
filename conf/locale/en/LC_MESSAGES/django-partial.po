@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-29 09:28+0000\n"
-"PO-Revision-Date: 2018-01-29 09:35:12.235533\n"
+"POT-Creation-Date: 2018-02-06 08:37+0000\n"
+"PO-Revision-Date: 2018-02-06 08:43:43.140979\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -723,7 +723,6 @@ msgid "Course id not specified"
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
-#: lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
 msgstr ""
 
@@ -858,6 +857,14 @@ msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Deleted the selected configuration(s)."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Delete the selected configuration"
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -5712,6 +5719,7 @@ msgid "Courses loaded in the modulestore"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py
 msgid "username"
 msgstr ""
 
@@ -8170,6 +8178,36 @@ msgstr ""
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and update learner enrollments."
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Manage User"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Disable User Account"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_support_url"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_detail_url"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Usable"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Unusable"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Disabled Successfully"
 msgstr ""
 
 #: lms/djangoapps/support/views/refund.py

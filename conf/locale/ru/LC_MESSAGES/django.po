@@ -12,7 +12,7 @@
 # berseneva, 2013
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
-# Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
+# Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Евгений Козлов <eudjin@gmail.com>, 2014
@@ -25,6 +25,7 @@
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Maria Artemieva <maria.m.artemieva@gmail.com>, 2015
+# Maxim Alexeev <ma1exe@yandex.com>, 2018
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # mchalyk <mchalyk@gmail.com>, 2014
 # mchalyk <mchalyk@gmail.com>, 2014
@@ -113,7 +114,7 @@
 # Rad <daznix@gmail.com>, 2014
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Dmitry Ganchev <dima.ganchev@gmail.com>, 2014
-# Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
+# Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Dzmitryi Halyava, 2016
 # Dzmitryi Halyava, 2016
 # Евгений Козлов <eudjin@gmail.com>, 2014
@@ -195,7 +196,7 @@
 # berseneva, 2013
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dmitriy <polevaiabrest@gmail.com>, 2014
-# Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
+# Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Gubin Pavel <pashkun73@gmail.com>, 2013
@@ -249,7 +250,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2018-01-25 11:41+0000\n"
-"PO-Revision-Date: 2017-10-02 16:09+0000\n"
+"PO-Revision-Date: 2018-02-05 11:26+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -967,9 +968,10 @@ msgid ""
 "below, and then link your {platform_name} account with {provider_name} from "
 "your dashboard."
 msgstr ""
-"Чтобы войти на платформу «{platform_name}», используйте имя пользователя и "
-"пароль {platform_name}. После этого свяжите учётную запись {platform_name} с"
-" учётной записью {provider_name} в панели управления."
+"Для входа на платформу «{platform_name}» используйте имя пользователя и "
+"пароль {platform_name}, введённые при регистрации, а затем свяжите вашу "
+"учётную запись {platform_name} с учётной записью {provider_name} в панели "
+"управления."
 
 #: common/djangoapps/student/views/login.py
 #, python-brace-format
@@ -5827,7 +5829,7 @@ msgstr "Я окончил курс на {platform_name}. Взгляните на
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "More Information About {user_name}'s Certificate:"
-msgstr "Дополнительная информация о сертификате {user_name}:"
+msgstr "Дополнительная информация о сертификате слушателя {user_name}:"
 
 #. Translators: This line is displayed to a user who has completed a course
 #. and achieved a certification
@@ -7088,7 +7090,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
-msgstr "Идентификатор пользователя"
+msgstr "ID пользователя"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the password reset
@@ -8207,7 +8209,8 @@ msgid ""
 "Confirmation and Registration Codes for the following courses: "
 "{course_name_list}"
 msgstr ""
-"Подтверждение и регистрационные коды на следующие курсы: {course_name_list}"
+"Подтверждение платежа и регистрационные коды на следующие курсы: "
+"{course_name_list}"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
@@ -8334,7 +8337,7 @@ msgid ""
 "were provided in exchange for this gift."
 msgstr ""
 "Мы высоко ценим этот щедрый вклад и вашу поддержку миссии платформы "
-"{platform_name}. Этот чек идёт в поддержку благотворительных взносов для "
+"«{platform_name}». Этот чек идёт в поддержку благотворительных взносов для "
 "целей налогообложения. Мы подтверждаем, что ни товары, ни услуги не были "
 "предоставлены в обмен на этот дар."
 
@@ -12739,7 +12742,7 @@ msgstr "Форма для новой темы"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussion thread list"
-msgstr "Список тем обсуждения"
+msgstr "Список тем обсуждений"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -13463,7 +13466,7 @@ msgstr "Обзор курса"
 
 #: lms/templates/preview_menu.html
 msgid "View this course as:"
-msgstr "Просмотр курса в качестве:"
+msgstr "Просмотреть курс как:"
 
 #: lms/templates/preview_menu.html
 msgid "Learner"
@@ -15422,7 +15425,7 @@ msgstr "Опубликовать в Facebook"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share on Twitter"
-msgstr "Опубликовать в Twitter"
+msgstr "Поделиться в Twitter"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -15872,7 +15875,7 @@ msgstr "Уточнить параметры поиска"
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 #: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "{course_number} Courseware"
-msgstr "{course_number} Содержание"
+msgstr "Содержание курса {course_number}"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -15924,7 +15927,7 @@ msgstr "следующая страница"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
-msgstr "{course_number} О курсе"
+msgstr "О курсе {course_number}"
 
 #: lms/templates/courseware/info.html
 msgid "You are not enrolled yet"
@@ -15969,7 +15972,7 @@ msgstr "Новости: MITx 6.002x"
 
 #: lms/templates/courseware/news.html
 msgid "Updates to Discussion Posts You Follow"
-msgstr "Новые сообщения в обсуждениях, за которыми вы следите"
+msgstr "Новые сообщения в темах, за которыми вы следите"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Purchase the Program ("
@@ -16113,7 +16116,7 @@ msgstr "Скачать свой сертификат"
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
-msgstr "Запросить сертификат"
+msgstr "Получить сертификат"
 
 #: lms/templates/courseware/progress.html
 msgid "Requirements for Course Credit"
@@ -16214,7 +16217,7 @@ msgstr "Нет баллов за выполненные в этом раздел
 
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} О курсе"
+msgstr "О курсе {course.display_number_with_default}"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -16228,7 +16231,7 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
-msgstr "Здравствуйте, {name},"
+msgstr "Здравствуйте, {name}!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid "Hi,"
@@ -16898,7 +16901,7 @@ msgstr "Все обсуждения"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr "Отслеживаемые сообщения"
+msgstr "Отслеживаемые темы"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -17019,15 +17022,15 @@ msgstr "Показать заметки"
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "Welcome to {course_name}"
-msgstr "Добро пожаловать на курс {course_name}"
+msgstr "Добро пожаловать на курс «{course_name}»"
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid ""
 "To get started, please visit https://{site_name}. The login information for "
 "your account follows."
 msgstr ""
-"Чтобы приступить, пожалуйста, посетите https://{site_name}. Информация для "
-"входа с вашей учётной записью представлена далее."
+"Чтобы приступить, пожалуйста, посетите https://{site_name}. Учётные данные "
+"для входа:"
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "email: {email}"
@@ -17039,11 +17042,11 @@ msgstr "пароль: {password}"
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "It is recommended that you change your password."
-msgstr "Советуем вам поменять пароль."
+msgstr "Настоятельно рекомендуем вам сразу поменять пароль."
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "Sincerely yours,The {course_name} Team"
-msgstr "С уважением, команда курса {course_name}"
+msgstr "С уважением, команда курса «{course_name}»"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -17084,15 +17087,14 @@ msgid ""
 "You have been invited to be a beta tester for {course_name} at {site_name} "
 "by a member of the course staff."
 msgstr ""
-"Вы получили приглашение от сотрудника курса {course_name} стать бета-"
+"Вы получили приглашение от сотрудника курса «{course_name}» стать бета-"
 "тестером на {site_name}."
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
-"Чтобы приступить к просмотру материалов курса, пожалуйста, посетите сайт "
-"{course_url}"
+"Для доступа к материалам курса, пожалуйста, перейдите по ссылке {course_url}"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
@@ -17116,7 +17118,7 @@ msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
-msgstr "Приглашение на бета-тестирование курса {course_name}"
+msgstr "Приглашение на бета-тестирование курса «{course_name}»"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -17301,8 +17303,8 @@ msgid ""
 "request, please contact us immediately. Contact information is listed at:"
 msgstr ""
 "Подтверждаем смену электронного адреса, связанного с вашей учётной записью "
-"на {platform_name}, с {old_email} на {new_email}. Если вы не делали такого "
-"запроса, пожалуйста, свяжитесь с нами по адресу:"
+"на платформе «{platform_name}», с {old_email} на {new_email}. Если вы не "
+"делали такого запроса, пожалуйста, свяжитесь с нами по адресу:"
 
 #: lms/templates/emails/confirm_email_change.txt
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
@@ -17321,9 +17323,9 @@ msgid ""
 " please confirm your new e-mail address by visiting:"
 msgstr ""
 "Мы получили запрос на смену электронного адреса, связанного с вашей учётной "
-"записью на {platform_name} с {old_email} на {new_email}. Если всё верно, "
-"пожалуйста, пройдите по этой ссылке, чтобы подтвердить свой новый "
-"электронный адрес:"
+"записью на платформе «{platform_name}» с {old_email} на {new_email}. Если "
+"всё верно, пожалуйста, пройдите по этой ссылке, чтобы подтвердить свой новый"
+" электронный адрес:"
 
 #: lms/templates/emails/email_change.txt
 msgid ""
@@ -17351,7 +17353,7 @@ msgid ""
 "You have been invited to join {course_name} at {site_name} by a member of "
 "the course staff."
 msgstr ""
-"Вы получили приглашение пройти курс {course_name} на {site_name} от "
+"Вы получили приглашение пройти курс «{course_name}» на {site_name} от "
 "сотрудника курса."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
@@ -17374,8 +17376,8 @@ msgid ""
 "field."
 msgstr ""
 "Для завершения регистрации, пожалуйста, пройдите по ссылке "
-"{registration_url} и заполните форму регистрации.  Обязательно укажите адрес"
-" {email_address} в поле «Электронная почта»."
+"{registration_url} и заполните форму регистрации. Обязательно укажите адрес "
+"{email_address} в поле «Электронная почта»."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -17383,23 +17385,23 @@ msgid ""
 "{course_name} listed on your dashboard."
 msgstr ""
 "Как только вы зарегистрируетесь и активируете свою учётную запись, "
-"{course_name} появится в вашей панели управления."
+"«{course_name}» появится в вашей панели управления."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
 "Once you have registered and activated your account, visit "
 "{course_about_url} to join the course."
 msgstr ""
-"Как только вы зарегистрируетесь и активируете свою учётную запись, посетите "
-"{course_about_url}, чтобы записаться на курс."
+"Как только вы зарегистрируетесь и активируете свою учётную запись, перейдите"
+" по ссылке {course_about_url}, чтобы записаться на курс."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "You can then enroll in {course_name}."
-msgstr "Затем вы сможете записаться на курс {course_name}."
+msgstr "Затем вы сможете записаться на курс «{course_name}»."
 
 #: lms/templates/emails/enroll_email_allowedsubject.txt
 msgid "You have been invited to register for {course_name}"
-msgstr "Приглашение записаться на курс {course_name}"
+msgstr "Приглашение записаться на курс «{course_name}»"
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid ""
@@ -17407,7 +17409,7 @@ msgid ""
 "course staff. The course should now appear on your {site_name} dashboard."
 msgstr ""
 "Вы записаны на курс «{course_name}» на {site_name} сотрудником курса. Курс "
-"теперь должен появиться на вашей {site_name} панели управления."
+"теперь должен появиться в вашей панели управления {site_name}."
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
@@ -17417,7 +17419,7 @@ msgstr ""
 
 #: lms/templates/emails/enroll_email_enrolledsubject.txt
 msgid "You have been enrolled in {course_name}"
-msgstr "Вы записаны на курс {course_name}"
+msgstr "Вы записаны на курс «{course_name}»"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
@@ -17439,7 +17441,7 @@ msgstr "Номер вашего заказа: {order_number}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
-msgstr "Здравствуйте, {full_name},"
+msgstr "Здравствуйте, {full_name}!"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Thanks for submitting your photos!"
@@ -17614,7 +17616,7 @@ msgid ""
 " member of the course staff. The course will remain on your dashboard, but "
 "you will no longer be part of the beta testing group."
 msgstr ""
-"Вы были исключены из бета-тестерования курса {course_name} на {site_name} "
+"Вы были исключены из бета-тестерования курса «{course_name}» на {site_name} "
 "сотрудником курса. Курс останется на вашей панели управления, но вы более не"
 " будете членом группы бета-тестирования."
 
@@ -17625,15 +17627,15 @@ msgstr "Это не повлияет на ваши остальные курсы
 
 #: lms/templates/emails/remove_beta_tester_email_subject.txt
 msgid "You have been removed from a beta test for {course_name}"
-msgstr "Исключение из бета-тестерования курса {course_name}"
+msgstr "Исключение из бета-тестерования курса «{course_name}»"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "We have successfully verified your identity for the {assessment} assessment "
 "in the {course_name} course."
 msgstr ""
-"Ваши данные успешно подтверждены для аттестации  {assessment} по курсу "
-"{course_name}."
+"Вы успешно прошли проверку личных данных, чтобы пройти {assessment} в курсе "
+"«{course_name}»."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -17641,9 +17643,9 @@ msgid ""
 "{course_name} course. You have used {used_attempts} out of "
 "{allowed_attempts} attempts to verify your identity."
 msgstr ""
-"К сожалению, нам не удалось подтвердить ваши данные для аттестации "
-"{assessment} по курсу {course_name}. Использовано попыток: {used_attempts} "
-"из {allowed_attempts}."
+"К сожалению, нам не удалось подтвердить ваши личные данные, чтобы вы могли "
+"пройти {assessment} в курсе «{course_name}». Вы использовали {used_attempts}"
+" из {allowed_attempts} попыток для подтверждения личных данных."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -17665,9 +17667,10 @@ msgid ""
 "{allowed_attempts} attempts to verify your identity, and verification is no "
 "longer possible."
 msgstr ""
-"К сожалению, нам не удалось подтвердить ваши данные для аттестации "
-"{assessment} по курсу {course_name}. Вы использовали все возможные попытки: "
-"{used_attempts} из {allowed_attempts}. Повторить проверку более невозможно."
+"К сожалению, нам не удалось подтвердить ваши личные данные, чтобы вы могли "
+"пройти {assessment} в курсе «{course_name}». Вы использовали {used_attempts}"
+" из {allowed_attempts} попыток для подтверждения личных данных. Повторить "
+"проверку более невозможно."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "To go to the courseware, select the following link:"
@@ -17694,7 +17697,7 @@ msgid ""
 "You have been un-enrolled from course {course_name} by a member of the "
 "course staff. Please disregard the invitation previously sent."
 msgstr ""
-"Вы были отчислены с курса {course_name} сотрудником курса. Просим считать "
+"Вы были отчислены с курса «{course_name}» сотрудником курса. Просим считать "
 "ранее высланное приглашение аннулированным."
 
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
@@ -17703,13 +17706,13 @@ msgid ""
 " course staff. The course will no longer appear on your {site_name} "
 "dashboard."
 msgstr ""
-"Вы были отчислены с курса {course_name} на {site_name} одним из сотрудников "
-"курса. Курс больше не будет отображаться на вашей {site_name} панели "
-"управления."
+"Вы были отчислены с курса «{course_name}» на {site_name} одним из "
+"сотрудников курса. Курс больше не будет отображаться в вашей панели "
+"управления {site_name}."
 
 #: lms/templates/emails/unenroll_email_subject.txt
 msgid "You have been un-enrolled from {course_name}"
-msgstr "Отмена записи на курс {course_name}"
+msgstr "Отмена записи на курс «{course_name}»"
 
 #: lms/templates/embargo/default_courseware.html
 #: lms/templates/embargo/default_enrollment.html
@@ -17967,7 +17970,7 @@ msgstr "Обновить статус"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Student-Generated Certificates"
-msgstr "Сертификаты, выпущенные обучающимися самостоятельно"
+msgstr "Выпуск сертификатов по запросу обучающихся"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Disable Student-Generated Certificates"
