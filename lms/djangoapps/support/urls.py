@@ -1,13 +1,18 @@
 """
 URLs for the student support app.
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
+from rest_framework.routers import DefaultRouter
 
 from support import views
 
 from lms.djangoapps.support.views.contact_us import ContactUsView
 
+router = DefaultRouter()
+router.register(r'course_entitlement', views.EntitlementSupportView, base_name="course_entitlement")
+
 urlpatterns = [
+    url(r'', include(router.urls)),
     url(r'^$', views.index, name="index"),
     url(r'^certificates/?$', views.CertificatesSupportView.as_view(), name="certificates"),
     url(r'^refund/?$', views.RefundSupportView.as_view(), name="refund"),

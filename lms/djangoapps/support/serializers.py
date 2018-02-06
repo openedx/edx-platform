@@ -3,6 +3,8 @@ Serializers for use in the support app.
 """
 from rest_framework import serializers
 
+from entitlements.api.v1.serializers import CourseEntitlementSerializer
+from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from student.models import ManualEnrollmentAudit
 
 

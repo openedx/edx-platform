@@ -7,3 +7,4 @@ from .certificate import *
 from .enrollments import *
 from .refund import *
 from .manage_user import *
+from .course_entitlements import *

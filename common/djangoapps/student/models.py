@@ -1668,7 +1668,7 @@ class CourseEnrollment(models.Model):
             datetime.strptime(order['date_placed'], ECOMMERCE_DATE_FORMAT),
             self.course_overview.start.replace(tzinfo=None)
         )
-
+        log.info(u'Current EnrollmentRefundConfiguration: %s', EnrollmentRefundConfiguration.current())
         return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
 
     @property
