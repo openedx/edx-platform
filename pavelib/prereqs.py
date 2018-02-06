@@ -25,10 +25,10 @@ COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
     'requirements/edx/github.txt',
-    'requirements/edx/custom.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
     'requirements/edx/paver.txt',
+    'requirements/edx/custom.txt',
     'requirements/edx/post.txt',
 ]
 
