@@ -43,6 +43,7 @@
 # Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
+# Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
 # José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -76,7 +77,7 @@
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
-# Yovany Alvarez <yalvarez@innovapues.com>, 2018
+# Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2018 edX
@@ -137,8 +138,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2018-01-25 11:23+0000\n"
-"PO-Revision-Date: 2018-01-22 14:19+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"PO-Revision-Date: 2018-01-29 16:24+0000\n"
+"Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2919,7 +2920,7 @@ msgstr "Equipo \"{team}\" eliminado exitosamente."
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
-msgstr "No eres actualmente miembro de ningún equipo."
+msgstr "No pertenece actualmente a ningún equipo."
 
 #. Translators: "and others" refers to fact that additional members of a team
 #. exist that are not displayed.
@@ -2991,8 +2992,9 @@ msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
 msgstr ""
-"Revisa los equipos de tu curso, organizados por tema. Unete a un equipo para"
-" colaborar con otros que estén interesados en los mismos temas."
+"Observe todos los equipos de su curso organizados por tema. Únase a un "
+"equipo para colaborar con otros estudiantes que estén interesados en los "
+"mismos temas que usted."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
@@ -3136,7 +3138,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr "Tu pregunta o idea (requerido)"
+msgstr "Su pregunta o idea (requerido)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
@@ -4021,7 +4023,7 @@ msgstr "Correo electrónico"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Revoke access"
-msgstr "Quitar el acceso"
+msgstr "Remover el acceso"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Group"
@@ -4186,7 +4188,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
-msgstr "Estos usuarios quedarán inscritos una vez que se hayan registrado:"
+msgstr ""
+"Estos usuarios quedarán inscritos una vez que se hayan registrado en el "
+"sitio:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -4638,7 +4642,7 @@ msgstr "Mensaje:"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "No tasks currently running."
-msgstr "No hay tareas corriendo en el momento."
+msgstr "No hay tareas en proceso en este momento."
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "File Name"
@@ -5909,7 +5913,7 @@ msgstr "Fecha añadida"
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Type"
-msgstr "Escribir"
+msgstr "Tipo"
 
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
@@ -7107,11 +7111,11 @@ msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
-msgstr "seguir esta entrada"
+msgstr "seguir esta publicación"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "post anonymously"
-msgstr "escribir anónimamente"
+msgstr "Escribir una publicación de forma anónima"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "post anonymously to classmates"
@@ -7952,7 +7956,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Add notes about this learner"
-msgstr "Añada una nota sobre este estudiante"
+msgstr "Añada una nota o comentario sobre este estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidate Certificate"
@@ -7997,7 +8001,7 @@ msgstr "Correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
-msgstr "Notas libres"
+msgstr "Notas o comentarios"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
@@ -8055,8 +8059,9 @@ msgid ""
 "Enter email addresses and/or usernames, separated by new lines or commas, "
 "for the learners you want to add. *"
 msgstr ""
-"Ingrese correos electrónicos y/o nombres de usuarios, separados por nuevas "
-"líneas o comas, de los estudiantes que quieras agregar.*"
+"Ingrese los correos electrónicos y/o nombres de usuarios, separados por "
+"comas o en líneas nuevas, uno debajo del otro, de los estudiantes que quiera"
+" agregar.*"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -8489,7 +8494,7 @@ msgstr "Ocurrió un error. Por favor recargue la página."
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
-msgstr "¿Olvidaste tu contraseña?"
+msgstr "¿Olvido su contraseña?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -9819,7 +9824,7 @@ msgstr "Arrastre para reorganizar"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Release Status:"
-msgstr "Estado de Publicación:"
+msgstr "Estado de liberación:"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -10381,7 +10386,7 @@ msgstr "Borrador (Cambios no publicados)"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Release:"
-msgstr "Publicación:"
+msgstr "Liberación:"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publishing Status"
@@ -10437,23 +10442,23 @@ msgstr "Ocultar a los estudiantes"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
 msgstr ""
-"Nota: No oculte las tareas calificadas después de que han sido publicadas."
+"Nota: No oculte las tareas calificadas después de que han sido liberadas."
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
-msgstr "Fecha y hora de publicación"
+msgstr "Fecha y hora de liberación"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date:"
-msgstr "Fecha de publicación:"
+msgstr "Fecha de liberación:"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Time in UTC:"
-msgstr "Hora de publicación en UTC:"
+msgstr "Hora de liberación en UTC:"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Clear Release Date/Time"
-msgstr "Borrar la fecha y hora de publicación"
+msgstr "Borrar la fecha y hora de liberación"
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Assessment Results Visibility"
@@ -10621,7 +10626,7 @@ msgid ""
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
 "Si hace este %(xblockType)s visible a los estudiantes, podrán ver su "
-"contenido a partir de la fecha de publicación siempre que haya publicado la "
+"contenido a partir de la fecha de liberación siempre que haya publicado la "
 "unidad. Sólo las unidades que están ocultos explícitamente permanecerán "
 "ocultas después de quitar esta opción para %(xblockType)s."
 

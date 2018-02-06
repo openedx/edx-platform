@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-29 09:28+0000\n"
-"PO-Revision-Date: 2018-01-29 09:35:12.590726\n"
+"POT-Creation-Date: 2018-02-06 08:37+0000\n"
+"PO-Revision-Date: 2018-02-06 08:43:43.513401\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -8000,6 +8000,14 @@ msgstr ""
 
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
+msgstr ""
+
+#: lms/templates/support/manage_user.html
+msgid "Manage User"
+msgstr ""
+
+#: lms/templates/support/manage_user.html
+msgid "Student Support: Manage User"
 msgstr ""
 
 #: lms/templates/support/refund.html

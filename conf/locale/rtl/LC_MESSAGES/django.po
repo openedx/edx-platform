@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-29 09:35+0000\n"
-"PO-Revision-Date: 2018-01-29 09:35:12.337942\n"
+"POT-Creation-Date: 2018-02-06 08:43+0000\n"
+"PO-Revision-Date: 2018-02-06 08:43:43.282230\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -824,7 +824,6 @@ msgid "Course id not specified"
 msgstr "ذخعقسث هي رخف سحثذهبهثي"
 
 #: common/djangoapps/student/views/management.py
-#: lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
 msgstr "هردشمهي ذخعقسث هي"
 
@@ -974,6 +973,14 @@ msgstr "شر شذذخعرف صهفا فاهس ث-وشهم شمقثشيغ ثطه�
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr "عرشزمث فخ سثري ثوشهم شذفهدشفهخر مهرن. حمثشسث فقغ شلشهر مشفثق."
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Deleted the selected configuration(s)."
+msgstr "يثمثفثي فاث سثمثذفثي ذخربهلعقشفهخر(س)."
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Delete the selected configuration"
+msgstr "يثمثفث فاث سثمثذفثي ذخربهلعقشفهخر"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -6465,7 +6472,8 @@ msgstr "فخفشم رعوزثق خب عسثقس"
 msgid "Courses loaded in the modulestore"
 msgstr "ذخعقسثس مخشيثي هر فاث وخيعمثسفخقث"
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
+#: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
 msgid "username"
 msgstr "عسثقرشوث"
 
@@ -9262,6 +9270,35 @@ msgstr "ثرقخمموثرف"
 msgid "View and update learner enrollments."
 msgstr "دهثص شري عحيشفث مثشقرثق ثرقخمموثرفس."
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/manage_user.html
+msgid "Manage User"
+msgstr "وشرشلث عسثق"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Disable User Account"
+msgstr "يهسشزمث عسثق شذذخعرف"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_support_url"
+msgstr "عسثق_سعححخقف_عقم"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_detail_url"
+msgstr "عسثق_يثفشهم_عقم"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Usable"
+msgstr "عسشزمث"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Unusable"
+msgstr "عرعسشزمث"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Disabled Successfully"
+msgstr "عسثق يهسشزمثي سعذذثسسبعممغ"
+
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
@@ -11597,6 +11634,10 @@ msgid ""
 msgstr ""
 "قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s خر ثيط.خقل? صث يخ, شري صث’قث "
 "لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+
+#: cms/djangoapps/api/v1/serializers/course_runs.py
+msgid "Course team user does not exist"
+msgstr "ذخعقسث فثشو عسثق يخثس رخف ثطهسف"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -20511,6 +20552,10 @@ msgstr "ذخرفشذف {platform_name} سعححخقف"
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "سفعيثرف سعححخقف: ثرقخمموثرف"
+
+#: lms/templates/support/manage_user.html
+msgid "Student Support: Manage User"
+msgstr "سفعيثرف سعححخقف: وشرشلث عسثق"
 
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"

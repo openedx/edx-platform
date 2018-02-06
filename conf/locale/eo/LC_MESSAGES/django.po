@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-29 09:35+0000\n"
-"PO-Revision-Date: 2018-01-29 09:35:12.337942\n"
+"POT-Creation-Date: 2018-02-06 08:43+0000\n"
+"PO-Revision-Date: 2018-02-06 08:43:43.282230\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -940,7 +940,6 @@ msgid "Course id not specified"
 msgstr "Çöürsé ïd nöt spéçïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: common/djangoapps/student/views/management.py
-#: lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
 msgstr "Ìnvälïd çöürsé ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -1123,6 +1122,17 @@ msgid "Unable to send email activation link. Please try again later."
 msgstr ""
 "Ûnäßlé tö sénd émäïl äçtïvätïön lïnk. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Deleted the selected configuration(s)."
+msgstr ""
+"Délétéd thé séléçtéd çönfïgürätïön(s). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Delete the selected configuration"
+msgstr ""
+"Délété thé séléçtéd çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -7529,7 +7539,8 @@ msgid "Courses loaded in the modulestore"
 msgstr ""
 "Çöürsés löädéd ïn thé mödüléstöré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
+#: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
 msgid "username"
 msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -10696,6 +10707,35 @@ msgstr ""
 "Vïéw änd üpdäté léärnér énröllménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/manage_user.html
+msgid "Manage User"
+msgstr "Mänägé Ûsér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Disable User Account"
+msgstr "Dïsäßlé Ûsér Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_support_url"
+msgstr "üsér_süppört_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_detail_url"
+msgstr "üsér_détäïl_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Usable"
+msgstr "Ûsäßlé Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Unusable"
+msgstr "Ûnüsäßlé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Disabled Successfully"
+msgstr "Ûsér Dïsäßléd Süççéssfüllý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
@@ -13382,6 +13422,10 @@ msgid ""
 msgstr ""
 "Rémémßér whén ýöü énrölléd ïn %(course_name)s ön édX.örg? Wé dö, änd wé’ré "
 "gläd tö hävé ýöü! Çömé séé whät évérýöné ïs léärnïng. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: cms/djangoapps/api/v1/serializers/course_runs.py
+msgid "Course team user does not exist"
+msgstr "Çöürsé téäm üsér döés nöt éxïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -23525,6 +23569,10 @@ msgstr "Çöntäçt {platform_name} Süppört Ⱡ'σяєм ιρѕυм ∂σłσ�
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "Stüdént Süppört: Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/support/manage_user.html
+msgid "Student Support: Manage User"
+msgstr "Stüdént Süppört: Mänägé Ûsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"

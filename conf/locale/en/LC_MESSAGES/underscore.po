@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-29 09:28+0000\n"
-"PO-Revision-Date: 2018-01-29 09:35:12.827384\n"
+"POT-Creation-Date: 2018-02-06 08:37+0000\n"
+"PO-Revision-Date: 2018-02-06 08:43:43.824120\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -236,6 +236,7 @@ msgid "Status"
 msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
@@ -244,6 +245,8 @@ msgid "Action"
 msgstr ""
 
 #: cms/templates/js/transcript-organization-credentials.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
@@ -313,6 +316,8 @@ msgstr ""
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: test_root/staticfiles/common/templates/components/search-field.underscore
 #: test_root/staticfiles/common/templates/components/search-field.underscore
 #: test_root/staticfiles/discussion/templates/search.underscore
@@ -1095,6 +1100,23 @@ msgstr ""
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Change Enrollment"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
+msgid "Email"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+msgid "Password Status"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+msgid "Disable Account"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
@@ -3325,10 +3347,6 @@ msgstr ""
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Exam Name"
-msgstr ""
-
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-msgid "Email"
 msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
