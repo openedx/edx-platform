@@ -147,5 +147,5 @@ SECRET_KEY = uuid.uuid4().hex
 
 ############################### PIPELINE #######################################
 
-PIPELINE_ENABLED = False
+PIPELINE['PIPELINE_ENABLED'] = False
 REQUIRE_DEBUG = True

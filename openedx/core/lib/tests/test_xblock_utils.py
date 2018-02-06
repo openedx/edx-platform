@@ -3,9 +3,11 @@ Tests for xblock_utils.py
 """
 from __future__ import absolute_import, unicode_literals
 
+from copy import copy
 import uuid
 
 import ddt
+from django.conf import settings
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 from web_fragments.fragment import Fragment
@@ -194,7 +196,11 @@ class TestXblockUtils(SharedModuleStoreTestCase):
                 'output_filename': "combined.css"
             }
         }
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_CSS=pipeline_css):
+
+        tmp_pipeline = copy(settings.PIPELINE)
+        tmp_pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        tmp_pipeline['STYLESHEETS'] = pipeline_css
+        with self.settings(PIPELINE=tmp_pipeline):
             css_dependencies = get_css_dependencies("style-group")
             self.assertEqual(css_dependencies, expected_css_dependencies)
 
@@ -213,6 +219,10 @@ class TestXblockUtils(SharedModuleStoreTestCase):
                 'output_filename': "combined.js"
             }
         }
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_JS=pipeline_js):
+
+        tmp_pipeline = copy(settings.PIPELINE)
+        tmp_pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        tmp_pipeline['JAVASCRIPT'] = pipeline_js
+        with self.settings(PIPELINE=tmp_pipeline):
             js_dependencies = get_js_dependencies("js-group")
             self.assertEqual(js_dependencies, expected_js_dependencies)
