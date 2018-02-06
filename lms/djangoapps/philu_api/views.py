@@ -39,8 +39,7 @@ class UpdateCommunityProfile(APIView):
         token = request.META["HTTP_X_CSRFTOKEN"]
         if not token == get_encoded_token(username, email, id):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        extended_profile = user.extended_profile
+
         userprofile = user.profile
 
         data = request.data
@@ -51,13 +50,6 @@ class UpdateCommunityProfile(APIView):
             birthday = data.get('birthday')
 
             about_me = data.get('aboutme', userprofile.bio)
-            language = data.get('language', userprofile.language)
-            city = data.get('city_of_residence', userprofile.city)
-            country = data.get('country_of_residence', userprofile.country)
-
-            city_of_employment = data.get('city_of_employment', extended_profile.city_of_employment)
-            country_of_employment = data.get('country_of_employment', extended_profile.country_of_employment if
-            extended_profile.country_of_employment else "")
 
             if birthday:
                 birthday_year = birthday.split("/")[2]
@@ -68,24 +60,16 @@ class UpdateCommunityProfile(APIView):
             user.last_name = last_name
 
             user.profile.bio = about_me
-            userprofile.city = city
-            userprofile.country = get_country_iso(country)
-            userprofile.language = language
-
-            extended_profile.city_of_employment = city_of_employment
-            extended_profile.country_of_employment = get_country_iso(country_of_employment)
 
             if birthday:
                 userprofile.year_of_birth = int(birthday_year)
 
             user.save()
             userprofile.save()
-            extended_profile.save()
 
             return JsonResponse({"message": "user info updated successfully"}, status=status.HTTP_200_OK)
         except Exception as ex:
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
-
 
 def get_user_chat(request):
     """ Get recent chats of the user from NodeBB """
