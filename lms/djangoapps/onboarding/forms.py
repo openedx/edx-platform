@@ -679,14 +679,17 @@ class UpdateRegModelForm(RegModelForm):
             prev_org = extended_profile.organization
             extended_profile.organization = organization_to_assign
 
+            # Reset organizations under my administrations if i updated my organization + ask for org details
             if not prev_org == organization_to_assign:
+                Organization.objects.filter(admin=user).update(admin=None)
                 extended_profile.is_organization_metrics_submitted = False
 
+            # if user check YES option on account settings page => set user as admin of selected/created organization
             if user and is_poc == '1' and admin_not_assigned_or_me(user, organization_to_assign):
-                Organization.objects.filter(admin=user).update(admin=None)
                 organization_to_assign.unclaimed_org_admin_email = None
                 organization_to_assign.admin = user
 
+            # if user check NO option on account settings page => clear my admin status if i was admin
             if not is_poc == '1':
                 if organization_to_assign.admin == user:
                     organization_to_assign.admin = None
