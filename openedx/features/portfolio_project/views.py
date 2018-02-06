@@ -17,6 +17,13 @@ class GenericTabView(CourseTabView):
     """
     Provides a blank page that acts as its own tab in courseware for displaying content.
     """
+
+    def uses_bootstrap(self, request, course, tab):
+        """
+        Forces the generic tab to use bootstrap styling.
+        """
+        return True
+
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
     def get(self, request, course_id, **kwargs):
@@ -32,7 +39,6 @@ class GenericTabView(CourseTabView):
         context = {
             'course': course,
             'user': request.user,
-            'uses_bootstrap': True,
             'tab_name': tab,
         }
         html = render_to_string('portfolio_project/generic_tab.html', context)
