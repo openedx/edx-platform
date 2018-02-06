@@ -117,6 +117,32 @@ class Command(BaseCommand):
             checkout_on_ecommerce_service=True
         )
 
+    def _update_default_clients(self):
+        """
+        These two clients is being created by default without service
+        users so we have to associate the service users to them.
+        """
+        ecommerce_queryset = Client.objects.filter(
+            redirect_uri="https://ecommerce-{dns_name}.sandbox.edx.org/complete/edx-oidc/".format(
+                dns_name=self.dns_name
+            )
+        )
+
+        if ecommerce_queryset:
+            ecommerce_client = ecommerce_queryset[0]
+            ecommerce_client.user = self.ecommerce_user
+            ecommerce_client.save()
+
+        discovery_queryset = Client.objects.filter(
+            redirect_uri="https://discovery-{dns_name}.sandbox.edx.org/complete/edx-oidc/".format(
+                dns_name=self.dns_name
+            )
+        )
+        if discovery_queryset:
+            discovery_client = discovery_queryset[0]
+            discovery_client.user = self.discovery_user
+            discovery_client.save()
+
     def _get_sites_data(self):
         """
         Reads the json files from theme directory and returns the site data in JSON format.
@@ -174,6 +200,7 @@ class Command(BaseCommand):
         self.ecommerce_user = self.get_or_create_service_user("ecommerce_worker")
 
         all_sites = self._get_sites_data()
+        self._update_default_clients()
 
         # creating Sites, SiteThemes, SiteConfigurations and oauth2 clients
         for site_name, site_data in all_sites.items():
