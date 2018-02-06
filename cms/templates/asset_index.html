@@ -13,11 +13,18 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-    % for template_name in ["asset"]:
-    <script type="text/template" id="${template_name}-tpl">
-        <%static:include path="js/${template_name}.underscore" />
-    </script>
-    % endfor
+    % if waffle_flag_enabled:
+        % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+            <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/vendor.min.css')}" />
+            <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/assets.min.css')}" />
+        % endif
+    % else:
+        % for template_name in ["asset"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="js/${template_name}.underscore" />
+        </script>
+        % endfor
+    % endif
 </%block>
 
 % if not waffle_flag_enabled:

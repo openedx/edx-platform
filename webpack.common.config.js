@@ -22,10 +22,8 @@ module.exports = {
 
     entry: {
         // Studio
-        AssetsPage: './node_modules/@edx/studio-frontend/src/index.jsx',
         Import: './cms/static/js/features/import/factories/import.js',
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-        AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
         'js/pages/login': './cms/static/js/pages/login.js',
 
         // LMS
@@ -127,7 +125,6 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 include: [
-                    /studio-frontend/,
                     /paragon/
                 ],
                 use: 'babel-loader'
