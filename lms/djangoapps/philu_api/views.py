@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from lms.djangoapps.onboarding.forms import RegModelForm
+from lms.djangoapps.onboarding.helpers import get_country_iso
 from student.models import User
 
 from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
@@ -40,55 +41,51 @@ class UpdateCommunityProfile(APIView):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
         
         extended_profile = user.extended_profile
-        user_info_survey = user.user_info_survey
+        userprofile = user.profile
 
         data = request.data
 
         try:
-            first_name = data.get('first_name', extended_profile.first_name)
-            last_name = data.get('last_name', extended_profile.last_name)
-            about_me = data.get('aboutme', user.profile.bio)
-            organization = data.get('organization')
-            if organization:
-                organization, is_created = Organization.objects.get_or_create(name=organization)
-
-                if organization != extended_profile.organization:
-                    is_poc_value, is_poc_label = RegModelForm.POC_CHOICES[0]
-                    extended_profile.org_admin_email = ""
-                    extended_profile.is_poc = is_poc_value
-                    extended_profile.organization = organization
-
-            city_of_residence = data.get('city_of_residence', user_info_survey.city_of_residence)
-            country_of_residence = data.get('country_of_residence', user_info_survey.country_of_residence)
-            city_of_employment = data.get('city_of_employment', user_info_survey.city_of_employment)
-            country_of_employment = data.get('country_of_employment', user_info_survey.country_of_employment)
-
-            language = data.get('language', user_info_survey.language)
-
+            first_name = data.get('first_name', user.first_name)
+            last_name = data.get('last_name', user.last_name)
             birthday = data.get('birthday')
+
+            about_me = data.get('aboutme', userprofile.bio)
+            language = data.get('language', userprofile.language)
+            city = data.get('city_of_residence', userprofile.city)
+            country = data.get('country_of_residence', userprofile.country)
+
+            city_of_employment = data.get('city_of_employment', extended_profile.city_of_employment)
+            country_of_employment = data.get('country_of_employment', extended_profile.country_of_employment if
+            extended_profile.country_of_employment else "")
+
             if birthday:
                 birthday_year = birthday.split("/")[2]
             else:
-                birthday_year = user_info_survey.year_of_birth
+                birthday_year = userprofile.year_of_birth
 
-            extended_profile.first_name = first_name
-            extended_profile.last_name = last_name
+            user.first_name = first_name
+            user.last_name = last_name
+
             user.profile.bio = about_me
-            user_info_survey.city_of_residence = city_of_residence
-            user_info_survey.country_of_residence = country_of_residence
-            user_info_survey.city_of_employment = city_of_employment
-            user_info_survey.country_of_employment = country_of_employment
-            user_info_survey.language = language
+            userprofile.city = city
+            userprofile.country = get_country_iso(country)
+            userprofile.language = language
+
+            extended_profile.city_of_employment = city_of_employment
+            extended_profile.country_of_employment = get_country_iso(country_of_employment)
 
             if birthday:
-                user_info_survey.year_of_birth = birthday_year
+                userprofile.year_of_birth = int(birthday_year)
 
+            user.save()
+            userprofile.save()
             extended_profile.save()
-            user_info_survey.save()
 
             return JsonResponse({"message": "user info updated successfully"}, status=status.HTTP_200_OK)
         except Exception as ex:
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 def get_user_chat(request):
     """ Get recent chats of the user from NodeBB """
