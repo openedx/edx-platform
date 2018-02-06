@@ -6,12 +6,12 @@ Replace this with more appropriate tests for your application.
 """
 
 import itertools
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import ddt
-import pytz
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
+from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 
@@ -31,7 +31,7 @@ class CourseModeModelTest(TestCase):
     """
     NOW = 'now'
     DATES = {
-        NOW: datetime.now(),
+        NOW: now(),
         None: None,
     }
 
@@ -133,7 +133,7 @@ class CourseModeModelTest(TestCase):
 
     def test_modes_for_course_expired(self):
         expired_mode, _status = self.create_mode('verified', 'Verified Certificate', 10)
-        expired_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
+        expired_mode.expiration_datetime = now() + timedelta(days=-1)
         expired_mode.save()
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
@@ -143,7 +143,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([mode1], modes)
 
-        expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=1)
+        expiration_datetime = now() + timedelta(days=1)
         expired_mode.expiration_datetime = expiration_datetime
         expired_mode.save()
         expired_mode_value = Mode(
@@ -232,9 +232,9 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(CourseMode.auto_enroll_mode(self.course_key, modes), result)
 
     def test_all_modes_for_courses(self):
-        now = datetime.now(pytz.UTC)
-        future = now + timedelta(days=1)
-        past = now - timedelta(days=1)
+        now_dt = now()
+        future = now_dt + timedelta(days=1)
+        past = now_dt - timedelta(days=1)
 
         # Unexpired, no expiration date
         CourseModeFactory.create(
@@ -430,20 +430,20 @@ class CourseModeModelTest(TestCase):
     def test_expiration_datetime_explicitly_set(self):
         """ Verify that setting the expiration_date property sets the explicit flag. """
         verified_mode, __ = self.create_mode('verified', 'Verified Certificate', 10)
-        now = datetime.now()
-        verified_mode.expiration_datetime = now
+        now_dt = now()
+        verified_mode.expiration_datetime = now_dt
 
         self.assertTrue(verified_mode.expiration_datetime_is_explicit)
-        self.assertEqual(verified_mode.expiration_datetime, now)
+        self.assertEqual(verified_mode.expiration_datetime, now_dt)
 
     def test_expiration_datetime_not_explicitly_set(self):
         """ Verify that setting the _expiration_date property does not set the explicit flag. """
         verified_mode, __ = self.create_mode('verified', 'Verified Certificate', 10)
-        now = datetime.now()
-        verified_mode._expiration_datetime = now  # pylint: disable=protected-access
+        now_dt = now()
+        verified_mode._expiration_datetime = now_dt  # pylint: disable=protected-access
 
         self.assertFalse(verified_mode.expiration_datetime_is_explicit)
-        self.assertEqual(verified_mode.expiration_datetime, now)
+        self.assertEqual(verified_mode.expiration_datetime, now_dt)
 
     def test_expiration_datetime_explicitly_set_to_none(self):
         """ Verify that setting the _expiration_date property does not set the explicit flag. """

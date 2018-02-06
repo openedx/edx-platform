@@ -1,8 +1,9 @@
 """
 Test helpers for the course experience.
 """
+from datetime import timedelta
 
-import datetime
+from django.utils.timezone import now
 
 from course_modes.models import CourseMode
 
@@ -13,11 +14,11 @@ def add_course_mode(course, upgrade_deadline_expired=False):
     """
     Adds a course mode to the test course.
     """
-    upgrade_exp_date = datetime.datetime.now()
+    upgrade_exp_date = now()
     if upgrade_deadline_expired:
-        upgrade_exp_date = upgrade_exp_date - datetime.timedelta(days=21)
+        upgrade_exp_date = upgrade_exp_date - timedelta(days=21)
     else:
-        upgrade_exp_date = upgrade_exp_date + datetime.timedelta(days=21)
+        upgrade_exp_date = upgrade_exp_date + timedelta(days=21)
 
     CourseMode(
         course_id=course.id,
