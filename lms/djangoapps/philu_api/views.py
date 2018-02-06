@@ -39,7 +39,7 @@ class UpdateCommunityProfile(APIView):
         token = request.META["HTTP_X_CSRFTOKEN"]
         if not token == get_encoded_token(username, email, id):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         extended_profile = user.extended_profile
         userprofile = user.profile
 

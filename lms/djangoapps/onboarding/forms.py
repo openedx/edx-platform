@@ -338,6 +338,10 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
                                          label_suffix="*",
                                          widget=forms.RadioSelect,
                                          initial=1,
+                                         help_text=ugettext_noop("If your organization does not have its own website, "
+                                                                 "but it does have a page on another platform like "
+                                                                 "Facebook or WordPress, please answer Yes here and "
+                                                                 "give the address for this page."),
                                          error_messages={
                                             'required': ugettext_noop('Please select an option for "Does your organization have a'
                                                         ' webpage?"'),
@@ -433,6 +437,16 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
             'country': {
                 'required': ugettext_noop(EMPTY_FIELD_ERROR.format('Country of Organization Headquarters')),
             }
+        }
+
+        help_texts = {
+            "founding_year": ugettext_noop("Founding year is the year that your organization was started. This may be "
+                                           "before your organization was legally registered."),
+            "registration_number": ugettext_noop("A registration or tax identification number is the unique number your"
+                                                 " government uses to identify your organization. Please note that you "
+                                                 "should only give information that you are allowed to share and that "
+                                                 "is available to the public. You should not give nonpublic or "
+                                                 "confidential information.")
         }
 
     def clean_country(self):
@@ -775,6 +789,11 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
         }
 
         help_texts = {
+            "actual_data": ugettext_noop("If you don't have access to information from official documents, please give "
+                                         "your best guesses based on your knowledge of your organization. Please note "
+                                         "that you should only give information that you are allowed to share and that "
+                                         "is available to the public. You should not give nonpublic or confidential "
+                                         "information."),
             "total_clients" : ugettext_noop("A client or direct beneficiary is any person benefiting directly from your "
                                            "organization's activities through face-to-face contact with program staff, "
                                            "often in a one-on-one or small-group setting. Please do not include "
@@ -959,6 +978,11 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
         }
 
         help_texts = {
+            "actual_data": ugettext_noop("If you don't have access to information from official documents, please give "
+                                         "your best guesses based on your knowledge of your organization. Please note "
+                                         "that you should only give information that you are allowed to share and that "
+                                         "is available to the public. You should not give nonpublic or confidential "
+                                         "information."),
             "total_clients": ugettext_noop("A client or direct beneficiary is any person benefiting directly from your "
                                            "organization's activities through face-to-face contact with program staff, "
                                            "often in a one-on-one or small-group setting. Please do not include "
