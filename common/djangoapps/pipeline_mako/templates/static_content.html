@@ -89,7 +89,7 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
-<%def name="studiofrontend(page, lang='en')">
+<%def name="studiofrontend(entry, lang='en')">
     <%doc>
         Loads a studio-frontend page, with the necessary context. Context is expected
         as a dictionary in the body of this tag.
@@ -109,11 +109,11 @@ source, template_path = Loader(engine).load_template_source(path)
     </script>
     <div id="root"></div>
     % if settings.STUDIO_FRONTEND_CONTAINER_URL:
-        <script type="text/javascript" src="${settings.STUDIO_FRONTEND_CONTAINER_URL}/assets.js"></script>
+        <script type="text/javascript" src="${settings.STUDIO_FRONTEND_CONTAINER_URL}/${entry}.js"></script>
     % else:
         <script type="text/javascript" src="${url('common/js/vendor/manifest.min.js')}"></script>
         <script type="text/javascript" src="${url('common/js/vendor/vendor.min.js')}"></script>
-        <script type="text/javascript" src="${url('common/js/vendor/assets.min.js')}"></script>
+        <script type="text/javascript" src="${url('common/js/vendor/{}.min.js'.format(entry))}"></script>
     % endif
 </%def>
 
