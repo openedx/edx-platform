@@ -19,7 +19,6 @@ module.exports = Merge.smart(commonConfig, {
     },
     devtool: false,
     plugins: [
-        new ExtractTextPlugin('node_modules/@edx/studio-frontend/dist/studio-frontend.min.css'),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production')
         }),
@@ -33,7 +32,6 @@ module.exports = Merge.smart(commonConfig, {
             {
                 test: /(.scss|.css)$/,
                 include: [
-                    /studio-frontend/,
                     /paragon/,
                     /font-awesome/
                 ],

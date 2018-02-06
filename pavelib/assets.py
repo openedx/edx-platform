@@ -64,6 +64,20 @@ NPM_INSTALLED_LIBRARIES = [
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
+    '@edx/studio-frontend/dist/manifest.min.js',
+    '@edx/studio-frontend/dist/manifest.min.js.map',
+    '@edx/studio-frontend/dist/vendor.min.js',
+    '@edx/studio-frontend/dist/vendor.min.js.map',
+    '@edx/studio-frontend/dist/vendor.min.css',
+    '@edx/studio-frontend/dist/vendor.min.css.map',
+    '@edx/studio-frontend/dist/assets.min.js',
+    '@edx/studio-frontend/dist/assets.min.js.map',
+    '@edx/studio-frontend/dist/assets.min.css',
+    '@edx/studio-frontend/dist/assets.min.css.map',
+    '@edx/studio-frontend/dist/accessibilityPolicy.min.js',
+    '@edx/studio-frontend/dist/accessibilityPolicy.min.js.map',
+    '@edx/studio-frontend/dist/accessibilityPolicy.min.css',
+    '@edx/studio-frontend/dist/accessibilityPolicy.min.css.map',
     'which-country/index.js'
 ]
 
