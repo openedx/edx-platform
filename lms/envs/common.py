@@ -42,6 +42,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_base_dirs_from_settings
 )
 from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.lib.rooted_paths import rooted_glob
 from openedx.core.release import doc_version
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -1351,32 +1352,6 @@ X_FRAME_OPTIONS = 'ALLOW'
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############################### PIPELINE #######################################
-
-PIPELINE_ENABLED = True
-
-STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
-
-# List of finder classes that know how to find static files in various locations.
-# Note: the pipeline finder is included to be able to discover optimized files
-STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
-    'pipeline.finders.PipelineFinder',
-]
-
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Don't wrap JavaScript as there is code that depends upon updating the global namespace
-PIPELINE_DISABLE_WRAPPER = True
-
-# Specify the UglifyJS binary to use
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
-
-from openedx.core.lib.rooted_paths import rooted_glob
-
 courseware_js = (
     [
         'coffee/src/' + pth + '.js'
@@ -1719,7 +1694,6 @@ PIPELINE_CSS = {
     },
 }
 
-
 separately_bundled_js = set(courseware_js + discussion_js + notes_js + instructor_dash_js)
 common_js = sorted(set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - separately_bundled_js)
 xblock_runtime_js = [
@@ -1820,6 +1794,27 @@ PIPELINE_JS = {
     }
 }
 
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    'STYLESHEETS': PIPELINE_CSS,
+    'CSS_COMPRESSOR': None,
+    'JAVASCRIPT': PIPELINE_JS,
+    'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+    'DISABLE_WRAPPER': True,
+    'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
+}
+
+STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+
+# List of finder classes that know how to find static files in various locations.
+# Note: the pipeline finder is included to be able to discover optimized files
+STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
+    'pipeline.finders.PipelineFinder',
+]
 
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
@@ -1845,7 +1840,6 @@ STATICFILES_IGNORE_PATTERNS = (
     # Symlinks used by js-test-tool
     "xmodule_js",
 )
-
 
 ################################# DJANGO-REQUIRE ###############################
 

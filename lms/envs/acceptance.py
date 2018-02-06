@@ -204,8 +204,7 @@ import uuid
 SECRET_KEY = uuid.uuid4().hex
 
 ############################### PIPELINE #######################################
-
-PIPELINE_ENABLED = False
+PIPELINE['PIPELINE_ENABLED'] = False
 
 # We want to make sure that any new migrations are run
 # see https://groups.google.com/forum/#!msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ

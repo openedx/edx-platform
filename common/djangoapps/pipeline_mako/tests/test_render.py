@@ -1,5 +1,6 @@
 """ Tests for rendering functions in the mako pipeline. """
 
+from copy import copy
 from unittest import skipUnless
 
 import ddt
@@ -96,6 +97,8 @@ class PipelineRenderTest(TestCase):
             self.assertIn(u'lms-base-application.js', js_include)
 
         # Verify that multiple JS files are rendered with the pipeline disabled
-        with self.settings(PIPELINE_ENABLED=False):
+        tmp_pipeline = copy(settings.PIPELINE)
+        tmp_pipeline['PIPELINE_ENABLED'] = False
+        with self.settings(PIPELINE=tmp_pipeline):
             js_include = compressed_js('base_application')
             self.assertIn(u'/static/js/src/logger.js', js_include)
