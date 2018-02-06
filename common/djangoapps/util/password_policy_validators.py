@@ -9,7 +9,7 @@ from __future__ import division
 
 import string
 
-import nltk
+from nltk.metrics.distance import edit_distance
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -106,6 +106,6 @@ def validate_password_dictionary(value):
 
     if password_max_edit_distance and password_dictionary:
         for word in password_dictionary:
-            distance = nltk.metrics.distance.edit_distance(value, word)
+            distance = edit_distance(value, word)
             if distance <= password_max_edit_distance:
                 raise ValidationError(_("Too similar to a restricted dictionary word."), code="dictionary_word")

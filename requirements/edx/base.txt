@@ -79,6 +79,7 @@ Markdown>=2.6,<2.7
 mongoengine==0.10.0
 MySQL-python==1.2.5
 networkx==1.7
+nltk==3.2.5
 nose-xunitmp==0.3.2
 oauthlib==1.0.3
 path.py==8.2.1
