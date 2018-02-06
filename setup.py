@@ -58,7 +58,7 @@ setup(
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
-            "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer"
+            "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer",
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
@@ -69,12 +69,15 @@ setup(
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
+            "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
+            "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
+            "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
         ],
     }
 )

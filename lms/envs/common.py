@@ -2123,9 +2123,6 @@ INSTALLED_APPS = [
     # edX Video Pipeline integration
     'openedx.core.djangoapps.video_pipeline',
 
-    # Bookmarks
-    'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
-
     # Our courseware
     'courseware',
     'student',
@@ -3287,9 +3284,6 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 # financial assistance form
 FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
-
-# Course Content Bookmarks Settings
-MAX_BOOKMARKS_PER_COURSE = 100
 
 #### Registration form extension. ####
 # Only used if combined login/registration is enabled.

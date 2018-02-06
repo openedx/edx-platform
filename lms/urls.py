@@ -107,9 +107,6 @@ urlpatterns = [
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
-    # Bookmarks API endpoints
-    url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
-
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
 
@@ -647,7 +644,7 @@ urlpatterns += [
         include('openedx.features.course_experience.urls'),
     ),
 
-    # Course bookmarks
+    # Course bookmarks UI in LMS
     url(
         r'^courses/{}/bookmarks/'.format(
             settings.COURSE_ID_PATTERN,
