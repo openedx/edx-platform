@@ -13,10 +13,10 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
 
 Mode = namedtuple('Mode',

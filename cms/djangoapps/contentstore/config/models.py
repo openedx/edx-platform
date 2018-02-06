@@ -4,8 +4,8 @@ controlling the new assets page.
 """
 from config_models.models import ConfigurationModel
 from django.db.models import BooleanField
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class NewAssetsPageFlag(ConfigurationModel):

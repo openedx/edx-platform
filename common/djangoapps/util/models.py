@@ -7,7 +7,7 @@ from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.text import compress_string
 
-from openedx.core.djangoapps.util.model_utils import CreatorMixin
+from opaque_keys.edx.django.models import CreatorMixin
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

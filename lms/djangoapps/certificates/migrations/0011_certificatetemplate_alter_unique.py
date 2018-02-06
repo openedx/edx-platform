@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 import logging
 from django.db import migrations, models
+from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
 

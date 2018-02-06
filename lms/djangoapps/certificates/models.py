@@ -61,12 +61,13 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
 LOGGER = logging.getLogger(__name__)

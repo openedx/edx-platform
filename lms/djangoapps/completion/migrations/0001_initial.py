@@ -5,9 +5,9 @@ from django.db import migrations, models
 import django.utils.timezone
 from django.conf import settings
 import model_utils.fields
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
 import lms.djangoapps.completion.models
-import openedx.core.djangoapps.xmodule_django.models
 
 # pylint: disable=ungrouped-imports
 try:
@@ -29,8 +29,8 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('id', BigAutoField(serialize=False, primary_key=True)),
-                ('course_key', openedx.core.djangoapps.xmodule_django.models.CourseKeyField(max_length=255)),
-                ('block_key', openedx.core.djangoapps.xmodule_django.models.UsageKeyField(max_length=255)),
+                ('course_key', CourseKeyField(max_length=255)),
+                ('block_key', UsageKeyField(max_length=255)),
                 ('block_type', models.CharField(max_length=64)),
                 ('completion', models.FloatField(validators=[lms.djangoapps.completion.models.validate_percent])),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),

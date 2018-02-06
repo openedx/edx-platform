@@ -3,8 +3,7 @@ Configuration models for Video XModule
 """
 from config_models.models import ConfigurationModel
 from django.db.models import BooleanField
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class HLSPlaybackEnabledFlag(ConfigurationModel):

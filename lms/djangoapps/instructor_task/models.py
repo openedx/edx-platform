@@ -24,9 +24,9 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.storage import get_storage
 
 logger = logging.getLogger(__name__)

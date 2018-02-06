@@ -7,8 +7,7 @@ from config_models.models import ConfigurationModel
 from django.contrib import admin
 from django.core.cache import cache
 from django.db import models
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class GlobalStatusMessage(ConfigurationModel):

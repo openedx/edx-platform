@@ -7,8 +7,8 @@ from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
 # We are trying to move some of this functionality into separate apps,

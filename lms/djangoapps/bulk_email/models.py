@@ -7,6 +7,7 @@ import markupsafe
 from config_models.models import ConfigurationModel
 from django.contrib.auth.models import User
 from django.db import models
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from course_modes.models import CourseMode
@@ -14,7 +15,6 @@ from enrollment.api import validate_course_mode
 from enrollment.errors import CourseModeNotFoundError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 from student.roles import CourseInstructorRole, CourseStaffRole

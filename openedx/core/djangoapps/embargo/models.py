@@ -24,9 +24,10 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django_countries import countries
 from django_countries.fields import CountryField
+from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
 from .exceptions import InvalidAccessPoint
 from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES

@@ -7,7 +7,7 @@ import badges.models
 from django.conf import settings
 import django.utils.timezone
 from model_utils import fields
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):

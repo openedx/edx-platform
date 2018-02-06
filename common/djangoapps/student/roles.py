@@ -8,8 +8,8 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 from django.contrib.auth.models import User
+from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangoapps.request_cache import get_cache
 from student.models import CourseAccessRole
 

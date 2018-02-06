@@ -32,6 +32,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.ssencrypt import (
@@ -42,7 +43,6 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangolib.model_mixins import DeprecatedModelMixin
 from openedx.core.storage import get_storage
 
