@@ -301,3 +301,42 @@ class CourseEntitlement(TimeStampedModel):
             expired_at__isnull=False,
             enrollment_course_run=None
         ).select_related('user').select_related('enrollment_course_run')
+
+
+class CourseEntitlementSupportDetail(TimeStampedModel):
+    """
+    Table recording support interactions with an entitlement
+    """
+    LEAVE_SESSION = 'LEAVE'
+    CHANGE_SESSION = 'CHANGE'
+    LEARNER_REQUEST_NEW = 'LEARNER_NEW'
+    COURSE_TEAM_REQUEST_NEW = 'COURSE_TEAM_NEW'
+    OTHER = 'OTHER'
+    ENTITLEMENT_SUPPORT_REASONS = (
+        (LEAVE_SESSION, u'Learner requested leave session for expired entitlement'),
+        (CHANGE_SESSION, u'Learner requested session change for expired entitlement'),
+        (LEARNER_REQUEST_NEW, u'Learner requested new entitlement'),
+        (COURSE_TEAM_REQUEST_NEW, u'Course team requested entitlement for learnerg'),
+        (OTHER, u'Other'),
+    )
+    entitlement = models.ForeignKey('entitlements.CourseEntitlement')
+    support_user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+    reason = models.CharField(max_length=15, choices=ENTITLEMENT_SUPPORT_REASONS)
+    comments = models.TextField(null=True)
+
+    unenrolled_run = models.ForeignKey(
+        CourseOverview,
+        null=True,
+        blank=True,
+        db_constraint=False,
+    )
+
+    def __unicode__(self):
+        """Unicode representation of an Entitlement"""
+        return u'Course Entitlement Suppor Detail: entitlement: {}, support_user: {}, reason: {}'\
+            .format(
+                self.entitlement,
+                self.support_user,
+                self.reason,
+            )
