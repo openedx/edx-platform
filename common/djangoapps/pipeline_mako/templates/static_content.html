@@ -107,7 +107,7 @@ source, template_path = Loader(engine).load_template_source(path)
     <script type="text/javascript" id='courseContext'>
       var studioContext = ${ body | n, decode.utf8};
     </script>
-    <div id="root"></div>
+    <div id="root" class="SFE"></div>
     % if settings.STUDIO_FRONTEND_CONTAINER_URL:
         <script type="text/javascript" src="${settings.STUDIO_FRONTEND_CONTAINER_URL}/${entry}.js"></script>
     % else:
