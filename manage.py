@@ -119,9 +119,9 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
-    import ptvsd
-    try:
-        ptvsd.enable_attach("my_secret", address = ('0.0.0.0', 21000))
-    except:
-        pass
+    # import ptvsd
+    # try:
+    #     ptvsd.enable_attach("my_secret", address = ('0.0.0.0', 21000))
+    # except:
+    #     pass
     execute_from_command_line([sys.argv[0]] + django_args)

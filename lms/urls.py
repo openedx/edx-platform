@@ -93,7 +93,7 @@ urlpatterns = [
     url(r'^api/entitlements/', include('entitlements.api.urls', namespace='entitlements_api')),
 
     # Digital Book API RESTful endpoints
-    url(r'^api/digital_book/', include('digital_book.api.urls')),
+    url(r'^api/digital_book/', include('digital_book.api.urls', namespace='digital_book_api')),
 
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
