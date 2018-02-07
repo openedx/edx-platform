@@ -115,6 +115,15 @@ def log_python_warnings():
     each test case.
     """
     warnings.simplefilter('default')
+    warnings.filterwarnings('ignore', 'Not importing directory ')
     warnings.filterwarnings('ignore', 'Setting _field_data is deprecated')
     warnings.filterwarnings('ignore', 'Setting _field_data via the constructor is deprecated')
+    try:
+        # There are far too many of these deprecation warnings in startup to output for every management command;
+        # suppress them until we've fixed at least the most common ones as reported by the test suite
+        from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango21Warning
+        warnings.simplefilter('ignore', RemovedInDjango20Warning)
+        warnings.simplefilter('ignore', RemovedInDjango21Warning)
+    except ImportError:
+        pass
     logging.captureWarnings(True)
