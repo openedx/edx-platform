@@ -243,11 +243,13 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
+
+            webpack_prod_mode = expected_asset_settings != Env.DEVSTACK_SETTINGS
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
-                node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
+                node_env="production" if webpack_prod_mode else "development",
                 static_root_lms='/edx/var/edxapp/staticfiles',
                 static_root_cms='/edx/var/edxapp/staticfiles/studio',
-                webpack_config_path='webpack.prod.config.js' if expected_asset_settings != Env.DEVSTACK_SETTINGS else "webpack.dev.config.js"
+                webpack_config_path='webpack.prod.config.js' if webpack_prod_mode else "webpack.dev.config.js"
             ))
             expected_messages.extend(self.expected_sass_commands(system=system, asset_settings=expected_asset_settings))
         if expected_collect_static:
@@ -286,11 +288,13 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
+
+            webpack_prod_mode = expected_asset_settings != Env.DEVSTACK_SETTINGS
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
-                node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
+                node_env="production" if webpack_prod_mode else "development",
                 static_root_lms='/edx/var/edxapp/staticfiles',
                 static_root_cms='/edx/var/edxapp/staticfiles/studio',
-                webpack_config_path='webpack.prod.config.js' if expected_asset_settings != Env.DEVSTACK_SETTINGS else "webpack.dev.config.js"
+                webpack_config_path='webpack.prod.config.js' if webpack_prod_mode else "webpack.dev.config.js"
             ))
             expected_messages.extend(self.expected_sass_commands(asset_settings=expected_asset_settings))
         if expected_collect_static:
