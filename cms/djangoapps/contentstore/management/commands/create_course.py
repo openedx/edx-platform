@@ -30,10 +30,14 @@ class Command(BaseCommand):
                             help="The instructor's email address or integer ID.")
         parser.add_argument('org',
                             help="The organization to create the course within.")
-        parser.add_argument('course',
-                            help="The name of the course.")
+        parser.add_argument('number',
+                            help="The number of the course.")
         parser.add_argument('run',
                             help="The name of the course run.")
+        parser.add_argument('name',
+                            nargs='?',
+                            default=None,
+                            help="The display name of the course. (OPTIONAL)")
 
     def parse_args(self, **options):
         """
@@ -44,13 +48,20 @@ class Command(BaseCommand):
         except User.DoesNotExist:
             raise CommandError("No user {user} found.".format(user=options['user']))
 
-        return options['modulestore'], user, options['org'], options['course'], options['run']
+        return options['modulestore'], user, options['org'], options['number'], options['run'], options['name']
 
     def handle(self, *args, **options):
-        storetype, user, org, course, run = self.parse_args(**options)
+        storetype, user, org, number, run, name = self.parse_args(**options)
 
         if storetype == ModuleStoreEnum.Type.mongo:
             self.stderr.write("WARNING: The 'Old Mongo' store is deprecated. New courses should be added to split.")
 
-        new_course = create_new_course_in_store(storetype, user, org, course, run, {})
+        new_course = create_new_course_in_store(
+            storetype,
+            user,
+            org,
+            number,
+            run,
+            {"display_name": name} if name else {}
+        )
         self.stdout.write(u"Created {}".format(text_type(new_course.id)))

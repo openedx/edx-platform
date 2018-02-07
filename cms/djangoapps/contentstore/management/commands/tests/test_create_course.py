@@ -49,7 +49,7 @@ class TestCreateCourse(ModuleStoreTestCase):
             "create_course",
             store,
             str(self.user.email),
-            "org", "course", "run"
+            "org", "course", "run", "dummy-course-name"
         )
         new_key = modulestore().make_course_key("org", "course", "run")
         self.assertTrue(
