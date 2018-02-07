@@ -2,7 +2,6 @@ import logging
 
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
-from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 
 from collections import Counter
@@ -15,6 +14,7 @@ from boto.ses.exceptions import (
 from common.lib.mandrill_client.client import MandrillClient
 from crum import get_current_request
 from util.request import safe_get_host
+
 
 
 log = logging.getLogger('timed_notifications')
