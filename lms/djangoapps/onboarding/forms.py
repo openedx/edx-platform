@@ -619,14 +619,8 @@ class RegModelForm(BaseOnboardingModelForm):
 
         already_an_admin = Organization.objects.filter(admin__email=org_admin_email).first()
         if already_an_admin:
-            raise forms.ValidationError(ugettext_noop('%s is already as admin of organiztaion %s'
+            raise forms.ValidationError(ugettext_noop('%s is already admin of organization "%s"'
                                                       % (org_admin_email, already_an_admin.label)))
-
-        already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
-            suggested_admin_email=org_admin_email, is_hash_consumed=False).first()
-        if already_suggested_as_admin:
-            raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of some other organiztaion'
-                                                      % org_admin_email))
 
         return org_admin_email
 
@@ -734,7 +728,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
                                          widget=forms.RadioSelect,
-                                         initial=0,
+                                         initial=1,
                                          error_messages={
                                              'required': ugettext_noop('Please select an option for Are you able to '
                                                                        'provide information'),
