@@ -13,19 +13,18 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
     """
 
     def create(self, request):
+        #TODO: serialize data coming in
+        log.info(">>> request: %s", request)
+        log.info(">>> request.data: %s", request.data)
 
+        order_number = request.data['order_number']
+        user = request.data['user']
+        book_key = request.data['book_key']
 
-        #TODO: print something
-        log.info(">>> ")
-
-        #TODO: print some aspect of the resquest
-
-
-        #TODO: return some response
         return Response(
             status=status.HTTP_201_CREATED,
             data={
-                'string_data':"very useful unique data",
-                'num_data':42,
+                'string_data': "very useful unique data",
+                'num_data': 42,
             }
         )

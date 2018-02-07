@@ -147,7 +147,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
 
         # if there is only one upgradeable enrollment, convert it from audit to the entitlement.mode
         # if there is any ambiguity about which enrollment to upgrade
-        # (i.e. multiple upgradeable enrollments or no available upgradeable enrollment), dont enroll
+        # (i.e. multiple upgradeable enrollments or no available upgradeable enrollment), don't enroll
         if len(upgradeable_enrollments) == 1:
             enrollment = upgradeable_enrollments[0]
             log.info(
