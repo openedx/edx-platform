@@ -80,7 +80,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 if FEATURES.get("ENABLE_TIERS_APP", True):
     TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-    TIERS_EXPIRED_REDIRECT_URL = None
+    TIERS_EXPIRED_REDIRECT_URL = ENV_TOKENS.get('TIERS_EXPIRED_REDIRECT_URL', None)
     TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
 
     TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
