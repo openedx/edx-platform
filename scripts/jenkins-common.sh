@@ -59,7 +59,8 @@ echo "npm version is `npm --version`"
 
 # Log any paver or ansible command timing
 TIMESTAMP=$(date +%s)
-export PAVER_TIMER_LOG="test_root/log/timing.paver.$TIMESTAMP.log"
+SHARD_NUM=${SHARD:="all"}
+export PAVER_TIMER_LOG="test_root/log/timing.paver.$TEST_SUITE.$SHARD_NUM.log"
 export ANSIBLE_TIMER_LOG="test_root/log/timing.ansible.$TIMESTAMP.log"
 
 echo "This node is `curl http://169.254.169.254/latest/meta-data/hostname`"
