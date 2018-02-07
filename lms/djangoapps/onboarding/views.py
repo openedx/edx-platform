@@ -18,7 +18,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext_noop
 from django.views.decorators.csrf import csrf_exempt
 from path import Path as path
 
@@ -309,7 +309,6 @@ def org_detail_survey(request):
                                                       user=request.user).last()
 
     initial = {
-        'can_provide_info': '1' if latest_survey else '0',
         'actual_data': '1' if latest_survey and latest_survey.actual_data else '0',
         "effective_date": datetime.strftime(latest_survey.effective_date, '%d/%m/%Y') if latest_survey else ""
     }
@@ -423,6 +422,8 @@ def suggest_org_admin(request):
     Suggest a user as administrator of an organization
     """
     status = 200
+    message = 'Email successfully sent'
+
     if request.method == 'POST':
         organization = request.POST.get('organization')
         org_admin_email = request.POST.get('email')
@@ -433,12 +434,19 @@ def suggest_org_admin(request):
                 extended_profile = request.user.extended_profile
 
                 if org_admin_email:
-                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, org_admin_email)
-                    org_id = extended_profile.organization_id
-                    org_name = extended_profile.organization.label
-                    organization.unclaimed_org_admin_email = org_admin_email
+                    already_an_admin = Organization.objects.filter(admin__email=org_admin_email).first()
+                    if already_an_admin:
+                        status = 400
+                        message = ugettext_noop('%s is already admin of organization "%s"'
+                                                      % (org_admin_email, already_an_admin.label))
+                    else:
+                        hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, org_admin_email)
+                        org_id = extended_profile.organization_id
+                        org_name = extended_profile.organization.label
+                        organization.unclaimed_org_admin_email = org_admin_email
 
-                    send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email, hash_key)
+                        send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email,
+                                                    hash_key)
                 else:
                     hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, request.user.email)
                     send_admin_update_email(organization.id, organization.label, organization.admin.email,
@@ -452,7 +460,7 @@ def suggest_org_admin(request):
                 log.info(ex.args)
                 status = 400
 
-    return JsonResponse({'status': status})
+    return JsonResponse({'status': status, 'message': message})
 
 
 @csrf_exempt
@@ -568,15 +576,16 @@ def admin_activation(request, activation_key):
 
             # Change the admin of the organization if admin is being activated or updated on user confirmation[True]
             if admin_activation or admin_change_confirmation:
-                hash_key.organization.unclaimed_org_admin_email = None
-                hash_key.organization.admin = user
-                hash_key.organization.save()
 
                 # If claimer's is admin of some other organization remove his privileges
                 # for that organization as he can only be an admin of single organization
-                if user_extended_profile.organization.admin == user:
+                if user_extended_profile.organization and user_extended_profile.organization.admin == user:
                     user_extended_profile.organization.admin = None
                     user_extended_profile.organization.save()
+
+                hash_key.organization.unclaimed_org_admin_email = None
+                hash_key.organization.admin = user
+                hash_key.organization.save()
 
                 # Update the claimer's organization if a user confirms
                 user_extended_profile.organization = hash_key.organization
