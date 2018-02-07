@@ -32,24 +32,6 @@ def task_course_notifications():
             'course_url': get_course_link(course_id=course.id),
         }
 
-        # if course end-date is missing then we can't guess the course week
-        if course.end:
-            log.info('Getting course end date')
-            course_end_date = course.end.date()
-            # check if course is already started or just started today and not ended yet
-            if (date_now >= course_start_date) and (date_now <= course_end_date):
-                if date.today().weekday() == 0:
-                    log.info('Calculating course week')
-                    course_week = (abs((date_now - course_start_date).days) / 7) + 1
-                    log.info('Adding week in the context')
-                    context['course_week'] = course_week
-                    log.info('Sending weekly notification email')
-                    send_course_notification_email(course=course,
-                                                   template_name=MandrillClient.WEEKLY_TEMPLATE,
-                                                   context=context)
-        else:
-            log.info("Course: %s, weekly notification-email sending failed, course end-date missing.", course)
-
         # send email when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
             send_course_notification_email(course=course,

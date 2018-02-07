@@ -314,5 +314,9 @@ NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
 }
 
+LMS_BASE_URL = 'http://localhost:8000'
+
+MANDRILL_API_KEY = 'VmO_YjiGNJOJ6KukuRnhZA'
+
 # NodeBB settings
 NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)

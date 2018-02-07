@@ -8,8 +8,8 @@ def can_take_oef(function):
         user_extended_profile = request.user.extended_profile
 
         if user_extended_profile.organization and \
-                (user_extended_profile.is_organization_admin or user_extended_profile.organization.is_first_signup_in_org()) \
-                and user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE:
+                (user_extended_profile.is_organization_admin or
+                     user_extended_profile.organization.is_first_signup_in_org()):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
