@@ -45,11 +45,6 @@ EXPECTED_RUN_SERVER_COMMAND = (
 EXPECTED_INDEX_COURSE_COMMAND = (
     u"python manage.py {system} --settings={settings} reindex_course --setup"
 )
-EXPECTED_PRINT_SETTINGS_COMMAND = [
-    u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>/dev/null",
-    u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>/dev/null",
-    u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>/dev/null"
-]
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
     "$(npm bin)/webpack --config={webpack_config_path}"
@@ -248,14 +243,11 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-            expected_messages.extend(
-                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
-            )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
-                static_root_lms=None,
-                static_root_cms=None,
-                webpack_config_path=None
+                static_root_lms='/edx/var/edxapp/staticfiles',
+                static_root_cms='/edx/var/edxapp/staticfiles/studio',
+                webpack_config_path='webpack.prod.config.js' if expected_asset_settings != Env.DEVSTACK_SETTINGS else "webpack.dev.config.js"
             ))
             expected_messages.extend(self.expected_sass_commands(system=system, asset_settings=expected_asset_settings))
         if expected_collect_static:
@@ -294,14 +286,11 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-            expected_messages.extend(
-                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
-            )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
-                static_root_lms=None,
-                static_root_cms=None,
-                webpack_config_path=None
+                static_root_lms='/edx/var/edxapp/staticfiles',
+                static_root_cms='/edx/var/edxapp/staticfiles/studio',
+                webpack_config_path='webpack.prod.config.js' if expected_asset_settings != Env.DEVSTACK_SETTINGS else "webpack.dev.config.js"
             ))
             expected_messages.extend(self.expected_sass_commands(asset_settings=expected_asset_settings))
         if expected_collect_static:
