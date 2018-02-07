@@ -17,11 +17,13 @@ class CompletionStatus extends React.Component {
             course_id: this.props.course_id || '',
             percent_complete: this.props.percentComplete || 0,
             isCelebrating: false,
+            display: 'block',
         };
 
         this.sendSocketMessage = this.sendSocketMessage.bind(this);
         this.startCelebration = this.startCelebration.bind(this);
         this.stopCelebration = this.stopCelebration.bind(this);
+        //this.display = this.display.bind(this);
     }
 
     componentDidMount() {
@@ -51,10 +53,12 @@ class CompletionStatus extends React.Component {
 
     startCelebration() {
         this.setState({isCelebrating: true});
+        this.setState({display: 'block'});
     }
 
     stopCelebration() {
         this.setState({isCelebrating: false});
+        this.setState({display: 'none'});
     }
 
     render() {
@@ -66,8 +70,8 @@ class CompletionStatus extends React.Component {
                 <Websocket ref="socket" url={socketUrl}
                     onMessage={this.handleData.bind(this)} reconnect={true}/>
                 <label>Completion: </label><progress max="100" value={this.state.percent_complete}></progress><span>&nbsp;{this.state.percent_complete}%</span>
-                {isComplete &&
-                    <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}>
+                {isComplete && 
+                    <div id='confetti' style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: this.state.display}}>
                         <Confetti width={this.props.width} height={this.props.height} run={this.state.isCelebrating}/>
                     </div>
                 }
