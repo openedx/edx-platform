@@ -207,6 +207,8 @@ SECRET_KEY = uuid.uuid4().hex
 
 PIPELINE_ENABLED = False
 
+PIPELINE['PIPELINE_ENABLED'] = PIPELINE_ENABLED
+
 # We want to make sure that any new migrations are run
 # see https://groups.google.com/forum/#!msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ
 MIGRATION_MODULES = {}

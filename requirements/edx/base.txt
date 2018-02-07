@@ -28,6 +28,7 @@ django-ipware==1.1.0
 django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
 django-oauth-toolkit==0.12.0
+django-pipeline==1.6.14
 django-pyfs==2.0
 django-ratelimit==1.1.0
 django-sekizai>=0.10
@@ -79,6 +80,7 @@ Markdown>=2.6,<2.7
 mongoengine==0.10.0
 MySQL-python==1.2.5
 networkx==1.7
+nltk==3.2.5
 nose-xunitmp==0.3.2
 oauthlib==1.0.3
 path.py==8.2.1

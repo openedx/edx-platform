@@ -71,6 +71,8 @@ WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "lms" / "w
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None
 
+PIPELINE['JS_COMPRESSOR'] = PIPELINE_JS_COMPRESSOR
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
