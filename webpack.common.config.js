@@ -33,6 +33,7 @@ module.exports = {
         AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
         LearnerAnalyticsDashboard: './lms/static/js/learner_analytics_dashboard/LearnerAnalyticsDashboard.jsx',
         UpsellExperimentModal: './lms/static/common/js/components/UpsellExperimentModal.jsx',
+        PortfolioExperimentUpsellModal: './lms/static/common/js/components/PortfolioExperimentUpsellModal.jsx',
 
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',

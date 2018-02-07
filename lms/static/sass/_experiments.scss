@@ -48,7 +48,7 @@
 
 /* modal-specific */
 
-#upsell-modal {
+#upsell-modal, #portfolio-experiment-upsell-modal {
   display: none;
 
   /* slick modal from https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css */
@@ -489,6 +489,11 @@
   }
 
   .my-stats-slide-header {
+    padding-bottom: 10px;
+  }
+
+  .checkmark-group-header {
+    padding-top: 10px;
     padding-bottom: 10px;
   }
 
