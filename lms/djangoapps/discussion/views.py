@@ -4,7 +4,6 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 import logging
 from functools import wraps
-from sets import Set
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -727,9 +726,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         works in conjunction with the Django pipeline to ensure that in development mode
         the files are loaded individually, but in production just the single bundle is loaded.
         """
-        dependencies = Set()
-        dependencies.update(self.get_js_dependencies('discussion_vendor'))
-        return list(dependencies)
+        return list(set(self.get_js_dependencies('discussion_vendor')))
 
     def js_dependencies(self):
         """

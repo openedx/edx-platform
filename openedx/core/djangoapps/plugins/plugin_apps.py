@@ -17,5 +17,5 @@ def get_apps(project_type):
         for app_config in registry.get_app_configs(project_type)
         if getattr(app_config, constants.PLUGIN_APP_CLASS_ATTRIBUTE_NAME, None) is not None
     ]
-    log.info(u'Plugin Apps: Found %s', plugin_apps)
+    log.debug(u'Plugin Apps: Found %s', plugin_apps)
     return plugin_apps

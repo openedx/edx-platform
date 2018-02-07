@@ -29,13 +29,13 @@ def _iter_plugins(project_type):
     for app_config in registry.get_app_configs(project_type):
         signals_config = _get_config(app_config, project_type)
         if signals_config is None:
-            log.info(u'Plugin Apps [Signals]: Did NOT find %s for %s', app_config.name, project_type)
+            log.debug(u'Plugin Apps [Signals]: Did NOT find %s for %s', app_config.name, project_type)
             continue
 
         signals_module_path = utils.get_module_path(app_config, signals_config, constants.PluginSignals)
         signals_module = utils.import_module(signals_module_path)
 
-        log.info(
+        log.debug(
             u'Plugin Apps [Signals]: Found %s with %d receiver(s) for %s',
             app_config.name,
             len(signals_config.get(constants.PluginSignals.RECEIVERS, [])),
