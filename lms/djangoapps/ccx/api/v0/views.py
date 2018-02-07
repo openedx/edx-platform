@@ -9,12 +9,10 @@ from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from courseware import courses
@@ -28,7 +26,8 @@ from lms.djangoapps.ccx.utils import (
 )
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api import authentication, permissions
+from openedx.core.lib.api import permissions
+from openedx.core.lib.api.view_utils import view_auth_classes
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler
@@ -207,6 +206,7 @@ def make_user_coach(user, master_course_key):
     coach_role_on_master_course.add_users(user)
 
 
+@view_auth_classes(permission_classes=(permissions.IsMasterCourseStaffInstructor,))
 class CCXListView(GenericAPIView):
     """
         **Use Case**
@@ -355,12 +355,6 @@ class CCXListView(GenericAPIView):
                 ]
     }
     """
-    authentication_classes = (
-        JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
     pagination_class = CCXAPIPagination
 
@@ -528,6 +522,7 @@ class CCXListView(GenericAPIView):
         )
 
 
+@view_auth_classes(permission_classes=(permissions.IsCourseStaffInstructor,))
 class CCXDetailView(GenericAPIView):
     """
         **Use Case**
@@ -605,12 +600,6 @@ class CCXDetailView(GenericAPIView):
             response is returned.
     """
 
-    authentication_classes = (
-        JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
 
     def get_object(self, course_id, is_ccx=False):  # pylint: disable=arguments-differ

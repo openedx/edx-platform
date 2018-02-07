@@ -8,10 +8,10 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import JsonResponse
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.api.permissions import IsStaffOrOwner
+from openedx.core.lib.api.view_utils import view_auth_classes
 from rest_framework import permissions, serializers, viewsets, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
@@ -34,6 +34,7 @@ class CourseGoalSerializer(serializers.ModelSerializer):
         fields = ('user', 'course_key', 'goal_key')
 
 
+@view_auth_classes(permission_classes=(IsStaffOrOwner,))
 class CourseGoalViewSet(viewsets.ModelViewSet):
     """
     API calls to create and update a course goal.
@@ -52,8 +53,6 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
     Returns Http400 response if the course_key does not map to a known
     course or if the goal_key does not map to a valid goal key.
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner,)
     queryset = CourseGoal.objects.all()
     serializer_class = CourseGoalSerializer
 

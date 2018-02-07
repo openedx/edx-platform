@@ -1,15 +1,11 @@
-import datetime
 import logging
 
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from rest_framework import permissions, viewsets, status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from entitlements.api.v1.filters import CourseEntitlementFilter
@@ -19,8 +15,8 @@ from entitlements.models import CourseEntitlement
 from entitlements.utils import is_course_run_entitlement_fullfillable
 from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
-from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.lib.api.paginators import DefaultPagination
+from openedx.core.lib.api.view_utils import view_auth_classes
 from student.models import CourseEnrollment
 from student.models import CourseEnrollmentException, AlreadyEnrolledError
 
@@ -88,11 +84,10 @@ def _process_revoke_and_unenroll_entitlement(course_entitlement, is_refund=False
             raise IntegrityError
 
 
+@view_auth_classes(permission_classes=(IsAdminOrAuthenticatedReadOnly,))
 class EntitlementViewSet(viewsets.ModelViewSet):
     ENTITLEMENT_UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 
-    authentication_classes = (JwtAuthentication, SessionAuthenticationCrossDomainCsrf,)
-    permission_classes = (permissions.IsAuthenticated, IsAdminOrAuthenticatedReadOnly,)
     lookup_value_regex = ENTITLEMENT_UUID4_REGEX
     lookup_field = 'uuid'
     serializer_class = CourseEntitlementSerializer
@@ -223,6 +218,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
         _process_revoke_and_unenroll_entitlement(instance)
 
 
+@view_auth_classes()
 class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
     """
     Endpoint in the Entitlement API to handle the Enrollment of a User's Entitlement.
@@ -231,8 +227,6 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         - Unenroll
         - Switch Enrollment
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
     queryset = CourseEntitlement.objects.all()
 
     def _verify_course_run_for_entitlement(self, entitlement, course_run_id):

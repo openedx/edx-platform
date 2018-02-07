@@ -7,7 +7,6 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
@@ -19,15 +18,11 @@ from six import text_type
 from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
-from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser
-)
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.api import (
@@ -45,11 +40,6 @@ log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
 }
-
-
-class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
-    """Session authentication that allows inactive users and cross-domain requests. """
-    pass
 
 
 class ApiKeyPermissionMixIn(object):
@@ -91,6 +81,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
 
 
 @can_disable_rate_limit
+@view_auth_classes(is_authenticated=False, permission_classes=(ApiKeyHeaderPermissionIsAuthenticated,))
 class EnrollmentView(APIView, ApiKeyPermissionMixIn):
     """
         **Use Case**
@@ -153,10 +144,6 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
             * mode: The enrollment mode of the user in this course.
             * user: The ID of the user.
    """
-
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
-                              SessionAuthenticationAllowInactiveUser,)
-    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
     # Since the course about page on the marketing site uses this API to auto-enroll users,
@@ -299,6 +286,7 @@ class EnrollmentCourseDetailView(APIView):
 
 
 @can_disable_rate_limit
+@view_auth_classes(is_authenticated=False, permission_classes=(ApiKeyHeaderPermissionIsAuthenticated,))
 class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     """
         **Use Cases**
@@ -472,9 +460,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
              * user: The username of the user.
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
-                              EnrollmentCrossDomainSessionAuth,)
-    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
     # Since the course about page on the marketing site

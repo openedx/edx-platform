@@ -8,6 +8,7 @@ from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
+from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCorsCSRFMixin
 
 
 OAUTH2_TOKEN_ERROR = u'token_error'
@@ -20,7 +21,7 @@ OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
 log = logging.getLogger(__name__)
 
 
-class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
+class SessionAuthenticationAllowInactiveUser(SessionAuthenticationCorsCSRFMixin, SessionAuthentication):
     """Ensure that the user is logged in, but do not require the account to be active.
 
     We use this in the special case that a user has created an account,

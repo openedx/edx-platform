@@ -8,28 +8,25 @@ from rest_framework import authentication
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
 
 
-class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication):
+class SessionAuthenticationCorsCSRFMixin(object):
     """
-    Session authentication that skips the referer check over secure connections.
+    Session authentication Mixin that skips the referer check over secure connections.
 
     Django Rest Framework's `SessionAuthentication` class calls Django's
     CSRF middleware implementation directly, which bypasses the middleware
     stack.
 
-    This version of `SessionAuthentication` performs the same workaround
+    This Mixin for `SessionAuthentication` performs the same workaround
     as `CorsCSRFMiddleware` to skip the referer check for whitelisted
     domains over a secure connection.  See `cors_csrf.middleware` for
     more information.
-
-    Since this subclass overrides only the `enforce_csrf()` method,
-    it can be mixed in with other `SessionAuthentication` subclasses.
     """
     # TODO: Remove Django 1.11 upgrade shim
     # SHIM: Call new process_request in Django 1.11 to process CSRF token in cookie.
     def _process_enforce_csrf(self, request):
         if django.VERSION >= (1, 11):
             CsrfViewMiddleware().process_request(request)
-        return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)
+        return super(SessionAuthenticationCorsCSRFMixin, self).enforce_csrf(request)
 
     def enforce_csrf(self, request):
         """

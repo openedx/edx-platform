@@ -6,7 +6,6 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
 
 from django.db import transaction
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
@@ -16,14 +15,12 @@ from rest_framework.viewsets import ViewSet
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
-from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser,
-    OAuth2AuthenticationAllowInactiveUser,
-)
 from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.core.lib.api.view_utils import view_auth_classes
 from student.models import User
 
 
+@view_auth_classes()
 class AccountViewSet(ViewSet):
     """
         **Use Cases**
@@ -161,10 +158,6 @@ class AccountViewSet(ViewSet):
 
             If the update is successful, updated user account data is returned.
     """
-    authentication_classes = (
-        OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
-    )
-    permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
     def get(self, request):
@@ -230,13 +223,12 @@ class AccountViewSet(ViewSet):
         return Response(account_settings)
 
 
+@view_auth_classes(permission_classes=(CanDeactivateUser,))
 class AccountDeactivationView(APIView):
     """
     Account deactivation viewset. Currently only supports POST requests.
     Only admins can deactivate accounts.
     """
-    authentication_classes = (JwtAuthentication, )
-    permission_classes = (permissions.IsAuthenticated, CanDeactivateUser)
 
     def post(self, request, username):
         """

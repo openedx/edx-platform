@@ -1,19 +1,19 @@
 """ API v0 views. """
 import logging
 
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from lms.djangoapps.certificates.api import get_certificate_for_user
-from openedx.core.lib.api import authentication, permissions
+from openedx.core.lib.api.view_utils import view_auth_classes
+
 
 log = logging.getLogger(__name__)
 
 
+@view_auth_classes(is_user_in_url=True)
 class CertificatesDetailView(GenericAPIView):
     """
         **Use Case**
@@ -68,16 +68,6 @@ class CertificatesDetailView(GenericAPIView):
                 "grade": "0.98"
             }
     """
-
-    authentication_classes = (
-        authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
-        JwtAuthentication,
-    )
-    permission_classes = (
-        IsAuthenticated,
-        permissions.IsUserInUrlOrStaff
-    )
 
     def get(self, request, username, course_id):
         """

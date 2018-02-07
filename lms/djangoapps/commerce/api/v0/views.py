@@ -13,11 +13,10 @@ from six import text_type
 from course_modes.models import CourseMode
 from courseware import courses
 from enrollment.api import add_enrollment
-from enrollment.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.view_utils import view_auth_classes
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
 
@@ -28,12 +27,9 @@ log = logging.getLogger(__name__)
 SAILTHRU_CAMPAIGN_COOKIE = 'sailthru_bid'
 
 
+@view_auth_classes()
 class BasketsView(APIView):
     """ Creates a basket with a course seat and enrolls users. """
-
-    # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
-    authentication_classes = (EnrollmentCrossDomainSessionAuth, OAuth2AuthenticationAllowInactiveUser)
-    permission_classes = (IsAuthenticated,)
 
     def _is_data_valid(self, request):
         """

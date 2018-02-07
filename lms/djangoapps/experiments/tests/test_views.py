@@ -215,20 +215,20 @@ class ExperimentKeyValueViewSetTests(APITestCase):
         """ Staff access is required for write operations. """
         url = reverse('api_experiments:v0:key_value-list')
 
+        user = UserFactory()
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
         instance = ExperimentKeyValueFactory()
         url = reverse('api_experiments:v0:key_value-detail', kwargs={'pk': instance.id})
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
-        user = UserFactory(is_staff=False)
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
 
         response = self.client.put(url, {})
         self.assertEqual(response.status_code, 403)

@@ -58,4 +58,4 @@ def mobile_view(is_user=False):
     """
     Function and class decorator that abstracts the authentication and permission checks for mobile api views.
     """
-    return view_auth_classes(is_user)
+    return view_auth_classes(is_user_in_url=is_user)

@@ -10,14 +10,11 @@ import pytz
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import generics, mixins, permissions, views, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework_oauth.authentication import OAuth2Authentication
 from six import text_type
 
 from openedx.core.djangoapps.credit.api import create_credit_request
@@ -42,19 +39,18 @@ from openedx.core.djangoapps.credit.serializers import (
 )
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from openedx.core.lib.api.permissions import IsStaffOrOwner
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 log = logging.getLogger(__name__)
-AUTHENTICATION_CLASSES = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
 
 
+@view_auth_classes()
 class CreditProviderViewSet(viewsets.ReadOnlyModelViewSet):
     """ Credit provider endpoints. """
 
     lookup_field = 'provider_id'
     lookup_value_regex = CREDIT_PROVIDER_ID_REGEX
-    authentication_classes = AUTHENTICATION_CLASSES
     pagination_class = None
-    permission_classes = (permissions.IsAuthenticated,)
     queryset = CreditProvider.objects.all()
     serializer_class = CreditProviderSerializer
 
@@ -71,11 +67,9 @@ class CreditProviderViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
+@view_auth_classes(permission_classes=(IsStaffOrOwner,))
 class CreditProviderRequestCreateView(views.APIView):
     """ Creates a credit request for the given user and course, if the user is eligible for credit."""
-
-    authentication_classes = AUTHENTICATION_CLASSES
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner,)
 
     def post(self, request, provider_id):
         """ POST handler. """
@@ -141,12 +135,11 @@ class CreditProviderCallbackView(views.APIView):
         return Response()
 
 
+@view_auth_classes(permission_classes=(IsStaffOrOwner,))
 class CreditEligibilityView(generics.ListAPIView):
     """ Returns eligibility for a user-course combination. """
 
-    authentication_classes = AUTHENTICATION_CLASSES
     pagination_class = None
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner)
     serializer_class = CreditEligibilitySerializer
     queryset = CreditEligibility.objects.all()
 
@@ -171,6 +164,7 @@ class CreditEligibilityView(generics.ListAPIView):
         )
 
 
+@view_auth_classes(permission_classes=(permissions.IsAdminUser,))
 class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
     """ CreditCourse endpoints. """
 
@@ -178,8 +172,6 @@ class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.Re
     lookup_value_regex = settings.COURSE_KEY_REGEX
     queryset = CreditCourse.objects.all()
     serializer_class = CreditCourseSerializer
-    authentication_classes = AUTHENTICATION_CLASSES
-    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
     # In Django Rest Framework v3, there is a default pagination
     # class that transmutes the response data into a dictionary

@@ -18,7 +18,7 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
 )
-from openedx.core.lib.api.permissions import IsUserInUrl
+from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 
 
 class DeveloperErrorViewMixin(object):
@@ -84,7 +84,16 @@ class ExpandableFieldViewMixin(object):
         return result
 
 
-def view_auth_classes(is_user=False, is_authenticated=True):
+BASE_AUTHENTICATION_CLASSES = (
+    JwtAuthentication,
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+)
+
+BASE_PERMISSION_CLASSES = ()
+
+
+def view_auth_classes(is_user_in_url=False, is_authenticated=True, permission_classes=None):
     """
     Function and class decorator that abstracts the authentication and permission checks for api views.
     """
@@ -93,16 +102,14 @@ def view_auth_classes(is_user=False, is_authenticated=True):
         Requires either OAuth2 or Session-based authentication.
         If is_user is True, also requires username in URL matches the request user.
         """
-        func_or_class.authentication_classes = (
-            JwtAuthentication,
-            OAuth2AuthenticationAllowInactiveUser,
-            SessionAuthenticationAllowInactiveUser
-        )
-        func_or_class.permission_classes = ()
+        func_or_class.authentication_classes = BASE_AUTHENTICATION_CLASSES
+        func_or_class.permission_classes = BASE_PERMISSION_CLASSES
+        if permission_classes:
+            func_or_class.permission_classes += permission_classes
         if is_authenticated:
             func_or_class.permission_classes += (IsAuthenticated,)
-        if is_user:
-            func_or_class.permission_classes += (IsUserInUrl,)
+        if is_user_in_url:
+            func_or_class.permission_classes += (IsUserInUrlOrStaff,)
         return func_or_class
     return _decorator
 

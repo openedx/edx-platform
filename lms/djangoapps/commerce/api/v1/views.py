@@ -3,16 +3,13 @@ import logging
 from django.contrib.auth.models import User
 from django.http import Http404
 from edx_rest_api_client import exceptions
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.api.mixins import PutAsCreateMixin
+from openedx.core.lib.api.view_utils import view_auth_classes
 from util.json_request import JsonResponse
 
 from ...utils import is_account_activation_requirement_disabled
@@ -23,10 +20,9 @@ from .serializers import CourseSerializer
 log = logging.getLogger(__name__)
 
 
+@view_auth_classes()
 class CourseListView(ListAPIView):
     """ List courses and modes. """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
     pagination_class = None
 
@@ -34,13 +30,12 @@ class CourseListView(ListAPIView):
         return list(Course.iterator())
 
 
+@view_auth_classes(is_authenticated=False, permission_classes=(ApiKeyOrModelPermission,))
 class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     """ Retrieve, update, or create courses/modes. """
     lookup_field = 'id'
     lookup_url_kwarg = 'course_id'
     model = CourseMode
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (ApiKeyOrModelPermission,)
     serializer_class = CourseSerializer
 
     # Django Rest Framework v3 requires that we provide a queryset.
@@ -63,11 +58,9 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
         pass
 
 
+@view_auth_classes(is_authenticated=False, permission_classes=(IsAuthenticatedOrActivationOverridden,))
 class OrderView(APIView):
     """ Retrieve order details. """
-
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticatedOrActivationOverridden,)
 
     def get(self, request, number):
         """ HTTP handler. """

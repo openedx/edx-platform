@@ -7,14 +7,19 @@ from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.conf import settings
 
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import PermissionDenied
 
-from ..authentication import SessionAuthenticationCrossDomainCsrf
+from ..authentication import SessionAuthenticationCorsCSRFMixin
 
 
 # A class to pass into django.middleware.csrf.get_token() so we can easily get a valid CSRF token to use.
 class FakeRequest(object):
     META = {}
+
+
+class CrossDomainSessionAuthentication(SessionAuthenticationCorsCSRFMixin, SessionAuthentication):
+    pass
 
 
 class CrossDomainAuthTest(TestCase):
@@ -25,7 +30,7 @@ class CrossDomainAuthTest(TestCase):
 
     def setUp(self):
         super(CrossDomainAuthTest, self).setUp()
-        self.auth = SessionAuthenticationCrossDomainCsrf()
+        self.auth = CrossDomainSessionAuthentication()
         self.csrf_token = get_token(FakeRequest())
 
     def test_perform_csrf_referer_check(self):

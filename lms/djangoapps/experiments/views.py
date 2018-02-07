@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -9,16 +8,15 @@ from rest_framework.response import Response
 from experiments import filters, serializers
 from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
-from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 User = get_user_model()  # pylint: disable=invalid-name
 
 
+@view_auth_classes(permission_classes=(IsStaffOrOwner,))
 class ExperimentDataViewSet(viewsets.ModelViewSet):
-    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
     filter_backends = (DjangoFilterBackend,)
     filter_class = filters.ExperimentDataFilter
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner,)
     queryset = ExperimentData.objects.all()
     serializer_class = serializers.ExperimentDataSerializer
     _cached_users = {}
@@ -82,11 +80,10 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
 
+@view_auth_classes(permission_classes=(IsStaffOrReadOnly,))
 class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
-    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
     filter_backends = (DjangoFilterBackend,)
     filter_class = filters.ExperimentKeyValueFilter
-    permission_classes = (IsStaffOrReadOnly,)
     queryset = ExperimentKeyValue.objects.all()
     serializer_class = serializers.ExperimentKeyValueSerializer
 
