@@ -1,7 +1,7 @@
 """Tools for helping with testing capa."""
 
 import gettext
-from path import path  # pylint: disable=no-name-in-module
+from path import Path
 import os
 import os.path
 
@@ -23,7 +23,7 @@ def get_template(template_name):
     Return template for a capa inputtype.
     """
     return TemplateLookup(
-        directories=[path(__file__).dirname().dirname() / 'templates'],
+        directories=[Path(__file__).dirname().dirname() / 'templates'],
         default_filters=['decode.utf8']
     ).get_template(template_name)
 

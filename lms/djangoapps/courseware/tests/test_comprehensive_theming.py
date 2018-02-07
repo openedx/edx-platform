@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase
-from path import path  # pylint: disable=no-name-in-module
+from path import Path
 
 import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -37,14 +37,14 @@ class TestComprehensiveTheming(TestCase):
         # of test.
 
         # Make a temp directory as a theme.
-        themes_dir = path(mkdtemp_clean())
+        themes_dir = Path(mkdtemp_clean())
         tmp_theme = "temp_theme"
         template_dir = themes_dir / tmp_theme / "lms/templates"
         template_dir.makedirs()
         with open(template_dir / "footer.html", "w") as footer:
             footer.write("<footer>TEMPORARY THEME</footer>")
 
-        dest_path = path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
+        dest_path = Path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
         create_symlink(themes_dir / tmp_theme, dest_path)
 
         edxmako.paths.add_lookup('main', themes_dir, prepend=True)
