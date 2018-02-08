@@ -146,7 +146,7 @@ from student.models import CourseEnrollment
       <h2 class="header-courses">${_("My Courses")}</h2>
     </header>
     % if len(course_entitlements + course_enrollments) > 0:
-        <ul class="listing-courses">
+        <ul class="listing-courses" data-programs=${programs_data}>
         <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
         % for dashboard_index, enrollment in enumerate(course_entitlements + course_enrollments):
           <%
