@@ -1354,6 +1354,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
     @attr(shard=2)
     def test_rewrite_dismiss(self):
+        self.page.dismiss_alert_message("There are no posts in this topic yet.")
         self.setup_corrected_text("foo")
         self.page.perform_search()
         self.check_search_alert_messages(["foo"])
@@ -1362,6 +1363,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
     @attr(shard=2)
     def test_new_search(self):
+        self.page.dismiss_alert_message("There are no posts in this topic yet.")
         self.setup_corrected_text("foo")
         self.page.perform_search()
         self.check_search_alert_messages(["foo"])
@@ -1376,6 +1378,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
     @attr(shard=2)
     def test_rewrite_and_user(self):
+        self.page.dismiss_alert_message("There are no posts in this topic yet.")
         self.setup_corrected_text("foo")
         self.page.perform_search(self.SEARCHED_USERNAME)
         self.check_search_alert_messages(["foo", self.SEARCHED_USERNAME])
