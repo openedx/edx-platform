@@ -50,6 +50,7 @@ COMMON_LOOKUP_PATHS = [
 
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
+# If string ends with '/' then all file in the directory will be copied.
 NPM_INSTALLED_LIBRARIES = [
     'backbone.paginator/lib/backbone.paginator.js',
     'backbone/backbone.js',
@@ -64,20 +65,7 @@ NPM_INSTALLED_LIBRARIES = [
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
-    '@edx/studio-frontend/dist/manifest.min.js',
-    '@edx/studio-frontend/dist/manifest.min.js.map',
-    '@edx/studio-frontend/dist/vendor.min.js',
-    '@edx/studio-frontend/dist/vendor.min.js.map',
-    '@edx/studio-frontend/dist/vendor.min.css',
-    '@edx/studio-frontend/dist/vendor.min.css.map',
-    '@edx/studio-frontend/dist/assets.min.js',
-    '@edx/studio-frontend/dist/assets.min.js.map',
-    '@edx/studio-frontend/dist/assets.min.css',
-    '@edx/studio-frontend/dist/assets.min.css.map',
-    '@edx/studio-frontend/dist/accessibilityPolicy.min.js',
-    '@edx/studio-frontend/dist/accessibilityPolicy.min.js.map',
-    '@edx/studio-frontend/dist/accessibilityPolicy.min.css',
-    '@edx/studio-frontend/dist/accessibilityPolicy.min.css.map',
+    '@edx/studio-frontend/dist/',
     'which-country/index.js'
 ]
 
@@ -655,7 +643,11 @@ def process_npm_assets():
         """
         Copies a vendor library to the shared vendor directory.
         """
-        library_path = 'node_modules/{library}'.format(library=library)
+        if library.startswith('node_modules/'):
+            library_path = library
+        else:
+            library_path = 'node_modules/{library}'.format(library=library)
+
         if library.endswith('.css') or library.endswith('.css.map'):
             vendor_dir = NPM_CSS_VENDOR_DIRECTORY
         else:
@@ -667,6 +659,17 @@ def process_npm_assets():
             ))
         elif not skip_if_missing:
             raise Exception('Missing vendor file {library_path}'.format(library_path=library_path))
+
+    def copy_vendor_library_dir(library_dir, skip_if_missing=False):
+        """
+        Copies all vendor libraries in directory to the shared vendor directory.
+        """
+        library_dir_path = 'node_modules/{library_dir}'.format(library_dir=library_dir)
+        print('Copying vendor library dir: {}'.format(library_dir_path))
+        if os.path.exists(library_dir_path):
+            for dirpath, dirnames, filenames in os.walk(library_dir_path):
+                for filename in filenames:
+                    copy_vendor_library(os.path.join(dirpath, filename))
 
     # Skip processing of the libraries if this is just a dry run
     if tasks.environment.dry_run:
@@ -681,7 +684,10 @@ def process_npm_assets():
     # Copy each file to the vendor directory, overwriting any existing file.
     print("Copying vendor files into static directory")
     for library in NPM_INSTALLED_LIBRARIES:
-        copy_vendor_library(library)
+        if library.endswith('/'):
+            copy_vendor_library_dir(library)
+        else:
+            copy_vendor_library(library)
 
     # Copy over each developer library too if they have been installed
     print("Copying developer vendor files into static directory")
