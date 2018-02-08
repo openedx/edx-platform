@@ -3,6 +3,8 @@ import logging
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
+from digital_book.models import DigitalBookUserAccess
+
 log = logging.getLogger(__name__)
 
 
@@ -21,10 +23,19 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
         user = request.data['user']
         book_key = request.data['book_key']
 
+        book_access, created = DigitalBookUserAccess.get_or_create_digital_book_user_access(
+            user=user,
+            book_key=book_key,
+            order_number=order_number
+        )
+
+        log.info(">>> book_access: %s", book_access)
+        log.info(">>> created: %s", created)
+
         return Response(
             status=status.HTTP_201_CREATED,
             data={
-                'string_data': "very useful unique data",
-                'num_data': 42,
+                'book_access': str(book_access),
+                'created': str(created)
             }
         )
