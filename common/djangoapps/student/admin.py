@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -180,6 +181,21 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     search_fields = ('course__id', 'mode', 'user__username',)
     form = CourseEnrollmentForm
+
+    def get_search_results(self, request, queryset, search_term):
+        qs, use_distinct = super(CourseEnrollmentAdmin, self).get_search_results(request, queryset, search_term)
+
+        # annotate each enrollment with whether the username was an
+        # exact match for the search term
+        qs = qs.annotate(exact_username_match=models.Case(
+            models.When(user__username=search_term, then=models.Value(True)),
+            default=models.Value(False),
+            output_field=models.BooleanField()))
+
+        # present exact matches first
+        qs = qs.order_by('-exact_username_match', 'user__username', 'course_id')
+
+        return qs, use_distinct
 
     def queryset(self, request):
         return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
