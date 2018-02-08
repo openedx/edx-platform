@@ -588,32 +588,22 @@ def student_dashboard(request):
     urls, programs_data = {}, {}
     bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
 
-    if bundles_on_dashboard_flag.is_enabled():
-        programs_data = {}
-        if inverted_programs and inverted_programs.items():
-            for program in inverted_programs.values():
-                try:
-                    program_uuid = program[0]['uuid']
-                    program_data = get_programs(request.site, uuid=program_uuid)
-                    program_data = ProgramDataExtender(program_data, request.user).extend()
-                    skus = program_data.get('skus')
-                    program_data['completeProgramURL'] = ecommerce_service.get_checkout_page_url(*skus) + '&bundle=' + program_data.get('uuid')
-                    price_string = ''
-                    import pdb; pdb.set_trace()
-                    is_discounted = program_data.get('discount_data', {}).get('total_incl_tax_excl_discounts')
-                    if is_discounted:
-                        price_string += '<span class="list-price">' + '( {price}'.format(price=is_discounted) + '</span>'
-                    price = program_data.get('full_program_price')
-                    if price:
-                        price_string += ' ${price} USD ) '.format(price=price)
-                    program_data['priceString'] = price_string
-                    programs_data[program_uuid] = program_data
-                except:
-                    pass
+    # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
+    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
+        for program in inverted_programs.values():
             try:
-                programs_data = json.dumps(programs_data)
+                program_uuid = program[0]['uuid']
+                program_data = get_programs(request.site, uuid=program_uuid)
+                program_data = ProgramDataExtender(program_data, request.user).extend()
+                skus = program_data.get('skus')
+                program_data['completeProgramURL'] = ecommerce_service.get_checkout_page_url(*skus) + '&bundle=' + program_data.get('uuid')
+                programs_data[program_uuid] = program_data
             except:
-                programs_data = {}
+                pass
+        try:
+            programs_data = json.dumps(programs_data)
+        except:
+            programs_data = {}
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
