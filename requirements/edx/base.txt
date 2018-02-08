@@ -33,6 +33,7 @@ django-ratelimit==1.1.0
 django-sekizai>=0.10
 django-ses==0.8.4
 django-simple-history==1.9.0
+django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
