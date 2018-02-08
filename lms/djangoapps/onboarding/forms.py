@@ -622,6 +622,13 @@ class RegModelForm(BaseOnboardingModelForm):
             raise forms.ValidationError(ugettext_noop('%s is already admin of organization "%s"'
                                                       % (org_admin_email, already_an_admin.label)))
 
+        already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
+            suggested_admin_email=org_admin_email, is_hash_consumed=False).first()
+        if already_suggested_as_admin:
+            raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of "%s" organization'
+                                                      % (org_admin_email,
+                                                         already_suggested_as_admin.organization.label)))
+
         return org_admin_email
 
     def save(self, user=None, commit=True):
