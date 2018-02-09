@@ -475,17 +475,18 @@ class MongoContentStore(ContentStore):
     def ensure_indexes(self):
         # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
         # which can be `uploadDate`, `displayname`,
-        create_collection_index(
-            self.fs_files,
-            [
-                ('_id.tag', pymongo.ASCENDING),
-                ('_id.org', pymongo.ASCENDING),
-                ('_id.course', pymongo.ASCENDING),
-                ('_id.category', pymongo.ASCENDING)
-            ],
-            sparse=True,
-            background=True
-        )
+        # TODO: uncomment this line once this index in prod is cleaned up. See OPS-2863 for tracking clean up.
+        #  create_collection_index(
+            #  self.fs_files,
+            #  [
+                #  ('_id.tag', pymongo.ASCENDING),
+                #  ('_id.org', pymongo.ASCENDING),
+                #  ('_id.course', pymongo.ASCENDING),
+                #  ('_id.category', pymongo.ASCENDING)
+            #  ],
+            #  sparse=True,
+            #  background=True
+        #  )
         create_collection_index(
             self.fs_files,
             [
