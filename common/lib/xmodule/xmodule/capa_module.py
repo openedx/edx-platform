@@ -8,6 +8,9 @@ from lxml import etree
 from pkg_resources import resource_string
 
 import dogstats_wrapper as dog_stats_api
+from webob import Response
+from xblock.core import XBlock
+
 from capa import responsetypes
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawDescriptor
@@ -224,6 +227,18 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
+
+    @XBlock.handler
+    def info(self, request, suffix=''):
+        """Expose some simple public metadata so that people don't scrape the HTML."""
+        public_metadata = {
+            'attempts': self.attempts,
+            'display_name': self.display_name,
+            'due': self.due,
+            'max_attempts': self.max_attempts,
+            'score': self.score,
+        }
+        return Response(json.dumps(public_metadata), content_type='application/json')
 
     def index_dictionary(self):
         """
