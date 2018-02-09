@@ -186,7 +186,7 @@ def _footer_navigation_links():
 def _auth_footer_legal_links():
     """Return the legal footer links (e.g. terms of service). """
     links = [
-        ("terms_of_service_and_honor_code", marketing_link("TOS"), _("Terms of Use")),
+        ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use")),
         ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
         ("faq", "/faq", _("Faq")),
         ("disclaimir", "/disclaimer", _("Disclaimer"))
@@ -207,7 +207,7 @@ def my_footer_legal_links():
     """Return the legal footer links (e.g. terms of service). """
 
     links = [
-        ("terms_of_service_and_honor_code", marketing_link("TOS"), _("Terms of Use")),
+        ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use")),
         ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
         ("faq", "/faq", _("Faq")),
         ("disclaimir", "/disclaimer", _("Disclaimer"))
