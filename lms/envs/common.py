@@ -1262,6 +1262,7 @@ MIDDLEWARE_CLASSES = [
 
     'openedx.core.djangoapps.request_cache.middleware.RequestCache',
     'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringCustomMetrics',
+    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
