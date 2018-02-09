@@ -2,7 +2,6 @@
 
 import 'bootstrap';
 
-import _ from 'underscore';
 import Backbone from 'backbone';
 import moment from 'moment';
 
@@ -118,10 +117,10 @@ class CourseEntitlementView extends Backbone.View {
         course_run_id: this.currentSessionSelection,
       }),
       statusCode: {
-        201: _.bind(this.enrollSuccess, this),
-        204: _.bind(this.unenrollSuccess, this),
+        201: this.enrollSuccess.bind(this),
+        204: this.unenrollSuccess.bind(this),
       },
-      error: _.bind(this.enrollError, this),
+      error: this.enrollError.bind(this),
     });
   }
 
@@ -371,29 +370,24 @@ class CourseEntitlementView extends Backbone.View {
     the object with a session_dates attribute representing a formatted date string that highlights
     the start and end dates of the particular session.
     */
-    const formattedSessionData = sessionData;
-    let startDate;
-    let endDate;
     // Set the date format string to the user's selected language
     moment.locale(document.documentElement.lang);
     const dateFormat = moment.localeData().longDateFormat('L').indexOf('DD') >
       moment.localeData().longDateFormat('L').indexOf('MM') ? 'MMMM D, YYYY' : 'D MMMM, YYYY';
 
-    return _.map(formattedSessionData, (session) => {
-      const formattedSession = session;
-      startDate = CourseEntitlementView.formatDate(formattedSession.start, dateFormat);
-      endDate = CourseEntitlementView.formatDate(formattedSession.end, dateFormat);
-      formattedSession.enrollment_end = CourseEntitlementView.formatDate(
-        formattedSession.enrollment_end,
-        dateFormat);
-      formattedSession.session_dates = this.courseCardModel.formatDateString({
-        start_date: startDate,
-        advertised_start: session.advertised_start,
-        end_date: endDate,
-        pacing_type: formattedSession.pacing_type,
+    sessionData.forEach((session) => {
+      Object.assign(session, {
+        enrollment_end: CourseEntitlementView.formatDate(session.enrollment_end, dateFormat),
+        session_dates: this.courseCardModel.formatDateString({
+          start_date: CourseEntitlementView.formatDate(session.start, dateFormat),
+          advertised_start: session.advertised_start,
+          end_date: CourseEntitlementView.formatDate(session.end, dateFormat),
+          pacing_type: session.pacing_type,
+        }),
       });
-      return formattedSession;
-    }, this);
+    });
+
+    return sessionData;
   }
 
   static formatDate(date, dateFormat) {
