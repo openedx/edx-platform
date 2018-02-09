@@ -435,10 +435,17 @@ def suggest_org_admin(request):
 
                 if org_admin_email:
                     already_an_admin = Organization.objects.filter(admin__email=org_admin_email).first()
+
+                    already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
+                        suggested_admin_email=org_admin_email, is_hash_consumed=False).first()
+
                     if already_an_admin:
                         status = 400
                         message = ugettext_noop('%s is already admin of organization "%s"'
                                                       % (org_admin_email, already_an_admin.label))
+                    elif already_suggested_as_admin:
+                        message = ugettext_noop('%s is already suggested as admin of "%s" organization'
+                                                % (org_admin_email, already_suggested_as_admin.organization.label))
                     else:
                         hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, org_admin_email)
                         org_id = extended_profile.organization_id
@@ -448,7 +455,7 @@ def suggest_org_admin(request):
                         send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email,
                                                     hash_key)
                 else:
-                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, request.user, request.user.email)
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, organization.admin, request.user.email)
                     send_admin_update_email(organization.id, organization.label, organization.admin.email,
                                             hash_key, request.user.email, request.user.username
                                             )
@@ -547,7 +554,11 @@ def admin_activation(request, activation_key):
         5 = User not exist in platform
 
     """
-    context = {}
+    hash_key = None
+    context = {
+        'is_org_admin': False
+    }
+
     admin_activation = True if request.GET.get('admin_activation') == 'True' else False
 
     try:
@@ -557,6 +568,8 @@ def admin_activation(request, activation_key):
         user = user_extended_profile.user
 
         context['key'] = hash_key.activation_hash
+        context['is_org_admin'] = True if hash_key.suggested_by == hash_key.organization.admin else False
+
         if hash_key.is_hash_consumed:
             activation_status = 2
         else:
@@ -623,6 +636,7 @@ def admin_activation(request, activation_key):
         return render_to_response('onboarding/admin_activation.html', context)
 
     context['username'] = user.username if user else None
+
     return render_to_response('onboarding/admin_change_confirmation.html', context)
 
 
