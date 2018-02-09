@@ -95,12 +95,7 @@ class LearnerAnalyticsView(View):
             (raw_grade_data, answered_percent, percent_grade) = self.get_grade_data(request.user, course_key, grading_policy['GRADE_CUTOFFS'])
             raw_schedule_data = self.get_assignments_with_due_date(request, course_key)
 
-            # TODO: LEARNER-3854: Removed assignment schedule and grade sorting code.
-            #  The original code had several problems:
-            #    - It dropped one of the surveys from course-v1:Microsoft+DAT206x+1T2018.
-            #    - It was dependent on due dates which are not available for self-paced yet.
-            grade_data = raw_grade_data
-            schedule_data = []
+            grade_data, schedule_data = self.sort_grade_and_schedule_data(raw_grade_data, raw_schedule_data)
 
             # TODO: LEARNER-3854: Fix hacked defaults with real error handling if implementing Learner Analytics.
             try:
@@ -144,25 +139,32 @@ class LearnerAnalyticsView(View):
         total_possible = 0
         # answered_percent seems to be unused and it does not take into account assignment type weightings
         answered_percent = None
-        for (location, subsection_grade) in course_grade.subsection_grades.iteritems():
-            if subsection_grade.format is not None:
-                possible = subsection_grade.graded_total.possible
-                earned = subsection_grade.graded_total.earned
-                passing_grade = math.ceil(possible * grade_cutoffs['Pass'])
-                grades.append({
-                    'assignment_type': subsection_grade.format,
-                    'total_earned': earned,
-                    'total_possible': possible,
-                    'passing_grade': passing_grade,
-                    'location': unicode(location),
-                    'assigment_url': reverse('jump_to_id', kwargs={
-                        'course_id': unicode(course_key),
-                        'module_id': unicode(location),
+
+        chapter_grades = course_grade.chapter_grades.values()
+
+        for chapter in chapter_grades:
+            # Note: this code exists on the progress page. We should be able to remove it going forward.
+            if not chapter['display_name'] == "hidden":
+                for subsection_grade in chapter['sections']:
+                    log.info(subsection_grade.display_name)
+                    possible = subsection_grade.graded_total.possible
+                    earned = subsection_grade.graded_total.earned
+                    passing_grade = math.ceil(possible * grade_cutoffs['Pass'])
+                    grades.append({
+                        'assignment_type': subsection_grade.format,
+                        'total_earned': earned,
+                        'total_possible': possible,
+                        'passing_grade': passing_grade,
+                        'display_name': subsection_grade.display_name,
+                        'location': unicode(subsection_grade.location),
+                        'assigment_url': reverse('jump_to_id', kwargs={
+                            'course_id': unicode(course_key),
+                            'module_id': unicode(subsection_grade.location),
+                        })
                     })
-                })
-                if earned > 0:
-                    total_earned += earned
-                    total_possible += possible
+                    if earned > 0:
+                        total_earned += earned
+                        total_possible += possible
 
         if total_possible > 0:
             answered_percent = float(total_earned) / total_possible
