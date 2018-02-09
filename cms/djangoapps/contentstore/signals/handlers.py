@@ -45,8 +45,8 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     if CoursewareSearchIndexer.indexing_is_enabled():
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
         from contentstore.tasks import update_search_index
-        if ((course.catalog_visibility not in ['none', 'about'])):
-            update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat())
+        #if ((course.catalog_visibility not in ['none', 'about'])):
+        update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat())
 
 
 @receiver(SignalHandler.library_updated)
