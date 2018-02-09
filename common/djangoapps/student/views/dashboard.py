@@ -585,25 +585,25 @@ def student_dashboard(request):
     ecommerce_service = EcommerceService()
     inverted_programs = meter.invert_programs()
 
-    urls, program_data = {}, {}
+    urls, programs_data = {}, {}
     bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
 
-    if bundles_on_dashboard_flag.is_enabled():
-        programs_data = meter.programs
-
-        if programs_data and inverted_programs and inverted_programs.values():
-            program_uuid = inverted_programs.values()[0][0]['uuid']
-            meter.programs = [get_programs(request.site, uuid=program_uuid)]
-            program_data = meter.programs[0]
-            program_data = ProgramDataExtender(program_data, request.user).extend()
-
-            skus = program_data.get('skus')
-
-            urls = {
-                'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
-                'buy_button_url': ecommerce_service.get_checkout_page_url(*skus)
-            }
-            urls['completeProgramURL'] = urls['buy_button_url'] + '&bundle=' + program_data.get('uuid')
+    # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
+    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
+        for program in inverted_programs.values():
+            try:
+                program_uuid = program[0]['uuid']
+                program_data = get_programs(request.site, uuid=program_uuid)
+                program_data = ProgramDataExtender(program_data, request.user).extend()
+                skus = program_data.get('skus')
+                program_data['completeProgramURL'] = ecommerce_service.get_checkout_page_url(*skus) + '&bundle=' + program_data.get('uuid')
+                programs_data[program_uuid] = program_data
+            except:
+                pass
+        try:
+            programs_data = json.dumps(programs_data)
+        except:
+            programs_data = {}
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -709,7 +709,7 @@ def student_dashboard(request):
 
     context = {
         'urls': urls,
-        'program_data': program_data,
+        'programs_data': programs_data,
         'enterprise_message': enterprise_message,
         'consent_required_courses': consent_required_courses,
         'enterprise_customer_name': enterprise_customer_name,

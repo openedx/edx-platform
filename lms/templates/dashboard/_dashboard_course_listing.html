@@ -335,22 +335,6 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
             </li>
             % endfor
           </ul>
-          <div class="complete-div" data-programdata="${program_data}">
-            % if program_data.get('is_learner_eligible_for_one_click_purchase'):
-              <div class="complete-program-dashboard-div"><span class="complete-program-dashboard-span">${_('Buy all remaining courses in this program and save 10%')}</span>
-                <a href="${urls.get('completeProgramURL')}" class="btn-brand btn cta-primary upgrade-button complete-program-dashboard-button">
-                  ${_('Upgrade All Remaining Courses (')}
-                  % if program_data.get('discount_data', {}).get('is_discounted'):
-                      <span class='list-price'>
-                        ${' ${price:.2f} '.format(price=program_data.get('discount_data', {}).get('total_incl_tax_excl_discounts'))}
-                      </span>
-                  % endif
-                  ${_(' ${price:.2f} {currency} ) '.format(price=program_data.get('full_program_price'),
-                  currency=program_data.get('discount_data', {}).get('currency')))}
-                </a>
-              </div>
-            % endif
-          </div>
         </div>
       % endif
 
