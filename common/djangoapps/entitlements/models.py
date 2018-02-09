@@ -6,7 +6,6 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import User
 from django.db import models
 from django.db import transaction
 from django.utils.timezone import now
@@ -159,16 +158,6 @@ class CourseEntitlement(TimeStampedModel):
         help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.',
         blank=True
     )
-    # TODO: change this to a foreign key pointing to the DB that holds list of digital books
-    digital_book_key = models.CharField(max_length=200, null=True)
-    COURSE = 'c'
-    DIGITAL_BOOK = 'db'
-    ENTITLEMENT_TYPE_CHOICES = (
-        (COURSE, 'course'),
-        (DIGITAL_BOOK, 'digital book')
-    )
-    entitlement_type = models.CharField(max_length=2, choices=ENTITLEMENT_TYPE_CHOICES, default=COURSE)
-
     order_number = models.CharField(max_length=128, null=True)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True)
 
