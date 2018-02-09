@@ -3,7 +3,7 @@ import logging
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from digital_book.models import DigitalBookUserAccess
+from entitlements.models import CourseEntitlement
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
     """
 
     def create(self, request):
-        #TODO: serialize data coming in
+
         log.info(">>> request: %s", request)
         log.info(">>> request.data: %s", request.data)
 
@@ -23,19 +23,18 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
         user = request.data['user']
         book_key = request.data['book_key']
 
-        book_access, created = DigitalBookUserAccess.get_or_create_digital_book_user_access(
-            user=user,
-            book_key=book_key,
-            order_number=order_number
+        entitlement, created = CourseEntitlement.get_or_create_digital_book_entitlement(
+            username=user,
+            book_key=book_key
         )
 
-        log.info(">>> book_access: %s", book_access)
+        log.info(">>> entitlement: %s", entitlement)
         log.info(">>> created: %s", created)
 
         return Response(
             status=status.HTTP_201_CREATED,
             data={
-                'book_access': str(book_access),
+                'book_access': str(entitlement),
                 'created': str(created)
             }
         )

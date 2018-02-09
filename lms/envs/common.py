@@ -2212,6 +2212,9 @@ INSTALLED_APPS = [
     # Entitlement API
     'entitlements',
 
+    # Digital Book API
+    'digital_book',
+
     # Bulk Enrollment API
     'bulk_enroll',
 
