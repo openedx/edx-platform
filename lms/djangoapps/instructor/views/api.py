@@ -104,6 +104,7 @@ from student.models import (
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED,
     CourseEnrollment,
+    CourseEnrollmentAllowed,
     EntranceExamConfiguration,
     ManualEnrollmentAudit,
     Registration,
@@ -1869,6 +1870,63 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_post_params(
+    unique_student_identifier="email or username of student for whom to get enrollment status"
+)
+def get_student_enrollment_status(request, course_id):
+    """
+    Get the enrollment status of a student.
+    Limited to staff access.
+
+    Takes query parameter unique_student_identifier
+    """
+
+    error = ''
+    user = None
+    mode = None
+    is_active = None
+
+    course_id = CourseKey.from_string(course_id)
+    unique_student_identifier = request.POST.get('unique_student_identifier')
+
+    try:
+        user = get_student_from_identifier(unique_student_identifier)
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    except User.DoesNotExist:
+        # The student could have been invited to enroll without having
+        # registered. We'll also look at CourseEnrollmentAllowed
+        # records, so let the lack of a User slide.
+        pass
+
+    enrollment_status = _('Enrollment status for {student}: unknown').format(student=unique_student_identifier)
+
+    if user and mode:
+        if is_active:
+            enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+        else:
+            enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
+    else:
+        email = user.email if user else unique_student_identifier
+        allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
+        if allowed and email in [cea.email for cea in allowed]:
+            enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
+        else:
+            enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'error': error,
+        'enrollment_status': enrollment_status
+    }
+
+    return JsonResponse(response_payload)
+
+
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@common_exceptions_400
 @require_level('staff')
 @require_post_params(
     unique_student_identifier="email or username of student for whom to get progress url"
