@@ -1,8 +1,9 @@
 """Capa's specialized use of codejail.safe_exec."""
 
+from codejail import SafeExecException
 from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
-from codejail.safe_exec import json_safe, SafeExecException
+from codejail.util import json_safe
 from . import lazymod
 from dogapi import dog_stats_api
 from six import text_type
