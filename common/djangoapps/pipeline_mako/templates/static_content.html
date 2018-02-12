@@ -89,7 +89,7 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
-<%def name="studiofrontend(entry, lang='en')">
+<%def name="studiofrontend(entry)">
     <%doc>
         Loads a studio-frontend page, with the necessary context. Context is expected
         as a dictionary in the body of this tag.
@@ -101,8 +101,6 @@ source, template_path = Loader(engine).load_template_source(path)
     </%doc>
     <%
         body = capture(caller.body)
-        body_dict = json.loads(body)
-        body_dict['lang'] = lang
     %>
     <script type="text/javascript" id='courseContext'>
       var studioContext = ${ body | n, decode.utf8};
