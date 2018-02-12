@@ -23,18 +23,20 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
         user = request.data['user']
         book_key = request.data['book_key']
 
-        digital_book_access, created = DigitalBookAccess.get_or_create_digital_book_access(
+        digital_book_access = DigitalBookAccess()
+
+        user_access, created = digital_book_access.get_or_create_digital_book_access(
             user=user,
             book_key=book_key
         )
 
-        log.info(">>> book_access: %s", digital_book_access)
+        log.info(">>> book_access: %s", user_access)
         log.info(">>> created: %s", created)
 
         return Response(
             status=status.HTTP_201_CREATED,
             data={
-                'book_access': str(entitlement),
+                'user_access': str(user_access),
                 'created': str(created)
             }
         )
