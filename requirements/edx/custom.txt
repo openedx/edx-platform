@@ -15,7 +15,7 @@
 -e git+https://github.com/open-craft/problem-builder.git@v2.8.1#egg=xblock-problem-builder==2.8.1
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@038009f7c646be8001998002325efbafe14e2981#egg=xblock-chat
--e git+https://github.com/open-craft/xblock-eoc-journal.git@1d1c5a5ffea4168b690d8922d25da7dfb1fa2fbf#egg=xblock-eoc-journal
+-e git+https://github.com/open-craft/xblock-eoc-journal.git@e1495e855a27514971ca08d87d1a7a2735cd3e31#egg=xblock-eoc-journal
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.8#egg=xblock-scorm==2.0.8
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.2#egg=xblock-diagnostic-feedback==0.2.2
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.6#egg=xblock-group-project-v2==0.4.6
