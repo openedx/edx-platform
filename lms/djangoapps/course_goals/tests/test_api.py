@@ -55,6 +55,17 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
 
+    def test_add_without_goal_key(self):
+        """ Ensures if no goal key provided, post does not succeed. """
+
+        response = self.post_course_goal(goal_key=None)
+        self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
+        self.assertContains(
+            response=response,
+            text='Please provide a valid goal key from following options.',
+            status_code=400
+        )
+
     @mock.patch('lms.djangoapps.course_goals.views.update_google_analytics')
     @override_settings(LMS_SEGMENT_KEY="foobar")
     def test_update_goal(self, ga_call):
@@ -74,12 +85,12 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         Sends a post request to set a course goal and returns the response.
         """
         goal_key = goal_key if valid else 'invalid'
-        response = self.client.post(
-            self.apiUrl,
-            {
-                'goal_key': goal_key,
-                'course_key': self.course.id,
-                'user': self.user.username,
-            },
-        )
+        post_data = {
+            'course_key': self.course.id,
+            'user': self.user.username,
+        }
+        if goal_key:
+            post_data['goal_key'] = goal_key
+
+        response = self.client.post(self.apiUrl, post_data)
         return response
