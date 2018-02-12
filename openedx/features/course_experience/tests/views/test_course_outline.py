@@ -10,6 +10,7 @@ from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.test import override_settings
 from mock import Mock, patch
 from six import text_type
 
@@ -402,6 +403,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         ),
         active=True
     )
+    @override_settings(LMS_BASE='test_url:9999')
     @patch('completion.waffle.get_current_site')
     def test_resume_course_with_completion_api(self, get_patched_current_site):
         """
