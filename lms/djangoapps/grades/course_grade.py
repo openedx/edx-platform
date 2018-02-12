@@ -14,6 +14,8 @@ from .config import assume_zero_if_absent
 from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 from .scores import compute_percent
+from lms.djangoapps.course_api.blocks.api import has_individual_student_override_provider
+from lms.djangoapps.course_api.blocks.transformers.load_override_data import override_xblock_fields
 
 
 class CourseGradeBase(object):
@@ -81,6 +83,14 @@ class CourseGradeBase(object):
         subsection grades, display name, and url name.
         """
         course_structure = self.course_data.structure
+        if has_individual_student_override_provider():
+            override_xblock_fields(
+                self.course_data.course_key,
+                course_structure.topological_traversal(),
+                course_structure,
+                self.user.id
+            )
+
         grades = OrderedDict()
         for chapter_key in course_structure.get_children(self.course_data.location):
             grades[chapter_key] = self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
