@@ -757,7 +757,7 @@ class TestMakoTemplateLinter(TestLinter):
                 ${x | h}
             </%static:require_module>
             ${x | h}
-            <%static:studiofrontend page="${x}" lang="en">
+            <%static:studiofrontend page="${x}">
                 ${x | h}
             </%static:studiofrontend>
             ${x | h}
