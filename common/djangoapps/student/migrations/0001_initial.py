@@ -190,7 +190,7 @@ class Migration(migrations.Migration):
                 ('gender', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'm', b'Male'), (b'f', b'Female'), (b'o', b'Other/Prefer Not to Say')])),
                 ('level_of_education', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'p', b'Doctorate'), (b'm', b"Master's or professional degree"), (b'b', b"Bachelor's degree"), (b'a', b'Associate degree'), (b'hs', b'Secondary/high school'), (b'jhs', b'Junior secondary/junior high/middle school'), (b'el', b'Elementary/primary school'), (b'none', b'No Formal Education'), (b'other', b'Other Education')])),
                 ('mailing_address', models.TextField(null=True, blank=True)),
-                ('city', models.TextField(null=True, blank=True)),
+                ('city', models.CharField(null=True, blank=True, db_index=True)),
                 ('country', django_countries.fields.CountryField(blank=True, max_length=2, null=True)),
                 ('goals', models.TextField(null=True, blank=True)),
                 ('allow_certificate', models.BooleanField(default=1)),
