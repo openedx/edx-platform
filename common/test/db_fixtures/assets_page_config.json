@@ -1,7 +1,7 @@
 [
   {
     "pk": 1,
-    "model": "contentstore.newassetspageflag",
+    "model": "config.NewAssetsPageFlag",
     "fields": {
       "enabled": true,
       "enabled_for_all_courses": true,
