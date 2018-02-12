@@ -220,4 +220,7 @@ XBlock==1.1.1
 # Redis version
 redis==2.10.6
 
+# memory leak monitoring
+objgraph==3.3.0
+
 -r base_common.txt

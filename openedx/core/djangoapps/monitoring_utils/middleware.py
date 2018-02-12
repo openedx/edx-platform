@@ -13,6 +13,7 @@ import logging
 from uuid import uuid4
 
 import psutil
+from objgraph import typestats, get_leaking_objects
 
 from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
@@ -80,6 +81,22 @@ class MonitoringCustomMetrics(object):
         self._batch_report()
         return None
 
+class TypeStats(dict):
+    def __sub__(self, y):
+        """
+        calculate and return the result of: self - y
+        """
+        difference = TypeStats()
+        for key in self:
+            if key in y:
+                # When the old (y) type count was larger, don't record the type at all.
+                if self[key] > y[key]:
+                    difference[key] = self[key] - y[key]
+            else:
+                # The type was not even present in the old (y) TypeStats, so assume it was zero.
+                difference[key] = self[key]
+        return difference
+
 
 class MonitoringMemoryMiddleware(object):
     """
@@ -135,10 +152,13 @@ class MonitoringMemoryMiddleware(object):
             'cpu_percent': process.get_cpu_percent(),
         }
 
+        leaking_type_stats = typestats(get_leaking_objects())
+
         log.info(u"%s Machine memory usage: %s; Process memory usage: %s", log_prefix, machine_data, process_data)
         return {
             'machine_data': machine_data,
             'process_data': process_data,
+            'leaking_type_stats': leaking_type_stats,
         }
 
     def _log_diff_memory_data(self, prefix, new_memory_data, old_memory_data):
@@ -158,6 +178,9 @@ class MonitoringMemoryMiddleware(object):
         def _process_vms(memory_data):
             return memory_data['process_data']['memory_info'].vms
 
+        def _leaking_type_stats(memory_data):
+            return TypeStats(memory_data['leaking_type_stats'])
+
         if new_memory_data and old_memory_data:
             log.info(
                 u"%s Diff Vmem used: %s, Diff percent memory: %s, Diff rss: %s, Diff vms: %s",
@@ -166,6 +189,11 @@ class MonitoringMemoryMiddleware(object):
                 _process_mem_percent(new_memory_data) - _process_mem_percent(old_memory_data),
                 _process_rss(new_memory_data) - _process_rss(old_memory_data),
                 _process_vms(new_memory_data) - _process_vms(old_memory_data),
+            )
+            log.info(
+                u"%s Diff typestats: %s",
+                prefix,
+                _leaking_type_stats(new_memory_data) - _leaking_type_stats(old_memory_data),
             )
 
     def _is_enabled(self):
