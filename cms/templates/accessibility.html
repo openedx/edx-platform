@@ -12,13 +12,20 @@
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="header_extras">
+    % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/vendor.min.css')}" />
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/accessibilityPolicy.min.css')}" />
+    % endif
+</%block>
+
 <%block name="content">
 
 <div class="wrapper-content wrapper">
      <div class="content">
         <div class="content-primary">
             <div id="root"></div>
-            <%static:studiofrontend page="AccessibilityPage" lang="en">
+            <%static:studiofrontend entry="accessibilityPolicy" lang="en">
             {}
             </%static:studiofrontend>
         </div>

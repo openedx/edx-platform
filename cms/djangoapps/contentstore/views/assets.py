@@ -79,7 +79,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
         return _update_asset(request, course_key, asset_key)
 
     elif request.method == 'GET':  # assume html
-        return _asset_index(course_key)
+        return _asset_index(request, course_key)
 
     return HttpResponseNotFound()
 
@@ -92,15 +92,16 @@ def _request_response_format_is_json(request, response_format):
     return response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json')
 
 
-def _asset_index(course_key):
+def _asset_index(request, course_key):
     '''
     Display an editable asset library.
 
     Supports start (0-based index into the list of assets) and max query parameters.
     '''
     course_module = modulestore().get_course(course_key)
-
+    # import pudb; pu.db;
     return render_to_response('asset_index.html', {
+        'language_code': request.LANGUAGE_CODE,
         'waffle_flag_enabled': NewAssetsPageFlag.feature_enabled(course_key),
         'context_course': course_module,
         'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
@@ -168,6 +169,10 @@ def _assets_json(request, course_key):
         'textSearch': request_options['requested_text_search'],
     }
 
+    if response_payload['page'] == 3:
+        return JsonResponse(status=400)
+    if response_payload['assetTypes'] == ['Documents','Images']:
+        return JsonResponse(status=400)
     return JsonResponse(response_payload)
 
 
@@ -188,6 +193,10 @@ def _get_requested_attribute(request, attribute):
 
 def _get_error_if_invalid_parameters(requested_filter):
     requested_file_types = _get_requested_file_types_from_requested_filter(requested_filter)
+
+    if(requested_file_types == ['Images']):
+        import time; time.sleep(3);
+
     invalid_filters = []
 
     # OTHER is not described in the settings file as a filter
@@ -326,6 +335,10 @@ def _get_assets_for_page(course_key, options):
     sort = options['sort']
     filter_params = options['filter_params'] if options['filter_params'] else None
     start = current_page * page_size
+
+    if current_page == 3:
+        import time; time.sleep(5)
+
     return contentstore().get_all_content_for_course(
         course_key, start=start, maxresults=page_size, sort=sort, filter_params=filter_params
     )
