@@ -27,13 +27,13 @@ class UpdateCommunityProfile(APIView):
     def get(self, request):
         """ Send user is_admin/first_learner status """
 
-        username = request.GET.get('username')
-        email = request.GET.get('email')
+        username = request.GET.get("username")
+        email = request.GET.get("email")
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({'message': "User does not exist for provided username"},
+            return JsonResponse({"message": "User does not exist for provided username"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
         token = request.META["HTTP_X_CSRFTOKEN"]
@@ -50,13 +50,13 @@ class UpdateCommunityProfile(APIView):
     def post(self, request):
         """ Update provided information in openEdx received from nodeBB client """
 
-        username = request.GET.get('username')
-        email = request.GET.get('email')
+        username = request.GET.get("username")
+        email = request.GET.get("email")
         
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({'message': "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message": "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
 
         id = user.id        
 
