@@ -16,9 +16,6 @@ class BlockCompletionTransformer(BlockStructureTransformer):
     WRITE_VERSION = 1
     COMPLETION = 'completion'
 
-    def __init__(self):
-        super(BlockCompletionTransformer, self).__init__()
-
     @classmethod
     def name(cls):
         return "blocks_api:completion"
