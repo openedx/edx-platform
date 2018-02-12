@@ -8,6 +8,7 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.conf import settings
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from lms.djangoapps.onboarding.forms import RegModelForm
@@ -21,18 +22,41 @@ log = logging.getLogger("edx.philu_api")
 
 
 class UpdateCommunityProfile(APIView):
-    """ Retrieve order details. """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """ Send user is_admin/first_learner status """
+
+        username = request.GET.get("username")
+        email = request.GET.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return JsonResponse({"message": "User does not exist for provided username"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        token = request.META["HTTP_X_CSRFTOKEN"]
+        if not token == get_encoded_token(username, email, id):
+            return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_extended_profile = user.extended_profile
+        return JsonResponse({
+            "is_admin": user.extended_profile.is_organization_admin,
+            "is_first_learner": user_extended_profile.organization.is_first_signup_in_org()
+            if user_extended_profile.organization else False,
+        }, status=status.HTTP_200_OK)
 
     def post(self, request):
         """ Update provided information in openEdx received from nodeBB client """
 
-        username = request.GET.get('username')
-        email = request.GET.get('email')
+        username = request.GET.get("username")
+        email = request.GET.get("email")
         
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({'message': "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message": "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
 
         id = user.id        
 
@@ -70,6 +94,7 @@ class UpdateCommunityProfile(APIView):
             return JsonResponse({"message": "user info updated successfully"}, status=status.HTTP_200_OK)
         except Exception as ex:
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 def get_user_chat(request):
     """ Get recent chats of the user from NodeBB """
