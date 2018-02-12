@@ -49,8 +49,9 @@ class EntitlementSupportView(viewsets.ModelViewSet):
 
         return CourseEntitlement.objects.filter(user=user).order_by('created')
 
-    def put(self, request, username_or_email):
+    def update(self):
         """ Allows support staff to unexpire a user's entitlement."""
+        username_or_email = self.request.user
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
             course_uuid = request.data['course_uuid']
@@ -92,7 +93,7 @@ class EntitlementSupportView(viewsets.ModelViewSet):
                 )
             )
     
-    def post(self, request, username_or_email):
+    def create(self):
         """ Allows support staff to grant a user a new entitlement for a course. """
         username_or_email = self.request.user
         try:
