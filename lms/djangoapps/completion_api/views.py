@@ -14,6 +14,7 @@ from rest_framework import status
 from courseware.courses import get_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, paginators
 from progress.models import CourseModuleCompletion
 from student.models import CourseEnrollment
@@ -171,6 +172,10 @@ class CompletionListView(CompletionViewMixin, APIView):
             `course`), or any of the other optional fields specified above.
             If any invalid fields are requested, a 400 error will be returned.
 
+        mobile_only (optional):
+            A value of "true" will provide only completions that come from
+            mobile courses.
+
     **Returns**
 
         * 200 on success with above fields
@@ -254,9 +259,21 @@ class CompletionListView(CompletionViewMixin, APIView):
         Handler for GET requests.
         """
         self.paginator = self.pagination_class()  # pylint: disable=attribute-defined-outside-init
+        mobile_only = (self.request.query_params.get('mobile_only', 'false')).lower() == 'true'
 
         # Paginate the list of active enrollments, annotated (manually) with a student progress object.
-        enrollments = CourseEnrollment.objects.filter(user=self.get_user(), is_active=True).order_by('course_id')
+        enrollments = CourseEnrollment.objects.filter(
+            user=self.get_user(),
+            is_active=True).order_by('course_id')
+
+        if mobile_only:
+            course_keys = []
+            for course_enrollment in enrollments:
+                course_keys.append(course_enrollment.course_id)
+            course_overview_list = CourseOverview.objects.filter(id__in=course_keys, mobile_available=True)
+            filtered_course_overview = [overview.id for overview in course_overview_list]
+            enrollments = enrollments.filter(course_id__in=filtered_course_overview)
+
         paginated = self.paginator.paginate_queryset(enrollments, self.request, view=self)
 
         # Grab the progress items for these enrollments
