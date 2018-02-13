@@ -27,3 +27,17 @@ class DigitalBookAccess(TimeStampedModel):
         )
 
         return digital_book_access, created
+
+    @classmethod
+    def has_access(cls, username, book_key):
+        user = User.objects.get(username=username)
+        #TODO: set expiration and check expiration here
+        try:
+            cls.objects.get(
+                user=user,
+                digital_book_key=book_key
+            )
+            return True
+        except cls.DoesNotExist:
+            return False
+
