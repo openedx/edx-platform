@@ -635,6 +635,16 @@
       }
     }
   }
+
+  .batch-enrollment-ccx{
+    @extend .batch-enrollment;
+    float: left;
+    width: 100%;
+
+    textarea {
+      width: 100%;
+    }
+  }
   // Auto Enroll Csv Section
   .auto_enroll_csv {
     .enrollment_signup_button {
@@ -805,6 +815,12 @@
         }
       }
     }
+  }
+
+  .member-lists-management-ccx {
+    @extend .member-lists-management;
+    float: left;
+    width: 100%;
   }
 }
 

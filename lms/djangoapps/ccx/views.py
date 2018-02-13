@@ -45,11 +45,11 @@ from lms.djangoapps.ccx.utils import (
     get_ccx_creation_dict,
     get_ccx_for_coach,
     get_date,
+    get_enrollment_action_and_identifiers,
     parse_date,
 )
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
-from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
@@ -459,40 +459,15 @@ def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_invite(request, course, ccx=None):
+def ccx_students_management(request, course, ccx=None):
     """
-    Invite users to new ccx
-    """
-    if not ccx:
-        raise Http404
-
-    action = request.POST.get('enrollment-button')
-    identifiers_raw = request.POST.get('student-ids')
-    identifiers = _split_input_list(identifiers_raw)
-    email_students = 'email-students' in request.POST
-    course_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
-    email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
-
-    ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
-
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})
-    return redirect(url)
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@coach_dashboard
-def ccx_student_management(request, course, ccx=None):
-    """
-    Manage the enrollment of individual students in a CCX
+    Manage the enrollment of the students in a CCX
     """
     if not ccx:
         raise Http404
 
-    action = request.POST.get('student-action', None)
-    student_id = request.POST.get('student-id', '')
+    action, identifiers = get_enrollment_action_and_identifiers(request)
     email_students = 'email-students' in request.POST
-    identifiers = [student_id]
     course_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
