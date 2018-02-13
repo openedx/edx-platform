@@ -26,7 +26,7 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
         digital_book_access = DigitalBookAccess()
 
         user_access, created = digital_book_access.get_or_create_digital_book_access(
-            user=user,
+            username=user,
             book_key=book_key
         )
 

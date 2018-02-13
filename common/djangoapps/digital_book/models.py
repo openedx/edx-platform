@@ -22,7 +22,7 @@ class DigitalBookAccess(TimeStampedModel):
         user = User.objects.get(username=username)
 
         digital_book_access, created = cls.objects.get_or_create(
-            user=user.id,
+            user=user,
             digital_book_key=book_key,
         )
 
