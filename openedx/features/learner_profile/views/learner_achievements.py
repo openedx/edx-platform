@@ -3,7 +3,6 @@ Views to render a learner's achievements.
 """
 
 from django.template.loader import render_to_string
-from student.views import get_org_black_and_whitelist_for_site
 from lms.djangoapps.certificates import api as certificate_api
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -42,16 +41,6 @@ class LearnerAchievementsFragmentView(EdxFragmentView):
                 course_key = course_certificate['course_key']
                 try:
                     course_overview = CourseOverview.get_from_id(course_key)
-                    site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site(request.user)
-
-                    # Filter out anything that is not in the whitelist.
-                    if site_org_whitelist and course_overview.location.org not in site_org_whitelist:
-                        continue
-
-                    # Conversely, filter out any enrollments in the blacklist.
-                    elif site_org_blacklist and course_overview.location.org in site_org_blacklist:
-                        continue
-
                     course_certificate['course'] = course_overview
                     if certificates_viewable_for_course(course_overview):
                         passing_certificates.append(course_certificate)
