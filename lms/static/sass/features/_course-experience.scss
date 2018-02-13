@@ -301,6 +301,119 @@
   }
 }
 
+// Course outline for visual progress waffle switch
+.course-outline-visualprogress {
+  .block-tree {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+
+    .section {
+      @include media-breakpoint-up(md) {
+        margin: 0;
+      }
+
+      margin: 0 (-1 * $baseline) 0 ($baseline);
+      width: calc(100% + (2));
+      padding: 0;
+
+      border-bottom: 1px solid $border-color;
+
+      .section-name {
+        padding: ($baseline / 2) 0 ($baseline / 2) 0;
+
+        .section-title {
+          font-weight: $font-bold;
+          font-size: 1.1rem;
+          margin: 0;
+          display: inline;
+          padding-left: $baseline;
+        }
+      }
+
+      .outline-item {
+        @include padding-left(0);
+      }
+
+      ol.outline-item {
+        margin: 0;
+
+        .subsection {
+          list-style-type: none;
+          border-top: 1px solid $border-color;
+          margin: 0 0 ($baseline / 4) 35px;
+
+          .subsection-title {
+            margin: 0;
+            font-weight: $font-bold;
+            margin-left: $baseline;
+          }
+
+          .subsection-text {
+            .details {
+              font-size: $body-font-size;
+              color: theme-color("secondary");
+              margin-left: 35px;
+            }
+            .prerequisite {
+              color: theme-color("secondary");
+              font-weight: $font-bold;
+            }
+          }
+
+          .vertical {
+            @include margin-left(10px);
+
+            list-style-type: none;
+            border: 1px solid transparent;
+            border-radius: 2px;
+
+            a.outline-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: ($baseline / 2) 0 ($baseline / 2) 0;
+              margin: 0 0 0 ($baseline);
+              border-top: 1px solid $border-color;
+            }
+
+            &:hover,
+            &:focus {
+              background-color: palette(primary, x-back);
+              border-radius: $btn-border-radius;
+              text-decoration: none;
+            }
+
+            .vertical-actions {
+              .resume-right {
+                position: relative;
+                top: calc(50% - (#{$baseline} / 2));
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Course outline accordion
+button.accordion-trigger {
+  margin: 2px;
+  padding: 10px 0 10px 0;
+  border: none;
+  width: 100%;
+  text-align: left;
+
+  .fa {
+    color: $blue;
+  }
+}
+
+.accordion-panel.is-hidden {
+  display: none;
+}
+
 // Course outline
 .course-outline {
   .block-tree {

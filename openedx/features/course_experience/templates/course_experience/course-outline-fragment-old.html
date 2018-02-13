@@ -46,7 +46,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                     </span>
                                                     <span class="sr">&nbsp;${_("Unlocked")}</span>
                                                 % else:
-                                                    <span class="menu-icon icon fa fa-lock" 
+                                                    <span class="menu-icon icon fa fa-lock"
                                                     aria-hidden="true">
                                                     </span>
                                                     <span class="subsection-title-name">
@@ -147,5 +147,5 @@ from openedx.core.djangolib.markup import HTML, Text
 </%static:require_module_async>
 
 <%static:webpack entry="CourseOutline">
-    new CourseOutline('.block-tree');
+    new CourseOutline('.block-tree', false);
 </%static:webpack>
