@@ -1,6 +1,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
 from django.core.urlresolvers import reverse
 from courseware.courses import get_course_about_section
 from django.conf import settings
@@ -336,12 +337,12 @@ from six import string_types
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
-        <legend class="sr">${_("Enroll")}</legend>
+        <legend class="sr">${pgettext("self","Enroll")}</legend>
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="${_('enroll')}">
+        <input name="submit" type="submit" value="${pgettext('self','enroll')}">
       </div>
     </form>
   </div>
