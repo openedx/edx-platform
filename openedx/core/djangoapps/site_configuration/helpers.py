@@ -215,6 +215,6 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
         if separator.join(crumbs):
             return u'{}{}{}'.format(separator.join(crumbs), separator, platform_name)
         else:
-            return platform_name
+            return u'{}{}'.format(' ', platform_name)
     else:
         return platform_name
