@@ -57,6 +57,7 @@ enum34==1.1.6
 edx-django-oauth2-provider==1.2.5
 edx-django-sites-extensions==2.3.0
 edx-enterprise==0.65.3
+edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-organizations==0.4.9
 edx-proctoring==1.3.7
