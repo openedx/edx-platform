@@ -6,7 +6,7 @@ from completion.waffle import visual_progress_enabled
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
 
@@ -118,26 +118,18 @@ def get_course_outline_block_tree(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
-    if visual_progress_enabled(course_key=course_key):
-        # Deeper query for course tree traversing/marking complete
-        # and last completed block
-        block_types_filter = [
-            'course',
-            'chapter',
-            'sequential',
-            'vertical',
-            'html',
-            'problem',
-            'video',
-            'discussion'
-        ]
-    else:
-        # Shallower query is sufficient for last accessed block
-        block_types_filter = [
-            'course',
-            'chapter',
-            'sequential'
-        ]
+    # Deeper query for course tree traversing/marking complete
+    # and last completed block
+    block_types_filter = [
+        'course',
+        'chapter',
+        'sequential',
+        'vertical',
+        'html',
+        'problem',
+        'video',
+        'discussion'
+    ]
     all_blocks = get_blocks(
         request,
         course_usage_key,
