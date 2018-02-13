@@ -22,7 +22,6 @@ log = logging.getLogger("edx.philu_api")
 
 
 class UpdateCommunityProfile(APIView):
-    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         """ Send user is_admin/first_learner status """
@@ -36,8 +35,10 @@ class UpdateCommunityProfile(APIView):
             return JsonResponse({"message": "User does not exist for provided username"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
+        _id = user.id
+
         token = request.META["HTTP_X_CSRFTOKEN"]
-        if not token == get_encoded_token(username, email, id):
+        if not token == get_encoded_token(username, email, _id):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
 
         user_extended_profile = user.extended_profile
@@ -58,10 +59,10 @@ class UpdateCommunityProfile(APIView):
         except User.DoesNotExist:
             return JsonResponse({"message": "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
 
-        id = user.id        
+        _id = user.id
 
         token = request.META["HTTP_X_CSRFTOKEN"]
-        if not token == get_encoded_token(username, email, id):
+        if not token == get_encoded_token(username, email, _id):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
 
         userprofile = user.profile
