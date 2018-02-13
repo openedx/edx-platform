@@ -92,10 +92,6 @@ def send_course_notification_email(course, template_name, context, to_list=None)
 
 
 def get_course_link(course_id):
-    request = get_current_request()
-    course_full_link = '{protocol}://{site}{course_link}'.format(
-        protocol='https' if request.is_secure() else 'http',
-        site=safe_get_host(request),
-        course_link=reverse('about_course', args=[course_id]),
-    )
-    return course_full_link
+    course_link = reverse("about_course", args=[course_id])
+    base_url = settings.LMS_ROOT_URL[:-3]
+    return base_url + course_link
