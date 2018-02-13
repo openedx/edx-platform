@@ -18,8 +18,10 @@
      <div class="content">
         <div class="content-primary">
             <div id="root"></div>
-            <%static:studiofrontend page="AccessibilityPage" lang="en">
-            {}
+            <%static:studiofrontend page="AccessibilityPage">
+            {
+              "lang": "${language_code | n, js_escaped_string}",
+            }
             </%static:studiofrontend>
         </div>
     </div>

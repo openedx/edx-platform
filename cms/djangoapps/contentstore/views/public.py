@@ -75,9 +75,11 @@ def howitworks(request):
 
 
 @waffle_switch('{}.{}'.format(waffle.WAFFLE_NAMESPACE, waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE))
-def accessibility(_request):
+def accessibility(request):
     """
     Display the accessibility accommodation form.
     """
 
-    return render_to_response('accessibility.html', {})
+    return render_to_response('accessibility.html', {
+        'language_code': request.LANGUAGE_CODE
+    })

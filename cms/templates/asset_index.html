@@ -58,8 +58,9 @@
     <div class="content">
         <%static:optional_include_mako file="asset_index_content_header.html" />
         % if waffle_flag_enabled:
-            <%static:studiofrontend page="AssetsPage" lang="en">
+            <%static:studiofrontend page="AssetsPage">
                 {
+                    "lang": "${language_code | n, js_escaped_string}",
                     "course": {
                         "id": "${context_course.id | n, js_escaped_string}",
                         "name": "${context_course.display_name_with_default | n, js_escaped_string}",
