@@ -593,6 +593,7 @@ class CourseAboutSearchIndexer(object):
             'course': course_id,
             'content': {},
             'image_url': course_image_url(course),
+            'catalog_visibility': course.catalog_visibility
         }
 
         # load data for all of the 'about' modules for this course into a dictionary
