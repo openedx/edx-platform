@@ -24,7 +24,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from courseware.courses import get_course_with_access, has_access
 from django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from openedx.core.lib.api.paginators import DefaultPagination, paginate_search_results
+from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (

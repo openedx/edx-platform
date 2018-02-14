@@ -20,7 +20,7 @@ from entitlements.utils import is_course_run_entitlement_fullfillable
 from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.core.lib.api.paginators import DefaultPagination
+from edx_rest_framework_extensions.paginators import DefaultPagination
 from student.models import CourseEnrollment
 from student.models import CourseEnrollmentException, AlreadyEnrolledError
 

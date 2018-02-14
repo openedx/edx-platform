@@ -2373,7 +2373,7 @@ CSRF_COOKIE_SECURE = False
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'openedx.core.lib.api.paginators.DefaultPagination',
+    'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),

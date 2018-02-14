@@ -21,7 +21,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 import eventtracking
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
-from openedx.core.lib.api.paginators import DefaultPagination
+from edx_rest_framework_extensions.paginators import DefaultPagination
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
 from xmodule.modulestore.exceptions import ItemNotFoundError
