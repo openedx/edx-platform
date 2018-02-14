@@ -554,7 +554,20 @@ class RegModelForm(BaseOnboardingModelForm):
 
     is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our '
                                                    'website?'),
-                               label_suffix="*",
+                               help_text=ugettext_noop("Your organization's PhilU Administrator is responsible for "
+                                                       "maintaining your organization's profile, inviting learners "
+                                                       "from your organization to the PhilU platform, completing "
+                                                       "the Organizational Effectiveness Framework assessment and "
+                                                       "updating it over time. Your Administrator should be the most "
+                                                       "senior person in your organization responsible for "
+                                                       "organizational capacity building and learning. In a small "
+                                                       "organization with few employees, the Organization "
+                                                       "Administrator might be the Executive Director or "
+                                                       "Chief Executive. In a larger organization, the "
+                                                       "Organization Administrator might be the director or "
+                                                       "manager responsible for staff learning and development "
+                                                       "and organizational capacity assessment and development "
+                                                       "planning."),
                                choices=IS_POC_CHOICES,
                                widget=forms.RadioSelect)
 
