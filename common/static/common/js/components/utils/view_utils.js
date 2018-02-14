@@ -4,9 +4,17 @@
 (function(define, require) {
     'use strict';
 
+    /* RequireJS */
     define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
         'common/js/components/views/feedback_prompt'],
         function($, _, gettext, NotificationView, PromptView) {
+    /* End RequireJS */
+    /* Webpack
+    define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
+        'common/js/components/views/feedback_prompt', 'scriptjs'],
+        function($, _, gettext, NotificationView, PromptView, $script) {
+    /* End Webpack */
+
             var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
                 runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
                 getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes,
@@ -259,6 +267,7 @@
              */
             loadJavaScript = function(url) {
                 var deferred = $.Deferred();
+                /* RequireJS */
                 require([url],
                     function() {
                         deferred.resolve();
@@ -266,6 +275,12 @@
                     function() {
                         deferred.reject();
                     });
+                /* End RequireJS */
+                /* Webpack
+                $script(url, url, function () {
+                    deferred.resolve();
+                });
+                /* End Webpack */
                 return deferred.promise();
             };
 
