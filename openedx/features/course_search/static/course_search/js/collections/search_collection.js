@@ -19,11 +19,22 @@
             fetchXhr: null,
 
             initialize: function(models, options) {
-            // call super constructor
+                // call super constructor
                 Backbone.Collection.prototype.initialize.apply(this, arguments);
                 if (options && options.courseId) {
                     this.url += options.courseId;
                 }
+            },
+
+            extractErrorMessage: function(response) {
+                var errorMessage;
+                if (response.responseJSON && response.responseJSON.error) {
+                    // eslint-disable-next-line no-param-reassign
+                    errorMessage = response.responseJSON.error || '';
+                } else {
+                    errorMessage = '';  // eslint-disable-line no-param-reassign
+                }
+                return errorMessage;
             },
 
             performSearch: function(searchTerm) {
@@ -44,14 +55,7 @@
                         self.trigger('search');
                     },
                     error: function(self, response) {
-                        if (response.responseJSON && response.responseJSON.error) {
-                            // eslint-disable-next-line no-param-reassign
-                            self.errorMessage = response.responseJSON.error || '';
-                        } else {
-                            // eslint-disable-next-line no-param-reassign
-                            self.errorMessage = '';
-                        }
-
+                        self.errorMessage = self.extractErrorMessage(response);
                         self.trigger('error');
                     }
                 });
@@ -74,13 +78,7 @@
                         self.trigger('next');
                     },
                     error: function(self, response) {
-                        if (response.responseJSON && response.responseJSON.error) {
-                            // eslint-disable-next-line no-param-reassign
-                            self.errorMessage = response.responseJSON.error || '';
-                        } else {
-                            self.errorMessage = '';  // eslint-disable-line no-param-reassign
-                        }
-
+                        self.errorMessage = self.extractErrorMessage(response);
                         self.trigger('error');
                     },
                     add: true,
@@ -111,7 +109,7 @@
                 this.totalCount = 0;
                 this.latestModelsCount = 0;
                 this.accessDeniedCount = 0;
-            // empty the entire collection
+                // empty the entire collection
                 this.reset();
             },
 
