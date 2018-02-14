@@ -314,7 +314,7 @@ def org_detail_survey(request):
     }
 
     template = 'onboarding/organization_detail_survey.html'
-    next_page_url = reverse('oef_survey')
+    next_page_url = reverse('recommendations')
     org_metric_form = forms.OrganizationMetricModelForm
     redirect_to_next = True
 
@@ -564,8 +564,9 @@ def admin_activation(request, activation_key):
     try:
         hash_key = OrganizationAdminHashKeys.objects.get(activation_hash=activation_key)
         admin_change_confirmation = True if request.GET.get('confirm') == 'True' else False
+        current_admin = request.user
         user_extended_profile = UserExtendedProfile.objects.get(user__email=hash_key.suggested_admin_email)
-        user = user_extended_profile.user
+        new_admin = user_extended_profile.user
 
         context['key'] = hash_key.activation_hash
         context['is_org_admin'] = True if hash_key.suggested_by == hash_key.organization.admin else False
@@ -592,12 +593,12 @@ def admin_activation(request, activation_key):
 
                 # If claimer's is admin of some other organization remove his privileges
                 # for that organization as he can only be an admin of single organization
-                if user_extended_profile.organization and user_extended_profile.organization.admin == user:
+                if user_extended_profile.organization and user_extended_profile.organization.admin == new_admin:
                     user_extended_profile.organization.admin = None
                     user_extended_profile.organization.save()
 
                 hash_key.organization.unclaimed_org_admin_email = None
-                hash_key.organization.admin = user
+                hash_key.organization.admin = new_admin
                 hash_key.organization.save()
 
                 # Update the claimer's organization if a user confirms
@@ -607,8 +608,9 @@ def admin_activation(request, activation_key):
 
             if not admin_activation:
                 # Send an email to claimer, on admin updation depending upon whether user accepts or rejects the request
-                send_admin_update_confirmation_email(hash_key.organization.label, user.email,
-                                                     confirm=1 if admin_change_confirmation else None)
+                send_admin_update_confirmation_email(hash_key.organization.label, current_admin, new_admin,
+                                                     confirm=1 if admin_change_confirmation else None,
+                                                     )
                 return HttpResponseRedirect('/myaccount/settings/')
 
     except OrganizationAdminHashKeys.DoesNotExist:
@@ -635,7 +637,7 @@ def admin_activation(request, activation_key):
     if admin_activation:
         return render_to_response('onboarding/admin_activation.html', context)
 
-    context['username'] = user.username if user else None
+    context['username'] = new_admin.username if new_admin else None
 
     return render_to_response('onboarding/admin_change_confirmation.html', context)
 
