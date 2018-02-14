@@ -8,8 +8,9 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from student.forms import AccountCreationForm
+from student.helpers import do_create_account
 from student.models import CourseEnrollment, create_comments_service_user
-from student.views import _do_create_account, AccountValidationError
+from student.views import AccountValidationError
 from track.management.tracked_command import TrackedCommand
 
 
@@ -75,7 +76,7 @@ class Command(TrackedCommand):
         translation.activate(settings.LANGUAGE_CODE)
 
         try:
-            user, _, reg = _do_create_account(form)
+            user, _, reg = do_create_account(form)
             if options['staff']:
                 user.is_staff = True
                 user.save()
