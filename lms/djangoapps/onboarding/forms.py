@@ -572,10 +572,8 @@ class RegModelForm(BaseOnboardingModelForm):
                                widget=forms.RadioSelect)
 
     org_admin_email = forms.CharField(
-        label=ugettext_noop('If you know who should be the Admin for [Organization name],'
-              ' please provide their email address and we will invite them to sign up.*'),
         required=False,
-        widget=forms.EmailInput)
+        widget=forms.EmailInput(attrs={'placeholder': 'Organization Admin email'}))
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
