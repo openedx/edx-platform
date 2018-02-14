@@ -1,12 +1,13 @@
 """
-Tests for the views
+Tests for v1 views
 """
 from datetime import datetime
 import ddt
 import json
 
 from django.core.urlresolvers import reverse
-from mock import patch
+from django.test.utils import override_settings
+from mock import MagicMock, patch
 from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
@@ -14,20 +15,18 @@ from rest_framework.test import APITestCase
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
-from lms.djangoapps.grades.tests.utils import mock_get_score
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 from openedx.core.djangoapps.oauth_dispatch.tests.test_views import _DispatchingViewTestCase
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 
-@ddt.ddt
-class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
+class GradeViewTestMixin(SharedModuleStoreTestCase):
     """
-    Tests for the Current Grade View
+    Mixin class for grades related view tests
 
     The following tests assume that the grading policy is the edX default one:
     {
@@ -69,7 +68,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CurrentGradeViewTest, cls).setUpClass()
+        super(GradeViewTestMixin, cls).setUpClass()
 
         cls.course = CourseFactory.create(display_name='test course', run="Testing_course")
 
@@ -107,19 +106,69 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         cls.student = UserFactory(username='dummy', password=cls.password)
         cls.other_student = UserFactory(username='foo', password=cls.password)
         cls.other_user = UserFactory(username='bar', password=cls.password)
+        cls.staff = StaffFactory(course_key=cls.course_key, password=cls.password)
+        cls.global_staff = GlobalStaffFactory.create()
         date = datetime(2013, 1, 22, tzinfo=UTC)
-        for user in (cls.student, cls.other_student, ):
+        for user in (cls.student, cls.other_student,):
             CourseEnrollmentFactory(
                 course_id=cls.course.id,
                 user=user,
                 created=date,
             )
 
-        cls.namespaced_url = 'grades_api:user_grade_detail'
+    def setUp(self):
+        super(GradeViewTestMixin, self).setUp()
+        self.client.login(username=self.student.username, password=self.password)
+
+    @classmethod
+    def _create_test_course_with_default_grading_policy(cls, display_name, run):
+        course = CourseFactory.create(display_name=display_name, run=run)
+
+        chapter = ItemFactory.create(
+            category='chapter',
+            parent_location=course.location,
+            display_name="Chapter 1",
+        )
+        # create a problem for each type and minimum count needed by the grading policy
+        # A section is not considered if the student answers less than "min_count" problems
+        for grading_type, min_count in (("Homework", 12), ("Lab", 12), ("Midterm Exam", 1), ("Final Exam", 1)):
+            for num in xrange(min_count):
+                section = ItemFactory.create(
+                    category='sequential',
+                    parent_location=chapter.location,
+                    due=datetime(2017, 12, 18, 11, 30, 00),
+                    display_name='Sequential {} {}'.format(grading_type, num),
+                    format=grading_type,
+                    graded=True,
+                )
+                vertical = ItemFactory.create(
+                    category='vertical',
+                    parent_location=section.location,
+                    display_name='Vertical {} {}'.format(grading_type, num),
+                )
+                ItemFactory.create(
+                    category='problem',
+                    parent_location=vertical.location,
+                    display_name='Problem {} {}'.format(grading_type, num),
+                )
+
+        return course
+
+
+@ddt.ddt
+class CurrentGradeViewTest(GradeViewTestMixin, APITestCase):
+    """
+    Tests for grades related to a course
+        i.e. /api/grades/v1/course_grade/{course_id}/users/{username}=(student)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(CurrentGradeViewTest, cls).setUpClass()
+        cls.namespaced_url = 'grades_api:v1:user_grade_detail'
 
     def setUp(self):
         super(CurrentGradeViewTest, self).setUp()
-        self.client.login(username=self.student.username, password=self.password)
 
     def get_url(self, username):
         """
@@ -152,10 +201,12 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         """
         Test that a request for a nonexistent username returns an error.
         """
+        self.client.logout()
+        self.client.login(username=self.staff.username, password=self.password)
         resp = self.client.get(self.get_url('IDoNotExist'))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn('error_code', resp.data)  # pylint: disable=no-member
-        self.assertEqual(resp.data['error_code'], 'user_mismatch')  # pylint: disable=no-member
+        self.assertEqual(resp.data['error_code'], 'user_does_not_exist')  # pylint: disable=no-member
 
     def test_other_get_grade(self):
         """
@@ -164,7 +215,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.client.logout()
         self.client.login(username=self.other_student.username, password=self.password)
         resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('error_code', resp.data)  # pylint: disable=no-member
         self.assertEqual(resp.data['error_code'], 'user_mismatch')  # pylint: disable=no-member
 
@@ -183,6 +234,22 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             resp.data['error_code'],  # pylint: disable=no-member
             'user_or_course_does_not_exist'
         )
+
+    def test_no_grade(self):
+        """
+        Test the grade for a user who has not answered any test.
+        """
+        resp = self.client.get(self.get_url(self.student.username))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        expected_data = [{
+            'user': self.student.username,
+            'course_key': str(self.course_key),
+            'passed': False,
+            'percent': 0.0,
+            'letter_grade': None
+        }]
+
+        self.assertEqual(resp.data, expected_data)  # pylint: disable=no-member
 
     def test_wrong_course_key(self):
         """
@@ -221,14 +288,46 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             'user_or_course_does_not_exist'
         )
 
-    def test_no_grade(self):
+    @ddt.data(
+        ({'letter_grade': None, 'percent': 0.4, 'passed': False}),
+        ({'letter_grade': 'Pass', 'percent': 1, 'passed': True}),
+    )
+    def test_grade(self, grade):
         """
-        Test the grade for a user who has not answered any test.
+        Test that the user gets her grade in case she answered tests with an insufficient score.
         """
+        with patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.get_persisted') as mock_grade:
+            grade_fields = {
+                'letter_grade': grade['letter_grade'],
+                'percent': grade['percent'],
+                'passed': grade['letter_grade'] is not None,
+
+            }
+            mock_grade.return_value = MagicMock(**grade_fields)
+            resp = self.client.get(self.get_url(self.student.username))
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        expected_data = {
+            'user': unicode(self.student.username),
+            'course_key': str(self.course_key),
+        }
+
+        expected_data.update(grade)
+        self.assertEqual(resp.data, [expected_data])  # pylint: disable=no-member
+
+    @ddt.data(
+        'staff', 'global_staff'
+    )
+    def test_staff_can_see_student(self, staff_user):
+        """
+        Ensure that staff members can see her student's grades.
+        """
+        self.client.logout()
+        self.client.login(username=getattr(self, staff_user).username, password=self.password)
         resp = self.client.get(self.get_url(self.student.username))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         expected_data = [{
-            'username': self.student.username,
+            'user': self.student.username,
             'letter_grade': None,
             'percent': 0.0,
             'course_key': str(self.course_key),
@@ -236,24 +335,52 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         }]
         self.assertEqual(resp.data, expected_data)  # pylint: disable=no-member
 
+
+@ddt.ddt
+class CourseGradeAllUsersViewTest(GradeViewTestMixin, APITestCase):
+    """
+    Tests for grades related to a user
+        i.e. /api/grades/v1/course_grade/{course_id}/all_users
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseGradeAllUsersViewTest, cls).setUpClass()
+        cls.namespaced_url = 'grades_api:v1:course_grades_all'
+
+    def setUp(self):
+        super(CourseGradeAllUsersViewTest, self).setUp()
+
+    def get_url(self):
+        """
+        Helper function to create the url
+        """
+        base_url = reverse(
+            self.namespaced_url,
+            kwargs={
+                'course_id': self.course_key,
+            }
+        )
+
+        return base_url
+
+    def test_anonymous(self):
+        self.client.logout()
+        resp = self.client.get(self.get_url())
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_student_forbidden(self):
+        resp = self.client.get(self.get_url())
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
     @ddt.data(
-        ((2, 5), {'letter_grade': None, 'percent': 0.4, 'passed': False}),
-        ((5, 5), {'letter_grade': 'Pass', 'percent': 1, 'passed': True}),
+        'staff', 'global_staff'
     )
-    @ddt.unpack
-    def test_grade(self, grade, result):
-        """
-        Test that the user gets her grade in case she answered tests with an insufficient score.
-        """
-        with mock_get_score(*grade):
-            resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        expected_data = {
-            'username': self.student.username,
-            'course_key': str(self.course_key),
-        }
-        expected_data.update(result)
-        self.assertEqual(resp.data, [expected_data])  # pylint: disable=no-member
+    def test_staff_forbidden(self, staff_user):
+        self.client.logout()
+        self.client.login(username=getattr(self, staff_user).username, password=self.password)
+        resp = self.client.get(self.get_url())
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
 
 @ddt.ddt
@@ -498,7 +625,7 @@ class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModule
         self.assertListEqual(response.data, expected)
 
 
-class OAuth2RestrictedAppTests(_DispatchingViewTestCase, SharedModuleStoreTestCase):
+class OAuth2RestrictedAppMixin(_DispatchingViewTestCase, SharedModuleStoreTestCase):
     """
     Tests specifically around RestrictedApplications for OAuth2 clients
     We separated this out from other OAuth tests above, because those
@@ -506,7 +633,7 @@ class OAuth2RestrictedAppTests(_DispatchingViewTestCase, SharedModuleStoreTestCa
     """
 
     def setUp(self):
-        super(OAuth2RestrictedAppTests, self).setUp()
+        super(OAuth2RestrictedAppMixin, self).setUp()
         self.url = reverse('access_token')
         self.course = CourseFactory.create()
         self.second_org_course = CourseFactory.create(
@@ -550,51 +677,66 @@ class OAuth2RestrictedAppTests(_DispatchingViewTestCase, SharedModuleStoreTestCa
 
         return body
 
-    def _do_grades_call(self, dot_application, scopes, course_key=None):
+    def _get_api_url(self, course_key=None, username=None):
+        """
+        Helper method to get the current API url
+        """
+        namespaced_url = 'grades_api:v1:user_grade_detail'
+        if not username:
+            namespaced_url = 'grades_api:v1:course_grades_all'
+
+        url = reverse(
+            namespaced_url,
+            kwargs={
+                'course_id': course_key if course_key else self.course.id,
+            }
+        )
+        if username is not None:
+            url = '{}?username={}'.format(url, username)
+
+        return url
+
+    def _do_grades_call(self, dot_application, scopes, course_key=None, username=None):
         """
         Helper method to consolidate code
         """
-
         response = self._post_request(
             self.user,
             dot_application,
             scopes=scopes,
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = json.loads(response.content)
 
         self.assertIn('access_token', data)
 
-        # call into Enrollments API endpoint
-        url = "{0}?username={1}".format(
-            reverse(
-                'grades_api:user_grade_detail',
-                kwargs={
-                    'course_id': course_key if course_key else self.course.id,
-                }
-            ),
-            self.user.username
-        )
+        # call into Grades API endpoint
         response = self.client.get(
-            url,
+            self._get_api_url(course_key, username),
             HTTP_AUTHORIZATION="Bearer {0}".format(data['access_token'])
         )
         return response
 
+
+class OAuth2RestrictedAppCurrentCourseTests(OAuth2RestrictedAppMixin):
+    """
+    OAuth2 Restricted App tests for a single user in a course
+    """
     def test_wrong_scope(self):
         """
         assert that a RestrictedApplication client which DOES NOT have the
         grades:read scope CANNOT access the Grade API
         """
 
-        # call into Enrollments API endpoint with a 'profile' scoped access_token
+        # call into Grades API endpoint with a 'profile' scoped access_token
         response = self._do_grades_call(
             self.restricted_dot_app_limited_scopes,
-            'profile'
+            'profile',
+            username=self.restricted_dot_app.user
         )
 
         # this should NOT have permission to access this API
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_correct_scope_with_correct_org(self):
         """
@@ -606,14 +748,15 @@ class OAuth2RestrictedAppTests(_DispatchingViewTestCase, SharedModuleStoreTestCa
         restricted_application.org_associations = [self.course.id.org]
         restricted_application.save()
 
-        # call into Enrollments API endpoint with a 'enrollments:read' scoped access_token
+        # call into Grades API endpoint with a 'grades:read' scoped access_token
         response = self._do_grades_call(
             self.restricted_dot_app,
-            'grades:read'
+            'grades:read',
+            username=self.restricted_dot_app.user
         )
 
         # this should have permission to access this API endpoint
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_correct_scope_with_wrong_org(self):
         """
@@ -630,10 +773,81 @@ class OAuth2RestrictedAppTests(_DispatchingViewTestCase, SharedModuleStoreTestCa
         # call into Enrollments API endpoint with a 'enrollments:read' scoped access_token
         response = self._do_grades_call(
             self.restricted_dot_app,
-            'grades:read'
+            'grades:read',
+            username=self.restricted_dot_app.user
         )
 
         # this should have permission to access this API endpoint
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        data = json.loads(response.content)
+        self.assertEqual(data['error_code'], 'course_org_not_associated_with_calling_application')
+
+
+class OAuth2RestrictedAppCourseAllUsersTests(OAuth2RestrictedAppMixin):
+    """
+    OAuth2 Restricted App tests for grades of all users in a course
+    """
+    def test_wrong_scope(self):
+        """
+        assert that a RestrictedApplication client which DOES NOT have the
+        grades:read scope CANNOT access the Grade API
+        """
+
+        # call into Grades API endpoint with a 'profile' scoped access_token
+        response = self._do_grades_call(
+            self.restricted_dot_app_limited_scopes,
+            'profile'
+        )
+
+        # this should NOT have permission to access this API
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_correct_scope_with_correct_org(self):
+        """
+        assert that a RestrictedApplication client which DOES have the
+        grade:read scope as well as being associated with the org CAN access the Grade API
+        """
+
+        restricted_application = RestrictedApplication.objects.get(application=self.restricted_dot_app)
+        restricted_application.org_associations = [self.course.id.org]
+        restricted_application.save()
+
+        # call into Grades API endpoint with a 'grades:statistics' scoped access_token
+        response = self._do_grades_call(
+            self.restricted_dot_app,
+            'grades:statistics'
+        )
+
+        # this should have permission to access this API endpoint
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = [{
+            'user': self.restricted_dot_app.user.username,
+            'course_key': str(self.course.id),
+            'passed': False,
+            'percent': 0.0,
+            'letter_grade': None
+        }]
+
+        self.assertEqual(response.data, expected_data)
+
+    def test_correct_scope_with_wrong_org(self):
+        """
+        assert that a RestrictedApplication client which
+             - DOES have the grade:read scope as well
+             - IS NOT associated with requested org
+        CANNOT access the Grade API
+        """
+        restricted_application = RestrictedApplication.objects.get(application=self.restricted_dot_app)
+        restricted_application.org_associations = ['badorg']
+        restricted_application.save()
+
+        # call into Grades API endpoint with a 'grades:statistics' scoped access_token
+        response = self._do_grades_call(
+            self.restricted_dot_app,
+            'grades:statistics'
+        )
+
+        # this should have permission to access this API endpoint
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         data = json.loads(response.content)
         self.assertEqual(data['error_code'], 'course_org_not_associated_with_calling_application')

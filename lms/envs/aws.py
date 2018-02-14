@@ -668,6 +668,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'social.backends.linkedin.LinkedinOAuth2',
             'social.backends.facebook.FacebookOAuth2',
             'social.backends.azuread.AzureADOAuth2',
+            'social.backends.live.LiveOAuth2',
             'third_party_auth.saml.SAMLAuthBackend',
             'third_party_auth.lti.LTIAuthBackend',
         ]) + list(AUTHENTICATION_BACKENDS)

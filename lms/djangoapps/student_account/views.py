@@ -520,4 +520,6 @@ def cookies_api(request):
             return JsonResponse(json.loads(response.content))
 
         except:
-            log.info('Failed in calling cookies api {}'.format(settings.API_COOKIE_URL))
+            message = 'Failed in calling cookies api {}'.format(settings.API_COOKIE_URL)
+            log.error(message)
+            return HttpResponseBadRequest(message)

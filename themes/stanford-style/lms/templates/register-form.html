@@ -95,14 +95,14 @@ from student.models import UserProfile
 
     <li class="is-disabled field optional password" id="field-password" hidden>
       <label for="password">${_('Password')}</label>
-      <input id="password" type="password" name="password" value="" disabled required aria-required="true" />
+      <input id="password" type="password" name="password" value="" autocomplete="off" disabled required aria-required="true" />
     </li>
 
     % else:
 
     <li class="field required password" id="field-password">
       <label for="password">${_('Password')}</label>
-      <input id="password" type="password" name="password" value="" required aria-required="true" />
+      <input id="password" type="password" name="password" value="" autocomplete="off" required aria-required="true" />
     </li>
 
     % endif

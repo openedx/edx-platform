@@ -3,7 +3,7 @@
 
 #### Where should the reviewer start?
 
-#### How can this be manually tested? (brief repro steps)
+#### How can this be manually tested? (brief repro steps and corpnet-URL with change)
 
 #### What are the relevant TFS items? (list id numbers)
 
@@ -12,18 +12,11 @@
 - [ ] Add pull request hyperlink to relevant TFS items
 - [ ] For large or complex change: schedule an in-person review session
 - [ ] This change has appropriate test coverage
+- [ ] Get at least two approvals
 
-#### Reminders BEFORE merging
-1. Get at least two approvals
-1. If you're merging from a feature branch into the development branch then "flatten" or "squash" commits
-1. If merging from the development branch into master (or porting changes from upstream) then use github's UI to get review feedback, but use the git command line interface to complete the actual merge.
-
-#### Reminders AFTER merging
-1. Delete the remote feature branch
-1. Resolve relevant TFS items
-1. (reverse merge) If you merged from the development branch into master then check to see if there are any changes in master that can be merged down to the development branch (like hotfixes, etc). In this case, use github's UI for feedback and the git command line interface for the actual merge.
-
-[//]: # ( todo: If you merged into development branch then verify change in our "rolling deployment" environment. Then notify stakeholders interested in or involved with the change )
+#### Reminders DURING merge
+1. If you're merging from a short-term (feature) branch into a long-term branch (like dev, release, or master) then "Squash and merge" to keep our history clean.
+1. If merging from two longterm branches (like cherry picks from upstream, dev to release, etc) then "Create merge commit" to preserve individual commits.
 
 [//]: # ( fyi: This content was heavily inspired by )
 [//]: # ( 1 Our team's policies and processes )

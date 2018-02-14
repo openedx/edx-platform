@@ -806,7 +806,7 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
     if cert_downloadable_status['is_downloadable']:
         cert_status = CertificateStatuses.downloadable
         title = _('Your certificate is available')
-        msg = _('You can keep working for a higher grade, or request your certificate now.')
+        msg = _('You can continue working on the course.')
         if certs_api.has_html_certificates_enabled(course_key, course):
             if certs_api.get_active_web_certificate(course) is not None:
                 cert_web_view_url = certs_api.get_certificate_url(

@@ -3,6 +3,7 @@ import json
 
 import pytz
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -32,12 +33,50 @@ def _get_request_header(request, header_name, default=''):
         return default
 
 
+def get_request_ip(request):
+    """Wrapper for helper method to get request ip."""
+    return _get_request_ip(request)
+
+
 def _get_request_ip(request, default=''):
-    """Helper method to get IP from a request's META dict, if present."""
-    if request is not None and hasattr(request, 'META'):
-        return get_ip(request)
-    else:
+    """
+        Helper method to get IP from a request's META dict, if present.
+        If SQUELCH_PII_IN_LOGS is True:
+        Anonymize the ip address to the first two octets.
+        This gives enough data to be useful for Analysis
+        without explicitly identifying user
+            e.g. 127.0.0.1 => 127.0.X.X
+        """
+    if request is None:
         return default
+
+    def _anonymize_if_needed(ip_address_str):
+        if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+            return _get_anonymous_ip(ip_address_str)
+        else:
+            return ip_address_str
+
+    if hasattr(request, 'META'):
+        ip_address = get_ip(request)
+        request_ip = _anonymize_if_needed(ip_address)
+    elif request.get('ip'):
+        request_ip = _anonymize_if_needed(request.get('ip'))
+    else:
+        request_ip = default
+
+    return request_ip
+
+
+def _get_anonymous_ip(ip_address_str):
+    """Helper method to obbuscate the last two octets of an ip address"""
+    try:
+        ip_comps = ip_address_str.split('.')
+        first = '.'.join(ip_comps[0:2])
+        ip_address = '{}.x.x'.format(first)
+    except:
+        ip_address = 'unknown'
+
+    return ip_address
 
 
 def _get_request_value(request, value_name, default=''):
@@ -50,6 +89,34 @@ def _get_request_value(request, value_name, default=''):
     return default
 
 
+BROWSER_VIDEO_EVENT_TYPES = ['load_video', 'play_video', 'pause_video', 'seek_video', 'do_not_show_again_video',
+                             'skip_video', 'edx.video.language_menu.shown', 'edx.video.language_menu.hidden',
+                             'speed_change_video', 'edx.video.closed_captions.shown', 'show_transcript',
+                             'edx.video.closed_captions.hidden', 'hide_transcript', 'stop_video']
+
+SERVER_VIDEO_EVENT_IDENTIFIERS = ['+type@azure_media_services+block@', '+type@video+block@']
+
+
+def is_anonymization_needed(request, default=''):
+    """Checks if an event should be anonymized, currently we are only anonymizing video events"""
+    if request is None:
+        return False
+    if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+        """Checks if the event is coming through one of the video players"""
+        event_type = _get_request_value(request, 'event_type')
+        if hasattr(request, 'META'):
+            event_path = request.META.get('PATH_INFO', default)
+        else:
+            event_path = default
+
+        return event_type in BROWSER_VIDEO_EVENT_TYPES or any(
+            identifier in event_path for identifier in SERVER_VIDEO_EVENT_IDENTIFIERS
+        )
+
+    else:
+        return False
+
+
 def user_track(request):
     """
     Log when POST call to "event" URL is made by a user.
@@ -58,6 +125,10 @@ def user_track(request):
     """
     try:
         username = request.user.username
+
+        if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+            username = ''
+
     except:
         username = "anonymous"
 
@@ -72,6 +143,10 @@ def user_track(request):
             pass
 
     context_override = contexts.course_context_from_url(page)
+    """Check if this is an event(e.g. video) that needs anonymization"""
+    if is_anonymization_needed(request):
+        context_override['user_id'] = ''
+
     context_override['username'] = username
     context_override['event_source'] = 'browser'
     context_override['page'] = page
@@ -91,15 +166,28 @@ def server_track(request, event_type, event, page=None):
     if event_type.startswith("/event_logs") and request.user.is_staff:
         return  # don't log
 
+    context_override = eventtracker.get_tracker().resolve_context()
     try:
         username = request.user.username
+        """Check if we want to keep username"""
+        if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+            username = ''
+            context_override['username'] = ''
+
+        """Check if this is an event(e.g. video) that needs anonymization"""
+        if is_anonymization_needed(request):
+            context_override['user_id'] = ''
+            if isinstance(event, dict):
+                """WAMS is logging the user_id for events that are triggered from the media player, if that is the case anonyimize that as well"""
+                if 'user_id' in event:
+                    event['user_id'] = ''
     except:
         username = "anonymous"
 
     # define output:
     event = {
         "username": username,
-        "ip": _get_request_ip(request),
+        "ip": get_request_ip(request),
         "referer": _get_request_header(request, 'HTTP_REFERER'),
         "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
         "event_source": "server",
@@ -109,7 +197,7 @@ def server_track(request, event_type, event, page=None):
         "page": page,
         "time": datetime.datetime.utcnow(),
         "host": _get_request_header(request, 'SERVER_NAME'),
-        "context": eventtracker.get_tracker().resolve_context(),
+        "context": context_override,
     }
 
     # Some duplicated fields are passed into event-tracking via the context by track.middleware.
@@ -146,10 +234,18 @@ def task_track(request_info, task_info, event_type, event, page=None):
     # All fields must be specified, in case the tracking information is
     # also saved to the TrackingLog model.  Get values from the task-level
     # information, or just add placeholder values.
+
     with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
+        username = request_info.get('username', 'unknown')
+        context_override = eventtracker.get_tracker().resolve_context()
+
+        if settings.FEATURES.get('SQUELCH_PII_IN_LOGS', False):
+            username = ''
+            context_override['username'] = username
+
         event = {
-            "username": request_info.get('username', 'unknown'),
-            "ip": request_info.get('ip', 'unknown'),
+            "username": username,
+            "ip": _get_request_ip(request_info, 'unknown'),
             "event_source": "task",
             "event_type": event_type,
             "event": full_event,
@@ -157,7 +253,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
             "page": page,
             "time": datetime.datetime.utcnow(),
             "host": request_info.get('host', 'unknown'),
-            "context": eventtracker.get_tracker().resolve_context(),
+            "context": context_override,
         }
 
     log_event(event)

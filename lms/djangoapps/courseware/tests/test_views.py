@@ -1319,7 +1319,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = self._get_progress_page()
         self.assertContains(resp, u"View Certificate")
 
-        self.assertContains(resp, u"You can keep working for a higher grade")
+        self.assertContains(resp, u"You can continue working on the course.")
         cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
         self.assertContains(resp, cert_url)
 

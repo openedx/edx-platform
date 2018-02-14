@@ -93,6 +93,24 @@ class TrackMiddlewareTestCase(TestCase):
             'client_id': None,
         })
 
+    @override_settings(FEATURES={'SQUELCH_PII_IN_LOGS': True})
+    def test_default_request_context_without_personal_data(self):
+        context = self.get_context_for_path('/courses/')
+        self.assertEquals(context, {
+            'accept_language': '',
+            'referer': '',
+            'user_id': '',
+            'session': '',
+            'username': '',
+            'ip': '127.0.x.x',
+            'host': 'testserver',
+            'agent': '',
+            'path': '/courses/',
+            'org_id': '',
+            'course_id': '',
+            'client_id': None,
+        })
+
     def test_no_forward_for_header_ip_context(self):
         request = self.request_factory.get('/courses/')
         remote_addr = '127.0.0.1'

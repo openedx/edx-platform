@@ -97,7 +97,6 @@ class UserBadgeAssertions(generics.ListAPIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser
     )
-    permission_classes = (is_field_shared_factory("accomplishments_shared"),)
 
     def filter_queryset(self, queryset):
         """
