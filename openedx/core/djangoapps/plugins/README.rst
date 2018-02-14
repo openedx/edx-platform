@@ -181,7 +181,7 @@ class::
 
                         # The full path to a sender (if connecting to a specific sender) to be passed to Signal.connect.
                         # Optional; Defaults to None.
-                        PluginSignals.SENDER_PATH: u'full_path_to_sender_app.ModelZ,
+                        PluginSignals.SENDER_PATH: u'full_path_to_sender_app.ModelZ',
                     }],
                 }
             }
@@ -214,9 +214,10 @@ OR use string constants when they cannot import from djangoapps.plugins::
                         u'receiver_func_name': u'on_signal_x',
                         u'signal_path': u'full_path_to_signal_x_module.SignalX',
                         u'dispatch_uid': u'my_app.my_signals.on_signal_x',
-                        u'sender_path': u'full_path_to_sender_app.ModelZ,
+                        u'sender_path': u'full_path_to_sender_app.ModelZ',
                     }],
                 }
+            }
         }
 
 4. For Plugin Settings, insert the following function into each of the Plugin
