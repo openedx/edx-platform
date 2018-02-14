@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=404 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=405 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2638,7 +2638,7 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `modified` datetime(6) NOT NULL,
   `active` tinyint(1) NOT NULL,
   `delivery_method` varchar(20) NOT NULL,
-  `email` varchar(254) NOT NULL,
+  `email` longtext NOT NULL,
   `frequency` varchar(20) NOT NULL,
   `day_of_month` smallint(6) DEFAULT NULL,
   `day_of_week` smallint(6) DEFAULT NULL,
