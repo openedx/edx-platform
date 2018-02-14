@@ -2499,6 +2499,18 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         )
         self.assertEquals(preference.value, u"True")
 
+    def test_update_email_opt_in_anonymous_user(self):
+        """
+        Test that an anonymous user gets 403 response when
+        updating email optin preference.
+        """
+        self.client.logout()
+        response = self.client.post(self.url, {
+            "course_id": unicode(self.course.id),
+            "email_opt_in": u"True"
+        })
+        self.assertEqual(response.status_code, 403)
+
     def test_update_email_opt_with_invalid_course_key(self):
         """
         Test that with invalid key it returns bad request

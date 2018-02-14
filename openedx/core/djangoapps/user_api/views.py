@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from six import text_type
 
 import accounts
@@ -256,6 +257,7 @@ class PreferenceUsersListView(generics.ListAPIView):
 class UpdateEmailOptInPreference(APIView):
     """View for updating the email opt in preference. """
     authentication_classes = (SessionAuthenticationAllowInactiveUser,)
+    permission_classes = (IsAuthenticated,)
 
     @method_decorator(require_post_params(["course_id", "email_opt_in"]))
     @method_decorator(ensure_csrf_cookie)
