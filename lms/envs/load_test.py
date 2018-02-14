@@ -20,4 +20,6 @@ EXCLUDE_CSRF = lambda elem: elem not in [
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] = filter(
     EXCLUDE_CSRF, DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors']
 )
+INSTALLED_APPS.append('openedx.core.djangoapps.monitoring_utils.apps.MonitoringUtilsConfig')
+MIDDLEWARE_CLASSES.insert(0, 'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware')
 MIDDLEWARE_CLASSES = filter(EXCLUDE_CSRF, MIDDLEWARE_CLASSES)

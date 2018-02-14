@@ -13,6 +13,7 @@ import logging
 from uuid import uuid4
 
 import psutil
+from six import text_type
 
 from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
@@ -89,26 +90,25 @@ class MonitoringMemoryMiddleware(object):
     guid_key = u'guid_key'
 
     def process_request(self, request):
+        """
+        Record pre-request memory usage data
+        """
         if self._is_enabled():
-            self._cache[self.guid_key] = unicode(uuid4())
+            setattr(request, self.guid_key, text_type(uuid4()))
             log_prefix = self._log_prefix(u"Before", request)
-            self._cache[self.memory_data_key] = self._memory_data(log_prefix)
+            setattr(request, self.memory_data_key, self._memory_data(log_prefix))
 
     def process_response(self, request, response):
+        """
+        Record post-request memory usage data
+        """
         if self._is_enabled():
             log_prefix = self._log_prefix(u"After", request)
             new_memory_data = self._memory_data(log_prefix)
 
             log_prefix = self._log_prefix(u"Diff", request)
-            self._log_diff_memory_data(log_prefix, new_memory_data, self._cache.get(self.memory_data_key))
+            self._log_diff_memory_data(log_prefix, new_memory_data, getattr(request, self.memory_data_key))
         return response
-
-    @property
-    def _cache(self):
-        """
-        Namespaced request cache for tracking memory usage.
-        """
-        return get_cache(name='monitoring_memory')
 
     def _log_prefix(self, prefix, request):
         """
@@ -117,7 +117,7 @@ class MonitoringMemoryMiddleware(object):
         # After a celery task runs, the request cache is cleared. So if celery
         # tasks are running synchronously (CELERY_ALWAYS _EAGER), "guid_key"
         # will no longer be in the request cache when process_response executes.
-        cached_guid = self._cache.get(self.guid_key) or u"without_guid"
+        cached_guid = getattr(request, self.guid_key) or u"without_guid"
         return u"{} request '{} {} {}'".format(prefix, request.method, request.path, cached_guid)
 
     def _memory_data(self, log_prefix):
