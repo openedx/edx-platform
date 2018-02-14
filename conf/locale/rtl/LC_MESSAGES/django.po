@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 08:43+0000\n"
-"PO-Revision-Date: 2018-02-06 08:43:43.282230\n"
+"POT-Creation-Date: 2018-02-14 08:08+0000\n"
+"PO-Revision-Date: 2018-02-14 08:08:26.388743\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5073,7 +5073,7 @@ msgstr "حخصثقثي زغ خحثر ثيط"
 msgid "Blog"
 msgstr "زمخل"
 
-#: lms/djangoapps/branding/api.py cms/templates/widgets/sock.html
+#: lms/djangoapps/branding/api.py cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
@@ -5631,6 +5631,7 @@ msgstr "وخقث شزخعف {fullname}'س شذذخوحمهساوثرف"
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr "عسثقرشوث"
@@ -6155,6 +6156,18 @@ msgid ""
 "not include a certificate."
 msgstr ""
 "غخع شقث ثرقخممثي هر فاث شعيهف فقشذن بخق فاهس ذخعقسث. فاث شعيهف فقشذن يخثس "
+"رخف هرذمعيث ش ذثقفهبهذشفث."
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Honor track"
+msgstr "غخعق ثرقخمموثرف: اخرخق فقشذن"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the honor track for this course. The honor track does "
+"not include a certificate."
+msgstr ""
+"غخع شقث ثرقخممثي هر فاث اخرخق فقشذن بخق فاهس ذخعقسث. فاث اخرخق فقشذن يخثس "
 "رخف هرذمعيث ش ذثقفهبهذشفث."
 
 #: lms/djangoapps/courseware/views/views.py
@@ -6901,7 +6914,7 @@ msgstr "عسثق هي"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "ثوشهم"
@@ -9261,7 +9274,7 @@ msgid "Track refunds issued directly through CyberSource."
 msgstr "فقشذن قثبعريس هسسعثي يهقثذفمغ فاقخعلا ذغزثقسخعقذث."
 
 #: lms/djangoapps/support/views/index.py
-#: lms/templates/ccx/coach_dashboard.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
 msgid "Enrollment"
 msgstr "ثرقخمموثرف"
@@ -10363,6 +10376,14 @@ msgid ""
 msgstr ""
 "ه, شري وغ ذخوحشرغ, شذذثحف فاث {link_start}{platform_name} شحه فثقوس خب "
 "سثقدهذث{link_end}."
+
+#: openedx/core/djangoapps/bookmarks/apps.py
+#: openedx/features/course_bookmarks/plugins.py
+#: openedx/features/course_bookmarks/views/course_bookmarks.py
+#: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "Bookmarks"
+msgstr "زخخنوشقنس"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
@@ -11512,13 +11533,6 @@ msgstr ""
 "غخع شقث رخف سهلرثي هر. فخ دهثص فاث يهسذعسسهخر ذخرفثرف, {sign_in_link} خق "
 "{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
 
-#: openedx/features/course_bookmarks/plugins.py
-#: openedx/features/course_bookmarks/views/course_bookmarks.py
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "Bookmarks"
-msgstr "زخخنوشقنس"
-
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
@@ -12563,37 +12577,37 @@ msgstr "اهيث {studio_name} اثمح"
 msgid "{studio_name} Documentation"
 msgstr "{studio_name} يخذعوثرفشفهخر"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Access documentation on http://docs.edx.org"
 msgstr "شذذثسس يخذعوثرفشفهخر خر اففح://يخذس.ثيط.خقل"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Documentation"
 msgstr "ثيط يخذعوثرفشفهخر"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101: Overview of Creating an edX Course"
 msgstr "ثرقخمم هر ثيط101: خدثقدهثص خب ذقثشفهرل شر ثيط ذخعقسث"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "ثرقخمم هر ثيط101"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX: Creating a Course with edX Studio"
 msgstr "ثرقخمم هر سفعيهخط: ذقثشفهرل ش ذخعقسث صهفا ثيط سفعيهخ"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX"
 msgstr "ثرقخمم هر سفعيهخط"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Send an email to {email}"
 msgstr "سثري شر ثوشهم فخ {email}"
@@ -15222,7 +15236,7 @@ msgstr "ذقثشفث ش رثص ذعسفخو ذخعقسث بخق ثيط"
 msgid "Grading Policy"
 msgstr "لقشيهرل حخمهذغ"
 
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
 msgstr "زشفذا ثرقخمموثرف"
@@ -15241,20 +15255,20 @@ msgid "Email Addresses/Usernames"
 msgstr "ثوشهم شييقثسسثس/عسثقرشوثس"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Enter email addresses and/or usernames separated by new lines or commas."
+"Enter one or more email addresses or usernames separated by new lines or "
+"commas."
 msgstr ""
-"ثرفثق ثوشهم شييقثسسثس شري/خق عسثقرشوثس سثحشقشفثي زغ رثص مهرثس خق ذخووشس."
+"ثرفثق خرث خق وخقث ثوشهم شييقثسسثس خق عسثقرشوثس سثحشقشفثي زغ رثص مهرثس خق "
+"ذخووشس."
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"You will not get notification for emails that bounce, so please double-check"
-" spelling."
+"Make sure you enter the information carefully. You will not receive "
+"notification for invalid usernames or email addresses."
 msgstr ""
-"غخع صهمم رخف لثف رخفهبهذشفهخر بخق ثوشهمس فاشف زخعرذث, سخ حمثشسث يخعزمث-ذاثذن"
-" سحثممهرل."
+"وشنث سعقث غخع ثرفثق فاث هربخقوشفهخر ذشقثبعممغ. غخع صهمم رخف قثذثهدث "
+"رخفهبهذشفهخر بخق هردشمهي عسثقرشوثس خق ثوشهم شييقثسسثس."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -15311,14 +15325,6 @@ msgstr "ذذط سفعيثرف مهسف وشرشلثوثرف قثسحخرسث و�
 #: lms/templates/ccx/enrollment.html
 msgid "Revoke access"
 msgstr "قثدخنث شذذثسس"
-
-#: lms/templates/ccx/enrollment.html
-msgid "Enter username or email"
-msgstr "ثرفثق عسثقرشوث خق ثوشهم"
-
-#: lms/templates/ccx/enrollment.html
-msgid "Checking this box has no effect if 'Revoke' is clicked."
-msgstr "ذاثذنهرل فاهس زخط اشس رخ ثببثذف هب 'قثدخنث' هس ذمهذنثي."
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -15723,7 +15729,8 @@ msgstr "{span_start}ذعققثرف سثذفهخر{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "due {date}"
 msgstr "يعث {date}"
 
@@ -15732,7 +15739,8 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} يعث {{date}}"
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "This content is graded"
 msgstr "فاهس ذخرفثرف هس لقشيثي"
 
@@ -15968,7 +15976,7 @@ msgstr "صثمذخوث فخ {org}'س {course_name}!"
 
 #: lms/templates/courseware/info.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "قثسعوث ذخعقسث"
 
@@ -16044,8 +16052,8 @@ msgid "Meet the Instructors"
 msgstr "وثثف فاث هرسفقعذفخقس"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Frequenty Asked Questions"
-msgstr "بقثضعثرفغ شسنثي ضعثسفهخرس"
+msgid "Frequently Asked Questions"
+msgstr "بقثضعثرفمغ شسنثي ضعثسفهخرس"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Job Outlook"
@@ -16110,10 +16118,6 @@ msgstr "ذخعقسثس هر فاث {}"
 #: lms/templates/courseware/program_marketing.html
 msgid "Starts on {}"
 msgstr "سفشقفس خر {}"
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Frequently Asked Questions"
-msgstr "بقثضعثرفمغ شسنثي ضعثسفهخرس"
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
@@ -16551,18 +16555,6 @@ msgstr "ثوشهم سثففهرلس"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "قثمشفثي حقخلقشوس"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Buy all remaining courses in this program and save 10%"
-msgstr "زعغ شمم قثوشهرهرل ذخعقسثس هر فاهس حقخلقشو شري سشدث 10%"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade All Remaining Courses ("
-msgstr "عحلقشيث شمم قثوشهرهرل ذخعقسثس ("
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid " ${price:.2f} {currency} ) "
-msgstr " ${price:.2f} {currency} ) "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -18988,6 +18980,20 @@ msgstr "بهري ثرقخمموثرف ذخيث"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
+msgstr ""
+"ثرفثق ثوشهم شييقثسسثس شري/خق عسثقرشوثس سثحشقشفثي زغ رثص مهرثس خق ذخووشس."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+"غخع صهمم رخف لثف رخفهبهذشفهخر بخق ثوشهمس فاشف زخعرذث, سخ حمثشسث يخعزمث-ذاثذن"
+" سحثممهرل."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr ""
 "ثرفثق فاث قثشسخر صاغ فاث سفعيثرفس شقث فخ زث وشرعشممغ ثرقخممثي خق عرثرقخممثي."
@@ -20866,17 +20872,23 @@ msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
 msgid "Upgrade ({price})"
 msgstr "عحلقشيث ({price})"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Unlocked"
 msgstr "عرمخذنثي"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "(Prerequisite required)"
-msgstr "(حقثقثضعهسهفث قثضعهقثي)"
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Prerequisite: "
+msgstr "حقثقثضعهسهفث: "
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+msgid "(Prerequisite required)"
+msgstr "(حقثقثضعهسهفث قثضعهقثي)"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
@@ -24981,11 +24993,11 @@ msgstr "فخللمث ذاثشفساثثف"
 msgid "Label"
 msgstr "مشزثم"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 msgid "Access the Open edX Portal"
 msgstr "شذذثسس فاث خحثر ثيط حخقفشم"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 msgid "Open edX Portal"
 msgstr "خحثر ثيط حخقفشم"
 

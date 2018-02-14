@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 08:37+0000\n"
-"PO-Revision-Date: 2018-02-06 08:43:43.140979\n"
+"POT-Creation-Date: 2018-02-14 08:01+0000\n"
+"PO-Revision-Date: 2018-02-14 08:08:26.291716\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5428,6 +5428,16 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Honor track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the honor track for this course. The honor track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
 msgstr ""
 
@@ -9171,6 +9181,12 @@ msgid ""
 "Service{link_end}."
 msgstr ""
 
+#: openedx/core/djangoapps/bookmarks/apps.py
+#: openedx/features/course_bookmarks/plugins.py
+#: openedx/features/course_bookmarks/views/course_bookmarks.py
+msgid "Bookmarks"
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
 msgstr ""
@@ -10193,11 +10209,6 @@ msgstr ""
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
-msgstr ""
-
-#: openedx/features/course_bookmarks/plugins.py
-#: openedx/features/course_bookmarks/views/course_bookmarks.py
-msgid "Bookmarks"
 msgstr ""
 
 #: openedx/features/course_experience/plugins.py

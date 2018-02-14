@@ -352,7 +352,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-01-25 11:41+0000\n"
+"POT-Creation-Date: 2018-02-06 09:29+0000\n"
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -1089,7 +1089,6 @@ msgid "Course id not specified"
 msgstr "课程编号未指定"
 
 #: common/djangoapps/student/views/management.py
-#: lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
 msgstr "无效的课程编号"
 
@@ -1223,6 +1222,14 @@ msgstr "已经存在与该电子邮件关联的账户。"
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr "无法发送邮箱激活链接，请重试 。"
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Deleted the selected configuration(s)."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/admin.py
+msgid "Delete the selected configuration"
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -5505,17 +5512,16 @@ msgstr ""
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
+#: lms/djangoapps/commerce/utils.py lms/djangoapps/shoppingcart/models.py
+msgid "[Refund] User-Requested Refund"
+msgstr "[Refund] 用户申请退款"
+
+#: lms/djangoapps/commerce/utils.py
 #, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
 msgstr "{username} ({email}) 的退款要求已经建立。为了处理此请求，请访问以下联结(s) 。"
-
-#: lms/djangoapps/commerce/signals.py lms/djangoapps/commerce/utils.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "[Refund] User-Requested Refund"
-msgstr "[Refund] 用户申请退款"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -6196,7 +6202,8 @@ msgstr "用户总数"
 msgid "Courses loaded in the modulestore"
 msgstr "已加载课程至模块仓库"
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
+#: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
 msgid "username"
 msgstr "用户名"
 
@@ -8806,6 +8813,35 @@ msgstr "选课"
 msgid "View and update learner enrollments."
 msgstr "查看及更新学习者注册资讯。"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/manage_user.html
+msgid "Manage User"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Disable User Account"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_support_url"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_detail_url"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Usable"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Unusable"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Disabled Successfully"
+msgstr ""
+
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
@@ -10949,6 +10985,10 @@ msgid ""
 "glad to have you! Come see what everyone is learning."
 msgstr ""
 
+#: cms/djangoapps/api/v1/serializers/course_runs.py
+msgid "Course team user does not exist"
+msgstr ""
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -11951,10 +11991,6 @@ msgstr "新主题表格"
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussion thread list"
 msgstr "讨论列表"
-
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "Discussion - {course_number}"
-msgstr "讨论 - {course_number}"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -19105,6 +19141,10 @@ msgstr ""
 msgid "Student Support: Enrollment"
 msgstr "学生支持：选课"
 
+#: lms/templates/support/manage_user.html
+msgid "Student Support: Manage User"
+msgstr ""
+
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
 msgstr "准备就该订单退费"
@@ -19496,7 +19536,7 @@ msgid "Search Results"
 msgstr ""
 
 #: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
-msgid "Learner Analytics"
+msgid "My Stats (Beta)"
 msgstr ""
 
 #. Translators: this section lists all the third-party authentication

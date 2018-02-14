@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 08:37+0000\n"
-"PO-Revision-Date: 2018-02-06 08:43:43.668350\n"
+"POT-Creation-Date: 2018-02-14 08:01+0000\n"
+"PO-Revision-Date: 2018-02-14 08:08:26.735776\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2141,6 +2141,10 @@ msgstr "فاهس يهسذعسسهخر ذخعمي رخف زث مخشيثي. قث�
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
 msgstr "ساخص يهسذعسسهخر"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "There are no posts in this topic yet."
+msgstr "فاثقث شقث رخ حخسفس هر فاهس فخحهذ غثف."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
