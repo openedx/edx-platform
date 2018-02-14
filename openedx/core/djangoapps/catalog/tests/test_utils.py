@@ -1,8 +1,10 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 import copy
+import datetime
 
 import ddt
+import pytz
 import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -10,6 +12,7 @@ from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 
+from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -27,13 +30,16 @@ from openedx.core.djangoapps.catalog.utils import (
     get_localized_price_text,
     get_program_types,
     get_programs,
-    get_programs_with_type
+    get_programs_with_type,
+    get_visible_course_runs_for_entitlement
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
+YESTERDAY = str(datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1))
+TOMORROW = str(datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1))
 
 
 @skip_unless_lms
@@ -341,3 +347,79 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
         data = get_course_run_details(course_run['key'], ['content_language', 'weeks_to_complete', 'max_effort'])
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, course_run_details)
+
+
+@skip_unless_lms
+@ddt.ddt
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetVisibleCourseRuns(CatalogIntegrationMixin, TestCase):
+    """
+    Tests covering retrieval of available sessions to fulfill a given entitlement.
+    """
+    def setUp(self):
+        super(TestGetVisibleCourseRuns, self).setUp()
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+
+    def test_get_visible_course_runs_for_entitlement(self, mock_get_edx_api_data):
+        # The method should include a course run in the entitlement's available sessions if
+        #   - start date is not null
+        #   - end date is in the future
+        #   - enrollment_start is in the past or not set
+        #   - enrollment_end is in the future or not set
+        #   - a seat exists with the same mode as the entitlement and its upgrade deadline is in the future
+        data = {
+            'course_runs': [
+                {
+                    'start': YESTERDAY,
+                    'end': TOMORROW,
+                    'enrollment_start': YESTERDAY,
+                    'enrollment_end': TOMORROW,
+                    'status': 'published',
+                    'seats': [
+                        {
+                            'type': 'verified',
+                            'upgrade_deadline': TOMORROW,
+                        }
+                    ]
+                }
+            ]
+        }
+        mock_get_edx_api_data.return_value = data
+        entitlement = CourseEntitlementFactory(user=self.user, mode='verified')
+        available_course_runs = get_visible_course_runs_for_entitlement(entitlement)
+        self.assertEqual(data['course_runs'], available_course_runs)
+
+    @ddt.data(
+        (None, TOMORROW, YESTERDAY, TOMORROW, TOMORROW),
+        (YESTERDAY, YESTERDAY, YESTERDAY, TOMORROW, TOMORROW),
+        (YESTERDAY, TOMORROW, TOMORROW, TOMORROW, TOMORROW),
+        (YESTERDAY, TOMORROW, YESTERDAY, YESTERDAY, TOMORROW),
+        (YESTERDAY, TOMORROW, YESTERDAY, TOMORROW, YESTERDAY),
+    )
+    @ddt.unpack
+    def test_get_visible_course_runs_for_entitlement_returns_none(self, start, end, enrollment_start, enrollment_end,
+                                                                  upgrade_deadline, mock_get_edx_api_data):
+        # The method should not include a course run in the entitlement's available sessions if
+        # any one of the qualifications identified in the test above fails.
+        data = {
+            'course_runs': [
+                {
+                    'start': start,
+                    'end': end,
+                    'enrollment_start': enrollment_start,
+                    'enrollment_end': enrollment_end,
+                    'status': 'published',
+                    'seats': [
+                        {
+                            'type': 'verified',
+                            'upgrade_deadline': upgrade_deadline,
+                        }
+                    ]
+                }
+            ]
+        }
+        mock_get_edx_api_data.return_value = data
+        entitlement = CourseEntitlementFactory(user=self.user, mode='verified')
+        available_course_runs = get_visible_course_runs_for_entitlement(entitlement)
+        self.assertEqual([], available_course_runs)
