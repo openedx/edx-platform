@@ -63,7 +63,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                             successCallback(xblock);
                         }
                     } catch (e) {
-                        console.error(e.stack);
+                        console.error(e, e.stack);
                         // Add 'xblock-initialization-failed' class to every xblock
                         self.$('.xblock').addClass('xblock-initialization-failed');
 
