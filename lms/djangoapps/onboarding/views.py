@@ -314,7 +314,7 @@ def org_detail_survey(request):
     }
 
     template = 'onboarding/organization_detail_survey.html'
-    next_page_url = reverse('oef_survey')
+    next_page_url = reverse('recommendations')
     org_metric_form = forms.OrganizationMetricModelForm
     redirect_to_next = True
 
