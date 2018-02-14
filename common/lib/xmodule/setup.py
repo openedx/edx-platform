@@ -61,7 +61,7 @@ setup(
         'xmodule': ['js/module/*'],
     },
 
-    # See http://guide.python-distribute.org/creation.html#entry-points
+    # See http://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
     # for a description of entry_points
     entry_points={
         'xblock.v1': XMODULES + XBLOCKS,
