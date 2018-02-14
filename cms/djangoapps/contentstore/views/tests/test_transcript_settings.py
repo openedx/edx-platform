@@ -578,4 +578,4 @@ class TranscriptUploadTest(CourseTestCase):
             language_code=language_code
         ))
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(api.get_video_transcript_data([video_id], language_code=language_code))
+        self.assertFalse(api.get_video_transcript_data(video_id=video_id, language_code=language_code))

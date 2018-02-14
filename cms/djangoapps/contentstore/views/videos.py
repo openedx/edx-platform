@@ -541,7 +541,7 @@ def _get_videos(course):
         video["status"] = convert_video_status(video)
 
         if is_video_transcript_enabled:
-            video['transcripts'] = get_available_transcript_languages([video['edx_video_id']])
+            video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
 
     return videos
 

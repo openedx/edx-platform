@@ -156,7 +156,7 @@ def transcript_download_handler(request, course_key_string):
 
     edx_video_id = request.GET['edx_video_id']
     language_code = request.GET['language_code']
-    transcript = get_video_transcript_data(video_ids=[edx_video_id], language_code=language_code)
+    transcript = get_video_transcript_data(video_id=edx_video_id, language_code=language_code)
     if transcript:
         name_and_extension = os.path.splitext(transcript['file_name'])
         basename, file_format = name_and_extension[0], name_and_extension[1][1:]
@@ -193,7 +193,7 @@ def validate_transcript_upload_data(data, files):
         error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
     elif (
         data['language_code'] != data['new_language_code'] and
-        data['new_language_code'] in get_available_transcript_languages([data['edx_video_id']])
+        data['new_language_code'] in get_available_transcript_languages(video_id=data['edx_video_id'])
     ):
         error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
             language_code=data['new_language_code']
@@ -251,7 +251,7 @@ def transcript_upload_handler(request, course_key_string):
                     'file_format': Transcript.SJSON,
                     'language_code': new_language_code
                 },
-                file_data=ContentFile(json.dumps(sjson_subs)),
+                file_data=ContentFile(sjson_subs),
             )
             response = JsonResponse(status=201)
         except (TranscriptsGenerationException, UnicodeDecodeError):

@@ -100,6 +100,7 @@ git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd3
 git+https://github.com/edx/xblock-utils.git@v1.0.5#egg=xblock-utils==1.0.5
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.7#egg=lti_consumer-xblock==1.1.7
+-e git+https://github.com/edx/edx-val.git@mrehan/refactor-val-api-utils#egg=edxval
 
 # Third Party XBlocks
 

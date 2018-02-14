@@ -527,45 +527,71 @@ def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     return external, video_ids
 
 
-def get_video_transcript_content(language_code, edx_video_id, youtube_id_1_0, html5_sources):
+def clean_video_id(edx_video_id):
+    """
+    Cleans an edx video ID.
+
+    Arguments:
+        edx_video_id(unicode): edx-val's video identifier
+    """
+    return edx_video_id and edx_video_id.strip()
+
+
+def get_video_transcript_content(edx_video_id, language_code):
     """
     Gets video transcript content, only if the corresponding feature flag is enabled for the given `course_id`.
 
     Arguments:
         language_code(unicode): Language code of the requested transcript
         edx_video_id(unicode): edx-val's video identifier
-        youtube_id_1_0(unicode): A youtube source identifier
-        html5_sources(list): A list containing html5 sources
 
     Returns:
         A dict containing transcript's file name and its sjson content.
     """
     transcript = None
-    if edxval_api:
-        __, video_candidate_ids = get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources)
-        transcript = edxval_api.get_video_transcript_data(video_candidate_ids, language_code)
+    edx_video_id = clean_video_id(edx_video_id)
+    if edxval_api and edx_video_id:
+        transcript = edxval_api.get_video_transcript_data(edx_video_id, language_code)
 
     return transcript
 
 
-def get_available_transcript_languages(edx_video_id, youtube_id_1_0, html5_sources):
+def get_available_transcript_languages(edx_video_id):
     """
-    Gets available transcript languages from edx-val.
+    Gets available transcript languages for a video.
 
     Arguments:
         edx_video_id(unicode): edx-val's video identifier
-        youtube_id_1_0(unicode): A youtube source identifier
-        html5_sources(list): A list containing html5 sources
 
     Returns:
         A list containing distinct transcript language codes against all the passed video ids.
     """
     available_languages = []
-    if edxval_api:
-        __, video_candidate_ids = get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources)
-        available_languages = edxval_api.get_available_transcript_languages(video_candidate_ids)
+    edx_video_id = clean_video_id(edx_video_id)
+    if edxval_api and edx_video_id:
+        available_languages = edxval_api.get_available_transcript_languages(video_id=edx_video_id)
 
     return available_languages
+
+
+def convert_video_transcript(file_name, content, output_format):
+    """
+    Convert video transcript into desired format
+
+    Arguments:
+        file_name: name of transcript file along with its extension
+        content: transcript content stream
+        output_format: the format in which transcript will be converted
+
+    Returns:
+        A dict containing the new transcript filename and the content converted into desired format.
+    """
+    name_and_extension = os.path.splitext(file_name)
+    basename, input_format = name_and_extension[0], name_and_extension[1][1:]
+    filename = '{base_name}.{ext}'.format(base_name=basename.encode('utf8'), ext=output_format)
+    converted_transcript = Transcript.convert(content, input_format=input_format, output_format=output_format)
+
+    return dict(filename=filename, content=converted_transcript)
 
 
 class Transcript(object):
@@ -615,7 +641,7 @@ class Transcript(object):
                 except Error as ex:   # Base exception from pysrt
                     raise TranscriptsGenerationException(text_type(ex))
 
-                return generate_sjson_from_srt(srt_subs)
+                return json.dumps(generate_sjson_from_srt(srt_subs))
 
         if input_format == 'sjson':
 
@@ -712,11 +738,7 @@ class VideoTranscriptsMixin(object):
         # If we've gotten this far, we're going to verify that the transcripts
         # being referenced are actually either in the contentstore or in edx-val.
         if include_val_transcripts:
-            translations = get_available_transcript_languages(
-                edx_video_id=self.edx_video_id,
-                youtube_id_1_0=self.youtube_id_1_0,
-                html5_sources=self.html5_sources
-            )
+            translations = get_available_transcript_languages(edx_video_id=self.edx_video_id)
 
         if sub:  # check if sjson exists for 'en'.
             try:
@@ -827,11 +849,7 @@ class VideoTranscriptsMixin(object):
         # For phase 2, removing `include_val_transcripts` will make edx-val
         # taking over the control for transcripts.
         if include_val_transcripts:
-            transcript_languages = get_available_transcript_languages(
-                edx_video_id=self.edx_video_id,
-                youtube_id_1_0=self.youtube_id_1_0,
-                html5_sources=self.html5_sources
-            )
+            transcript_languages = get_available_transcript_languages(edx_video_id=self.edx_video_id)
             # HACK Warning! this is temporary and will be removed once edx-val take over the
             # transcript module and contentstore will only function as fallback until all the
             # data is migrated to edx-val.

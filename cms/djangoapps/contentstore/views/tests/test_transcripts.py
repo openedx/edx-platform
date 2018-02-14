@@ -542,7 +542,7 @@ class TestDownloadTranscripts(BaseTranscripts):
         }
 
         self.item.data = textwrap.dedent("""
-            <video youtube="" sub="">
+            <video youtube="" sub="" edx_video_id="123">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
@@ -838,7 +838,7 @@ class TestCheckTranscripts(BaseTranscripts):
         """
         video_transcript_feature.return_value = feature_enabled
         self.item.data = textwrap.dedent("""
-            <video youtube="" sub="">
+            <video youtube="" sub="" edx_video_id="123">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>

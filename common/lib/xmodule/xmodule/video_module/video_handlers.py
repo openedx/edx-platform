@@ -21,6 +21,7 @@ from xmodule.fields import RelativeTime
 from opaque_keys.edx.locator import CourseLocator
 
 from .transcripts_utils import (
+    convert_video_transcript,
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
     get_video_transcript_content,
@@ -297,19 +298,16 @@ class VideoStudentViewHandlers(object):
                 response = self.get_static_transcript(request, transcripts)
                 if response.status_code == 404 and feature_enabled:
                     # Try to get transcript from edx-val as a last resort.
-                    transcript = get_video_transcript_content(
-                        language_code=self.transcript_language,
-                        edx_video_id=self.edx_video_id,
-                        youtube_id_1_0=self.youtube_id_1_0,
-                        html5_sources=self.html5_sources,
-                    )
+                    transcript = get_video_transcript_content(self.edx_video_id, self.transcript_language)
                     if transcript:
+                        transcript_conversion_props = dict(transcript, output_format=Transcript.SJSON)
+                        transcript = convert_video_transcript(**transcript_conversion_props)
                         response = Response(
                             transcript['content'],
                             headerlist=[('Content-Language', self.transcript_language)],
                             charset='utf8',
                         )
-                        response.content_type = Transcript.mime_types['sjson']
+                        response.content_type = Transcript.mime_types[Transcript.SJSON]
 
                 return response
             except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
@@ -335,28 +333,16 @@ class VideoStudentViewHandlers(object):
                     if not lang:
                         lang = self.get_default_transcript_language(transcripts)
 
-                    transcript = get_video_transcript_content(
-                        language_code=lang,
-                        edx_video_id=self.edx_video_id,
-                        youtube_id_1_0=self.youtube_id_1_0,
-                        html5_sources=self.html5_sources,
-                    )
+                    transcript = get_video_transcript_content(edx_video_id=self.edx_video_id, language_code=lang)
                     if transcript:
-                        transcript_content = Transcript.convert(
-                            transcript['content'],
-                            input_format='sjson',
-                            output_format=self.transcript_download_format
-                        )
-                        # Construct the response
-                        base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
-                        filename = '{base_name}.{ext}'.format(
-                            base_name=base_name.encode('utf8'),
-                            ext=self.transcript_download_format
-                        )
+                        transcript_conversion_props = dict(transcript, output_format=self.transcript_download_format)
+                        transcript = convert_video_transcript(**transcript_conversion_props)
                         response = Response(
-                            transcript_content,
+                            transcript['content'],
                             headerlist=[
-                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(filename=filename)),
+                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(
+                                    filename=transcript['filename']
+                                )),
                                 ('Content-Language', lang),
                             ],
                             charset='utf8',
