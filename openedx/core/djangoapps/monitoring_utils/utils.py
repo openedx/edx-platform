@@ -10,6 +10,7 @@ from django.conf import settings
 
 indices = {}
 
+DUMP_DIR = u'/tmp/memory_graphs'
 MAX_CONSOLE_ROWS = 10
 MAX_GRAPHED_OBJECT_TYPES = 5
 REFS_DEPTH = 3
@@ -20,6 +21,7 @@ IGNORED_TYPES = ('set',)
 
 def show_memory_leaks(
         label=u'memory_leaks',
+        dump_dir=DUMP_DIR,
         max_console_rows=MAX_CONSOLE_ROWS,
         max_graphed_object_types=MAX_GRAPHED_OBJECT_TYPES,
         refs_depth=REFS_DEPTH,
@@ -31,12 +33,13 @@ def show_memory_leaks(
     leaked, where did they come from, and what do they contain?  The leaks
     are measured from the last call to ``objgraph.get_new_ids()`` (which is
     called within this function).  Some data is printed to stdout, and more
-    details are available in graphs stored in ``test_root/log/memory_graphs``.
-    Subsequent calls with the same label are indicated by an increasing index
-    in the filename.
+    details are available in graphs stored in ``dump_dir``.  Subsequent calls
+    with the same label are indicated by an increasing index in the filename.
 
     Args:
         label (unicode): The start of the filename for each graph
+        dump_dir (unicode): The directory in which graphs are dumped.  It will
+            be created if it doesn't already exist.
         max_console_rows (int): The max number of object types for which to
             show data on the console
         max_graphed_object_types (int): The max number of object types for
@@ -55,9 +58,8 @@ def show_memory_leaks(
     indices[label] += 1
     sorted_by_count = sorted(new_ids.items(), key=lambda entry: len(entry[1]), reverse=True)
 
-    dir_path = settings.REPO_ROOT / 'test_root' / 'log' / 'memory_graphs'
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    if not os.path.exists(dump_dir):
+        os.makedirs(dump_dir)
 
     for item in sorted_by_count[:max_graphed_object_types]:
         type_name = item[0]
@@ -65,7 +67,7 @@ def show_memory_leaks(
         if type_name in ignored_types or len(object_ids) == 0:
             continue
         objects = objgraph.at_addrs(object_ids)[:max_objects_per_type]
-        data = {'dir': dir_path, 'label': label, 'index': index, 'type_name': type_name}
+        data = {'dir': dump_dir, 'label': label, 'index': index, 'type_name': type_name}
         objgraph.show_backrefs(objects, max_depth=back_refs_depth,
                                filename=u'{dir}/{label}_{index}_{type_name}_backrefs.dot'.format(**data))
         objgraph.show_refs(objects, max_depth=refs_depth,
