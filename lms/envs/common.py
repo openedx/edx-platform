@@ -1258,11 +1258,11 @@ else:
     _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
 
 MIDDLEWARE_CLASSES = [
+    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
     'crum.CurrentRequestUserMiddleware',
 
     'openedx.core.djangoapps.request_cache.middleware.RequestCache',
     'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringCustomMetrics',
-    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',

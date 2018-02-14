@@ -10,13 +10,16 @@ request handlers which do not record custom metrics.
 
 """
 import logging
+import os
 from uuid import uuid4
 
 import psutil
-from objgraph import typestats, get_leaking_objects
+from objgraph import get_new_ids
 
 from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+
+from .utils import show_memory_leaks
 
 log = logging.getLogger(__name__)
 try:
@@ -27,6 +30,7 @@ except ImportError:
 
 
 REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
+MONITORING_MEMORY_REQUEST_CACHE_KEY = 'monitoring_memory'
 WAFFLE_NAMESPACE = 'monitoring_utils'
 
 
@@ -103,18 +107,20 @@ class MonitoringMemoryMiddleware(object):
     Middleware for monitoring memory usage.
     """
     memory_data_key = u'memory_data'
+    memory_graphs_key = u'memory_graphs_view_name'
     guid_key = u'guid_key'
 
     def process_request(self, request):
         if self._is_enabled():
             self._cache[self.guid_key] = unicode(uuid4())
             log_prefix = self._log_prefix(u"Before", request)
-            self._cache[self.memory_data_key] = self._memory_data(log_prefix)
+            self._cache[self.memory_data_key] = self._memory_data(request, log_prefix)
+            self._reset_memory_leak_baseline()
 
     def process_response(self, request, response):
         if self._is_enabled():
             log_prefix = self._log_prefix(u"After", request)
-            new_memory_data = self._memory_data(log_prefix)
+            new_memory_data = self._memory_data(request, log_prefix)
 
             log_prefix = self._log_prefix(u"Diff", request)
             self._log_diff_memory_data(log_prefix, new_memory_data, self._cache.get(self.memory_data_key))
@@ -125,7 +131,7 @@ class MonitoringMemoryMiddleware(object):
         """
         Namespaced request cache for tracking memory usage.
         """
-        return get_cache(name='monitoring_memory')
+        return get_cache(name=MONITORING_MEMORY_REQUEST_CACHE_KEY)
 
     def _log_prefix(self, prefix, request):
         """
@@ -137,11 +143,14 @@ class MonitoringMemoryMiddleware(object):
         cached_guid = self._cache.get(self.guid_key) or u"without_guid"
         return u"{} request '{} {} {}'".format(prefix, request.method, request.path, cached_guid)
 
-    def _memory_data(self, log_prefix):
+    def _memory_data(self, request, log_prefix):
         """
         Returns a dict with information for current memory utilization.
         Uses log_prefix in log statements.
         """
+        graphed_view_name = getattr(request, self.memory_graphs_key, u'')
+        if graphed_view_name:
+            show_memory_leaks(graphed_view_name)
         machine_data = psutil.virtual_memory()
 
         process = psutil.Process()
@@ -152,13 +161,11 @@ class MonitoringMemoryMiddleware(object):
             'cpu_percent': process.get_cpu_percent(),
         }
 
-        leaking_type_stats = typestats(get_leaking_objects())
-
         log.info(u"%s Machine memory usage: %s; Process memory usage: %s", log_prefix, machine_data, process_data)
+
         return {
             'machine_data': machine_data,
             'process_data': process_data,
-            'leaking_type_stats': leaking_type_stats,
         }
 
     def _log_diff_memory_data(self, prefix, new_memory_data, old_memory_data):
@@ -178,9 +185,6 @@ class MonitoringMemoryMiddleware(object):
         def _process_vms(memory_data):
             return memory_data['process_data']['memory_info'].vms
 
-        def _leaking_type_stats(memory_data):
-            return TypeStats(memory_data['leaking_type_stats'])
-
         if new_memory_data and old_memory_data:
             log.info(
                 u"%s Diff Vmem used: %s, Diff percent memory: %s, Diff rss: %s, Diff vms: %s",
@@ -190,14 +194,14 @@ class MonitoringMemoryMiddleware(object):
                 _process_rss(new_memory_data) - _process_rss(old_memory_data),
                 _process_vms(new_memory_data) - _process_vms(old_memory_data),
             )
-            log.info(
-                u"%s Diff typestats: %s",
-                prefix,
-                _leaking_type_stats(new_memory_data) - _leaking_type_stats(old_memory_data),
-            )
 
     def _is_enabled(self):
         """
         Returns whether this middleware is enabled.
         """
         return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')
+
+    @staticmethod
+    def _reset_memory_leak_baseline():
+        with open(os.devnull, 'w') as devnull:
+            get_new_ids(file=devnull)

@@ -20,6 +20,7 @@ At this time, these custom metrics will only be reported to New Relic.
 TODO: supply additional public functions for storing strings and booleans.
 
 """
+import inspect
 from contextlib import contextmanager
 
 from . import middleware
@@ -110,3 +111,14 @@ def function_trace(function_name):
             yield
     else:
         yield
+
+
+def graph_memory_leaks(request):
+    """
+    Run anywhere inside a view to have the memory monitoring middleware create
+    diagnostic memory reference graphs for new objects leaked while executing
+    it.  That middleware must be enabled via a waffle switch for this to have
+    any effect.
+    """
+    view_name = inspect.stack()[1][3]
+    setattr(request, middleware.MonitoringMemoryMiddleware.memory_graphs_key, view_name)

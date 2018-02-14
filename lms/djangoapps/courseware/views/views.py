@@ -80,7 +80,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.core.djangoapps.monitoring_utils import graph_memory_leaks, set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -722,6 +722,7 @@ def course_about(request, course_id):
     """
     Display the course's about page.
     """
+    graph_memory_leaks(request)
     course_key = CourseKey.from_string(course_id)
 
     # If a user is not able to enroll in a course then redirect
