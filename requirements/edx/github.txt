@@ -4,6 +4,12 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 #
+# Do *NOT* install Python packages from GitHub unless it's absolutely necessary!
+# "I don't have time to add automatic Travis upload to PyPI." is *not* an
+# acceptable excuse. Non-wheel module installations slow down the dev/building process.
+# Travis/PyPI instructions are here:
+# https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/41911049/Publishing+a+Package+to+PyPI+using+Travis
+#
 # A correct GitHub reference looks like this:
 #
 #   git+https://github.com/OWNER/REPO-NAME.git@TAG-OR-SHA#egg=DIST-NAME==VERSION
@@ -93,10 +99,7 @@ git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd3
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 git+https://github.com/edx/xblock-utils.git@v1.0.5#egg=xblock-utils==1.0.5
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
-git+https://github.com/edx/edx-user-state-client.git@1.0.2#egg=edx-user-state-client==1.0.2
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.7#egg=lti_consumer-xblock==1.1.7
-# This is here because all of the other XBlocks are located here. However, it is published to PyPI and will be installed that way
-xblock-review==1.1.4
 
 # Third Party XBlocks
 
