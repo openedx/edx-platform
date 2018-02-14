@@ -1,7 +1,7 @@
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from django.dispatch import receiver
-from core import get_course_link
+from openedx.core.djangoapps.timed_notification.core import get_course_link
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.certificates.api import get_certificate_url
 from common.lib.mandrill_client.client import MandrillClient
