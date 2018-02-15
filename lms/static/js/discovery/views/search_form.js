@@ -62,9 +62,9 @@
 
             showErrorMessage: function(search) {
                 if (search && search.errorMessage) {
-                    this.$message.html(gettext(search.errorMessage));
+                    this.$message.text(gettext(search.errorMessage));
                 } else {
-                    this.$message.html(gettext('There was an error, try searching again.'));
+                    this.$message.text(gettext('There was an error, try searching again.'));
                 }
             }
 
