@@ -48,6 +48,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     """
     A form to validate query parameters in the course list retrieval endpoint
     """
+    search_term = CharField(required=False)
     username = CharField(required=False)
     org = CharField(required=False)
 

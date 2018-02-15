@@ -66,6 +66,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
             'username': user.username,
             'org': '',
             'mobile': None,
+            'search_term': '',
             'filter_': None,
         }
 
