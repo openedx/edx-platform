@@ -16,13 +16,13 @@ from student.tests.factories import (TEST_PASSWORD, UserFactory, CourseOverviewF
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
     from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.utils import is_course_run_entitlement_fullfillable
+    from entitlements.utils import is_course_run_entitlement_fulfillable
 
 
 @skip_unless_lms
 class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
     """
-    Tests for the utility function is_course_run_entitlement_fullfillable
+    Tests for the utility function is_course_run_entitlement_fulfillable
     """
 
     def setUp(self):
@@ -64,7 +64,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
+        assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
     def test_course_run_not_fullfillable_run_ended(self):
         course_overview = self.create_course(
@@ -76,7 +76,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
     def test_course_run_not_fullfillable_enroll_period_ended(self):
         course_overview = self.create_course(
@@ -88,7 +88,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
     def test_course_run_fullfillable_user_enrolled(self):
         course_overview = self.create_course(
@@ -102,7 +102,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
         # Enroll User in the Course, but do not update the entitlement
         CourseEnrollmentFactory.create(user=entitlement.user, course_id=course_overview.id)
 
-        assert is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
+        assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
     def test_course_run_not_fullfillable_upgrade_ended(self):
         course_overview = self.create_course(
@@ -115,4 +115,4 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
-        assert not is_course_run_entitlement_fullfillable(course_overview.id, entitlement)
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)

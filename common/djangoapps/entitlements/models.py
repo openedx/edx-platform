@@ -1,16 +1,25 @@
+"""Entitlement Models"""
+
+import logging
 import uuid as uuid_tools
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db import transaction
 from django.utils.timezone import now
 from model_utils.models import TimeStampedModel
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from openedx.core.djangoapps.catalog.utils import get_course_uuid_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
+from student.models import CourseEnrollmentException
 from util.date_utils import strftime_localized
+from entitlements.utils import is_course_run_entitlement_fulfillable
+
+log = logging.getLogger("common.entitlements.models")
 
 
 class CourseEntitlementPolicy(models.Model):
@@ -319,6 +328,91 @@ class CourseEntitlement(TimeStampedModel):
             expired_at__isnull=False,
             enrollment_course_run=None
         ).select_related('user').select_related('enrollment_course_run')
+
+    @classmethod
+    def get_fulfillable_entitlements(cls, user):
+        """
+        Returns all fulfillable entitlements for a User
+
+        Arguments:
+            user (User): The user we are looking at the entitlements of.
+
+        Returns
+            Queryset: A queryset of course Entitlements ordered descending by creation date that a user can enroll in.
+            These must not be expired and not have a course run already assigned to it.
+        """
+
+        return cls.objects.filter(
+            user=user,
+        ).exclude(
+            expired_at__isnull=False,
+            enrollment_course_run__isnull=False
+        ).order_by('-created')
+
+    @classmethod
+    def get_fulfillable_entitlement_for_user_course_run(cls, user, course_run_key):
+        """
+        Retrieves a fulfillable entitlement for the user and the given course run.
+
+        Arguments:
+            user (User): The user that we are inspecting the entitlements for.
+            course_run_key (CourseKey): The course run Key.
+
+        Returns:
+            CourseEntitlement: The most recent fulfillable CourseEntitlement, None otherwise.
+        """
+        # Check if the User has any fulfillable entitlements.
+        # Note: Wait to retrieve the Course UUID until we have confirmed the User has fulfillable entitlements.
+        # This was done to avoid calling the APIs when the User does not have an entitlement.
+        entitlements = cls.get_fulfillable_entitlements(user)
+        if entitlements:
+            course_uuid = get_course_uuid_for_course(course_run_key)
+            if course_uuid:
+                entitlement = entitlements.filter(course_uuid=course_uuid).first()
+                if is_course_run_entitlement_fulfillable(course_run_key=course_run_key, entitlement=entitlement):
+                    return entitlement
+        return None
+
+    @classmethod
+    @transaction.atomic
+    def enroll_user_and_fulfill_entitlement(cls, entitlement, course_run_key):
+        """
+        Enrolls the user in the Course Run and updates the entitlement with the new Enrollment.
+
+        Returns:
+            bool: True if successfully fulfills given entitlement by enrolling the user in the given course run.
+        """
+        try:
+            enrollment = CourseEnrollment.enroll(
+                user=entitlement.user,
+                course_key=course_run_key,
+                mode=entitlement.mode
+            )
+        except CourseEnrollmentException:
+            log.exception('Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
+            return False
+
+        entitlement.set_enrollment(enrollment)
+        return True
+
+    @classmethod
+    def check_for_existing_entitlement_and_enroll(cls, user, course_run_key):
+        """
+        Looks at the User's existing entitlements to see if the user already has a Course Entitlement for the
+        course run provided in the course_key.  If the user does have an Entitlement with no run set, the User is
+        enrolled in the mode set in the Entitlement.
+
+        Arguments:
+            user (User): The user that we are inspecting the entitlements for.
+            course_run_key (CourseKey): The course run Key.
+        Returns:
+            bool: True if the user had an eligible course entitlement to which an enrollment in the
+            given course run was applied.
+        """
+        entitlement = cls.get_fulfillable_entitlement_for_user_course_run(user, course_run_key)
+        if entitlement:
+            return cls.enroll_user_and_fulfill_entitlement(entitlement, course_run_key)
+        return False
 
 
 class CourseEntitlementSupportDetail(TimeStampedModel):
