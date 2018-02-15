@@ -2,15 +2,16 @@
 Monitoring utilities which aren't used by the application by default, but can
 be used as needed to troubleshoot problems.
 """
-from __future__ import print_function
-
 import os
 from StringIO import StringIO
+import logging
 
 import objgraph
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+
+log = logging.getLogger(__name__)
 
 indices = {}
 
@@ -78,8 +79,8 @@ def show_memory_leaks(
 
         path = u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data)
         default_storage.save(path, ContentFile(backrefs_dot.getvalue()))
-        print(u'Graph generated at {}{}'.format(settings.MEDIA_URL, path))
+        log.info(u'Graph generated at %s%s', settings.MEDIA_URL, path)
 
         path = u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data)
         default_storage.save(path, ContentFile(refs_dot.getvalue()))
-        print(u'Graph generated at {}{}'.format(settings.MEDIA_URL, path))
+        log.info(u'Graph generated at %s%s', settings.MEDIA_URL, path)
