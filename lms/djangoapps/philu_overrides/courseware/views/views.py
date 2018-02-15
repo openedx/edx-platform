@@ -8,7 +8,6 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.courseware.views.views import is_course_passed, _track_successful_certificate_generation

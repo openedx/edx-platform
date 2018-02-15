@@ -13,7 +13,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from student.helpers import get_next_url_for_login_page
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
