@@ -4,12 +4,16 @@ be used as needed to troubleshoot problems.
 """
 
 import os
+from StringIO import StringIO
 
 import objgraph
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 indices = {}
 
-DUMP_DIR = u'/tmp/memory_graphs'
+DUMP_DIR = u'memory_graphs'
 MAX_CONSOLE_ROWS = 10
 MAX_GRAPHED_OBJECT_TYPES = 5
 REFS_DEPTH = 3
@@ -37,8 +41,8 @@ def show_memory_leaks(
 
     Args:
         label (unicode): The start of the filename for each graph
-        dump_dir (unicode): The directory in which graphs are dumped.  It will
-            be created if it doesn't already exist.
+        dump_dir (unicode): The directory (under the default storage backend)
+            in which graphs are dumped.
         max_console_rows (int): The max number of object types for which to
             show data on the console
         max_graphed_object_types (int): The max number of object types for
@@ -57,17 +61,21 @@ def show_memory_leaks(
     indices[label] += 1
     sorted_by_count = sorted(new_ids.items(), key=lambda entry: len(entry[1]), reverse=True)
 
-    if not os.path.exists(dump_dir):
-        os.makedirs(dump_dir)
-
     for item in sorted_by_count[:max_graphed_object_types]:
         type_name = item[0]
         object_ids = new_ids[type_name]
         if type_name in ignored_types or len(object_ids) == 0:
             continue
         objects = objgraph.at_addrs(object_ids)[:max_objects_per_type]
+
+        backrefs_dot = StringIO()
+        refs_dot = StringIO()
+
+        objgraph.show_backrefs(objects, max_depth=back_refs_depth, output=backrefs_dot)
+        objgraph.show_refs(objects, max_depth=refs_depth, output=refs_dot)
+
         data = {'dir': dump_dir, 'label': label, 'pid': os.getpid(), 'index': index, 'type_name': type_name}
-        objgraph.show_backrefs(objects, max_depth=back_refs_depth,
-                               filename=u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data))
-        objgraph.show_refs(objects, max_depth=refs_depth,
-                           filename=u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data))
+        default_storage.save(u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data),
+                             ContentFile(backrefs_dot))
+        default_storage.save(u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data),
+                             ContentFile(refs_dot))
