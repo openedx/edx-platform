@@ -2,6 +2,7 @@
 Monitoring utilities which aren't used by the application by default, but can
 be used as needed to troubleshoot problems.
 """
+from __future__ import print_function
 
 import os
 from StringIO import StringIO
@@ -73,9 +74,12 @@ def show_memory_leaks(
 
         objgraph.show_backrefs(objects, max_depth=back_refs_depth, output=backrefs_dot)
         objgraph.show_refs(objects, max_depth=refs_depth, output=refs_dot)
-
         data = {'dir': dump_dir, 'label': label, 'pid': os.getpid(), 'index': index, 'type_name': type_name}
-        default_storage.save(u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data),
-                             ContentFile(backrefs_dot))
-        default_storage.save(u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data),
-                             ContentFile(refs_dot))
+
+        path = u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data)
+        default_storage.save(path, ContentFile(backrefs_dot.getvalue()))
+        print(u'Graph generated at {}{}'.format(settings.MEDIA_URL, path))
+
+        path = u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data)
+        default_storage.save(path, ContentFile(refs_dot.getvalue()))
+        print(u'Graph generated at {}{}'.format(settings.MEDIA_URL, path))
