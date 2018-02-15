@@ -21,10 +21,10 @@ from openedx.core.djangolib.markup import HTML
         data-discussion-id='${entries[entry]["id"]}'
         id='${entries[entry]["id"]}'
         data-divided="${str(entries[entry]['is_divided']).lower()}"
-        role="presentation"
+        role="option"
     >
     %if entry:
-        <span class="forum-nav-browse-title" role="option">
+        <span class="forum-nav-browse-title">
         %if topic_list:
             <span class="sr">
                 ${', '.join(topic_list)},  
@@ -39,9 +39,9 @@ from openedx.core.djangolib.markup import HTML
 <%def name="render_category(categories, category, topic_list)">
     <li class="forum-nav-browse-menu-item"
         id='${category | u}'
-        role="presentation"
+        role="option"
     >
-        <span class="forum-nav-browse-title" role="option">${category}</span>
+        <span class="forum-nav-browse-title">${category}</span>
         <ul class="forum-nav-browse-submenu" role="presentation">
             <% topic_list.append(category) %>
             ${HTML(render_dropdown(categories[category], topic_list))}
@@ -59,12 +59,12 @@ from openedx.core.djangolib.markup import HTML
         </label>
     </form>
     <ul class="forum-nav-browse-menu" role="listbox" id="discussion_topics_listbox">
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all" role="presentation" id="all_discussions">
-            <span class="forum-nav-browse-title" role="option">${_("All Discussions")}</span>
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all" role="option" id="all_discussions">
+            <span class="forum-nav-browse-title">${_("All Discussions")}</span>
         </li>
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following" role="presentation" id="posts_following">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following" role="option" id="posts_following">
             <span class="icon fa fa-star" aria-hidden="true"></span>
-            <span class="forum-nav-browse-title" role="option">${_("Posts I'm Following")}</span>
+            <span class="forum-nav-browse-title">${_("Posts I'm Following")}</span>
         </li>
         ${HTML(render_dropdown(category_map, []))}
     </ul>
