@@ -1,6 +1,7 @@
 """
 Django management command to create a course in a specific modulestore
 """
+from datetime import datetime, timedelta
 from six import text_type
 
 from django.contrib.auth.models import User
@@ -38,30 +39,48 @@ class Command(BaseCommand):
                             nargs='?',
                             default=None,
                             help="The display name of the course. (OPTIONAL)")
+        parser.add_argument('start_date',
+                            nargs='?',
+                            default=None,
+                            help="The start date of the course. Format: YYYY-MM-DD")
 
-    def parse_args(self, **options):
+    def get_user(self, user):
         """
-        Return a tuple of passed in values for (modulestore, user, org, course, run).
+        Return a User object.
         """
         try:
-            user = user_from_str(options['user'])
+            user_object = user_from_str(user)
         except User.DoesNotExist:
-            raise CommandError("No user {user} found.".format(user=options['user']))
-
-        return options['modulestore'], user, options['org'], options['number'], options['run'], options['name']
+            raise CommandError("No user {user} found.".format(user=user))
+        return user_object
 
     def handle(self, *args, **options):
-        storetype, user, org, number, run, name = self.parse_args(**options)
+
+        run = options['run']
+        org = options['org']
+        name = options['name']
+        number = options['number']
+        storetype = options['modulestore']
+        start_date = options["start_date"]
+        user = self.get_user(options['user'])
+
+        # start date is set one week ago if not given
+        start_date = datetime.strptime(start_date, "%Y-%m-%d") if start_date else datetime.now() - timedelta(days=7)
 
         if storetype == ModuleStoreEnum.Type.mongo:
             self.stderr.write("WARNING: The 'Old Mongo' store is deprecated. New courses should be added to split.")
 
+        fields = {
+            "start": start_date
+        }
+        if name:
+            fields["display_name"] = name
         new_course = create_new_course_in_store(
             storetype,
             user,
             org,
             number,
             run,
-            {"display_name": name} if name else {}
+            fields
         )
         self.stdout.write(u"Created {}".format(text_type(new_course.id)))
