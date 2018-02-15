@@ -3,6 +3,7 @@
 <%def name="online_help_token()"><% return "learnerdashboard" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
+import json
 import pytz
 from courseware.context_processor import user_timezone_locale_prefs
 from datetime import datetime, timedelta
@@ -146,7 +147,7 @@ from student.models import CourseEnrollment
       <h2 class="header-courses">${_("My Courses")}</h2>
     </header>
     % if len(course_entitlements + course_enrollments) > 0:
-        <ul class="listing-courses" data-programs=${programs_data}>
+        <ul class="listing-courses" data-programs='${json.dumps(programs_data)}'>
         <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
         % for dashboard_index, enrollment in enumerate(course_entitlements + course_enrollments):
           <%

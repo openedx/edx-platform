@@ -526,7 +526,6 @@ def student_dashboard(request):
     enrollment_message = _create_recent_enrollment_message(
         course_enrollments, course_modes_by_course
     )
-
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     sidebar_account_activation_message = ''
@@ -590,20 +589,18 @@ def student_dashboard(request):
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
     if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
-        for program in inverted_programs.values():
-            try:
-                program_uuid = program[0]['uuid']
-                program_data = get_programs(request.site, uuid=program_uuid)
-                program_data = ProgramDataExtender(program_data, request.user).extend()
-                skus = program_data.get('skus')
-                program_data['completeProgramURL'] = ecommerce_service.get_checkout_page_url(*skus) + '&bundle=' + program_data.get('uuid')
-                programs_data[program_uuid] = program_data
-            except:
-                pass
-        try:
-            programs_data = json.dumps(programs_data)
-        except:
-            programs_data = {}
+        if len(course_enrollments) < 4:
+            for program in inverted_programs.values():
+                try:
+                    program_uuid = program[0]['uuid']
+                    program_data = get_programs(request.site, uuid=program_uuid)
+                    program_data = ProgramDataExtender(program_data, request.user).extend()
+                    skus = program_data.get('skus')
+                    checkout_page_url = ecommerce_service.get_checkout_page_url(*skus)
+                    program_data['completeProgramURL'] = checkout_page_url + '&bundle=' + program_data.get('uuid')
+                    programs_data[program_uuid] = program_data
+                except:  # pylint: disable=bare-except
+                    pass
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
