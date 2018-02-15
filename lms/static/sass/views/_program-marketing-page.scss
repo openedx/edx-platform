@@ -1,7 +1,8 @@
-.content-wrapper{
+.content-wrapper {
   margin-left: auto;
   margin-right: auto;
 }
+
 #program-details-hero {
   .program_title {
     font-weight: bold;
@@ -26,6 +27,7 @@
     .btn {
       font-size: 20px;
       font-weight: $font-weight-bold;
+
       .original-price {
         text-decoration: line-through;
         font-weight: $font-weight-normal;
@@ -215,10 +217,12 @@
     }
   }
 
-  a:focus, a:active {
+  a:focus,
+  a:active {
     text-decoration: none;
     outline: 0;
   }
+
   .modal-custom {
     max-width: 500px;
     max-height: 80%;
@@ -231,9 +235,9 @@
     margin-right: auto !important;
     background-color: #fff;
     overflow: auto;
-    
-    .modal-header{
-      padding-top: 0px;
+
+    .modal-header {
+      padding-top: 0;
       justify-content: center;
       text-align: center;
     }
@@ -241,14 +245,15 @@
     .instructor-bio {
       padding: 10px 0;
     }
+
     .btn-close.modal_close {
       text-align: right;
 
-      i{
+      i {
         font-size: 28px;
         cursor: pointer;
         padding: 5px;
       }
     }
-  }   
+  }
 }
