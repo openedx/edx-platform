@@ -1,35 +1,36 @@
 """ Views for a student's account information. """
 import base64
-import logging
 import json
+import logging
 import urlparse
 
+import third_party_auth
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
-from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
-    _third_party_auth_context
-from common.djangoapps.student.views import get_course_related_keys
-from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id
-from lms.djangoapps.courseware.access import has_access
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
+from student.helpers import get_next_url_for_login_page
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
-import third_party_auth
 from third_party_auth.decorators import xframe_allow_whitelisted
-from util.enterprise_helpers import set_enterprise_branding_filter_param
 from util.cache import cache_if_anonymous
+from util.enterprise_helpers import set_enterprise_branding_filter_param
+from xmodule.modulestore.django import modulestore
+
+from common.djangoapps.student.views import get_course_related_keys
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id
+from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
+from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
+    _third_party_auth_context
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)

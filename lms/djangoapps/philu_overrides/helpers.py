@@ -1,5 +1,5 @@
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 
 def get_course_details(course_id):

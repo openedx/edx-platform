@@ -1,15 +1,16 @@
 
 from certificates import api as certs_api
-from common.lib.mandrill_client.client import MandrillClient
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
+
+from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.courseware.views.views import is_course_passed, _track_successful_certificate_generation
 from openedx.core.djangoapps.timed_notification.core import get_course_link
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from xmodule.modulestore.django import modulestore
 
 
 @transaction.non_atomic_requests
