@@ -23,8 +23,26 @@ from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
+class EntitlementSupportView(View):
+    """
+    View for viewing and changing learner enrollments, used by the
+    support team.
+    """
 
-class EntitlementSupportView(viewsets.ModelViewSet):
+    @method_decorator(require_support_permission)
+    def get(self, request):
+        """Render the enrollment support tool view."""
+        context = {
+            'username': request.GET.get('user', ''),
+            'entitlementsUrl': reverse('support:enrollment_list'),
+            'entitlementSupportUrl': reverse('support:enrollment'),
+            'uses_bootstrap': True
+        }
+    
+        return render_to_response('support/entitlement.html', context)
+
+
+class EntitlementSupportListView(viewsets.ModelViewSet):
     """
     Allows viewing and changing learner course entitlements, used the support team.
     """

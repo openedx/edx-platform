@@ -24,5 +24,5 @@ urlpatterns = [
         views.ManageUserDetailView.as_view(),
         name="manage_user_detail"
     ),
-    url(r'^course_entitlement/?$', views.EntitlementSupportView.as_view({'get': 'list'}), name="course_entitlement")
+    url(r'^course_entitlement/?$', views.EntitlementSupportView.as_view(), name="course_entitlement")
 ]
