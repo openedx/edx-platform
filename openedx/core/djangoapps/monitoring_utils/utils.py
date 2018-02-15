@@ -7,7 +7,6 @@ from StringIO import StringIO
 import logging
 
 import objgraph
-from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 
@@ -16,7 +15,7 @@ log = logging.getLogger(__name__)
 indices = {}
 
 DUMP_DIR = u'memory_graphs'
-MAX_CONSOLE_ROWS = 10
+MAX_CONSOLE_ROWS = 20
 MAX_GRAPHED_OBJECT_TYPES = 5
 REFS_DEPTH = 3
 BACK_REFS_DEPTH = 8
@@ -58,7 +57,9 @@ def show_memory_leaks(
             ignored by default because many sets are created in the course of
             tracking the number of new objects of each type.
     """
-    new_ids = objgraph.get_new_ids(limit=max_console_rows)
+    new_objects_output = StringIO()
+    new_ids = objgraph.get_new_ids(limit=max_console_rows, file=new_objects_output)
+    log.info('\n' + new_objects_output.getvalue())
     index = indices.setdefault(label, 1)
     indices[label] += 1
     sorted_by_count = sorted(new_ids.items(), key=lambda entry: len(entry[1]), reverse=True)
