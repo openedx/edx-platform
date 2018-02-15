@@ -2,42 +2,40 @@ import datetime
 import json
 import logging
 
+import analytics
+import dogstats_wrapper as dog_stats_api
+import third_party_auth
+from django.conf import settings
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_email, ValidationError
+from django.db import IntegrityError, transaction
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt
-
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
-from openedx.core.djangoapps.user_api.views import RegistrationView
+from eventtracking import tracker
+from notification_prefs.views import enable_notifications
+from pytz import UTC
+from requests import HTTPError
+from social.exceptions import AuthException, AuthAlreadyAssociated
+from student.cookies import set_logged_in_cookies
+from student.forms import AccountCreationForm, get_registration_extension_form
+from student.models import Registration, create_comments_service_user, PasswordHistory, UserProfile
+from third_party_auth import pipeline, provider
+from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from util.json_request import JsonResponse
 from util.request import safe_get_host
+
 from common.djangoapps.student.views import AccountValidationError, social_utils, REGISTER_USER, \
     _enroll_user_in_pending_courses, record_registration_attributions
-from django.core.validators import validate_email, ValidationError
-from student.cookies import set_logged_in_cookies
-from django.contrib.auth import authenticate, login
-import third_party_auth
-from third_party_auth import pipeline, provider
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from django.conf import settings
-from pytz import UTC
-from django.db import IntegrityError, transaction
-import analytics
-from eventtracking import tracker
-from requests import HTTPError
-import dogstats_wrapper as dog_stats_api
-from django.utils.translation import ugettext as _, get_language
-from notification_prefs.views import enable_notifications
-from util.enterprise_helpers import data_sharing_consent_requirement_at_login
-from student.forms import AccountCreationForm, get_registration_extension_form
-from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from social.exceptions import AuthException, AuthAlreadyAssociated
 from common.lib.mandrill_client.client import MandrillClient
-from edxmako.shortcuts import render_to_string
-from student.models import Registration, create_comments_service_user, PasswordHistory, UserProfile
-
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
+from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_api.views import RegistrationView
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
