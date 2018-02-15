@@ -667,9 +667,9 @@ def process_npm_assets():
         library_dir_path = 'node_modules/{library_dir}'.format(library_dir=library_dir)
         print('Copying vendor library dir: {}'.format(library_dir_path))
         if os.path.exists(library_dir_path):
-            for dirpath, dirnames, filenames in os.walk(library_dir_path):
+            for dirpath, _, filenames in os.walk(library_dir_path):
                 for filename in filenames:
-                    copy_vendor_library(os.path.join(dirpath, filename))
+                    copy_vendor_library(os.path.join(dirpath, filename), skip_if_missing=skip_if_missing)
 
     # Skip processing of the libraries if this is just a dry run
     if tasks.environment.dry_run:
