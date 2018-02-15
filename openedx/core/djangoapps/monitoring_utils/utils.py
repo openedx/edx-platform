@@ -6,7 +6,6 @@ be used as needed to troubleshoot problems.
 import os
 
 import objgraph
-from django.conf import settings
 
 indices = {}
 
@@ -67,8 +66,8 @@ def show_memory_leaks(
         if type_name in ignored_types or len(object_ids) == 0:
             continue
         objects = objgraph.at_addrs(object_ids)[:max_objects_per_type]
-        data = {'dir': dump_dir, 'label': label, 'index': index, 'type_name': type_name}
+        data = {'dir': dump_dir, 'label': label, 'pid': os.getpid(), 'index': index, 'type_name': type_name}
         objgraph.show_backrefs(objects, max_depth=back_refs_depth,
-                               filename=u'{dir}/{label}_{index}_{type_name}_backrefs.dot'.format(**data))
+                               filename=u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data))
         objgraph.show_refs(objects, max_depth=refs_depth,
-                           filename=u'{dir}/{label}_{index}_{type_name}_refs.dot'.format(**data))
+                           filename=u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data))
