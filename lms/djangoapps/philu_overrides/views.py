@@ -13,7 +13,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from openedx.core.djangoapps.catalog.utils import get_programs_data
 from student.helpers import get_next_url_for_login_page
+from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
@@ -25,7 +28,7 @@ from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id
+from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
