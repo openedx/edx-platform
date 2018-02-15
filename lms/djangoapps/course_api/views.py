@@ -2,6 +2,8 @@
 Course API Views
 """
 
+import search
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
@@ -136,6 +138,8 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         Body comprises a list of objects as returned by `CourseDetailView`.
 
     **Parameters**
+        search_term (optional):
+            Search term to filter courses (used by ElasticSearch).
 
         username (optional):
             The username of the specified user whose visible courses we
@@ -192,6 +196,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     pagination_class = NamespacedPageNumberPagination
     serializer_class = CourseSerializer
 
+    # Return all the results, 10K is the maximum allowed value for ElasticSearch.
+    # We should use 0 after upgrading to 1.1+:
+    #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
+    results_size_infinity = 10000
+
     def get_queryset(self):
         """
         Return a list of courses visible to the user.
@@ -200,9 +209,24 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        return list_courses(
+        db_courses = list_courses(
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
             filter_=form.cleaned_data['filter_'],
         )
+
+        if not settings.FEATURES['ENABLE_COURSEWARE_SEARCH'] or not form.cleaned_data['search_term']:
+            return db_courses
+
+        search_courses = search.api.course_discovery_search(
+            form.cleaned_data['search_term'],
+            size=self.results_size_infinity,
+        )
+
+        search_courses_ids = {course['data']['id']: True for course in search_courses['results']}
+
+        return [
+            course for course in db_courses
+            if unicode(course.id) in search_courses_ids
+        ]

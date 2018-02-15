@@ -5,7 +5,11 @@ from hashlib import md5
 
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
+from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+from search.tests.test_course_discovery import DemoCourse
+from search.tests.tests import TEST_INDEX_NAME
+from search.tests.utils import SearcherMixin
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from .mixins import CourseApiFactoryMixin, TEST_PASSWORD
@@ -221,3 +225,85 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request.user = self.staff_user
         response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
         self.assertEquals(response.status_code, 400)
+
+
+@override_settings(ELASTIC_FIELD_MAPPINGS={
+    'start_date': {'type': 'date'},
+    'enrollment_start': {'type': 'date'},
+    'enrollment_end': {'type': 'date'}
+})
+@override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
+@override_settings(COURSEWARE_INDEX_NAME=TEST_INDEX_NAME)
+class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, SearcherMixin):
+    """
+    Tests the search functionality of the courses API.
+
+    Similar to search.tests.test_course_discovery_views but with the course API integration.
+    """
+
+    ENABLED_SIGNALS = ['course_published']
+
+    def setUp(self):
+        super(CourseListSearchViewTest, self).setUp()
+        DemoCourse.reset_count()
+        self.searcher.destroy()
+
+        self.courses = [
+            self.create_and_index_course('OrgA', 'Find this one with the right parameter'),
+            self.create_and_index_course('OrgB', 'Find this one with another parameter'),
+            self.create_and_index_course('OrgC', 'This course has a unique search term'),
+        ]
+
+        self.url = reverse('course-list')
+        self.staff_user = self.create_user(username='staff', is_staff=True)
+        self.honor_user = self.create_user(username='honor', is_staff=False)
+
+    def create_and_index_course(self, org_code, short_description):
+        """
+        Add a course to both database and search.
+
+        Warning: A ton of gluing here! If this fails, double check both CourseListViewTestCase and MockSearchUrlTest.
+        """
+
+        search_course = DemoCourse.get({
+            'org': org_code,
+            'run': '2010',
+            'number': 'DemoZ',
+            # Using the slash separated course ID bcuz `DemoCourse` isn't updated yet to new locator.
+            'id': '{org_code}/DemoZ/2010'.format(org_code=org_code),
+            'content': {
+                'short_description': short_description,
+            },
+        })
+
+        DemoCourse.index(self.searcher, [search_course])
+
+        org, course, run = search_course['id'].split('/')
+
+        db_course = self.create_course(
+            mobile_available=False,
+            org=org,
+            course=course,
+            run=run,
+            short_description=short_description,
+        )
+
+        return db_course
+
+    def test_list_all(self):
+        """
+        Test without search, should list all the courses.
+        """
+        res = self.verify_response()
+        self.assertIn('results', res.data)
+        self.assertNotEqual(res.data['results'], [])
+        self.assertEqual(res.data['pagination']['count'], 3)  # Should list all of the 3 courses
+
+    def test_list_all_with_search_term(self):
+        """
+        Test with search, should only the course that matches the search term.
+        """
+        res = self.verify_response(params={'search_term': 'unique search term'})
+        self.assertIn('results', res.data)
+        self.assertNotEqual(res.data['results'], [])
+        self.assertEqual(res.data['pagination']['count'], 1)  # Should list a single course
