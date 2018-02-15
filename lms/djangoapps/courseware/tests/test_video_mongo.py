@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
-"""Video xmodule tests in mongo."""
+"""
+Video xmodule tests in mongo.
+"""
 
 import json
 from collections import OrderedDict
 from uuid import uuid4
 
+from tempfile import mkdtemp
+import shutil
 import ddt
 from django.conf import settings
+from django.core.files import File
+from django.core.files.base import ContentFile
 from django.test import TestCase
 from django.test.utils import override_settings
+from fs.osfs import OSFS
+from fs.path import combine
 from edxval.api import (
     ValCannotCreateError,
     ValVideoNotFoundError,
@@ -16,7 +24,8 @@ from edxval.api import (
     create_profile,
     create_video,
     get_video_info,
-    get_video_transcript
+    get_video_transcript,
+    get_video_transcript_data
 )
 from lxml import etree
 from mock import MagicMock, Mock, patch
@@ -32,6 +41,7 @@ from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.video_module import VideoDescriptor, bumper_utils, rewrite_video_url, video_utils
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store
+from xmodule.video_module.video_module import EXPORT_STATIC_DIR
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
@@ -42,6 +52,16 @@ MODULESTORES = {
     ModuleStoreEnum.Type.mongo: TEST_DATA_MONGO_MODULESTORE,
     ModuleStoreEnum.Type.split: TEST_DATA_SPLIT_MODULESTORE,
 }
+
+TRANSCRIPT_FILE_DATA = """
+1
+00:00:14,370 --> 00:00:16,530
+I am overwatch.
+
+2
+00:00:16,500 --> 00:00:18,600
+可以用“我不太懂艺术 但我知道我喜欢什么”做比喻.
+"""
 
 
 @attr(shard=1)
@@ -1509,12 +1529,15 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         super(VideoDescriptorTest, self).setUp()
         self.descriptor.runtime.handler_url = MagicMock()
         self.descriptor.runtime.course_id = MagicMock()
+        self.temp_dir = mkdtemp()
+        self.file_system = OSFS(self.temp_dir)
+        self.addCleanup(shutil.rmtree, self.temp_dir)
 
     def get_video_transcript_data(self, video_id):
         return dict(
             video_id=video_id,
             language_code='ar',
-            url='/media/ext101.srt',
+            url='{media_url}ext101.srt'.format(media_url=settings.MEDIA_URL),   # MEDIA_URL is /static/uploads/
             provider='Cielo24',
             file_format='srt',
         )
@@ -1547,7 +1570,14 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         )
 
     def test_export_val_data_with_internal(self):
+        """
+        Tests that exported VAL videos are working as expected.
+        """
+        language_code = 'ar'
+        transcript_file_name = 'test_edx_video_id-ar.srt'
+        expected_transcript_path = combine(self.temp_dir, combine(EXPORT_STATIC_DIR, transcript_file_name))
         self.descriptor.edx_video_id = 'test_edx_video_id'
+
         create_profile('mobile')
         create_video({
             'edx_video_id': self.descriptor.edx_video_id,
@@ -1561,34 +1591,48 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 'bitrate': 333,
             }],
         })
-        create_or_update_video_transcript(
+        transcript_url = create_or_update_video_transcript(
             video_id=self.descriptor.edx_video_id,
-            language_code='ar',
+            language_code=language_code,
             metadata={
                 'provider': 'Cielo24',
-                'file_name': 'ext101.srt',
                 'file_format': 'srt'
-            }
+            },
+            file_data=ContentFile(TRANSCRIPT_FILE_DATA)
         )
 
-        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
         expected_str = """
             <video download_video="false" url_name="SampleProblem">
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                     <transcripts>
-                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24" video_id="{video_id}"/>
+                        <transcript file_format="srt" file_name='video-transcripts/{transcript_name}' language_code="{language_code}" provider="Cielo24"/>
                     </transcripts>
                 </video_asset>
             </video>
-        """.format(video_id=self.descriptor.edx_video_id)
+        """.format(
+            transcript_name=transcript_url.split('/')[-1],
+            language_code=language_code
+        )
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
+        # Verify transcript file is created.
+        self.assertEqual([transcript_file_name], self.file_system.listdir(EXPORT_STATIC_DIR))
+
+        # Also verify the content of created transcript file.
+        expected_transcript_content = File(open(expected_transcript_path)).read()
+        transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
+        self.assertEqual(transcript['content'], expected_transcript_content)
+
     def test_export_val_data_not_found(self):
+        """
+        Tests that external video export works as expected.
+        """
         self.descriptor.edx_video_id = 'nonexistent'
-        actual = self.descriptor.definition_to_xml(resource_fs=None)
+        actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
         expected_str = """<video download_video="false" url_name="SampleProblem"/>"""
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
@@ -1597,12 +1641,12 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     @patch('xmodule.video_module.transcripts_utils.get_video_ids_info')
     def test_export_no_video_ids(self, mock_get_video_ids_info):
         """
-        Tests export when there are no video ids
+        Tests export when there is no video id. `export_to_xml` only works in case of video id.
         """
         mock_get_video_ids_info.return_value = True, []
 
-        actual = self.descriptor.definition_to_xml(resource_fs=None)
-        expected_str = '<video url_name="SampleProblem" download_video="false"><video_asset/></video>'
+        actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
+        expected_str = '<video url_name="SampleProblem" download_video="false"></video>'
 
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
