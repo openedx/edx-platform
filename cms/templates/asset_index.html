@@ -13,25 +13,32 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-    % for template_name in ["asset"]:
-    <script type="text/template" id="${template_name}-tpl">
-        <%static:include path="js/${template_name}.underscore" />
-    </script>
-    % endfor
+    % if waffle_flag_enabled:
+        % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+            <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/vendor.min.css')}" />
+            <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/assets.min.css')}" />
+        % endif
+    % else:
+        % for template_name in ["asset"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="js/${template_name}.underscore" />
+        </script>
+        % endfor
+    % endif
 </%block>
 
-% if not waffle_flag_enabled:
 <%block name="requirejs">
-    require(["js/factories/asset_index"], function (AssetIndexFactory) {
-        AssetIndexFactory({
-          assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
-          uploadChunkSizeInMBs: ${chunk_size_in_mbs|n, dump_js_escaped_json},
-          maxFileSizeInMBs: ${max_file_size_in_mbs|n, dump_js_escaped_json},
-          maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
-        });
-    });
+    % if not waffle_flag_enabled:
+            require(["js/factories/asset_index"], function (AssetIndexFactory) {
+                AssetIndexFactory({
+                  assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
+                  uploadChunkSizeInMBs: ${chunk_size_in_mbs|n, dump_js_escaped_json},
+                  maxFileSizeInMBs: ${max_file_size_in_mbs|n, dump_js_escaped_json},
+                  maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
+                });
+            });
+    % endif
 </%block>
-% endif
 
 <%block name="content">
 
@@ -58,7 +65,7 @@
     <div class="content">
         <%static:optional_include_mako file="asset_index_content_header.html" />
         % if waffle_flag_enabled:
-            <%static:studiofrontend page="AssetsPage">
+            <%static:studiofrontend entry="assets">
                 {
                     "lang": "${language_code | n, js_escaped_string}",
                     "course": {
@@ -78,9 +85,6 @@
                     }
                 }
             </%static:studiofrontend>
-            <div class="ui-loading">
-                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
-            </div>
         % else:
             <div class="content-primary">
                 <div class="wrapper-assets"></div>
