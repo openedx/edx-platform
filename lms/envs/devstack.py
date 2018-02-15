@@ -19,7 +19,7 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = 'http://localhost:8000:80'
 
 ################################ LOGGERS ######################################
 
@@ -313,10 +313,6 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
 NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
 }
-
-LMS_BASE_URL = 'http://localhost:8000'
-
-MANDRILL_API_KEY = 'VmO_YjiGNJOJ6KukuRnhZA'
 
 # NodeBB settings
 NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)

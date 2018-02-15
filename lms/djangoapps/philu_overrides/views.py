@@ -3,7 +3,6 @@ import base64
 import logging
 import json
 import urlparse
-import mandrill
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -17,7 +16,6 @@ from lms.djangoapps.student_account.views import _local_server_get, _get_form_de
     _third_party_auth_context
 from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id
-from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
@@ -203,3 +201,4 @@ def courses(request):
             'programs_list': programs_list
         }
     )
+

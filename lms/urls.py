@@ -645,7 +645,7 @@ urlpatterns += (
         r'^courses/{}/generate_user_cert'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.generate_user_cert',
+        'philu_overrides.courseware.views.views.generate_user_cert',
         name='generate_user_cert',
     ),
 )
