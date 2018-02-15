@@ -8,7 +8,7 @@ import logging
 
 import objgraph
 from django.conf import settings
-from django.core.files.storage import default_storage
+from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 
 log = logging.getLogger(__name__)
@@ -77,10 +77,12 @@ def show_memory_leaks(
         objgraph.show_refs(objects, max_depth=refs_depth, output=refs_dot)
         data = {'dir': dump_dir, 'label': label, 'pid': os.getpid(), 'index': index, 'type_name': type_name}
 
+        tmp_storage = FileSystemStorage(location='/tmp')
+
         path = u'{dir}/{label}_{pid}_{index}_{type_name}_backrefs.dot'.format(**data)
-        default_storage.save(path, ContentFile(backrefs_dot.getvalue()))
-        log.info(u'Graph generated at %s%s', settings.MEDIA_URL, path)
+        tmp_storage.save(path, ContentFile(backrefs_dot.getvalue()))
+        log.info(u'Graph generated at %s', os.path.join(tmp_storage.location, path))
 
         path = u'{dir}/{label}_{pid}_{index}_{type_name}_refs.dot'.format(**data)
-        default_storage.save(path, ContentFile(refs_dot.getvalue()))
-        log.info(u'Graph generated at %s%s', settings.MEDIA_URL, path)
+        tmp_storage.save(path, ContentFile(refs_dot.getvalue()))
+        log.info(u'Graph generated at %s', os.path.join(tmp_storage.location, path))
