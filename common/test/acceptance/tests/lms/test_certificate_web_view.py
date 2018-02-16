@@ -8,7 +8,6 @@ from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDe
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.certificate_page import CertificatePage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
-from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
@@ -156,7 +155,6 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.user_id = "99"  # we have created a user with this id in fixture
         self.cert_fixture = CertificateConfigFixture(self.course_id, test_certificate_config)
 
-        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.progress_page = ProgressPage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
@@ -192,7 +190,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
 
         self.complete_course_problems()
 
-        self.course_info_page.visit()
+        self.course_home_page.visit()
         self.tab_nav.go_to_tab('Progress')
 
         self.assertTrue(self.progress_page.q(css='.auto-cert-message').first.visible)
@@ -210,9 +208,6 @@ class CertificateProgressPageTest(UniqueCourseTest):
 
         Problems were added in the setUp
         """
-        # self.course_info_page.visit()
-        # self.tab_nav.go_to_tab('Course')
-        #
         # # TODO: TNL-6546: Remove extra visit call.
         self.course_home_page.visit()
 
