@@ -427,6 +427,7 @@ def assert_opened_help_link_is_correct(test, url):
         url (str): url to verify.
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
+    WebDriverWait(test.browser, 10).until(lambda driver: driver.current_url != "about:blank")
     # Assert that url in the browser is the same.
     test.assertEqual(url, test.browser.current_url)
     # Check that the URL loads. Can't do this in the browser because it might
@@ -858,6 +859,18 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     return UserPartition(
         partition_id, name, description, groups, MockScheme()
     ).to_json()
+
+
+def wait_for_help_window(page, help_element):
+    """
+    To avoid a race condition, wait for the help window to launch.
+    To check this, make sure the number of window_handles increases by one.
+    """
+    num_windows = len(page.browser.window_handles)
+    help_element.click()
+    WebDriverWait(page.browser, 10).until(
+        lambda driver: len(driver.window_handles) > num_windows
+    )
 
 
 def assert_nav_help_link(test, page, href, signed_in=True, close_window=True):
