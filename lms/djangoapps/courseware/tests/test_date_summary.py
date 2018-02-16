@@ -63,9 +63,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertNotIn('date-summary', response.content)
 
-    def test_course_info_logged_out(self):
+    def test_course_home_logged_out(self):
         course = create_course_run()
-        url = reverse('info', args=(course.id,))
+        url = reverse('openedx.course_experience.course_home', args=(course.id,))
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 

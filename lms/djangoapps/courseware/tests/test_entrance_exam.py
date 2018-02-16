@@ -455,18 +455,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                                })
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
-    def test_courseinfo_page_access_without_passing_entrance_exam(self):
-        """
-        Test courseware access page without passing entrance exam
-        """
-        url = reverse('info', args=[unicode(self.course.id)])
-        response = self.client.get(url)
-        redirect_url = reverse('courseware', args=[unicode(self.course.id)])
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=302)
-        response = self.client.get(redirect_url)
-        exam_url = response.get('Location')
-        self.assertRedirects(response, exam_url)
-
     @patch('courseware.entrance_exams.get_entrance_exam_content', Mock(return_value=None))
     def test_courseware_page_access_after_passing_entrance_exam(self):
         """

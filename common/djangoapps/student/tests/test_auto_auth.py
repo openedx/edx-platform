@@ -201,7 +201,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
         # Check that the redirect was to the course info/outline page
         if settings.ROOT_URLCONF == 'lms.urls':
-            url_pattern = '/info'
+            url_pattern = '/course/'
         else:
             url_pattern = '/course/{}'.format(unicode(course_key))
 
