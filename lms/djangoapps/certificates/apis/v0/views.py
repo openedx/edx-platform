@@ -72,15 +72,8 @@ class CertificatesDetailView(GenericAPIView):
     )
     permission_classes = (
         IsAuthenticated,
-        permissions.IsUserInUrlOrStaff,
-        permissions.OAuth2RestrictedApplicatonPermission,
+        permissions.IsUserInUrlOrStaff
     )
-
-    # needed for passing OAuth2RestrictedApplicatonPermission checks
-    # for RestrictedApplications (only). A RestrictedApplication can
-    # only call this method if it is allowed to receive a 'certificates:read'
-    # scope
-    required_scopes = ['certificates:read']
 
     def get(self, request, username, course_id):
         """
@@ -102,19 +95,6 @@ class CertificatesDetailView(GenericAPIView):
                 status=404,
                 data={'error_code': 'course_id_not_valid'}
             )
-
-        # See if the request has an explicit ORG filter on the request
-        # which limits which OAuth2 clients can see what courses
-        # based on the association with a RestrictedApplication
-        #
-        # For more information on RestrictedApplications and the
-        # permissions model, see openedx/core/lib/api/permissions.py
-        if hasattr(request, 'auth') and hasattr(request.auth, 'org_associations'):
-            if course_key.org not in request.auth.org_associations:
-                return Response(
-                    status=403,
-                    data={'error_code': 'course_org_not_associated_with_calling_application'}
-                )
 
         user_cert = get_certificate_for_user(username=username, course_key=course_key)
         if user_cert is None:

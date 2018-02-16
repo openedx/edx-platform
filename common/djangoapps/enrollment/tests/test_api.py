@@ -156,17 +156,13 @@ class EnrollmentTest(CacheIsolationTestCase):
         for enrollment in enrollments:
             fake_data_api.add_course(enrollment['course_id'], course_modes=enrollment['course_modes'])
             api.add_enrollment(self.USERNAME, enrollment['course_id'], enrollment['mode'])
-
-        result = api.get_enrollments(self.USERNAME, org_filter=['the'])
+        result = api.get_enrollments(self.USERNAME)
         self.assertEqual(len(enrollments), len(result))
         for result_enrollment in result:
             self.assertIn(
                 result_enrollment['course']['course_id'],
                 [enrollment['course_id'] for enrollment in enrollments]
             )
-
-        other_org_result = api.get_enrollments(self.USERNAME, org_filter=['other_org'])
-        self.assertEqual(other_org_result, [])
 
     def test_update_enrollment(self):
         # Add fake course enrollment information to the fake data API

@@ -15,7 +15,6 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
-from openedx.core.lib.api.permissions import OAuth2RestrictedApplicatonPermission
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
@@ -155,10 +154,7 @@ class AccountViewSet(ViewSet):
     authentication_classes = (
         OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
     )
-    permission_classes = (
-        permissions.IsAuthenticated,
-        OAuth2RestrictedApplicatonPermission,
-    )
+    permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
     def get(self, request):
