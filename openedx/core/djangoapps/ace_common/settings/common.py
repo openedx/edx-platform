@@ -9,6 +9,8 @@ def plugin_settings(settings):
     settings.ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = 'Automated Communication Engine Email'
     settings.ACE_CHANNEL_SAILTHRU_API_KEY = None
     settings.ACE_CHANNEL_SAILTHRU_API_SECRET = None
+    settings.ACE_CHANNEL_DEFAULT_EMAIL = 'sailthru_email'
+    settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'file_email'
 
     settings.ACE_ROUTING_KEY = 'edx.core.low'
 
