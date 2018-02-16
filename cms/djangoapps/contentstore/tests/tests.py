@@ -223,7 +223,7 @@ class AuthTestCase(ContentStoreTestCase):
             data = parse_json(resp)
             self.assertFalse(data['success'])
             self.assertIn(
-                'This account has been temporarily locked due to excessive login failures. Try again later.',
+                'This account has been temporarily locked due to excessive login failures.',
                 data['value']
             )
 
