@@ -37,6 +37,7 @@ import django
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
 
+from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
@@ -708,15 +709,6 @@ COURSE_MODE_DEFAULTS = {
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
-
-# These are standard regexes for pulling out info like course_ids, usage_ids, etc.
-# They are used so that URLs with deprecated-format strings still work.
-# Note: these intentionally greedily grab all chars up to the next slash including any pluses
-# DHM: I really wanted to ensure the separators were the same (+ or /) but all patts I tried had
-# too many inadvertent side effects :-(
-COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
-COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
-COURSE_KEY_REGEX = COURSE_KEY_PATTERN.replace('P<course_key_string>', ':')
 
 USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
@@ -2189,7 +2181,6 @@ INSTALLED_APPS = [
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'lms.djangoapps.discussion.apps.DiscussionConfig',
 
     # Notes
     'notes',

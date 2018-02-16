@@ -49,7 +49,7 @@ from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
-from . import USE_BOOTSTRAP_FLAG
+from .config import USE_BOOTSTRAP_FLAG
 
 log = logging.getLogger("edx.discussions")
 

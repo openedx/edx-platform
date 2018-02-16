@@ -9,7 +9,7 @@ import django_comment_client.utils as utils
 from courseware.tabs import EnrolledTab
 from xmodule.tabs import TabFragmentViewMixin
 
-from . import USE_BOOTSTRAP_FLAG
+from .config import USE_BOOTSTRAP_FLAG
 
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
