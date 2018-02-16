@@ -3,7 +3,7 @@ Grades API URLs.
 """
 
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import include, url
 
 from lms.djangoapps.grades.api import views
 
@@ -20,4 +20,5 @@ urlpatterns = [
         ),
         views.CourseGradingPolicy.as_view(), name='course_grading_policy'
     ),
+    url(r'^v1/', include('grades.api.v1.urls', namespace='v1'))
 ]

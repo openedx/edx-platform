@@ -170,8 +170,8 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         """
         resp = self.client.get(self.get_url('IDoNotExist'))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
-        self.assertEqual(resp.data['error_code'], 'user_mismatch')  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
+        self.assertEqual(resp.data['error_code'], 'user_mismatch')
 
     def test_other_get_grade(self):
         """
@@ -181,8 +181,8 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.client.login(username=self.other_student.username, password=self.password)
         resp = self.client.get(self.get_url(self.student.username))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
-        self.assertEqual(resp.data['error_code'], 'user_mismatch')  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
+        self.assertEqual(resp.data['error_code'], 'user_mismatch')
 
     def test_self_get_grade_not_enrolled(self):
         """
@@ -194,9 +194,9 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.client.login(username=self.other_user.username, password=self.password)
         resp = self.client.get(self.get_url(self.other_user.username))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
         self.assertEqual(
-            resp.data['error_code'],  # pylint: disable=no-member
+            resp.data['error_code'],
             'user_or_course_does_not_exist'
         )
 
@@ -212,9 +212,9 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             resp = self.client.get(self.get_url(self.student.username))
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
         self.assertEqual(
-            resp.data['error_code'],  # pylint: disable=no-member
+            resp.data['error_code'],
             'invalid_course_key'
         )
 
@@ -231,9 +231,9 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         url = "{0}?username={1}".format(base_url, self.student.username)
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
         self.assertEqual(
-            resp.data['error_code'],  # pylint: disable=no-member
+            resp.data['error_code'],
             'user_or_course_does_not_exist'
         )
 
@@ -255,7 +255,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             'course_key': str(self.course_key),
             'passed': False
         }]
-        self.assertEqual(resp.data, expected_data)  # pylint: disable=no-member
+        self.assertEqual(resp.data, expected_data)
 
     @ddt.data(
         'staff', 'global_staff'
@@ -268,8 +268,8 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.client.login(username=getattr(self, staff_user).username, password=self.password)
         resp = self.client.get(self.get_url('IDoNotExist'))
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
-        self.assertEqual(resp.data['error_code'], 'user_does_not_exist')  # pylint: disable=no-member
+        self.assertIn('error_code', resp.data)
+        self.assertEqual(resp.data['error_code'], 'user_does_not_exist')
 
     def test_no_grade(self):
         """
@@ -284,7 +284,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             'course_key': str(self.course_key),
             'passed': False
         }]
-        self.assertEqual(resp.data, expected_data)  # pylint: disable=no-member
+        self.assertEqual(resp.data, expected_data)
 
     @ddt.data(
         ({'letter_grade': None, 'percent': 0.4, 'passed': False}),
@@ -302,7 +302,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             'course_key': str(self.course_key),
         }
         expected_data.update(grade)
-        self.assertEqual(resp.data, [expected_data])  # pylint: disable=no-member
+        self.assertEqual(resp.data, [expected_data])
 
 
 @ddt.ddt

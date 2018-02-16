@@ -62,7 +62,10 @@ class IsUserInUrl(permissions.BasePermission):
         Note: a 404 is returned for non-staff instead of a 403. This is to prevent
         users from being able to detect the existence of accounts.
         """
-        url_username = request.parser_context.get('kwargs', {}).get('username', '')
+        url_username = (
+            request.parser_context.get('kwargs', {}).get('username') or
+            request.GET.get('username', '')
+        )
         if request.user.username.lower() != url_username.lower():
             if request.user.is_staff:
                 return False  # staff gets 403

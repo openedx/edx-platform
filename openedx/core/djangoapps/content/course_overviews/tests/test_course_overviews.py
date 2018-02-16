@@ -546,6 +546,18 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
         self.assertEqual(len(course_ids_to_overviews), 1)
         self.assertIn(course_with_overview_1.id, course_ids_to_overviews)
 
+    def test_get_from_id_if_exists(self):
+        course_with_overview = CourseFactory.create(emit_signals=True)
+        course_id_to_overview = CourseOverview.get_from_id_if_exists(course_with_overview.id)
+        self.assertEqual(course_with_overview.id, course_id_to_overview.id)
+
+        overview_prev_version = CourseOverview.get_from_id_if_exists(course_with_overview.id)
+        overview_prev_version.version = CourseOverview.VERSION - 1
+        overview_prev_version.save()
+
+        course_id_to_overview = CourseOverview.get_from_id_if_exists(course_with_overview.id)
+        self.assertEqual(course_id_to_overview, None)
+
 
 @attr(shard=3)
 @ddt.ddt
