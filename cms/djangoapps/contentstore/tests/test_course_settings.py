@@ -20,7 +20,6 @@ from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CH
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from util import milestones_helpers
@@ -113,7 +112,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
-        SelfPacedConfiguration(enabled=True).save()
         details = CourseDetails.fetch(self.course.id)
 
         # resp s/b json from here on
@@ -297,7 +295,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'short_description': 'empty',
             'overview': '',
             'effort': '',
-            'intro_video': ''
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
         }
         response = self.client.post(settings_details_url, data=json.dumps(data), content_type='application/json',
                                     HTTP_ACCEPT='application/json')
@@ -352,7 +352,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'short_description': 'empty',
             'overview': '',
             'effort': '',
-            'intro_video': ''
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
         }
         response = self.client.post(
             settings_details_url,
@@ -375,7 +377,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'short_description': 'empty',
             'overview': '',
             'effort': '',
-            'intro_video': ''
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
         }
 
         response = self.client.post(

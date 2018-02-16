@@ -570,32 +570,32 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </div>
           % endif
 
-          % if self_paced_enabled:
+          <hr class="divide" />
 
-            <hr class="divide" />
-
-            <div class="group-settings pacing">
-              <header>
-                <h2 class="title-2">${_("Course Pacing")}</h2>
-                <span class="tip">${_("Set the pacing for this course")}</span>
-              </header>
+          <div class="group-settings pacing">
+            <fieldset role="radiogroup">
+              <legend>
+                <header>
+                  <h2 class="title-2">${_("Course Pacing")}</h2>
+                  <span class="tip">${_("Set the pacing for this course")}</span>
+                </header>
+              </legend>
               <span class="msg" id="course-pace-toggle-tip"></span>
 
               <ol class="list-input">
-                <li class="field">
-                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-instructor-paced" value="false"/>
-                  <label class="course-pace-label" for="course-pace-instructor-paced">${_("Instructor-Paced")}</label>
-                  <span class="tip">${_("Instructor-paced courses progress at the pace that the course author sets. You can configure release dates for course content and due dates for assignments.")}</span>
-                </li>
-                <li class="field">
-                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-self-paced" value="true"/>
-                  <label class="course-pace-label" for="course-pace-self-paced">${_("Self-Paced")}</label>
-                  <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
-                </li>
+                  <li class="field">
+                    <input type="radio" class="field-radio" name="self-paced" id="course-pace-instructor-paced" value="false" aria-labelledby="course-pace-instructor-label" />
+                    <label id="course-pace-instructor-label" class="course-pace-label" for="course-pace-instructor-paced">${_("Instructor-Paced")}</label>
+                    <span class="tip">${_("Instructor-paced courses progress at the pace that the course author sets. You can configure release dates for course content and due dates for assignments.")}</span>
+                  </li>
+                  <li class="field">
+                    <input type="radio" class="field-radio" name="self-paced" id="course-pace-self-paced" value="true" aria-labelledby="course-pace-self-paced-label"/>
+                    <label id="course-pace-self-paced-label" class="course-pace-label" for="course-pace-self-paced">${_("Self-Paced")}</label>
+                    <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
+                  </li>
               </ol>
-            </div>
-
-          % endif
+            </fieldset>
+          </div>
 
           % if settings.FEATURES.get("LICENSING", False):
             <hr class="divide" />

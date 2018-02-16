@@ -7,7 +7,6 @@ from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.utils import reverse_usage_url
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
 %>
 <%block name="title">${_("Course Outline")}</%block>
@@ -166,17 +165,15 @@ from openedx.core.djangolib.markup import HTML, Text
                       </li>
                     </ul>
                 </div>
-                % if SelfPacedConfiguration.current().enabled:
-                    <div class="status-pacing">
-                        <h2 class=status-pacing-label>${_("Course Pacing")}</h2>
-                        <br>
-                        % if context_course.self_paced:
-                            <p class="status-pacing-value">${_("Self-Paced")}</p>
-                        % else:
-                            <p class="status-pacing-value">${_("Instructor-Paced")}</p>
-                        % endif
-                    </div>
-                % endif
+                <div class="status-pacing">
+                    <h2 class=status-pacing-label>${_("Course Pacing")}</h2>
+                    <br>
+                    % if context_course.self_paced:
+                        <p class="status-pacing-value">${_("Self-Paced")}</p>
+                    % else:
+                        <p class="status-pacing-value">${_("Instructor-Paced")}</p>
+                    % endif
+                </div>
                 <div class="status-highlights-enabled"></div>
             </div>
             <div class="wrapper-dnd"

@@ -11,7 +11,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
@@ -50,7 +49,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         self.assertFalse(details.self_paced)
 
     def test_update_and_fetch(self):
-        SelfPacedConfiguration(enabled=True).save()
         jsondetails = CourseDetails.fetch(self.course.id)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -143,7 +141,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             )
 
     def test_toggle_pacing_during_course_run(self):
-        SelfPacedConfiguration(enabled=True).save()
         self.course.start = datetime.datetime.now()
         self.store.update_item(self.course, self.user.id)
 
