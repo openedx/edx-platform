@@ -429,7 +429,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.login(self.email, self.password)
         request = get_mock_request(self.user)
         course_tab_list = get_course_tab_list(request, self.course)
-        self.assertEqual(len(course_tab_list), 5)
+        self.assertEqual(len(course_tab_list), 4)
 
     def test_course_tabs_list_for_staff_members(self):
         """
@@ -442,7 +442,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.login(username=staff_user.username, password='test')
         request = get_mock_request(staff_user)
         course_tab_list = get_course_tab_list(request, self.course)
-        self.assertEqual(len(course_tab_list), 5)
+        self.assertEqual(len(course_tab_list), 4)
 
 
 @attr(shard=1)

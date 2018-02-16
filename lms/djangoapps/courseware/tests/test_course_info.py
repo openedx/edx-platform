@@ -12,7 +12,8 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from nose.plugins.attrib import attr
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from pyquery import PyQuery as pq
 from six import text_type
@@ -35,6 +36,7 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
@@ -144,6 +146,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CourseInfo last accessed link.
@@ -212,6 +215,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CourseInfo page title.
@@ -265,6 +269,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
 
 
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test for unenrolled student tries to access ccx.
@@ -302,6 +307,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
@@ -351,6 +357,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 @attr(shard=1)
 @override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.
