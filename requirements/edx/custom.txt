@@ -24,7 +24,7 @@ git+https://github.com/edx-solutions/api-integration.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@ziafazal/ginkgo-fixes
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.1.7#egg=discussion-edx-platform-extensions==1.1.7
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.1.9#egg=discussion-edx-platform-extensions==1.1.9
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v1.1.8#egg=mobileapps-edx-platform-extensions==1.1.8
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@ihtram/ginkgo-fixes
