@@ -54,6 +54,7 @@ class TestFooter(TestCase):
         "DONATE": "/donate",
         "JOBS": "/jobs",
         "SITE_MAP": "/sitemap",
+        "TRADEMARKS": "/trademarks",
         "TOS_AND_HONOR": "/edx-terms-service",
         "PRIVACY": "/edx-privacy-policy",
         "ACCESSIBILITY": "/accessibility",
@@ -98,6 +99,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/accessibility',
                  'name': 'accessibility_policy',
                  'title': 'Accessibility Policy'},
+                {'url': 'https://edx.org/trademarks', 'name': 'trademarks', 'title': 'Trademarks'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
 
             ],
