@@ -558,6 +558,7 @@ class CourseTabView(EdxFragmentView):
         """
         Handle exceptions raised when rendering a view.
         """
+        import pdb; pdb.set_trace()
         if isinstance(exception, Redirect) or isinstance(exception, Http404):
             raise
         if isinstance(exception, UnicodeEncodeError):

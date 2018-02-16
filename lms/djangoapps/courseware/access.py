@@ -603,7 +603,6 @@ def _has_access_string(user, action, perm):
 
 
 #####  Internal helper methods below
-
 def _dispatch(table, action, user, obj):
     """
     Helper: call table[action], raising a nice pretty error if there is no such key.

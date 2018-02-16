@@ -153,9 +153,9 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         # leaking info about access control settings
         raise CoursewareAccessException(access_response)
 
+    import pdb;pdb.set_trace()
     if check_if_enrolled:
         # If the user is not enrolled, redirect them to the about page
-        import pdb; pdb.set_trace()
         if not CourseEnrollment.is_enrolled(user, course.id):
             raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
 

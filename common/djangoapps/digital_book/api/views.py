@@ -1,9 +1,12 @@
 import logging
 
+from django.contrib.auth.views import redirect_to_login
+from django.core.urlresolvers import reverse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from digital_book.models import DigitalBookAccess
+from digital_book.api.exceptions import DigitalBookAccessRedirect
 from edxmako.shortcuts import render_to_response
 
 log = logging.getLogger(__name__)
@@ -43,6 +46,35 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
         )
 
 
+def digital_book_content(request, book_key_string):
+    # TODO: ultimately this will redirect the user to a book represented by 'book_key_string'
+    """
+    For now: serves up book content (represented by a simple HTML page) if user is authenticated
+    and has access to this book.  If a user does not have access to the book, they will be redirected
+    to the digital book about page.
+    """
+    log.info(">>> calling digital_book_content")
+    log.info(">>> request: %s", request)
+    log.info(">>> book_key: %s", book_key_string)
+
+    log.info(">>> authenticating user...")
+    if not (request.user.is_authenticated()):
+        return redirect_to_login(request.get_full_path())
+
+    try:
+        has_access(request.user, book_key_string)
+
+        context = {
+            'book_title': book_key_string,
+            'username': request.user,
+        }
+
+        return render_to_response('digital_book/digital_book_content.html', context)
+
+    except Exception as exception:
+        return None
+
+
 def digital_book_about(request, book_key_string):
     """
     Display the digital book's about page
@@ -72,3 +104,10 @@ def digital_book_about(request, book_key_string):
     }
 
     return render_to_response('digital_book/digital_book_about.html', context)
+
+
+def has_access(username, digital_book_key):
+
+    digital_book_access = DigitalBookAccess()
+    if not digital_book_access.has_access(username, digital_book_key):
+        raise DigitalBookAccessRedirect(reverse('about_digital_book', args=[digital_book_key]))
