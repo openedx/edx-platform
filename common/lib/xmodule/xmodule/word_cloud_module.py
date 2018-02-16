@@ -91,11 +91,6 @@ class WordCloudFields(object):
 
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-        ],
-    }
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
     js_module_name = "WordCloud"
 

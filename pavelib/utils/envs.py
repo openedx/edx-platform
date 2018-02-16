@@ -183,6 +183,7 @@ class Env(object):
         REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
         REPO_ROOT / 'lms/static/karma_lms.conf.js',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule.conf.js',
+        REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule_webpack.conf.js',
         REPO_ROOT / 'common/static/karma_common.conf.js',
         REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
@@ -192,6 +193,7 @@ class Env(object):
         'cms-squire',
         'lms',
         'xmodule',
+        'xmodule-webpack',
         'common',
         'common-requirejs'
     ]

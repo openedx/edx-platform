@@ -52,9 +52,9 @@ define(
             return deferred.promise();
         }
 
-        if (!window.xmoduleUrls) {
-            throw Error('window.xmoduleUrls must be defined');
-        }
-        return requireQueue(window.xmoduleUrls);
+        // if (!window.xmoduleUrls) {
+        //     throw Error('window.xmoduleUrls must be defined');
+        // }
+        return requireQueue([]);
     }
 );

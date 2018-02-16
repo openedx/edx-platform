@@ -7,6 +7,7 @@ from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
+from xmodule.x_module import XModule, XModuleDescriptor
 %>
 <%
 xblock_url = xblock_studio_url(xblock)
@@ -37,6 +38,10 @@ block_is_unit = is_unit(xblock)
         );
     });
 </script>
+
+% if isinstance(xblock, (XModule, XModuleDescriptor)):
+    <%static:webpack entry="${getattr(xblock.__class__, 'unmixed_class', xblock.__class__).__name__}"/>
+% endif
 
 % if not is_root:
     % if is_reorderable:

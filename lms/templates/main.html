@@ -108,10 +108,6 @@ from pipeline_mako import render_require_js_path_overrides
     ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES) | n, decode.utf8}
   </%block>
 
-  % if not disable_courseware_js:
-    <%static:js group='module-js'/>
-  % endif
-
   <%block name="headextra"/>
   <%block name="head_extra"/>
 

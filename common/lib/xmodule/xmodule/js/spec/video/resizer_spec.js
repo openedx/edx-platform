@@ -1,4 +1,4 @@
-(function(requirejs, require, define, undefined) {
+(function(require, define, undefined) {
     require(
 ['video/00_resizer.js'],
 function(Resizer) {
@@ -261,4 +261,4 @@ function(Resizer) {
         });
     });
 });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(require, define));

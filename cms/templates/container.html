@@ -43,20 +43,18 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <%block name="page_bundle">
-    <script type="text/javascript">
-        <%! from pipeline_js.utils import get_xmodule_urls %>
-        window.xmoduleUrls = ${get_xmodule_urls() | n, dump_js_escaped_json};
-    </script>
-    <%static:invoke_page_bundle page_name="js/pages/container" class_name="ContainerFactory">
-        ${component_templates | n, dump_js_escaped_json},
-        ${xblock_info | n, dump_js_escaped_json},
-        "${action | n, js_escaped_string}",
-        {
-            isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
-            canEdit: true,
-            outlineURL: "${outline_url | n, js_escaped_string}"
-        }
-    </%static:invoke_page_bundle>
+    <%static:webpack entry="js/factories/container">
+        ContainerFactory(
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
+            "${action | n, js_escaped_string}",
+            {
+                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
+                canEdit: true,
+                outlineURL: "${outline_url | n, js_escaped_string}"
+            }
+        );
+    </%static:webpack>
 </%block>
 
 <%block name="content">

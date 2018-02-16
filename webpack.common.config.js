@@ -8,9 +8,13 @@ var BundleTracker = require('webpack-bundle-tracker');
 var StringReplace = require('string-replace-webpack-plugin');
 
 var files = require('./webpack-config/file-lists.js');
+var xmoduleJS = require('./common/static/xmodule/webpack.xmodule.config.js');
 
 var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
+    /descriptors\/js/,
+    /modules\/js/,
+    /common\/lib\/xmodule\/xmodule\/js\/src\//,
 ];
 
 var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
@@ -64,7 +68,10 @@ module.exports = {
         CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
         // Common
-        ReactRenderer: './common/static/js/src/ReactRenderer.jsx'
+        ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
+        XModuleShim: 'xmodule/js/src/xmodule.js',
+
+        VerticalStudentView: './common/lib/xmodule/xmodule/assets/vertical/public/js/vertical_student_view.js'
     },
 
     output: {
@@ -114,7 +121,7 @@ module.exports = {
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
-            /\/sinon\.js|codemirror-compressed\.js/
+            /\/sinon\.js|codemirror-compressed\.js|hls\.js/
         ],
         rules: [
             {
@@ -196,24 +203,24 @@ module.exports = {
                         replacements: [
                             {
                                 pattern: /\(function\(AjaxPrefix\) {/,
-                                replacement: function() { return ''; }
+                                replacement: function () { return ''; }
                             },
                             {
                                 pattern: /], function\(domReady, \$, str, Backbone, gettext, NotificationView\) {/,
-                                replacement: function() {
+                                replacement: function () {
                                     // eslint-disable-next-line
                                     return '], function(domReady, $, str, Backbone, gettext, NotificationView, AjaxPrefix) {';
                                 }
                             },
                             {
                                 pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
-                                replacement: function() {
+                                replacement: function () {
                                     return "'../../common/js/components/views/feedback_notification', 'AjaxPrefix',";
                                 }
                             },
                             {
                                 pattern: /}\).call\(this, AjaxPrefix\);/,
-                                replacement: function() { return ''; }
+                                replacement: function () { return ''; }
                             }
                         ]
                     }
@@ -229,11 +236,19 @@ module.exports = {
             },
             {
                 test: /xblock\/core/,
-                loader: 'exports-loader?this.XBlock!imports-loader?jquery,jquery.immediateDescendents'
+                loader: 'exports-loader?window.XBlock!imports-loader?jquery,jquery.immediateDescendents,this=>window'
             },
             {
                 test: /xblock\/runtime.v1/,
-                loader: 'exports-loader?XBlock!imports-loader?XBlock=xblock/core'
+                loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
+            },
+            {
+                test: /descriptors\/js/,
+                loader: 'imports-loader?this=>window'
+            },
+            {
+                test: /modules\/js/,
+                loader: 'imports-loader?this=>window'
             },
             {
                 test: /codemirror/,
@@ -241,6 +256,30 @@ module.exports = {
             },
             {
                 test: /tinymce/,
+                loader: 'imports-loader?this=>window'
+            },
+            {
+                test: /xmodule\/js\/src\/xmodule/,
+                loader: 'exports-loader?window.XModule!imports-loader?this=>window'
+            },
+            {
+                test: /mock-ajax/,
+                loader: 'imports-loader?exports=>false'
+            },
+            {
+                test: /d3.min/,
+                use: [
+                    'babel-loader',
+                    {
+                        loader: 'exports-loader',
+                        options: {
+                            d3: true
+                        }
+                    }
+                ]
+            },
+            {
+                test: /logger/,
                 loader: 'imports-loader?this=>window'
             }
         ]
@@ -264,6 +303,7 @@ module.exports = {
             'jquery.smoothScroll': 'jquery.smooth-scroll.min',
             'jquery.timepicker': 'timepicker/jquery.timepicker',
             'backbone.associations': 'backbone-associations/backbone-associations-min',
+            squire: 'Squire',
 
             // See sinon/webpack interaction weirdness:
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
@@ -271,6 +311,7 @@ module.exports = {
             // was the only one that worked.)
             sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
             WordCloudMain: 'xmodule/assets/word_cloud/public/js/word_cloud_main',
+            hls: 'hls.js/dist/hls.js'
         },
         modules: [
             'cms/djangoapps/pipeline_js/js',

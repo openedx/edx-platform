@@ -1,3 +1,9 @@
+<%namespace name='static' file='static_content.html'/>
+
+% if is_xmodule:
+    <%static:webpack entry="${class_name}"/>
+% endif
+<!-- This is the xblock wrapper ${is_xmodule} -->
 <div class="${' '.join(classes) | n}" ${data_attributes}>
 % if js_init_parameters:
   <script type="json/xblock-args" class="xblock-json-init-args">
