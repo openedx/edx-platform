@@ -10,7 +10,7 @@ from django.conf.urls.static import static
 
 from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
-from lms.djangoapps.philu_overrides.courseware.views.index import CustomCoursewareIndex
+from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -73,6 +73,8 @@ urlpatterns = (
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
+    url(r'^404$', 'philu_overrides.views.render_404'),
+
 
     url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
 
@@ -396,28 +398,28 @@ urlpatterns += (
         r'^courses/{}/courseware/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        CustomCoursewareIndex.as_view(),
+        CoursewareIndex.as_view(),
         name='courseware',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        CustomCoursewareIndex.as_view(),
+        CoursewareIndex.as_view(),
         name='courseware_chapter',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        CustomCoursewareIndex.as_view(),
+        CoursewareIndex.as_view(),
         name='courseware_section',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        CustomCoursewareIndex.as_view(),
+        CoursewareIndex.as_view(),
         name='courseware_position',
     ),
 
@@ -957,7 +959,7 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
-handler404 = 'static_template_view.views.render_404'
+handler404 = 'philu_overrides.views.render_404'
 handler500 = 'static_template_view.views.render_500'
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
