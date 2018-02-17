@@ -451,9 +451,12 @@ def suggest_org_admin(request):
                         org_id = extended_profile.organization_id
                         org_name = extended_profile.organization.label
                         organization.unclaimed_org_admin_email = org_admin_email
+                        claimed_by_name = "{first_name} {last_name}".format(first_name=request.user.first_name,
+                                                                            last_name=request.user.last_name)
+                        claimed_by_email = request.user.email
 
-                        send_admin_activation_email(request.user.first_name, org_id, org_name, org_admin_email,
-                                                    hash_key)
+                        send_admin_activation_email(request.user.first_name, org_id, org_name, claimed_by_name,
+                                                    claimed_by_email, org_admin_email, hash_key)
                 else:
                     hash_key = OrganizationAdminHashKeys.assign_hash(organization, organization.admin, request.user.email)
                     send_admin_update_email(organization.id, organization.label, organization.admin.email,
