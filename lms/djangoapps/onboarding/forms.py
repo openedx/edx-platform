@@ -405,7 +405,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
         The meta class used to customize the default behaviour of form fields
         """
         model = Organization
-        fields = ['country', 'city', 'is_org_url_exist', 'url', 'founding_year', 'registration_number', 'focus_area',
+        fields = ['country', 'city', 'is_org_url_exist', 'url', 'founding_year', 'focus_area',
                   'org_type', 'level_of_operation', 'total_employees', 'alternate_admin_email', 'partner_networks']
 
         widgets = {
@@ -425,7 +425,6 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
             'url': ugettext_noop('Website Address*'),
             'alternate_admin_email': ugettext_noop('Please provide the email address for an alternative Administrator '
                                                    'contact at your organization if we are unable to reach you.'),
-            'registration_number': ugettext_noop("Organization's registration or tax identification number"),
         }
 
         required_error = 'Please select an option for {}'
@@ -442,11 +441,6 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
         help_texts = {
             "founding_year": ugettext_noop("Founding year is the year that your organization was started. This may be "
                                            "before your organization was legally registered."),
-            "registration_number": ugettext_noop("A registration or tax identification number is the unique number your"
-                                                 " government uses to identify your organization. Please note that you "
-                                                 "should only give information that you are allowed to share and that "
-                                                 "is available to the public. You should not give nonpublic or "
-                                                 "confidential information.")
         }
 
     def clean_country(self):
@@ -763,6 +757,14 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                                              "giving below is for the last 12 months, please enter "
                                                              "today's date."),
                                      label_suffix='*')
+    registration_number = forms.CharField(max_length=30,
+                                          required=False,
+                                          label=ugettext_noop("Organization's registration or tax identification number"),
+                                          help_text=ugettext_noop("A registration or tax identification number is the unique number your"
+                                                                  " government uses to identify your organization. Please note that you "
+                                                                  "should only give information that you are allowed to share and that "
+                                                                  "is available to the public. You should not give nonpublic or "
+                                                                  "confidential information."))
 
     def __init__(self,  *args, **kwargs):
         super(OrganizationMetricModelForm, self).__init__(*args, **kwargs)
@@ -774,7 +776,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 
         fields = [
             'can_provide_info', 'actual_data', 'effective_date', 'total_clients', 'total_employees', 'local_currency',
-            'total_revenue', 'total_donations', 'total_expenses', 'total_program_expenses'
+            'total_revenue', 'total_donations', 'total_expenses', 'total_program_expenses',
         ]
 
         widgets = {
@@ -937,6 +939,10 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 
             org_detail.save()
 
+        if self.data['registration_number']:
+            user_extended_profile.organization.registration_number = self.data['registration_number']
+            user_extended_profile.organization.save()
+
         user_extended_profile.is_organization_metrics_submitted = True
         user_extended_profile.save()
 
@@ -952,6 +958,17 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
                                                              "today's date."),
                                      label=ugettext_noop('End date of last Fiscal Year'),
                                      label_suffix='*')
+
+    registration_number = forms.CharField(max_length=30,
+                                          required=False,
+                                          label=ugettext_noop(
+                                              "Organization's registration or tax identification number"),
+                                          help_text=ugettext_noop(
+                                              "A registration or tax identification number is the unique number your"
+                                              " government uses to identify your organization. Please note that you "
+                                              "should only give information that you are allowed to share and that "
+                                              "is available to the public. You should not give nonpublic or "
+                                              "confidential information."))
 
     def __init__(self,  *args, **kwargs):
         super(OrganizationMetricModelForm, self).__init__(*args, **kwargs)
@@ -1114,6 +1131,10 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
             alphabetic_code=self.cleaned_data['local_currency']).first().alphabetic_code
 
         org_detail.save()
+
+        if self.data['registration_number']:
+            user_extended_profile.organization.registration_number = self.data['registration_number']
+            user_extended_profile.organization.save()
 
         user_extended_profile.is_organization_metrics_submitted = True
         user_extended_profile.save()

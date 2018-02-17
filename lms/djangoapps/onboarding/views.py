@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -310,6 +311,7 @@ def org_detail_survey(request):
 
     initial = {
         'actual_data': '1' if latest_survey and latest_survey.actual_data else '0',
+        'registration_number': user_extended_profile.organization.registration_number if user_extended_profile.organization else '',
         "effective_date": datetime.strftime(latest_survey.effective_date, '%d/%m/%Y') if latest_survey else ""
     }
 
@@ -521,8 +523,9 @@ def get_currencies(request):
 
     if request.is_ajax():
         term = request.GET.get('term', '')
-        currencies = Currency.objects.filter(alphabetic_code__istartswith=term).values_list('alphabetic_code',
-                                                                                            flat=True).distinct()
+        currencies = Currency.objects.filter(Q(country__icontains=term) | Q(name__icontains=term) |
+                                             Q(alphabetic_code__icontains=term)).values_list('alphabetic_code',
+                                                                                               flat=True).distinct()
     data = json.dumps(list(currencies))
     return HttpResponse(data, 'application/json')
 

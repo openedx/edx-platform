@@ -110,8 +110,14 @@ class PartnerNetwork(models.Model):
 
 
 class Currency(models.Model):
+    country = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     alphabetic_code = models.CharField(max_length=255)
+    number = models.CharField(max_length=255)
+    minor_units = models.CharField(max_length=255)
+
+    def __str__(self):
+        return "%s %s %s" % (self.country, self.name, self.alphabetic_code)
 
 
 class EducationLevel(models.Model):
