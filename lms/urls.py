@@ -73,6 +73,8 @@ urlpatterns = (
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
+    url(r'^404$', 'philu_overrides.views.render_404'),
+
 
     url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
 
@@ -957,7 +959,7 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
-handler404 = 'static_template_view.views.render_404'
+handler404 = 'philu_overrides.views.render_404'
 handler500 = 'static_template_view.views.render_500'
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.

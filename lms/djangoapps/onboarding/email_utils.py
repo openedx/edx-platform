@@ -6,7 +6,7 @@ from util.request import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
 
 
-def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_key):
+def send_admin_activation_email(first_name, org_id, org_name, claimed_by_name, claimed_by_email, dest_addr, hash_key):
     """
     Send an admin activation email.
     """
@@ -21,6 +21,8 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
         "org_id": encoded_org_id,
         "org_name": org_name,
         "referring_user": hash_key.suggested_by.username,
+        "claimed_by_name": claimed_by_name,
+        "claimed_by_email": claimed_by_email,
     }
 
     admin_activation_link = '{protocol}://{site}/onboarding/admin_activate/{activation_key}?admin_activation=True'.format(
@@ -29,7 +31,7 @@ def send_admin_activation_email(first_name, org_id, org_name, dest_addr, hash_ke
         org_id=encoded_org_id,
         activation_key=hash_key.activation_hash
     )
-    message_context["activation_link"] = admin_activation_link
+    message_context["admin_activation_link"] = admin_activation_link
 
     while max_retries > 0:
         try:

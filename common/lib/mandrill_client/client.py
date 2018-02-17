@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 class MandrillClient(object):
     PASSWORD_RESET_TEMPLATE = 'template-60'
     USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
-    ORG_ADMIN_ACTIVATION_TEMPLATE = 'template-62'
+    ORG_ADMIN_ACTIVATION_TEMPLATE = 'org-admin-identified'
     ORG_ADMIN_CHANGE_TEMPLATE = 'org-admin-change'
     ORG_ADMIN_GET_IN_TOUCH = 'org-admin-get-in-touch'
     ORG_ADMIN_CLAIM_CONFIRMATION = 'org-admin-claim-confirmation'
@@ -20,7 +20,6 @@ class MandrillClient(object):
     COURSE_EARLY_WELCOME_TEMPLATE = 'course-early-welcome'
     COURSE_START_REMINDER_TEMPLATE = 'course-start-reminder'
     COURSE_COMPLETION_TEMPLATE = 'course-completion'
-    WEEKLY_TEMPLATE = 'weekly'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
