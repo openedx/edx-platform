@@ -413,7 +413,8 @@ class TestTranscriptDownloadDispatch(TestVideo):
     DATA = """
         <video show_captions="true"
         display_name="A Name"
-        sub='OEoXaMPEzfM'
+        sub="OEoXaMPEzfM"
+        edx_video_id="123"
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>
@@ -528,8 +529,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
 
     srt_file = _create_srt_file()
     DATA = """
-        <video show_captions="true"
-        display_name="A Name"
+        <video
+            show_captions="true"
+            display_name="A Name"
+            edx_video_id="123"
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>

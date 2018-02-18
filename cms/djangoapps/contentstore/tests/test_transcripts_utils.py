@@ -647,9 +647,9 @@ class TestTranscript(unittest.TestCase):
         """
         Tests that the srt transcript is successfully converted into sjson format.
         """
-        expected = json.loads(self.sjson_transcript)
+        expected = self.sjson_transcript
         actual = transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'sjson')
-        self.assertDictEqual(actual, expected)
+        self.assertDictEqual(json.loads(actual), json.loads(expected))
 
     def test_convert_invalid_srt_to_sjson(self):
         """

@@ -18,6 +18,7 @@ from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import (
+    convert_video_transcript,
     get_video_transcript_content,
     Transcript,
 )
@@ -129,20 +130,16 @@ class VideoTranscripts(generics.RetrieveAPIView):
             # Fallback mechanism for edx-val transcripts
             transcript = None
             if feature_enabled:
-                transcript = get_video_transcript_content(
-                    language_code=lang,
-                    edx_video_id=video_descriptor.edx_video_id,
-                    youtube_id_1_0=video_descriptor.youtube_id_1_0,
-                    html5_sources=video_descriptor.html5_sources,
-                )
+                transcript = get_video_transcript_content(video_descriptor.edx_video_id, lang)
 
             if not transcript:
                 raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
 
-            base_name, __ = os.path.splitext(os.path.basename(transcript['file_name']))
-            filename = '{base_name}.srt'.format(base_name=base_name)
-            content = Transcript.convert(transcript['content'], 'sjson', 'srt')
-            mimetype = Transcript.mime_types['srt']
+            transcript_conversion_props = dict(transcript, output_format=Transcript.SRT)
+            transcript = convert_video_transcript(**transcript_conversion_props)
+            filename = transcript['filename']
+            content = transcript['content']
+            mimetype = Transcript.mime_types[Transcript.SRT]
         except KeyError:
             raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 

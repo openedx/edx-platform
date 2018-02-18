@@ -1310,7 +1310,9 @@ class TestVideoDescriptorStudentViewJson(TestCase):
 
     def setUp(self):
         super(TestVideoDescriptorStudentViewJson, self).setUp()
-        video_declaration = "<video display_name='Test Video' youtube_id_1_0=\'" + self.TEST_YOUTUBE_ID + "\'>"
+        video_declaration = (
+            "<video display_name='Test Video' edx_video_id='123' youtube_id_1_0=\'" + self.TEST_YOUTUBE_ID + "\'>"
+        )
         sample_xml = ''.join([
             video_declaration,
             "<source src='", self.TEST_SOURCE_URL, "'/> ",
