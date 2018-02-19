@@ -31,6 +31,7 @@ from .transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
     youtube_speed_dict,
+    get_transcript,
 )
 from .transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -319,47 +320,68 @@ class VideoStudentViewHandlers(object):
 
         elif dispatch == 'download':
             lang = request.GET.get('lang', None)
+
+            from django.http import Http404
+
+            # import pdb; pdb.set_trace()
             try:
-                transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
-                    transcripts, transcript_format=self.transcript_download_format, lang=lang
+                content, filename, mimetype = get_transcript(
+                    self.course_id, block_id=self.location.block_id, lang=lang
                 )
-            except (KeyError, UnicodeDecodeError):
+            except Http404:
                 return Response(status=404)
-            except (ValueError, NotFoundError):
-                response = Response(status=404)
-                # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
-                if feature_enabled:
-                    # Make sure the language is set.
-                    if not lang:
-                        lang = self.get_default_transcript_language(transcripts)
 
-                    transcript = get_video_transcript_content(edx_video_id=self.edx_video_id, language_code=lang)
-                    if transcript:
-                        transcript_conversion_props = dict(transcript, output_format=self.transcript_download_format)
-                        transcript = convert_video_transcript(**transcript_conversion_props)
-                        response = Response(
-                            transcript['content'],
-                            headerlist=[
-                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(
-                                    filename=transcript['filename']
-                                )),
-                                ('Content-Language', lang),
-                            ],
-                            charset='utf8',
-                        )
-                        response.content_type = Transcript.mime_types[self.transcript_download_format]
+            response = Response(
+                content,
+                headerlist=[
+                    ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
+                    ('Content-Language', self.transcript_language),
+                ],
+                charset='utf8'
+            )
+            response.content_type = mimetype
 
-                return response
-            else:
-                response = Response(
-                    transcript_content,
-                    headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename.encode('utf8'))),
-                        ('Content-Language', self.transcript_language),
-                    ],
-                    charset='utf8'
-                )
-                response.content_type = transcript_mime_type
+            # try:
+            #     transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
+            #         transcripts, transcript_format=self.transcript_download_format, lang=lang
+            #     )
+            # except (KeyError, UnicodeDecodeError):
+            #     return Response(status=404)
+            # except (ValueError, NotFoundError):
+            #     response = Response(status=404)
+            #     # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
+            #     if feature_enabled:
+            #         # Make sure the language is set.
+            #         if not lang:
+            #             lang = self.get_default_transcript_language(transcripts)
+
+            #         transcript = get_video_transcript_content(edx_video_id=self.edx_video_id, language_code=lang)
+            #         if transcript:
+            #             transcript_conversion_props = dict(transcript, output_format=self.transcript_download_format)
+            #             transcript = convert_video_transcript(**transcript_conversion_props)
+            #             response = Response(
+            #                 transcript['content'],
+            #                 headerlist=[
+            #                     ('Content-Disposition', 'attachment; filename="{filename}"'.format(
+            #                         filename=transcript['filename']
+            #                     )),
+            #                     ('Content-Language', lang),
+            #                 ],
+            #                 charset='utf8',
+            #             )
+            #             response.content_type = Transcript.mime_types[self.transcript_download_format]
+
+            #     return response
+            # else:
+            #     response = Response(
+            #         transcript_content,
+            #         headerlist=[
+            #             ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename.encode('utf8'))),
+            #             ('Content-Language', self.transcript_language),
+            #         ],
+            #         charset='utf8'
+            #     )
+            #     response.content_type = transcript_mime_type
 
         elif dispatch.startswith('available_translations'):
 

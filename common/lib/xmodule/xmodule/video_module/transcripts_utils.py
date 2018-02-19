@@ -11,12 +11,18 @@ import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
 from pysrt.srtexc import Error
 from lxml import etree
+from opaque_keys.edx.locator import BlockUsageLocator
 from HTMLParser import HTMLParser
 from six import text_type
 
+from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+
+from xmodule.video_module.transcripts_model_utils import (
+    is_val_transcript_feature_enabled_for_course
+)
 
 from .bumper_utils import get_bumper_settings
 
@@ -863,3 +869,37 @@ class VideoTranscriptsMixin(object):
             "sub": sub,
             "transcripts": transcripts,
         }
+
+from django.http import Http404, HttpResponse
+
+def get_transcript(course_id, block_id, lang=None):
+
+    usage_key = BlockUsageLocator(course_id, block_type='video', block_id=block_id)
+    video_descriptor = modulestore().get_item(usage_key)
+    feature_enabled = is_val_transcript_feature_enabled_for_course(usage_key.course_key)
+    try:
+        transcripts = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
+        content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
+    except (ValueError, NotFoundError):
+        # Fallback mechanism for edx-val transcripts
+        transcript = None
+        if feature_enabled:
+            transcript = get_video_transcript_content(video_descriptor.edx_video_id, lang)
+
+        if not transcript:
+            raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
+
+        transcript_conversion_props = dict(transcript, output_format=Transcript.SRT)
+        transcript = convert_video_transcript(**transcript_conversion_props)
+        filename = transcript['filename']
+        content = transcript['content']
+        mimetype = Transcript.mime_types[Transcript.SRT]
+    except KeyError:
+        raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
+
+    return content, filename.encode('utf-8'), mimetype
+
+    # response = HttpResponse(content, content_type=mimetype)
+    # response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename.encode('utf-8'))
+
+    # return response
