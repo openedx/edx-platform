@@ -6,5 +6,5 @@
 # https://github.com/pypa/setuptools/issues/951
 setuptools==24.0.3
 
-# OpenStack swift backend for django storage API, with lazy connection loading
-git+https://github.com/open-craft/django-storage-swift.git@jill/lazy_connect#egg=django-storage-swift==1.2.15
+# OpenStack swift backend for django storage API
+django-storage-swift==1.2.18
