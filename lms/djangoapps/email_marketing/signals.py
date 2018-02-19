@@ -3,6 +3,7 @@ This module contains signals needed for email integration
 """
 import datetime
 import logging
+from random import randint
 
 import crum
 from django.conf import settings
@@ -210,6 +211,7 @@ def _create_sailthru_user_vars(user, profile, registration=None):
 
     if registration:
         sailthru_vars['activation_key'] = registration.activation_key
+        sailthru_vars['signupNumber'] = randint(0, 9)
 
     return sailthru_vars
 

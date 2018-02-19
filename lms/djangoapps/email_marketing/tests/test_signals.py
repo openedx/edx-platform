@@ -483,6 +483,7 @@ class EmailMarketingTests(TestCase):
         email_marketing_register_user(None, user=self.user, registration=self.registration)
         self.assertTrue(mock_update_user.called)
         self.assertEqual(mock_update_user.call_args[0][0]['activation_key'], self.registration.activation_key)
+        self.assertLessEqual(mock_update_user.call_args[0][0]['signupNumber'], 9)
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     def test_register_user_no_request(self, mock_update_user):
