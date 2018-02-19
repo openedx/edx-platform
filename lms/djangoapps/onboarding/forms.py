@@ -662,7 +662,7 @@ class RegModelForm(BaseOnboardingModelForm):
                     org_name = extended_profile.organization.label
                     organization_to_assign.unclaimed_org_admin_email = org_admin_email
                     claimed_by_name = "{first_name} {last_name}".format(first_name=first_name, last_name=last_name)
-                    claimed_by_email = self.cleaned_data['email']
+                    claimed_by_email = self.data["email"]
                     send_admin_activation_email(first_name, org_id, org_name, claimed_by_name,
                                                 claimed_by_email, org_admin_email, hash_key)
 
