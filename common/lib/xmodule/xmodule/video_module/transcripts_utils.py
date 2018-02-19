@@ -15,6 +15,8 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from HTMLParser import HTMLParser
 from six import text_type
 
+from django.http import Http404
+
 from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
@@ -870,10 +872,19 @@ class VideoTranscriptsMixin(object):
             "transcripts": transcripts,
         }
 
-from django.http import Http404, HttpResponse
 
 def get_transcript(course_id, block_id, lang=None):
+    """
+    Get video transcript from content store or edx-val.
 
+    Arguments:
+        course_id (CourseLocator): course identifier
+        block_id (unicode): a unique identifier for an item in modulestore
+        lang (unicode): transcript language
+
+    Returns:
+        tuple containing content, filename, mimetype
+    """
     usage_key = BlockUsageLocator(course_id, block_type='video', block_id=block_id)
     video_descriptor = modulestore().get_item(usage_key)
     feature_enabled = is_val_transcript_feature_enabled_for_course(usage_key.course_key)
@@ -898,8 +909,3 @@ def get_transcript(course_id, block_id, lang=None):
         raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 
     return content, filename.encode('utf-8'), mimetype
-
-    # response = HttpResponse(content, content_type=mimetype)
-    # response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename.encode('utf-8'))
-
-    # return response
