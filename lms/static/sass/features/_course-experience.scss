@@ -353,7 +353,7 @@
             .details {
               font-size: $body-font-size;
               color: theme-color("secondary");
-              margin-left: 35px;
+              margin-left: 34px;
             }
             .prerequisite {
               color: theme-color("secondary");
@@ -362,7 +362,7 @@
           }
 
           .vertical {
-            @include margin-left(10px);
+            @include margin-left(16px);
 
             list-style-type: none;
             border: 1px solid transparent;
@@ -398,7 +398,7 @@
 }
 
 // Course outline accordion
-button.accordion-trigger {
+button.accordion-trigger, button.prerequisite-button {
   margin: 2px;
   padding: 10px 0 10px 0;
   border: none;
