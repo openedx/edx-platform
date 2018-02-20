@@ -103,6 +103,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.7#egg=lti_consumer-xbloc
 
 # Third Party XBlocks
 
-git+https://github.com/mitodl/edx-sga.git@d019b8a050c056db535e3ff13c93096145a932de#egg=edx-sga==0.7.1
+git+https://github.com/mitodl/edx-sga.git@6b2f7aa2a18206023c8407e2c46f86d4b4c3ac96#egg=edx-sga==0.8.0
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@2.1.5#egg=xblock-drag-and-drop-v2==2.1.5
