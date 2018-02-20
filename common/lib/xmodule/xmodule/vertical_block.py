@@ -60,13 +60,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
     show_in_read_only_mode = True
 
-    def get_completable_by_viewing(self, completion_service):
+    def get_completable_by_viewing(self):
         """
         Return a set of descendent blocks that this vertical still needs to
         mark complete upon viewing.
 
         Completed blocks are excluded to reduce network traffic from clients.
         """
+        completion_service = self.runtime.service(self, 'completion')
         if completion_service is None:
             return set()
         if not completion_service.completion_tracking_enabled():
@@ -78,15 +79,6 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # Exclude completed blocks to reduce traffic from client.
         completions = completion_service.get_completions(blocks)
         return {six.text_type(block_key) for block_key in blocks if completions[block_key] < 1.0}
-
-    def get_completion_delay_ms(self, completion_service):
-        """
-        Do not mark blocks as complete until they have been visible to the user
-        for the returned amount of time (in milliseconds).
-        """
-        if completion_service is None:
-            return 0
-        return completion_service.get_completion_by_viewing_delay_ms()
 
     def student_view(self, context):
         """
@@ -107,9 +99,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             user_service = self.runtime.service(self, 'user')
             child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
 
-        completion_service = self.runtime.service(self, 'completion')
-
         child_context['child_of_vertical'] = True
+
         is_child_of_vertical = context.get('child_of_vertical', False)
 
         # pylint: disable=no-member
@@ -129,8 +120,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
             'bookmarked': child_context['bookmarked'],
             'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location)),  # pylint: disable=no-member
-            'watched_completable_blocks': self.get_completable_by_viewing(completion_service),
-            'completion_delay_ms': self.get_completion_delay_ms(completion_service),
+            'watched_completable_blocks': self.get_completable_by_viewing(),
         }))
 
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
