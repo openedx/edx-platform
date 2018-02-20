@@ -1,15 +1,16 @@
 import uuid as uuid_tools
 from datetime import timedelta
-from util.date_utils import strftime_localized
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.timezone import now
+from model_utils.models import TimeStampedModel
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
+from util.date_utils import strftime_localized
 
 
 class CourseEntitlementPolicy(models.Model):
@@ -253,6 +254,23 @@ class CourseEntitlement(TimeStampedModel):
         self.enrollment_course_run = enrollment
         self.save()
 
+    def reinstate(self):
+        """
+        Unenrolls a user from the run in which they have spent the given entitlement and
+        sets the entitlement's expired_at date to null.
+
+        Returns:
+            CourseOverview: course run from which the user has been unenrolled
+        """
+        unenrolled_run = self.enrollment_course_run.course
+        self.expired_at = None
+        CourseEnrollment.unenroll(
+            user=self.enrollment_course_run.user, course_id=unenrolled_run.id, skip_refund=True
+        )
+        self.enrollment_course_run = None
+        self.save()
+        return unenrolled_run
+
     @classmethod
     def unexpired_entitlements_for_user(cls, user):
         return cls.objects.filter(user=user, expired_at=None).select_related('user')
@@ -334,9 +352,8 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
 
     def __unicode__(self):
         """Unicode representation of an Entitlement"""
-        return u'Course Entitlement Suppor Detail: entitlement: {}, support_user: {}, reason: {}'\
-            .format(
-                self.entitlement,
-                self.support_user,
-                self.reason,
-            )
+        return u'Course Entitlement Support Detail: entitlement: {}, support_user: {}, reason: {}'.format(
+            self.entitlement,
+            self.support_user,
+            self.reason,
+        )

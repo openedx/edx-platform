@@ -7,6 +7,7 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 import ddt
 import pytest
@@ -19,10 +20,12 @@ from pytz import UTC
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from entitlements.models import CourseEntitlementSupportDetail
+from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -107,7 +110,8 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:enrollment',
             'support:enrollment_list',
             'support:manage_user',
-            'support:manage_user_detail'
+            'support:manage_user_detail',
+            'support:enrollment_list'
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -135,7 +139,8 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:enrollment",
         "support:enrollment_list",
         "support:manage_user",
-        "support:manage_user_detail"
+        "support:manage_user_detail",
+        "support:enrollment_list"
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
@@ -432,3 +437,82 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
         verified_mode.save()
+
+
+@ddt.ddt
+class SupportViewCourseEntitlementsTests(SupportViewTestCase):
+    """ Tests for the course entitlement support view."""
+
+    def setUp(self):
+        super(SupportViewCourseEntitlementsTests, self).setUp()
+        self.user = UserFactory(is_staff=True)
+        SupportStaffRole().add_users(self.user)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+        self.student = UserFactory.create(username='student', email='test@example.com', password='test')
+        self.course_uuid = uuid4()
+
+        self.url = reverse('support:course_entitlement')
+
+    @ddt.data('username', 'email')
+    def test_get_entitlements(self, search_string_type):
+        CourseEntitlementFactory.create(mode=CourseMode.VERIFIED, user=self.student, course_uuid=self.course_uuid)
+        url = self.url + getattr(self.student, search_string_type)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 1)
+        self.assertDictContainsSubset({
+            'user': self.student.username,
+            'course_uuid': unicode(self.course_uuid),
+            'enrollment_course_run': None,
+            'mode': CourseMode.VERIFIED,
+            'support_details': []
+        }, data[0])
+
+    def test_reinstate_entitlement(self):
+        selected_run = CourseEnrollmentFactory(mode=CourseMode.VERIFIED, user=self.student)
+        expired_entitlement = CourseEntitlementFactory.create(
+            mode=CourseMode.VERIFIED, user=self.student, enrollment_course_run=selected_run, expired_at=datetime.now()
+        )
+        url = self.url + self.student.username
+        response = self.client.put(url, data=json.dumps(
+            {
+                'entitlement_uuid': unicode(expired_entitlement.uuid),
+                'reason': CourseEntitlementSupportDetail.LEAVE_SESSION
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data['support_details']), 1)
+        self.assertDictContainsSubset({
+            'support_user': self.user.username,
+            'reason': CourseEntitlementSupportDetail.LEAVE_SESSION,
+            'comments': None,
+            'unenrolled_run': unicode(selected_run.course_id)
+        }, data['support_details'][0])
+
+    def test_create_entitlement(self):
+        CourseEntitlementFactory.create(
+            mode=CourseMode.VERIFIED, user=self.student, course_uuid=self.course_uuid, expired_at=datetime.now()
+        )
+        url = self.url + self.student.username
+        response = self.client.post(
+            url,
+            data=json.dumps({
+                'course_uuid': unicode(self.course_uuid),
+                'reason': CourseEntitlementSupportDetail.LEARNER_REQUEST_NEW,
+                'mode': CourseMode.VERIFIED
+            }),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.content)
+        self.assertEqual(len(data['support_details']), 1)
+        self.assertDictContainsSubset({
+            'support_user': self.user.username,
+            'reason': CourseEntitlementSupportDetail.LEARNER_REQUEST_NEW,
+            'comments': None,
+            'unenrolled_run': None
+        }, data['support_details'][0])
