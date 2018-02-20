@@ -15,8 +15,6 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from HTMLParser import HTMLParser
 from six import text_type
 
-from django.http import Http404
-
 from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
@@ -898,7 +896,7 @@ def get_transcript(course_id, block_id, lang=None):
             transcript = get_video_transcript_content(video_descriptor.edx_video_id, lang)
 
         if not transcript:
-            raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
+            raise NotFoundError(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
 
         transcript_conversion_props = dict(transcript, output_format=Transcript.SRT)
         transcript = convert_video_transcript(**transcript_conversion_props)
@@ -906,6 +904,6 @@ def get_transcript(course_id, block_id, lang=None):
         content = transcript['content']
         mimetype = Transcript.mime_types[Transcript.SRT]
     except KeyError:
-        raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
+        raise NotFoundError(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 
     return content, filename.encode('utf-8'), mimetype

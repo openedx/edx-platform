@@ -118,11 +118,13 @@ class VideoTranscripts(generics.RetrieveAPIView):
 
     @mobile_course_access()
     def get(self, request, course, *args, **kwargs):
-        content, filename, mimetype = get_transcript(
-            course.id,
-            block_id=kwargs['block_id'],
-            lang=kwargs['lang']
-        )
+        block_id = kwargs['block_id']
+        lang = kwargs['lang']
+
+        try:
+            content, filename, mimetype = get_transcript(course.id, block_id, lang)
+        except NotFoundError:
+            raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)

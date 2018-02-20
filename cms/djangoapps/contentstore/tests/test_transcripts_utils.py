@@ -20,6 +20,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import UserFactory
 from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -721,3 +722,120 @@ class TestVideoIdsInfo(unittest.TestCase):
         """
         actual_result = transcripts_utils.get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources)
         self.assertEqual(actual_result, expected_result)
+
+@ddt.ddt
+class TestGetTranscript(SharedModuleStoreTestCase):
+    """Tests for `get_transcript` function."""
+
+    org = 'MITx'
+    number = '999'
+    display_name = 'Test course'
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetTranscript, cls).setUpClass()
+        cls.course = CourseFactory.create(org=cls.org, number=cls.number, display_name=cls.display_name)
+
+        cls.subs = {
+            'start': [100, 200, 240, 390, 1000],
+            'end': [200, 240, 380, 1000, 1500],
+            'text': [
+                'subs #1',
+                'subs #2',
+                'subs #3',
+                'subs #4',
+                'subs #5'
+            ]
+        }
+
+        cls.subs_srt = transcripts_utils.Transcript.convert(json.dumps(cls.subs), 'sjson', 'srt')
+
+        cls.srt_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SRT]
+
+    def setUp(self):
+        super(TestGetTranscript, self).setUp()
+
+        self.user = UserFactory.create()
+        self.vertical = self.store.create_item(self.user.id, self.course.id, 'vertical', 'a_vertical')
+
+        self.subs_id_en = 'video_en_101'
+        self.subs_id_ur = 'video_ur_102'
+
+        self.video = self.store.create_item(
+            self.user.id,
+            self.course.id,
+            'video',
+            'a_video'
+        )
+        self.vertical.children.append(self.video.location)
+        self.store.update_item(self.vertical, self.user.id)
+
+    def create_transcript(self, subs_id, language=u'en'):
+        """
+        create transcript.
+        """
+        self.video = self.store.create_item(
+            self.user.id,
+            self.course.id,
+            'video',
+            'a_video'
+        )
+        self.video.sub = subs_id
+        self.store.update_item(self.video, self.user.id)
+
+        self.saved_sub = transcripts_utils.save_subs_to_store(
+            self.subs,
+            subs_id,
+            self.video,
+            language=language,
+        )
+
+    @ddt.data(
+        # en lang does not exist so NotFoundError will be raised
+        (u'en',),
+        # ur lang does not exist so KeyError and then NotFoundError will be raised
+        (u'ur',),
+    )
+    @ddt.unpack
+    def test_get_transcript_not_found(self, lang):
+        """
+        Verify that `NotFoundError` exception is raised when transcript is not found in both the content store and val.
+        """
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.get_transcript(self.course.id, self.video.location.block_id, lang=lang)
+
+    def test_get_transcript_from_content_store(self):
+        """
+        Verify that `get_transcript` function returns correct data when transcript is in content store.
+        """
+        self.create_transcript(self.subs_id_en)
+        content, filename, mimetype = transcripts_utils.get_transcript(
+            self.course.id,
+            self.video.location.block_id,
+        )
+
+        self.assertEqual(content, self.subs_srt)
+        self.assertEqual(filename, 'video_en_101.srt')
+        self.assertEqual(mimetype, self.srt_mime_type)
+
+    @patch(
+        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
+        Mock(return_value=True),
+    )
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    def test_get_transcript_from_val(self, mock_get_video_transcript_content):
+        """
+        Verify that `get_transcript` function returns correct data when transcript is in val.
+        """
+        mock_get_video_transcript_content.return_value = {
+            'content': json.dumps(self.subs),
+            'file_name': 'edx.sjson'
+        }
+
+        content, filename, mimetype = transcripts_utils.get_transcript(
+            self.course.id,
+            self.video.location.block_id,
+        )
+        self.assertEqual(content, self.subs_srt)
+        self.assertEqual(filename, 'edx.srt')
+        self.assertEqual(mimetype, self.srt_mime_type)

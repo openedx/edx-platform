@@ -163,14 +163,17 @@ def download_transcripts(request):
         log.debug('transcripts are supported only for video" modules.')
         raise Http404
 
-    content, filename, mimetype = get_transcript(
-        item.location.course_key,
-        block_id=item.location.block_id,
-        lang=u'en'
-    )
+    try:
+        content, filename, mimetype = get_transcript(
+            item.location.course_key,
+            block_id=item.location.block_id,
+            lang=u'en'
+        )
+    except NotFoundError:
+        raise Http404
 
     # Construct an HTTP response
-    response = HttpResponse(content, content_type='application/x-subrip; charset=utf-8')
+    response = HttpResponse(content, content_type=mimetype)
     response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=filename)
     return response
 

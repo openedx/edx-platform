@@ -326,7 +326,7 @@ class VideoStudentViewHandlers(object):
                 content, filename, mimetype = get_transcript(
                     self.course_id, block_id=self.location.block_id, lang=lang
                 )
-            except (Http404, UnicodeDecodeError):
+            except (NotFoundError, UnicodeDecodeError):
                 return Response(status=404)
 
             response = Response(

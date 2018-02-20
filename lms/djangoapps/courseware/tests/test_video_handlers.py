@@ -435,7 +435,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
 
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptsMixin.get_transcript', return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptsMixin.get_transcript',
+        return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8')
+    )
     def test_download_srt_exist(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
@@ -443,7 +446,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Language'], 'en')
 
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptsMixin.get_transcript', return_value=('Subs!', 'txt', 'text/plain; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptsMixin.get_transcript',
+        return_value=('Subs!', 'txt', 'text/plain; charset=utf-8')
+    )
     def test_download_txt_exist(self, __):
         self.item.transcript_format = 'txt'
         request = Request.blank('/download')
@@ -460,7 +466,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         with self.assertRaises(NotFoundError):
             self.item.get_transcript(transcripts)
 
-    @patch('xmodule.video_module.transcripts_utils.VideoTranscriptsMixin.get_transcript', return_value=('Subs!', u"塞.srt", 'application/x-subrip; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.transcripts_utils.VideoTranscriptsMixin.get_transcript',
+        return_value=('Subs!', u"塞.srt", 'application/x-subrip; charset=utf-8')
+    )
     def test_download_non_en_non_ascii_filename(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
