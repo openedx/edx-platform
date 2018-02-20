@@ -7,7 +7,6 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext
-from uuid import uuid4
 
 from lazy import lazy
 from lxml import etree
@@ -154,15 +153,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'added' (set) of newly added (block_type, block_id) tuples
         """
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
-        course_is_mit_supply_chain = len(selected) != 0 and "MITx+CTL" in next(iter(selected))[1]  # used for temporary logging for EDUCATOR-1290
-        if course_is_mit_supply_chain:
-            log_id = uuid4()
-            logger.info(
-                "EDUCATOR-1290: LibraryContentModule.make_selection executing. selected: {0} | log ID: {1}".format(
-                    selected,
-                    log_id
-                )
-            )
+
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
 
@@ -190,24 +181,39 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             else:
                 raise NotImplementedError("Unsupported mode.")
             selected |= added_block_keys
-        if course_is_mit_supply_chain:
-            logger.info(
-                "EDUCATOR-1290: LibraryContentModule.make_selection executed. "
-                "valid_block_keys: {0} | selected: {1} | invalid: {2} | overlimit: {3} | added: {4} | log ID: {5}".format(
-                    valid_block_keys,
-                    selected,
-                    invalid_block_keys,
-                    overlimit_block_keys,
-                    added_block_keys,
-                    log_id
-                )
-            )
+        # TODO: used for temporary logging for EDUCATOR-1290
+        cls._log_if_mit_supply_chain(
+            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys
+        )
         return {
             'selected': selected,
             'invalid': invalid_block_keys,
             'overlimit': overlimit_block_keys,
             'added': added_block_keys,
         }
+
+    @staticmethod
+    def _log_if_mit_supply_chain(
+            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys
+    ):
+        """
+        Helper method to debug case where random block_keys are not assigned for particular courses.
+        TODO: Delete this before closing EDUCATOR-1290
+        """
+        if not selected:
+            return
+        first_block_id = list(selected)[0][1]
+        if selected and "MITx+CTL" in first_block_id:
+            logger.info(
+                "EDUCATOR-1290: LibraryContentModule.make_selection executed: "
+                "valid_block_keys: {1} | selected: {2} | invalid: {3} | overlimit: {4} | added: {5}".format(
+                    valid_block_keys,
+                    selected,
+                    invalid_block_keys,
+                    overlimit_block_keys,
+                    added_block_keys
+                )
+            )
 
     def _publish_event(self, event_name, result, **kwargs):
         """
@@ -660,7 +666,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():
+        for field_name, field in self.fields.iteritems():  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
