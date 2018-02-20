@@ -31,11 +31,6 @@ SUPPORT_INDEX_URLS = [
         "name": _("Manage User"),
         "description": _("Disable User Account"),
     },
-    {
-        "url": reverse_lazy("support:course_entitlement"),
-        "name": _("Course Entitlement"),
-        "description": _("View, update, and grant course entitlements for users.")
-    },
 ]
 
 
