@@ -690,7 +690,6 @@
     });
 
     testFiles = [
-        'completion/js/spec/ViewedEvent_spec.js',
         'course_bookmarks/js/spec/bookmark_button_view_spec.js',
         'course_bookmarks/js/spec/bookmarks_list_view_spec.js',
         'course_bookmarks/js/spec/course_bookmarks_factory_spec.js',

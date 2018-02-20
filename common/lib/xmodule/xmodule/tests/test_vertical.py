@@ -20,8 +20,6 @@ from .xml import factories as xml
 from ..x_module import STUDENT_VIEW, AUTHOR_VIEW
 
 
-COMPLETION_DELAY = 9876
-
 JsonRequest = namedtuple('JsonRequest', ['method', 'body'])
 
 
@@ -43,7 +41,6 @@ class StubCompletionService(object):
     def __init__(self, enabled, completion_value):
         self._enabled = enabled
         self._completion_value = completion_value
-        self.delay = COMPLETION_DELAY
 
     def completion_tracking_enabled(self):
         """
@@ -58,12 +55,6 @@ class StubCompletionService(object):
         block.
         """
         return {candidate: self._completion_value for candidate in candidates}
-
-    def get_completion_by_viewing_delay_ms(self):
-        """
-        Return the completion-by-viewing delay in milliseconds.
-        """
-        return self.delay
 
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
@@ -126,7 +117,6 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         self.module_system._services['bookmarks'] = Mock()
         self.module_system._services['user'] = StubUserService()
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0.0)
 
         html = self.module_system.render(
             self.vertical, STUDENT_VIEW, self.default_context if context is None else context
@@ -134,7 +124,6 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
         self.assert_bookmark_info_in(html)
-        self.assertIn(six.text_type(COMPLETION_DELAY), html)
 
     @staticmethod
     def _render_completable_blocks(template, context):  # pylint: disable=unused-argument

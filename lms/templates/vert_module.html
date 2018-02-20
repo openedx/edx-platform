@@ -8,11 +8,7 @@
     <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
 % endif
 
-<div class="vert-mod" \
-  % if completion_delay_ms is not None:
-    data-completion-delay-ms="${completion_delay_ms}" \
-  % endif
-    >
+<div class="vert-mod">
 % for idx, item in enumerate(items):
   <div class="vert vert-${idx}" data-id="${item['id']}" \
     % if item['id'] in watched_completable_blocks:
