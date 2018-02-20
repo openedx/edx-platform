@@ -25,23 +25,9 @@ _VERIFIED_MODE_EXPIRED = []
 
 
 # pylint: disable=unused-argument
-def get_course_enrollments(student_id, org_filter=None):
+def get_course_enrollments(student_id):
     """Stubbed out Enrollment data request."""
-    res = _ENROLLMENTS
-
-    # apply ORG filter, if specified
-    # NOTE, do not do a Falsy type check here because an empty list
-    # and None do not have the same semantic meaning. None means no filtering.
-    # Empty list means 'filter everything out'
-    if org_filter is not None:
-        _set = []
-        for enrollment in _ENROLLMENTS:
-            for org in org_filter:
-                if org in enrollment['course']['course_id']:
-                    _set.append(enrollment)
-        res = _set
-
-    return res
+    return _ENROLLMENTS
 
 
 def get_course_enrollment(student_id, course_id):

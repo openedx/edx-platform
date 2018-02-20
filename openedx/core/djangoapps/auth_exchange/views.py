@@ -29,7 +29,6 @@ import social.apps.django_app.utils as social_utils
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.lib.api.permissions import OAuth2RestrictedApplicatonPermission
 
 
 class AccessTokenExchangeBase(APIView):
@@ -150,7 +149,7 @@ class LoginWithAccessTokenView(APIView):
     View for exchanging an access token for session cookies
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
-    permission_classes = (permissions.IsAuthenticated, OAuth2RestrictedApplicatonPermission)
+    permission_classes = (permissions.IsAuthenticated,)
 
     @staticmethod
     def _get_path_of_arbitrary_backend_for_user(user):

@@ -5,7 +5,6 @@ Tests for Blocks Views
 import json
 
 import ddt
-from mock import patch
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.core.urlresolvers import reverse
@@ -91,51 +90,22 @@ class _DispatchingViewTestCase(TestCase):
 
         # Create a "restricted" DOT Application which means any AccessToken/JWT
         # generated for this application will be immediately expired
-        all_scopes = u' '.join([
-            scope for scope in settings.OAUTH2_PROVIDER['SCOPES'].keys()
-        ])
-
-        self.restricted_dot_app = self._create_restricted_app(
+        self.restricted_dot_app = self.dot_adapter.create_public_client(
             name='test restricted dot application',
-            client_id='dot-restricted-app-client-id',
-            allowed_scopes=all_scopes,
-        )
-
-        self.restricted_dot_app_limited_scopes = self._create_restricted_app(
-            name='test restricted dot application limited scopes',
-            client_id='dot-restricted-app-limited-scopes-client-id',
-            allowed_scopes=u'profile',
-        )
-
-    def _create_restricted_app(self, name, client_id, allowed_scopes):
-        """
-        Helper method to create a RestrictedApp
-        """
-
-        restricted_dot_app = self.dot_adapter.create_public_client(
-            name=name,
             user=self.user,
             redirect_uri=DUMMY_REDIRECT_URL,
-            client_id=client_id,
+            client_id='dot-restricted-app-client-id',
         )
-        restricted_app = models.RestrictedApplication.objects.create(
-            application=restricted_dot_app,
-            _allowed_scopes=allowed_scopes
-        )
+        models.RestrictedApplication.objects.create(application=self.restricted_dot_app)
 
-        return restricted_dot_app
-
-    def _post_request(self, user, client, token_type=None, scopes=None):
+    def _post_request(self, user, client, token_type=None):
         """
         Call the view with a POST request objectwith the appropriate format,
         returning the response object.
         """
-        return self.client.post(
-            self.url,
-            self._post_body(user, client, token_type, scopes)
-        )  # pylint: disable=no-member
+        return self.client.post(self.url, self._post_body(user, client, token_type))  # pylint: disable=no-member
 
-    def _post_body(self, user, client, token_type=None, scopes=None):
+    def _post_body(self, user, client, token_type=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
@@ -152,7 +122,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.url = reverse('access_token')
         self.view_class = views.AccessTokenView
 
-    def _post_body(self, user, client, token_type=None, scopes=None):
+    def _post_body(self, user, client, token_type=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
@@ -165,9 +135,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         if token_type:
             body['token_type'] = token_type
-
-        if scopes:
-            body['scope'] = scopes
 
         return body
 
@@ -182,7 +149,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.assertIn('scope', data)
         self.assertIn('token_type', data)
 
-    @patch.dict('django.conf.settings.FEATURES', {'AUTO_EXPIRE_RESTRICTED_ACCESS_TOKENS': True})
     def test_restricted_access_token_fields(self):
         response = self._post_request(self.user, self.restricted_dot_app)
         self.assertEqual(response.status_code, 200)
@@ -209,7 +175,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.assertEqual(data['token_type'], 'JWT')
         self.assert_valid_jwt_access_token(data['access_token'], self.user, data['scope'].split(' '))
 
-    @patch.dict('django.conf.settings.FEATURES', {'AUTO_EXPIRE_RESTRICTED_ACCESS_TOKENS': True})
     def test_restricted_jwt_access_token(self):
         """
         Verify that when requesting a JWT token from a restricted Application
@@ -231,7 +196,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             should_be_expired=True
         )
 
-    @patch.dict('django.conf.settings.FEATURES', {'AUTO_EXPIRE_RESTRICTED_ACCESS_TOKENS': True})
     def test_restricted_access_token(self):
         """
         Verify that an access_token generated for a RestrictedApplication fails when
@@ -251,25 +215,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         # try submitting this expired access_token to an API,
         # and assert that it fails
         self._assert_access_token_invalidated(data['access_token'])
-
-    def test_allowed_scope_access_token(self):
-        """
-        Verify that an access_token generated for a RestrictedApplication fails when
-        submitted to an API endpoint
-        """
-
-        response = self._post_request(self.user, self.restricted_dot_app, scopes='profile')
-        self.assertEqual(response.status_code, 200)
-
-    def test_disallowed_scope_access_token(self):
-        """
-        Verify that an access_token generated for a RestrictedApplication fails when
-        submitted to an API endpoint
-        """
-
-        # now check no access to a scope not allowed on the application
-        response = self._post_request(self.user, self.restricted_dot_app_limited_scopes, scopes='email')
-        self.assertEqual(response.status_code, 401)
 
     def test_dot_access_token_provides_refresh_token(self):
         response = self._post_request(self.user, self.dot_app)
@@ -295,7 +240,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self.view_class = views.AccessTokenExchangeView
         super(TestAccessTokenExchangeView, self).setUp()
 
-    def _post_body(self, user, client, token_type=None, scopes=None):
+    def _post_body(self, user, client, token_type=None):
         return {
             'client_id': client.client_id,
             'access_token': self.access_token,
