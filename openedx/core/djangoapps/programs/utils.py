@@ -5,7 +5,7 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from urlparse import urljoin
+from urlparse import urljoin, urlparse, urlunparse
 
 from dateutil.parser import parse
 from django.conf import settings
@@ -673,10 +673,17 @@ def get_certificates(user, extended_program):
         certificates.append({
             'type': 'program',
             'title': extended_program['title'],
-            'url': program_credentials[0]['certificate_url'],
+            'url': get_logged_in_program_certificate_url(program_credentials[0]['certificate_url']),
         })
 
     return certificates
+
+
+def get_logged_in_program_certificate_url(certificate_url):
+    parsed_url = urlparse(certificate_url)
+    query_string = 'next=' + parsed_url.path
+    url_parts = (parsed_url.scheme, parsed_url.netloc, '/login/', '', query_string, '')
+    return urlunparse(url_parts)
 
 
 class ProgramMarketingDataExtender(ProgramDataExtender):

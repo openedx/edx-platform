@@ -36,7 +36,8 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramDataExtender,
     ProgramMarketingDataExtender,
     ProgramProgressMeter,
-    get_certificates
+    get_certificates,
+    get_logged_in_program_certificate_url
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -1299,7 +1300,7 @@ class TestGetCertificates(TestCase):
         self.user = UserFactory()
         self.program = ProgramFactory()
         self.course_certificate_url = 'fake-course-certificate-url'
-        self.program_certificate_url = 'fake-program-certificate-url'
+        self.program_certificate_url = 'http://fake-credentials.edx.org/credentials/fake-uuid/'
 
         for course in self.program['courses']:
             # Give all course runs a certificate URL, but only expect one to come
@@ -1332,7 +1333,7 @@ class TestGetCertificates(TestCase):
         expected.append({
             'type': 'program',
             'title': self.program['title'],
-            'url': self.program_certificate_url,
+            'url': get_logged_in_program_certificate_url(self.program_certificate_url),
         })
 
         mock_get_credentials.return_value = [{
@@ -1383,6 +1384,14 @@ class TestGetCertificates(TestCase):
 
         certificates = get_certificates(self.user, self.program)
         self.assertEqual(certificates, expected)
+
+    def test_get_program_certificate_url(self, mock_get_credentials):  # pylint: disable=unused-argument
+        """
+        Verify that function returns correct url with login prepended
+        """
+        expected = 'http://fake-credentials.edx.org/login/?next=/credentials/fake-uuid/'
+        actual = get_logged_in_program_certificate_url(self.program_certificate_url)
+        self.assertEqual(expected, actual)
 
 
 @ddt.ddt
