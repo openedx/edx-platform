@@ -50,6 +50,7 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
 %>
 
 <%block name="js_extra">
+  <script src="${static.url('js/leanModal.js')}"></script>
   <script src="${static.url('js/program_marketing.js')}"></script>
 </%block>
 
@@ -130,31 +131,33 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
         </div>
       </div>
     </div>
-    <div class="row quick-nav">
+    <div class="quick-nav">
       <div class="container">
-        <ul class="nav nav-fill col-lg-12">
-          % if courses:
-          <li class="nav-item">
-            <a class="nav-link" href="#courses">${_('View Courses')}</a>
-          </li>
-          % endif
-          % if instructors:
-          <li class="nav-item">
-            <a class="nav-link" href="#instructors">${_('Meet the Instructors')}</a>
-          </li>
-          % endif
-          % if faqs:
-          <li class="nav-item">
-            <a class="nav-link" href="#faqs">${_('Frequently Asked Questions')}</a>
-          </li>
-          % endif
-        </ul>
+        <div class="row">
+            <ul class="nav nav-fill col-lg-12">
+                % if courses:
+                <li class="nav-item">
+                  <a class="nav-link" href="#courses">${_('View Courses')}</a>
+                </li>
+                % endif
+                % if instructors:
+                <li class="nav-item">
+                  <a class="nav-link" href="#instructors">${_('Meet the Instructors')}</a>
+                </li>
+                % endif
+                % if faqs:
+                <li class="nav-item">
+                  <a class="nav-link" href="#faqs">${_('Frequently Asked Questions')}</a>
+                </li>
+                % endif
+              </ul>
+        </div>
       </div>
     </div>
   </div>
 </%block>
 
-<div id="program-details-page" class="container">  
+<div id="program-details-page" class="container">
   <div class="row program-info">
     <div class="col col-12 col-lg-7">
       <div class="section">
@@ -341,14 +344,47 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
         <h2>${_('Instructors')}</h2>
       </div>
       % for instructor in instructors:
-        <div class="col-6 col-sm-3 instructor">
-          <div>
+        <%
+          instructor_hash = hash(instructor['name'])
+        %>
+        <div class="col-12 col-sm-6 col-md-4 instructor">
+          <a href="#instructor-details-${instructor_hash}" class="instructor-label">
             <img alt="" src="${instructor['image']}"/>
+          </a>
+          <a href="#instructor-details-${instructor_hash}" class="instructor-label">
+            <div class="instructor-name">${instructor['name']}</div>
+          </a>
+          % if instructor.get('title'):
+            <div class="instructor-position">${instructor['title']}</div>
+          % endif
+          % if instructor.get('organization'):
+            <div class="instructor-org">${instructor['organization']}</div>
+          % endif
+          % if instructor.get('bio'):
+          <div class="instructor-modal">
+              <div class="col col-12 sm-col-12 md-col-6 lg-col-6 xl-col-6">
+                  <div class="modal modal-custom" id="instructor-details-${instructor_hash}">
+                     <div class="btn-close modal_close"><i class="fa fa-close"></i></div>
+                     <div class="modal-body">
+                       <div class="modal-header">
+                         <div>
+                            <img alt="" src="${instructor['image']}"/>
+                            <div class="instructor-name">${instructor['name']}</div>
+                            <div>
+                              % if instructor.get('title'):
+                                <span>${instructor['title']}</span>,
+                              % endif
+                              % if instructor.get('organization'):
+                                <span>${instructor['organization']}</span>
+                              % endif
+                            </div>
+                         </div>
+                       </div>
+                       <div class="instructor-bio">${HTML(instructor['bio'])}</div>
+                     </div>
+                   </div>
+                </div>
           </div>
-          <div class="instructor-name">${instructor['name']}</div>
-          % if instructor.get('position'):
-            <div class="instructor-position">${instructor['position'].get('position')}</div>
-            <div class="instructor-org">${instructor['position'].get('organization_name')}</div>
           % endif
         </div>
       % endfor
