@@ -162,11 +162,9 @@
                             if (test.isValid) {
                                 obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
                                 $el.removeClass('error');
-                                $label.removeClass('error');
                             } else {
                                 errors.push(test.message);
                                 $el.addClass('error');
-                                $label.addClass('error');
                             }
                         }
                     }

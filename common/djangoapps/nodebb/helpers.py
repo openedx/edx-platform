@@ -1,7 +1,14 @@
 import collections
-from courseware.tabs import get_course_tab_list
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+
 from django.core.urlresolvers import reverse
+
+from courseware.tabs import get_course_tab_list
+from common.lib.nodebb_client.client import NodeBBClient
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from nodebb.models import DiscussionCommunity, TeamGroupChat
+
+from logging import getLogger
+log = getLogger(__name__)
 
 
 def get_course_related_tabs(request, course):
@@ -49,3 +56,39 @@ def get_all_course_progress(student, course):
         percentage = 0
 
     return int(percentage)
+
+
+def get_community_url(course_id):
+    """
+    Get community url(if exists) based on the course id
+    """
+    discussion_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
+    if discussion_community:
+        return discussion_community.community_url
+
+
+def get_room_id(user_info):
+    """
+    Get room_id for MyTeam of a user
+    """
+    room_info = {}
+
+    for team in user_info['teams']['results']:
+        team = dict(team)
+        if team['membership']:
+            team_group = TeamGroupChat.objects.filter(team__team_id=team['id']).first()
+            if team_group:
+                room_info.update({team['id']: team_group.room_id})
+
+    return room_info
+
+
+def update_nodebb_for_user_status(username):
+    """
+    Call nodebb client to update NodeBB for survey status update
+    """
+    status_code, response_body = NodeBBClient().users.update_onboarding_surveys_status(username)
+    if status_code != 200:
+        log.error('Surveys completion status sending failed')
+    else:
+        log.info('Surveys completion status sent for %s' % username)

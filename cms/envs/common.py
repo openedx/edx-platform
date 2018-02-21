@@ -368,7 +368,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
+
+    # Enable session sharing b/w edx and nodebb platform
     'student.middleware.UserSessionSharingMiddleware',
+
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -933,6 +936,7 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
+    'lms.djangoapps.onboarding',
 
     # Microsite configuration application
     'microsite_configuration',
@@ -960,6 +964,10 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # Course teams
+    # Nodebb app has dependency on this app that's why we are adding it here
+    'lms.djangoapps.teams',
 
     # NodeBB app
     'nodebb',
@@ -1250,7 +1258,34 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
 
-# NodeBB settings
-NODEBB_ENDPOINT = 'http://utp.community.philanthropyu.arbisoft.com'
 
+# Enabled this setting to add Course Instructors through User Interface in CMS.
 FEATURES['ENABLE_EXTENDED_COURSE_DETAILS'] = True
+
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}

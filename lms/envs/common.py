@@ -470,6 +470,37 @@ OAUTH2_PROVIDER = {
 # otherwise it fails saying this attribute is not present in Settings
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
+
+
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 # TODO: Move the Mako templating into a different engine in TEMPLATES below.
@@ -509,6 +540,7 @@ TEMPLATES = [
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
             'context_processors': [
+                'lms.djangoapps.homepage.custom_context_processors.notifications_configs',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
@@ -850,6 +882,7 @@ DEFAULT_COURSE_ABOUT_IMAGE_URL = 'images/pencils.jpg'
 
 # User-uploaded content
 MEDIA_ROOT = '/edx/var/edxapp/media/'
+
 MEDIA_URL = '/media/'
 
 # Locale/Internationalization
@@ -1186,7 +1219,7 @@ MIDDLEWARE_CLASSES = (
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
-    'lms.djangoapps.onboarding_survey.middleware.RedirectMiddleware',
+    'lms.djangoapps.onboarding.middleware.RedirectMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1939,6 +1972,10 @@ INSTALLED_APPS = (
     'pipeline',
     'static_replace',
 
+    # Edx-Notifications
+    'edx_notifications',
+    'edx_notifications.server.api',
+
     # For content serving
     'openedx.core.djangoapps.contentserver',
 
@@ -2163,7 +2200,11 @@ INSTALLED_APPS = (
     # Unusual migrations
     'database_fixups',
 
-    'lms.djangoapps.onboarding_survey',
+    'lms.djangoapps.onboarding',
+
+
+    # OEF survey
+    'lms.djangoapps.oef',
 
     # Dynamic FAQ page
     'lms.djangoapps.faq',
@@ -2179,8 +2220,15 @@ INSTALLED_APPS = (
 
     # Philu Overrides
     'lms.djangoapps.philu_overrides',
+
+    #third party surveys
+    'lms.djangoapps.third_party_surveys',
+
     # timed notification and periodic tasks
     'openedx.core.djangoapps.timed_notification',
+
+    # student_dashboard App
+    'lms.djangoapps.student_dashboard',
 )
 
 ######################### CSRF #########################################
@@ -2217,7 +2265,7 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy',
     'PRESS': 'press',
     'BLOG': 'blog',
-    'DONATE': 'donate',
+
     'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
@@ -2246,12 +2294,10 @@ SOCIAL_SHARING_SETTINGS = {
 # The names list controls the order of social media
 # links in the footer.
 SOCIAL_MEDIA_FOOTER_NAMES = [
+    "linkedin",
     "facebook",
     "twitter",
     "youtube",
-    "linkedin",
-    "google_plus",
-    "reddit",
 ]
 
 # JWT Settings
@@ -2277,11 +2323,18 @@ SOCIAL_MEDIA_FOOTER_URLS = {}
 # The display dictionary defines the title
 # and icon class for each social media link.
 SOCIAL_MEDIA_FOOTER_DISPLAY = {
+    "linkedin": {
+        # Translators: This is the website name of www.linkedin.com.  Please
+        # translate this the way that LinkedIn advertises in your language.
+        "title": _("LinkedIn"),
+        "icon": "fa-linkedin",
+        "action": _("Follow {platform_name} on LinkedIn")
+    },
     "facebook": {
         # Translators: This is the website name of www.facebook.com.  Please
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
-        "icon": "fa-facebook-square",
+        "icon": "fa-facebook",
         "action": _("Like {platform_name} on Facebook")
     },
     "twitter": {
@@ -2290,51 +2343,6 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         "title": _("Twitter"),
         "icon": "fa-twitter",
         "action": _("Follow {platform_name} on Twitter")
-    },
-    "linkedin": {
-        # Translators: This is the website name of www.linkedin.com.  Please
-        # translate this the way that LinkedIn advertises in your language.
-        "title": _("LinkedIn"),
-        "icon": "fa-linkedin-square",
-        "action": _("Follow {platform_name} on LinkedIn")
-    },
-    "google_plus": {
-        # Translators: This is the website name of plus.google.com.  Please
-        # translate this the way that Google+ advertises in your language.
-        "title": _("Google+"),
-        "icon": "fa-google-plus-square",
-        "action": _("Follow {platform_name} on Google+")
-    },
-    "tumblr": {
-        # Translators: This is the website name of www.tumblr.com.  Please
-        # translate this the way that Tumblr advertises in your language.
-        "title": _("Tumblr"),
-        "icon": "fa-tumblr"
-    },
-    "meetup": {
-        # Translators: This is the website name of www.meetup.com.  Please
-        # translate this the way that MeetUp advertises in your language.
-        "title": _("Meetup"),
-        "icon": "fa-calendar"
-    },
-    "reddit": {
-        # Translators: This is the website name of www.reddit.com.  Please
-        # translate this the way that Reddit advertises in your language.
-        "title": _("Reddit"),
-        "icon": "fa-reddit",
-        "action": _("Subscribe to the {platform_name} subreddit"),
-    },
-    "vk": {
-        # Translators: This is the website name of https://vk.com.  Please
-        # translate this the way that VK advertises in your language.
-        "title": _("VK"),
-        "icon": "fa-vk"
-    },
-    "weibo": {
-        # Translators: This is the website name of http://www.weibo.com.  Please
-        # translate this the way that Weibo advertises in your language.
-        "title": _("Weibo"),
-        "icon": "fa-weibo"
     },
     "youtube": {
         # Translators: This is the website name of www.youtube.com.  Please
@@ -2871,7 +2879,7 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
-HOMEPAGE_COURSE_MAX = 9
+HOMEPAGE_COURSE_MAX = 4
 
 ################################ Settings for Credit Courses ################################
 # Initial delay used for retrying tasks.
@@ -2981,7 +2989,7 @@ MAX_BOOKMARKS_PER_COURSE = 100
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = 'onboarding_survey.forms.RegModelForm'
+REGISTRATION_EXTENSION_FORM = 'onboarding.forms.RegModelForm'
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [
@@ -3051,12 +3059,14 @@ DOC_LINK_BASE_URL = None
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 
-# NodeBB settings
-NODEBB_ENDPOINT = 'http://utp.community.philanthropyu.arbisoft.com'
-
-# Project features
-LMS_BASE_URL = 'http://utp.philanthropyu.arbisoft.com/'
-
 # Notification email settings
 NOTIFICATION_FROM_EMAIL = 'no-reply@philanthropyu.org'
 NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
+
+
+# Google Place API key
+GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
+
+# OEF renewal
+
+OEF_RENEWAL_DAYS = 180

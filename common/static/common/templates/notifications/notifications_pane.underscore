@@ -1,0 +1,41 @@
+<ul aria-labelledby="notif_dropdown" class="xns-container">
+
+    <li class="notification-header xns-list-header action-btns">
+        <div class="xns-actions">
+            <ul class="xns-tab-list">
+                <li class="xns-unread-action"><a href="#">View unread</a></li>
+                <li class="xns-all-action"><a href="#">View all</a></li>
+                <li class="xns-mark-read-action disabled"><a href="#">Mark as read</a></li>
+            </ul>
+        </div>
+    </li>
+
+    <% if(count === 0) { %>
+        <li class="no-notifs"><span>No notifications</span></li>
+    <% } %>
+    <li>
+        <ul class="notification-menu xns-items" id="notification-dropdown">
+            <% _.each(notifications, function(notification){ %>
+
+                <li <% if (!notification.read_at) { %> class="unread xns-item"  <% } else { %> class="xns-item" <% } %> id="<%-notification.msg.id%>" data-path="<%-notification.msg.payload.path%>"
+                    data-pid="<%-notification.msg.payload.pid%>" data-tid="<%-notification.msg.payload.tid%>">
+                        <%  if (notification.image) { %>
+                         <span class="img-box"><img src="<%-notification.image%>"/></span>
+                        <% } else { %>
+                            <span class="img-box"><img data-name="<%-notification.msg.payload.from_user%>" class="profile"/></span>
+                        <% } %>
+                        <span class="notification-text mark-me-read " data-msg-id="<%-notification.msg.id%>" data-path="<%-notification.msg.payload.path%>">
+                            <span class="text"><%= notification.msg.payload.bodyShort%></span>
+                        </span>
+                        <% if (!notification.read_at && selected_pane == "unread") { %>
+                            <span class="mark-read mark-me-read xns-close-item" data-msg-id="<%-notification.msg.id%>" data-redirect="false" aria-label="Mark Read">&#9673</span>
+                        <% } %>
+
+                        <span class="relTime"><time class="timeago" datetime="<%-notification.created%>"></time></span>
+
+                </li>
+
+            <% }); %>
+        </ul>
+    </li>
+</ul>

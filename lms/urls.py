@@ -19,6 +19,7 @@ from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.enterprise_helpers import enterprise_enabled
 
+
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
@@ -26,11 +27,12 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
 urlpatterns = (
     '',
-
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
 
-    url(r'^onboarding_survey/', include('lms.djangoapps.onboarding_survey.urls')),
+    url(r'', include('lms.djangoapps.onboarding.urls')),
+    url(r'^oef/', include('lms.djangoapps.oef.urls')),
+    url(r'', include('edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
@@ -71,6 +73,8 @@ urlpatterns = (
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
+    url(r'^404$', 'philu_overrides.views.render_404'),
+
 
     url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
 
@@ -123,9 +127,11 @@ urlpatterns += (
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
-        url(r'^login$', 'student_account.views.login_and_registration_form',
+        url(r'^login$', 'philu_overrides.views.login_and_registration_form',
             {'initial_mode': 'login'}, name="signin_user"),
-        url(r'^register$', 'student_account.views.login_and_registration_form',
+        url(r'^register$', 'philu_overrides.views.login_and_registration_form',
+            {'initial_mode': 'register'}, name="register_user"),
+        url(r'^register/(?P<org_name>[^/]*)/(?P<admin_email>[^/]*)/$', 'philu_overrides.views.login_and_registration_form',
             {'initial_mode': 'register'}, name="register_user"),
     )
 else:
@@ -276,7 +282,7 @@ urlpatterns += (
     # TODO: These views need to be updated before they work
     url(r'^calculate$', 'util.views.calculate'),
 
-    url(r'^courses/?$', 'branding.views.courses', name="courses"),
+    url(r'^courses/?$', 'lms.djangoapps.philu_overrides.views.courses', name="courses"),
 
     #About the course
     url(
@@ -641,7 +647,7 @@ urlpatterns += (
         r'^courses/{}/generate_user_cert'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.generate_user_cert',
+        'philu_overrides.courseware.views.views.generate_user_cert',
         name='generate_user_cert',
     ),
 )
@@ -953,7 +959,7 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
-handler404 = 'static_template_view.views.render_404'
+handler404 = 'philu_overrides.views.render_404'
 handler500 = 'static_template_view.views.render_500'
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.

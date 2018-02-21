@@ -19,7 +19,7 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = 'http://localhost:8000:80'
 
 ################################ LOGGERS ######################################
 
@@ -133,13 +133,17 @@ FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ########################## SECURITY #######################
-FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENFORCE_PASSWORD_POLICY'] = True
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
 FEATURES['ADVANCED_SECURITY'] = False
-PASSWORD_MIN_LENGTH = None
-PASSWORD_COMPLEXITY = {}
+PASSWORD_MIN_LENGTH = 6
+PASSWORD_COMPLEXITY = {
+    'UPPER': 1,
+    'LOWER': 1,
+    'DIGITS': 1
+}
 
 
 ########################### Milestones #################################
@@ -188,7 +192,7 @@ FEATURES['ENABLE_COURSE_DISCOVERY'] = True
 # Setting for overriding default filtering facets for Course discovery
 # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
-HOMEPAGE_COURSE_MAX = 9
+HOMEPAGE_COURSE_MAX = 4
 
 # Software secure fake page feature flag
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
@@ -281,3 +285,34 @@ if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
+# NodeBB settings
+NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)

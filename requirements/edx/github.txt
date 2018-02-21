@@ -1,3 +1,4 @@
+
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
@@ -76,7 +77,8 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.13#egg=XBlock==0.4.13
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@1.1.13#egg=ora2==1.1.13
+-e git+https://github.com/philanthropy-u/edx-ora2.git@d4993791391bf0de9a66667c475a07d509de73c4#egg=ora2==1.1.13.2
+
 -e git+https://github.com/edx/edx-submissions.git@1.1.4#egg=edx-submissions==1.1.4
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/edx-val.git@0.0.12#egg=edxval==0.0.12
@@ -98,3 +100,8 @@ git+https://github.com/edx/edx-proctoring.git@0.17.0#egg=edx-proctoring==0.17.0
 -e git+https://github.com/philanthropy-u/AudioXBlock.git#egg=audio-xblock==1.0.2
 -e git+https://github.com/adlnet-archive/Table-XBlock.git#egg=table-xblock==1.0
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.15#egg=xblock-drag-and-drop-v2==2.0.15
+
+# edx-notifications
+-e git+https://github.com/philanthropy-u/edx-notifications.git@0770571453072a7c8e185bdbdd778545c9c7ef59#egg=edx-notifications
+-e git+https://github.com/philanthropy-u/django-simple-history.git@c081e21f61126b3528a3a1cbd537b045937de43b#egg=django-simple-history
+
