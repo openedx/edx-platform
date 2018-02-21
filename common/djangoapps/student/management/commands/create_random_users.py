@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
 from student.forms import AccountCreationForm
-from student.views import _do_create_account
+from student.helpers import do_create_account
 
 
 def make_random_form():
@@ -30,7 +30,7 @@ def make_random_form():
 def create(num, course_key):
     """Create num users, enrolling them in course_key if it's not None"""
     for __ in range(num):
-        (user, _, _) = _do_create_account(make_random_form())
+        (user, _, _) = do_create_account(make_random_form())
         if course_key is not None:
             CourseEnrollment.enroll(user, course_key)
         print('Created user {}'.format(user.username))

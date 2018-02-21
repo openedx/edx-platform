@@ -466,7 +466,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         """Creates user, profile, registration, and (usually) social auth.
 
         This synthesizes what happens during /register.
-        See student.views.register and student.views._do_create_account.
+        See student.views.register and student.helpers.do_create_account.
         """
         response_data = self.get_response_data()
         uid = strategy.request.backend.get_user_id(response_data, response_data)
