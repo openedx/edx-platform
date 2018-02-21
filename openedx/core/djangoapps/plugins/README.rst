@@ -129,7 +129,7 @@ class::
 
                     # The regex to provide to django's urls.url.
                     # Optional; Defaults to r''.
-                    PluginURLs.REGEX: r'api/my_app/',
+                    PluginURLs.REGEX: r'^api/my_app/',
 
                     # The python path (relative to this app) to the URLs module to be plugged into the project.
                     # Optional; Defaults to u'urls'.
@@ -197,7 +197,7 @@ OR use string constants when they cannot import from djangoapps.plugins::
             u'url_config': {
                 u'lms.djangoapp': {
                     u'namespace': u'my_app',
-                    u'regex': u'api/my_app/',
+                    u'regex': u'^api/my_app/',
                     u'relative_path': u'api.urls',
                 }
             },
