@@ -2,24 +2,55 @@
 Support tool for changing and granting course entitlements
 """
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import DatabaseError, transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.utils.decorators import method_decorator
+from django.views.generic import View
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
+from edxmako.shortcuts import render_to_response
 from entitlements.api.v1.permissions import IsAdminOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import SupportCourseEntitlementSerializer
 from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 
 REQUIRED_CREATION_FIELDS = ['course_uuid', 'reason', 'mode']
 
+import logging
+log = logging.getLogger(__name__)
 
-class EntitlementSupportView(viewsets.ModelViewSet):
+class EntitlementSupportView(View):
+    """
+    View for viewing and changing learner enrollments, used by the
+    support team.
+    """
+    @method_decorator(require_support_permission)
+    def get(self, request):
+        """Render the enrollment support tool view."""
+        log.info('ENTITLEMENT SUPPORT VIEW HIT')
+        support_reasons = CourseEntitlementSupportDetail.get_support_reasons_list()
+        log.info('trying to attach support_reasons' + str(support_reasons))
+
+        ecommerce_service = EcommerceService()
+
+        ecommerce_url = ecommerce_service.get_order_dashboard_url()
+        #ecommerce_url = "http://localhost:18130/dashboard/orders/"
+        context = {
+            'username': request.GET.get('user', ''),
+            'uses_bootstrap': True,
+            'ecommerce_url': ecommerce_url,
+            'support_reasons': support_reasons
+        }
+    
+        return render_to_response('support/entitlement.html', context)
+
+class EntitlementSupportListView(viewsets.ModelViewSet):
     """
     Allows viewing and changing learner course entitlements, used the support team.
     """
@@ -37,7 +68,7 @@ class EntitlementSupportView(viewsets.ModelViewSet):
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
         except User.DoesNotExist:
-            return Response([])
+            return Response(['blah'])
 
         return Response(self.serializer_class(self.queryset.filter(user=user), many=True).data)
 
