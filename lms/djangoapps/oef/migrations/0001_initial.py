@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('title', models.CharField(max_length=256)),
                 ('is_enabled', models.BooleanField(default=False)),
+                ('description', models.TextField(default='Description')),
             ],
             options={
                 'abstract': False,
@@ -62,6 +63,7 @@ class Migration(migrations.Migration):
                 ('title', models.TextField()),
                 ('description', models.TextField()),
                 ('survey', models.ForeignKey(related_name='topics', to='oef.OefSurvey')),
+                ('score_name', models.CharField(default='score', max_length=50)),
             ],
             options={
                 'abstract': False,
@@ -110,5 +112,5 @@ class Migration(migrations.Migration):
             model_name='option',
             name='topic',
             field=models.ForeignKey(related_name='options', to='oef.TopicQuestion'),
-        ),
+        )
     ]
