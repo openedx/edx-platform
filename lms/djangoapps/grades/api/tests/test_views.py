@@ -3,8 +3,6 @@ Tests for the views
 """
 from datetime import datetime
 import ddt
-import json
-
 from django.core.urlresolvers import reverse
 from mock import patch
 from opaque_keys import InvalidKeyError
@@ -16,8 +14,6 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
 from lms.djangoapps.grades.tests.utils import mock_get_score
-from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
-from openedx.core.djangoapps.oauth_dispatch.tests.test_views import _DispatchingViewTestCase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -496,144 +492,3 @@ class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModule
             }
         ]
         self.assertListEqual(response.data, expected)
-
-
-class OAuth2RestrictedAppTests(_DispatchingViewTestCase, SharedModuleStoreTestCase):
-    """
-    Tests specifically around RestrictedApplications for OAuth2 clients
-    We separated this out from other OAuth tests above, because those
-    tests use the deprecated DOP framework (as opposed to DOT)
-    """
-
-    def setUp(self):
-        super(OAuth2RestrictedAppTests, self).setUp()
-        self.url = reverse('access_token')
-        self.course = CourseFactory.create()
-        self.second_org_course = CourseFactory.create(
-            org='SecondOrg'
-        )
-        self.not_associated_course = CourseFactory.create(
-            org='NotAssociated'
-        )
-
-        # enroll user associated with OAuth2 Client Application
-        # in all courses
-        CourseEnrollmentFactory(
-            course_id=self.course.id,
-            user=self.restricted_dot_app.user
-        )
-        CourseEnrollmentFactory(
-            course_id=self.second_org_course.id,
-            user=self.restricted_dot_app.user
-        )
-        CourseEnrollmentFactory(
-            course_id=self.not_associated_course.id,
-            user=self.restricted_dot_app.user
-        )
-
-    def _post_body(self, user, client, token_type=None, scopes=None):
-        """
-        Return a dictionary to be used as the body of the POST request
-        """
-        body = {
-            'client_id': client.client_id,
-            'grant_type': 'password',
-            'username': user.username,
-            'password': 'test',
-        }
-
-        if token_type:
-            body['token_type'] = token_type
-
-        if scopes:
-            body['scope'] = scopes
-
-        return body
-
-    def _do_grades_call(self, dot_application, scopes, course_key=None):
-        """
-        Helper method to consolidate code
-        """
-
-        response = self._post_request(
-            self.user,
-            dot_application,
-            scopes=scopes,
-        )
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-
-        self.assertIn('access_token', data)
-
-        # call into Enrollments API endpoint
-        url = "{0}?username={1}".format(
-            reverse(
-                'grades_api:user_grade_detail',
-                kwargs={
-                    'course_id': course_key if course_key else self.course.id,
-                }
-            ),
-            self.user.username
-        )
-        response = self.client.get(
-            url,
-            HTTP_AUTHORIZATION="Bearer {0}".format(data['access_token'])
-        )
-        return response
-
-    def test_wrong_scope(self):
-        """
-        assert that a RestrictedApplication client which DOES NOT have the
-        grades:read scope CANNOT access the Grade API
-        """
-
-        # call into Enrollments API endpoint with a 'profile' scoped access_token
-        response = self._do_grades_call(
-            self.restricted_dot_app_limited_scopes,
-            'profile'
-        )
-
-        # this should NOT have permission to access this API
-        self.assertEqual(response.status_code, 403)
-
-    def test_correct_scope_with_correct_org(self):
-        """
-        assert that a RestrictedApplication client which DOES have the
-        grade:read scope as well as being associated with the org CAN access the Grade API
-        """
-
-        restricted_application = RestrictedApplication.objects.get(application=self.restricted_dot_app)
-        restricted_application.org_associations = [self.course.id.org]
-        restricted_application.save()
-
-        # call into Enrollments API endpoint with a 'enrollments:read' scoped access_token
-        response = self._do_grades_call(
-            self.restricted_dot_app,
-            'grades:read'
-        )
-
-        # this should have permission to access this API endpoint
-        self.assertEqual(response.status_code, 200)
-
-    def test_correct_scope_with_wrong_org(self):
-        """
-        assert that a RestrictedApplication client which
-             - DOES have the grade:read scope as well
-             - IS NOT associated with requested org
-        CANNOT access the Grade API
-        """
-
-        restricted_application = RestrictedApplication.objects.get(application=self.restricted_dot_app)
-        restricted_application.org_associations = ['badorg']
-        restricted_application.save()
-
-        # call into Enrollments API endpoint with a 'enrollments:read' scoped access_token
-        response = self._do_grades_call(
-            self.restricted_dot_app,
-            'grades:read'
-        )
-
-        # this should have permission to access this API endpoint
-        self.assertEqual(response.status_code, 403)
-        data = json.loads(response.content)
-        self.assertEqual(data['error_code'], 'course_org_not_associated_with_calling_application')

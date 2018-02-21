@@ -21,7 +21,6 @@ from enrollment.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.lib.api.permissions import OAuth2RestrictedApplicatonPermission
 from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment, RegistrationCookieConfiguration
 from util.json_request import JsonResponse
@@ -36,7 +35,7 @@ class BasketsView(APIView):
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
     authentication_classes = (EnrollmentCrossDomainSessionAuth, OAuth2AuthenticationAllowInactiveUser)
-    permission_classes = (IsAuthenticated, OAuth2RestrictedApplicatonPermission,)
+    permission_classes = (IsAuthenticated,)
 
     def _is_data_valid(self, request):
         """
