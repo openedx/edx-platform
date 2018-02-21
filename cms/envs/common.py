@@ -1258,6 +1258,7 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
 
+
 # Enabled this setting to add Course Instructors through User Interface in CMS.
 FEATURES['ENABLE_EXTENDED_COURSE_DETAILS'] = True
 
