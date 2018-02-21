@@ -5,6 +5,10 @@ URLs for static_template_view app
 from django.conf import settings
 from django.conf.urls import patterns, url
 
+
+handler404 = 'lms.djangoapps.static_template_view.views.handler404'
+handler500 = 'lms.djangoapps.static_template_view.views.handler500'
+
 urlpatterns = (
     'static_template_view.views',
 

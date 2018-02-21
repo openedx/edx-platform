@@ -76,3 +76,17 @@ def render_404(request):
 
 def render_500(request):
     return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))
+
+
+def handler404(request):
+    response = render_to_response('static_templates/404.html', {},
+                                  context_instance=RequestContext(request))
+    response.status_code = 404
+    return response
+
+
+def handler500(request):
+    response = render_to_response('static_templates/server-error.html', {},
+                                  context_instance=RequestContext(request))
+    response.status_code = 500
+    return response
