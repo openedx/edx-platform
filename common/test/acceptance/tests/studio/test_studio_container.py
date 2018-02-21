@@ -999,33 +999,6 @@ class UnitPublishingTest(ContainerBase):
         unit_page = unit.go_to()
         self._verify_explicit_lock_overrides_implicit_lock_information(unit_page)
 
-    def test_published_unit_with_draft_child(self):
-        """
-        Scenario: A published unit with a draft child can be published
-            Given I have a published unit with no unpublished changes
-            When I go to the unit page in Studio
-            And edit the content of the only component
-            Then the content changes
-            And the title in the Publish information box is "Draft (Unpublished changes)"
-            And when I click the Publish button
-            Then the title in the Publish information box is "Published and Live"
-            And when I click the View Live button
-            Then I see the changed content in LMS
-        """
-        modified_content = 'modified content'
-
-        unit = self.go_to_unit_page()
-        component = unit.xblocks[1]
-        component.edit()
-        HtmlXBlockEditorView(self.browser, component.locator).set_content_and_save(modified_content)
-        self.assertEqual(component.student_content, modified_content)
-        unit.verify_publish_title(self.DRAFT_STATUS)
-        unit.publish_action.click()
-        unit.wait_for_ajax()
-        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
-        self._view_published_version(unit)
-        self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
-
     def test_cancel_does_not_create_draft(self):
         """
         Scenario: Editing a component and then canceling does not create a draft version (TNL-399)
