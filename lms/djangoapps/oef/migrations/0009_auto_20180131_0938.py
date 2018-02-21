@@ -28,10 +28,4 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
-        migrations.AddField(
-            model_name='oefsurvey',
-            name='description',
-            field=models.TextField(default='Description'),
-            preserve_default=False,
-        ),
     ]
