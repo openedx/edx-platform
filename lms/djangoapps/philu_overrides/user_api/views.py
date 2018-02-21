@@ -14,28 +14,28 @@ from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, get_language
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
 from social.exceptions import AuthException, AuthAlreadyAssociated
+from philu_overrides.helpers import send_account_activation_email
 from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
 from student.forms import AccountCreationForm, get_registration_extension_form
 from student.models import Registration, create_comments_service_user, PasswordHistory, UserProfile
 from third_party_auth import pipeline, provider
 from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from util.json_request import JsonResponse
-from util.request import safe_get_host
 
 from common.djangoapps.student.views import AccountValidationError, social_utils, REGISTER_USER, \
     _enroll_user_in_pending_courses, record_registration_attributions
-from common.lib.mandrill_client.client import MandrillClient
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.user_api.views import RegistrationView
+from openedx.core.djangoapps.user_api.views import RegistrationView, LoginSessionView
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -344,17 +344,7 @@ def create_account_with_params_custom(request, params):
         )
     )
     if send_email:
-        activation_link = '{protocol}://{site}/activate/{key}'.format(
-            protocol='https' if request.is_secure() else 'http',
-            site=safe_get_host(request),
-            key=registration.activation_key
-        )
-
-        context = {
-            'first_name': user.first_name,
-            'activation_link': activation_link,
-        }
-        MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
+        send_account_activation_email(request, registration, user)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
@@ -466,3 +456,13 @@ class RegistrationViewCustom(RegistrationView):
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
         return response
+
+
+class LoginSessionViewCustom(LoginSessionView):
+    @method_decorator(require_post_params(["email", "password"]))
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        # For the initial implementation, shim the existing login view
+        # from the student Django app.
+        from philu_overrides.views import login_user_custom
+        return shim_student_view(login_user_custom, check_logged_in=True)(request)
