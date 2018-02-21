@@ -225,7 +225,7 @@ def render_404(request):
     except:
         return redirect("404/")
 
-
+      
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user_custom(request, error=""):  # pylint: disable=too-many-statements,unused-argument
