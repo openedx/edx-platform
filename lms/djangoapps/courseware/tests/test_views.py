@@ -62,7 +62,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
-from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from openedx.tests.util import expected_redirect_url
 from student.models import CourseEnrollment
@@ -907,6 +907,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_bypass_course_info(self):
         course_id = unicode(self.course_key)
 
