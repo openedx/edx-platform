@@ -462,7 +462,8 @@ def suggest_org_admin(request):
                 else:
                     hash_key = OrganizationAdminHashKeys.assign_hash(organization, organization.admin, request.user.email)
                     send_admin_update_email(organization.id, organization.label, organization.admin.email,
-                                            hash_key, request.user.email, request.user.username
+                                            organization.admin.first_name, hash_key, request.user.email,
+                                            request.user.username
                                             )
 
             except Organization.DoesNotExist:

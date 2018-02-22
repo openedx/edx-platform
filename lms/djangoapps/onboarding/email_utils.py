@@ -40,8 +40,8 @@ def send_admin_activation_email(first_name, org_id, org_name, claimed_by_name, c
         except:
             max_retries -= 1
 
-            
-def send_admin_update_email(org_id, org_name, dest_addr, hash_key, claimed_by_email, claimed_by_name):
+
+def send_admin_update_email(org_id, org_name, dest_addr, org_admin_name, hash_key, claimed_by_email, claimed_by_name):
     """
     Send an email to the admin, that this user claims himself to be the admin
     """
@@ -55,6 +55,7 @@ def send_admin_update_email(org_id, org_name, dest_addr, hash_key, claimed_by_em
 
     message_context = {
         "org_name": org_name,
+        "first_name": org_admin_name,
         "claimed_by_name": claimed_by_name,
         "claimed_by_email": claimed_by_email,
         "admin_activation_link": admin_activation_link
@@ -75,21 +76,25 @@ def send_admin_update_confirmation_email(org_name, current_admin, new_admin, con
     """
     if confirm == 1:
         MandrillClient().send_mail(MandrillClient.ORG_ADMIN_CLAIM_CONFIRMATION, current_admin.email, {
+            "first_name": current_admin.first_name,
             "org_name": org_name,
             "claimed_by_name": new_admin.email,
         })
         MandrillClient().send_mail(MandrillClient.NEW_ADMIN_CLAIM_CONFIRMATION, new_admin.email, {
+            "first_name": new_admin.first_name,
             "org_name": org_name,
             "confirm": confirm,
         })
     else:
         MandrillClient().send_mail(MandrillClient.ORG_ADMIN_GET_IN_TOUCH, current_admin.email, {
+            "first_name": current_admin.first_name,
             "org_name": org_name,
             "claimed_by_name": "{first_name} {last_name}".format(first_name= new_admin.first_name,
                                                                  last_name=new_admin.last_name),
             "claimed_by_email": new_admin.email,
         })
         MandrillClient().send_mail(MandrillClient.NEW_ADMIN_GET_IN_TOUCH, new_admin.email, {
+            "first_name": new_admin.first_name,
             "org_name": org_name,
             "current_admin": current_admin.email,
         })

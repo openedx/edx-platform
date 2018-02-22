@@ -22,9 +22,9 @@ class UserSessionSharingMiddleware(object):
                                         'username': request.user.username,
                                         'email': request.user.email},
                                         'secret', algorithm='HS256')
-                response.set_cookie('token', encoded_jwt, domain=".arbisoft.com")
+                response.set_cookie('token', encoded_jwt, domain=".philanthropyu.org")
             else:
-                response.delete_cookie('token', domain=".arbisoft.com")
+                response.delete_cookie('token', domain=".philanthropyu.org")
         except AttributeError:
             pass
         return response
