@@ -51,6 +51,12 @@ REQUIREJS_WAIT = {
         "js/sock", "gettext", "js/base",
         "jquery.ui", "cms/js/main", "underscore"],
 
+    # Upload
+    re.compile(r'^\s*Files & Uploads'): [
+        'js/base', 'jquery.ui', 'cms/js/main', 'underscore',
+        'js/views/assets', 'js/views/asset'
+    ],
+
     # Pages
     re.compile(r'^Pages \|'): [
         'js/models/explicit_url', 'js/views/tabs',
