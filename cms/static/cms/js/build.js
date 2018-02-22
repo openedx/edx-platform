@@ -24,7 +24,7 @@
             'js/factories/edit_tabs',
             'js/factories/export',
             'js/factories/group_configurations',
-            'js/certificates/factories/certificates_page_factory',
+            'js/certificates/pages/certificates_page',
             'js/factories/index',
             'js/factories/library',
             'js/factories/manage_users',
