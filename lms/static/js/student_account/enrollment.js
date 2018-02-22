@@ -41,12 +41,15 @@
                             this.redirect(redirectUrl);
                         }
                     }
-                }).done(function() {
+                }).done(function(response) {
                     // If we successfully enrolled, redirect the user
                     // to the next page (usually the student dashboard or payment flow)
-                    if (redirectUrl) {
+                    if (response.redirect_destination) {
+                        this.redirect(response.redirect_destination)
+                    } else if (redirectUrl) {
                         this.redirect(redirectUrl);
                     }
+
                 });
             },
 

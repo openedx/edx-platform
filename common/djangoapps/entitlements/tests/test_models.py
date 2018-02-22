@@ -6,16 +6,88 @@ from datetime import timedelta
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
+from mock import patch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.api import MODES
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import CourseEnrollmentFactory
+from student.models import CourseEnrollment
+from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
     from entitlements.tests.factories import CourseEntitlementFactory
+    from entitlements.models import CourseEntitlement
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
+    """
+    Series of tests for the helper methods in the CourseEntitlement Model Class.
+    """
+    def setUp(self):
+        super(TestCourseEntitlementModelHelpers, self).setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    @patch("entitlements.models.get_course_uuid_for_course")
+    def test_check_for_existing_entitlement_and_enroll(self, mock_get_course_uuid):
+        course = CourseFactory()
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=now() + timedelta(days=1)
+        )
+        entitlement = CourseEntitlementFactory.create(
+            mode=CourseMode.VERIFIED,
+            user=self.user,
+        )
+        mock_get_course_uuid.return_value = entitlement.course_uuid
+
+        assert not CourseEnrollment.is_enrolled(user=self.user, course_key=course.id)
+
+        CourseEntitlement.check_for_existing_entitlement_and_enroll(
+            user=self.user,
+            course_run_key=course.id,
+        )
+
+        assert CourseEnrollment.is_enrolled(user=self.user, course_key=course.id)
+
+        entitlement.refresh_from_db()
+        assert entitlement.enrollment_course_run
+
+    @patch("entitlements.models.get_course_uuid_for_course")
+    def test_check_for_no_entitlement_and_do_not_enroll(self, mock_get_course_uuid):
+        course = CourseFactory()
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=now() + timedelta(days=1)
+        )
+        entitlement = CourseEntitlementFactory.create(
+            mode=CourseMode.VERIFIED,
+            user=self.user,
+        )
+        mock_get_course_uuid.return_value = None
+
+        assert not CourseEnrollment.is_enrolled(user=self.user, course_key=course.id)
+
+        CourseEntitlement.check_for_existing_entitlement_and_enroll(
+            user=self.user,
+            course_run_key=course.id,
+        )
+
+        assert not CourseEnrollment.is_enrolled(user=self.user, course_key=course.id)
+
+        entitlement.refresh_from_db()
+        assert entitlement.enrollment_course_run is None
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -28,6 +100,8 @@ class TestModels(TestCase):
             start=now()
         )
         self.enrollment = CourseEnrollmentFactory.create(course_id=self.course.id)
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def test_is_entitlement_redeemable(self):
         """

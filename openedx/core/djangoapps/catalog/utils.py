@@ -2,6 +2,7 @@
 import copy
 import datetime
 import logging
+import uuid
 
 import pycountry
 from django.conf import settings
@@ -11,13 +12,13 @@ from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from entitlements.utils import is_course_run_entitlement_fullfillable
-from student.models import CourseEnrollment
+from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
+from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 
@@ -287,6 +288,69 @@ def get_course_runs_for_course(course_uuid):
         return []
 
 
+def get_course_uuid_for_course(course_run_key):
+    """
+    Retrieve the Course UUID for a given course key
+
+    Arguments:
+        course_run_key (CourseKey): A Key for a Course run that will be pulled apart to get just the information
+        required for a Course (e.g. org+course)
+
+    Returns:
+        UUID: Course UUID and None if it was not retrieved.
+    """
+    catalog_integration = CatalogIntegration.current()
+
+    if catalog_integration.is_enabled():
+        try:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
+            logger.error(
+                'Catalog service user with username [%s] does not exist. Course UUID will not be retrieved.',
+                catalog_integration.service_username,
+            )
+            return []
+
+        api = create_catalog_api_client(user)
+
+        run_cache_key = '{base}.course_run.{course_run_key}'.format(
+            base=catalog_integration.CACHE_KEY,
+            course_run_key=course_run_key
+        )
+
+        course_run_data = get_edx_api_data(
+            catalog_integration,
+            'course_runs',
+            resource_id=unicode(course_run_key),
+            api=api,
+            cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
+            long_term_cache=True,
+            many=False,
+        )
+
+        course_key_str = course_run_data.get('course', None)
+
+        if course_key_str:
+            run_cache_key = '{base}.course.{course_key}'.format(
+                base=catalog_integration.CACHE_KEY,
+                course_key=course_key_str
+            )
+
+            data = get_edx_api_data(
+                catalog_integration,
+                'courses',
+                resource_id=course_key_str,
+                api=api,
+                cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
+                long_term_cache=True,
+                many=False,
+            )
+            uuid_str = data.get('uuid', None)
+            if uuid_str:
+                return uuid.UUID(uuid_str)
+    return None
+
+
 def get_pseudo_session_for_entitlement(entitlement):
     """
     This function is used to pass pseudo-data to the front end, returning a single session, regardless of whether that
@@ -325,7 +389,7 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     for course_run in course_runs:
         course_id = CourseKey.from_string(course_run.get('key'))
         is_enrolled = CourseEnrollment.is_enrolled(entitlement.user, course_id)
-        if is_course_run_entitlement_fullfillable(course_id, entitlement, search_time):
+        if is_course_run_entitlement_fulfillable(course_id, entitlement, search_time):
             if (is_enrolled and
                     entitlement.enrollment_course_run and
                     course_id == entitlement.enrollment_course_run.course_id):

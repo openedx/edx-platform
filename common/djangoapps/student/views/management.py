@@ -9,16 +9,20 @@ import uuid
 import warnings
 from collections import namedtuple
 
+import analytics
+import dogstats_wrapper as dog_stats_api
+from bulk_email.models import Optout
+from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, load_backend, login as django_login, logout
+from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
 from django.core import mail
-from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
+from django.core.urlresolvers import reverse
 from django.core.validators import ValidationError, validate_email
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -26,12 +30,15 @@ from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_bytes, force_text
-from django.utils.http import base36_to_int, is_safe_url, urlencode, urlsafe_base64_encode
-from django.utils.translation import ugettext as _
+from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import get_language, ungettext
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
+from eventtracking import tracker
 from ipware.ip import get_ip
+# Note that this lives in LMS, so this dependency should be refactored.
+from notification_prefs.views import enable_notifications
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -39,19 +46,14 @@ from requests import HTTPError
 from six import text_type, iteritems
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
+from xmodule.modulestore.django import modulestore
 
-import analytics
-import dogstats_wrapper as dog_stats_api
 import openedx.core.djangoapps.external_auth.views
 import third_party_auth
 import track.views
-from bulk_email.models import Optout  # pylint: disable=import-error
 from course_modes.models import CourseMode
-from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from edxmako.shortcuts import render_to_response, render_to_string
-from eventtracking import tracker
-# Note that this lives in LMS, so this dependency should be refactored.
-from notification_prefs.views import enable_notifications
+from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import (
     get_programs_with_type,
@@ -103,7 +105,6 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import validate_password_length, validate_password_strength
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
@@ -402,6 +403,9 @@ def change_enrollment(request, check_access=True):
         )
         if redirect_url:
             return HttpResponse(redirect_url)
+
+        if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
+            return HttpResponse(reverse('courseware', args=[unicode(course_id)]))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
