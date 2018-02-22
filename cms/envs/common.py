@@ -461,6 +461,9 @@ MIDDLEWARE_CLASSES = [
     _csrf_middleware,
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
+    # Allows us to define redirects via Django admin
+    'django_sites_extensions.middleware.RedirectMiddleware',
+
     # Instead of SessionMiddleware, we use a more secure version
     # 'django.contrib.sessions.middleware.SessionMiddleware',
     'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
