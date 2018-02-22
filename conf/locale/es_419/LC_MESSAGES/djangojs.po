@@ -139,9 +139,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 09:22+0000\n"
-"PO-Revision-Date: 2018-02-12 22:40+0000\n"
-"Last-Translator: Natalia\n"
+"POT-Creation-Date: 2018-02-22 07:29+0000\n"
+"PO-Revision-Date: 2018-02-16 22:21+0000\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -439,7 +439,7 @@ msgstr "Expandir instrucciones"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Contraer instrucciones"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Commentary"
@@ -561,7 +561,7 @@ msgstr "Párrafo"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Preformatted"
-msgstr ""
+msgstr "Preformateado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -591,25 +591,25 @@ msgstr "Encabezado 6"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
-msgstr ""
+msgstr "Agregar al diccionario"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align center"
-msgstr ""
+msgstr "Centrar"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align left"
-msgstr ""
+msgstr "Alienar a la izquierda"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align right"
-msgstr ""
+msgstr "Alinear a la derecha"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -627,13 +627,13 @@ msgstr "Fuente alternativa"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchor"
-msgstr ""
+msgstr "Ancla"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchors"
-msgstr ""
+msgstr "Anclas"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -658,13 +658,13 @@ msgstr "Comillas"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Blocks"
-msgstr ""
+msgstr "Bloques"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Body"
-msgstr ""
+msgstr "Cuerpo"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -688,7 +688,7 @@ msgstr "Borde"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bottom"
-msgstr ""
+msgstr "Base"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -700,13 +700,13 @@ msgstr "Lista con viñetas"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Caption"
-msgstr ""
+msgstr "Leyenda"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell padding"
-msgstr ""
+msgstr "Espaciado del borde de la celda"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -718,7 +718,7 @@ msgstr "Propiedades de la celda"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell spacing"
-msgstr ""
+msgstr "Espaciado de la celda"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -736,13 +736,13 @@ msgstr "Celda"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Center"
-msgstr ""
+msgstr "Centrado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Circle"
-msgstr ""
+msgstr "Círculo"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -781,7 +781,7 @@ msgstr "Columnas"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column group"
-msgstr ""
+msgstr "Agrupar columna"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -793,7 +793,7 @@ msgstr "Columna"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Constrain proportions"
-msgstr ""
+msgstr "Restringir proporciones"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -811,19 +811,19 @@ msgstr "Copiar"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Could not find the specified string."
-msgstr ""
+msgstr "No se encontró la cadena especificada."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom color"
-msgstr ""
+msgstr "Color personalizado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom..."
-msgstr ""
+msgstr "Personalizado..."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -896,7 +896,7 @@ msgstr "Disco"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Div"
-msgstr ""
+msgstr "Div"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -933,19 +933,19 @@ msgstr "Editar"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Embed"
-msgstr ""
+msgstr "Incrustar código"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Emoticons"
-msgstr ""
+msgstr "Emoticonos"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Encoding"
-msgstr ""
+msgstr "Codificación"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -987,7 +987,7 @@ msgstr "Finalizar"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Family"
-msgstr ""
+msgstr "Tipo de fuente"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1033,7 +1033,7 @@ msgstr "General"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "H Align"
-msgstr ""
+msgstr "Alineación H"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1075,7 +1075,7 @@ msgstr "Encabezado 6"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header cell"
-msgstr ""
+msgstr "Celda de encabezado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1160,7 +1160,7 @@ msgstr "Aumentar Sangría"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Inline"
-msgstr ""
+msgstr "Dentro de la línea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1250,7 +1250,7 @@ msgstr "Insertar o editar video"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Italic"
-msgstr ""
+msgstr "Itálica"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1280,7 +1280,7 @@ msgstr "Izquierda"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Alpha"
-msgstr ""
+msgstr "Alpha minúscula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1292,13 +1292,13 @@ msgstr "Griega minúscula"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Roman"
-msgstr ""
+msgstr "Romana minúscula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Match case"
-msgstr ""
+msgstr "Igualar mayúsculas y minúculas"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1310,7 +1310,7 @@ msgstr "Fusionar celdas"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Middle"
-msgstr ""
+msgstr "Media"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1375,6 +1375,8 @@ msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
 "until you toggle this option off."
 msgstr ""
+"La función pegar está en modo de texto. Los contenidos se pegarán como texto"
+" plano hasta que se desactive esta opción."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1392,7 +1394,7 @@ msgstr "Pegar fila antes"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste your embed code below:"
-msgstr ""
+msgstr "Pegar el código para incrustar debajo:"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1404,13 +1406,13 @@ msgstr "Pegar"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Poster"
-msgstr ""
+msgstr "Poster"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Pre"
-msgstr ""
+msgstr "Pre"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1571,25 +1573,25 @@ msgstr "Fuente"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Special character"
-msgstr ""
+msgstr "Caracter especial"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Spellcheck"
-msgstr ""
+msgstr "Revisión ortográfica"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Split cell"
-msgstr ""
+msgstr "Dividir celda"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Square"
-msgstr ""
+msgstr "Cuadrado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1601,7 +1603,7 @@ msgstr "Iniciar búsqueda"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Strikethrough"
-msgstr ""
+msgstr "Tachado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1613,13 +1615,13 @@ msgstr "Estilo"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Subscript"
-msgstr ""
+msgstr "Subescrito"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Superscript"
-msgstr ""
+msgstr "Superescrito"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1637,7 +1639,7 @@ msgstr "Tabla"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Target"
-msgstr ""
+msgstr "Objetivo"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1655,7 +1657,7 @@ msgstr "Color de texto"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text to display"
-msgstr ""
+msgstr "Texto para desplegar"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1664,6 +1666,8 @@ msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
 msgstr ""
+"La URL que introdujiste parece ser una dirección de correo electrónico. "
+"¿Desea agregarle el prefijo requerido mailto:?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1672,6 +1676,8 @@ msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
 msgstr ""
+"La URL que introdujiste parece ser un vínculo externo. ¿Desea agregarle el "
+"prefijo requerido http://?"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1698,13 +1704,13 @@ msgstr "Herramientas"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Top"
-msgstr ""
+msgstr "Superior"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Underline"
-msgstr ""
+msgstr "Subrayado"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1716,32 +1722,36 @@ msgstr "Deshacer"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Alpha"
-msgstr ""
+msgstr "Alfa Mayúscula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Roman"
-msgstr ""
+msgstr "Romana mayúscula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Url"
-msgstr ""
+msgstr "URL"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "V Align"
-msgstr ""
+msgstr "Alineación vertical"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Vertical space"
-msgstr ""
+msgstr "Espacio vertical"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
@@ -1755,31 +1765,33 @@ msgstr "Ver"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Visual aids"
-msgstr ""
+msgstr "Ayudas visuales"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Whole words"
-msgstr ""
+msgstr "Palabras completas"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Width"
-msgstr ""
+msgstr "Anchura"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Words: {0}"
-msgstr ""
+msgstr "Palabras: {0}"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr ""
+"Tienes cambios sin guardar, ¿estás seguro que deseas avanzar en el "
+"navegador?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1788,6 +1800,8 @@ msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
 msgstr ""
+"Tu navegador no soporta el acceso directo al portapapeles. Por favor, usa "
+"los atajos Ctrl+X/C/V"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1841,9 +1855,9 @@ msgid ""
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"Si utilizas el Editor Avanzado, este problema se convertirá a formato XML y no podrá retornar al Editor Simple.\n"
+"Si utiliza el Editor Avanzado, este problema será convertido a formato XML y no podrá volver a la pantalla del Editor Simple.\n"
 "\n"
-"¿Deseas pasar al Editor avanzado y convertir el problema a formato XML?"
+"¿Pasar al Editor avanzado y convertir este problema al formato XML?"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
@@ -2260,6 +2274,10 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
 msgstr "Mostrar Discusión"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "There are no posts in this topic yet."
+msgstr "Todavía no hay publicaciones en este tema."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
@@ -3035,7 +3053,7 @@ msgstr "Cerrar Calculadora"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "HTML preview of post"
-msgstr ""
+msgstr "previsiualización en HTML"
 
 #: lms/static/coffee/src/customwmd.js
 #: common/static/common/templates/discussion/new-post.underscore
@@ -4582,78 +4600,86 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
-msgstr ""
+msgstr "(A su propio ritmo) Empieza {start}"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Started {start}"
-msgstr ""
+msgstr "(A ritmo propio) Empezado {start}"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Ends {end}"
-msgstr ""
+msgstr "(A ritmo propio)Termina{end}"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Ended {end}"
-msgstr ""
+msgstr "(A ritmo propio) Terminado {end}"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Starts {start}"
-msgstr ""
+msgstr "Comienza {start}"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Started {start}"
-msgstr ""
+msgstr "Comenzado {start}"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Ends {end}"
-msgstr ""
+msgstr "Termina {end}"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
-msgstr ""
+msgstr "Debe seleccionar una sesión para acceder al curso."
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "There was an error. Please reload the page and try again."
 msgstr ""
+"Hubo un error inesperado. Por favor recargue la página e intente de nuevo."
 
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
 msgstr "Cambiar sesión"
 
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Select Session"
 msgstr "Seleccione la sesión."
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Leave Current Session"
-msgstr ""
+msgstr "Salir de la sesión actual."
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure you want to select this session?"
-msgstr ""
+msgstr "¿Está seguro de que quiere seleccionar esta sesión?"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure you want to change to a different session?"
-msgstr ""
+msgstr "¿Está seguro de que quiere cambiar a una sesión diferente?"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Any course progress or grades from your current session will be lost."
 msgstr ""
+"Se perderá cualquier calificación o progreso del curso en la sesión actual. "
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure that you want to leave this session?"
-msgstr ""
+msgstr "¿ Está seguro de que quiere salir de esta sesión?"
 
 #: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
 msgid ""
 "Your unenrollment request could not be processed. Please try again later."
 msgstr ""
+"Su solicitud de cancelar la inscripción del curso no pudo ser procesada. Por"
+" favor intente de nuevo."
 
 #: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
 msgid ""
 "Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
 "will be refunded the amount you paid."
 msgstr ""
+"¿ Está seguro que quiere cancelar la inscripción del curso {courseName} "
+"({courseNumber})? Se reembolsará el dinero que pagó."
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -4797,13 +4823,13 @@ msgid ""
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
 "{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}Tu ingresaste {boldStart}{email}{boldEnd}. Si esta dirección"
-" de email está asociada con tu cuenta en {platform_name}, enviaremos un "
-"mensaje a esta dirección con instrucciones para restablecer tu "
-"contraseña.{paragraphEnd}{paragraphStart}Si no recibes ningún mensaje, "
-"verifica que ingresaste la dirección correctamente y revisa tu carpeta de "
-"spam.{paragraphEnd}{paragraphStart}Si necesitas asistencia adicional, "
-"{anchorStart}contacta al equipo de soporte{anchorEnd}.{paragraphEnd}"
+"{paragraphStart}Ha ingresado {boldStart}{email}{boldEnd}. Si esta dirección "
+"de email está asociada con una cuenta en {platform_name}, enviaremos un "
+"mensaje a esta dirección con instrucciones para restablecer la "
+"contraseña.{paragraphEnd}{paragraphStart}Si no recibe ningún mensaje, "
+"verifique que ingresó la dirección correctamente y revise su carpeta de "
+"spam.{paragraphEnd}{paragraphStart}Si necesita asistencia adicional, "
+"{anchorStart}contacte al equipo de soporte{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4855,15 +4881,18 @@ msgid ""
 "Your profile settings are managed by {enterprise_name}. Contact your "
 "administrator or {link_start}edX Support{link_end} for help."
 msgstr ""
+"Los ajustes en el perfil son administrados por {enterprise_name}. Contacte "
+"su administrador o {link_start}Soporte edX {link_end} para obtener ayuda."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address (Sign In)"
-msgstr ""
+msgstr "Dirección de correo electrónico (ingresar)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
 msgstr ""
+"Recibe mensajes de {platform_name} y equipos del curso en esta dirección."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -4875,6 +4904,8 @@ msgid ""
 "The name that is used for ID verification and that appears on your "
 "certificates."
 msgstr ""
+"El nombre que es usado para la verificación de identidad y aparece en sus "
+"certificados."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Country or Region of Residence"
@@ -4897,6 +4928,8 @@ msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr ""
+"El nombre que lo identifica en {platform_name}. No puede cambiar el nombre "
+"de usuario."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -4911,6 +4944,8 @@ msgstr "Restablecer tu contraseña"
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
 msgstr ""
+"Revise en su correo electrónico las instrucciones para cambiar su "
+"contraseña."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4918,6 +4953,9 @@ msgid ""
 "a limited number of languages. Changing the value of this field will cause "
 "the page to refresh."
 msgstr ""
+"El idioma utilizado en este sitio. Actualmente este sitio está disponible en"
+" un número limitado de idiomas. Cambiar el valor de este campo causará que "
+"la página se actualice."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
@@ -4971,6 +5009,8 @@ msgid ""
 "Optionally, link your personal accounts to the social media icons on your "
 "edX profile."
 msgstr ""
+"Opcionalmente, conecte sus cuentas personales a los iconos de redes sociales"
+" en su perfil de edX"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid " Link"
@@ -4978,7 +5018,7 @@ msgstr "Enlace"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Enter your "
-msgstr ""
+msgstr "Ingrese su"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -5339,11 +5379,11 @@ msgstr "Marcar esta página"
 
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "You have successfully updated your goal."
-msgstr ""
+msgstr "Ha actualizado exitosamente su objetivo."
 
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
-msgstr ""
+msgstr "Hubo un error actualizando su objetivo."
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -5365,11 +5405,11 @@ msgstr "Perfil completo"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Joined"
-msgstr ""
+msgstr "Afiliado"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Joined Date"
-msgstr ""
+msgstr "Fecha de Afiliación"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Location"
@@ -5448,10 +5488,13 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Esto puede estar sucediendo debido a un error con nuestros servidores o con "
+"tu conexión a Internet. Intenta refrescar la página o verifica tu acceso a "
+"Internet."
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studio tiene problemas para guardar tu trabajo"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -5604,48 +5647,53 @@ msgstr "Tiene cambios no guardados. ¿Realmente desea abandonar esta página?"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "Hubo un error durante el proceso de carga."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "Ha habido un error desempaquetando el archivo"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "Ha ocurrido un error verificando el archivo que usted ha enviado."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "Choose new file"
-msgstr ""
+msgstr "Seleccione un nuevo archivo"
 
 #: cms/static/js/features/import/factories/import.js
 msgid ""
 "File format not supported. Please upload a file with a {ext} extension."
 msgstr ""
+"Formato de archivo no soportado. Por favor carga un archivo con extensión "
+"{ext}"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while importing the new library to our database."
 msgstr ""
+"Hubo un error mientras importábamos la nueva librería a nuestra base de "
+"datos."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "Ha habido un error importando el nuevo curso a nuestra base de datos."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "Your import has failed."
-msgstr ""
+msgstr "Tu importación ha fallado."
 
 #: cms/static/js/features/import/views/import.js
 msgid "Your import is in progress; navigating away will abort it."
 msgstr ""
+"Tu importación está en progreso. Si abandona esta página, la cancelará."
 
 #: cms/static/js/features/import/views/import.js
 msgid "Error importing course"
-msgstr ""
+msgstr "Error importando curso"
 
 #: cms/static/js/features/import/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "Hubo un error con la subida del archivo"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -5746,6 +5794,8 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The certificate available date must be later than the course end date."
 msgstr ""
+"La fecha disponible para el certificado debe ser más tarde que la fecha de "
+"terminación del curso."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -5757,7 +5807,7 @@ msgstr "Por favor ingrese un número entero entre %(min)s y %(max)s."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "The assignment type must have a name."
-msgstr ""
+msgstr "El tipo de asignación debe tener un nombre"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
@@ -5956,43 +6006,44 @@ msgstr "Procesando petición de reapertura"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "An error has occurred. Wait a few minutes, and then try again."
-msgstr ""
+msgstr "Un error ha ocurrido. Espere unos pocos minutos e intenta de nuevo."
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Select turnaround"
-msgstr ""
+msgstr "Seleccione tiempo de entrega."
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Select fidelity"
-msgstr ""
+msgstr "Seleccionar fidelidad"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Select language"
-msgstr ""
+msgstr "Seleccionar lenguaje"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Press Remove to remove language"
-msgstr ""
+msgstr "Seleccione Remover para eliminar el idioma"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Settings updated"
-msgstr ""
+msgstr "Configuraciones actualizadas"
 
+#: cms/static/js/views/course_video_settings.js
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 msgid "Last updated"
 msgstr "Última actualización"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Required"
-msgstr ""
+msgstr "Requerido"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Automatic transcripts are disabled."
-msgstr ""
+msgstr "Transcripciones automáticas están deshabilitadas"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
-msgstr ""
+msgstr "{selectedProvider} credenciales guardadas"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
@@ -6266,19 +6317,19 @@ msgstr "Publicar"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Highlights for {display_name}"
-msgstr ""
+msgstr "Destacados por {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable Weekly Highlight Emails"
-msgstr ""
+msgstr "Habilitar correos destacados semanalmente"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
-msgstr ""
+msgstr "Habilitar"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Not yet"
-msgstr ""
+msgstr "Aún no"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
@@ -6889,36 +6940,40 @@ msgstr "Subida de la imagen fallida."
 
 #: cms/static/js/views/video_transcripts.js
 msgid "The file could not be uploaded."
-msgstr ""
+msgstr "El archivo no pudo ser cargado."
 
 #: cms/static/js/views/video_transcripts.js
 msgid "Hide transcripts ({transcriptCount})"
-msgstr ""
+msgstr "Ocultar transcripciones ({transcriptCount})"
 
 #: cms/static/js/views/video_transcripts.js
 msgid "Show transcripts ({transcriptCount})"
-msgstr ""
+msgstr "Mostrar transcripciones ({transcriptCount})"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
 "This file type is not supported. Supported file type is "
 "{supportedFileFormat}."
 msgstr ""
+"Este tipo de archivo no es soportado. El tipo de archivo soportado es "
+"{supportedFileFormat}."
 
 #: cms/static/js/views/video_transcripts.js
 #: cms/templates/js/video-transcripts.underscore
 msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
-msgstr ""
+msgstr "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 
 #: cms/static/js/views/video_transcripts.js
 msgid "Are you sure you want to remove this transcript?"
-msgstr ""
+msgstr "¿Esta seguro de que quiere eliminar esta transcripción?"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
 "If you remove this transcript, the transcript will not be available for any "
 "components that use this video."
 msgstr ""
+"Si elimina esta transcripción, la transcripción no estará disponible para "
+"ningún componente que use este vídeo."
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
@@ -7755,11 +7810,11 @@ msgstr "Cambiar inscripción"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Date Joined"
-msgstr ""
+msgstr "Fecha de Registro"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Password Status"
-msgstr ""
+msgstr "Estado de la Contraseña"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Disable Account"
@@ -8705,7 +8760,7 @@ msgstr "Certificado Comprado"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "Change or Leave Session"
-msgstr ""
+msgstr "Cambiar o Abandonar la Sesión"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You must select a session by {expiration_date} to access the course."
@@ -8743,7 +8798,7 @@ msgstr "Ver curso"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select a session:"
-msgstr ""
+msgstr "Seleccione una sesión:"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -8767,19 +8822,19 @@ msgstr "Actualmente no disponible"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "More sessions coming soon."
-msgstr ""
+msgstr "Próximamente más sesiones."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change to a different session or leave the current session."
-msgstr ""
+msgstr "Cambiar a una sesión diferente o salir de la sección actual."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "To access the course, select a session."
-msgstr ""
+msgstr "Para acceder al curso seleccione una sesión."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Session Selection Dropdown for {courseName}"
-msgstr ""
+msgstr "Menú desplegable para seleccionar la sesión del curso {courseName}"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "{sessionDates} - Currently Selected"
@@ -8791,7 +8846,7 @@ msgstr "{sessionDates} (Abierto hasta {enrollmentEnd})"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "More sessions coming soon"
-msgstr ""
+msgstr "Próximamente más sesiones"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Leave the current session and decide later"
@@ -9027,32 +9082,39 @@ msgstr "Crear una cuenta."
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
-msgstr ""
+msgstr "Regístrese para seguir aprendiendo como {email}"
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning"
-msgstr ""
+msgstr "Regístrese para seguir aprendiendo"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You already have an edX account with your {enterprise_name} email address."
 msgstr ""
+"Ya tiene una cuenta edX con su dirección de correo electrónico de "
+"{enterprise_name}"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
 "Going forward, your account information will be updated and maintained by "
 "{enterprise_name}."
 msgstr ""
+"En el futuro, la información de su cuenta será actualizada y mantenida por "
+"{enterprise_name}."
 
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You can view your information or unlink from {enterprise_name} anytime in "
 "your Account Settings."
 msgstr ""
+"Puede ver su información o desvincularse de {enterprise_name} en cualquier "
+"momento en las Configuraciones de Cuenta."
 
 #: lms/templates/student_account/login.underscore
 msgid "To continue learning with this account, sign in below."
 msgstr ""
+"Para continuar aprendiendo con esta cuenta, regístrese a continuación."
 
 #: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
@@ -9151,7 +9213,7 @@ msgstr "Crear una cuenta"
 #: lms/templates/student_account/register.underscore
 #: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
-msgstr ""
+msgstr "Ayuda a la investigación académica brindando más información"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
@@ -9979,11 +10041,11 @@ msgstr "Examen especial"
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #, python-format
 msgid " %(exam_display_name)s "
-msgstr ""
+msgstr "%(exam_display_name)s"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Exam Type"
-msgstr ""
+msgstr "Tipo de examen"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
@@ -10034,11 +10096,11 @@ msgstr "Finalizado a las"
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 #, python-format
 msgid " %(username)s "
-msgstr ""
+msgstr "%(username)s"
 
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Choose a course run:"
-msgstr ""
+msgstr "Seleccionar una sesión de curso:"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10393,7 +10455,7 @@ msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
-msgstr ""
+msgstr "correos destacados semanalmente"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
@@ -10613,22 +10675,23 @@ msgstr "Seleccione descartar cambios para descartar los cambios realizados"
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 msgid "Press update settings to update course video settings"
 msgstr ""
+"Seleccione actualizar ajustes para actualizar los ajustes de vídeo del curso"
 
 #: cms/templates/js/course-video-settings.underscore
 msgid "Press close to hide course video settings"
-msgstr ""
+msgstr "Seleccione cerrar para ocultar los ajustes de vídeo del curso"
 
 #: cms/templates/js/course-video-settings.underscore
 msgid "Course Video Settings"
-msgstr ""
+msgstr "Ajustes de vídeo del curso"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
-msgstr ""
+msgstr "Tiempo de procesamiento de la transcripción"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Fidelity"
-msgstr ""
+msgstr "Fidelidad de la transcripción"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Video Source Language"
@@ -10636,7 +10699,7 @@ msgstr "Idioma de la fuente del video"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Languages"
-msgstr ""
+msgstr "Idiomas de Transcripción"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 #: cms/templates/js/metadata-dict-entry.underscore
@@ -10651,11 +10714,11 @@ msgstr "Seleccione Añadir para idioma"
 
 #: cms/templates/js/course-video-transcript-provider-empty.underscore
 msgid "Automated Transcripts"
-msgstr ""
+msgstr "Transcripciones automatizadas"
 
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Transcript Provider"
-msgstr ""
+msgstr "Proveedor de la transcripción"
 
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Change"
@@ -10664,6 +10727,7 @@ msgstr "Cambiar"
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Press change to change selected transcript provider."
 msgstr ""
+"Seleccione cambiar para cambiar el proveedor de transcripción seleccionado"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
@@ -10917,20 +10981,25 @@ msgid ""
 "This feature is currently in testing. Course teams can enter highlights, but"
 " learners will not receive email messages."
 msgstr ""
+"Esta característica está en prueba actualmente. Equipos del curso pueden "
+"ingresar destacados, pero los estudiantes no recibirán mensajes de correo "
+"electrónico."
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
 "Enter 3-5 highlights to include in the email message that learners receive "
 "for this section (250 character limit)."
 msgstr ""
+"Ingrese de 3 a 5 destacados para incluir en el mensaje de correo electrónico"
+" que los estudiantes reciben para esta sección (límite de 250 caracteres)."
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "Highlight {highlight_index}"
-msgstr ""
+msgstr "Destacado {highlight_index}"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "A highlight to look forward to this week."
-msgstr ""
+msgstr "Un destacado esperado para esta semana."
 
 #: cms/templates/js/license-selector.underscore
 msgid "License Type"
@@ -11054,7 +11123,7 @@ msgstr "ID del video"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Transcripts"
-msgstr ""
+msgstr "Transcripciones"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"
@@ -11474,6 +11543,11 @@ msgid ""
 "calculators are allowed. These specified rules are visible to learners "
 "before the learners start the exam."
 msgstr ""
+"Especifique cualquier regla o excepción a la regla que el equipo de revisión"
+" y monitoreo debería hacer cumplir cuando se vean los vídeos. Por ejemplo, "
+"podría especificar que calculadoras están permitidas. Esta reglas "
+"específicas son visibles para los estudiantes antes de que empiecen el "
+"examen."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Account"
@@ -11492,11 +11566,11 @@ msgstr "Ingrese la información de la cuenta para su organización."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Key"
-msgstr ""
+msgstr "Llave API"
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Secret"
-msgstr ""
+msgstr "Secreto API"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"
@@ -11571,15 +11645,15 @@ msgstr ""
 
 #: cms/templates/js/video-transcript-upload-status.underscore
 msgid "Read more"
-msgstr ""
+msgstr "Leer más"
 
 #: cms/templates/js/video-transcripts.underscore
 msgid "Show transcripts ({totalTranscripts})"
-msgstr ""
+msgstr "Mostrar transcripciones ({totalTranscripts})"
 
 #: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
-msgstr ""
+msgstr "No se ha subido ninguna transcripción"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"

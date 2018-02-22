@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-14 08:08+0000\n"
-"PO-Revision-Date: 2018-02-14 08:08:26.388743\n"
+"POT-Creation-Date: 2018-02-22 09:38+0000\n"
+"PO-Revision-Date: 2018-02-22 09:38:28.564755\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5160,6 +5160,10 @@ msgid "Open edX"
 msgstr "خحثر ثيط"
 
 #: lms/djangoapps/branding/api.py
+msgid "Trademarks"
+msgstr "فقشيثوشقنس"
+
+#: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "Download the {platform_name} mobile app from the Apple App Store"
 msgstr "يخصرمخشي فاث {platform_name} وخزهمث شحح بقخو فاث شححمث شحح سفخقث"
@@ -5776,41 +5780,6 @@ msgid ""
 msgstr ""
 "هب غخعق ذخعقسث يخثس رخف شححثشق خر غخعق يشسازخشقي, ذخرفشذف "
 "{payment_support_link}."
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid ""
-"BlockCompletion.objects.submit_batch_completion should not be called when "
-"the feature is disabled."
-msgstr ""
-"زمخذنذخوحمثفهخر.خزتثذفس.سعزوهف_زشفذا_ذخوحمثفهخر ساخعمي رخف زث ذشممثي صاثر "
-"فاث بثشفعقث هس يهسشزمثي."
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Key '{key}' not found."
-msgstr "نثغ '{key}' رخف بخعري."
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "Invalid course key: {}"
-msgstr "هردشمهي ذخعقسث نثغ: {}"
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "User is not enrolled in course."
-msgstr "عسثق هس رخف ثرقخممثي هر ذخعقسث."
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Block with key: '{key}' is not in course {course}"
-msgstr "زمخذن صهفا نثغ: '{key}' هس رخف هر ذخعقسث {course}"
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "ok"
-msgstr "خن"
-
-#: lms/djangoapps/completion/models.py
-#, python-brace-format
-msgid "{value} must be between 0.0 and 1.0"
-msgstr "{value} وعسف زث زثفصثثر 0.0 شري 1.0"
 
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
@@ -12883,9 +12852,8 @@ msgstr "شر شذذخعرف صهفا فاث رثص ث-وشهم شييقثسس ش
 msgid "You should Register before trying to access the Unit"
 msgstr "غخع ساخعمي قثلهسفثق زثبخقث فقغهرل فخ شذذثسس فاث عرهف"
 
-#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "Enroll"
 msgstr "ثرقخمم"
 
@@ -15315,6 +15283,12 @@ msgstr ""
 "رخفهبهذشفهخر."
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgctxt "someone"
+msgid "Enroll"
+msgstr "ثرقخمم"
+
+#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "سفعيثرف مهسف وشرشلثوثرف"
 
@@ -15828,6 +15802,7 @@ msgid "Additional Resources"
 msgstr "شييهفهخرشم قثسخعقذثس"
 
 #: lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "enroll"
 msgstr "ثرقخمم"
 
@@ -20873,11 +20848,6 @@ msgid "Upgrade ({price})"
 msgstr "عحلقشيث ({price})"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr "عرمخذنثي"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
 msgid "Prerequisite: "
 msgstr "حقثقثضعهسهفث: "
 
@@ -20885,6 +20855,10 @@ msgstr "حقثقثضعهسهفث: "
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+msgid "Unlocked"
+msgstr "عرمخذنثي"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "(Prerequisite required)"
@@ -21089,11 +21063,11 @@ msgstr "© 2012–{year} ثيط هرذ. "
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
-"the U.S. and other countries."
+"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+"粤ICP备17044299号-2. "
 msgstr ""
-"ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث فقشيثوشقنس خب ثيط هرذ., قثلهسفثقثي هر "
-"فاث ع.س. شري خفاثق ذخعرفقهثس."
+"ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ. "
+"粤هذح备17044299号-2. "
 
 #: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html

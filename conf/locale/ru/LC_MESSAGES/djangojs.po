@@ -154,7 +154,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 09:22+0000\n"
+"POT-Creation-Date: 2018-02-22 07:29+0000\n"
 "PO-Revision-Date: 2018-02-06 09:31+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -2101,11 +2101,11 @@ msgstr ""
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex} out of {numItems} total"
-msgstr "Показывать совокупность {firstIndex} к {numItems} "
+msgstr "Показано: {firstIndex} из {numItems} "
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
-msgstr "Показывать совокупность {firstIndex}-{lastIndex} к {numItems} "
+msgstr "Показано: {firstIndex}–{lastIndex} из {numItems} "
 
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
@@ -2220,6 +2220,10 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
 msgstr "Показать Обсуждения"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "There are no posts in this topic yet."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
@@ -7525,7 +7529,7 @@ msgstr "Начало курса"
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Course End"
-msgstr "Курс завершится"
+msgstr "Окончание курса"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: test_root/staticfiles/support/templates/enrollment.underscore
@@ -9637,7 +9641,7 @@ msgstr "Сделать фото"
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: test_root/staticfiles/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
-msgstr "Закладка на"
+msgstr "Закладка от"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: test_root/staticfiles/course_bookmarks/templates/bookmarks-list.underscore

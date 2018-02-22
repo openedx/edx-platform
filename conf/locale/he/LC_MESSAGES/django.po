@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 09:29+0000\n"
+"POT-Creation-Date: 2018-02-22 07:36+0000\n"
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -4974,7 +4974,7 @@ msgstr "מופעל על ידי Open edX"
 msgid "Blog"
 msgstr "בלוג"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
@@ -5057,6 +5057,10 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Trademarks"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -5522,6 +5526,7 @@ msgstr "מידע נוסף אודות ההישג של {fullname}"
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr "שם משתמש"
@@ -5658,39 +5663,6 @@ msgid ""
 "{payment_support_link}."
 msgstr ""
 "אם הקורס אינו מופיע בלוח הבקרה שלך, צור קשר עם {payment_support_link}."
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid ""
-"BlockCompletion.objects.submit_batch_completion should not be called when "
-"the feature is disabled."
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Key '{key}' not found."
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "Invalid course key: {}"
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "User is not enrolled in course."
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Block with key: '{key}' is not in course {course}"
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "ok"
-msgstr ""
-
-#: lms/djangoapps/completion/models.py
-#, python-brace-format
-msgid "{value} must be between 0.0 and 1.0"
-msgstr ""
 
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
@@ -6007,6 +5979,16 @@ msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
 "not include a certificate."
 msgstr "נרשמת למסלול שומע חופשי לקורס זה. מסלול זה אינו כולל תעודה."
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Honor track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the honor track for this course. The honor track does "
+"not include a certificate."
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
@@ -6733,7 +6715,7 @@ msgstr "מזהה משתמש"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "דואר אלקטרוני"
@@ -9004,7 +8986,7 @@ msgid "Track refunds issued directly through CyberSource."
 msgstr "עקוב אחר החזרים כספיים שנופקו ישירות דרך CyberSource."
 
 #: lms/djangoapps/support/views/index.py
-#: lms/templates/ccx/coach_dashboard.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
 msgid "Enrollment"
 msgstr "הרשמה"
@@ -10082,6 +10064,11 @@ msgstr ""
 "אני והחברה שלי, מקבלים את {link_start}{platform_name} תנאי השירות של "
 "API{link_end}."
 
+#: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "Bookmarks"
+msgstr "סימניות"
+
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
 msgstr "אירעה שגיאה. אנא נסה שוב."
@@ -11155,11 +11142,6 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "Bookmarks"
-msgstr "סימניות"
-
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
@@ -12162,37 +12144,37 @@ msgstr "הסתר עזרה של {studio_name}"
 msgid "{studio_name} Documentation"
 msgstr "מסמכי {studio_name}"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Access documentation on http://docs.edx.org"
 msgstr "גישה לתיעוד בכתובת http://docs.edx.org"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Documentation"
 msgstr "מסמכי edX"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101: Overview of Creating an edX Course"
 msgstr "הירשם ל-edX101: סקירה כללית של יצירת קורס edX"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "רישום ל-edX101"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX: Creating a Course with edX Studio"
 msgstr "הירשם ל-StudioX: יצירת קורס באמצעות edX Studio"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX"
 msgstr "הירשם ל-StudioX"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Send an email to {email}"
 msgstr "שלח הודעת דואר אלקטרוני ל-{email}"
@@ -12461,11 +12443,10 @@ msgstr "חשבון עם כתובת דואר אלקטרוני חדשה כבר ק�
 msgid "You should Register before trying to access the Unit"
 msgstr "עליך להירשם לפני שתוכל לגשת ליחידה"
 
-#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "Enroll"
-msgstr "הירשם"
+msgstr ""
 
 #: lms/templates/enroll_staff.html
 msgid "Don't enroll"
@@ -14732,7 +14713,7 @@ msgstr "צור קורס מותאם אישית חדש עבור edX"
 msgid "Grading Policy"
 msgstr "תקנון ציונים"
 
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
 msgstr "רישום קבוצתי"
@@ -14751,20 +14732,16 @@ msgid "Email Addresses/Usernames"
 msgstr "כתובות דואר אלקטרוני/שמות משתמשים"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Enter email addresses and/or usernames separated by new lines or commas."
+"Enter one or more email addresses or usernames separated by new lines or "
+"commas."
 msgstr ""
-"הזן רשימת כתובות דואר אלקטרוני ו/או שמות משתמש מופרדים בשורה חדשה או פסיק."
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"You will not get notification for emails that bounce, so please double-check"
-" spelling."
+"Make sure you enter the information carefully. You will not receive "
+"notification for invalid usernames or email addresses."
 msgstr ""
-"לא תקבל התראות על הודעות דואר אלקטרוני שלא יגיעו ליעדם, אז אנא בדוק את "
-"האיות. "
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14809,6 +14786,12 @@ msgstr ""
 "אם אפשרות זו {em_start}סומנה{em_end}, יקבלו המשתמשים הודעה בדואר אלקטרוני."
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgctxt "someone"
+msgid "Enroll"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "ניהול רשימת הסטודנטים"
 
@@ -14819,14 +14802,6 @@ msgstr "הודעת תשובה לניהול רשימת הסטודנטים ב-CCX"
 #: lms/templates/ccx/enrollment.html
 msgid "Revoke access"
 msgstr "שלול גישה"
-
-#: lms/templates/ccx/enrollment.html
-msgid "Enter username or email"
-msgstr "הכנס שם משתמש או כתובת דואר אלקטרוני"
-
-#: lms/templates/ccx/enrollment.html
-msgid "Checking this box has no effect if 'Revoke' is clicked."
-msgstr "לסימון תיבה זו אין תוקף אם מסומן 'שלול' ."
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -15216,7 +15191,8 @@ msgstr "{span_start}פרק נוכחי{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "due {date}"
 msgstr "תאריך הגשה {date}"
 
@@ -15225,7 +15201,8 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} ב- {{date}}"
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "This content is graded"
 msgstr "תוכן זה מקבל דירוג"
 
@@ -15311,8 +15288,9 @@ msgid "Additional Resources"
 msgstr "משאבים נוספים"
 
 #: lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "enroll"
-msgstr "הירשם"
+msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -15457,7 +15435,7 @@ msgstr "ברוכים הבאים אל הקורס {course_name} של {org}!"
 
 #: lms/templates/courseware/info.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "המשך בקורס"
 
@@ -15533,7 +15511,7 @@ msgid "Meet the Instructors"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Frequenty Asked Questions"
+msgid "Frequently Asked Questions"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15596,10 +15574,6 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Starts on {}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Frequently Asked Questions"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -16015,18 +15989,6 @@ msgstr "הגדרות דואר אלקטרוני"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "תכניות קשורות"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Buy all remaining courses in this program and save 10%"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade All Remaining Courses ("
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid " ${price:.2f} {currency} ) "
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -18364,6 +18326,20 @@ msgstr "חפש קוד הרשמה"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
+msgstr ""
+"הזן רשימת כתובות דואר אלקטרוני ו/או שמות משתמש מופרדים בשורה חדשה או פסיק."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+"לא תקבל התראות על הודעות דואר אלקטרוני שלא יגיעו ליעדם, אז אנא בדוק את "
+"האיות. "
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr "הזן את הסיבה שבגללה נרשמו הסטודנטים ידנית או לא נרשמו כלל."
 
@@ -20164,16 +20140,21 @@ msgstr ""
 msgid "Upgrade ({price})"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Prerequisite: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+msgid "{subsection_format} due {{date}}"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Unlocked"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "(Prerequisite required)"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "{subsection_format} due {{date}}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -20364,8 +20345,8 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
-"the U.S. and other countries."
+"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+"粤ICP备17044299号-2. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
@@ -24103,11 +24084,11 @@ msgstr "החלף דף עזר"
 msgid "Label"
 msgstr "תווית"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 msgid "Access the Open edX Portal"
 msgstr "קבל גישה לפורטל edX הפתוח"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 msgid "Open edX Portal"
 msgstr "פתח Edx פורטל"
 

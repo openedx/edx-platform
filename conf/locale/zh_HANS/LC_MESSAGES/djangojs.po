@@ -190,7 +190,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 09:22+0000\n"
+"POT-Creation-Date: 2018-02-22 07:29+0000\n"
 "PO-Revision-Date: 2018-02-06 09:31+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2217,6 +2217,10 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
 msgstr "显示讨论"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "There are no posts in this topic yet."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
