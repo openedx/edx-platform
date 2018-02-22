@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-14 08:08+0000\n"
-"PO-Revision-Date: 2018-02-14 08:08:26.388743\n"
+"POT-Creation-Date: 2018-02-22 09:38+0000\n"
+"PO-Revision-Date: 2018-02-22 09:38:28.564755\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6011,6 +6011,10 @@ msgid "Open edX"
 msgstr "Öpén édX Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/branding/api.py
+msgid "Trademarks"
+msgstr "Trädémärks Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "Download the {platform_name} mobile app from the Apple App Store"
 msgstr ""
@@ -6737,44 +6741,6 @@ msgid ""
 msgstr ""
 "Ìf ýöür çöürsé döés nöt äppéär ön ýöür däshßöärd, çöntäçt "
 "{payment_support_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid ""
-"BlockCompletion.objects.submit_batch_completion should not be called when "
-"the feature is disabled."
-msgstr ""
-"BlöçkÇömplétïön.ößjéçts.süßmït_ßätçh_çömplétïön shöüld nöt ßé çälléd whén "
-"thé féätüré ïs dïsäßléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Key '{key}' not found."
-msgstr "Kéý '{key}' nöt föünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "Invalid course key: {}"
-msgstr "Ìnvälïd çöürsé kéý: {} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "User is not enrolled in course."
-msgstr "Ûsér ïs nöt énrölléd ïn çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Block with key: '{key}' is not in course {course}"
-msgstr ""
-"Blöçk wïth kéý: '{key}' ïs nöt ïn çöürsé {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "ok"
-msgstr "ök Ⱡ'σя#"
-
-#: lms/djangoapps/completion/models.py
-#, python-brace-format
-msgid "{value} must be between 0.0 and 1.0"
-msgstr ""
-"{value} müst ßé ßétwéén 0.0 änd 1.0 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
@@ -14799,9 +14765,8 @@ msgstr ""
 "Ýöü shöüld Régïstér ßéföré trýïng tö äççéss thé Ûnït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "Enroll"
 msgstr "Énröll Ⱡ'σяєм ιρѕυ#"
 
@@ -17497,6 +17462,12 @@ msgstr ""
 "nötïfïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgctxt "someone"
+msgid "Enroll"
+msgstr "Énröll Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "Stüdént Lïst Mänägémént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -18090,6 +18061,7 @@ msgid "Additional Resources"
 msgstr "Àddïtïönäl Résöürçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "enroll"
 msgstr "énröll Ⱡ'σяєм ιρѕυ#"
 
@@ -23922,11 +23894,6 @@ msgid "Upgrade ({price})"
 msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr "Ûnlöçkéd Ⱡ'σяєм ιρѕυм ∂#"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
 msgid "Prerequisite: "
 msgstr "Préréqüïsïté:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -23934,6 +23901,10 @@ msgstr "Préréqüïsïté:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+msgid "Unlocked"
+msgstr "Ûnlöçkéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "(Prerequisite required)"
@@ -24166,11 +24137,11 @@ msgstr "© 2012–{year} édX Ìnç.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
-"the U.S. and other countries."
+"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+"粤ICP备17044299号-2. "
 msgstr ""
-"ÉdX, Öpén édX, änd MïçröMästérs äré trädémärks öf édX Ìnç., régïstéréd ïn "
-"thé Û.S. änd öthér çöüntrïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"ÉdX, Öpén édX, änd MïçröMästérs äré régïstéréd trädémärks öf édX Ìnç. "
+"粤ÌÇP备17044299号-2.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html

@@ -265,7 +265,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-06 09:29+0000\n"
+"POT-Creation-Date: 2018-02-22 07:36+0000\n"
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -5212,7 +5212,7 @@ msgstr "Desenvolvido por Open edX"
 msgid "Blog"
 msgstr "Blog"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
@@ -5292,6 +5292,10 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Trademarks"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -5765,6 +5769,7 @@ msgstr "Mais sobre as realizações de {fullname} "
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr "Usuário"
@@ -5908,39 +5913,6 @@ msgid ""
 msgstr ""
 "Se seu curso não aparecer no painel, entre em contato com "
 "{payment_support_link}."
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid ""
-"BlockCompletion.objects.submit_batch_completion should not be called when "
-"the feature is disabled."
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Key '{key}' not found."
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "Invalid course key: {}"
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "User is not enrolled in course."
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-#, python-brace-format
-msgid "Block with key: '{key}' is not in course {course}"
-msgstr ""
-
-#: lms/djangoapps/completion/api/v1/views.py
-msgid "ok"
-msgstr ""
-
-#: lms/djangoapps/completion/models.py
-#, python-brace-format
-msgid "{value} must be between 0.0 and 1.0"
-msgstr ""
 
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
@@ -6260,6 +6232,16 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Honor track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the honor track for this course. The honor track does "
 "not include a certificate."
 msgstr ""
 
@@ -7009,7 +6991,7 @@ msgstr "ID do usuário"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "E-mail"
@@ -9387,7 +9369,7 @@ msgid "Track refunds issued directly through CyberSource."
 msgstr "Acompanhe os reembolsos emitidos diretamente através da CyberSource"
 
 #: lms/djangoapps/support/views/index.py
-#: lms/templates/ccx/coach_dashboard.html
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
 msgid "Enrollment"
 msgstr "Matrícula"
@@ -10466,6 +10448,11 @@ msgid ""
 "I, and my company, accept the {link_start}{platform_name} API Terms of "
 "Service{link_end}."
 msgstr ""
+
+#: lms/templates/courseware/courseware.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "Bookmarks"
+msgstr "Favoritos"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
@@ -11552,11 +11539,6 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "Bookmarks"
-msgstr "Favoritos"
-
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
@@ -12570,37 +12552,37 @@ msgstr "Esconder Ajuda de {studio_name}"
 msgid "{studio_name} Documentation"
 msgstr "Documentação de {studio_name}"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Access documentation on http://docs.edx.org"
 msgstr "Acessar documentação em http://docs.edx.org"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Documentation"
 msgstr "Documentação edX"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101: Overview of Creating an edX Course"
 msgstr "Matricule-se no edX101: Visão geral de Criando um curso no Edx"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
 msgstr "Matricule-se no edX101"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX: Creating a Course with edX Studio"
 msgstr "Matricule-se no StudioX: Criando um curso com Edx Studio"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX"
 msgstr "Matricule-se no StudioX"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Send an email to {email}"
 msgstr "Enviar um e-mail para {email}"
@@ -12868,11 +12850,10 @@ msgstr "Já existe uma conta com o seu novo e-mail."
 msgid "You should Register before trying to access the Unit"
 msgstr ""
 
-#: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "Enroll"
-msgstr "Inscrever-se"
+msgstr ""
 
 #: lms/templates/enroll_staff.html
 msgid "Don't enroll"
@@ -14949,7 +14930,7 @@ msgstr ""
 msgid "Grading Policy"
 msgstr "Política de avaliação"
 
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
 msgstr "Inscrição em lote"
@@ -14968,21 +14949,16 @@ msgid "Email Addresses/Usernames"
 msgstr "Endereços de e-mail/Nomes de usuário"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Enter email addresses and/or usernames separated by new lines or commas."
+"Enter one or more email addresses or usernames separated by new lines or "
+"commas."
 msgstr ""
-"Insira os endereços de e-mail e/ou nomes de usuário separados por novas "
-"linhas ou vírgulas."
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"You will not get notification for emails that bounce, so please double-check"
-" spelling."
+"Make sure you enter the information carefully. You will not receive "
+"notification for invalid usernames or email addresses."
 msgstr ""
-"Você não receberá notificações caso as mensagens para o seu e-mail retornem,"
-" por favor, certifique-se que o seu e-mail foi digitado corretamente."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -15024,6 +15000,12 @@ msgid ""
 msgstr ""
 
 #: lms/templates/ccx/enrollment.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgctxt "someone"
+msgid "Enroll"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
 msgstr "Gerenciamento da Lista de Alunos"
 
@@ -15034,14 +15016,6 @@ msgstr "mensagem de resposta de gerenciamento de lista de estudante CCX"
 #: lms/templates/ccx/enrollment.html
 msgid "Revoke access"
 msgstr "Revogar acesso"
-
-#: lms/templates/ccx/enrollment.html
-msgid "Enter username or email"
-msgstr "Digite um nome de usuário ou email"
-
-#: lms/templates/ccx/enrollment.html
-msgid "Checking this box has no effect if 'Revoke' is clicked."
-msgstr "Marcar esta caixa não terá efeito se \"Revogar\" for selecionado. "
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -15458,7 +15432,8 @@ msgstr ""
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "due {date}"
 msgstr "data de entrega {date}"
 
@@ -15467,7 +15442,8 @@ msgid "{section_format} due {{date}}"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "This content is graded"
 msgstr "Este conteúdo é classificado"
 
@@ -15555,8 +15531,9 @@ msgid "Additional Resources"
 msgstr "Recursos adicionais "
 
 #: lms/templates/courseware/course_about.html
+msgctxt "self"
 msgid "enroll"
-msgstr "matricular-se"
+msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -15702,7 +15679,7 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr ""
 
@@ -15778,7 +15755,7 @@ msgid "Meet the Instructors"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Frequenty Asked Questions"
+msgid "Frequently Asked Questions"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15841,10 +15818,6 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Starts on {}"
-msgstr ""
-
-#: lms/templates/courseware/program_marketing.html
-msgid "Frequently Asked Questions"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -16266,18 +16239,6 @@ msgstr "Configurações do e-mail"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Buy all remaining courses in this program and save 10%"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade All Remaining Courses ("
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid " ${price:.2f} {currency} ) "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -18701,6 +18662,21 @@ msgstr "Localizar código de matrícula"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
+msgstr ""
+"Insira os endereços de e-mail e/ou nomes de usuário separados por novas "
+"linhas ou vírgulas."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+"Você não receberá notificações caso as mensagens para o seu e-mail retornem,"
+" por favor, certifique-se que o seu e-mail foi digitado corretamente."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr ""
 "Insira a razão pela qual os alunos estão inscritos ou cancelados "
@@ -20518,16 +20494,21 @@ msgstr ""
 msgid "Upgrade ({price})"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Prerequisite: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+msgid "{subsection_format} due {{date}}"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Unlocked"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "(Prerequisite required)"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "{subsection_format} due {{date}}"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -20718,8 +20699,8 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"EdX, Open edX, and MicroMasters are trademarks of edX Inc., registered in "
-"the U.S. and other countries."
+"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+"粤ICP备17044299号-2. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
@@ -24506,11 +24487,11 @@ msgstr "Abrir/fechar lista de dicas"
 msgid "Label"
 msgstr "Etiqueta"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 msgid "Access the Open edX Portal"
 msgstr "Acessar o Portal Aberto Edx"
 
-#: cms/templates/widgets/sock.html
+#: cms/templates/widgets/sock_links.html
 msgid "Open edX Portal"
 msgstr "Abrir Portal Edx "
 
