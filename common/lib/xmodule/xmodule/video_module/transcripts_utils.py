@@ -871,9 +871,61 @@ class VideoTranscriptsMixin(object):
         }
 
 
+def get_transcript_from_content_store(video_descriptor, lang=None, feature_enabled=False):
+    """
+    Get video transcript from content store.
+
+    Arguments:
+        video_descriptor (Video Descriptor): course identifier
+        lang (unicode): transcript language
+        feature_enabled (bool): whether to include transcript info from val
+
+    Returns:
+        tuple containing content, filename, mimetype
+    """
+    try:
+        transcripts = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
+        content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
+    except (KeyError, ValueError):
+        raise NotFoundError(
+            u"Transcript not found for {}, lang: {}".format(video_descriptor.location.block_id, lang)
+        )
+
+    return content, filename.encode('utf-8'), mimetype
+
+
+def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SRT, feature_enabled=False):
+    """
+    Get video transcript from edx-val.
+
+    Arguments:
+        edx_video_id (unicode): course identifier
+        lang (unicode): transcript language
+        output_format (unicode): transcript output format
+        feature_enabled (bool): whether to include transcript info from val
+
+    Returns:
+        tuple containing content, filename, mimetype
+    """
+    transcript = None
+    if feature_enabled:
+        transcript = get_video_transcript_content(edx_video_id, lang)
+
+    if not transcript:
+        raise NotFoundError(u'Transcript not found for {}, lang: {}'.format(edx_video_id, lang))
+
+    transcript_conversion_props = dict(transcript, output_format=output_format)
+    transcript = convert_video_transcript(**transcript_conversion_props)
+    filename = transcript['filename']
+    content = transcript['content']
+    mimetype = Transcript.mime_types[output_format]
+
+    return content, filename.encode('utf-8'), mimetype
+
+
 def get_transcript(course_id, block_id, lang=None):
     """
-    Get video transcript from content store or edx-val.
+    Get video transcript from edx-val or content store.
 
     Arguments:
         course_id (CourseLocator): course identifier
@@ -886,24 +938,8 @@ def get_transcript(course_id, block_id, lang=None):
     usage_key = BlockUsageLocator(course_id, block_type='video', block_id=block_id)
     video_descriptor = modulestore().get_item(usage_key)
     feature_enabled = is_val_transcript_feature_enabled_for_course(usage_key.course_key)
+
     try:
-        transcripts = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
-        content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
-    except (ValueError, NotFoundError):
-        # Fallback mechanism for edx-val transcripts
-        transcript = None
-        if feature_enabled:
-            transcript = get_video_transcript_content(video_descriptor.edx_video_id, lang)
-
-        if not transcript:
-            raise NotFoundError(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
-
-        transcript_conversion_props = dict(transcript, output_format=Transcript.SRT)
-        transcript = convert_video_transcript(**transcript_conversion_props)
-        filename = transcript['filename']
-        content = transcript['content']
-        mimetype = Transcript.mime_types[Transcript.SRT]
-    except KeyError:
-        raise NotFoundError(u"Transcript not found for {}, lang: {}".format(block_id, lang))
-
-    return content, filename.encode('utf-8'), mimetype
+        return get_transcript_from_val(video_descriptor.edx_video_id, lang, feature_enabled=feature_enabled)
+    except NotFoundError:
+        return get_transcript_from_content_store(video_descriptor, lang, feature_enabled)

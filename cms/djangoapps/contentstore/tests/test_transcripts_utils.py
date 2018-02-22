@@ -723,6 +723,7 @@ class TestVideoIdsInfo(unittest.TestCase):
         actual_result = transcripts_utils.get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources)
         self.assertEqual(actual_result, expected_result)
 
+
 @ddt.ddt
 class TestGetTranscript(SharedModuleStoreTestCase):
     """Tests for `get_transcript` function."""

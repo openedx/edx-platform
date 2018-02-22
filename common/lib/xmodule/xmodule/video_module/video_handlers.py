@@ -33,6 +33,8 @@ from .transcripts_utils import (
     TranscriptsGenerationException,
     youtube_speed_dict,
     get_transcript,
+    get_transcript_from_content_store,
+    get_transcript_from_val
 )
 from .transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -299,17 +301,21 @@ class VideoStudentViewHandlers(object):
                 # if no translation is required
                 response = self.get_static_transcript(request, transcripts)
                 if response.status_code == 404 and feature_enabled:
-                    # Try to get transcript from edx-val as a last resort.
-                    transcript = get_video_transcript_content(self.edx_video_id, self.transcript_language)
-                    if transcript:
-                        transcript_conversion_props = dict(transcript, output_format=Transcript.SJSON)
-                        transcript = convert_video_transcript(**transcript_conversion_props)
-                        response = Response(
-                            transcript['content'],
-                            headerlist=[('Content-Language', self.transcript_language)],
-                            charset='utf8',
-                        )
-                        response.content_type = Transcript.mime_types[Transcript.SJSON]
+                    content, filename, mimetype = get_transcript_from_val(
+                        self.edx_video_id,
+                        lang=self.transcript_language,
+                        output_format=Transcript.SJSON,
+                        feature_enabled=feature_enabled
+                    )
+                    response = Response(
+                        content,
+                        headerlist=[
+                            ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
+                            ('Content-Language', self.transcript_language),
+                        ],
+                        charset='utf8',
+                    )
+                    response.content_type = mimetype
 
                 return response
             except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
