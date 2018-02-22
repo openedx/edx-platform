@@ -13,6 +13,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from util.cache import cache_if_anonymous
+from util.views import fix_crum_request
 
 valid_templates = []
 
@@ -74,9 +75,11 @@ def render_press_release(request, slug):
         return resp
 
 
+@fix_crum_request
 def render_404(request):
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 
 
+@fix_crum_request
 def render_500(request):
     return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))
