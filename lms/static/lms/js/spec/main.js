@@ -778,7 +778,6 @@
         'js/spec/student_account/account_settings_factory_spec.js',
         'js/spec/student_account/account_settings_fields_spec.js',
         'js/spec/student_account/account_settings_view_spec.js',
-        'js/spec/student_account/account_spec.js',
         'js/spec/student_account/emailoptin_spec.js',
         'js/spec/student_account/enrollment_spec.js',
         'js/spec/student_account/finish_auth_spec.js',
