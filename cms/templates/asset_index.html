@@ -27,16 +27,16 @@
     % endif
 </%block>
 
-<%block name="page_bundle">
+<%block name="requirejs">
     % if not waffle_flag_enabled:
-        <%static:invoke_page_bundle page_name="js/pages/asset_index" class_name="AssetIndexFactory">
-            {
-                assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
-                uploadChunkSizeInMBs: ${ chunk_size_in_mbs| n, dump_js_escaped_json },
-                maxFileSizeInMBs: ${ max_file_size_in_mbs| n, dump_js_escaped_json },
-                maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
-            }
-        </%static:invoke_page_bundle>
+            require(["js/factories/asset_index"], function (AssetIndexFactory) {
+                AssetIndexFactory({
+                  assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
+                  uploadChunkSizeInMBs: ${chunk_size_in_mbs|n, dump_js_escaped_json},
+                  maxFileSizeInMBs: ${max_file_size_in_mbs|n, dump_js_escaped_json},
+                  maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
+                });
+            });
     % endif
 </%block>
 
