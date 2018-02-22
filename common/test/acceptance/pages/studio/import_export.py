@@ -279,6 +279,7 @@ class ImportMixin(ImportExportMixin):
         Upload a tarball to be imported.
         """
         asset_file_path = self.file_path(tarball_filename)
+        assert os.path.isfile(asset_file_path)
         # Make the upload elements visible to the WebDriver.
         self.browser.execute_script('$(".file-name-block").show();$(".file-input").show()')
         # Upload the file.
