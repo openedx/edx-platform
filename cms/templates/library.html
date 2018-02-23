@@ -37,7 +37,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 showChildrenPreviews: ${context_library.show_children_previews | n, dump_js_escaped_json}
             }
         );
-    });
+    </%static:webpack>
 </%block>
 
 <%block name="content">

@@ -33,6 +33,7 @@ module.exports = {
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
         'js/pages/container': './cms/static/js/pages/container.js',
+        'js/pages/library': './cms/static/js/pages/library.js',
         'js/sock': './cms/static/js/sock.js',
 
         // LMS
