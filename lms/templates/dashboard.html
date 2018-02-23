@@ -296,7 +296,7 @@ from student.models import CourseEnrollment
 
     <form id="email_settings_form" method="post">
       <input name="course_id" id="email_settings_course_id" type="hidden" />
-      <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
+      <label><input type="checkbox" id="receive_emails" name="receive_emails" />${_("Receive course emails")} </label>
       <div class="submit">
         <input type="submit" id="submit" value="${_("Save Settings")}" />
       </div>
