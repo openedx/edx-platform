@@ -18,23 +18,34 @@ SITES = ["site_a", "site_b"]
 MANAGEMENT_COMMAND_PATH = "openedx.core.djangoapps.theming.management.commands.create_sites_and_configurations."
 
 
-def _generate_site_config(dns_name, site_domain):
+def _generate_site_config(dns_name, site_domain, devstack=False):
     """ Generate the site configuration for a given site """
+    if devstack:
+        lms_url_fmt = "{domain}-{dns_name}.e2e.devstack"
+    else:
+        lms_url_fmt = "{domain}-{dns_name}.sandbox.edx.org"
+
     return {
-        "lms_url": "{domain}-{dns_name}.sandbox.edx.org".format(domain=site_domain, dns_name=dns_name),
+        "lms_url": lms_url_fmt.format(domain=site_domain, dns_name=dns_name),
         "platform_name": "{domain}-{dns_name}".format(domain=site_domain, dns_name=dns_name)
     }
 
 
-def _get_sites(dns_name):
+def _get_sites(dns_name, devstack=False):
     """ Creates the mocked data for management command """
     sites = {}
+
+    if devstack:
+        site_domain_fmt = "{site}-{dns_name}.e2e.devstack"
+    else:
+        site_domain_fmt = "{site}-{dns_name}.sandbox.edx.org"
+
     for site in SITES:
         sites.update({
             site: {
                 "theme_dir_name": "{}_dir_name".format(site),
                 "configuration": _generate_site_config(dns_name, site),
-                "site_domain": "{site}-{dns_name}.sandbox.edx.org".format(site=site, dns_name=dns_name)
+                "site_domain": site_domain_fmt.format(site=site, dns_name=dns_name)
             }
         })
     return sites
@@ -80,7 +91,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.assertEqual(len(user_profile), 1)
         return service_user
 
-    def _assert_ecommerce_clients_are_valid(self):
+    def _assert_ecommerce_clients_are_valid(self, devstack=False):
         """
         Checks that all ecommerce clients are valid
         """
@@ -89,10 +100,15 @@ class TestCreateSiteAndConfiguration(TestCase):
         clients = Client.objects.filter(user=service_user)
         self.assertEqual(len(clients), len(SITES))
 
+        if devstack:
+            ecommerce_url_fmt = u"http://ecommerce-{site_name}-{dns_name}.e2e.devstack:18130/"
+        else:
+            ecommerce_url_fmt = u"https://ecommerce-{site_name}-{dns_name}.sandbox.edx.org/"
+
         for client in clients:
             self.assertEqual(client.user.username, service_user[0].username)
             site_name = client.name[:6]
-            ecommerce_url = "https://ecommerce-{site_name}-{dns_name}.sandbox.edx.org/".format(
+            ecommerce_url = ecommerce_url_fmt.format(
                 site_name=site_name,
                 dns_name=self.dns_name
             )
@@ -114,22 +130,29 @@ class TestCreateSiteAndConfiguration(TestCase):
                 1
             )
 
-    def _assert_discovery_clients_are_valid(self):
+    def _assert_discovery_clients_are_valid(self, devstack=False):
         """
         Checks that all discovery clients are valid
         """
         service_user = self._assert_service_user_is_valid("lms_catalog_service_user")
 
         clients = Client.objects.filter(user=service_user)
+
         self.assertEqual(len(clients), len(SITES))
+
+        if devstack:
+            discovery_url_fmt = u"http://discovery-{site_name}-{dns_name}.e2e.devstack:18381/"
+        else:
+            discovery_url_fmt = u"https://discovery-{site_name}-{dns_name}.sandbox.edx.org/"
 
         for client in clients:
             self.assertEqual(client.user.username, service_user[0].username)
             site_name = client.name[:6]
-            discovery_url = "https://discovery-{site_name}-{dns_name}.sandbox.edx.org/".format(
+            discovery_url = discovery_url_fmt.format(
                 site_name=site_name,
                 dns_name=self.dns_name
             )
+
             self.assertEqual(client.url, discovery_url)
             self.assertEqual(
                 client.redirect_uri,
@@ -179,3 +202,30 @@ class TestCreateSiteAndConfiguration(TestCase):
         self._assert_sites_are_valid()
         self._assert_discovery_clients_are_valid()
         self._assert_ecommerce_clients_are_valid()
+
+    @mock.patch(MANAGEMENT_COMMAND_PATH + "Command._enable_commerce_configuration")
+    @mock.patch(MANAGEMENT_COMMAND_PATH + "Command._get_sites_data")
+    def test_with_devstack_and_dns(self, mock_get_sites, mock_commerce):
+        """ Test the command with dns_name """
+        mock_get_sites.return_value = _get_sites(self.dns_name, devstack=True)
+        mock_commerce.return_value = None
+        call_command(
+            "create_sites_and_configurations",
+            "--dns-name", self.dns_name,
+            "--theme-path", self.theme_path,
+            "--devstack"
+        )
+        self._assert_sites_are_valid()
+        self._assert_discovery_clients_are_valid(devstack=True)
+        self._assert_ecommerce_clients_are_valid(devstack=True)
+
+        call_command(
+            "create_sites_and_configurations",
+            "--dns-name", self.dns_name,
+            "--theme-path", self.theme_path,
+            "--devstack"
+        )
+        # if we run command with same dns then it will not duplicates the sites and oauth2 clients.
+        self._assert_sites_are_valid()
+        self._assert_discovery_clients_are_valid(devstack=True)
+        self._assert_ecommerce_clients_are_valid(devstack=True)

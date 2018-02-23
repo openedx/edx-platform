@@ -32,7 +32,12 @@ class Command(BaseCommand):
     dns_name = None
     theme_path = None
     ecommerce_user = None
+    ecommerce_base_url_fmt = None
+    ecommerce_oidc_url = None
     discovery_user = None
+    discovery_base_url_fmt = None
+    discovery_oidc_url = None
+    configuration_filename = None
 
     def add_arguments(self, parser):
         """
@@ -50,6 +55,12 @@ class Command(BaseCommand):
             type=str,
             help="Enter theme directory path",
             required=True
+        )
+
+        parser.add_argument(
+            "--devstack",
+            action='store_true',
+            help="Use devstack config, otherwise sandbox config is assumed",
         )
 
     def _create_oauth2_client(self, url, site_name, is_discovery=True):
@@ -119,25 +130,17 @@ class Command(BaseCommand):
 
     def _update_default_clients(self):
         """
-        These two clients is being created by default without service
+        These two clients are being created by default without service
         users so we have to associate the service users to them.
         """
-        ecommerce_queryset = Client.objects.filter(
-            redirect_uri="https://ecommerce-{dns_name}.sandbox.edx.org/complete/edx-oidc/".format(
-                dns_name=self.dns_name
-            )
-        )
+        ecommerce_queryset = Client.objects.filter(redirect_uri=self.ecommerce_oidc_url)
 
         if ecommerce_queryset:
             ecommerce_client = ecommerce_queryset[0]
             ecommerce_client.user = self.ecommerce_user
             ecommerce_client.save()
 
-        discovery_queryset = Client.objects.filter(
-            redirect_uri="https://discovery-{dns_name}.sandbox.edx.org/complete/edx-oidc/".format(
-                dns_name=self.dns_name
-            )
-        )
+        discovery_queryset = Client.objects.filter(redirect_uri=self.discovery_oidc_url)
         if discovery_queryset:
             discovery_client = discovery_queryset[0]
             discovery_client.user = self.discovery_user
@@ -155,7 +158,7 @@ class Command(BaseCommand):
         }
         """
         site_data = {}
-        for config_file in self.find('sandbox_configuration.json', self.theme_path):
+        for config_file in self.find(self.configuration_filename, self.theme_path):
             LOG.info("Reading file from {file}".format(file=config_file))
             configuration_data = json.loads(
                 json.dumps(
@@ -192,10 +195,23 @@ class Command(BaseCommand):
         return service_user
 
     def handle(self, *args, **options):
-
-        self.theme_path = options['theme_path']
         self.dns_name = options['dns_name']
+        self.theme_path = options['theme_path']
 
+        if options['devstack']:
+            configuration_prefix = "devstack"
+            self.discovery_oidc_url = "http://discovery-{}.e2e.devstack:18381/complete/edx-oidc/".format(self.dns_name)
+            self.discovery_base_url_fmt = "http://discovery-{site_domain}:18381/"
+            self.ecommerce_oidc_url = "http://ecommerce-{}.e2e.devstack:18130/complete/edx-oidc/".format(self.dns_name)
+            self.ecommerce_base_url_fmt = "http://ecommerce-{site_domain}:18130/"
+        else:
+            configuration_prefix = "sandbox"
+            self.discovery_oidc_url = "https://discovery-{}.sandbox.edx.org/complete/edx-oidc/".format(self.dns_name)
+            self.discovery_base_url_fmt = "https://discovery-{site_domain}/"
+            self.ecommerce_oidc_url = "https://ecommerce-{}.sandbox.edx.org/complete/edx-oidc/".format(self.dns_name)
+            self.ecommerce_base_url_fmt = "https://ecommerce-{site_domain}/"
+
+        self.configuration_filename = '{}_configuration.json'.format(configuration_prefix)
         self.discovery_user = self.get_or_create_service_user("lms_catalog_service_user")
         self.ecommerce_user = self.get_or_create_service_user("ecommerce_worker")
 
@@ -206,8 +222,8 @@ class Command(BaseCommand):
         for site_name, site_data in all_sites.items():
             site_domain = site_data['site_domain']
 
-            discovery_url = "https://discovery-{site_domain}/".format(site_domain=site_domain)
-            ecommerce_url = "https://ecommerce-{site_domain}/".format(site_domain=site_domain)
+            discovery_url = self.discovery_base_url_fmt.format(site_domain=site_domain)
+            ecommerce_url = self.ecommerce_base_url_fmt.format(site_domain=site_domain)
 
             LOG.info("Creating '{site_name}' Site".format(site_name=site_name))
             self._create_sites(site_domain, site_data['theme_dir_name'], site_data['configuration'])
