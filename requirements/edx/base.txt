@@ -113,6 +113,7 @@ PyYAML==3.12
 requests-oauthlib==0.4.1
 rules==1.1.1
 s3transfer==0.1.12
+numpy==1.6.2
 scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
