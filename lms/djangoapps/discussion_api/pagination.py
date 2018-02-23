@@ -3,7 +3,7 @@ Discussion API pagination support
 """
 from rest_framework.utils.urls import replace_query_param
 
-from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
+from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 
 
 class _Page(object):
