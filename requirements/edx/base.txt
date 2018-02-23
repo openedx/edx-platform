@@ -56,7 +56,7 @@ git+https://github.com/cpennington/pylint-django@fix-field-inference-during-monk
 enum34==1.1.6
 edx-django-oauth2-provider==1.2.5
 edx-django-sites-extensions==2.3.0
-edx-completion==0.0.6
+edx-completion==0.0.9
 edx-enterprise==0.65.7
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2

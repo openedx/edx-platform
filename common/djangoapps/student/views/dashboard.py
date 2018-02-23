@@ -6,6 +6,8 @@ import datetime
 import logging
 from collections import defaultdict
 
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_course_block
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,6 +15,7 @@ from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type, iteritems
@@ -453,6 +456,24 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
+def _get_urls_for_resume_buttons(user, enrollments):
+    '''
+    Checks whether a user has made progress in any of a list of enrollments.
+    '''
+    resume_button_urls = []
+    for enrollment in enrollments:
+        try:
+            block_key = get_key_to_last_completed_course_block(user, enrollment.course_id)
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': enrollment.course_id, 'location': block_key}
+            )
+        except UnavailableCompletionData:
+            url_to_block = ''
+        resume_button_urls.append(url_to_block)
+    return resume_button_urls
+
+
 @login_required
 @ensure_csrf_cookie
 def student_dashboard(request):
@@ -473,6 +494,7 @@ def student_dashboard(request):
         return redirect(reverse('account_settings'))
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
+
     enable_verified_certificates = configuration_helpers.get_value(
         'ENABLE_VERIFIED_CERTIFICATES',
         settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES')
@@ -755,6 +777,15 @@ def student_dashboard(request):
             'use_ecommerce_payment_flow': True,
             'ecommerce_payment_page': ecommerce_service.payment_page_url(),
         })
+
+    # Gather urls for course card resume buttons.
+    resume_button_urls = _get_urls_for_resume_buttons(user, course_enrollments)
+    # There must be enough urls for dashboard.html. Template creates course
+    # cards for "enrollments + entitlements".
+    resume_button_urls += ['' for entitlement in course_entitlements]
+    context.update({
+        'resume_button_urls': resume_button_urls
+    })
 
     response = render_to_response('dashboard.html', context)
     set_user_info_cookie(response, request)
