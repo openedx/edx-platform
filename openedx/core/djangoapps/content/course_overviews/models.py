@@ -484,7 +484,7 @@ class CourseOverview(TimeStampedModel):
         Returns whether it is acceptable to show the student a certificate
         download link.
         """
-        return course_metadata_utils.may_certify_for_course(
+        return self.has_any_active_web_certificate or course_metadata_utils.may_certify_for_course(
             self.certificates_display_behavior,
             self.certificates_show_before_end,
             self.has_ended()
