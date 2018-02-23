@@ -426,7 +426,7 @@ def assert_opened_help_link_is_correct(test, url):
         test (AcceptanceTest): test calling this method.
         url (str): url to verify.
     """
-    test.browser.switch_to_window(test.browser.window_handles[-1])
+    test.browser.switch_to.window(test.browser.window_handles[-1])
     # Assert that url in the browser is the same.
     test.assertEqual(url, test.browser.current_url)
     # Check that the URL loads. Can't do this in the browser because it might
