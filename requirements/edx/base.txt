@@ -46,7 +46,7 @@ edx-ace==0.1.6
 edx-analytics-data-api-client==0.14.3
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
-edx-drf-extensions==1.2.3
+edx-drf-extensions==1.2.4
 edx-i18n-tools==0.4.2
 edx-lint==0.5.4
 
