@@ -291,7 +291,7 @@ class ImportMixin(ImportExportMixin):
         self.q(css='input[type="file"]')[0].send_keys(asset_file_path)
         # Some of the tests need these lines to pass so don't remove them.
         self._wait_for_button()
-        click_css(self, '.submit-button', require_notification=False)
+        click_css(self, '.submit-button', require_notification=True)
 
     def is_upload_finished(self):
         """
