@@ -207,6 +207,8 @@ from six import string_types
   </%block>
 
   <div class="container">
+
+    <%block name="course_about_details">
     <div class="details">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info studio-view">
@@ -217,7 +219,8 @@ from six import string_types
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>
-  </div>
+    </div>
+    </%block>
 
     <div class="course-sidebar">
       <div class="course-summary">
