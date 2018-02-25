@@ -2,7 +2,7 @@
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Avi Levy <avi@sysbind.co.il>, 2017
@@ -23,7 +23,7 @@
 # edX translation file.
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2017
@@ -37,7 +37,7 @@
 # edX community translations have been downloaded from Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
@@ -57,7 +57,7 @@
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016-2017
@@ -71,7 +71,7 @@
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2017
@@ -88,12 +88,12 @@ msgstr ""
 "PO-Revision-Date: 2017-09-28 17:01+0000\n"
 "Last-Translator: Zimeng Chen <schen@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
+"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
-"Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 1.3\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -2675,22 +2675,22 @@ msgstr "מיפוי נושאי דיון"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
-"הכנס/י קטגוריות דיון בתבנית הבאה:  \"שם הקטגוריה\": {\"id\": \"i4x-"
-"InstitutionName-CourseNumber-course-CourseRun\"}. לדוגמא אחת קטגוריות דיון "
-"יכולה להיות \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-"
-"2015_T1\"}. ערך ה \"id\" עבור כל קטגוריה חייב להיות יחודי. בערך ה \"id\", "
-"התווים היחודים  שניתן להשתמש בהם הם קו תחתון, מקף ונקודה. ניתן גם לציין "
-"קטגוריה כברירת מחדל עבור הודעות חדשות בדף הדיון על ידי הגדרת התכונה \"ברירת "
-"מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101"
-"-course-2015_T1\", \"default\": true}."
+"הכנס/י קטגוריות דיון בתבנית הבאה:  \"שם הקטגוריה\": {\"id\": "
+"\"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. לדוגמא אחת קטגוריות "
+"דיון יכולה להיות \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
+"MUS101-course-2015_T1\"}. ערך ה \"id\" עבור כל קטגוריה חייב להיות יחודי. "
+"בערך ה \"id\", התווים היחודים  שניתן להשתמש בהם הם קו תחתון, מקף ונקודה. "
+"ניתן גם לציין קטגוריה כברירת מחדל עבור הודעות חדשות בדף הדיון על ידי הגדרת "
+"התכונה \"ברירת מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
