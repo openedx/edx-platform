@@ -19,7 +19,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory
 from xmodule.video_module import transcripts_utils
 
@@ -728,16 +728,14 @@ class TestVideoIdsInfo(unittest.TestCase):
 class TestGetTranscript(SharedModuleStoreTestCase):
     """Tests for `get_transcript` function."""
 
-    org = 'MITx'
-    number = '999'
-    display_name = 'Test course'
+    def setUp(self):
+        super(TestGetTranscript, self).setUp()
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestGetTranscript, cls).setUpClass()
-        cls.course = CourseFactory.create(org=cls.org, number=cls.number, display_name=cls.display_name)
+        self.course = CourseFactory.create()
 
-        cls.subs = {
+        self.subs_id = 'video_101'
+
+        self.subs_sjson = {
             'start': [100, 200, 240, 390, 1000],
             'end': [200, 240, 380, 1000, 1500],
             'text': [
@@ -749,43 +747,35 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             ]
         }
 
-        cls.subs_srt = transcripts_utils.Transcript.convert(json.dumps(cls.subs), 'sjson', 'srt')
+        self.subs_srt = transcripts_utils.Transcript.convert(json.dumps(self.subs_sjson), 'sjson', 'srt')
 
-        cls.srt_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SRT]
+        self.subs = {
+            u'en': self.subs_srt,
+            u'ur': json.dumps(self.subs_sjson),
+        }
 
-    def setUp(self):
-        super(TestGetTranscript, self).setUp()
+        self.srt_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SRT]
 
         self.user = UserFactory.create()
-        self.vertical = self.store.create_item(self.user.id, self.course.id, 'vertical', 'a_vertical')
-
-        self.subs_id_en = 'video_en_101'
-        self.subs_id_ur = 'video_ur_102'
-
-        self.video = self.store.create_item(
-            self.user.id,
-            self.course.id,
-            'video',
-            'a_video'
-        )
-        self.vertical.children.append(self.video.location)
-        self.store.update_item(self.vertical, self.user.id)
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.course.location)
+        self.video = ItemFactory.create(category='video', parent_location=self.vertical.location)
 
     def create_transcript(self, subs_id, language=u'en'):
         """
         create transcript.
         """
-        self.video = self.store.create_item(
-            self.user.id,
-            self.course.id,
-            'video',
-            'a_video'
-        )
-        self.video.sub = subs_id
-        self.store.update_item(self.video, self.user.id)
+        transcripts = {}
+        if language != u'en':
+            transcripts = {language: transcripts_utils.subs_filename(subs_id, language)}
 
+        self.video = ItemFactory.create(
+            category='video',
+            parent_location=self.vertical.location,
+            sub=subs_id,
+            transcripts=transcripts
+        )
         self.saved_sub = transcripts_utils.save_subs_to_store(
-            self.subs,
+            self.subs_sjson,
             subs_id,
             self.video,
             language=language,
@@ -805,18 +795,36 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         with self.assertRaises(NotFoundError):
             transcripts_utils.get_transcript(self.course.id, self.video.location.block_id, lang=lang)
 
-    def test_get_transcript_from_content_store(self):
+    def test_get_transcript_from_content_store_for_en(self):
         """
-        Verify that `get_transcript` function returns correct data when transcript is in content store.
+        Verify that `get_transcript` function returns correct data for english when transcript is in content store.
         """
-        self.create_transcript(self.subs_id_en)
+        language = u'en'
+        self.create_transcript(self.subs_id)
         content, filename, mimetype = transcripts_utils.get_transcript(
             self.course.id,
             self.video.location.block_id,
+            language
         )
 
-        self.assertEqual(content, self.subs_srt)
-        self.assertEqual(filename, 'video_en_101.srt')
+        self.assertEqual(content, self.subs[language])
+        self.assertEqual(filename, 'video_101.srt')
+        self.assertEqual(mimetype, self.srt_mime_type)
+
+    def test_get_transcript_from_content_store_for_ur(self):
+        """
+        Verify that `get_transcript` function returns correct data for non-english when transcript is in content store.
+        """
+        language = u'ur'
+        self.create_transcript(self.subs_id, language)
+        content, filename, mimetype = transcripts_utils.get_transcript(
+            self.course.id,
+            self.video.location.block_id,
+            language
+        )
+
+        self.assertEqual(json.loads(content), json.loads(self.subs[language]))
+        self.assertEqual(filename, 'ur_subs_video_101.srt.srt')
         self.assertEqual(mimetype, self.srt_mime_type)
 
     @patch(
@@ -829,7 +837,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         Verify that `get_transcript` function returns correct data when transcript is in val.
         """
         mock_get_video_transcript_content.return_value = {
-            'content': json.dumps(self.subs),
+            'content': json.dumps(self.subs_sjson),
             'file_name': 'edx.sjson'
         }
 

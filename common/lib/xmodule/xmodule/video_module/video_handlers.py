@@ -293,6 +293,12 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None), transcripts)
+                content, filename, mimetype = get_transcript_from_contentstore(
+                    self,
+                    lang,
+                    output_format=Transcript.SJSON,
+                    youtube_id=request.GET.get('videoId', None)
+                )
             except (TypeError, TranscriptException, NotFoundError) as ex:
                 # Catching `TranscriptException` because its also getting raised at places
                 # when transcript is not found in contentstore.
@@ -307,23 +313,20 @@ class VideoStudentViewHandlers(object):
                         output_format=Transcript.SJSON,
                         feature_enabled=feature_enabled
                     )
-                    response = Response(
-                        content,
-                        headerlist=[
-                            ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
-                            ('Content-Language', self.transcript_language),
-                        ],
-                        charset='utf8',
-                    )
-                    response.content_type = mimetype
-
                 return response
             except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
                 log.info(six.text_type(ex))
                 response = Response(status=404)
-            else:
-                response = Response(transcript, headerlist=[('Content-Language', language)])
-                response.content_type = Transcript.mime_types['sjson']
+
+            response = Response(
+                content,
+                headerlist=[
+                    ('Content-Disposition', 'attachment; filename="{}"'.format(filename)),
+                    ('Content-Language', self.transcript_language),
+                ],
+                charset='utf8',
+            )
+            response.content_type = mimetype
 
         elif dispatch == 'download':
             lang = request.GET.get('lang', None)
