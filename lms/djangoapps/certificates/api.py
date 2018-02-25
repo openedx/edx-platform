@@ -16,6 +16,7 @@ from branding import api as branding_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.organizations_helpers import get_course_organizations
 
 from certificates.models import (
@@ -363,7 +364,7 @@ def has_html_certificates_enabled(course_key, course=None):
         course (CourseDescriptor|CourseOverview): A course.
     """
     # If the feature is disabled, then immediately return a False
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+    if not configuration_helpers.get_value("CERTIFICATES_HTML_VIEW", False):
         return False
 
     # If we don't have a course object, we'll need to assemble one
