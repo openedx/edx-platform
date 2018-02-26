@@ -755,6 +755,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         }
 
         self.srt_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SRT]
+        self.sjson_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SJSON]
 
         self.user = UserFactory.create()
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.course.location)
@@ -808,7 +809,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         )
 
         self.assertEqual(content, self.subs[language])
-        self.assertEqual(filename, 'video_101.srt')
+        self.assertEqual(filename, 'en_video_101.srt')
         self.assertEqual(mimetype, self.srt_mime_type)
 
     def test_get_transcript_from_content_store_for_ur(self):
@@ -820,12 +821,13 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         content, filename, mimetype = transcripts_utils.get_transcript(
             self.course.id,
             self.video.location.block_id,
-            language
+            language,
+            output_format=transcripts_utils.Transcript.SJSON
         )
 
         self.assertEqual(json.loads(content), json.loads(self.subs[language]))
-        self.assertEqual(filename, 'ur_subs_video_101.srt.srt')
-        self.assertEqual(mimetype, self.srt_mime_type)
+        self.assertEqual(filename, 'ur_video_101.sjson')
+        self.assertEqual(mimetype, self.sjson_mime_type)
 
     @patch(
         'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',

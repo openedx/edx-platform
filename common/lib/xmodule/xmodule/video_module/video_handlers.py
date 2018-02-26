@@ -11,7 +11,6 @@ import os
 
 import six
 from django.utils.timezone import now
-from django.http import Http404
 from webob import Response
 
 from xblock.core import XBlock
@@ -33,8 +32,8 @@ from .transcripts_utils import (
     TranscriptsGenerationException,
     youtube_speed_dict,
     get_transcript,
-    get_transcript_from_content_store,
-    get_transcript_from_val
+    get_transcript_from_val,
+    get_transcript_from_contentstore,
 )
 from .transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -292,12 +291,12 @@ class VideoStudentViewHandlers(object):
                 self.transcript_language = language
 
             try:
-                transcript = self.translation(request.GET.get('videoId', None), transcripts)
                 content, filename, mimetype = get_transcript_from_contentstore(
                     self,
-                    lang,
+                    self.transcript_language,
                     output_format=Transcript.SJSON,
-                    youtube_id=request.GET.get('videoId', None)
+                    youtube_id=request.GET.get('videoId', None),
+                    is_bumper=is_bumper
                 )
             except (TypeError, TranscriptException, NotFoundError) as ex:
                 # Catching `TranscriptException` because its also getting raised at places
@@ -310,10 +309,10 @@ class VideoStudentViewHandlers(object):
                     content, filename, mimetype = get_transcript_from_val(
                         self.edx_video_id,
                         lang=self.transcript_language,
-                        output_format=Transcript.SJSON,
-                        feature_enabled=feature_enabled
+                        output_format=Transcript.SJSON
                     )
-                return response
+                else:
+                    return response
             except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
                 log.info(six.text_type(ex))
                 response = Response(status=404)

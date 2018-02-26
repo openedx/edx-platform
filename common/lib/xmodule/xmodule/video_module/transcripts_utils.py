@@ -770,7 +770,7 @@ class VideoTranscriptsMixin(object):
         # to clean redundant language codes.
         return list(set(translations))
 
-    def get_transcript(self, transcripts, input_format='srt', output_format='srt', lang=None):
+    def get_transcript(self, transcripts, transcript_format='srt', lang=None):
         """
         Returns transcript, filename and MIME type.
 
@@ -800,12 +800,12 @@ class VideoTranscriptsMixin(object):
                 raise ValueError
 
             data = Transcript.asset(self.location, transcript_name, lang).data
-            filename = u'{}.{}'.format(transcript_name, output_format)
-            content = Transcript.convert(data, 'sjson', output_format)
+            filename = u'{}.{}'.format(transcript_name, transcript_format)
+            content = Transcript.convert(data, 'sjson', transcript_format)
         else:
             data = Transcript.asset(self.location, None, None, other_lang[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], output_format)
-            content = Transcript.convert(data, 'srt', output_format)
+            filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
+            content = Transcript.convert(data, 'srt', transcript_format)
 
         if not content:
             log.debug('no subtitles produced in get_transcript')
@@ -920,20 +920,22 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
 
 def get_transcript_for_video(video_location, subs_id, file_name, language):
     try:
-        content = Transcript.asset(video_location, subs_id, language)
+        content = Transcript.asset(video_location, subs_id, language).data
         base_name = subs_id
         input_format = Transcript.SJSON
     except NotFoundError:
-        content = Transcript.asset(video_location, None, language, file_name)
+        content = Transcript.asset(video_location, None, language, file_name).data
         base_name = os.path.splitext(file_name)[0]
         input_format = Transcript.SRT
+
     return input_format, base_name, content
 
 
-def get_transcript_from_contentstore(video, language, output_format, youtube_id=None):
-    transcripts_info = video.get_transcripts_info()
+def get_transcript_from_contentstore(video, language, output_format, youtube_id=None, is_bumper=False):
+    transcripts_info = video.get_transcripts_info(is_bumper=is_bumper)
     sub, other_languages = transcripts_info['sub'], transcripts_info['transcripts']
     transcripts = dict(other_languages)
+
     # this is sent in case of a translation dispatch and we need to use it as our subs_id.
     if youtube_id:
         transcripts['en'] = youtube_id
@@ -941,18 +943,32 @@ def get_transcript_from_contentstore(video, language, output_format, youtube_id=
         transcripts['en'] = sub
     elif video.youtube_id_1_0:
         transcripts['en'] = video.youtube_id_1_0
-    input_format, base_name, transcript_content = get_transcript_for_video(
-        video.location,
-        subs_id=transcripts['en'],
-        file_name=transcripts[language],
-        language=language
-    )
-    transcript_name = u'{}.{}'.format(base_name, output_format)
+
+    try:
+        input_format, base_name, transcript_content = get_transcript_for_video(
+            video.location,
+            subs_id=transcripts['en'],
+            file_name=transcripts.get(language),
+            language=language
+        )
+    except KeyError:
+        raise NotFoundError
+
+    # add language prefix to transcript file only if language is not None
+    language_prefix = '{}_'.format(language) if language else ''
+    transcript_name = u'{}{}.{}'.format(language_prefix, base_name, output_format)
     transcript_content = Transcript.convert(transcript_content, input_format=input_format, output_format=output_format)
-    return transcript_content, transcript_name, Transcript.mime_types[output_format]
+
+    if youtube_id:
+        youtube_ids = youtube_speed_dict(video)
+        transcript_content = json.dumps(
+            generate_subs(youtube_ids.get(youtube_id, 1), 1, json.loads(transcript_content))
+        )
+
+    return transcript_content, transcript_name.encode('utf-8'), Transcript.mime_types[output_format]
 
 
-def get_transcript(course_id, block_id, lang=None, output_format=Transcript.SRT):
+def get_transcript(course_id, block_id, lang=None, output_format=Transcript.SRT, is_bumper=False):
     """
     Get video transcript from edx-val or content store.
 
@@ -970,5 +986,9 @@ def get_transcript(course_id, block_id, lang=None, output_format=Transcript.SRT)
     try:
         return get_transcript_from_val(video_descriptor.edx_video_id, lang, output_format)
     except NotFoundError:
-        return get_transcript_from_contentstore(video_descriptor, lang, output_format=Transcript.SJSON)
-        # return get_transcript_from_content_store(video_descriptor, lang)
+        return get_transcript_from_contentstore(
+            video_descriptor,
+            lang,
+            output_format=output_format,
+            is_bumper=is_bumper
+        )
