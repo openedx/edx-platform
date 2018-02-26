@@ -39,8 +39,10 @@ class CourseOutlineFragmentView(EdxFragmentView):
 
         # TODO: EDUCATOR-2283 Remove 'show_visual_progress' from context
         # and remove the check for it in the HTML file
-        show_visual_progress = (completion_waffle.visual_progress_enabled(course_key) and
-                                self.user_enrolled_after_completion_collection(request.user, course_key))
+        show_visual_progress = (
+            completion_waffle.visual_progress_enabled(course_key) and
+            self.user_enrolled_after_completion_collection(request.user, course_key)
+        )
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course_overview,
@@ -139,14 +141,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
         check until all active enrollments are created after the date.
         """
         begin_collection_date = datetime.datetime(2018, 01, 24, tzinfo=pytz.utc)
-        user = User.objects.get(username=user)
-        user_enrollment = CourseEnrollment.objects.get(
-            user=user,
-            course_id=course_key,
-            is_active=True
-        )
-
-        if user_enrollment and user_enrollment.created > begin_collection_date:
+        user_enrollment = CourseEnrollment.get_enrollment(user=user, course_key=course_key)
+        if user_enrollment and user_enrollment.is_active and user_enrollment.created > begin_collection_date:
             return True
-
         return False
