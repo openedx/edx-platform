@@ -65,6 +65,7 @@ setup(
         ],
         "lms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "grades = lms.djangoapps.grades.apps:GradesConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
