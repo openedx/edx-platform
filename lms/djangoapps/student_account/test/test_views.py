@@ -324,8 +324,6 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     @ddt.data(
         (None, "signin_user"),
         (None, "register_user"),
-        # ("edx.org", "signin_user"),
-        # ("edx.org", "register_user"),
     )
     @ddt.unpack
     def test_login_and_registration_form_signin_not_preserves_params(self, theme, url_name):

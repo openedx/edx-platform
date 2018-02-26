@@ -32,7 +32,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-# from lms.djangoapps.bulk_email.models import CourseEmail
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
