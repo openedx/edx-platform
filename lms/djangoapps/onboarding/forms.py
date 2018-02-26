@@ -751,7 +751,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
     effective_date = forms.DateField(input_formats=['%m/%d/%Y'],
                                      required=False,
                                      label=ugettext_noop('End date of last Fiscal Year'),
-                                     help_text=ugettext_noop("he fiscal year is the period that an organization uses "
+                                     help_text=ugettext_noop("The fiscal year is the period that an organization uses "
                                                              "for accounting  purposes and preparing financial "
                                                              "statements. A fiscal year may or may not be the same"
                                                              " as a calendar year. If the information you are "
@@ -951,7 +951,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
     effective_date = forms.DateField(input_formats=['%m/%d/%Y'],
                                      required=False,
-                                     help_text=ugettext_noop("he fiscal year is the period that an organization uses "
+                                     help_text=ugettext_noop("The fiscal year is the period that an organization uses "
                                                              "for accounting  purposes and preparing financial "
                                                              "statements. A fiscal year may or may not be the same"
                                                              " as a calendar year. If the information you are "
