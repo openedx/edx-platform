@@ -11,7 +11,6 @@ describe('Currency factory', () => {
 
   beforeEach(() => {
     loadFixtures('course_experience/fixtures/course-currency-fragment.html');
-    currency = new Currency(true);
     canadaPosition = {
       coords: {
         latitude: 58.773884,
@@ -34,30 +33,14 @@ describe('Currency factory', () => {
   });
 
   describe('converts price to local currency', () => {
-    it('when location is US', () => {
-      currency.getCountry(usaPosition);
+    it('when location is the default (US)', () => {
+      $.cookie('edx-price-l10n', '{"rate":1,"code":"USD","symbol":"$","countryCode":"US"}', { path: '/' });
+      currency = new Currency();
       expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($100 USD)');
     });
-
-    it('when location is an unsupported country', () => {
-      currency.getCountry(japanPosition);
-      expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($100 USD)');
-    });
-
-    it('when cookie is not set and country is supported', () => {
-      currency.getCountry(canadaPosition);
-      expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($220 CAD)');
-    });
-
-    it('when cookie is set to same country', () => {
-      currency.getCountry(canadaPosition);
+    it('when cookie is set to a different country', () => {
       $.cookie('edx-price-l10n', '{"rate":2.2,"code":"CAD","symbol":"$","countryCode":"CAN"}', { expires: 1 });
-      expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($220 CAD)');
-    });
-
-    it('when cookie is set to different country', () => {
-      currency.getCountry(canadaPosition);
-      $.cookie('edx-price-l10n', '{"rate":1,"code":"USD","symbol":"$","countryCode":"USA"}', { expires: 1 });
+      currency = new Currency();
       expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($220 CAD)');
     });
   });

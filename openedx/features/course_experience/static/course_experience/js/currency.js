@@ -4,34 +4,6 @@ import $ from 'jquery'; // eslint-disable-line import/extensions
 
 export class Currency {  // eslint-disable-line import/prefer-default-export
 
-  setCookie(countryCode, l10nData) {
-    function pick(curr, arr) {
-      const obj = {};
-      arr.forEach((key) => {
-        obj[key] = curr[key];
-      });
-      return obj;
-    }
-    const userCountryData = pick(l10nData, [countryCode]);
-    let countryL10nData = userCountryData[countryCode];
-
-    if (countryL10nData) {
-      countryL10nData.countryCode = countryCode;
-      $.cookie('edx-price-l10n', JSON.stringify(countryL10nData), {
-        domain: 'edx.org',
-        expires: 1,
-      });
-    } else {
-      countryL10nData = {
-        countryCode: 'USA',
-        symbol: '$',
-        rate: '1',
-        code: 'USD',
-      };
-    }
-    this.countryL10nData = countryL10nData;
-  }
-
   setPrice() {
     const l10nCookie = this.countryL10nData;
     const lmsregex = /(\$)(\d*)( USD)/g;
@@ -45,42 +17,17 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
     price.value = price.value.replace(regexMatch[0], string);
   }
 
-  getL10nData(countryCode) {
-    const l10nData = JSON.parse($('#currency_data').attr('value'));
-    if (l10nData) {
-      this.setCookie(countryCode, l10nData);
-    }
-  }
-
-  getCountry(position) {
-    const countryCode = whichCountry([position.coords.longitude, position.coords.latitude]);
+  getCountry() {
     this.countryL10nData = JSON.parse($.cookie('edx-price-l10n'));
-
-    if (countryCode) {
-      if (!(this.countryL10nData && this.countryL10nData.countryCode === countryCode)) {
-        // If pricing cookie has not been set or the country is not correct
-        // Make API call and set the cookie
-        this.getL10nData(countryCode);
-      }
+    if (this.countryL10nData) {
+      window.analytics.track('edx.bi.user.track_selection.local_currency_cookie_set');
+      this.setPrice();
     }
-    this.setPrice();
   }
 
-  getCountryCaller(position) {
-    const caller = function callerFunction() {
-      this.getCountry(position);
-    }.bind(this);
-    $(document).ready(caller);
-  }
-
-  getUserLocation() {
-    // Get user location from browser
-    navigator.geolocation.getCurrentPosition(this.getCountryCaller.bind(this));
-  }
-
-  constructor(skipInitialize) {
-    if (!skipInitialize) {
-      this.getUserLocation();
-    }
+  constructor() {
+    $(document).ready(() => {
+      this.getCountry();
+    });
   }
 }
