@@ -371,7 +371,6 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         cls.self_paced_course = CourseFactory.create(self_paced=True)
 
     def setUp(self):
-        SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedCourseInfoTestCase, self).setUp()
         self.setup_user()
 

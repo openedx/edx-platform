@@ -37,7 +37,6 @@ from contentstore.views.item import (
     highlights_setting,
 )
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xblock_django.user_service import DjangoXBlockUserService
@@ -3145,7 +3144,6 @@ class TestXBlockPublishingInfo(ItemTest):
         Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
         now in self-paced course, item should have `live` visibility state.
         """
-        SelfPacedConfiguration(enabled=True).save()
 
         # Create course, chapter and setup future release date to make chapter in scheduled state
         course = CourseFactory.create(default_store=store_type)

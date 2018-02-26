@@ -60,7 +60,6 @@ from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
@@ -1045,7 +1044,7 @@ def settings_handler(request, course_key_string):
                 'EDITABLE_SHORT_DESCRIPTION',
                 settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             )
-            self_paced_enabled = SelfPacedConfiguration.current().enabled
+            # self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {
                 'context_course': course_module,
@@ -1066,7 +1065,6 @@ def settings_handler(request, course_key_string):
                 'enrollment_end_editable': enrollment_end_editable,
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
                 'is_entrance_exams_enabled': is_entrance_exams_enabled(),
-                'self_paced_enabled': self_paced_enabled,
                 'enable_extended_course_details': enable_extended_course_details
             }
             if is_prerequisite_courses_enabled():

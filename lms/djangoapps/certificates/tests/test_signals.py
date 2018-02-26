@@ -17,7 +17,6 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -31,7 +30,6 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
 
     def setUp(self):
         super(SelfGeneratedCertsSignalTest, self).setUp()
-        SelfPacedConfiguration(enabled=True).save()
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     def test_cert_generation_flag_on_pacing_toggle(self):

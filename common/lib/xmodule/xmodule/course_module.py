@@ -1408,8 +1408,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Whether or not the course can be set to self-paced at this time.
 
         Returns:
-          bool: False if the course has already started, True otherwise.
+          bool: False if the course has already started or no start date set, True otherwise.
         """
+        if not self.start:
+            return False
         return datetime.now(utc) <= self.start
 
 
