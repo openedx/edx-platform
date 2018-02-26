@@ -56,7 +56,7 @@ TEST_ROOT = path('test_root')
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'webpack_loader']
 INSTALLED_APPS.append('openedx.tests.util.webpack_loader')
-WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = "/edx/var/edxapp/staticfiles/webpack-stats.json"
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 DATA_DIR = TEST_ROOT / "data"
