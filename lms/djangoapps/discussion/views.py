@@ -5,8 +5,11 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 import logging
 from contextlib import contextmanager
 from functools import wraps
-from sets import Set
 
+import django_comment_client.utils as utils
+from courseware.access import has_access
+from courseware.courses import get_course_with_access
+from courseware.views.views import CourseTabView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -19,15 +22,6 @@ from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
-from opaque_keys.edx.keys import CourseKey
-from rest_framework import status
-from web_fragments.fragment import Fragment
-
-import django_comment_client.utils as utils
-import lms.lib.comment_client as cc
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
 from django_comment_client.constants import TYPE_ENTRY
 from django_comment_client.permissions import get_team, has_permission
 from django_comment_client.utils import (
@@ -43,6 +37,14 @@ from django_comment_client.utils import (
     strip_none
 )
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
+from student.models import CourseEnrollment
+from util.json_request import JsonResponse, expect_json
+from web_fragments.fragment import Fragment
+from xmodule.modulestore.django import modulestore
+
+import lms.lib.comment_client as cc
 from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
 from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
@@ -50,9 +52,6 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from student.models import CourseEnrollment
-from util.json_request import JsonResponse, expect_json
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.discussions")
 try:
@@ -144,11 +143,11 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         cc_user.default_sort_key = request.GET.get('sort_key')
         cc_user.save()
 
-    #there are 2 dimensions to consider when executing a search with respect to group id
-    #is user a moderator
-    #did the user request a group
+    # there are 2 dimensions to consider when executing a search with respect to group id
+    # is user a moderator
+    # did the user request a group
 
-    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
+    # if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     if discussion_id:
         is_cohorted = is_commentable_divided(course.id, discussion_id)
