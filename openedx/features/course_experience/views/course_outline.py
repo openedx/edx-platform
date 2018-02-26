@@ -141,7 +141,13 @@ class CourseOutlineFragmentView(EdxFragmentView):
         check until all active enrollments are created after the date.
         """
         begin_collection_date = datetime.datetime(2018, 01, 24, tzinfo=pytz.utc)
-        user_enrollment = CourseEnrollment.get_enrollment(user=user, course_key=course_key)
-        if user_enrollment and user_enrollment.is_active and user_enrollment.created > begin_collection_date:
-            return True
-        return False
+        user = User.objects.get(username=user)
+        try:
+            user_enrollment = CourseEnrollment.objects.get(
+                user=user,
+                course_id=course_key,
+                is_active=True
+            )
+            return user_enrollment.created > begin_collection_date
+        except CourseEnrollment.DoesNotExist:
+            return False
