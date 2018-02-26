@@ -162,3 +162,20 @@ def get_course_outline_block_tree(request, course_id):
         else:
             mark_last_accessed(request.user, course_key, course_outline_root_block)
     return course_outline_root_block
+
+
+def get_resume_block(block):
+    """
+    Gets the deepest block marked as 'resume_block'.
+
+    """
+    if not block['resume_block']:
+        return None
+    if not block.get('children'):
+        return block
+
+    for child in block['children']:
+        resume_block = get_resume_block(child)
+        if resume_block:
+            return resume_block
+    return block

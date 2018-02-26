@@ -29,7 +29,7 @@ from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 
 from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG
-from ..utils import get_course_outline_block_tree
+from ..utils import get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
@@ -81,23 +81,6 @@ class CourseHomeFragmentView(EdxFragmentView):
                 otherwise the URL of the course root.
 
         """
-
-        def get_resume_block(block):
-            """
-            Gets the deepest block marked as 'resume_block'.
-
-            """
-            if not block['resume_block']:
-                return None
-            if not block.get('children'):
-                return block
-
-            for child in block['children']:
-                resume_block = get_resume_block(child)
-                if resume_block:
-                    return resume_block
-            return block
-
         course_outline_root_block = get_course_outline_block_tree(request, course_id)
         resume_block = get_resume_block(course_outline_root_block) if course_outline_root_block else None
         has_visited_course = bool(resume_block)
