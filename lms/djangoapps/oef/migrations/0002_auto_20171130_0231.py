@@ -97,28 +97,7 @@ class Migration(migrations.Migration):
         survey = apps.get_model('oef', 'OefSurvey')
         survey_obj = survey(title='Organization Effectiveness Survey', is_enabled=True, description="""<h4>This page answers some questions you may have about the OEF assessment tool.</h4>
                         <p>If you're ready to start your OEF assessment, &nbsp; <a
-                                class="link has-border oef-questionnaire" href="#">Start OEF here</a></p>
-
-                        <p class="mt40">This is the final step in the registration process!</p>
-                        <p>Click to open each of the 10 areas of organizational effectiveness using the <span class="circle-text-icon">+</span>.
-                             For each area, select the button closest to the box which best
-                            describes your organization’s capacity in that area, based on the examples provided. If you
-                            want more information than the examples provided, click the <span class="see-more-text-icon">SEE MORE</span> and more
-                            information will drop down. In some cases, you may find that there is not a box that
-                            perfectly describes the state of your organization - select the box that most closely
-                            describes your organization.</p>
-
-                        <p>If you think that your organization’s capacity sits between two levels, select the <span class="circle-text-icon">+/-</span>
-                             which sits between each level. For example, if you believe your organization is
-                            more effective than the box which describes level 3 for the Human resource management area,
-                            but not quite a level 4, you can select the <span class="circle-text-icon">+/-</span> which sits between 3 and
-                            4.</p>
-
-                        <p>Remember that you can start the OEF, complete part of it, save it as a draft, and return to
-                            complete it when you have time. There is no deadline for completion.</p>
-
-                        <p>If you have questions, check out the OEF Q&A.</p>
-""")
+                                class="link has-border oef-questionnaire" href="#">Start OEF here</a></p>""")
         survey_obj.save()
         create_topics(apps, survey_obj, level_models)
 
