@@ -18,6 +18,7 @@ from six import text_type
 from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.tests.util import expected_redirect_url
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
@@ -62,13 +63,15 @@ class LoginTest(CacheIsolationTestCase):
             self.url = reverse('login')
 
     def test_login_success(self):
-        response, mock_audit_log = self._login_response('test@edx.org', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = self._login_response('test@edx.org', 'test_password',
+                                                        patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test@edx.org'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
-        response, mock_audit_log = self._login_response('test@edx.org', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = self._login_response('test@edx.org', 'test_password',
+                                                        patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
@@ -78,9 +81,23 @@ class LoginTest(CacheIsolationTestCase):
         self.user.email = unicode_email
         self.user.save()
 
-        response, mock_audit_log = self._login_response(unicode_email, 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = self._login_response(unicode_email, 'test_password',
+                                                        patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
+
+    def test_last_login_updated(self):
+        old_last_login = self.user.last_login
+        self.test_login_success()
+        self.user.refresh_from_db()
+        assert self.user.last_login > old_last_login
+
+    def test_login_success_prevent_auth_user_writes(self):
+        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+            old_last_login = self.user.last_login
+            self.test_login_success()
+            self.user.refresh_from_db()
+            assert old_last_login == self.user.last_login
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
@@ -126,7 +143,8 @@ class LoginTest(CacheIsolationTestCase):
         )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+        self._assert_audit_log(mock_audit_log, 'warning',
+                               [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
@@ -190,7 +208,8 @@ class LoginTest(CacheIsolationTestCase):
             'student.views.login.AUDIT_LOG'
         )
         self._assert_response(response, success=False)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+        self._assert_audit_log(mock_audit_log, 'warning',
+                               [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
 
     def test_logout_logging(self):
         response, _ = self._login_response('test@edx.org', 'test_password')
@@ -585,7 +604,7 @@ class LoginOAuthTokenMixin(ThirdPartyOAuthTestMixin):
         self._setup_provider_response(success=True)
         response = self.client.post(self.url, {"access_token": "dummy"})
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)  # pylint: disable=no-member
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)
 
     def test_invalid_token(self):
         self._setup_provider_response(success=False)

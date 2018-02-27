@@ -2116,7 +2116,7 @@ INSTALLED_APPS = [
 
     # Our courseware
     'courseware',
-    'student',
+    'student.apps.StudentConfig',
 
     'static_template_view',
     'staticbook',

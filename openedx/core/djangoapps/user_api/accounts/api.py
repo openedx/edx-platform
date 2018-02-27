@@ -11,8 +11,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
-from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
-from openedx.core.djangoapps.user_api.errors import PreferenceValidationError, AccountValidationError
 from six import text_type
 
 from student.models import User, UserProfile, Registration
@@ -20,15 +18,21 @@ from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+from openedx.core.djangoapps.user_api.errors import (
+    AccountUpdateError,
+    AccountValidationError,
+    PreferenceValidationError,
+)
+from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
 
 from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
     UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
 )
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
-
 
 # Public access point for this function.
 visible_fields = _visible_fields
@@ -242,21 +246,21 @@ def update_account_settings(requesting_user, update, username=None):
 
     except PreferenceValidationError as err:
         raise AccountValidationError(err.preference_errors)
-    except AccountValidationError as err:
+    except (AccountUpdateError, AccountValidationError) as err:
         raise err
     except Exception as err:
-        raise errors.AccountUpdateError(
+        raise AccountUpdateError(
             u"Error thrown when saving account updates: '{}'".format(text_type(err))
         )
 
     # And try to send the email change request if necessary.
     if changing_email:
         if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
-            raise errors.AccountUpdateError(u"Email address changes have been disabled by the site operators.")
+            raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
         try:
             student_views.do_email_change_request(existing_user, new_email)
         except ValueError as err:
-            raise errors.AccountUpdateError(
+            raise AccountUpdateError(
                 u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
@@ -309,6 +313,9 @@ def create_account(username, password, email):
             settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
     ):
         return HttpResponseForbidden(_("Account creation not allowed."))
+
+    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+        raise errors.UserAPIInternalError(SYSTEM_MAINTENANCE_MSG)
 
     # Validate the username, password, and email
     # This will raise an exception if any of these are not in a valid format.
@@ -383,6 +390,8 @@ def activate_account(activation_key):
         errors.UserAPIInternalError: the operation failed due to an unexpected error.
 
     """
+    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+        raise errors.UserAPIInternalError(SYSTEM_MAINTENANCE_MSG)
     try:
         registration = Registration.objects.get(activation_key=activation_key)
     except Registration.DoesNotExist:
