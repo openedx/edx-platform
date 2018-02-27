@@ -186,8 +186,8 @@ def _auth_footer_legal_links():
     """Return the legal footer links (e.g. terms of service). """
     links = [
         ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use")),
-        ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
-        ("faq", "/faq", _("Faq")),
+        ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy")),
+        ("faq", "/faq", _("FAQ")),
         ("disclaimir", "/disclaimer", _("Disclaimer"))
     ]
 
@@ -207,8 +207,8 @@ def my_footer_legal_links():
 
     links = [
         ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use")),
-        ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
-        ("faq", "/faq", _("Faq")),
+        ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy")),
+        ("faq", "/faq", _("FAQ")),
         ("disclaimir", "/disclaimer", _("Disclaimer"))
     ]
 

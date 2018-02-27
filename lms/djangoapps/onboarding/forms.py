@@ -136,7 +136,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         focus_area_choices = sorted(focus_area_choices, key=lambda focus_area_choices: focus_area_choices[0])
 
         self.fields['function_areas'] = forms.ChoiceField(choices=focus_area_choices,
-            label=ugettext_noop('Department of Function (Check all that apply.)'),
+            label=ugettext_noop('Department or Function (Check all that apply.)'),
             widget=forms.CheckboxSelectMultiple)
 
     def clean(self):
@@ -202,6 +202,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             'country_of_employment': forms.TextInput,
             'city_of_employment': forms.TextInput,
             'start_month_year': forms.TextInput(attrs={'placeholder': 'mm/yy'}),
+            'hours_per_week': forms.NumberInput(attrs={'max': 168})
         }
 
         error_messages = {
@@ -370,7 +371,7 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
 
     total_employees = forms.ChoiceField(label=ugettext_noop('Total Employees'), label_suffix="*",
                                         help_text="An employee is a member of your staff who is paid for their work. "
-                                                  "An staff member working full-time counts as 1 employee; a staff "
+                                                  "A staff member working full-time counts as 1 employee; a staff "
                                                   "member working half-time counts as 0.5 of an employee. Please "
                                                   "include yourself in your organization's employee count.",
                                         choices=TOTAL_EMPLOYEES_CHOICES,
@@ -378,11 +379,11 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
                                             'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format('Total Employees')),
                                         })
 
-    partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of the "
+    partner_networks = forms.ChoiceField(label=ugettext_noop("Is your organization currently working with any of "
                                                              "Philanthropy University's partners? "
                                                              "(Check all that apply.)"),
                                          help_text=ugettext_noop("Philanthropy University works in partnership with a "
-                                                                 "number of international NGOs to improve the "
+                                                                 "number of organizations to improve the "
                                                                  "effectiveness of local organizations they fund and/or"
                                                                  " partner with to deliver programs. If you were asked "
                                                                  "to join Philanthropy University by one of your "
@@ -525,7 +526,7 @@ class RegModelForm(BaseOnboardingModelForm):
         max_length=255,
         label=ugettext_noop('Organization Name'),
         label_suffix="*",
-        help_text=ugettext_noop("You can choose an organization from the auto-suggestion list of add a new one by "
+        help_text=ugettext_noop("You can choose an organization from the auto-suggestion list or add a new one by "
                                 "entering the name and clicking the OK button."),
         required=False,
         widget=forms.TextInput(
@@ -747,10 +748,10 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                              'required': ugettext_noop('Please select an option for Are you able to '
                                                                        'provide information'),
                                          })
-    effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
+    effective_date = forms.DateField(input_formats=['%m/%d/%Y'],
                                      required=False,
-                                     label=ugettext_noop('End date of last Fiscal Year'),
-                                     help_text=ugettext_noop("he fiscal year is the period that an organization uses "
+                                     label=ugettext_noop('End Date of Last Fiscal Year'),
+                                     help_text=ugettext_noop("The fiscal year is the period that an organization uses "
                                                              "for accounting  purposes and preparing financial "
                                                              "statements. A fiscal year may or may not be the same"
                                                              " as a calendar year. If the information you are "
@@ -759,7 +760,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                      label_suffix='*')
     registration_number = forms.CharField(max_length=30,
                                           required=False,
-                                          label=ugettext_noop("Organization's registration or tax identification number"),
+                                          label=ugettext_noop("Organization's Registration or Tax Identification Number"),
                                           help_text=ugettext_noop("A registration or tax identification number is the unique number your"
                                                                   " government uses to identify your organization. Please note that you "
                                                                   "should only give information that you are allowed to share and that "
@@ -795,7 +796,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
         labels = {
             'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?*'),
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
-            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year'),
+            'total_employees': ugettext_noop('Total Employees at the End of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
             'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
@@ -948,21 +949,21 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 
 
 class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
-    effective_date = forms.DateField(input_formats=['%d/%m/%Y'],
+    effective_date = forms.DateField(input_formats=['%m/%d/%Y'],
                                      required=False,
-                                     help_text=ugettext_noop("he fiscal year is the period that an organization uses "
+                                     help_text=ugettext_noop("The fiscal year is the period that an organization uses "
                                                              "for accounting  purposes and preparing financial "
                                                              "statements. A fiscal year may or may not be the same"
                                                              " as a calendar year. If the information you are "
                                                              "giving below is for the last 12 months, please enter "
                                                              "today's date."),
-                                     label=ugettext_noop('End date of last Fiscal Year'),
+                                     label=ugettext_noop('End Date of Last Fiscal Year'),
                                      label_suffix='*')
 
     registration_number = forms.CharField(max_length=30,
                                           required=False,
                                           label=ugettext_noop(
-                                              "Organization's registration or tax identification number"),
+                                              "Organization's Registration or Tax Identification Number"),
                                           help_text=ugettext_noop(
                                               "A registration or tax identification number is the unique number your"
                                               " government uses to identify your organization. Please note that you "
@@ -999,7 +1000,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
         labels = {
             'actual_data': ugettext_noop('Is the information you will provide on this page estimated or actual?'),
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
-            'total_employees': ugettext_noop('Total Employees at the end of Last Fiscal Year'),
+            'total_employees': ugettext_noop('Total Employees at the End of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
             'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
