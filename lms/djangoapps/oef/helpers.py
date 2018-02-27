@@ -41,7 +41,7 @@ def get_user_survey_status(user, create_new_survey=True):
         limit = settings.OEF_RENEWAL_DAYS
         if (datetime.date.today() - uos.start_date).days < limit:
             is_eligible = False
-            error = NON_APPLICABLE_OEF % limit
+            error = NON_APPLICABLE_OEF
         elif create_new_survey:
             survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
 
