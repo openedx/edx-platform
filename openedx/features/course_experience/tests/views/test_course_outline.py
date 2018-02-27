@@ -495,6 +495,29 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         # check resume course buttons
         self.visit_course_home(course, resume_count=1)
 
+    @override_switch(
+        '{}.{}'.format(
+            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_VISUAL_PROGRESS
+        ),
+        active=True
+    )
+    @patch('completion.waffle.get_current_site')
+    def test_course_home_for_global_staff(self, get_patched_current_site):
+        """
+        Tests that staff user can access the course home without being enrolled
+        in the course.
+        """
+        course = self.course
+        get_patched_current_site.return_value = self.site
+        self.user.is_staff = True
+        self.user.save()
+
+        self.override_waffle_switch(True)
+        CourseEnrollment.get_enrollment(self.user, course.id).delete()
+        response = self.visit_course_home(course, start_count=1, resume_count=0)
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase):
     """
