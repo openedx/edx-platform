@@ -4,6 +4,8 @@ from .devstack import *
 from .appsembler import *
 import dj_database_url
 
+from django.utils.translation import ugettext_lazy as _
+
 OAUTH_ENFORCE_SECURE = False
 
 # disable caching in dev environment
@@ -17,6 +19,7 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
     'openedx.core.djangoapps.appsembler.msft_lp',
     'openedx.core.djangoapps.appsembler.tpa_admin',
+    'openedx.core.djangoapps.appsembler.html_certificates',
 )
 
 # those are usually hardcoded in devstack.py for some reason
@@ -131,6 +134,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
              'third_party_auth.lti.LTIAuthBackend',
         ])
     )
+
+DEFAULT_COURSE_MODE_SLUG = ENV_TOKENS.get('EDXAPP_DEFAULT_COURSE_MODE_SLUG', 'audit')
+DEFAULT_MODE_NAME_FROM_SLUG = _(DEFAULT_COURSE_MODE_SLUG.capitalize())
 
 try:
     from .private import *

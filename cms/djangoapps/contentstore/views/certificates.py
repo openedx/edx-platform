@@ -48,6 +48,8 @@ from django.core.exceptions import PermissionDenied
 from course_modes.models import CourseMode
 from contentstore.utils import get_lms_link_for_certificate_web_view
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
 
@@ -394,7 +396,12 @@ def certificates_list_handler(request, course_key_string):
                 certificate_web_view_url = None
             certificates = None
             is_active = False
-            if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+            current_organization = request.user.organizations.first()
+            if configuration_helpers.get_value_for_org(
+                current_organization.name,
+                "CERTIFICATES_HTML_VIEW",
+                False
+            ):
                 certificates = CertificateManager.get_certificates(course)
                 # we are assuming only one certificate in certificates collection.
                 for certificate in certificates:

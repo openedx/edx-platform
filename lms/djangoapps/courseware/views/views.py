@@ -825,9 +825,7 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
                     cert_web_view_url=None
                 )
 
-        return CertData(
-            cert_status, title, msg, download_url=cert_downloadable_status['download_url'], cert_web_view_url=None
-        )
+        return None
 
     if cert_downloadable_status['is_generating']:
         return CertData(
@@ -859,13 +857,16 @@ def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
             cert_web_view_url=None
         )
 
-    return CertData(
-        CertificateStatuses.requesting,
-        _('Congratulations, you qualified for a certificate!'),
-        _('You can keep working for a higher grade, or request your certificate now.'),
-        download_url=None,
-        cert_web_view_url=None
-    )
+    if certs_api.has_html_certificates_enabled(course_key, course) and certs_api.get_active_web_certificate(course) is not None:
+        return CertData(
+            CertificateStatuses.requesting,
+            _('Congratulations, you qualified for a certificate!'),
+            _('You can keep working for a higher grade, or request your certificate now.'),
+            download_url=None,
+            cert_web_view_url=None
+        )
+
+    return None
 
 
 def _credit_course_requirements(course_key, student):

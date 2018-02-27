@@ -4,9 +4,12 @@ from .devstack import *
 from .appsembler import *
 import dj_database_url
 
+from django.utils.translation import ugettext_lazy as _
+
 INSTALLED_APPS += (
     'django_extensions',
     'openedx.core.djangoapps.appsembler.sites',
+    'openedx.core.djangoapps.appsembler.html_certificates',
 )
 
 OAUTH_ENFORCE_SECURE = False
@@ -89,6 +92,9 @@ CELERY_QUEUES.update(
 CLONE_COURSE_FOR_NEW_SIGNUPS = False
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
+
+DEFAULT_COURSE_MODE_SLUG = ENV_TOKENS.get('EDXAPP_DEFAULT_COURSE_MODE_SLUG', 'audit')
+DEFAULT_MODE_NAME_FROM_SLUG = _(DEFAULT_COURSE_MODE_SLUG.capitalize())
 
 try:
     from .private import *
