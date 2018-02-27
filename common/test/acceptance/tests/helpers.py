@@ -848,6 +848,23 @@ class YouTubeStubConfig(object):
             return {}
 
 
+def click_and_wait_for_window(page, element):
+    """
+    To avoid a race condition, click an element that launces a new window, and
+    wait for that window to launch.
+    To check this, make sure the number of window_handles increases by one.
+
+    Arguments:
+    page (PageObject): Page object to perform method on
+    element (WebElement): Clickable element that triggers the new window to open
+    """
+    num_windows = len(page.browser.window_handles)
+    element.click()
+    WebDriverWait(page.browser, 10).until(
+        lambda driver: len(driver.window_handles) > num_windows
+    )
+
+
 def create_user_partition_json(partition_id, name, description, groups, scheme="random"):
     """
     Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
@@ -859,18 +876,6 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     return UserPartition(
         partition_id, name, description, groups, MockScheme()
     ).to_json()
-
-
-def wait_for_help_window(page, help_element):
-    """
-    To avoid a race condition, wait for the help window to launch.
-    To check this, make sure the number of window_handles increases by one.
-    """
-    num_windows = len(page.browser.window_handles)
-    help_element.click()
-    WebDriverWait(page.browser, 10).until(
-        lambda driver: len(driver.window_handles) > num_windows
-    )
 
 
 def assert_nav_help_link(test, page, href, signed_in=True, close_window=True):
