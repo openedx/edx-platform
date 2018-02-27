@@ -1,11 +1,3 @@
-podTemplate(cloud: 'jnlp', label: 'edxapp', containers: [
-    containerTemplate(name: 'edxapp', image: 'gcr.io/appsembler-testing/jenkins-worker:v0.1.3', ttyEnabled: true, 
-        command: 'cat')    
-  ]) {
-    node('edxapp') {
-        container('edxapp') {
-
-        }
 def makeNode(suite, shard) {
   return {
     echo "I am ${suite}:${shard}, and the worker is yet to be started!"
@@ -90,6 +82,10 @@ def buildParallelSteps() {
   return parallelSteps
 }
 
+podTemplate(cloud: 'jnlp', label: 'edxapp', containers: [
+    containerTemplate(name: 'edxapp', image: 'gcr.io/appsembler-testing/jenkins-worker:v0.1.3', ttyEnabled: true, 
+        command: 'cat')    
+  ]) {
 stage('Prepare') {
   echo 'Starting the build...'
   echo 'It it always nice to have a green checkmark :D'
