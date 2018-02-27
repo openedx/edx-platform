@@ -174,6 +174,16 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         raise forms.ValidationError(ugettext_noop('Please select language.'))
 
+    def clean_start_month_year(self):
+        start_month_year = datetime.strptime(
+            self.cleaned_data['start_month_year'],
+            '%m/%Y')
+
+        if start_month_year > datetime.now():
+            raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
+
+        return self.cleaned_data['start_month_year']
+
     class Meta:
         """
         The meta class used to customize the default behaviour of form fields
@@ -750,7 +760,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
                                          })
     effective_date = forms.DateField(input_formats=['%m/%d/%Y'],
                                      required=False,
-                                     label=ugettext_noop('End date of last Fiscal Year'),
+                                     label=ugettext_noop('End Date of Last Fiscal Year'),
                                      help_text=ugettext_noop("The fiscal year is the period that an organization uses "
                                                              "for accounting  purposes and preparing financial "
                                                              "statements. A fiscal year may or may not be the same"
@@ -860,6 +870,9 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
 
         if can_provide_info and not last_fiscal_year_end_date:
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
+
+        if last_fiscal_year_end_date > datetime.now().date():
+            raise forms.ValidationError(ugettext_noop("Please enter a valid End date for Last Fiscal Year"))
 
         return last_fiscal_year_end_date
 
@@ -1062,6 +1075,9 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
 
         if not last_fiscal_year_end_date:
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
+
+        if last_fiscal_year_end_date > datetime.now().date():
+            raise forms.ValidationError(ugettext_noop("Please enter a valid End date for Last Fiscal Year"))
 
         return last_fiscal_year_end_date
 
