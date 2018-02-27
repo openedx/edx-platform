@@ -183,7 +183,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             selected |= added_block_keys
         # TODO: used for temporary logging for EDUCATOR-1290
         cls._log_if_mit_supply_chain(
-            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys
+            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys, children
         )
         return {
             'selected': selected,
@@ -194,7 +194,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
     @staticmethod
     def _log_if_mit_supply_chain(
-            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys
+            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys, children
     ):
         """
         Helper method to debug case where random block_keys are not assigned for particular courses.
@@ -202,11 +202,14 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         """
         if not selected:
             return
-        first_block_id = list(selected)[0][1]
-        if selected and "MITx+CTL" in first_block_id:
+        course_key = ''
+        if children:
+            course_key = children[0].course_key
+        if selected and "MITx+CTL" in text_type(course_key):
             logger.info(
-                "EDUCATOR-1290: LibraryContentModule.make_selection executed: "
+                "EDUCATOR-1290: LibraryContentModule.make_selection executed for course {0}: "
                 "valid_block_keys: {1} | selected: {2} | invalid: {3} | overlimit: {4} | added: {5}".format(
+                    text_type(course_key),
                     valid_block_keys,
                     selected,
                     invalid_block_keys,
