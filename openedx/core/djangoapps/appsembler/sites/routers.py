@@ -37,4 +37,3 @@ class TiersDbRouter(object):
         if app_label == 'tiers':
             return db == 'tiers'
         return None
-

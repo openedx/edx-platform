@@ -5,6 +5,7 @@ from . import mixins
 import logging
 logger = logging.getLogger(__name__)
 
+
 def get_CourseDescriptor_mixins():
 
     new_mixins = []

@@ -11,7 +11,7 @@ class SAMLConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SAMLConfiguration
         fields = (
-            'id', 'site', 'enabled','entity_id', 'private_key', 'public_key', 'org_info_str', 'other_config_str'
+            'id', 'site', 'enabled', 'entity_id', 'private_key', 'public_key', 'org_info_str', 'other_config_str'
         )
 
     def validate_private_key(self, value):

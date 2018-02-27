@@ -13,7 +13,6 @@ APPSEMBLER_FEATURES = ENV_TOKENS.get('APPSEMBLER_FEATURES', {})
 
 INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
-    #'openedx.core.djangoapps.appsembler.msft_lp',
     'openedx.core.djangoapps.appsembler.tpa_admin',
     'openedx.core.djangoapps.appsembler.html_certificates',
 )

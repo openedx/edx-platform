@@ -17,6 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from enrollment.views import EnrollmentListView
 
+
 class AppsemblerEnrollmentListView(EnrollmentListView):
 
     @method_decorator(ensure_csrf_cookie_cross_domain)

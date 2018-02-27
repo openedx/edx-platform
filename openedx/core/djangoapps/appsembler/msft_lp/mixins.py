@@ -7,6 +7,7 @@ from xblock.fields import Scope, String, Float, Boolean, XBlockMixin
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
+
 class MsftLPMixin(XBlockMixin):
 
     # Marks if the course is a Microsft course. This advanced settings only will
