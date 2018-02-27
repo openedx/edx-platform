@@ -179,3 +179,21 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         ScheduleFactory(enrollment=enrollment)
         self.assertIsNotNone(enrollment.schedule)
         self.assertEqual(enrollment.upgrade_deadline, course_upgrade_deadline)
+
+    @skip_unless_lms
+    def test_upgrade_deadline_with_schedule_and_professional_mode(self):
+        """
+        Deadline should be None for courses with professional mode.
+
+        Regression test for EDUCATOR-2419.
+        """
+        course = CourseFactory(self_paced=True)
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.PROFESSIONAL,
+        )
+        enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        ScheduleFactory(enrollment=enrollment)
+        self.assertIsNotNone(enrollment.schedule)
+        self.assertIsNone(enrollment.upgrade_deadline)
