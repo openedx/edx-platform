@@ -174,6 +174,16 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         raise forms.ValidationError(ugettext_noop('Please select language.'))
 
+    def clean_start_month_year(self):
+        start_month_year = datetime.strptime(
+            self.cleaned_data['start_month_year'],
+            '%m/%Y')
+
+        if start_month_year > datetime.now():
+            raise forms.ValidationError(ugettext_noop("Invalid Date"))
+
+        return self.cleaned_data['start_month_year']
+
     class Meta:
         """
         The meta class used to customize the default behaviour of form fields
