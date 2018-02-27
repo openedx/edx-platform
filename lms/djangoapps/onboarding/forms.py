@@ -861,6 +861,9 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
         if can_provide_info and not last_fiscal_year_end_date:
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
 
+        if last_fiscal_year_end_date > datetime.now().date():
+            raise forms.ValidationError(ugettext_noop("Invalid Date"))
+
         return last_fiscal_year_end_date
 
     def clean_total_clients(self):
@@ -1062,6 +1065,9 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
 
         if not last_fiscal_year_end_date:
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
+
+        if last_fiscal_year_end_date > datetime.now().date():
+            raise forms.ValidationError(ugettext_noop("Invalid Date"))
 
         return last_fiscal_year_end_date
 
