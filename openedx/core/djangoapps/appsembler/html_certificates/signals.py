@@ -5,7 +5,7 @@ Appsembler's signals to customize certificates and course behaviour
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch.dispatcher import receiver
-from xmodule.modulestore.django import modulestore, SignalHandler
+from xmodule.modulestore.django import SignalHandler
 
 from course_modes.models import CourseMode
 
