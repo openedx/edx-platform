@@ -10,7 +10,7 @@ from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.tests.helpers import (
     assert_opened_help_link_is_correct,
     url_for_help,
-    wait_for_help_window
+    click_and_wait_for_window
 )
 
 
@@ -33,7 +33,7 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
         """
         help_element = self.cohort_management.get_cohort_help_element()
         self.assertEqual(help_element.text, "What does this mean?")
-        wait_for_help_window(self, help_element)
+        click_and_wait_for_window(self, help_element)
         assert_opened_help_link_is_correct(self, href)
 
     def test_manual_cohort_help(self):
@@ -98,5 +98,5 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         """
         href = url_for_help('course_author', '/CA_instructor_dash_help.html')
         help_element = self.instructor_dashboard_page.get_help_element()
-        wait_for_help_window(self, help_element)
+        click_and_wait_for_window(self, help_element)
         assert_opened_help_link_is_correct(self, href)
