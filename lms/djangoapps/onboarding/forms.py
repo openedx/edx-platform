@@ -180,7 +180,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             '%m/%Y')
 
         if start_month_year > datetime.now():
-            raise forms.ValidationError(ugettext_noop("Invalid Date"))
+            raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
 
         return self.cleaned_data['start_month_year']
 
@@ -872,7 +872,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
 
         if last_fiscal_year_end_date > datetime.now().date():
-            raise forms.ValidationError(ugettext_noop("Invalid Date"))
+            raise forms.ValidationError(ugettext_noop("Please enter a valid Date"))
 
         return last_fiscal_year_end_date
 
@@ -1077,7 +1077,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
 
         if last_fiscal_year_end_date > datetime.now().date():
-            raise forms.ValidationError(ugettext_noop("Invalid Date"))
+            raise forms.ValidationError(ugettext_noop("Please enter a valid Date"))
 
         return last_fiscal_year_end_date
 
