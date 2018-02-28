@@ -33,6 +33,8 @@ export ESLINT_THRESHOLD=9850
 source /tmp/ve/bin/activate
 EXIT=0
 
+mkdir reports
+
 echo "Finding fixme's and storing report..."
 paver find_fixme > reports/fixme.log || { cat reports/fixme.log; EXIT=1; }
 
