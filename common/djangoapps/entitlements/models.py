@@ -452,3 +452,15 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
             self.support_user,
             self.reason,
         )
+
+    @classmethod
+    def get_support_reasons_list(cls):
+        """
+        Method for retrieving a serializable version of the entitlement support reasons
+
+        Returns Array of reasons
+        """
+        reasons_list = []
+        for value, label in cls.ENTITLEMENT_SUPPORT_REASONS:
+            reasons_list.append({'value':value, 'label':label})
+        return reasons_list
