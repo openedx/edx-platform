@@ -53,7 +53,7 @@ def digital_book_content(request, book_key_string):
     and has access to this book.  If a user does not have access to the book, they will be redirected
     to the digital book about page.
     """
-    import pdb; pdb.set_trace()
+
     log.info(">>> calling digital_book_content")
     log.info(">>> request: %s", request)
     log.info(">>> book_key: %s", book_key_string)

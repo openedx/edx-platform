@@ -126,7 +126,6 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     check_if_enrolled: If true, additionally verifies that the user is enrolled.
     check_survey_complete: If true, additionally verifies that the user has completed the survey.
     """
-    import pdb; pdb.set_trace()
     # Allow staff full access to the course even if not enrolled
     if has_access(user, 'staff', course.id):
         return
@@ -153,7 +152,6 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         # leaking info about access control settings
         raise CoursewareAccessException(access_response)
 
-    import pdb;pdb.set_trace()
     if check_if_enrolled:
         # If the user is not enrolled, redirect them to the about page
         if not CourseEnrollment.is_enrolled(user, course.id):

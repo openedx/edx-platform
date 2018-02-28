@@ -113,7 +113,6 @@ class CoursewareIndex(View):
             set_custom_metrics_for_course_key(self.course_key)
             self._clean_position()
             with modulestore().bulk_operations(self.course_key):
-                import pdb;pdb.set_trace()
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
@@ -121,7 +120,6 @@ class CoursewareIndex(View):
                 )
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
-                import pdb;pdb.set_trace()
                 return self.render(request)
         except Exception as exception:  # pylint: disable=broad-except
             return CourseTabView.handle_exceptions(request, self.course, exception)
