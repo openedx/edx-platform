@@ -15,10 +15,10 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils.translation import get_language
 from markupsafe import escape
-from mock import Mock, patch
+from mock import Mock, MagicMock, patch
 from nose.plugins.attrib import attr
 
-from bulk_email.models import BulkEmailFlag, Optout
+from bulk_email.models import BulkEmailFlag, Optout, CourseEmail
 from bulk_email.tasks import _get_course_email_context, _get_source_address
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory, StaffFactory
@@ -138,6 +138,8 @@ class SendEmailWithMockedUgettextMixin(object):
     """
     Mock uggetext for EmailSendFromDashboardTestCase.
     """
+
+
     def send_email(self):
         """
         Sends a dummy email to check the `from_addr` translation.
@@ -162,14 +164,17 @@ class SendEmailWithMockedUgettextMixin(object):
                 text=text,
             )
 
+
         with patch('bulk_email.tasks._', side_effect=mock_ugettext):
             self.client.post(self.send_mail_url, test_email)
+
 
         return mail.outbox[0]
 
 
 @attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@patch.object(CourseEmail, 'DEFAULT_FROM_EMAIL', None)
 @ddt.ddt
 class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
     """
@@ -195,7 +200,8 @@ class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin,
 
 
 @attr(shard=1)
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False, })
+@patch.object(CourseEmail, 'DEFAULT_FROM_EMAIL', None)
 @ddt.ddt
 class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
     """
@@ -218,7 +224,7 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
             default_store=ModuleStoreEnum.Type.split
         )
 
-    @override_settings(LANGUAGE_CODE='eo')
+
     def test_esperanto_platform_arabic_course(self):
         """
         The course language should override the platform's.
@@ -249,6 +255,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertContains(response, "Email is not enabled for this course.", status_code=403)
 
     @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+    @patch.object(CourseEmail, 'DEFAULT_FROM_EMAIL', None)
     def test_send_to_self(self):
         """
         Make sure email send to myself goes to myself.
@@ -500,6 +507,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         )
 
     @override_settings(BULK_EMAIL_DEFAULT_FROM_EMAIL="no-reply@courseupdates.edx.org")
+    @patch.object(CourseEmail, 'DEFAULT_FROM_EMAIL', None)
     def test_long_course_display_name(self):
         """
         This test tests that courses with exorbitantly large display names

@@ -64,10 +64,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
         obj = json.loads(bad_pwd_resp.content)
-        self.assertEquals(obj, {
-            'success': True,
-            'value': "('registration/password_reset_done.html', [])",
-        })
+        self.assertEquals(obj, {'success': False})
         self.assert_no_events_were_emitted()
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
@@ -75,16 +72,14 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """Now test the exception cases with of reset_password called with invalid email."""
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email + "makeItFail"})
+
         bad_email_resp = password_reset(bad_email_req)
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which
         # emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
         obj = json.loads(bad_email_resp.content)
-        self.assertEquals(obj, {
-            'success': True,
-            'value': "('registration/password_reset_done.html', [])",
-        })
+        self.assertEquals(obj, {'success': False})
         self.assert_no_events_were_emitted()
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))

@@ -73,7 +73,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         super(CommonCertificatesTestCase, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
-            org='testorg', number='run1', display_name='refundable course'
+           org='testorg', number='run1', display_name='refundable course'
         )
         self.course_id = self.course.location.course_key
         self.user = UserFactory.create(
@@ -1157,6 +1157,17 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
+
+        new_user = UserFactory.create(
+            email='other_user@edx.org',
+            username='other_user',
+            password='foo'
+        )
+        new_user.profile.name = "Other User"
+        new_user.profile.save()
+        new_user.save()
+        self.client.login(username=new_user.username, password='foo')
+        self.recreate_tracker()
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         actual_event = self.get_event()

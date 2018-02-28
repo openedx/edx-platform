@@ -368,6 +368,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 4)
 
+    @patch('django.conf.settings.MOCK_SEARCH_BACKING_FILE', None)
     def _test_start_date_propagation(self, store):
         """ make sure that the start date is applied at the right level """
         early_date = self.course.start
