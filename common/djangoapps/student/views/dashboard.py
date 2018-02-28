@@ -771,6 +771,7 @@ def student_dashboard(request):
     set_user_info_cookie(response, request)
     return response
 
+
 def get_preferred_order_by_course_enrollments(order_by, course_enrollments):
     if order_by == 'created':
         course_enrollments.sort(key=lambda x: x.created, reverse=False)
