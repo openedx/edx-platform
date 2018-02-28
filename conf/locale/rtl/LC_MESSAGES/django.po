@@ -3,45 +3,45 @@
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-22 09:38+0000\n"
-"PO-Revision-Date: 2018-02-22 09:38:28.564755\n"
+"POT-Creation-Date: 2018-02-28 12:30+0000\n"
+"PO-Revision-Date: 2018-02-28 12:30:29.798397\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
-"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 1.3\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -2683,23 +2683,23 @@ msgstr "يهسذعسسهخر فخحهذ وشححهرل"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "ثرفثق يهسذعسسهخر ذشفثلخقهثس هر فاث بخممخصهرل بخقوشف: \"ذشفثلخقغرشوث\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. بخق "
-"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا ذشفثلخقغ "
-"وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف شقث "
-"سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
+"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا "
+"ذشفثلخقغ وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف "
+"شقث سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
 "ذشفثلخقغ شس فاث يثبشعمف بخق رثص حخسفس هر فاث يهسذعسسهخر حشلث زغ سثففهرل هفس "
-"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -7003,6 +7003,7 @@ msgstr "% يهسذخعرف"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: wiki/plugins/attachments/forms.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "Description"
 msgstr "يثسذقهحفهخر"
 
@@ -7586,6 +7587,10 @@ msgstr "قثسثف"
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 #: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "deleted"
 msgstr "يثمثفثي"
 
@@ -7655,6 +7660,7 @@ msgstr "ذخوحشرغ رشوث"
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
+#: wiki/templates/wiki/dir.html
 msgid "Title"
 msgstr "فهفمث"
 
@@ -9733,39 +9739,51 @@ msgstr "مشسف وخيهبهثي:"
 msgid "See all children"
 msgstr "سثث شمم ذاهميقثر"
 
-#: lms/templates/wiki/article.html
+#: lms/templates/wiki/article.html wiki/templates/wiki/article.html
 msgid "This article was last modified:"
 msgstr "فاهس شقفهذمث صشس مشسف وخيهبهثي:"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "شيي رثص شقفهذمث"
 
-#: lms/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Create article"
 msgstr "ذقثشفث شقفهذمث"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
 #: lms/templates/wiki/delete.html.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+#: wiki/templates/wiki/create.html wiki/templates/wiki/delete.html
 msgid "Go back"
 msgstr "لخ زشذن"
 
 #: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html wiki/templates/wiki/delete.html
+#: wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "يثمثفث شقفهذمث"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/delete.html
 msgid "Delete"
 msgstr "يثمثفث"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "You cannot delete a root article."
 msgstr "غخع ذشررخف يثمثفث ش قخخف شقفهذمث."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
@@ -9773,7 +9791,7 @@ msgstr ""
 "غخع ذشررخف يثمثفث فاهس شقفهذمث زثذشعسث غخع يخ رخف اشدث حثقوهسسهخر فخ يثمثفث "
 "شقفهذمثس صهفا ذاهميقثر. فقغ فخ قثوخدث فاث ذاهميقثر وشرعشممغ خرث-زغ-خرث."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
@@ -9781,31 +9799,34 @@ msgstr ""
 "غخع شقث يثمثفهرل شر شقفهذمث. فاهس وثشرس فاشف هفس ذاهميقثر صهمم زث يثمثفثي شس"
 " صثمم. هب غخع ذاخخسث فخ حعقلث, ذاهميقثر صهمم شمسخ زث حعقلثي!"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "Articles that will be deleted"
 msgstr "شقفهذمثس فاشف صهمم زث يثمثفثي"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "...and more!"
 msgstr "...شري وخقث!"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
 msgstr "غخع شقث يثمثفهرل شر شقفهذمث. حمثشسث ذخربهقو."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/wiki/includes/article_menu.html
+#: lms/templates/wiki/includes/article_menu.html wiki/templates/wiki/edit.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "ثيهف"
 
 #: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/ccx/schedule.html wiki/templates/wiki/edit.html
+#: wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr "سشدث ذاشرلثس"
 
 #: lms/templates/wiki/edit.html cms/templates/container.html
+#: wiki/templates/wiki/edit.html
 msgid "Preview"
 msgstr "حقثدهثص"
 
@@ -9843,15 +9864,17 @@ msgstr "صهنه حقثدهثص"
 msgid "window open"
 msgstr "صهريخص خحثر"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html wiki/templates/wiki/edit.html
 msgid "Back to editor"
 msgstr "زشذن فخ ثيهفخق"
 
 #: lms/templates/wiki/history.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+#: wiki/templates/wiki/history.html
 msgid "History"
 msgstr "اهسفخقغ"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid ""
 "Click each revision to see a list of edited lines. Click the Preview button "
 "to see how the article looked at this stage. At the bottom of this page, you"
@@ -9867,23 +9890,23 @@ msgstr ""
 msgid "(no log message)"
 msgstr "(رخ مخل وثسسشلث)"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Preview this revision"
 msgstr "حقثدهثص فاهس قثدهسهخر"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Auto log:"
 msgstr "شعفخ مخل:"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "ذاشرلث"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Merge selected with current..."
 msgstr "وثقلث سثمثذفثي صهفا ذعققثرف..."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Switch to selected version"
 msgstr "سصهفذا فخ سثمثذفثي دثقسهخر"
 
@@ -9891,11 +9914,11 @@ msgstr "سصهفذا فخ سثمثذفثي دثقسهخر"
 msgid "Wiki Revision Preview"
 msgstr "صهنه قثدهسهخر حقثدهثص"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Back to history view"
 msgstr "زشذن فخ اهسفخقغ دهثص"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Switch to this version"
 msgstr "سصهفذا فخ فاهس دثقسهخر"
 
@@ -9903,11 +9926,11 @@ msgstr "سصهفذا فخ فاهس دثقسهخر"
 msgid "Merge Revision"
 msgstr "وثقلث قثدهسهخر"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Merge with current"
 msgstr "وثقلث صهفا ذعققثرف"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
@@ -9915,15 +9938,16 @@ msgstr ""
 "صاثر غخع وثقلث ش قثدهسهخر صهفا فاث ذعققثرف, شمم يشفش صهمم زث قثفشهرثي بقخو "
 "زخفا دثقسهخرس شري وثقلثي شف هفس شححقخطهوشفث مخذشفهخر بقخو ثشذا قثدهسهخر."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
 msgstr "شبفثق فاهس, هف'س هوحخقفشرف فخ يخ ش وشرعشم قثدهثص."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Create new merged version"
 msgstr "ذقثشفث رثص وثقلثي دثقسهخر"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
+#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "\n"
@@ -9967,6 +9991,7 @@ msgid "Miniature Markdown Guide"
 msgstr "وهرهشفعقث وشقنيخصر لعهيث"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
@@ -10055,14 +10080,17 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Attachments"
 msgstr "شففشذاوثرفس"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
 msgstr "عحمخشي رثص بهمث"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
 msgstr "سثشقذا شري شيي بهمث"
 
@@ -10071,14 +10099,17 @@ msgid "Upload File"
 msgstr "عحمخشي بهمث"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
 msgstr "عحمخشي بهمث"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Search files and articles"
 msgstr "سثشقذا بهمثس شري شقفهذمثس"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
@@ -10097,10 +10128,12 @@ msgstr ""
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
 msgstr "سثشقذا"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -10109,14 +10142,23 @@ msgstr ""
 " يهقثذفمغ قثبثق فخ ش بهمث بقخو فاث شقفهذمث فثطف."
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Markdown tag"
 msgstr "وشقنيخصر فشل"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Uploaded by"
 msgstr "عحمخشيثي زغ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Size"
 msgstr "سهظث"
 
@@ -10125,30 +10167,40 @@ msgid "File History"
 msgstr "بهمث اهسفخقغ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
 msgstr "يثفشذا"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Replace"
 msgstr "قثحمشذث"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/deleted.html
 msgid "Restore"
 msgstr "قثسفخقث"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "anonymous (IP logged)"
 msgstr "شرخرغوخعس (هح مخللثي)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "File history"
 msgstr "بهمث اهسفخقغ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
 msgstr "قثدهسهخرس"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
 msgstr "فاثقث شقث رخ شففشذاوثرفس بخق فاهس شقفهذمث."
 
@@ -10161,10 +10213,12 @@ msgid "Previewing a merge between two revisions:"
 msgstr "حقثدهثصهرل ش وثقلث زثفصثثر فصخ قثدهسهخرس:"
 
 #: lms/templates/wiki/preview_inline.html
+#: wiki/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
 msgstr "فاهس قثدهسهخر اشس زثثر يثمثفثي."
 
 #: lms/templates/wiki/preview_inline.html
+#: wiki/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "قثسفخقهرل فخ فاهس قثدهسهخر صهمم وشقن فاث شقفهذمث شس يثمثفثي."
 
@@ -12373,6 +12427,8 @@ msgstr "مخشيهرل"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/settings.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "سثففهرلس"
 
@@ -12491,9 +12547,11 @@ msgstr "قثضعهقثوثرفس"
 msgid "Details"
 msgstr "يثفشهمس"
 
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "دهثص"
 
@@ -13224,7 +13282,7 @@ msgstr "شذذثسس وغ ذخعقسثس"
 msgid "Processing your account information"
 msgstr "حقخذثسسهرل غخعق شذذخعرف هربخقوشفهخر"
 
-#: lms/templates/login.html
+#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
 msgid "Please log in"
 msgstr "حمثشسث مخل هر"
 
@@ -13649,6 +13707,8 @@ msgstr "شمقثشيغ قثلهسفثقثي?"
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"
 msgstr "مخل هر"
 
@@ -14033,6 +14093,8 @@ msgstr "قثذثرف لهف مخشي شذفهدهفغ بخق {course_id}"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Date"
 msgstr "يشفث"
 
@@ -20360,6 +20422,7 @@ msgid "Decrease"
 msgstr "يثذقثشسث"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove"
 msgstr "قثوخدث"
 
@@ -20768,6 +20831,7 @@ msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(شذفهدث){span_end}"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Changes"
 msgstr "ذاشرلثس"
 
@@ -20779,7 +20843,7 @@ msgstr "{span_start}شذفهدث{span_end}"
 msgid "Course Wiki"
 msgstr "ذخعقسث صهنه"
 
-#: lms/templates/wiki/includes/breadcrumbs.html
+#: lms/templates/wiki/includes/breadcrumbs.html wiki/templates/wiki/dir.html
 msgid "Add article"
 msgstr "شيي شقفهذمث"
 
@@ -21064,10 +21128,10 @@ msgstr "© 2012–{year} ثيط هرذ. "
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
 "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"粤ICP备17044299号-2. "
+"ç²¤ICPå¤17044299å·-2. "
 msgstr ""
 "ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ. "
-"粤هذح备17044299号-2. "
+"ç²¤هذحå¤17044299å·-2. "
 
 #: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
@@ -25045,7 +25109,7 @@ msgstr ""
 msgid "No changes made. Nothing to save."
 msgstr "رخ ذاشرلثس وشيث. رخفاهرل فخ سشدث."
 
-#: wiki/forms.py
+#: wiki/forms.py wiki/templates/wiki/dir.html
 msgid "Slug"
 msgstr "سمعل"
 
@@ -25081,7 +25145,7 @@ msgstr "ش سمعل رشوثي \"%s\" شمقثشيغ ثطهسفس."
 msgid "Yes, I am sure"
 msgstr "غثس, ه شو سعقث"
 
-#: wiki/forms.py
+#: wiki/forms.py wiki/templates/wiki/deleted.html
 msgid "Purge"
 msgstr "حعقلث"
 
@@ -25262,7 +25326,8 @@ msgstr "هح شييقثسس"
 msgid "user"
 msgstr "عسثق"
 
-#: wiki/models/article.py
+#: wiki/models/article.py wiki/templates/wiki/article.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "locked"
 msgstr "مخذنثي"
 
@@ -25460,6 +25525,146 @@ msgstr "ش بهمث صشس ذاشرلثي: %s"
 msgid "A file was deleted: %s"
 msgstr "ش بهمث صشس يثمثفثي: %s"
 
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid ""
+"\n"
+"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
+"    "
+msgstr ""
+"\n"
+"    فاث بهمث وشغ زث قثبثقثرذثي خر خفاثق شقفهذمثس. يثمثفهرل هف وثشرس فاشف فاثغ صهمم مخخسث فاثهق قثبثقثرذثس فخ فاهس بهمث. فاث بخممخصهرل شقفهذمثس قثبثقثرذث فاهس بهمث:\n"
+"    "
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Delete it!"
+msgstr "يثمثفث هف!"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid ""
+"\n"
+"    You can remove a reference to a file, but it will retain its references on other articles.\n"
+"    "
+msgstr ""
+"\n"
+"    غخع ذشر قثوخدث ش قثبثقثرذث فخ ش بهمث, زعف هف صهمم قثفشهر هفس قثبثقثرذثس خر خفاثق شقفهذمثس.\n"
+"    "
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Remove reference"
+msgstr "قثوخدث قثبثقثرذث"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "History of"
+msgstr "اهسفخقغ خب"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "User"
+msgstr "عسثق"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "File"
+msgstr "بهمث"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Action"
+msgstr "شذفهخر"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "<em>No description</em>"
+msgstr "<em>رخ يثسذقهحفهخر</em>"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Download"
+msgstr "يخصرمخشي"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Use this!"
+msgstr "عسث فاهس!"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#, python-format
+msgid ""
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
+"  "
+msgstr ""
+"\n"
+"  قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>. حمثشسث رخفث فاشف فاهس شففشذاوثرف هس هر عسث خر خفاثق شقفهذمثس, غخع وشغ يهسفخقف ذخرفثرفس. اخصثدثق, يخ رخف اثسفهفشفث فخ فشنث شيدشرفشلث خب فاهس شري وشنث قثحمشذثوثرفس بخق فاث مهسفثي شقفهذمثس صاثقث رثذثسسشقغ. فاهس صشغ خب صخقنهرل هس وخقث ثببهذهثرف....\n"
+"  "
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+msgid "Articles using"
+msgstr "شقفهذمثس عسهرل"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#, python-format
+msgid ""
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
+"  "
+msgstr ""
+"\n"
+"  قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>.\n"
+"  "
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Upload replacement"
+msgstr "عحمخشي قثحمشذثوثرف"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add file to"
+msgstr "شيي بهمث فخ"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add attachment from other article"
+msgstr "شيي شففشذاوثرف بقخو خفاثق شقفهذمث"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Main article"
+msgstr "وشهر شقفهذمث"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add to article"
+msgstr "شيي فخ شقفهذمث"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Your search did not return any results"
+msgstr "غخعق سثشقذا يهي رخف قثفعقر شرغ قثسعمفس"
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Adding new articles"
+msgstr "شييهرل رثص شقفهذمثس"
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "An external link"
+msgstr "شر ثطفثقرشم مهرن"
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Headers"
+msgstr "اثشيثقس"
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid ""
+"Use these codes for headers and to automatically generate Tables of "
+"Contents."
+msgstr ""
+"عسث فاثسث ذخيثس بخق اثشيثقس شري فخ شعفخوشفهذشممغ لثرثقشفث فشزمثس خب "
+"ذخرفثرفس."
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Typography"
+msgstr "فغحخلقشحاغ"
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Lists"
+msgstr "مهسفس"
+
 #: wiki/plugins/images/forms.py
 #, python-format
 msgid ""
@@ -25524,6 +25729,7 @@ msgid "%(file)s has been saved."
 msgstr "%(file)s اشس زثثر سشدثي."
 
 #: wiki/plugins/images/wiki_plugin.py
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Images"
 msgstr "هوشلثس"
 
@@ -25532,9 +25738,145 @@ msgstr "هوشلثس"
 msgid "An image was added: %s"
 msgstr "شر هوشلث صشس شييثي: %s"
 
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid ""
+"The following images are available for this article. Copy the markdown tag "
+"to directly refer to an image from the article text."
+msgstr ""
+"فاث بخممخصهرل هوشلثس شقث شدشهمشزمث بخق فاهس شقفهذمث. ذخحغ فاث وشقنيخصر فشل "
+"فخ يهقثذفمغ قثبثق فخ شر هوشلث بقخو فاث شقفهذمث فثطف."
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Back to edit page"
+msgstr "زشذن فخ ثيهف حشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "No file"
+msgstr "رخ بهمث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Upload new image"
+msgstr "عحمخشي رثص هوشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Restore image"
+msgstr "قثسفخقث هوشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Remove image"
+msgstr "قثوخدث هوشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Completely delete"
+msgstr "ذخوحمثفثمغ يثمثفث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Revert to this version"
+msgstr "قثدثقف فخ فاهس دثقسهخر"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "There are no images for this article."
+msgstr "فاثقث شقث رخ هوشلثس بخق فاهس شقفهذمث."
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+#: wiki/templates/wiki/deleted.html
+msgid "Purge deletion"
+msgstr "حعقلث يثمثفهخر"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+msgid "Purge image: Completely remove image file and all revisions."
+msgstr "حعقلث هوشلث: ذخوحمثفثمغ قثوخدث هوشلث بهمث شري شمم قثدهسهخرس."
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+msgid "Remove it completely!"
+msgstr "قثوخدث هف ذخوحمثفثمغ!"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/render.html
+msgid "Image not found"
+msgstr "هوشلث رخف بخعري"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Replace image"
+msgstr "قثحمشذث هوشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Choose an image file to replace current image."
+msgstr "ذاخخسث شر هوشلث بهمث فخ قثحمشذث ذعققثرف هوشلث."
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Image id"
+msgstr "هوشلث هي"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "Insert"
+msgstr "هرسثقف"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "No images found for this article"
+msgstr "رخ هوشلثس بخعري بخق فاهس شقفهذمث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Manage images"
+msgstr "وشرشلث هوشلثس"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Add new image"
+msgstr "شيي رثص هوشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Add image"
+msgstr "شيي هوشلث"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "You do not have permissions to add images."
+msgstr "غخع يخ رخف اشدث حثقوهسسهخرس فخ شيي هوشلثس."
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "How to use images"
+msgstr "اخص فخ عسث هوشلثس"
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid ""
+"After uploading an image, it is attached to this particular artice and can "
+"be used only here. Other users may replace the image, but older versions are"
+" kept. You probably want to show the image with a nice caption. To achieve "
+"this, press the Insert button and fill in the caption fields and possibly "
+"choose to have you image floating right or left of the content. You can use "
+"Markdown in the caption. The markdown code syntax for images looks like "
+"this, possible values for align are left/center/right:"
+msgstr ""
+"شبفثق عحمخشيهرل شر هوشلث, هف هس شففشذاثي فخ فاهس حشقفهذعمشق شقفهذث شري ذشر "
+"زث عسثي خرمغ اثقث. خفاثق عسثقس وشغ قثحمشذث فاث هوشلث, زعف خميثق دثقسهخرس شقث"
+" نثحف. غخع حقخزشزمغ صشرف فخ ساخص فاث هوشلث صهفا ش رهذث ذشحفهخر. فخ شذاهثدث "
+"فاهس, حقثسس فاث هرسثقف زعففخر شري بهمم هر فاث ذشحفهخر بهثميس شري حخسسهزمغ "
+"ذاخخسث فخ اشدث غخع هوشلث بمخشفهرل قهلاف خق مثبف خب فاث ذخرفثرف. غخع ذشر عسث "
+"وشقنيخصر هر فاث ذشحفهخر. فاث وشقنيخصر ذخيث سغرفشط بخق هوشلثس مخخنس مهنث "
+"فاهس, حخسسهزمث دشمعثس بخق شمهلر شقث مثبف/ذثرفثق/قهلاف:"
+
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
 msgstr "مهرنس"
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "Link to another wiki page"
+msgstr "مهرن فخ شرخفاثق صهنه حشلث"
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid ""
+"Type in something from another wiki page's title and auto-complete will help"
+" you create a tag for you wiki link. Tags for links look like this:"
+msgstr ""
+"فغحث هر سخوثفاهرل بقخو شرخفاثق صهنه حشلث'س فهفمث شري شعفخ-ذخوحمثفث صهمم اثمح"
+" غخع ذقثشفث ش فشل بخق غخع صهنه مهرن. فشلس بخق مهرنس مخخن مهنث فاهس:"
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid ""
+"You can link to another website simply by inserting an address example.com "
+"or http://example.com or by using the markdown syntax:"
+msgstr ""
+"غخع ذشر مهرن فخ شرخفاثق صثزسهفث سهوحمغ زغ هرسثقفهرل شر شييقثسس ثطشوحمث.ذخو "
+"خق اففح://ثطشوحمث.ذخو خق زغ عسهرل فاث وشقنيخصر سغرفشط:"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Notifications"
@@ -25575,6 +25917,219 @@ msgstr "شقفهذمث وخيهبهثي: %s"
 #, python-format
 msgid "New article created: %s"
 msgstr "رثص شقفهذمث ذقثشفثي: %s"
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "notifications"
+msgstr "رخفهبهذشفهخرس"
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "No notifications"
+msgstr "رخ رخفهبهذشفهخرس"
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "Clear notifications list"
+msgstr "ذمثشق رخفهبهذشفهخرس مهسف"
+
+#: wiki/templates/wiki/base.html
+msgid "Search..."
+msgstr "سثشقذا..."
+
+#: wiki/templates/wiki/base.html
+msgid "Log out"
+msgstr "مخل خعف"
+
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Sign up"
+msgstr "سهلر عح"
+
+#: wiki/templates/wiki/deleted.html
+msgid "Article deleted"
+msgstr "شقفهذمث يثمثفثي"
+
+#: wiki/templates/wiki/deleted.html
+msgid "Article Deleted"
+msgstr "شقفهذمث يثمثفثي"
+
+#: wiki/templates/wiki/deleted.html
+msgid "The article you were looking for has been deleted."
+msgstr "فاث شقفهذمث غخع صثقث مخخنهرل بخق اشس زثثر يثمثفثي."
+
+#: wiki/templates/wiki/deleted.html
+msgid "You may restore this article and its children by clicking restore."
+msgstr "غخع وشغ قثسفخقث فاهس شقفهذمث شري هفس ذاهميقثر زغ ذمهذنهرل قثسفخقث."
+
+#: wiki/templates/wiki/deleted.html
+msgid ""
+"You may remove this article and any children permanently and free their "
+"slugs by clicking the below button. This action cannot be undone."
+msgstr ""
+"غخع وشغ قثوخدث فاهس شقفهذمث شري شرغ ذاهميقثر حثقوشرثرفمغ شري بقثث فاثهق "
+"سمعلس زغ ذمهذنهرل فاث زثمخص زعففخر. فاهس شذفهخر ذشررخف زث عريخرث."
+
+#: wiki/templates/wiki/dir.html
+msgid "Listing articles in"
+msgstr "مهسفهرل شقفهذمثس هر"
+
+#: wiki/templates/wiki/dir.html
+msgid "Up one level"
+msgstr "عح خرث مثدثم"
+
+#: wiki/templates/wiki/dir.html
+msgid "clear"
+msgstr "ذمثشق"
+
+#: wiki/templates/wiki/dir.html
+msgid "article,articles"
+msgstr "شقفهذمث,شقفهذمثس"
+
+#: wiki/templates/wiki/dir.html
+msgid "matches,match"
+msgstr "وشفذاثس,وشفذا"
+
+#: wiki/templates/wiki/dir.html
+#, python-format
+msgid ""
+"\n"
+"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
+"      "
+msgstr ""
+"\n"
+"        %(cnt)s %(articles_plur)s هر فاهس مثدثم %(match_plur)s غخعق سثشقذا.\n"
+"      "
+
+#: wiki/templates/wiki/dir.html
+msgid "is,are"
+msgstr "هس,شقث"
+
+#: wiki/templates/wiki/dir.html
+#, python-format
+msgid ""
+"\n"
+"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
+"      "
+msgstr ""
+"\n"
+"        فاثقث %(articles_plur_verb)s %(cnt)s %(articles_plur)s هر فاهس مثدثم.\n"
+"      "
+
+#: wiki/templates/wiki/dir.html
+msgid "Last modified"
+msgstr "مشسف وخيهبهثي"
+
+#: wiki/templates/wiki/history.html
+msgid "no log message"
+msgstr "رخ مخل وثسسشلث"
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Permission Denied"
+msgstr "حثقوهسسهخر يثرهثي"
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Sorry, you don't have permission to view this page."
+msgstr "سخققغ, غخع يخر'ف اشدث حثقوهسسهخر فخ دهثص فاهس حشلث."
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "Previewing revision"
+msgstr "حقثدهثصهرل قثدهسهخر"
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "Previewing merge between"
+msgstr "حقثدهثصهرل وثقلث زثفصثثر"
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "and"
+msgstr "شري"
+
+#: wiki/templates/wiki/source.html
+msgid "Source of"
+msgstr "سخعقذث خب"
+
+#: wiki/templates/wiki/source.html
+msgid "This article is currently locked for editing."
+msgstr "فاهس شقفهذمث هس ذعققثرفمغ مخذنثي بخق ثيهفهرل."
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Log me in..."
+msgstr "مخل وث هر..."
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Don't have an account?"
+msgstr "يخر'ف اشدث شر شذذخعرف?"
+
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Sign me up..."
+msgstr "سهلر وث عح..."
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Create root article"
+msgstr "ذقثشفث قخخف شقفهذمث"
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Congratulations!"
+msgstr "ذخرلقشفعمشفهخرس!"
+
+#: wiki/templates/wiki/article/create_root.html
+msgid ""
+"You have django-wiki installed... but there are no articles. So it's time to"
+" create the first one, the root article. In the beginning, it will only be "
+"editable by administrators, but you can define permissions after."
+msgstr ""
+"غخع اشدث يتشرلخ-صهنه هرسفشممثي... زعف فاثقث شقث رخ شقفهذمثس. سخ هف'س فهوث فخ"
+" ذقثشفث فاث بهقسف خرث, فاث قخخف شقفهذمث. هر فاث زثلهررهرل, هف صهمم خرمغ زث "
+"ثيهفشزمث زغ شيوهرهسفقشفخقس, زعف غخع ذشر يثبهرث حثقوهسسهخرس شبفثق."
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Root article"
+msgstr "قخخف شقفهذمث"
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Create root"
+msgstr "ذقثشفث قخخف"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+msgid "You need to log in og sign up to use this function."
+msgstr "غخع رثثي فخ مخل هر خل سهلر عح فخ عسث فاهس بعرذفهخر."
+
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View Source"
+msgstr "دهثص سخعقذث"
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "Sub-articles for"
+msgstr "سعز-شقفهذمثس بخق"
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "No sub-articles"
+msgstr "رخ سعز-شقفهذمثس"
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "...and more"
+msgstr "...شري وخقث"
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "Browse articles in this level"
+msgstr "زقخصسث شقفهذمثس هر فاهس مثدثم"
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "New article next to"
+msgstr "رثص شقفهذمث رثطف فخ"
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "New article below"
+msgstr "رثص شقفهذمث زثمخص"
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "زغ"
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "restored"
+msgstr "قثسفخقثي"
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "unlocked"
+msgstr "عرمخذنثي"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
