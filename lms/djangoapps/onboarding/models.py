@@ -186,12 +186,25 @@ class Organization(TimeStampedModel):
     history = HistoricalRecords()
 
     def is_first_signup_in_org(self):
+        """
+        :return: First learner exists/not exists in organization
+        """
         return UserExtendedProfile.objects.filter(organization=self).count() == 1
 
     @staticmethod
     def is_non_profit(user_extended_profile):
+        """
+        :return: Organization NP status
+        """
         return True if user_extended_profile.organization and \
             user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE else False
+
+    def admin_info(self):
+        """
+        :return: Information about the current admin of organization
+        """
+        return "%s (%s)" % (self.admin.get_full_name(), self.admin.email) if self.admin \
+            else "Administrator not assigned yet."
 
     def __str__(self):
         return self.label
@@ -208,6 +221,9 @@ class OrganizationPartner(models.Model):
 
     @classmethod
     def update_organization_partners(cls, organization, partners):
+        """
+        Add/Update partners data or an organization
+        """
         cls.objects.filter(organization=organization).delete()
 
         _partners = PartnerNetwork.objects.filter(code__in=partners)
@@ -253,6 +269,9 @@ class OrganizationAdminHashKeys(TimeStampedModel):
 
     @classmethod
     def assign_hash(cls, organization, suggested_by, suggested_admin_email):
+        """
+        Link a hash key to a user for administrator role confirmation
+        """
         return cls.objects.create(organization=organization, suggested_by=suggested_by,
                                   suggested_admin_email=suggested_admin_email, activation_hash=uuid.uuid4().hex)
 
@@ -364,6 +383,11 @@ class UserExtendedProfile(TimeStampedModel):
         return str(self.user)
 
     def get_user_selected_functions(self, _type="labels"):
+        """
+        :return: Users selected function areas
+        :param _type: labels / fields
+        :return: list of labels / names of fields
+        """
         if _type == "labels":
             return [label for field_name, label in self.FUNCTIONS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
@@ -372,6 +396,11 @@ class UserExtendedProfile(TimeStampedModel):
                     getattr(self, field_name.split("=")[1]) == 1]
 
     def get_user_selected_interests(self, _type="labels"):
+        """
+        :return: Users selected interest
+        :param _type: labels / fields
+        :return: list of labels / names of fields
+        """
         if _type == "labels":
             return [label for field_name, label in self.INTERESTS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
@@ -380,6 +409,12 @@ class UserExtendedProfile(TimeStampedModel):
                     getattr(self, field_name.split("=")[1]) == 1]
 
     def get_user_selected_interested_learners(self, _type="labels"):
+        """
+        :return: Users selected interested learners
+        :param _type: labels / fields
+        :return: list of labels / names of fields
+        """
+
         if _type == "labels":
             return [label for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
@@ -388,6 +423,12 @@ class UserExtendedProfile(TimeStampedModel):
                     getattr(self, field_name.split("=")[1]) == 1]
 
     def get_user_selected_personal_goal(self, _type="labels"):
+        """
+        :return: Users selected personal goals
+        :param _type: labels / fields
+        :return: list of labels / names of fields
+        """
+
         if _type == "labels":
             return [label for field_name, label in self.GOALS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
@@ -396,6 +437,11 @@ class UserExtendedProfile(TimeStampedModel):
                     getattr(self, field_name.split("=")[1]) == 1]
 
     def save_user_function_areas(self, selected_values):
+        """
+        Save users selected function areas
+        :param selected_values: selected values list
+        """
+
         for function_area_field, label in self.FUNCTIONS_LABELS.items():
             function_area_field = function_area_field.split("=")[1]
             if function_area_field in selected_values:
@@ -406,6 +452,11 @@ class UserExtendedProfile(TimeStampedModel):
             self.__setattr__(function_area_field, _updated_value)
 
     def save_user_interests(self, selected_values):
+        """
+        Save users selected interests
+        :param selected_values: selected values list
+        """
+
         for interest_field, label in self.INTERESTS_LABELS.items():
             interest_field = interest_field.split("=")[1]
             if interest_field in selected_values:
@@ -416,6 +467,11 @@ class UserExtendedProfile(TimeStampedModel):
             self.__setattr__(interest_field, _updated_value)
 
     def save_user_interested_learners(self, selected_values):
+        """
+        Save users selected interested learners
+        :param selected_values: selected values list
+        """
+
         for interested_learner_field, label in self.INTERESTED_LEARNERS_LABELS.items():
             interested_learner_field = interested_learner_field.split("=")[1]
             if interested_learner_field in selected_values:
@@ -426,13 +482,24 @@ class UserExtendedProfile(TimeStampedModel):
             self.__setattr__(interested_learner_field, _updated_value)
 
     def is_organization_data_filled(self):
+        """
+        Return status for registration third step completion
+        """
         return self.organization.org_type and self.organization.focus_area and self.organization.level_of_operation \
                and self.organization.total_employees
 
     def is_organization_details_filled(self):
+        """
+        :return: Status for registration fourth step completion
+        """
         return self.is_organization_metrics_submitted
 
     def save_user_personal_goals(self, selected_values):
+        """
+        Save data for users personal goals
+        :param selected_values: list of selected goals
+        """
+
         for goal_field, label in self.GOALS_LABELS.items():
             goal_field = goal_field.split("=")[1]
             if goal_field in selected_values:
@@ -443,6 +510,9 @@ class UserExtendedProfile(TimeStampedModel):
             self.__setattr__(goal_field, _updated_value)
 
     def get_normal_user_attend_surveys(self):
+        """
+        :return: List of attended surveys that a simple learner can attend
+        """
         attended_list = []
 
         if self.user.profile.level_of_education and self.start_month_year and self.english_proficiency:
@@ -453,6 +523,9 @@ class UserExtendedProfile(TimeStampedModel):
         return attended_list
 
     def get_admin_or_first_user_attend_surveys(self):
+        """
+        :return: List of attended surveys that a first learner OR admin can attend
+        """
         attended_list = self.get_normal_user_attend_surveys()
 
         if self.is_organization_data_filled():
@@ -479,7 +552,9 @@ class UserExtendedProfile(TimeStampedModel):
         return surveys_to_attend
 
     def attended_surveys(self):
-        """Return list of user's attended on-boarding surveys"""
+        """
+        :return: List of user's attended on-boarding surveys
+        """
 
         if not (self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org())):
             attended_list = self.get_normal_user_attend_surveys()
@@ -489,7 +564,9 @@ class UserExtendedProfile(TimeStampedModel):
         return attended_list
 
     def unattended_surveys(self, _type="map"):
-        """Return maping of user's unattended on-boarding surveys"""
+        """
+        :return: Mapping of user's unattended on-boarding surveys
+        """
 
         surveys_to_attend = self.surveys_to_attend()
 
@@ -500,10 +577,19 @@ class UserExtendedProfile(TimeStampedModel):
 
     @property
     def is_organization_admin(self):
+        """
+        :return: User organization administration status
+        """
         if self.organization:
             return self.user == self.organization.admin
 
         return False
+
+    def admin_has_pending_admin_suggestion_request(self):
+        pending_suggestion_request = OrganizationAdminHashKeys.objects.filter(organization=self.organization,
+                                                                               suggested_by=self.user,
+                                                                               is_hash_consumed=False).first()
+        return bool(self.is_organization_admin and pending_suggestion_request)
 
 
 class OrganizationMetric(TimeStampedModel):

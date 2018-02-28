@@ -412,10 +412,15 @@ def update_account_settings(request):
             }
         )
 
-    return render(
-        request, 'myaccount/registration_update.html',
-        {'form': form, 'org_url': reverse('get_organizations')}
-    )
+    ctx = {
+        'form': form,
+        'admin_has_pending_admin_suggestion_request': user_extended_profile.admin_has_pending_admin_suggestion_request(),
+        'admin_tooltip_info': user_extended_profile.organization.admin_info if user_extended_profile.organization
+                                else "Organization association data missing",
+        'org_url': reverse('get_organizations')
+    }
+
+    return render(request, 'myaccount/registration_update.html', ctx)
 
 
 @login_required
@@ -424,7 +429,7 @@ def suggest_org_admin(request):
     Suggest a user as administrator of an organization
     """
     status = 200
-    message = 'Email successfully sent'
+    message = 'E-mail successfully sent.'
 
     if request.method == 'POST':
         organization = request.POST.get('organization')
