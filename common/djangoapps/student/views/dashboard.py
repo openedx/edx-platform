@@ -516,7 +516,7 @@ def student_dashboard(request):
         )
     )
 
-    get_preferred_order_by_course_enrollments(
+    _get_preferred_order_by_course_enrollments(
         preferred_order_by_course_enrollments,
         course_enrollments
     )
@@ -772,7 +772,7 @@ def student_dashboard(request):
     return response
 
 
-def get_preferred_order_by_course_enrollments(order_by, course_enrollments):
+def _get_preferred_order_by_course_enrollments(order_by, course_enrollments):
     if order_by == 'created':
         course_enrollments.sort(key=lambda x: x.created, reverse=False)
     elif order_by == 'created_reverse':
