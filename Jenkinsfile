@@ -11,21 +11,20 @@ def makeNode(suite, shard) {
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
                     sh """
-mkdir /tmp/mongodata
 npm install
 source /tmp/ve/bin/activate
+# temporary fix for openssl/cryptography==1.5.3 incompatibility on debian stretch
 sed -i 's/cryptography==1.5.3/cryptography==1.9/' requirements/edx/base.txt
 pip install --exists-action w -r requirements/edx/paver.txt
 pip install --exists-action w -r requirements/edx/pre.txt
 pip install --exists-action w -r requirements/edx/github.txt
 pip install --exists-action w -r requirements/edx/local.txt
-pip install  --exists-action w pbr==0.9.0
+pip install --exists-action w pbr==0.9.0
 pip install --exists-action w -r requirements/edx/base.txt
 pip install --exists-action w -r requirements/edx/post.txt
 pip install coveralls==1.0
 """
                     try {
-                        echo suite
                         if (suite == 'quality') {
                             sh """
 export PYLINT_THRESHOLD=3600
@@ -41,13 +40,13 @@ echo "Finding pep8 violations and storing report..."
 paver run_pep8 > reports/pep8.log || { cat reports/pep8.log; EXIT=1; }
 
 echo "Finding pylint violations and storing in report..."
-paver run_pylint -l $PYLINT_THRESHOLD | tee pylint.log || EXIT=1
+paver run_pylint -l \${PYLINT_THRESHOLD} | tee pylint.log || EXIT=1
 
 mkdir -p reports
-PATH=$PATH:node_modules/.bin
+PATH=\${PATH}:node_modules/.bin
 
 echo "Finding ESLint violations and storing report..."
-paver run_eslint -l $ESLINT_THRESHOLD > reports/eslint.log || { cat reports/eslint.log; EXIT=1; }
+paver run_eslint -l \${ESLINT_THRESHOLD} > reports/eslint.log || { cat reports/eslint.log; EXIT=1; }
 
 # Run quality task. Pass in the 'fail-under' percentage to diff-quality
 paver run_quality -p 100 || EXIT=1
@@ -58,6 +57,7 @@ paver run_complexity > reports/code_complexity.log || echo "Unable to calculate 
                         } else {
                             sh """
 source /tmp/ve/bin/activate
+mkdir /tmp/mongodata
 mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata
 paver test_lib --with-flaky --cov-args="-p" --with-xunitmp
 killall mongod
