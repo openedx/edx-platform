@@ -18,6 +18,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 
 REQUIRED_CREATION_FIELDS = ['course_uuid', 'reason', 'mode']
 
+# EntitlementSupportPage Feature Branch
 
 class EntitlementSupportView(viewsets.ModelViewSet):
     """
@@ -123,3 +124,4 @@ class EntitlementSupportView(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
             data=SupportCourseEntitlementSerializer(instance=entitlement).data
         )
+
