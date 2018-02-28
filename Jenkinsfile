@@ -10,26 +10,27 @@ def makeNode(suite, shard) {
                 
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
-                    sh 'mkdir /tmp/mongodata'
-                    sh 'mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata'
-                    sh 'npm install'
-                    sh 'source /tmp/ve/bin/activate'
-                    sh 'sed -i \'s/cryptography==1.5.3/cryptography==1.9/\' requirements/edx/base.txt'
-                    sh 'pip install --exists-action w -r requirements/edx/paver.txt'
-                    sh 'pip install --exists-action w -r requirements/edx/pre.txt'
-                    sh 'pip install --exists-action w -r requirements/edx/github.txt'
-                    sh 'pip install --exists-action w -r requirements/edx/local.txt'
-                    sh 'pip install  --exists-action w pbr==0.9.0'
-                    sh 'pip install --exists-action w -r requirements/edx/base.txt'
-                    sh 'then pip install --exists-action w -r requirements/edx/post.txt'
-                    sh 'pip install coveralls==1.0'
-                    sh 'export NO_PREREQ_INSTALL=\'true\''
+                    sh """
+mkdir /tmp/mongodata
+mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata
+npm install
+source /tmp/ve/bin/activate
+sed -i 's/cryptography==1.5.3/cryptography==1.9/' requirements/edx/base.txt
+pip install --exists-action w -r requirements/edx/paver.txt
+pip install --exists-action w -r requirements/edx/pre.txt
+pip install --exists-action w -r requirements/edx/github.txt
+pip install --exists-action w -r requirements/edx/local.txt
+pip install  --exists-action w pbr==0.9.0
+pip install --exists-action w -r requirements/edx/base.txt
+pip install --exists-action w -r requirements/edx/post.txt
+pip install coveralls==1.0
+"""
                     try {
                         if (suite == 'accessibility') {
-                            sh './scripts/accessibility-tests.sh'
+                            sh 'source /tmp/ve/bin/activate && ./scripts/accessibility-tests.sh'
                         } else {
-                            withEnv(["TEST_SUITE=${suite}", "SHARD=${shard}"]) {
-                                sh './scripts/all-tests.sh'
+                            withEnv(["TEST_SUITE=${suite}", "SHARD=${shard}", "NO_PREREQ_INSTALL=True"]) {
+                                sh 'source /tmp/ve/bin/activate && ./scripts/all-tests.sh'
                             }
                         }
                     } finally {
