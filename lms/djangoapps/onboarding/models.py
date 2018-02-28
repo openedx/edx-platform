@@ -439,7 +439,7 @@ class UserExtendedProfile(TimeStampedModel):
     def save_user_function_areas(self, selected_values):
         """
         Save users selected function areas
-        :param selected_values: selecte values list
+        :param selected_values: selected values list
         """
 
         for function_area_field, label in self.FUNCTIONS_LABELS.items():
@@ -454,7 +454,7 @@ class UserExtendedProfile(TimeStampedModel):
     def save_user_interests(self, selected_values):
         """
         Save users selected interests
-        :param selected_values: selecte values list
+        :param selected_values: selected values list
         """
 
         for interest_field, label in self.INTERESTS_LABELS.items():
@@ -469,7 +469,7 @@ class UserExtendedProfile(TimeStampedModel):
     def save_user_interested_learners(self, selected_values):
         """
         Save users selected interested learners
-        :param selected_values: selecte values list
+        :param selected_values: selected values list
         """
 
         for interested_learner_field, label in self.INTERESTED_LEARNERS_LABELS.items():
