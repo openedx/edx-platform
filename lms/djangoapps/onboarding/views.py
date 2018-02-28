@@ -415,8 +415,6 @@ def update_account_settings(request):
     ctx = {
         'form': form,
         'admin_has_pending_admin_suggestion_request': user_extended_profile.admin_has_pending_admin_suggestion_request(),
-        'admin_tooltip_info': user_extended_profile.organization.admin_info if user_extended_profile.organization
-                                else "Organization association data missing",
         'org_url': reverse('get_organizations')
     }
 
