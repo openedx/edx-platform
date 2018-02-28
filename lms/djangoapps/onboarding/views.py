@@ -458,7 +458,7 @@ def suggest_org_admin(request):
                         org_id = extended_profile.organization_id
                         org_name = extended_profile.organization.label
                         organization.unclaimed_org_admin_email = org_admin_email
-                        claimed_by_name = "{first_name} {lastf_name}".format(first_name=request.user.first_name,
+                        claimed_by_name = "{first_name} {last_name}".format(first_name=request.user.first_name,
                                                                             last_name=request.user.last_name)
                         claimed_by_email = request.user.email
 
