@@ -35,6 +35,7 @@ def oef_dashboard(request):
             'id': survey.id,
             'started_on': survey.start_date.strftime('%m/%d/%Y'),
             'completed_on': survey.finish_date.strftime('%m/%d/%Y') if survey.finish_date else '',
+            'modified': survey.modified.strftime('%m/%d/%Y'),
             'status': 'Draft' if not survey.finish_date else 'Finished'
         })
 
@@ -72,7 +73,7 @@ def get_survey_by_id(request, user_survey_id):
                                                    "instructions": get_oef_instructions(),
                                                    "levels": levels,
                                                    'organization': request.user.extended_profile.organization.label,
-                                                   'date': uos.start_date.strftime('%m/%d/%Y')
+                                                   'date': uos.modified.strftime('%m/%d/%Y')
                                                    })
 
 

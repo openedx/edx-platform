@@ -412,10 +412,15 @@ def update_account_settings(request):
             }
         )
 
-    return render(
-        request, 'myaccount/registration_update.html',
-        {'form': form, 'org_url': reverse('get_organizations')}
-    )
+    ctx = {
+        'form': form,
+        'admin_has_pending_admin_suggestion_request': user_extended_profile.admin_has_pending_admin_suggestion_request(),
+        'admin_tooltip_info': user_extended_profile.organization.admin_info if user_extended_profile.organization
+                                else "Organization association data missing",
+        'org_url': reverse('get_organizations')
+    }
+
+    return render(request, 'myaccount/registration_update.html', ctx)
 
 
 @login_required
@@ -424,7 +429,7 @@ def suggest_org_admin(request):
     Suggest a user as administrator of an organization
     """
     status = 200
-    message = 'Email successfully sent'
+    message = 'E-mail successfully sent.'
 
     if request.method == 'POST':
         organization = request.POST.get('organization')
@@ -493,7 +498,7 @@ def get_organizations(request):
             final_result[organization.label] = {
                 'is_admin_assigned': True if organization.admin else False,
                 'is_current_user_admin': True if organization.admin == request.user else False,
-                'admin_email': organization.admin.email if organization.admin else ''
+                'admin_email': organization.admin.email if organization.admin else 'Administrator not assigned yet.'
             }
 
         if request.user.is_authenticated():
@@ -539,9 +544,12 @@ def recommendations(request):
     """
     recommended_courses = get_recommended_xmodule_courses(request.user)
     recommended_communities = get_recommended_communities(request.user)
+    user_extended_profile = request.user.extended_profile
+
     context = {
         'recommended_courses': recommended_courses,
         'recommended_communities': recommended_communities,
+        'is_poc': user_extended_profile.is_organization_admin,
     }
 
     return render_to_response('onboarding/recommendations.html', context)
