@@ -37,9 +37,10 @@ def coverageTest() {
             try {
                 withCredentials([string(credentialsId: 'rg-codecov-edx-platform-token', variable: 'CODE_COV_TOKEN')]) {
                     branch_name = env.BRANCH_NAME
-					codecov_token = env.CODE_COV_TOKEN
+                    codecov_token = env.CODE_COV_TOKEN
                     change_target = env.CHANGE_TARGET
-                    ci_commit = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
+                    
+                    ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD^1').trim()
 
                     unstash "artifacts-lms-unit-1"
                     unstash "artifacts-lms-unit-2"
