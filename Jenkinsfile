@@ -34,35 +34,47 @@ def coverageTest() {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm', 'defaultFg': 1, 'defaultBg': 2]) {
             cleanWs()
             checkout scm
+            branch_name = env.BRANCH_NAME
+            change_target = env.CHANGE_TARGET
+            
+            withCredentials([string(credentialsId: 'rg-codecov-edx-platform-token', variable: 'CODE_COV_TOKEN')]) {
+                codecov_token = env.CODE_COV_TOKEN
+            }
+            
             try {
-                withCredentials([string(credentialsId: 'rg-codecov-edx-platform-token', variable: 'CODE_COV_TOKEN')]) {
-                    branch_name = env.BRANCH_NAME
-                    codecov_token = env.CODE_COV_TOKEN
-                    change_target = env.CHANGE_TARGET
-                    
-                    if (branch_name != change_target) {
-                        echo "BRANCH_NAME not equal to CHANGE_TARGET that signifies this is the '?{branch_name}'."
-                        echo "Changing ci_commit to HEAD^1."
-                        ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD^1').trim()
-                    } else {
-                        echo "This is not the PR. Changing ci_commit to HEAD."
-                        ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-                    }
-                    unstash "artifacts-lms-unit-1"
-                    unstash "artifacts-lms-unit-2"
-                    unstash "artifacts-lms-unit-3"
-                    unstash "artifacts-lms-unit-4"
-                    unstash "artifacts-cms-unit-all"
+                echo "Unstash unit-tests artifacts."
+                
+                unstash "artifacts-lms-unit-1"
+                unstash "artifacts-lms-unit-2"
+                unstash "artifacts-lms-unit-3"
+                unstash "artifacts-lms-unit-4"
+                unstash "artifacts-cms-unit-all"
+                             
+                if (change_target != null) {
+                    echo "BRANCH_NAME = '${branch_name}'"
+                    echo "CHANGE_TARGET = '${change_target}'"
+                    echo "Changing ci_commit to HEAD^1."
+                    ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD^1').trim()
                     sh """source ./scripts/jenkins-common.sh
                     paver coverage -b origin/${change_target}
+                    pip install codecov==2.0.5
+                    codecov --token=${codecov_token} --branch=${ci_commit}"""
+                } else {
+                    echo "BRANCH_NAME = '${branch_name}'"
+                    echo "CHANGE_TARGET = '${change_target}'"
+                    echo "Changing ci_commit to HEAD."
+                    ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    sh """source ./scripts/jenkins-common.sh
+                    paver coverage -b origin/${branch_name}
                     pip install codecov==2.0.5
                     codecov --token=${codecov_token} --branch=${ci_commit}"""
                 }
             } finally {
                 archiveArtifacts 'reports/**, test_root/log/**'
-                cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'reports/coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-                deleteDir()
-            }
+                cobertura autoUpdateHealth: false, autoUpdateStability: false, classCoverageTargets: '95, 95, 0', coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, fileCoverageTargets: '95, 95, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '95, 95, 0', onlyStable: false, packageCoverageTargets: '95, 95, 0', sourceEncoding: 'ASCII', zoomCoverageChart: true
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '', reportFiles: 'reports/diff_coverage_combined.html', reportName: 'Diff Coverage Report', reportTitles: ''])
+            }                
+            deleteDir()
         }
     }
 }
@@ -107,4 +119,5 @@ stage('Coverage') {
 
 stage('Done') {
     echo 'Done! :)'
+    slackSend channel: channel_name, color: 'good', message: "CI Tests finished! ${env.JOB_NAME} (<${env.BUILD_URL}|Open>)", teamDomain: 'raccoongang', tokenCredentialId: 'slack-secret-token'
 }
