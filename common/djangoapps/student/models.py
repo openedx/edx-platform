@@ -2269,9 +2269,11 @@ def get_user_by_username_or_email(username_or_email):
         retired, or the user is in the process of being retired.
     """
     username_or_email = strip_if_string(username_or_email)
+    user = None
     if '@' in username_or_email:
-        user = User.objects.get(email=username_or_email)
-    else:
+        user = User.objects.filter(email=username_or_email).first()
+
+    if user is None:
         user = User.objects.get(username=username_or_email)
         UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
         if UserRetirementRequest.has_user_requested_retirement(user):
