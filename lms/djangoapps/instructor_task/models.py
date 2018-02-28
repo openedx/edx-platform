@@ -193,7 +193,7 @@ class ReportStore(object):
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             if (
-                    hasattr(settings, 'S3_HOST') and settings.S3_HOST and hasattr(settings,'S3_USE_SIGV4') and settings.S3_USE_SIGV4
+                hasattr(settings, 'S3_HOST') and settings.S3_HOST and hasattr(settings,'S3_USE_SIGV4') and settings.S3_USE_SIGV4
             ):
                 return DjangoStorageReportStore(
                     storage_class='openedx.core.storage.S3ReportStorage',
