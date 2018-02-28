@@ -425,6 +425,9 @@ FEATURES = {
     # Whether to send an email for failed password reset attempts or not. This is mainly useful for notifying users
     # that they don't have an account associated with email addresses they believe they've registered with.
     'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
+
+    # sort the enrollment pairs
+    'PREFERRED_ORDER_BY_COURSE_ENROLLMENTS': 'created_reverse'
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews

@@ -507,8 +507,19 @@ def student_dashboard(request):
     # understanding of usage patterns on prod.
     monitoring_utils.accumulate('num_courses', len(course_enrollments))
 
-    # Sort the enrollment pairs by the enrollment date
-    course_enrollments.sort(key=lambda x: x.created, reverse=True)
+    # sort the enrollment pairs with the flag PREFERRED_ORDER_BY_COURSE_ENROLLMENTS
+    preferred_order_by_course_enrollments = configuration_helpers.get_value(
+        "PREFERRED_ORDER_BY_COURSE_ENROLLMENTS",
+        settings.FEATURES.get(
+            "PREFERRED_ORDER_BY_COURSE_ENROLLMENTS",
+            "created_reverse"
+        )
+    )
+
+    get_preferred_order_by_course_enrollments(
+        preferred_order_by_course_enrollments,
+        course_enrollments
+    )
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
@@ -759,3 +770,21 @@ def student_dashboard(request):
     response = render_to_response('dashboard.html', context)
     set_user_info_cookie(response, request)
     return response
+
+def get_preferred_order_by_course_enrollments(order_by, course_enrollments):
+    if order_by == 'created':
+        course_enrollments.sort(key=lambda x: x.created, reverse=False)
+    elif order_by == 'created_reverse':
+        course_enrollments.sort(key=lambda x: x.created, reverse=True)
+    elif order_by == 'course_name':
+        course_enrollments.sort(
+            key=lambda x: x.course.display_name,
+            reverse=False
+        )
+    elif order_by == 'course_name_reverse':
+        course_enrollments.sort(
+            key=lambda x: x.course.display_name,
+            reverse=True
+        )
+    else:
+        course_enrollments.sort(key=lambda x: x.created, reverse=True)
