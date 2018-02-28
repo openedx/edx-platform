@@ -3,8 +3,6 @@ def makeNode(suite, shard) {
     echo "I am ${suite}:${shard}, and the worker is yet to be started!"
         node('edxapp') {
             container('edxapp') {
-                // Cleaning up previous builds. Heads up! Not sure if `WsCleanup` actually works.
-                step([$class: 'WsCleanup'])
                 checkout scm
 
                 sh 'git log --oneline | head'
