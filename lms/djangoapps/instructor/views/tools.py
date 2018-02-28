@@ -63,11 +63,21 @@ def get_student_from_identifier(unique_student_identifier):
 
     Raises User.DoesNotExist if no user object can be found.
     """
+    student = None
     unique_student_identifier = strip_if_string(unique_student_identifier)
     if "@" in unique_student_identifier:
-        student = User.objects.get(email=unique_student_identifier)
-    else:
-        student = User.objects.get(username=unique_student_identifier)
+        student = User.objects.filter(email=unique_student_identifier).first()
+
+    if not student:
+        # since `@` can be part of username if feature flag `ENABLE_UNICODE_USERNAME` is enable
+        student = User.objects.filter(username=unique_student_identifier).first()
+
+    if not student:
+        raise User.DoesNotExist(
+            _("Could not find student matching identifier: {student_identifier}").format(
+                student_identifier=unique_student_identifier
+            )
+        )
     return student
 
 

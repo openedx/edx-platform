@@ -8,6 +8,7 @@ import unittest
 
 import mock
 import six
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
@@ -357,3 +358,31 @@ def msk_from_problem_urlname(course_id, urlname, block_type='problem'):
         urlname = urlname[:-4]
 
     return course_id.make_usage_key(block_type, urlname)
+
+
+@attr(shard=1)
+class TestStudentFromIdentifier(TestCase):
+    """
+    Test get_student_from_identifier()
+    """
+    def setUp(self):
+        """
+        Fixtures
+        """
+        super(TestStudentFromIdentifier, self).setUp()
+        self.students = [
+            UserFactory.create(username='foo@touchstone'),  # a student with character `@` in user name
+            UserFactory.create()
+        ]
+
+    def test_valid_student_id(self):
+        for student in self.students:
+            assert student == tools.get_student_from_identifier(student.username)
+
+    def test_valid_student_email(self):
+        for student in self.students:
+            assert student == tools.get_student_from_identifier(student.email)
+
+    def test_invalid_student_id(self):
+        with self.assertRaises(User.DoesNotExist):
+            assert tools.get_student_from_identifier("invalid")

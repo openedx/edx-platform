@@ -3242,13 +3242,19 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
-        CourseEnrollment.enroll(self.student, self.course.id)
+        self.module_to_reset = self.enroll_create_student_module(self.student)
 
-        self.module_to_reset = StudentModule.objects.create(
-            student=self.student,
+        # studnet with special character in user name
+        self.student_special_char = UserFactory(username="foo@example")
+        self.module_to_reset_special_char = self.enroll_create_student_module(self.student_special_char)
+
+    def enroll_create_student_module(self, student, attempts=10):
+        CourseEnrollment.enroll(student, self.course.id)
+        return StudentModule.objects.create(
+            student=student,
             course_id=self.course.id,
             module_state_key=self.problem_location,
-            state=json.dumps({'attempts': 10}),
+            state=json.dumps({'attempts': attempts}),
         )
 
     def test_reset_student_attempts_deletall(self):
@@ -3276,6 +3282,21 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
             0
         )
 
+    def test_reset_student_with_special_char_attempts_single(self):
+        """ Test reset single student attempts. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': text_type(self.course.id)})
+        response = self.client.post(url, {
+            'problem_to_reset': self.problem_urlname,
+            'unique_student_identifier': self.student_special_char.username,
+        })
+        self.assertEqual(response.status_code, 200)
+        # make sure problem attempts have been reset.
+        changed_module = StudentModule.objects.get(pk=self.module_to_reset_special_char.pk)
+        self.assertEqual(
+            json.loads(changed_module.state)['attempts'],
+            0
+        )
+
     # mock out the function which should be called to execute the action.
     @patch.object(lms.djangoapps.instructor_task.api, 'submit_reset_problem_attempts_for_all_students')
     def test_reset_student_attempts_all(self, act):
@@ -3296,6 +3317,25 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 400)
+
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    def test_reset_student_with_special_char_attempts_delete(self, _mock_signal):
+        """ Test delete single student state. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': text_type(self.course.id)})
+        response = self.client.post(url, {
+            'problem_to_reset': self.problem_urlname,
+            'unique_student_identifier': self.student_special_char.username,
+            'delete_module': True,
+        })
+        self.assertEqual(response.status_code, 200)
+        # make sure the module has been deleted
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.module_to_reset_special_char.student,
+                course_id=self.module_to_reset_special_char.course_id
+            ).count(),
+            0
+        )
 
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
     def test_reset_student_attempts_delete(self, _mock_signal):
@@ -3345,6 +3385,17 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         response = self.client.post(url, {
             'problem_to_reset': self.problem_urlname,
             'unique_student_identifier': self.student.username,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    @patch.object(lms.djangoapps.instructor_task.api, 'submit_rescore_problem_for_student')
+    def test_rescore_problem_single_from_uname_with_special_char(self, act):
+        """ Test rescoring of a single student. """
+        url = reverse('rescore_problem', kwargs={'course_id': text_type(self.course.id)})
+        response = self.client.post(url, {
+            'problem_to_reset': self.problem_urlname,
+            'unique_student_identifier': self.student_special_char.username,
         })
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
