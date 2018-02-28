@@ -179,6 +179,50 @@ class EnrollmentDataTest(ModuleStoreTestCase):
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that users are automatically enrolled as "honor".
+        ([], 'honor'),
+
+        # Audit / Verified / Honor
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as "honor" by default.
+        (['honor', 'verified', 'audit'], 'verified'),
+    )
+    @ddt.unpack
+    def test_get_user_enrollments(self, course_modes, enrollment_mode):
+        self._create_course_modes(course_modes)
+
+        # Try to get enrollments before they exist.
+        result = data.get_user_enrollments(unicode(self.course.id))
+        self.assertEqual(result, [])
+
+        # Create 10 test users to enroll in the course
+        users = []
+        for i in xrange(10):
+            users.append(UserFactory.create(
+                username=self.USERNAME + str(i),
+                email=self.EMAIL + str(i),
+                password=self.PASSWORD + str(i)
+            ))
+
+        # Create the original enrollments.
+        created_enrollments = []
+        for user in users:
+            created_enrollments.append(data.create_course_enrollment(
+                user.username,
+                unicode(self.course.id),
+                enrollment_mode,
+                True
+            ))
+
+        # Compare the created enrollments with the results
+        # from the get user enrollments request.
+        results = data.get_user_enrollments(
+            unicode(self.course.id), serialize=True
+        )
+        self.assertEqual(results, created_enrollments)
+
+    @ddt.data(
+        # Default (no course modes in the database)
+        # Expect that users are automatically enrolled as "honor".
         ([], 'credit'),
 
         # Audit / Verified / Honor

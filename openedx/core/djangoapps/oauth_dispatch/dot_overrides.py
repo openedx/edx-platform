@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from .models import RestrictedApplication
 
 from datetime import datetime
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -23,10 +24,10 @@ def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disab
 
     We do this as a pre-save hook on the ORM
     """
-
-    is_application_restricted = RestrictedApplication.objects.filter(application=instance.application).exists()
-    if is_application_restricted:
-        RestrictedApplication.set_access_token_as_expired(instance)
+    if settings.FEATURES.get('AUTO_EXPIRE_RESTRICTED_ACCESS_TOKENS', False):
+        is_application_restricted = RestrictedApplication.objects.filter(application=instance.application).exists()
+        if is_application_restricted:
+            RestrictedApplication.set_access_token_as_expired(instance)
 
 
 class EdxOAuth2Validator(OAuth2Validator):
@@ -84,7 +85,7 @@ class EdxOAuth2Validator(OAuth2Validator):
         super(EdxOAuth2Validator, self).save_bearer_token(token, request, *args, **kwargs)
 
         is_application_restricted = RestrictedApplication.objects.filter(application=request.client).exists()
-        if is_application_restricted:
+        if is_application_restricted and settings.FEATURES.get('AUTO_EXPIRE_RESTRICTED_ACCESS_TOKENS', False):
             # Since RestrictedApplications will override the DOT defined expiry, so that access_tokens
             # are always expired, we need to re-read the token from the database and then calculate the
             # expires_in (in seconds) from what we stored in the database. This value should be a negative
