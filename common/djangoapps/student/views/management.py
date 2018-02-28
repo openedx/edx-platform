@@ -66,7 +66,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+from openedx.core.djangolib.markup import HTML, Text
 from student.cookies import set_logged_in_cookies
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
@@ -112,7 +113,7 @@ AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple(
     'ReverifyInfo',
     'course_id course_name course_number date status display'
-)  # pylint: disable=invalid-name
+)
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 # Used as the name of the user attribute for tracking affiliate registrations
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
@@ -731,7 +732,7 @@ def create_account_with_params(request, params):
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         identity_args = [
-            user.id,  # pylint: disable=no-member
+            user.id,
             {
                 'email': user.email,
                 'username': user.username,
@@ -957,6 +958,9 @@ def create_account(request, post_override=None):
     ):
         return HttpResponseForbidden(_("Account creation not allowed."))
 
+    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+        return HttpResponseForbidden(SYSTEM_MAINTENANCE_MSG)
+
     warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
 
     try:
@@ -1014,7 +1018,26 @@ def activate_account(request, key):
             extra_tags='account-activation aa-icon'
         )
     else:
-        if not registration.user.is_active:
+        if registration.user.is_active:
+            messages.info(
+                request,
+                HTML(_('{html_start}This account has already been activated.{html_end}')).format(
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                ),
+                extra_tags='account-activation aa-icon',
+            )
+        elif waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+            messages.error(
+                request,
+                HTML(u'{html_start}{message}{html_end}').format(
+                    message=Text(SYSTEM_MAINTENANCE_MSG),
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                ),
+                extra_tags='account-activation aa-icon',
+            )
+        else:
             registration.activate()
             # Success message for logged in users.
             message = _('{html_start}Success{html_end} You have activated your account.')
@@ -1031,15 +1054,6 @@ def activate_account(request, key):
             messages.success(
                 request,
                 HTML(message).format(
-                    html_start=HTML('<p class="message-title">'),
-                    html_end=HTML('</p>'),
-                ),
-                extra_tags='account-activation aa-icon',
-            )
-        else:
-            messages.info(
-                request,
-                HTML(_('{html_start}This account has already been activated.{html_end}')).format(
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
                 ),
@@ -1068,6 +1082,9 @@ def activate_account_studio(request, key):
         user_logged_in = request.user.is_authenticated()
         already_active = True
         if not registration.user.is_active:
+            if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+                return render_to_response('registration/activation_invalid.html',
+                                          {'csrf': csrf(request)['csrf_token']})
             registration.activate()
             already_active = False
 
@@ -1184,8 +1201,6 @@ def validate_password_security_policy(user, password):
             num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
         else:
             num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-        # Because of how ngettext is, splitting the following into shorter lines would be ugly.
-        # pylint: disable=line-too-long
         err_msg = ungettext(
             "You are re-using a password that you have used recently. "
             "You must have {num} distinct password before reusing a previous password.",
@@ -1197,8 +1212,6 @@ def validate_password_security_policy(user, password):
     # also, check to see if passwords are getting reset too frequent
     if PasswordHistory.is_password_reset_too_soon(user):
         num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-        # Because of how ngettext is, splitting the following into shorter lines would be ugly.
-        # pylint: disable=line-too-long
         err_msg = ungettext(
             "You are resetting passwords too frequently. Due to security policies, "
             "{num} day must elapse between password resets.",
@@ -1229,6 +1242,18 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         # password_reset_confirm function handle it.
         return password_reset_confirm(
             request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+        context = {
+            'validlink': False,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': SYSTEM_MAINTENANCE_MSG,
+        }
+        context.update(platform_name)
+        return TemplateResponse(
+            request, 'registration/password_reset_confirm.html', context
         )
 
     if request.method == 'POST':
@@ -1354,7 +1379,7 @@ def do_email_change_request(user, new_email, activation_key=None):
     )
     try:
         mail.send_mail(subject, message, from_address, [pec.new_email])
-    except Exception:  # pylint: disable=broad-except
+    except Exception:
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         raise ValueError(_('Unable to send email activation link. Please try again later.'))
 
@@ -1378,6 +1403,9 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
+    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+        return render_to_response('email_change_failed.html', {'err_msg': SYSTEM_MAINTENANCE_MSG})
+
     with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)

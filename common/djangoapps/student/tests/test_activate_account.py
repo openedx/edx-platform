@@ -9,6 +9,7 @@ from mock import patch
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from student.models import Registration
 from student.tests.factories import UserFactory
 
@@ -199,3 +200,14 @@ class TestActivateAccount(TestCase):
         response = self.client.get(reverse('activate', args=[uuid4().hex]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Your account could not be activated')
+
+    def test_account_activation_prevent_auth_user_writes(self):
+        login_page_url = "{login_url}?next={redirect_url}".format(
+            login_url=reverse('signin_user'),
+            redirect_url=reverse('dashboard'),
+        )
+        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+            response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
+            self.assertRedirects(response, login_page_url)
+            self.assertContains(response, SYSTEM_MAINTENANCE_MSG)
+            assert not self.user.is_active

@@ -14,9 +14,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import patch
 
-import student
 from django_comment_common.models import ForumsConfig
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
@@ -25,10 +23,11 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
     USERNAME_BAD_LENGTH_MSG, USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
 )
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import UserAttribute
 from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS, \
-    skip_activation_email
+    create_account, skip_activation_email
 from student.tests.factories import UserFactory
 from third_party_auth.tests import factories as third_party_auth_factory
 
@@ -279,7 +278,7 @@ class TestCreateAccount(SiteMixin, TestCase):
 
         with mock.patch('edxmako.request_context.get_current_request', return_value=request):
             with mock.patch('django.core.mail.send_mail') as mock_send_mail:
-                student.views.create_account(request)
+                create_account(request)
 
         # check that send_mail is called
         if bypass_activation_email:
@@ -288,7 +287,8 @@ class TestCreateAccount(SiteMixin, TestCase):
             self.assertTrue(mock_send_mail.called)
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'AUTOMATIC_AUTH_FOR_TESTING': False})
+    @mock.patch.dict(settings.FEATURES,
+                     {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'AUTOMATIC_AUTH_FOR_TESTING': False})
     def test_extauth_bypass_sending_activation_email_with_bypass(self):
         """
         Tests user creation without sending activation email when
@@ -297,7 +297,8 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.base_extauth_bypass_sending_activation_email(True)
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False})
+    @mock.patch.dict(settings.FEATURES,
+                     {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False})
     def test_extauth_bypass_sending_activation_email_without_bypass_1(self):
         """
         Tests user creation without sending activation email when
@@ -306,7 +307,8 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.base_extauth_bypass_sending_activation_email(False)
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
+    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
+                                         'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
     def test_extauth_bypass_sending_activation_email_without_bypass_2(self):
         """
         Tests user creation without sending activation email when
@@ -395,8 +397,8 @@ class TestCreateAccount(SiteMixin, TestCase):
             instance = config.return_value
             instance.utm_cookie_name = utm_cookie_name
 
-            self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
-            self.assertIsNone(self.client.cookies.get(utm_cookie_name))  # pylint: disable=no-member
+            self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))
+            self.assertIsNone(self.client.cookies.get(utm_cookie_name))
             user = self.create_account_and_fetch_profile().user
             self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
             self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_source')))
@@ -449,13 +451,18 @@ class TestCreateAccount(SiteMixin, TestCase):
                 UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
             )
 
-    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=False))
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=False))
     def test_create_account_not_allowed(self):
         """
         Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+    def test_create_account_prevent_auth_user_writes(self):
+        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+            response = self.client.get(self.url)
+            assert response.status_code == 403
 
     def test_created_on_site_user_attribute_set(self):
         profile = self.create_account_and_fetch_profile(host=self.site.domain)
@@ -883,7 +890,7 @@ class TestUnicodeUsername(TestCase):
             'honor_code': 'true',
         }
 
-    @patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False})
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False})
     def test_with_feature_disabled(self):
         """
         Ensures backward-compatible defaults.
@@ -897,14 +904,14 @@ class TestUnicodeUsername(TestCase):
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.url_params['email'])
 
-    @patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
     def test_with_feature_enabled(self):
         response = self.client.post(self.url, self.url_params)
         self.assertEquals(response.status_code, 200)
 
         self.assertTrue(User.objects.get(email=self.url_params['email']))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
     def test_special_chars_with_feature_enabled(self):
         """
         Ensures that special chars are still prevented.

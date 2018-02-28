@@ -33,6 +33,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     INVALID_USERNAMES,
     VALID_USERNAMES_UNICODE
 )
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountEmailInvalid,
     AccountPasswordInvalid,
@@ -41,6 +42,7 @@ from openedx.core.djangoapps.user_api.errors import (
     AccountUserAlreadyExists,
     AccountUsernameInvalid,
     AccountValidationError,
+    UserAPIInternalError,
     UserNotAuthorized,
     UserNotFound
 )
@@ -408,9 +410,20 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
     def test_create_account_invalid_username(self, invalid_username):
         create_account(invalid_username, self.PASSWORD, self.EMAIL)
 
+    def test_create_account_prevent_auth_user_writes(self):
+        with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
+            with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+                create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+
     @raises(UserNotAuthorized)
     def test_activate_account_invalid_key(self):
         activate_account(u'invalid')
+
+    def test_activate_account_prevent_auth_user_writes(self):
+        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
+            with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+                activate_account(activation_key)
 
     @skip_unless_lms
     def test_request_password_change(self):
