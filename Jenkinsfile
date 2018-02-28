@@ -40,8 +40,14 @@ def coverageTest() {
                     codecov_token = env.CODE_COV_TOKEN
                     change_target = env.CHANGE_TARGET
                     
-                    ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD^1').trim()
-
+                    if (branch_name != change_target) {
+                        echo "BRANCH_NAME not equal to CHANGE_TARGET that signifies this is the '?{branch_name}'."
+                        echo "Changing ci_commit to HEAD^1."
+                        ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD^1').trim()
+                    } else {
+                        echo "This is not the PR. Changing ci_commit to HEAD."
+                        ci_commit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    }
                     unstash "artifacts-lms-unit-1"
                     unstash "artifacts-lms-unit-2"
                     unstash "artifacts-lms-unit-3"
