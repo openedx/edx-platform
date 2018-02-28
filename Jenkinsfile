@@ -12,7 +12,6 @@ def makeNode(suite, shard) {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
                     sh """
 mkdir /tmp/mongodata
-mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata
 npm install
 source /tmp/ve/bin/activate
 sed -i 's/cryptography==1.5.3/cryptography==1.9/' requirements/edx/base.txt
@@ -26,15 +25,41 @@ pip install --exists-action w -r requirements/edx/post.txt
 pip install coveralls==1.0
 """
                     try {
-                        if (suite == 'accessibility') {
-                            sh 'source /tmp/ve/bin/activate && ./scripts/accessibility-tests.sh'
+                        if (suite == 'quality') {
+                            sh """
+source /tmp/ve/bin/activate
+EXIT=0
+
+echo "Finding fixme's and storing report..."
+paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+
+echo "Finding pep8 violations and storing report..."
+paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+
+echo "Finding pylint violations and storing in report..."
+paver run_pylint -l $PYLINT_THRESHOLD | tee pylint.log || EXIT=1
+
+mkdir -p reports
+PATH=$PATH:node_modules/.bin
+
+echo "Finding ESLint violations and storing report..."
+paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
+
+# Run quality task. Pass in the 'fail-under' percentage to diff-quality
+paver run_quality -p 100 || EXIT=1
+
+echo "Running code complexity report (python)."
+paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+"""
                         } else {
-                            withEnv(["TEST_SUITE=${suite}", "SHARD=${shard}", "NO_PREREQ_INSTALL=True"]) {
-                                sh 'source /tmp/ve/bin/activate && ./scripts/all-tests.sh'
-                            }
+                            sh """
+source /tmp/ve/bin/activate
+mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata
+paver test_lib --with-flaky --cov-args="-p" --with-xunitmp
+killall mongod
+"""
                         }
                     } finally {
-                        sh 'killall mongod'
                         archiveArtifacts 'reports/**, test_root/log/**'
                         try {
                             junit 'reports/**/*.xml'
@@ -51,17 +76,8 @@ pip install coveralls==1.0
 
 def getSuites() {
     return [
-        [name: 'commonlib-js-unit', 'shards': ['all']],
         [name: 'quality', 'shards': ['all']],
-        [name: 'lms-unit', 'shards': [
-                1,
-                2,
-                3,
-                4,
-            ]],
-        [name: 'cms-unit', 'shards': ['all']],
-        [name: 'accessibility', 'shards': ['all']],
-        [name: 'cms-acceptance', 'shards': ['all']],
+        [name: 'test_lib', 'shards': ['all']]
     ]
 }
 
