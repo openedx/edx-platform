@@ -464,3 +464,17 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
             self.support_user,
             self.reason,
         )
+
+    @classmethod
+    def get_support_actions_list(cls):
+        """
+        Method for retrieving a serializable version of the entitlement support reasons
+
+        Returns
+            list: Containing the possible support actions
+        """
+        return [
+            action[0]  # get just the action code, not the human readable description.
+            for action
+            in cls.ENTITLEMENT_SUPPORT_ACTIONS
+        ]

@@ -15,6 +15,7 @@ class CommerceConfiguration(ConfigurationModel):
     API_NAME = 'commerce'
     CACHE_KEY = 'commerce.api.data'
     DEFAULT_RECEIPT_PAGE_URL = '/checkout/receipt/?order_number='
+    DEFAULT_ORDER_DASHBOARD_URL = '/dashboard/orders/'
     MULTIPLE_ITEMS_BASKET_PAGE_URL = '/basket/add/'
 
     checkout_on_ecommerce_service = models.BooleanField(

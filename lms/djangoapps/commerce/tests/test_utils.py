@@ -103,6 +103,13 @@ class EcommerceServiceTests(TestCase):
         self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    def test_get_order_dashboard_url(self):
+        """Verify that the proper order dashboard url is returned."""
+        url = EcommerceService().get_order_dashboard_url()
+        expected_url = 'http://ecommerce_url/dashboard/orders/'
+        self.assertEqual(url, expected_url)
+
+    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     @ddt.data(['TESTSKU'], ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'])
     def test_get_checkout_page_url(self, skus):
         """ Verify the checkout page URL is properly constructed and returned. """
