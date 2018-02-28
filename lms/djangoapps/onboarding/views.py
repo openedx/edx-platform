@@ -539,9 +539,12 @@ def recommendations(request):
     """
     recommended_courses = get_recommended_xmodule_courses(request.user)
     recommended_communities = get_recommended_communities(request.user)
+    user_extended_profile = request.user.extended_profile
+
     context = {
         'recommended_courses': recommended_courses,
         'recommended_communities': recommended_communities,
+        'is_poc': user_extended_profile.is_organization_admin,
     }
 
     return render_to_response('onboarding/recommendations.html', context)
