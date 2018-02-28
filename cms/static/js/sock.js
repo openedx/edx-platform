@@ -1,7 +1,5 @@
-define(['domReady', 'jquery', 'jquery.smoothScroll'],
+require(['domReady', 'jquery', 'jquery.smoothScroll'],
     function(domReady, $) {
-        'use strict';
-
         var toggleSock = function(e) {
             e.preventDefault();
 
@@ -35,5 +33,4 @@ define(['domReady', 'jquery', 'jquery.smoothScroll'],
             // toggling footer additional support
             $('.cta-show-sock').bind('click', toggleSock);
         });
-    }
-);
+    });
