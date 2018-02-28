@@ -554,3 +554,12 @@ class EvaluatorTest(unittest.TestCase):
             calc.evaluator({'r1': 5}, {}, "r1+r2")
         with self.assertRaisesRegexp(calc.UndefinedVariable, 'r1 r3'):
             calc.evaluator(variables, {}, "r1*r3", case_sensitive=True)
+
+    def test_mismatched_parens(self):
+        """
+        Check to see if the evaluator catches mismatched parens
+        """
+        with self.assertRaisesRegexp(calc.UnmatchedParenthesis, 'opened but never closed'):
+            calc.evaluator({}, {}, "(1+2")
+        with self.assertRaisesRegexp(calc.UnmatchedParenthesis, 'no matching opening parenthesis'):
+            calc.evaluator({}, {}, "(1+2))")

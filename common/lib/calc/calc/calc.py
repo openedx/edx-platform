@@ -100,6 +100,13 @@ class UndefinedVariable(Exception):
     pass
 
 
+class UnmatchedParenthesis(Exception):
+    """
+    Indicate when a student inputs a formula with mismatched parentheses.
+    """
+    pass
+
+
 def lower_dict(input_dict):
     """
     Convert all keys in a dictionary to lowercase; keep their original values.
@@ -249,6 +256,7 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
         return float('nan')
 
     # Parse the tree.
+    check_parens(math_expr)
     math_interpreter = ParseAugmenter(math_expr, case_sensitive)
     math_interpreter.parse_algebra()
 
@@ -276,6 +284,30 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
     }
 
     return math_interpreter.reduce_tree(evaluate_actions)
+
+
+def check_parens(formula):
+    """
+    Check that any open parentheses are closed
+
+    Otherwise, raise an UnmatchedParenthesis exception
+    """
+    count = 0
+    delta = {
+        '(': +1,
+        ')': -1
+    }
+    for index, char in enumerate(formula):
+        if char in delta:
+            count += delta[char]
+            if count < 0:
+                msg = "Invalid Input: A closing parenthesis was found after segment " + \
+                      "{}, but there is no matching opening parenthesis before it."
+                raise UnmatchedParenthesis(msg.format(formula[0:index]))
+    if count > 0:
+        msg = "Invalid Input: Parentheses are unmatched. " + \
+              "{} parentheses were opened but never closed."
+        raise UnmatchedParenthesis(msg.format(count))
 
 
 class ParseAugmenter(object):
