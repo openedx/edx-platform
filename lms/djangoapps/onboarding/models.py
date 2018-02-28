@@ -203,8 +203,7 @@ class Organization(TimeStampedModel):
         """
         :return: Information about the current admin of organization
         """
-        return "%s (%s)" % (self.admin.get_full_name(), self.admin.email) if self.admin \
-            else "Administrator not assigned yet."
+        return "%s" % self.admin.email if self.admin else "Administrator not assigned yet."
 
     def __str__(self):
         return self.label

@@ -498,7 +498,7 @@ def get_organizations(request):
             final_result[organization.label] = {
                 'is_admin_assigned': True if organization.admin else False,
                 'is_current_user_admin': True if organization.admin == request.user else False,
-                'admin_email': organization.admin.email if organization.admin else ''
+                'admin_email': organization.admin.email if organization.admin else 'Administrator not assigned yet.'
             }
 
         if request.user.is_authenticated():
