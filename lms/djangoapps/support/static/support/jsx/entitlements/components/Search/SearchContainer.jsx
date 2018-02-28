@@ -7,7 +7,6 @@ const mapStateToProps = state => ({
   entitlements: state.entitlements,
 });
 
-
 const mapDispatchToProps = dispatch => ({
   fetchEntitlements: username => dispatch(fetchEntitlements(username)),
 });
