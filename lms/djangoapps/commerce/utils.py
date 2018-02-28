@@ -54,6 +54,14 @@ class EcommerceService(object):
             Absolute path to the ecommerce page.
         """
         return urljoin(self.ecommerce_url_root, ecommerce_page_url)
+    
+    def get_order_dashboard_url(self):
+        """ Return the URL to the ecommerce dashboard orders page.
+
+        Returns:
+            order dashboard url.
+        """
+        return self.ecommerce_url_root + '/dashboard/orders/' #TODO: Store this in settings?
 
     def get_receipt_page_url(self, order_number):
         """
