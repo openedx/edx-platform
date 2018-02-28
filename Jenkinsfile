@@ -9,23 +9,23 @@ def makeNode(suite, shard) {
 
                 sh 'git log --oneline | head'
 
-                sh 'mkdir /tmp/mongodata'
-                sh 'mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata'
-                sh 'npm install'
-                sh 'source /tmp/ve/bin/activate'
-                sh 'sed -i \'s/cryptography==1.5.3/cryptography==1.9/\' requirements/edx/base.txt'
-                sh 'pip install --exists-action w -r requirements/edx/paver.txt'
-                sh 'pip install --exists-action w -r requirements/edx/pre.txt'
-                sh 'pip install --exists-action w -r requirements/edx/github.txt'
-                sh 'pip install --exists-action w -r requirements/edx/local.txt'
-                sh 'pip install  --exists-action w pbr==0.9.0'
-                sh 'pip install --exists-action w -r requirements/edx/base.txt'
-                sh 'then pip install --exists-action w -r requirements/edx/post.txt'
-                sh 'pip install coveralls==1.0'
-                sh 'export NO_PREREQ_INSTALL=\'true\''
                 
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
+                    sh 'mkdir /tmp/mongodata'
+                    sh 'mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata'
+                    sh 'npm install'
+                    sh 'source /tmp/ve/bin/activate'
+                    sh 'sed -i \'s/cryptography==1.5.3/cryptography==1.9/\' requirements/edx/base.txt'
+                    sh 'pip install --exists-action w -r requirements/edx/paver.txt'
+                    sh 'pip install --exists-action w -r requirements/edx/pre.txt'
+                    sh 'pip install --exists-action w -r requirements/edx/github.txt'
+                    sh 'pip install --exists-action w -r requirements/edx/local.txt'
+                    sh 'pip install  --exists-action w pbr==0.9.0'
+                    sh 'pip install --exists-action w -r requirements/edx/base.txt'
+                    sh 'then pip install --exists-action w -r requirements/edx/post.txt'
+                    sh 'pip install coveralls==1.0'
+                    sh 'export NO_PREREQ_INSTALL=\'true\''
                     try {
                         if (suite == 'accessibility') {
                             sh './scripts/accessibility-tests.sh'
@@ -62,21 +62,7 @@ def getSuites() {
             ]],
         [name: 'cms-unit', 'shards': ['all']],
         [name: 'accessibility', 'shards': ['all']],
-        [name: 'lms-acceptance', 'shards': ['all']],
         [name: 'cms-acceptance', 'shards': ['all']],
-        [name: 'bok-choy', 'shards': [
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-            ]],
     ]
 }
 
@@ -95,7 +81,9 @@ def buildParallelSteps() {
 }
 
 podTemplate(cloud: 'jnlp', label: 'edxapp', containers: [
-        containerTemplate(name: 'edxapp', image: 'gcr.io/appsembler-testing/jenkins-worker:v0.1.3', ttyEnabled: true, 
+        containerTemplate(name: 'edxapp',
+            image: 'gcr.io/appsembler-testing/jenkins-worker:v0.1.3',
+            ttyEnabled: true, 
             command: 'cat')
     ]) {
     stage('Prepare') {
