@@ -6,13 +6,11 @@ from completion.test_utils import CompletionWaffleTestMixin
 from xblock.core import XBlock
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
 
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase, TransformerRegistryTestMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-
-from ...api import get_course_blocks
 
 
 class StubAggregatorXBlock(XBlock):

@@ -2,7 +2,7 @@
 API function for retrieving course blocks data
 """
 
-from lms.djangoapps.course_blocks.api import COURSE_BLOCK_ACCESS_TRANSFORMERS, get_course_blocks
+import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
@@ -59,7 +59,7 @@ def get_blocks(
     include_gated_sections = 'show_gated_sections' in requested_fields
 
     if user is not None:
-        transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS
+        transformers += course_blocks_api.get_course_block_access_transformers()
         transformers += [MilestonesAndSpecialExamsTransformer(
             include_special_exams=include_special_exams,
             include_gated_sections=include_gated_sections)]
@@ -77,7 +77,7 @@ def get_blocks(
         transformers += [BlockCompletionTransformer()]
 
     # transform
-    blocks = get_course_blocks(user, usage_key, transformers)
+    blocks = course_blocks_api.get_course_blocks(user, usage_key, transformers)
 
     # filter blocks by types
     if block_types_filter:
