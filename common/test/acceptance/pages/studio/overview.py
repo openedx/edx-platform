@@ -291,16 +291,16 @@ class CourseOutlineContainer(CourseOutlineItem):
                 self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Toggle control is present'
             )
             css_element = self._bounded_selector(self.ADD_BUTTON_SELECTOR)
-            add_button = self.q(css=css_element).first.results
-            self.scroll_to_element(css_element)
+            add_button = self.q(css=css_element).first.results # pylint: disable=no-member
+            self.scroll_to_element(css_element) # pylint: disable=no-member
             return add_button and add_button[0].is_displayed()
 
         currently_expanded = subsection_expanded()
 
         # Need to click slightly off-center in order for the click to be recognized.
         css_element = self._bounded_selector('.ui-toggle-expansion .fa')
-        self.scroll_to_element(css_element)
-        ele = self.browser.find_element_by_css_selector(css_element)
+        self.scroll_to_element(css_element) # pylint: disable=no-member
+        ele = self.browser.find_element_by_css_selector(css_element) # pylint: disable=no-member
         ActionChains(self.browser).move_to_element_with_offset(ele, 8, 8).click().perform()  # pylint: disable=no-member
         self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
@@ -319,7 +319,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         Return whether this outline item is currently collapsed.
         """
         css_element = self._bounded_selector('')
-        self.scroll_to_element(css_element)
+        self.scroll_to_element(css_element) # pylint: disable=no-member
         return "is-collapsed" in self.q(css=css_element).first.attrs("class")[0]  # pylint: disable=no-member
 
 
