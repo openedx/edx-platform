@@ -282,6 +282,7 @@ def get_course_runs_for_course(course_uuid):
             api=api,
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
+            many=False
         )
         return data.get('course_runs', [])
     else:
