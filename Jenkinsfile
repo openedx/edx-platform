@@ -9,6 +9,21 @@ def makeNode(suite, shard) {
 
                 sh 'git log --oneline | head'
 
+                sh 'mkdir /tmp/mongodata'
+                sh 'mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata'
+                sh 'npm install'
+                sh 'source /tmp/ve/bin/activate'
+                sh 'sed -i \'s/cryptography==1.5.3/cryptography==1.9/\' requirements/edx/base.txt'
+                sh 'pip install --exists-action w -r requirements/edx/paver.txt'
+                sh 'pip install --exists-action w -r requirements/edx/pre.txt'
+                sh 'pip install --exists-action w -r requirements/edx/github.txt'
+                sh 'pip install --exists-action w -r requirements/edx/local.txt'
+                sh 'pip install  --exists-action w pbr==0.9.0'
+                sh 'pip install --exists-action w -r requirements/edx/base.txt'
+                sh 'then pip install --exists-action w -r requirements/edx/post.txt'
+                sh 'pip install coveralls==1.0'
+                sh 'export NO_PREREQ_INSTALL=\'true\''
+                
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
                     try {
@@ -20,6 +35,7 @@ def makeNode(suite, shard) {
                             }
                         }
                     } finally {
+                        sh 'killall mongod'
                         archiveArtifacts 'reports/**, test_root/log/**'
                         try {
                             junit 'reports/**/*.xml'
