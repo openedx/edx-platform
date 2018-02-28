@@ -338,3 +338,11 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # API access management -- needed for simple-history to run.
 INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
+
+STATIC_ROOT_BASE = REPO_ROOT / "static_test"
+EDX_PLATFORM_STATIC_ROOT_BASE = REPO_ROOT / "static_edxplatform_test"
+STATIC_COLLECTOR_ROOT = REPO_ROOT / "static_collection_test"
+
+MOCK_SEARCH_BACKING_FILE = (
+    REPO_ROOT / "test_root" / "index_file.dat"
+).abspath()

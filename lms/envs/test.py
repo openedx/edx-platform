@@ -605,3 +605,11 @@ ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
+
+STATIC_ROOT_BASE = REPO_ROOT / "static_test"
+EDX_PLATFORM_STATIC_ROOT_BASE = REPO_ROOT / "static_edxplatform_test"
+STATIC_COLLECTOR_ROOT = REPO_ROOT / "static_collection_test"
+
+#for lms.djangoapps.instructor_task.tests.test_models
+S3_HOST = ''
+S3_USE_SIGV4 = ''
