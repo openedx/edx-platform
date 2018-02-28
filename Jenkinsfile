@@ -25,16 +25,17 @@ pip install --exists-action w -r requirements/edx/post.txt
 pip install coveralls==1.0
 """
                     try {
+                        echo suite
                         if (suite == 'quality') {
                             sh """
 source /tmp/ve/bin/activate
 EXIT=0
 
 echo "Finding fixme's and storing report..."
-paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+paver find_fixme > reports/fixme.log || { cat reports/fixme.log; EXIT=1; }
 
 echo "Finding pep8 violations and storing report..."
-paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+paver run_pep8 > reports/pep8.log || { cat reports/pep8.log; EXIT=1; }
 
 echo "Finding pylint violations and storing in report..."
 paver run_pylint -l $PYLINT_THRESHOLD | tee pylint.log || EXIT=1
@@ -43,7 +44,7 @@ mkdir -p reports
 PATH=$PATH:node_modules/.bin
 
 echo "Finding ESLint violations and storing report..."
-paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
+paver run_eslint -l $ESLINT_THRESHOLD > reports/eslint.log || { cat reports/eslint.log; EXIT=1; }
 
 # Run quality task. Pass in the 'fail-under' percentage to diff-quality
 paver run_quality -p 100 || EXIT=1
@@ -60,9 +61,9 @@ killall mongod
 """
                         }
                     } finally {
-                        archiveArtifacts 'reports/**, test_root/log/**'
+//                        archiveArtifacts 'reports/**, test_root/log/**'
                         try {
-                            junit 'reports/**/*.xml'
+//                            junit 'reports/**/*.xml'
                         } finally {
                             // This works, but only for the current build files.
                             deleteDir()
