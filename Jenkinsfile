@@ -28,6 +28,9 @@ pip install coveralls==1.0
                         echo suite
                         if (suite == 'quality') {
                             sh """
+export PYLINT_THRESHOLD=3600
+export ESLINT_THRESHOLD=9850
+
 source /tmp/ve/bin/activate
 EXIT=0
 
