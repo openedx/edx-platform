@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-01 14:16+0500\n"
-"PO-Revision-Date: 2018-03-01 09:16:42.722902\n"
+"POT-Creation-Date: 2018-03-01 15:16+0000\n"
+"PO-Revision-Date: 2018-03-01 15:16:26.038535\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -24208,10 +24208,10 @@ msgstr "© 2012–{year} édX Ìnç.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
 "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"粤ICP备17044299号-2. "
+"ç²¤ICPå¤17044299å·-2. "
 msgstr ""
 "ÉdX, Öpén édX, änd MïçröMästérs äré régïstéréd trädémärks öf édX Ìnç. "
-"粤ÌÇP备17044299号-2.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"ç²¤ÌÇPå¤17044299å·-2.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
