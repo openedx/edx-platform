@@ -409,7 +409,7 @@ def run_stylelint(options):
 @timed
 def run_xsslint(options):
     """
-    Runs xss_linter.py on the codebase
+    Runs xsslint/xss_linter.py on the codebase
     """
 
     thresholds_option = getattr(options, 'thresholds', '{}')
@@ -434,7 +434,7 @@ def run_xsslint(options):
     _prepare_report_dir(xsslint_report_dir)
 
     sh(
-        "{repo_root}/scripts/{xsslint_script} --rule-totals >> {xsslint_report}".format(
+        "{repo_root}/scripts/xsslint/{xsslint_script} --rule-totals >> {xsslint_report}".format(
             repo_root=Env.REPO_ROOT,
             xsslint_script=xsslint_script,
             xsslint_report=xsslint_report,
