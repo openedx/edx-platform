@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=405 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=406 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3887,7 +3887,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempt` (
   `last_poll_ipaddr` varchar(32) DEFAULT NULL,
   `attempt_code` varchar(255) DEFAULT NULL,
   `external_id` varchar(255) DEFAULT NULL,
-  `allowed_time_limit_mins` int(11) NOT NULL,
+  `allowed_time_limit_mins` int(11) DEFAULT NULL,
   `status` varchar(64) NOT NULL,
   `taking_as_proctored` tinyint(1) NOT NULL,
   `is_sample_attempt` tinyint(1) NOT NULL,
@@ -3935,7 +3935,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempthistory` (
   `completed_at` datetime(6) DEFAULT NULL,
   `attempt_code` varchar(255) DEFAULT NULL,
   `external_id` varchar(255) DEFAULT NULL,
-  `allowed_time_limit_mins` int(11) NOT NULL,
+  `allowed_time_limit_mins` int(11) DEFAULT NULL,
   `status` varchar(64) NOT NULL,
   `taking_as_proctored` tinyint(1) NOT NULL,
   `is_sample_attempt` tinyint(1) NOT NULL,
