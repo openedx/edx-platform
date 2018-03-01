@@ -6,6 +6,7 @@ Unit tests for the Mongo modulestore
 # pylint: disable=bad-continuation
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
+from django.test import TestCase
 # pylint: enable=E0611
 from path import Path as path
 import pymongo
@@ -15,7 +16,6 @@ from tempfile import mkdtemp
 from uuid import uuid4
 from datetime import datetime
 from pytz import UTC
-import unittest
 from mock import patch
 from xblock.core import XBlock
 
@@ -68,7 +68,7 @@ class ReferenceTestXBlock(XModuleMixin):
     reference_dict = ReferenceValueDict(scope=Scope.settings)
 
 
-class TestMongoModuleStoreBase(unittest.TestCase):
+class TestMongoModuleStoreBase(TestCase):
     '''
     Basic setup for all tests
     '''
@@ -772,7 +772,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
 
 
-class TestMongoKeyValueStore(unittest.TestCase):
+class TestMongoKeyValueStore(TestCase):
     """
     Tests for MongoKeyValueStore.
     """

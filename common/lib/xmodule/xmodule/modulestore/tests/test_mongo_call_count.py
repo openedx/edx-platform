@@ -153,9 +153,9 @@ class CountMongoCallsCourseTraversal(TestCase):
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 4)
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 3),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 3),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 3)
     )
     @ddt.unpack
     def test_number_mongo_calls(self, store_builder, depth, lazy, access_all_block_fields, num_mongo_calls):

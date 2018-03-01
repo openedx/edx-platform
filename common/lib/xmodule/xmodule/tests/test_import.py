@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import ddt
-import unittest
+from tempfile import mkdtemp
 
-from fs.memoryfs import MemoryFS
+import ddt
+
+from django.test import TestCase
+
+from fs.osfs import OSFS
 from lxml import etree
 from mock import Mock, patch
 
@@ -33,7 +36,7 @@ COURSE = 'test_course'
 
 class DummySystem(ImportSystem):
 
-    @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
+    @patch('xmodule.modulestore.xml.OSFS', lambda dir: OSFS(mkdtemp()))
     def __init__(self, load_error_modules, library=False):
 
         if library:
@@ -58,7 +61,7 @@ class DummySystem(ImportSystem):
         raise Exception("Shouldn't be called")
 
 
-class BaseCourseTestCase(unittest.TestCase):
+class BaseCourseTestCase(TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
     @staticmethod
     def get_system(load_error_modules=True, library=False):
@@ -208,7 +211,8 @@ class ImportTestCase(BaseCourseTestCase):
         )
 
         # Now export and check things
-        descriptor.runtime.export_fs = MemoryFS()
+        file_system = OSFS(mkdtemp())
+        descriptor.runtime.export_fs = file_system.makedir(u'course', recreate=True)
         node = etree.Element('unknown')
         descriptor.add_xml_to_node(node)
 
@@ -594,7 +598,6 @@ class ImportTestCase(BaseCourseTestCase):
             video = sections[i]
             # Name should be 'video_{hash}'
             print "video {0} url_name: {1}".format(i, video.url_name)
-
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
     def test_poll_and_conditional_import(self):

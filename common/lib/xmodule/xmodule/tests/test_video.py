@@ -24,6 +24,7 @@ from mock import ANY, Mock, patch, MagicMock
 import ddt
 
 from django.conf import settings
+from django.test import TestCase
 from django.test.utils import override_settings
 
 from fs.osfs import OSFS
@@ -34,7 +35,7 @@ from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
-from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_STATIC_DIR
+from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
 from . import LogicTest
 from .test_import import DummySystem
@@ -259,7 +260,7 @@ class TestCreateYouTubeUrl(VideoDescriptorTestBase):
 
 
 @ddt.ddt
-class VideoDescriptorImportTestCase(unittest.TestCase):
+class VideoDescriptorImportTestCase(TestCase):
     """
     Make sure that VideoDescriptor can import an old XML-based video correctly.
     """
@@ -628,30 +629,46 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
 
     @patch('xmodule.video_module.video_module.edxval_api')
     def test_import_val_data(self, mock_val_api):
-        def mock_val_import(xml, edx_video_id, course_id):
+        """
+        Test that `from_xml` works method works as expected.
+        """
+        def mock_val_import(xml, edx_video_id, resource_fs, static_dir, external_transcripts, course_id):
             """Mock edxval.api.import_from_xml"""
             self.assertEqual(xml.tag, 'video_asset')
             self.assertEqual(dict(xml.items()), {'mock_attr': ''})
             self.assertEqual(edx_video_id, 'test_edx_video_id')
+            self.assertEqual(static_dir, EXPORT_IMPORT_STATIC_DIR)
+            self.assertIsNotNone(resource_fs)
+            self.assertEqual(external_transcripts, {u'en': [u'subs_3_yD_cEKoCk.srt.sjson']})
             self.assertEqual(course_id, 'test_course_id')
+            return edx_video_id
 
+        edx_video_id = 'test_edx_video_id'
         mock_val_api.import_from_xml = Mock(wraps=mock_val_import)
         module_system = DummySystem(load_error_modules=True)
 
+        # Create static directory in import file system and place transcript files inside it.
+        module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
+
         # import new edx_video_id
         xml_data = """
-            <video edx_video_id="test_edx_video_id">
+            <video edx_video_id="{edx_video_id}">
                 <video_asset mock_attr=""/>
             </video>
-        """
+        """.format(
+            edx_video_id=edx_video_id
+        )
         id_generator = Mock()
         id_generator.target_course_id = 'test_course_id'
         video = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
 
-        self.assert_attributes_equal(video, {'edx_video_id': 'test_edx_video_id'})
+        self.assert_attributes_equal(video, {'edx_video_id': edx_video_id})
         mock_val_api.import_from_xml.assert_called_once_with(
             ANY,
-            'test_edx_video_id',
+            edx_video_id,
+            module_system.resources_fs,
+            EXPORT_IMPORT_STATIC_DIR,
+            {u'en': [u'subs_3_yD_cEKoCk.srt.sjson']},
             course_id='test_course_id'
         )
 
@@ -721,7 +738,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.assertXmlEqual(expected, xml)
         mock_val_api.export_to_xml.assert_called_once_with(
             video_id=edx_video_id,
-            static_dir=EXPORT_STATIC_DIR,
+            static_dir=EXPORT_IMPORT_STATIC_DIR,
             resource_fs=self.file_system,
             course_id=unicode(self.descriptor.runtime.course_id.for_branch(None)),
         )

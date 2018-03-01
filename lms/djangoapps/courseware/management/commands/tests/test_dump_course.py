@@ -132,8 +132,10 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         video_id = text_type(test_course_key.make_usage_key('video', 'Welcome'))
         self.assertEqual(dump[video_id]['category'], 'video')
+        course_metadata = dump[video_id]['metadata']
+        course_metadata.pop('edx_video_id', None)
         self.assertItemsEqual(
-            dump[video_id]['metadata'].keys(),
+            course_metadata.keys(),
             ['download_video', 'youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
