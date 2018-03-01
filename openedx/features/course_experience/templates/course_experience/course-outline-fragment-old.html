@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<main role="main" class="course-outline" id="main" tabindex="-1">
+<main class="course-outline" id="main" aria-label="Content" tabindex="-1">
     % if blocks.get('children'):
         <ol class="block-tree">
             % for section in blocks.get('children'):

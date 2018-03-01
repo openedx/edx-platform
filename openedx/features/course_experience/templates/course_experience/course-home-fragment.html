@@ -80,7 +80,7 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
         </div>
     </header>
     <div class="page-content">
-        <main class="page-content-main">
+        <div class="page-content-main">
             % if course_home_message_fragment:
                 ${HTML(course_home_message_fragment.body_html())}
             % endif
@@ -94,7 +94,7 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
             % if outline_fragment:
                 ${HTML(outline_fragment.body_html())}
             % endif
-        </main>
+        </div>
         <aside class="page-content-secondary course-sidebar">
             % if has_goal_permission:
                 <div class="section section-goals ${'' if current_goal else 'hidden'}">
