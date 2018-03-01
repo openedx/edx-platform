@@ -2,19 +2,19 @@
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-22 09:36+0000\n"
-"PO-Revision-Date: 2018-02-22 09:38:28.749729\n"
+"POT-Creation-Date: 2018-03-01 14:16+0500\n"
+"PO-Revision-Date: 2018-03-01 09:16:42.707190\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js
@@ -443,6 +443,10 @@ msgid "Your file has been deleted."
 msgstr ""
 
 #: cms/static/js/views/assets.js
+msgid "Name"
+msgstr ""
+
+#: cms/static/js/views/assets.js
 msgid "Date Added"
 msgstr ""
 
@@ -491,6 +495,10 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "An error has occurred. Wait a few minutes, and then try again."
+msgstr ""
+
+#: cms/static/js/views/course_video_settings.js
+msgid "None"
 msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
@@ -708,6 +716,10 @@ msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
 msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
+msgid "Ok"
+msgstr ""
+
+#: cms/static/js/views/manage_users_and_roles.js
 msgid "There was an error changing the user's role"
 msgstr ""
 
@@ -753,6 +765,11 @@ msgstr ""
 msgid "Are you sure you want to restrict {email} access to “{container}”?"
 msgstr ""
 
+#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Save"
+msgstr ""
+
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "{display_name} Settings"
 msgstr ""
@@ -787,6 +804,10 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
+msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Advanced"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
