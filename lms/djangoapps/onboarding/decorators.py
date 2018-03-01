@@ -20,7 +20,7 @@ def can_access_org_page(user_extended_profile):
 
     # user is at registration pages & signup as admin/first_learner => can access org page
     elif not are_forms_complete and user_extended_profile.organization and \
-        (user_extended_profile.is_organization_admin or user_extended_profile.organization.is_first_signup_in_org()):
+        (user_extended_profile.is_organization_admin or user_extended_profile.is_first_signup_in_org):
         can_access = True
     else:
         can_access = False

@@ -307,3 +307,12 @@ def get_actual_field_names(fields):
 
 def admin_not_assigned_or_me(user, organization):
     return not organization.admin or organization.admin == user
+
+
+def oef_eligible_first_learner(user_extended_profile):
+    """
+    :param user_extended_profile:
+    :return: True if user is first learner & not submitted OEF yet & organization admin not set
+    """
+    return user_extended_profile.is_first_signup_in_org and not user_extended_profile.has_submitted_oef() \
+           and not user_extended_profile.organization.admin

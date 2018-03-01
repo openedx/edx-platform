@@ -9,10 +9,10 @@ from rest_framework import status
 from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
 from lms.djangoapps.onboarding.models import Organization
+from lms.djangoapps.onboarding.helpers import oef_eligible_first_learner
 
 
 @login_required
-@can_take_oef
 def oef_dashboard(request):
     """
     View for OEF dashboard
@@ -22,12 +22,14 @@ def oef_dashboard(request):
     surveys = []
     user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
     user_extended_profile = request.user.extended_profile
+    is_first_user = user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False
 
     context = {
-        'is_poc': user_extended_profile.is_organization_admin,
+        'user_has_organization': bool(user_extended_profile.organization),
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
-        'is_first_user': user_extended_profile.organization.is_first_signup_in_org()
-        if user_extended_profile.organization else False
+        'is_poc': user_extended_profile.is_organization_admin,
+        'is_first_user': is_first_user,
+        'first_learner_submitted_oef': is_first_user and user_extended_profile.has_submitted_oef()
     }
 
     for survey in user_surveys:
