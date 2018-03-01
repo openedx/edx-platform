@@ -44,10 +44,10 @@ class PlatformSyncService(APIView):
 
         user_extended_profile = user.extended_profile
         return JsonResponse({
-<           "is_admin": user_extended_profile.is_organization_admin,
+            "is_admin": user_extended_profile.is_organization_admin,
             "eligible_for_oef": eligible_for_oef(user_extended_profile),
             "help_center": configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
-=       }, status=status.HTTP_200_OK)
+        }, status=status.HTTP_200_OK)
 
     def post(self, request):
         """ Update provided information in openEdx received from nodeBB client """
