@@ -1,6 +1,9 @@
 import React from 'react';
 import {render} from 'react-dom';
 
+//Import components
+import MainContainer from './components/Main/MainContainer';
+
 //Import redux dependecies
 import {Provider } from 'react-redux';
 import store, {history} from './store';
@@ -12,7 +15,7 @@ export class EntitlementSupportPage extends React.Component {
 	render(){
 		return	(
 			<Provider store={store} >
-				<div> Store in place. </div>
+				<MainContainer {...this.props}/>
 			</Provider>
 		)
 	}
