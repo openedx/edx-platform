@@ -431,6 +431,10 @@ def suggest_org_admin(request):
     if request.method == 'POST':
         organization = request.POST.get('organization')
         org_admin_email = request.POST.get('email')
+        try:
+            org_admin_first_name = User.objects.get(email=org_admin_email).first_name
+        except:
+            org_admin_first_name = ''
 
         if organization:
             try:
@@ -459,7 +463,7 @@ def suggest_org_admin(request):
                                                                             last_name=request.user.last_name)
                         claimed_by_email = request.user.email
 
-                        send_admin_activation_email(request.user.first_name, org_id, org_name, claimed_by_name,
+                        send_admin_activation_email(org_admin_first_name, org_id, org_name, claimed_by_name,
                                                     claimed_by_email, org_admin_email, hash_key)
                 else:
                     hash_key = OrganizationAdminHashKeys.assign_hash(organization, organization.admin, request.user.email)
