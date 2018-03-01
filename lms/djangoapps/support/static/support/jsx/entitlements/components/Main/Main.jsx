@@ -1,5 +1,7 @@
 import React from 'react';
 
+import EntitlementModalContainer from '../EntitlementModal/EntitlementModalContainer'
+
 class Main extends React.Component{
 	constructor(props){
 		super(props);
@@ -11,7 +13,12 @@ class Main extends React.Component{
 				<h1>
 					Entitlement Support Page
 				</h1>
-			{/*Instert main content here*/}
+				<Button
+	        className={['btn', 'btn-primary']}
+	        label= "Create New Entitlement"
+	        onClick={this.openCreationModal.bind(this)}
+			  />
+				<EntitlementModalContainer supportReasons={this.props.supportReasons}/>
 			</div>
 		)
 	}
