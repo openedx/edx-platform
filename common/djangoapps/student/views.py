@@ -662,13 +662,13 @@ def dashboard(request):
 
     # Show different dashboard messages in case of admin OR regular user
     message = ""
-    first_name = user.first_name
+    user_name = request.user.username
     if not user.is_active:
         if user.extended_profile.is_organization_admin:
-            msg = ("Success! You are registered as the Admin for %s, %s"
-             % (user.extended_profile.organization.label, first_name))
+            msg = ("Success. You are registered as the Admin for %s, %s"
+             % (user.extended_profile.organization.label, user_name))
         else:
-            msg = "Success! You are registered, %s" % (first_name)
+            msg = "Success. You are registered, %s" % (user_name)
         message = render_to_string(
             'registration/activate_account_notice.html',
             {'msg': msg, 'email': user.email, 'platform_name': platform_name}
