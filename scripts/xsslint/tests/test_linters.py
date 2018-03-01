@@ -15,6 +15,19 @@ from xsslint.rules import Rules
 from xsslint.utils import ParseString
 
 
+def _build_javascript_linter():
+    return JavaScriptLinter(
+        underscore_linter=UnderscoreTemplateLinter()
+    )
+
+
+def _build_mako_linter():
+    return MakoTemplateLinter(
+        javascript_linter=_build_javascript_linter(),
+        python_linter=PythonLinter(),
+    )
+
+
 class TestLinter(TestCase):
     """
     Test Linter base class
@@ -219,7 +232,7 @@ class TestJavaScriptLinter(TestLinter):
         """
         Test check_javascript_file_is_safe with concatenating strings and HTML
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -249,7 +262,7 @@ class TestJavaScriptLinter(TestLinter):
         """
         Test check_javascript_file_is_safe with JQuery append()
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -277,7 +290,7 @@ class TestJavaScriptLinter(TestLinter):
         """
         Test check_javascript_file_is_safe with JQuery prepend()
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -309,7 +322,7 @@ class TestJavaScriptLinter(TestLinter):
         other than append(), prepend() and html() that take content as an
         argument (e.g. before(), after()).
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -340,7 +353,7 @@ class TestJavaScriptLinter(TestLinter):
         functions that take a target as an argument, like appendTo() and
         prependTo().
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -364,7 +377,7 @@ class TestJavaScriptLinter(TestLinter):
         """
         Test check_javascript_file_is_safe with JQuery html()
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -379,7 +392,7 @@ class TestJavaScriptLinter(TestLinter):
         """
         Test check_javascript_file_is_safe with interpolate()
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -394,7 +407,7 @@ class TestJavaScriptLinter(TestLinter):
         """
         Test check_javascript_file_is_safe with interpolate()
         """
-        linter = JavaScriptLinter()
+        linter = _build_javascript_linter()
         results = FileResults('')
 
         linter.check_javascript_file_is_safe(data['template'], results)
@@ -737,7 +750,8 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _is_valid_directory correctly determines mako directories
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
+        linter._skip_mako_dirs = ('test_root',)
 
         self.assertEqual(linter._is_valid_directory(data['directory']), data['expected'])
 
@@ -785,7 +799,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _check_mako_file_is_safe with different page defaults
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         linter._check_mako_file_is_safe(data['template'], results)
@@ -808,7 +822,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _check_mako_file_is_safe in html context provides appropriate violations
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -825,7 +839,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe with display_name_with_default_escaped
         fails.
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -971,7 +985,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _check_mako_file_is_safe tests for proper use of Text() and Html().
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -988,7 +1002,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe does not fail on entities when
         safe-by-default is not set.
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = "${'Rock &#38; Roll'}"
@@ -1003,7 +1017,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe with disable pragma for safe-by-default
         works to designate that this is not a Mako file
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1023,7 +1037,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe with disable pragma results in no
         violation
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1047,7 +1061,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe with disable pragma results in no
         violation
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         linter._check_mako_file_is_safe(data['template'], results)
@@ -1059,7 +1073,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe results in no violations,
         when strip_all_tags_but_br filter is applied in html context
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1075,7 +1089,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe in html context without the page level
         default h filter suppresses expression level violation
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1100,7 +1114,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe in JavaScript script context provides
         appropriate violations
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1126,7 +1140,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe in JavaScript require context provides
         appropriate violations
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1152,7 +1166,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe in JavaScript require js context provides
         appropriate violations
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1183,7 +1197,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _check_mako_file_is_safe in script tag with different media types
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1205,7 +1219,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe in mixed contexts provides
         appropriate violations
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1242,7 +1256,7 @@ class TestMakoTemplateLinter(TestLinter):
         - mako_js_missing_quotes
         - mako_js_html_string
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1277,7 +1291,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe with JavaScript error in JavaScript
         context.
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         mako_template = textwrap.dedent("""
@@ -1311,7 +1325,7 @@ class TestMakoTemplateLinter(TestLinter):
         Test _check_mako_file_is_safe provides detailed results, including line
         numbers, columns, and line
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
         results = FileResults('')
 
         linter._check_mako_file_is_safe(data['template'], results)
@@ -1346,7 +1360,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _find_mako_expressions for parseable expressions
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
 
         expressions = linter._find_mako_expressions(data['template'])
 
@@ -1364,7 +1378,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _find_mako_expressions for unparseable expressions
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
 
         expressions = linter._find_mako_expressions(data['template'])
         self.assertTrue(2 <= len(expressions))
@@ -1401,7 +1415,7 @@ class TestMakoTemplateLinter(TestLinter):
         """
         Test _parse_string helper
         """
-        linter = MakoTemplateLinter()
+        linter = _build_mako_linter()
 
         parse_string = ParseString(data['template'], data['result']['start_index'], len(data['template']))
         string_dict = {

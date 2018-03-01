@@ -82,6 +82,6 @@ else
     for f in $diff_files; do
         echo ""
         echo "Linting $f:"
-        ./scripts/xsslint/xss_linter.py $f
+        ./scripts/xsslint/xss_linter.py --config=scripts.xsslint_config $f
     done
 fi

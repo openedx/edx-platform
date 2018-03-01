@@ -46,6 +46,13 @@ class TestXSSLinter(TestCase):
         self.addCleanup(patcher.stop)
         return patch_start
 
+    def _build_linters(self):
+        underscore_linter = UnderscoreTemplateLinter()
+        python_linter = PythonLinter()
+        javascript_linter = JavaScriptLinter(underscore_linter=underscore_linter)
+        mako_linter = MakoTemplateLinter(javascript_linter=javascript_linter, python_linter=python_linter)
+        return [mako_linter, underscore_linter, javascript_linter, python_linter]
+
     def test_lint_defaults(self):
         """
         Tests the top-level linting with default options.
@@ -55,11 +62,12 @@ class TestXSSLinter(TestCase):
 
         _lint(
             'scripts/xsslint/tests/templates',
-            template_linters=[MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()],
+            template_linters=self._build_linters(),
             options={
                 'list_files': False,
                 'verbose': False,
                 'rule_totals': False,
+                'skip_dirs': ()
             },
             summary_results=summary_results,
             out=out,
@@ -97,11 +105,12 @@ class TestXSSLinter(TestCase):
 
         _lint(
             'scripts/xsslint/tests/templates',
-            template_linters=[MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()],
+            template_linters=self._build_linters(),
             options={
                 'list_files': False,
                 'verbose': True,
                 'rule_totals': False,
+                'skip_dirs': ()
             },
             summary_results=summary_results,
             out=out,
@@ -131,11 +140,12 @@ class TestXSSLinter(TestCase):
 
         _lint(
             'scripts/xsslint/tests/templates',
-            template_linters=[MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()],
+            template_linters=self._build_linters(),
             options={
                 'list_files': False,
                 'verbose': False,
                 'rule_totals': True,
+                'skip_dirs': ()
             },
             summary_results=summary_results,
             out=out,
@@ -155,14 +165,14 @@ class TestXSSLinter(TestCase):
         """
         out = StringIO()
         summary_results = SummaryResults()
-
         _lint(
             'scripts/xsslint/tests/templates',
-            template_linters=[MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()],
+            template_linters=self._build_linters(),
             options={
                 'list_files': True,
                 'verbose': False,
                 'rule_totals': False,
+                'skip_dirs': ()
             },
             summary_results=summary_results,
             out=out,

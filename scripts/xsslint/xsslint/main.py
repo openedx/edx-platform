@@ -2,12 +2,20 @@
 The main function for the XSS linter.
 """
 import argparse
+import importlib
 import os
 import sys
 
-from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
 from xsslint.reporting import SummaryResults
-from xsslint.utils import SKIP_DIRS, is_skip_dir
+from xsslint.utils import is_skip_dir
+
+
+def _load_config_module(module_path):
+    cwd = os.getcwd()
+    if cwd not in sys.path:
+        # Enable config module to be imported relative to wherever the script was run from.
+        sys.path.append(cwd)
+    return importlib.import_module(module_path)
 
 
 def _process_file(full_path, template_linters, options, summary_results, out):
@@ -61,8 +69,9 @@ def _process_os_dirs(starting_dir, template_linters, options, summary_results, o
         out: output file
 
     """
+    skip_dirs = options.get('skip_dirs', ())
     for root, dirs, files in os.walk(starting_dir):
-        if is_skip_dir(SKIP_DIRS, root):
+        if is_skip_dir(skip_dirs, root):
             del dirs
             continue
         dirs.sort(key=lambda s: s.lower())
@@ -125,16 +134,23 @@ def main():
         '--verbose', dest='verbose', action='store_true',
         help='Print multiple lines where possible for additional context of violations.'
     )
+    parser.add_argument(
+        '--config', dest='config', action='store', default='xsslint.default_config',
+        help='Specifies the config module to use. The config module should be in Python package syntax.'
+    )
     parser.add_argument('path', nargs="?", default=None, help='A file to lint or directory to recursively lint.')
 
     args = parser.parse_args()
-
+    config = _load_config_module(args.config)
     options = {
         'list_files': args.list_files,
         'rule_totals': args.rule_totals,
         'verbose': args.verbose,
+        'skip_dirs': getattr(config, 'SKIP_DIRS', ())
     }
-    template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()]
     summary_results = SummaryResults()
+    template_linters = getattr(config, 'LINTERS', ())
+    if not template_linters:
+        raise ValueError("LINTERS is empty or undefined in the config module ({}).".format(args.config))
 
     _lint(args.path, template_linters, options, summary_results, out=sys.stdout)
