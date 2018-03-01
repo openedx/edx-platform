@@ -11,7 +11,7 @@ class Main extends React.Component{
 				<h1>
 					Entitlement Support Page
 				</h1>
-			{/*Instert main content here*/}
+				<EntitlementTable {...this.props}/>
 			</div>
 		)
 	}
