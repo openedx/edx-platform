@@ -17,9 +17,8 @@
 // For the django-oauth-toolkit Authorization view
 .wrapper-authorize {
   background: $white;
-  width: 60%;
-  padding-right: 140px;
-  padding-left: 140px;
+  padding-right: $baseline/2;
+  padding-left: $baseline/2;
   font-family: $font-family-sans-serif;
 
   h1 {
