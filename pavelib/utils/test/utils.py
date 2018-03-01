@@ -33,6 +33,18 @@ def clean_test_files():
     sh("rm -rf /tmp/mako_[cl]ms")
 
 
+@task
+@timed
+def ensure_clean_package_lock():
+    """
+    Ensure no untracked changes have been made in the current git context.
+    """
+    sh("""
+      git diff --name-only --exit-code package-lock.json ||
+      (echo \"Dirty package-lock.json, run 'npm install' and commit the generated changes\" && exit 1)
+    """)
+
+
 def clean_dir(directory):
     """
     Delete all the files from the specified directory.
