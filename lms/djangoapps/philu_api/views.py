@@ -44,7 +44,7 @@ class UpdateCommunityProfile(APIView):
         user_extended_profile = user.extended_profile
         return JsonResponse({
             "is_admin": user.extended_profile.is_organization_admin,
-            "is_first_learner": user_extended_profile.organization.is_first_signup_in_org()
+            "is_first_learner": user_extended_profile.is_first_signup_in_org
             if user_extended_profile.organization else False,
         }, status=status.HTTP_200_OK)
 

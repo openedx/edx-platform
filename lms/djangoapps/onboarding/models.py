@@ -185,11 +185,11 @@ class Organization(TimeStampedModel):
 
     history = HistoricalRecords()
 
-    def is_first_signup_in_org(self):
+    def users_count(self):
         """
-        :return: First learner exists/not exists in organization
+        :return: Users count in an organization
         """
-        return UserExtendedProfile.objects.filter(organization=self).count() == 1
+        return UserExtendedProfile.objects.filter(organization=self).count()
 
     @staticmethod
     def is_non_profit(user_extended_profile):
@@ -369,6 +369,7 @@ class UserExtendedProfile(TimeStampedModel):
 
     is_interests_data_submitted = models.BooleanField(default=False)
     is_organization_metrics_submitted = models.BooleanField(default=False)
+    is_first_learner = models.BooleanField(default=False)
 
     history = HistoricalRecords()
 
@@ -534,12 +535,12 @@ class UserExtendedProfile(TimeStampedModel):
         :return: List of survey for a user to attend depending on the user type (admin/first user in org/non-admin)
         """
         surveys_to_attend = self.SURVEYS_LIST[:2]
-        if self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+        if self.organization and (self.is_organization_admin or self.is_first_signup_in_org):
             surveys_to_attend = self.SURVEYS_LIST[:3]
 
         if self.organization and \
                 self.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE and \
-                (self.is_organization_admin or self.organization.is_first_signup_in_org()):
+                (self.is_organization_admin or self.is_first_signup_in_org):
             surveys_to_attend = self.SURVEYS_LIST
 
         return surveys_to_attend
@@ -549,7 +550,7 @@ class UserExtendedProfile(TimeStampedModel):
         :return: List of user's attended on-boarding surveys
         """
 
-        if not (self.organization and (self.is_organization_admin or self.organization.is_first_signup_in_org())):
+        if not (self.organization and (self.is_organization_admin or self.is_first_signup_in_org)):
             attended_list = self.get_normal_user_attend_surveys()
         else:
             attended_list = self.get_admin_or_first_user_attend_surveys()
@@ -583,6 +584,25 @@ class UserExtendedProfile(TimeStampedModel):
                                                                                suggested_by=self.user,
                                                                                is_hash_consumed=False).first()
         return bool(self.is_organization_admin and pending_suggestion_request)
+
+    @property
+    def is_first_signup_in_org(self):
+        """
+        :return: User is first learner OR not
+        """
+        return self.is_first_learner
+
+    def has_submitted_oef(self):
+        """
+        :return: User has taken OEF OR not
+        """
+        taken_oef = False
+
+        if self.organization:
+            taken_oef = bool(self.user.organization_oef_scores.filter(org=self.organization, user=self.user).exclude(
+                finish_date__isnull=True))
+
+        return self.organization and taken_oef
 
 
 class OrganizationMetric(TimeStampedModel):

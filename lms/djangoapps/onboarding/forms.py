@@ -661,6 +661,9 @@ class RegModelForm(BaseOnboardingModelForm):
             organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
             extended_profile.organization = organization_to_assign
 
+            if organization_to_assign.users_count() == 0:
+                extended_profile.is_first_learner = True
+
             if user and is_poc == '1':
                 organization_to_assign.unclaimed_org_admin_email = None
                 organization_to_assign.admin = user

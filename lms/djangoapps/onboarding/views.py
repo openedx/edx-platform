@@ -27,7 +27,7 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
     can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, send_admin_update_email
-from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES
+from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, oef_eligible_first_learner
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
@@ -112,7 +112,7 @@ def user_info(request):
         'is_under_age': is_under_age,
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
-        'is_first_user': user_extended_profile.organization.is_first_signup_in_org() \
+        'is_first_user': user_extended_profile.is_first_signup_in_org \
         if user_extended_profile.organization else False,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY,
 
@@ -136,7 +136,7 @@ def interests(request):
     """
     user_extended_profile = request.user.extended_profile
     are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
-    is_first_signup_in_org = user_extended_profile.organization.is_first_signup_in_org() \
+    is_first_signup_in_org = user_extended_profile.is_first_signup_in_org \
         if user_extended_profile.organization else False
 
     template = 'onboarding/interests_survey.html'
@@ -251,7 +251,7 @@ def organization(request):
     context.update({
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
-        'is_first_user': organization.is_first_signup_in_org() if user_extended_profile.organization else False,
+        'is_first_user': user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False,
         'org_admin_id': organization.admin_id if user_extended_profile.organization else None,
         'organization_name': _organization.label,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY
@@ -352,8 +352,7 @@ def org_detail_survey(request):
     context.update({
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
-        'is_first_user': user_extended_profile.organization.is_first_signup_in_org()\
-            if user_extended_profile.organization else False,
+        'is_first_user': user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False,
         'organization_name': user_extended_profile.organization.label,
     })
 
@@ -547,7 +546,10 @@ def recommendations(request):
     context = {
         'recommended_courses': recommended_courses,
         'recommended_communities': recommended_communities,
+        'user_has_organization': bool(user_extended_profile.organization),
+        'is_nonprofit_org': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
+        'oef_eligible_first_learner': oef_eligible_first_learner(user_extended_profile),
     }
 
     return render_to_response('onboarding/recommendations.html', context)
