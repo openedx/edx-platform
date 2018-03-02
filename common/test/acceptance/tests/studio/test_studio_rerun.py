@@ -70,6 +70,7 @@ class CourseRerunTest(StudioCourseTest):
         updated_course_info = course_info[0] + "+" + course_info[1] + "+" + course_info[2]
 
         self.dashboard_page.visit()
+        self.dashboard_page.scroll_to_course(course_info[1])
         self.dashboard_page.create_rerun(updated_course_info)
 
         rerun_page = CourseRerunPage(self.browser, *course_info)

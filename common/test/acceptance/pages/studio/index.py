@@ -83,6 +83,13 @@ class DashboardPage(PageObject, HelpMixin):
         # Clicking on course with run will trigger an ajax event
         self.wait_for_ajax()
 
+    def scroll_to_course(self, course_key):
+        """
+        Scroll down to the course element
+        """
+        element = '[data-course-key*="{}"]'.format(course_key)
+        self.scroll_to_element(element)
+
     def has_new_library_button(self):
         """
         (bool) is the "New Library" button present?
