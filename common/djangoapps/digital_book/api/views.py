@@ -85,22 +85,29 @@ def digital_book_about(request, book_key_string):
     log.info(">>> book_key: %s", book_key_string)
 
     # TODO: query ecommerce for sku
-    sku = '8528EDB'
+    digital_book_sku = '8528EDB'
     #TODO: generate basket url dynamically
         #TODO: dynamically get lms base url
         #TODO: dynamically add the sku
         #TODO: pull this out into its own function
     basket_url = 'http://localhost:18130/basket/single-item/?sku={sku}'.format(
-        sku=sku
+        sku=digital_book_sku
     )
-
     log.info(">>> basket_url: %s", basket_url)
+
+    # TODO: dynamically get the course SKU
+    bundled_course_sku = '8CF08E5'
+    bundle_url = 'http://localhost:18130/basket/add/?sku={course_sku}&sku={book_sku}'.format(
+        course_sku=bundled_course_sku,
+        book_sku=digital_book_sku
+    )
 
     context = {
         'digital_book_key': book_key_string,
         'book_title': book_key_string+" title!", #TODO: make a db of book_keys and titles
         'partner_org': 'PARTNER ORG of ' + book_key_string, #TODO: add this data in db
         'basket_url': basket_url,
+        'bundle_url': bundle_url,
         'price': 100, #TODO: ask ecommerce for price
     }
 
