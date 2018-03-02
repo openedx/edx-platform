@@ -3,10 +3,9 @@ def makeNode(suite, shard) {
     echo "I am ${suite}:${shard}, and the worker is yet to be started!"
         node('edxapp') {
             container('edxapp') {
+                sh 'cp -vaR edx-platform-cache/. . && rmdir edx-platform-cache/'
+                sh 'git config remote.origin.url https://github.com/appsembler/edx-platform.git'
                 checkout scm
-
-                sh 'git log --oneline | head'
-
                 
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
@@ -103,7 +102,7 @@ def buildParallelSteps() {
 
 podTemplate(cloud: 'jnlp', label: 'edxapp', containers: [
         containerTemplate(name: 'edxapp',
-            image: 'gcr.io/appsembler-testing/jenkins-worker:v0.1.3',
+            image: 'gcr.io/appsembler-testing/jenkins-worker:v0.2.0',
             ttyEnabled: true, 
             command: 'cat')
     ]) {
