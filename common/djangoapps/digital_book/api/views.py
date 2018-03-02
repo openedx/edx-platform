@@ -96,7 +96,7 @@ def digital_book_about(request, book_key_string):
     log.info(">>> basket_url: %s", basket_url)
 
     # TODO: dynamically get the course SKU
-    bundled_course_sku = '8CF08E5'
+    bundled_course_sku = '2081139'
     bundle_url = 'http://localhost:18130/basket/add/?sku={course_sku}&sku={book_sku}'.format(
         course_sku=bundled_course_sku,
         book_sku=digital_book_sku
