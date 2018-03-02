@@ -1,12 +1,12 @@
 from logging import getLogger
-
+from crum import get_current_request
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
-from lms.djangoapps.onboarding.models import UserExtendedProfile
+from lms.djangoapps.onboarding.models import UserExtendedProfile, Organization, FocusArea
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -26,12 +26,15 @@ def log_action_response(user, status_code, response_body):
 
 @receiver(post_save, sender=UserProfile)
 @receiver(post_save, sender=UserExtendedProfile)
+@receiver(post_save, sender=Organization)
 def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
     Sync information b/w NodeBB User Profile and Edx User Profile
     """
 
-    user = instance.user
+    request = get_current_request()
+    user = request.user
+
     if sender == UserProfile:
         data_to_sync = {
             "city_of_residence": instance.city,
@@ -44,11 +47,15 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
             "country_of_employment": COUNTRIES.get(instance.country_of_employment, ''),
             "city_of_employment": instance.city_of_employment,
             "interests": instance.get_user_selected_interests(),
-            "focus_area": instance.get_user_selected_functions()
+            "self_prioritize_areas": instance.get_user_selected_functions()
         }
 
         if instance.organization:
             data_to_sync["organization"] = instance.organization.label
+    elif sender == Organization:
+        data_to_sync = {
+            "focus_area": FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ""
+        }
 
     status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
     log_action_response(user, status_code, response_body)

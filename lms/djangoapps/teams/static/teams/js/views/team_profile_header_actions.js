@@ -73,7 +73,8 @@
                                     team: view.model
                                 });
                             });
-                    }).fail(function(data) {
+                            window.location = ".";
+                        }).fail(function(data) {
                         TeamUtils.parseAndShowMessage(data, view.errorMessage);
                     });
                 },

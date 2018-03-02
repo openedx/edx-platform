@@ -205,12 +205,12 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         }
         widgets = {
             'year_of_birth': forms.TextInput,
-            'country': forms.TextInput,
+            'country': forms.TextInput(attrs={"autocomplete": "off"}),
             'not_listed_gender': forms.TextInput(attrs={'placeholder': ugettext_noop('Identify your gender here')}),
-            'city': forms.TextInput,
-            'language': forms.TextInput,
-            'country_of_employment': forms.TextInput,
-            'city_of_employment': forms.TextInput,
+            'city': forms.TextInput(attrs={"autocomplete": "off"}),
+            'language': forms.TextInput(attrs={"autocomplete": "off"}),
+            'country_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
+            'city_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
             'start_month_year': forms.TextInput(attrs={'placeholder': 'mm/yy'}),
             'hours_per_week': forms.NumberInput(attrs={'max': 168})
         }
@@ -420,8 +420,8 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
                   'org_type', 'level_of_operation', 'total_employees', 'alternate_admin_email', 'partner_networks']
 
         widgets = {
-            'country': forms.TextInput,
-            'city': forms.TextInput,
+            'country': forms.TextInput(attrs={"autocomplete": "off"}),
+            'city': forms.TextInput(attrs={"autocomplete": "off"}),
             'url': forms.TextInput,
             'founding_year': forms.NumberInput,
             'alternate_admin_email': forms.TextInput,
@@ -661,6 +661,9 @@ class RegModelForm(BaseOnboardingModelForm):
             organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
             extended_profile.organization = organization_to_assign
 
+            if organization_to_assign.users_count() == 0:
+                extended_profile.is_first_learner = True
+
             if user and is_poc == '1':
                 organization_to_assign.unclaimed_org_admin_email = None
                 organization_to_assign.admin = user
@@ -796,7 +799,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
             'effective_date': forms.TextInput,
             'total_clients': forms.NumberInput,
             'total_employees': forms.NumberInput,
-            'local_currency': forms.TextInput,
+            'local_currency': forms.TextInput(attrs={"autocomplete": "off"}),
             'total_revenue': forms.NumberInput,
             'total_donations': forms.NumberInput,
             'total_expenses': forms.NumberInput,
