@@ -3,20 +3,6 @@ Utility classes/functions for the XSS Linter.
 """
 import re
 
-SKIP_DIRS = (
-    '.git',
-    '.pycharm_helpers',
-    'common/static/xmodule/modules',
-    'common/static/bundles',
-    'perf_tests',
-    'node_modules',
-    'reports/diff_quality',
-    'scripts/xsslint',
-    'spec',
-    'test_root',
-    'vendor',
-)
-
 
 def is_skip_dir(skip_dirs, directory):
     """

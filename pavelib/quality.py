@@ -434,10 +434,11 @@ def run_xsslint(options):
     _prepare_report_dir(xsslint_report_dir)
 
     sh(
-        "{repo_root}/scripts/xsslint/{xsslint_script} --rule-totals >> {xsslint_report}".format(
+        "{repo_root}/scripts/xsslint/{xsslint_script} --rule-totals --config={cfg_module} >> {xsslint_report}".format(
             repo_root=Env.REPO_ROOT,
             xsslint_script=xsslint_script,
             xsslint_report=xsslint_report,
+            cfg_module='scripts.xsslint_config'
         ),
         ignore_error=True
     )

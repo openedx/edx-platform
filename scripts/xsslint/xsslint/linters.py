@@ -8,7 +8,7 @@ import textwrap
 
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
 from xsslint.rules import Rules
-from xsslint.utils import SKIP_DIRS, Expression, ParseString, StringLines, is_skip_dir
+from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
 from xsslint.visitors import AllNodeVisitor, HtmlStringVisitor, OuterFormatVisitor
 
 
@@ -194,12 +194,12 @@ class UnderscoreTemplateLinter(BaseLinter):
     """
     The linter for Underscore.js template files.
     """
-    def __init__(self):
+    def __init__(self, skip_dirs=None):
         """
         Init method.
         """
         super(UnderscoreTemplateLinter, self).__init__()
-        self._skip_underscore_dirs = SKIP_DIRS + ('test',)
+        self._skip_underscore_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):
         """
@@ -309,14 +309,14 @@ class JavaScriptLinter(BaseLinter):
 
     LINE_COMMENT_DELIM = "//"
 
-    def __init__(self):
+    def __init__(self, underscore_linter, javascript_skip_dirs=None, coffeescript_skip_dirs=None):
         """
         Init method.
         """
         super(JavaScriptLinter, self).__init__()
-        self._skip_javascript_dirs = SKIP_DIRS + ('i18n', 'static/coffee')
-        self._skip_coffeescript_dirs = SKIP_DIRS
-        self.underscore_linter = UnderscoreTemplateLinter()
+        self.underscore_linter = underscore_linter
+        self._skip_javascript_dirs = javascript_skip_dirs or ()
+        self._skip_coffeescript_dirs = coffeescript_skip_dirs or ()
 
     def process_file(self, directory, file_name):
         """
@@ -697,12 +697,12 @@ class PythonLinter(BaseLinter):
 
     LINE_COMMENT_DELIM = "#"
 
-    def __init__(self):
+    def __init__(self, skip_dirs=None):
         """
         Init method.
         """
         super(PythonLinter, self).__init__()
-        self._skip_python_dirs = SKIP_DIRS + ('tests', 'test/acceptance')
+        self._skip_python_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):
         """
@@ -856,13 +856,14 @@ class MakoTemplateLinter(BaseLinter):
     """
     LINE_COMMENT_DELIM = "##"
 
-    def __init__(self):
+    def __init__(self, javascript_linter, python_linter, skip_dirs=None):
         """
         Init method.
         """
         super(MakoTemplateLinter, self).__init__()
-        self.javascript_linter = JavaScriptLinter()
-        self.python_linter = PythonLinter()
+        self.javascript_linter = javascript_linter
+        self.python_linter = python_linter
+        self._skip_mako_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):
         """
@@ -909,7 +910,7 @@ class MakoTemplateLinter(BaseLinter):
             True if this directory should be linted for Mako template violations
             and False otherwise.
         """
-        if is_skip_dir(SKIP_DIRS, directory):
+        if is_skip_dir(self._skip_mako_dirs, directory):
             return False
 
         # TODO: This is an imperfect guess concerning the Mako template
