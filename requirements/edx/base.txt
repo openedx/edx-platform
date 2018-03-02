@@ -131,7 +131,7 @@ pyuca==1.1
 zendesk==1.1.1
 
 # XBlocks
-xblock-review==1.1.4
+xblock-review==1.1.5
 
 # lxml is also in requirements/edx-sandbox/post.txt
 lxml==3.8.0
