@@ -3,10 +3,8 @@ def makeNode(suite, shard) {
     echo "I am ${suite}:${shard}, and the worker is yet to be started!"
         node('edxapp') {
             container('edxapp') {
-                sh "mv /home/jenkins/edx-platform-cache/* /home/jenkins/"
-                sh "mv /home/jenkins/edx-platform-cache/.* /home/jenkins/"
-                sh 'git config remote.origin.url https://github.com/appsembler/edx-platform.git'
                 checkout scm
+                sh 'cat /home/jenkins/image_version'
                 
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
