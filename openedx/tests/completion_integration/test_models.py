@@ -5,7 +5,7 @@ Test models, managers, and validators.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from completion import models, waffle
-from completion.test_utils import CompletionWaffleTestMixin
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -200,34 +200,9 @@ class BatchCompletionMethodTests(CompletionWaffleTestMixin, TestCase):
         self.other_course_key = CourseKey.from_string("course-v1:ReedX+Hum110+1904")
         self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in xrange(5)]
 
-        self.submit_fake_completions()
-
-    def submit_fake_completions(self):
-        """
-        Submit completions for given runtime, run at setup
-        """
-        for idx, block_key in enumerate(self.block_keys[:3]):
-            models.BlockCompletion.objects.submit_completion(
-                user=self.user,
-                course_key=self.course_key,
-                block_key=block_key,
-                completion=1.0 - (0.2 * idx),
-            )
-
-        for idx, block_key in enumerate(self.block_keys[2:]):  # Wrong user
-            models.BlockCompletion.objects.submit_completion(
-                user=self.other_user,
-                course_key=self.course_key,
-                block_key=block_key,
-                completion=0.9 - (0.2 * idx),
-            )
-
-        models.BlockCompletion.objects.submit_completion(  # Wrong course
-            user=self.user,
-            course_key=self.other_course_key,
-            block_key=self.block_keys[4],
-            completion=0.75,
-        )
+        submit_completions_for_testing(self.user, self.course_key, self.block_keys[:3])
+        submit_completions_for_testing(self.other_user, self.course_key, self.block_keys[2:])
+        submit_completions_for_testing(self.user, self.other_course_key, [self.block_keys[4]])
 
     def test_get_course_completions_missing_runs(self):
         actual_completions = models.BlockCompletion.get_course_completions(self.user, self.course_key)
