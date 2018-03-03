@@ -811,7 +811,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
             'total_employees': ugettext_noop('Total Employees at the End of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
-            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year (Local Currency)'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
             'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)'),
             'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
@@ -1019,7 +1019,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
             'total_employees': ugettext_noop('Total Employees at the End of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
-            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year (Local Currency)'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
             'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)'),
             'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
