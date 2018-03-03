@@ -3,7 +3,9 @@ import base64
 import json
 import logging
 import urlparse
-from django.http import HttpResponseNotFound, HttpResponse
+
+from datetime import datetime
+from django.http import HttpResponseNotFound, HttpResponse, Http404
 
 import third_party_auth
 from django.conf import settings
@@ -16,6 +18,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from philu_overrides.helpers import reactivation_email_for_user_custom
+from pytz import utc
 from student.helpers import get_next_url_for_login_page
 from django.utils.translation import ugettext as _
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
@@ -39,6 +42,7 @@ from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
+from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from student.models import (LoginFailures, PasswordHistory)
 from ratelimitbackend.exceptions import RateLimitException
@@ -166,7 +170,7 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
 @ensure_csrf_cookie
 @cache_if_anonymous()
-def courses(request):
+def courses_custom(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
@@ -175,6 +179,9 @@ def courses(request):
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
+
+        # filter courses here as get_courses filter_ param not works for us, we need Q based filter
+        courses_list = filter(lambda x: (x.end and x.end.date() >= datetime.now(utc).date()) or not x.end, courses_list)
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -217,6 +224,31 @@ def courses(request):
             'programs_list': programs_list
         }
     )
+
+
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def courses(request):
+    """
+    Render the "find courses" page. If the marketing site is enabled, redirect
+    to that. Otherwise, if subdomain branding is on, this is the university
+    profile page. Otherwise, it's the edX courseware.views.views.courses page
+    """
+
+    enable_mktg_site = configuration_helpers.get_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
+
+    if enable_mktg_site:
+        return redirect(marketing_link('COURSES'), permanent=True)
+
+    if not settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+        raise Http404
+
+    #  we do not expect this case to be reached in cases where
+    #  marketing is enabled or the courses are not browsable
+    return courses_custom(request)
 
 
 def render_404(request):
