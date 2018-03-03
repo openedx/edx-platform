@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
-from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict, \
+from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso, get_sorted_choices_from_dict, \
     get_actual_field_names, admin_not_assigned_or_me
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
@@ -166,10 +166,9 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         raise forms.ValidationError(ugettext_noop('Please select country of residence.'))
 
     def clean_language(self):
-        all_languages = get_onboarding_autosuggesion_data('world_languages.json')
         submitted_language = self.cleaned_data['language']
 
-        if submitted_language in all_languages:
+        if submitted_language in LANGUAGES:
             return submitted_language
 
         raise forms.ValidationError(ugettext_noop('Please select language.'))
