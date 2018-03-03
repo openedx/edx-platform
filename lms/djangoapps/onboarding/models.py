@@ -199,6 +199,12 @@ class Organization(TimeStampedModel):
         return True if user_extended_profile.organization and \
             user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE else False
 
+    def admin_info(self):
+        """
+        :return: Information about the current admin of organization
+        """
+        return "%s" % self.admin.email if self.admin else "Administrator not assigned yet."
+
     def __str__(self):
         return self.label
 
@@ -281,7 +287,7 @@ class UserExtendedProfile(TimeStampedModel):
         "1=function_leadership_governance": "Leadership and governance",
         "2=function_program_design": "Program design and development",
         "3=function_measurement_eval": "Measurement, evaluation, and learning",
-        "4=function_stakeholder_engagement": "Stakeholder engagement and partnerships",
+        "4=function_stakeholder_engagement": "External relations and partnerships",
         "5=function_human_resource": "Human resource management",
         "6=function_financial_management": "Financial management",
         "7=function_fundraising": "Fundraising and resource mobilization",
@@ -294,7 +300,7 @@ class UserExtendedProfile(TimeStampedModel):
         "1=interest_leadership_governance": "Leadership and governance",
         "2=interest_program_design": "Program design and development",
         "3=interest_measurement_eval": "Measurement, evaluation, and learning",
-        "4=interest_stakeholder_engagement": "Stakeholder engagement and partnerships",
+        "4=interest_stakeholder_engagement": "External relations and partnerships",
         "5=interest_human_resource": "Human resource management",
         "6=interest_financial_management": "Financial management",
         "7=interest_fundraising": "Fundraising and resource mobilization",
