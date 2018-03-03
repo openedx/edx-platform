@@ -74,6 +74,7 @@ urlpatterns = (
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
     url(r'^404$', 'philu_overrides.views.render_404'),
+    url(r'^500$', 'philu_overrides.views.render_500'),
 
 
     url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),

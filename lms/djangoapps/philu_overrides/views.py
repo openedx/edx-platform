@@ -5,7 +5,7 @@ import logging
 import urlparse
 
 from datetime import datetime
-from django.http import HttpResponseNotFound, HttpResponse, Http404
+from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
 
 import third_party_auth
 from django.conf import settings
@@ -256,6 +256,13 @@ def render_404(request):
         return HttpResponseNotFound(render_to_string('custom_static_templates/404.html', {}, request=request))
     except:
         return redirect("404/")
+
+
+def render_500(request):
+    try:
+        return HttpResponseServerError(render_to_string('custom_static_templates/server-error.html', {}, request=request))
+    except:
+        return redirect("500/")
 
       
 # Need different levels of logging
