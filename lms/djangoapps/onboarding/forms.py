@@ -558,8 +558,8 @@ class RegModelForm(BaseOnboardingModelForm):
 
     is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our '
                                                    'website?'),
-                               help_text=ugettext_noop("Your organization’s Administrator is responsible for "
-                                                       "maintaining your organization’s profile and inviting learners "
+                               help_text=ugettext_noop("Your organization's Administrator is responsible for "
+                                                       "maintaining your organization's profile and inviting learners "
                                                        "from your organization to the Philanthropy University platform."
                                                        " An Administrator should be the most senior person in your "
                                                        "organization responsible for organizational capacity building "
