@@ -507,20 +507,6 @@ def student_dashboard(request):
     # understanding of usage patterns on prod.
     monitoring_utils.accumulate('num_courses', len(course_enrollments))
 
-    # sort the enrollment pairs with the flag PREFERRED_ORDER_BY_COURSE_ENROLLMENTS
-    preferred_order_by_course_enrollments = configuration_helpers.get_value(
-        "PREFERRED_ORDER_BY_COURSE_ENROLLMENTS",
-        settings.FEATURES.get(
-            "PREFERRED_ORDER_BY_COURSE_ENROLLMENTS",
-            "created_reverse"
-        )
-    )
-
-    _sort_course_enrollments(
-        preferred_order_by_course_enrollments,
-        course_enrollments
-    )
-
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
     __, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
@@ -714,6 +700,20 @@ def student_dashboard(request):
         course_enrollments = [
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
+
+    # sort the enrollment pairs with the flag PREFERRED_ORDER_BY_COURSE_ENROLLMENTS
+    preferred_order_by_course_enrollments = configuration_helpers.get_value(
+        "PREFERRED_ORDER_BY_COURSE_ENROLLMENTS",
+        settings.FEATURES.get(
+            "PREFERRED_ORDER_BY_COURSE_ENROLLMENTS",
+            "created_reverse"
+        )
+    )
+
+    _sort_course_enrollments(
+        preferred_order_by_course_enrollments,
+        course_enrollments
+    )
 
     context = {
         'urls': urls,

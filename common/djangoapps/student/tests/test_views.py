@@ -263,6 +263,23 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         },
     }
 
+    @classmethod
+    def setUpClass(cls):
+        super(StudentDashboardTests, cls).setUpClass()
+        cls.course_one = CourseFactory.create(
+            org="GotG",
+            number="001",
+            run="2018",
+            name="I am Groot"
+        )
+
+        cls.course_two = CourseFactory.create(
+            org="GotG",
+            number="002",
+            run="2018",
+            name="My name is Star Lord"
+        )
+
     def setUp(self):
         """
         Create a course and user, then log in.
@@ -270,6 +287,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         super(StudentDashboardTests, self).setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=PASSWORD)
+        CourseEnrollmentFactory(course_id=self.course_one.id, user=self.user)
+        CourseEnrollmentFactory(course_id=self.course_two.id, user=self.user)
         self.path = reverse('dashboard')
 
     def set_course_sharing_urls(self, set_marketing, set_social_sharing):
@@ -407,7 +426,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         response = self.client.get(self.path)
         # There should be two entitlements on the course page, one prompting for a mandatory session, but no
         # select option for the courses as there is only the single course run which has already been redeemed
-        self.assertEqual(response.content.count('<li class="course-item">'), 2)
+        self.assertEqual(response.content.count('<li class="course-item">'), 4)
         self.assertIn('You must select a session to access the course.', response.content)
         self.assertNotIn('To access the course, select a session.', response.content)
 
@@ -434,7 +453,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
             }
         ]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 0)
+        self.assertEqual(response.content.count('<li class="course-item">'), 2)
 
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
@@ -601,7 +620,36 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
         mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
         CourseEntitlementFactory(user=self.user)
         response = self.client.get(self.path)
-        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)
+        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0) 
+    
+    @ddt.data(
+        (
+            {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "created"},
+            "I am Groot"
+        ),
+        (
+            {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "created_reverse"},
+            "My name is Star Lord"
+        ),
+        (
+            {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "course_name"},
+            "I am Groot"
+        ),
+        (
+            {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "course_name_reverse"},
+            "My name is Star Lord"
+        ),
+    )
+    @ddt.unpack
+    def test_load_student_dashboard_order_by_enrollments(self, config, title):
+        with patch.dict('django.conf.settings.FEATURES', config):
+            response = self.client.get(reverse('dashboard'))
+            content = pq(response.content)
+            css_classes = """.listing-courses .course-item .course-container 
+                .course .details .wrapper-course-details .course-title a"""
+
+            course_title = content(css_classes).contents()[0]
+            self.assertEqual(title, course_title)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
