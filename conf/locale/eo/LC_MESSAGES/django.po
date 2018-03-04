@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-01 15:16+0000\n"
-"PO-Revision-Date: 2018-03-01 15:16:26.038535\n"
+"POT-Creation-Date: 2018-03-04 20:36+0000\n"
+"PO-Revision-Date: 2018-03-04 20:37:00.645912\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -18293,6 +18293,7 @@ msgid "Welcome to {org}'s {course_name}!"
 msgstr "Wélçömé tö {org}'s {course_name}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/courseware/info.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
