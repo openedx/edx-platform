@@ -22,6 +22,7 @@ from provider.oauth2 import models as dop_models
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
@@ -280,6 +281,18 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         # the user is not marked as active.
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
+
+    def test_password_reset_prevent_auth_user_writes(self):
+        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+            url = reverse(
+                "password_reset_confirm",
+                kwargs={"uidb36": self.uidb36, "token": self.token}
+            )
+            for request in [self.request_factory.get(url), self.request_factory.post(url)]:
+                response = password_reset_confirm_wrapper(request, self.uidb36, self.token)
+                assert response.context_data['err_msg'] == SYSTEM_MAINTENANCE_MSG
+                self.user.refresh_from_db()
+                assert not self.user.is_active
 
     @override_settings(PASSWORD_MIN_LENGTH=2)
     @override_settings(PASSWORD_MAX_LENGTH=10)

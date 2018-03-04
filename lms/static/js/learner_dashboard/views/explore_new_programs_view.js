@@ -1,44 +1,33 @@
-(function(define) {
-    'use strict';
+import _ from 'underscore';
+import Backbone from 'backbone';
 
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'text!../../../templates/learner_dashboard/explore_new_programs.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             exploreTpl
-         ) {
-             return Backbone.View.extend({
-                 el: '.program-advertise',
+import exploreTpl from '../../../templates/learner_dashboard/explore_new_programs.underscore';
 
-                 tpl: _.template(exploreTpl),
+class ExploreNewProgramsView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      el: '.program-advertise',
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                 initialize: function(data) {
-                     this.context = data.context;
-                     this.$parentEl = $(this.parentEl);
+  initialize(data) {
+    this.tpl = _.template(exploreTpl);
+    this.context = data.context;
+    this.$parentEl = $(this.parentEl);
 
-                     if (this.context.marketingUrl) {
-                        // Only render if there is a link
-                         this.render();
-                     } else {
-                        /**
-                         *  If not rendering remove el because
-                         *  styles are applied to it
-                         */
-                         this.remove();
-                     }
-                 },
+    if (this.context.marketingUrl) {
+      // Only render if there is a link
+      this.render();
+    } else {
+      // If not rendering, remove el because styles are applied to it
+      this.remove();
+    }
+  }
 
-                 render: function() {
-                     this.$el.html(this.tpl(this.context));
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+  render() {
+    this.$el.html(this.tpl(this.context));
+  }
+}
+
+export default ExploreNewProgramsView;

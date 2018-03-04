@@ -1726,7 +1726,7 @@ class CourseEnrollment(models.Model):
                 log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
                 return None
 
-            if self.verified_mode is None:
+            if self.verified_mode is None or CourseMode.is_professional_mode(self.verified_mode):
                 log.debug('Schedules: Returning None for dynamic upgrade deadline since the course does not have a '
                           'verified mode.')
                 return None

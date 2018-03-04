@@ -1,38 +1,24 @@
-(function(define) {
-    'use strict';
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'text!../../../templates/learner_dashboard/certificate_status.underscore',
-        'text!../../../templates/learner_dashboard/certificate_icon.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             HtmlUtils,
-             certificateStatusTpl,
-             certificateIconTpl
-         ) {
-             return Backbone.View.extend({
-                 statusTpl: HtmlUtils.template(certificateStatusTpl),
-                 iconTpl: HtmlUtils.template(certificateIconTpl),
+import Backbone from 'backbone';
 
-                 initialize: function(options) {
-                     this.$el = options.$el;
-                     this.render();
-                 },
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 render: function() {
-                     var data = this.model.toJSON();
+import certificateStatusTpl from '../../../templates/learner_dashboard/certificate_status.underscore';
+import certificateIconTpl from '../../../templates/learner_dashboard/certificate_icon.underscore';
 
-                     data = $.extend(data, {certificateSvg: this.iconTpl()});
-                     HtmlUtils.setHtml(this.$el, this.statusTpl(data));
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+class CertificateStatusView extends Backbone.View {
+  initialize(options) {
+    this.statusTpl = HtmlUtils.template(certificateStatusTpl);
+    this.iconTpl = HtmlUtils.template(certificateIconTpl);
+    this.$el = options.$el;
+    this.render();
+  }
+
+  render() {
+    let data = this.model.toJSON();
+
+    data = $.extend(data, { certificateSvg: this.iconTpl() });
+    HtmlUtils.setHtml(this.$el, this.statusTpl(data));
+  }
+}
+
+export default CertificateStatusView;

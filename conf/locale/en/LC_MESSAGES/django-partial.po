@@ -2,19 +2,19 @@
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-22 09:31+0000\n"
-"PO-Revision-Date: 2018-02-22 09:38:28.448569\n"
+"POT-Creation-Date: 2018-03-01 15:16+0000\n"
+"PO-Revision-Date: 2018-03-01 15:16:26.243400\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
@@ -797,6 +797,11 @@ msgstr ""
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
+msgid "{html_start}This account has already been activated.{html_end}"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr ""
 
@@ -806,11 +811,6 @@ msgid ""
 "{html_start}Success! You have activated your account.{html_end}You will now "
 "receive email updates and alerts from us related to the courses you are "
 "enrolled in. Sign In to continue."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}This account has already been activated.{html_end}"
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
@@ -835,6 +835,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+#: common/djangoapps/student/views/management.py
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr ""
@@ -2435,13 +2436,13 @@ msgstr ""
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -10040,6 +10041,10 @@ msgstr ""
 msgid ""
 "I agree to the {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end}"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/config/waffle.py
+msgid "System maintenance in progress. Please try again later."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py

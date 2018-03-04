@@ -1,9 +1,6 @@
-(function(define) {
-    'use strict';
-    define([
-        'backbone'
-    ],
-    function(Backbone) {
-        return Backbone.Collection.extend({});
-    });
-}).call(this, define || RequireJS.define);
+import Backbone from 'backbone';
+
+class ProgramProgressCollection extends Backbone.Collection {
+}
+
+export default ProgramProgressCollection;

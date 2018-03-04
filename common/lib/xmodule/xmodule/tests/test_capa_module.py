@@ -867,7 +867,7 @@ class CapaModuleTest(unittest.TestCase):
             # Ensure that the user is NOT staff
             module.system.user_is_staff = False
 
-            # Simulate a codejail exception 'Exception: test error'
+            # Simulate a codejail exception "Exception: Couldn't execute jailed code"
             with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 try:
                     raise ResponseError(
@@ -876,14 +876,14 @@ class CapaModuleTest(unittest.TestCase):
                         '  File "jailed_code", line 15, in <module>\\n'
                         '    exec code in g_dict\\n  File "<string>", line 67, in <module>\\n'
                         '  File "<string>", line 65, in check_func\\n'
-                        'Exception: test error\\n\' with status code: 1',)
+                        'Exception: Couldn\'t execute jailed code\\n\' with status code: 1',)
                 except ResponseError as err:
                     mock_grade.side_effect = exception_class(six.text_type(err))
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success' without the text of the stack trace
-            expected_msg = 'test error'
+            expected_msg = 'Couldn\'t execute jailed code'
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented

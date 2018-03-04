@@ -1,130 +1,134 @@
-(function(define) {
-    'use strict';
-    define(['backbone',
-        'jquery',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils'
-    ],
-        function(Backbone, $, gettext, HtmlUtils) {
-            return Backbone.View.extend({
-                el: '.js-entitlement-unenrollment-modal',
-                closeButtonSelector: '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-close-btn',
-                headerTextSelector: '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-header-text',
-                errorTextSelector: '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-error-text',
-                submitButtonSelector: '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-submit',
-                triggerSelector: '.js-entitlement-action-unenroll',
-                mainPageSelector: '#dashboard-main',
-                genericErrorMsg: gettext('Your unenrollment request could not be processed. Please try again later.'),
+/* globals gettext */
 
-                initialize: function(options) {
-                    var view = this;
-                    this.dashboardPath = options.dashboardPath;
-                    this.signInPath = options.signInPath;
+import Backbone from 'backbone';
 
-                    this.$submitButton = $(this.submitButtonSelector);
-                    this.$headerText = $(this.headerTextSelector);
-                    this.$errorText = $(this.errorTextSelector);
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                    this.$submitButton.on('click', this.handleSubmit.bind(this));
+class EntitlementUnenrollmentView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      el: '.js-entitlement-unenrollment-modal',
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                    $(this.triggerSelector).each(function() {
-                        var $trigger = $(this);
+  initialize(options) {
+    const view = this;
 
-                        $trigger.on('click', view.handleTrigger.bind(view));
+    this.closeButtonSelector = '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-close-btn';
+    this.headerTextSelector = '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-header-text';
+    this.errorTextSelector = '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-error-text';
+    this.submitButtonSelector = '.js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-submit';
+    this.triggerSelector = '.js-entitlement-action-unenroll';
+    this.mainPageSelector = '#dashboard-main';
+    this.genericErrorMsg = gettext('Your unenrollment request could not be processed. Please try again later.');
 
-                        if (window.accessible_modal) {
-                            window.accessible_modal(
-                                '#' + $trigger.attr('id'),
-                                view.closeButtonSelector,
-                                '#' + view.$el.attr('id'),
-                                view.mainPageSelector
-                            );
-                        }
-                    });
-                },
+    this.dashboardPath = options.dashboardPath;
+    this.signInPath = options.signInPath;
 
-                handleTrigger: function(event) {
-                    var $trigger = $(event.target),
-                        courseName = $trigger.data('courseName'),
-                        courseNumber = $trigger.data('courseNumber'),
-                        apiEndpoint = $trigger.data('entitlementApiEndpoint');
+    this.$submitButton = $(this.submitButtonSelector);
+    this.$headerText = $(this.headerTextSelector);
+    this.$errorText = $(this.errorTextSelector);
 
-                    this.resetModal();
-                    this.setHeaderText(courseName, courseNumber);
-                    this.setSubmitData(apiEndpoint);
-                    this.$el.css('position', 'fixed');
-                },
+    this.$submitButton.on('click', this.handleSubmit.bind(this));
 
-                handleSubmit: function() {
-                    var apiEndpoint = this.$submitButton.data('entitlementApiEndpoint');
+    $(this.triggerSelector).each(function setUpTrigger() {
+      const $trigger = $(this);
 
-                    if (apiEndpoint === undefined) {
-                        this.setError(this.genericErrorMsg);
-                        return;
-                    }
+      $trigger.on('click', view.handleTrigger.bind(view));
 
-                    this.$submitButton.prop('disabled', true);
-                    $.ajax({
-                        url: apiEndpoint,
-                        method: 'DELETE',
-                        complete: this.onComplete.bind(this)
-                    });
-                },
+      if (window.accessible_modal) {
+        window.accessible_modal(
+          `#${$trigger.attr('id')}`,
+          view.closeButtonSelector,
+          `#${view.$el.attr('id')}`,
+          view.mainPageSelector,
+        );
+      }
+    });
+  }
 
-                resetModal: function() {
-                    this.$submitButton.removeData();
-                    this.$submitButton.prop('disabled', false);
-                    this.$headerText.empty();
-                    this.$errorText.removeClass('entitlement-unenrollment-modal-error-text-visible');
-                    this.$errorText.empty();
-                },
+  handleTrigger(event) {
+    const $trigger = $(event.target);
+    const courseName = $trigger.data('courseName');
+    const courseNumber = $trigger.data('courseNumber');
+    const apiEndpoint = $trigger.data('entitlementApiEndpoint');
 
-                setError: function(message) {
-                    this.$submitButton.prop('disabled', true);
-                    this.$errorText.empty();
-                    HtmlUtils.setHtml(
+    this.resetModal();
+    this.setHeaderText(courseName, courseNumber);
+    this.setSubmitData(apiEndpoint);
+    this.$el.css('position', 'fixed');
+  }
+
+  handleSubmit() {
+    const apiEndpoint = this.$submitButton.data('entitlementApiEndpoint');
+
+    if (apiEndpoint === undefined) {
+      this.setError(this.genericErrorMsg);
+      return;
+    }
+
+    this.$submitButton.prop('disabled', true);
+    $.ajax({
+      url: apiEndpoint,
+      method: 'DELETE',
+      complete: this.onComplete.bind(this),
+    });
+  }
+
+  resetModal() {
+    this.$submitButton.removeData();
+    this.$submitButton.prop('disabled', false);
+    this.$headerText.empty();
+    this.$errorText.removeClass('entitlement-unenrollment-modal-error-text-visible');
+    this.$errorText.empty();
+  }
+
+  setError(message) {
+    this.$submitButton.prop('disabled', true);
+    this.$errorText.empty();
+    HtmlUtils.setHtml(
                         this.$errorText,
-                        message
+                        message,
                     );
-                    this.$errorText.addClass('entitlement-unenrollment-modal-error-text-visible');
-                },
+    this.$errorText.addClass('entitlement-unenrollment-modal-error-text-visible');
+  }
 
-                setHeaderText: function(courseName, courseNumber) {
-                    this.$headerText.empty();
-                    HtmlUtils.setHtml(
-                        this.$headerText,
-                        HtmlUtils.interpolateHtml(
-                            gettext('Are you sure you want to unenroll from {courseName} ({courseNumber})? You will be refunded the amount you paid.'), // eslint-disable-line max-len
-                            {
-                                courseName: courseName,
-                                courseNumber: courseNumber
-                            }
-                        )
-                    );
-                },
-
-                setSubmitData: function(apiEndpoint) {
-                    this.$submitButton.removeData();
-                    this.$submitButton.data('entitlementApiEndpoint', apiEndpoint);
-                },
-
-                onComplete: function(xhr) {
-                    var status = xhr.status,
-                        message = xhr.responseJSON && xhr.responseJSON.detail;
-
-                    if (status === 204) {
-                        this.redirectTo(this.dashboardPath);
-                    } else if (status === 401 && message === 'Authentication credentials were not provided.') {
-                        this.redirectTo(this.signInPath + '?next=' + encodeURIComponent(this.dashboardPath));
-                    } else {
-                        this.setError(this.genericErrorMsg);
-                    }
-                },
-
-                redirectTo: function(path) {
-                    window.location.href = path;
-                }
-            });
-        }
+  setHeaderText(courseName, courseNumber) {
+    this.$headerText.empty();
+    HtmlUtils.setHtml(
+      this.$headerText,
+      HtmlUtils.interpolateHtml(
+        gettext('Are you sure you want to unenroll from {courseName} ({courseNumber})? You will be refunded the amount you paid.'), // eslint-disable-line max-len
+        {
+          courseName,
+          courseNumber,
+        },
+      ),
     );
-}).call(this, define || RequireJS.define);
+  }
+
+  setSubmitData(apiEndpoint) {
+    this.$submitButton.removeData();
+    this.$submitButton.data('entitlementApiEndpoint', apiEndpoint);
+  }
+
+  onComplete(xhr) {
+    const status = xhr.status;
+    const message = xhr.responseJSON && xhr.responseJSON.detail;
+
+    if (status === 204) {
+      EntitlementUnenrollmentView.redirectTo(this.dashboardPath);
+    } else if (status === 401 && message === 'Authentication credentials were not provided.') {
+      EntitlementUnenrollmentView.redirectTo(`${this.signInPath}?next=${encodeURIComponent(this.dashboardPath)}`);
+    } else {
+      this.setError(this.genericErrorMsg);
+    }
+  }
+
+  static redirectTo(path) {
+    window.location.href = path;
+  }
+}
+
+export default EntitlementUnenrollmentView;

@@ -40,6 +40,7 @@ var options = {
     specFiles: [
         // Define the Webpack-built spec files first
         {pattern: 'course_experience/js/**/*_spec.js', webpack: true},
+        {pattern: 'js/learner_dashboard/**/*_spec.js', webpack: true},
 
         // Add all remaining spec files to be used without Webpack
         {pattern: '../**/*spec.js'}

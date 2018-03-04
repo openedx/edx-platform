@@ -1,23 +1,20 @@
+import Backbone from 'backbone';
+
 /**
  *  Store data for the current entitlement.
  */
-(function(define) {
-    'use strict';
+class CourseEntitlementModel extends Backbone.Model {
+  constructor(attrs, ...args) {
+    const defaults = {
+      availableSessions: [],
+      entitlementUUID: '',
+      currentSessionId: '',
+      courseName: '',
+      expiredAt: null,
+      daysUntilExpiration: Number.MAX_VALUE,
+    };
+    super(Object.assign({}, defaults, attrs), ...args);
+  }
+}
 
-    define([
-        'backbone'
-    ],
-        function(Backbone) {
-            return Backbone.Model.extend({
-                defaults: {
-                    availableSessions: [],
-                    entitlementUUID: '',
-                    currentSessionId: '',
-                    courseName: '',
-                    expiredAt: null,
-                    daysUntilExpiration: Number.MAX_VALUE
-                }
-            });
-        }
-    );
-}).call(this, define || RequireJS.define);
+export default CourseEntitlementModel;

@@ -2,14 +2,13 @@
 import json
 import unittest
 
-import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse
-from django.test import override_settings, TestCase, TransactionTestCase
+from django.test import override_settings, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
 from six import text_type
@@ -17,6 +16,7 @@ from six import text_type
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
 from student.models import PendingEmailChange, Registration, UserProfile
 from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
@@ -145,7 +145,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
         for fragment in body_fragments:
             self.assertIn(fragment, msg.body)
 
-    @mock.patch('student.tasks.log')
+    @patch('student.tasks.log')
     def test_send_email_to_inactive_user(self, mock_log):
         """
         Tests that when an inactive user logs-in using the social auth, system
@@ -217,7 +217,7 @@ class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
         self.assertReactivateEmailSent(email_user)
         self.assertFalse(response_data['success'])
 
-    def test_reactivation_for_unregistered_user(self, email_user):
+    def test_reactivation_for_unregistered_user(self, email_user):  # pylint: disable=unused-argument
         """
         Test that trying to send a reactivation email to an unregistered
         user fails without throwing a 500 error.
@@ -226,7 +226,7 @@ class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
 
         self.assertFalse(response_data['success'])
 
-    def test_reactivation_for_no_user_profile(self, email_user):
+    def test_reactivation_for_no_user_profile(self, email_user):  # pylint: disable=unused-argument
         """
         Test that trying to send a reactivation email to a user without
         user profile fails without throwing 500 error.
@@ -495,6 +495,14 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
             User.objects.get(username=self.user.username).email
         )
         self.assertEquals(0, PendingEmailChange.objects.count())
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    def test_prevent_auth_user_writes(self, email_user):  # pylint: disable=unused-argument
+        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+            self.check_confirm_email_change('email_change_failed.html', {
+                'err_msg': SYSTEM_MAINTENANCE_MSG
+            })
+            self.assertRolledBack()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})

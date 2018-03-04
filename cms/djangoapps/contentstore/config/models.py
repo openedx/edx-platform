@@ -27,12 +27,12 @@ class NewAssetsPageFlag(ConfigurationModel):
 
         There are 2 booleans to be concerned with - enabled_for_all_courses,
         and the implicit is_enabled(). They interact in the following ways:
-            - is_enabled: False, enabled_for_all_courses: True or False
+            - is_enabled(): False, enabled_for_all_courses: True or False
                 - no one can use the feature.
-            - is_enabled: True, enabled_for_all_courses: False
+            - is_enabled(): True, enabled_for_all_courses: False
                 - check for a CourseNewAssetsPageFlag, use that value (default False)
                 - if no course_id provided, return False
-            - is_enabled: True, enabled_for_all_courses: True
+            - is_enabled(): True, enabled_for_all_courses: True
                 - everyone can use the feature
         """
         if not NewAssetsPageFlag.is_enabled():

@@ -1,137 +1,128 @@
-(function(define) {
-    'use strict';
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'js/learner_dashboard/collections/course_card_collection',
-        'js/learner_dashboard/views/program_header_view',
-        'js/learner_dashboard/views/collection_list_view',
-        'js/learner_dashboard/views/course_card_view',
-        'js/learner_dashboard/views/program_details_sidebar_view',
-        'text!../../../templates/learner_dashboard/program_details_view.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             HtmlUtils,
-             CourseCardCollection,
-             HeaderView,
-             CollectionListView,
-             CourseCardView,
-             SidebarView,
-             pageTpl
-         ) {
-             return Backbone.View.extend({
-                 el: '.js-program-details-wrapper',
+/* globals gettext */
 
-                 tpl: HtmlUtils.template(pageTpl),
+import Backbone from 'backbone';
 
-                 events: {
-                     'click .complete-program': 'trackPurchase'
-                 },
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 initialize: function(options) {
-                     this.options = options;
-                     this.programModel = new Backbone.Model(this.options.programData);
-                     this.courseData = new Backbone.Model(this.options.courseData);
-                     this.certificateCollection = new Backbone.Collection(this.options.certificateData);
-                     this.completedCourseCollection = new CourseCardCollection(
-                        this.courseData.get('completed') || [],
-                        this.options.userPreferences
-                     );
-                     this.inProgressCourseCollection = new CourseCardCollection(
-                        this.courseData.get('in_progress') || [],
-                        this.options.userPreferences
-                     );
-                     this.remainingCourseCollection = new CourseCardCollection(
-                        this.courseData.get('not_started') || [],
-                        this.options.userPreferences
-                     );
+import CollectionListView from './collection_list_view';
+import CourseCardCollection from '../collections/course_card_collection';
+import CourseCardView from './course_card_view';
+import HeaderView from './program_header_view';
+import SidebarView from './program_details_sidebar_view';
 
-                     this.render();
-                 },
+import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
 
-                 getUrl: function(base, programData) {
-                     if (programData.uuid) {
-                         return base + '&bundle=' + encodeURIComponent(programData.uuid);
-                     }
-                     return base;
-                 },
+class ProgramDetailsView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      el: '.js-program-details-wrapper',
+      events: {
+        'click .complete-program': 'trackPurchase',
+      },
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                 render: function() {
-                     var completedCount = this.completedCourseCollection.length,
-                         inProgressCount = this.inProgressCourseCollection.length,
-                         remainingCount = this.remainingCourseCollection.length,
-                         totalCount = completedCount + inProgressCount + remainingCount,
-                         buyButtonUrl = this.getUrl(this.options.urls.buy_button_url, this.options.programData),
-                         data = {
-                             totalCount: totalCount,
-                             inProgressCount: inProgressCount,
-                             remainingCount: remainingCount,
-                             completedCount: completedCount,
-                             completeProgramURL: buyButtonUrl
-                         };
-                     data = $.extend(data, this.programModel.toJSON());
-                     HtmlUtils.setHtml(this.$el, this.tpl(data));
-                     this.postRender();
-                 },
-
-                 postRender: function() {
-                     this.headerView = new HeaderView({
-                         model: new Backbone.Model(this.options)
-                     });
-
-                     if (this.remainingCourseCollection.length > 0) {
-                         new CollectionListView({
-                             el: '.js-course-list-remaining',
-                             childView: CourseCardView,
-                             collection: this.remainingCourseCollection,
-                             context: $.extend(this.options, {collectionCourseStatus: 'remaining'})
-                         }).render();
-                     }
-
-                     if (this.completedCourseCollection.length > 0) {
-                         new CollectionListView({
-                             el: '.js-course-list-completed',
-                             childView: CourseCardView,
-                             collection: this.completedCourseCollection,
-                             context: $.extend(this.options, {collectionCourseStatus: 'completed'})
-                         }).render();
-                     }
-
-                     if (this.inProgressCourseCollection.length > 0) {
-                         // This is last because the context is modified below
-                         new CollectionListView({
-                             el: '.js-course-list-in-progress',
-                             childView: CourseCardView,
-                             collection: this.inProgressCourseCollection,
-                             context: $.extend(this.options,
-                               {enrolled: gettext('Enrolled'), collectionCourseStatus: 'in_progress'}
-                             )
-                         }).render();
-                     }
-
-                     this.sidebarView = new SidebarView({
-                         el: '.js-program-sidebar',
-                         model: this.programModel,
-                         courseModel: this.courseData,
-                         certificateCollection: this.certificateCollection
-                     });
-                 },
-
-                 trackPurchase: function() {
-                     var data = this.options.programData;
-                     window.analytics.track('edx.bi.user.dashboard.program.purchase', {
-                         category: data.variant + ' bundle',
-                         label: data.title,
-                         uuid: data.uuid
-                     });
-                 }
-             });
-         }
+  initialize(options) {
+    this.options = options;
+    this.tpl = HtmlUtils.template(pageTpl);
+    this.programModel = new Backbone.Model(this.options.programData);
+    this.courseData = new Backbone.Model(this.options.courseData);
+    this.certificateCollection = new Backbone.Collection(this.options.certificateData);
+    this.completedCourseCollection = new CourseCardCollection(
+      this.courseData.get('completed') || [],
+      this.options.userPreferences,
     );
-}).call(this, define || RequireJS.define);
+    this.inProgressCourseCollection = new CourseCardCollection(
+      this.courseData.get('in_progress') || [],
+      this.options.userPreferences,
+    );
+    this.remainingCourseCollection = new CourseCardCollection(
+      this.courseData.get('not_started') || [],
+      this.options.userPreferences,
+    );
+
+    this.render();
+  }
+
+  static getUrl(base, programData) {
+    if (programData.uuid) {
+      return `${base}&bundle=${encodeURIComponent(programData.uuid)}`;
+    }
+    return base;
+  }
+
+  render() {
+    const completedCount = this.completedCourseCollection.length;
+    const inProgressCount = this.inProgressCourseCollection.length;
+    const remainingCount = this.remainingCourseCollection.length;
+    const totalCount = completedCount + inProgressCount + remainingCount;
+    const buyButtonUrl = ProgramDetailsView.getUrl(
+      this.options.urls.buy_button_url,
+      this.options.programData);
+    let data = {
+      totalCount,
+      inProgressCount,
+      remainingCount,
+      completedCount,
+      completeProgramURL: buyButtonUrl,
+    };
+    data = $.extend(data, this.programModel.toJSON());
+    HtmlUtils.setHtml(this.$el, this.tpl(data));
+    this.postRender();
+  }
+
+  postRender() {
+    this.headerView = new HeaderView({
+      model: new Backbone.Model(this.options),
+    });
+
+    if (this.remainingCourseCollection.length > 0) {
+      new CollectionListView({
+        el: '.js-course-list-remaining',
+        childView: CourseCardView,
+        collection: this.remainingCourseCollection,
+        context: $.extend(this.options, { collectionCourseStatus: 'remaining' }),
+      }).render();
+    }
+
+    if (this.completedCourseCollection.length > 0) {
+      new CollectionListView({
+        el: '.js-course-list-completed',
+        childView: CourseCardView,
+        collection: this.completedCourseCollection,
+        context: $.extend(this.options, { collectionCourseStatus: 'completed' }),
+      }).render();
+    }
+
+    if (this.inProgressCourseCollection.length > 0) {
+      // This is last because the context is modified below
+      new CollectionListView({
+        el: '.js-course-list-in-progress',
+        childView: CourseCardView,
+        collection: this.inProgressCourseCollection,
+        context: $.extend(this.options,
+          { enrolled: gettext('Enrolled'), collectionCourseStatus: 'in_progress' },
+        ),
+      }).render();
+    }
+
+    this.sidebarView = new SidebarView({
+      el: '.js-program-sidebar',
+      model: this.programModel,
+      courseModel: this.courseData,
+      certificateCollection: this.certificateCollection,
+    });
+  }
+
+  trackPurchase() {
+    const data = this.options.programData;
+    window.analytics.track('edx.bi.user.dashboard.program.purchase', {
+      category: `${data.variant} bundle`,
+      label: data.title,
+      uuid: data.uuid,
+    });
+  }
+}
+
+export default ProgramDetailsView;
