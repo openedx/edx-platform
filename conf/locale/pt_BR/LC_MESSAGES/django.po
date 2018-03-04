@@ -180,6 +180,7 @@
 # Rene Souza Vianello Argento <rene.argento@gmail.com>, 2015
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
 # RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
+# Roger Gomes <roger@ucl.br>, 2018
 # danielnora <sandaephon@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Thais de Assis Angeloni <thais.angeloni@gmail.com>, 2015
