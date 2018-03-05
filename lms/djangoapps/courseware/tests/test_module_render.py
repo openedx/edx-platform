@@ -31,6 +31,7 @@ from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.asides import AsideUsageKeyV2
+from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery
 from six import text_type
@@ -855,6 +856,72 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             render.handle_xblock_callback(
                 request,
                 text_type(course.id),
+                "foo@bar",
+                'complete',
+                '',
+            )
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    @ddt.data((True, True), (False, False),)
+    @ddt.unpack
+    def test_aside(self, is_xblock_aside, is_get_aside_called):
+        """
+        test get_aside_from_xblock called
+        """
+        course = CourseFactory.create()
+        block = ItemFactory.create(category='comp', parent=course)
+        request = self.request_factory.post(
+            '/',
+            data=json.dumps({'completion': 0.625}),
+            content_type='application/json',
+        )
+        request.user = self.mock_user
+
+        def get_usage_key():
+            """return usage key"""
+            return (
+                quote_slashes(text_type(AsideUsageKeyV2(block.scope_ids.usage_id, "aside")))
+                if is_xblock_aside
+                else text_type(block.scope_ids.usage_id)
+            )
+
+        with patch(
+            'courseware.module_render.is_xblock_aside',
+            return_value=is_xblock_aside
+        ), patch(
+            'courseware.module_render.get_aside_from_xblock'
+        ) as mocked_get_aside_from_xblock, patch(
+            "courseware.module_render.webob_to_django_response"
+        ) as mocked_webob_to_django_response:
+            render.handle_xblock_callback(
+                request,
+                unicode(course.id),
+                get_usage_key(),
+                'complete',
+                '',
+            )
+            assert mocked_webob_to_django_response.called is True
+        assert mocked_get_aside_from_xblock.called is is_get_aside_called
+
+    def test_aside_invalid_usage_id(self):
+        """
+        test aside work when invalid usage id
+        """
+        course = CourseFactory.create()
+        request = self.request_factory.post(
+            '/',
+            data=json.dumps({'completion': 0.625}),
+            content_type='application/json',
+        )
+        request.user = self.mock_user
+
+        with patch(
+            'courseware.module_render.is_xblock_aside',
+            return_value=True
+        ), self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                request,
+                unicode(course.id),
                 "foo@bar",
                 'complete',
                 '',

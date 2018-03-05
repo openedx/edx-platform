@@ -10,10 +10,10 @@ import six
 from django.conf import settings
 from django.test.client import RequestFactory
 from mock import patch
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from openedx.core.lib.xblock_utils import (
