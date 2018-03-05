@@ -117,7 +117,7 @@ class Currency(models.Model):
     minor_units = models.CharField(max_length=255)
 
     def __str__(self):
-        return "%s %s %s" % (self.country, self.name, self.alphabetic_code)
+        return "%s %s %s" % (self.country, self.name, self.alphabetic_code if self.alphabetic_code else "N/A")
 
 
 class EducationLevel(models.Model):
