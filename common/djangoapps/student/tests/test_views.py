@@ -622,8 +622,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
         CourseEntitlementFactory(user=self.user)
         response = self.client.get(self.path)
-        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0) 
-    
+        self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)
+
     @ddt.data(
         (
             {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "created"},
@@ -647,7 +647,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         with patch.dict('django.conf.settings.FEATURES', config):
             response = self.client.get(reverse('dashboard'))
             content = pq(response.content)
-            css_classes = """.listing-courses .course-item .course-container 
+            css_classes = """.listing-courses .course-item .course-container
                 .course .details .wrapper-course-details .course-title a"""
 
             course_title = content(css_classes).contents()[0]
