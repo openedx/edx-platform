@@ -52,7 +52,7 @@ from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import request_token, wrap_xblock
+from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -324,6 +324,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
             'StudioRuntime',
             usage_id_serializer=unicode,
             request_token=request_token(request),
+        ))
+
+        xblock.runtime.wrappers_asides.append(partial(
+            wrap_xblock_aside,
+            'StudioRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request),
+            extra_classes=['wrapper-comp-plugins']
         ))
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
