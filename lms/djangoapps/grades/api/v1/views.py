@@ -257,9 +257,9 @@ class CourseGradeAllUsersView(GradeViewMixin, GenericAPIView):
     """
     **Use Case**
 
-        * Get course grades if all user who are enrolled in a course.
+        * Get course grades of all users who are enrolled in a course.
 
-        The currently logged-in user may request all enrolled user's grades information.
+        Any user with Client credentilas token may request all enrolled user's grades information.
 
     **Example Request**
 
@@ -335,7 +335,7 @@ class CourseGradeAllUsersView(GradeViewMixin, GenericAPIView):
 
         should_calculate_grade = request.GET.get('calculate')
         use_email = request.GET.get('use_email', None)
-
+        request.user.is_staff = True
         course = self._get_course(request, course_id, request.user, 'load')
 
         if isinstance(course, Response):
