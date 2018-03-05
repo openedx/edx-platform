@@ -24,6 +24,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -164,7 +165,8 @@ def wrap_xblock_aside(
         context,                        # pylint: disable=unused-argument
         usage_id_serializer,
         request_token,                   # pylint: disable=redefined-outer-name
-        extra_data=None
+        extra_data=None,
+        extra_classes=None
 ):
     """
     Wraps the results of rendering an XBlockAside view in a standard <section> with identifying
@@ -180,6 +182,7 @@ def wrap_xblock_aside(
     :param request_token: An identifier that is unique per-request, so that only xblocks
         rendered as part of this request will have their javascript initialized.
     :param extra_data: A dictionary with extra data values to be set on the wrapper
+    :param extra_classes: A list with extra classes to be set on the wrapper element
     """
 
     if extra_data is None:
@@ -196,6 +199,8 @@ def wrap_xblock_aside(
         ),
         'xblock_asides-v1'
     ]
+    if extra_classes:
+        css_classes.extend(extra_classes)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -513,3 +518,31 @@ def xblock_resource_pkg(block):
         return module_name
 
     return module_name.rsplit('.', 1)[0]
+
+
+def is_xblock_aside(usage_key):
+    """
+    Returns True if the given usage key is for an XBlock aside
+
+    Args:
+        usage_key (opaque_keys.edx.keys.UsageKey): A usage key
+
+    Returns:
+        bool: Whether or not the usage key is an aside key type
+    """
+    return isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2))
+
+
+def get_aside_from_xblock(xblock, aside_type):
+    """
+    Gets an instance of an XBlock aside from the XBlock that it's decorating. This also
+    configures the aside instance with the runtime and fields of the given XBlock.
+
+    Args:
+        xblock (xblock.core.XBlock): The XBlock that the desired aside is decorating
+        aside_type (str): The aside type
+
+    Returns:
+        xblock.core.XBlockAside: Instance of an xblock aside
+    """
+    return xblock.runtime.get_aside_of_type(xblock, aside_type)

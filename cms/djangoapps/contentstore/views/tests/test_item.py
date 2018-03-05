@@ -10,10 +10,12 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
+from six import text_type
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
@@ -2135,6 +2137,7 @@ class TestEditSplitModule(ItemTest):
 
 @ddt.ddt
 class TestComponentHandler(TestCase):
+    """Tests for component handler api"""
     shard = 1
 
     def setUp(self):
@@ -2151,9 +2154,10 @@ class TestComponentHandler(TestCase):
         # of the xBlock descriptor.
         self.descriptor = self.modulestore.return_value.get_item.return_value
 
-        self.usage_key_string = unicode(
-            BlockUsageLocator(CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name')
+        self.usage_key = BlockUsageLocator(
+            CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
+        self.usage_key_string = text_type(self.usage_key)
 
         self.user = UserFactory()
 
@@ -2191,6 +2195,43 @@ class TestComponentHandler(TestCase):
 
         self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                           status_code)
+
+    @ddt.data((True, True), (False, False),)
+    @ddt.unpack
+    def test_aside(self, is_xblock_aside, is_get_aside_called):
+        """
+        test get_aside_from_xblock called
+        """
+        def create_response(handler, request, suffix):  # pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        def get_usage_key():
+            """return usage key"""
+            return (
+                text_type(AsideUsageKeyV2(self.usage_key, "aside"))
+                if is_xblock_aside
+                else self.usage_key_string
+            )
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'contentstore.views.component.is_xblock_aside',
+            return_value=is_xblock_aside
+        ), patch(
+            'contentstore.views.component.get_aside_from_xblock'
+        ) as mocked_get_aside_from_xblock, patch(
+            "contentstore.views.component.webob_to_django_response"
+        ) as mocked_webob_to_django_response:
+            component_handler(
+                self.request,
+                get_usage_key(),
+                'dummy_handler'
+            )
+            assert mocked_webob_to_django_response.called is True
+
+        assert mocked_get_aside_from_xblock.called is is_get_aside_called
 
 
 class TestComponentTemplates(CourseTestCase):

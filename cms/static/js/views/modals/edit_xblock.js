@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                 view: 'studio_view',
                 viewSpecificClasses: 'modal-editor confirm',
                 // Translators: "title" is the name of the current component being edited.
-                titleFormat: gettext('Editing: %(title)s'),
+                titleFormat: gettext('Editing: {title}'),
                 addPrimaryActionButton: true
             }),
 
@@ -87,6 +87,10 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                     this.$('.modal-window-title').text(title);
                     if (editorView.getDataEditor() && editorView.getMetadataEditor()) {
                         this.addDefaultModes();
+                        // If the plugins content element exists, add a button to reveal it.
+                        if (this.$('.wrapper-comp-plugins').length > 0) {
+                            this.addModeButton('plugins', gettext('Plugins'));
+                        }
                         this.selectMode(editorView.mode);
                     }
                 }
@@ -125,7 +129,11 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                         displayName = gettext('Component');
                     }
                 }
-                return interpolate(this.options.titleFormat, {title: displayName}, true);
+                return edx.StringUtils.interpolate(
+                    this.options.titleFormat, {
+                        title: displayName
+                    }
+                );
             },
 
             addDefaultModes: function() {
@@ -192,6 +200,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
 
             addModeButton: function(mode, displayName) {
                 var buttonPanel = this.$('.editor-modes');
+                // xss-lint: disable=javascript-jquery-append
                 buttonPanel.append(this.editorModeButtonTemplate({
                     mode: mode,
                     displayName: displayName

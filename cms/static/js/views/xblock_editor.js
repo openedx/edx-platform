@@ -2,9 +2,9 @@
  * XBlockEditorView displays the authoring view of an xblock, and allows the user to switch between
  * the available modes.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata', 'js/collections/metadata',
+define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'js/views/xblock', 'js/views/metadata', 'js/collections/metadata',
     'jquery.inputnumber'],
-    function($, _, gettext, XBlockView, MetadataView, MetadataCollection) {
+    function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) {
         var XBlockEditorView = XBlockView.extend({
             // takes XBlockInfo as a model
 
@@ -24,6 +24,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata
 
             initializeEditors: function() {
                 var metadataEditor,
+                    pluginEl,
                     defaultMode = 'editor';
                 metadataEditor = this.createMetadataEditor();
                 this.metadataEditor = metadataEditor;
@@ -34,6 +35,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata
                         defaultMode = 'settings';
                     }
                     this.selectMode(defaultMode);
+                }
+                pluginEl = this.$('.wrapper-comp-plugins');
+                if (pluginEl.length > 0) {
+                    this.pluginEditor = new BaseView({
+                        el: pluginEl
+                    });
                 }
             },
 
@@ -85,6 +92,10 @@ define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata
 
             getMetadataEditor: function() {
                 return this.metadataEditor;
+            },
+
+            getPluginEditor: function() {
+                return this.pluginEditor;
             },
 
             /**
@@ -144,14 +155,17 @@ define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata
             },
 
             selectMode: function(mode) {
-                var showEditor = mode === 'editor',
-                    dataEditor = this.getDataEditor(),
-                    metadataEditor = this.getMetadataEditor();
+                var dataEditor = this.getDataEditor(),
+                    metadataEditor = this.getMetadataEditor(),
+                    pluginEditor = this.getPluginEditor();
                 if (dataEditor) {
-                    this.setEditorActivation(dataEditor, showEditor);
+                    this.setEditorActivation(dataEditor, mode === 'editor');
                 }
                 if (metadataEditor) {
-                    this.setEditorActivation(metadataEditor.$el, !showEditor);
+                    this.setEditorActivation(metadataEditor.$el, mode === 'settings');
+                }
+                if (pluginEditor) {
+                    this.setEditorActivation(pluginEditor.$el, mode === 'plugins');
                 }
                 this.mode = mode;
             },
