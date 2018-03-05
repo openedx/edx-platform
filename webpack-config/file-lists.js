@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 var path = require('path');
 
 module.exports = {
@@ -105,4 +106,4 @@ module.exports = {
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/section_two_tab.js'),
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/share_modal_view.js')
     ]
-}
+};
