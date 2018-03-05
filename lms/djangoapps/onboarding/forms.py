@@ -210,7 +210,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             'language': forms.TextInput(attrs={"autocomplete": "off"}),
             'country_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
             'city_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
-            'start_month_year': forms.TextInput(attrs={'placeholder': 'mm/yy'}),
+            'start_month_year': forms.TextInput(attrs={'placeholder': 'MM/YYYY'}),
             'hours_per_week': forms.NumberInput(attrs={'max': 168})
         }
 
