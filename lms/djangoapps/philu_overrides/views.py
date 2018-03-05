@@ -4,7 +4,7 @@ import json
 import logging
 import urlparse
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
 
 import third_party_auth
@@ -178,10 +178,10 @@ def courses_custom(request):
     programs_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
-
-        # filter courses here as get_courses filter_ param not works for us, we need Q based filter
-        courses_list = filter(lambda x: (x.end and x.end.date() >= datetime.now(utc).date()) or not x.end, courses_list)
+        current_date = datetime.now(utc)
+        courses_list = get_courses(request.user, filter_={
+            'end__gte': current_date.date() - timedelta(days=1)
+        })
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):

@@ -199,12 +199,6 @@ class Organization(TimeStampedModel):
         return True if user_extended_profile.organization and \
             user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE else False
 
-    def admin_info(self):
-        """
-        :return: Information about the current admin of organization
-        """
-        return "%s" % self.admin.email if self.admin else "Administrator not assigned yet."
-
     def __str__(self):
         return self.label
 
