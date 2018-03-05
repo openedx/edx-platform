@@ -34,7 +34,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         user = AdminFactory()
         self.client.login(username=user.username, password=TEST_PASSWORD)
 
-    def get_course_run_data(self, user, start, end, enrollment_start, enrollment_end, pacing_type, role='instructor'):
+    def get_course_run_data(self, user, start, end, pacing_type, role='instructor'):
         return {
             'title': 'Testing 101',
             'org': 'TestingX',
@@ -43,8 +43,6 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'schedule': {
                 'start': serialize_datetime(start),
                 'end': serialize_datetime(end),
-                'enrollment_start': serialize_datetime(enrollment_start),
-                'enrollment_end': serialize_datetime(enrollment_end),
             },
             'team': [
                 {
@@ -55,11 +53,9 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'pacing_type': pacing_type,
         }
 
-    def assert_course_run_schedule(self, course_run, start, end, enrollment_start, enrollment_end):
+    def assert_course_run_schedule(self, course_run, start, end):
         assert course_run.start == start
         assert course_run.end == end
-        assert course_run.enrollment_start == enrollment_start
-        assert course_run.enrollment_end == enrollment_end
 
     def assert_access_role(self, course_run, user, role):
         # An error will be raised if the endpoint did not create the role
@@ -111,14 +107,12 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         assert response.status_code == 404
 
     def test_update(self):
-        course_run = CourseFactory(start=None, end=None, enrollment_start=None, enrollment_end=None)
+        course_run = CourseFactory(start=None, end=None)
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 0
 
         url = reverse('api:v1:course_run-detail', kwargs={'pk': str(course_run.id)})
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
-        enrollment_start = start - datetime.timedelta(days=7)
-        enrollment_end = end - datetime.timedelta(days=14)
         title = 'A New Testing Strategy'
         user = UserFactory()
         role = 'staff'
@@ -127,8 +121,6 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'schedule': {
                 'start': serialize_datetime(start),
                 'end': serialize_datetime(end),
-                'enrollment_start': serialize_datetime(enrollment_start),
-                'enrollment_end': serialize_datetime(enrollment_end),
             },
             'team': [
                 {
@@ -145,7 +137,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         course_run = modulestore().get_course(course_run.id)
         assert response.data == CourseRunSerializer(course_run, context=self.get_serializer_context()).data
         assert course_run.display_name == title
-        self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
+        self.assert_course_run_schedule(course_run, start, end)
 
     def test_update_with_invalid_user(self):
         course_run = CourseFactory()
@@ -168,7 +160,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         Test that update run updates the pacing type
         """
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
-        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
+        course_run = CourseFactory(start=start, end=None, self_paced=False)
         data = {
             'pacing_type': 'self_paced',
         }
@@ -178,7 +170,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
         course_run = modulestore().get_course(course_run.id)
         assert course_run.self_paced is True
-        self.assert_course_run_schedule(course_run, start, None, None, None)
+        self.assert_course_run_schedule(course_run, start, None)
 
     def test_update_with_instructor_role(self):
         """
@@ -187,7 +179,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         instructor_role = 'instructor'
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         new_user = UserFactory()
-        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
+        course_run = CourseFactory(start=start, end=None, self_paced=False)
         assert CourseAccessRole.objects.filter(course_id=course_run.id).count() == 0
         data = {
             'team': [
@@ -217,7 +209,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         staff_role = 'staff'
         instructor_role = 'instructor'
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
-        course_run = CourseFactory(start=start, end=None, enrollment_start=None, enrollment_end=None, self_paced=False)
+        course_run = CourseFactory(start=start, end=None, self_paced=False)
 
         existing_user = UserFactory()
         CourseAccessRole.objects.create(
@@ -259,10 +251,8 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         user = UserFactory()
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
-        enrollment_start = start - datetime.timedelta(days=7)
-        enrollment_end = end - datetime.timedelta(days=14)
         role = 'staff'
-        data = self.get_course_run_data(user, start, end, enrollment_start, enrollment_end, pacing_type, role)
+        data = self.get_course_run_data(user, start, end, pacing_type, role)
 
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -274,7 +264,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         self.assertEqual(course_run.id.course, data['number'])
         self.assertEqual(course_run.id.run, data['run'])
         self.assertEqual(course_run.self_paced, expected_self_paced_value)
-        self.assert_course_run_schedule(course_run, start, end, enrollment_start, enrollment_end)
+        self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
 
@@ -286,9 +276,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         user = UserFactory()
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
-        enrollment_start = start - datetime.timedelta(days=7)
-        enrollment_end = end - datetime.timedelta(days=14)
-        data = self.get_course_run_data(user, start, end, enrollment_start, enrollment_end, 'self-paced')
+        data = self.get_course_run_data(user, start, end, 'self-paced')
         data['team'] = [{'user': 'invalid-username'}]
         response = self.client.post(self.list_url, data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -345,8 +333,6 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             'schedule': {
                 'start': serialize_datetime(start),
                 'end': serialize_datetime(end),
-                'enrollment_start': None,
-                'enrollment_end': None,
             },
             'team': [
                 {
@@ -363,7 +349,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         course_run = modulestore().get_course(course_run_key)
         assert course_run.id.run == run
         assert course_run.self_paced is expected_self_paced_value
-        self.assert_course_run_schedule(course_run, start, end, None, None)
+        self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
 

@@ -26,10 +26,11 @@ CMS.URL.TEXTBOOKS = "${textbook_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 </script>
 </%block>
-<%block name="requirejs">
-    require(["js/factories/textbooks"], function(TextbooksFactory) {
-        TextbooksFactory(${textbooks | n, dump_js_escaped_json});
-    });
+
+<%block name="page_bundle_extra">
+  <%static:invoke_page_bundle page_name="js/pages/textbooks" class_name="TextbooksFactory">
+     ${textbooks | n, dump_js_escaped_json}
+  </%static:invoke_page_bundle>
 </%block>
 
 <%block name="content">
@@ -54,7 +55,10 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
   <div class="wrapper-content wrapper">
     <section class="content">
       <article class="content-primary" role="main">
-
+        ${static.renderReact(
+          component="NoTextbooks",
+          id="no-textbooks-container"
+        )}
       </article>
       <aside class="content-supplementary" role="complementary">
         <div class="bit">
