@@ -11,7 +11,8 @@ define(['backbone'], function(Backbone) {
             explicitly_set: null,
             default_value: null,
             options: null,
-            type: null
+            type: null,
+            custom: false
         },
 
         initialize: function() {
@@ -24,6 +25,10 @@ define(['backbone'], function(Backbone) {
          * property has changed.
          */
         isModified: function() {
+            if (this.get('custom') === true) {
+                return false;
+            }
+
             if (!this.get('explicitly_set') && !this.original_explicitly_set) {
                 return false;
             }

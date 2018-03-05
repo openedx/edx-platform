@@ -603,8 +603,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
+        editable_fields['transcripts']['custom'] = True
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
+        editable_fields['transcripts']['value'] = {}
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(
             self,
             'studio_transcript',
@@ -756,6 +758,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         video_url = metadata_fields['html5_sources']
         video_id = metadata_fields['edx_video_id']
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
+        transcripts = dict(metadata_fields['transcripts'], value={})
+        # transcripts = dict(metadata_fields['transcripts'], value={'ar': 'arabic_transcript.srt'})
 
         def get_youtube_link(video_id):
             """
@@ -814,7 +818,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'edx_video_id': video_id
         }
 
-        _context.update({'transcripts_basic_tab_metadata': metadata})
+        _context.update({
+            'transcripts_basic_tab_metadata': metadata,
+            'transcripts': transcripts,
+        })
         return _context
 
     @classmethod
