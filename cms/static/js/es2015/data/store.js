@@ -2,9 +2,9 @@ import { applyMiddleware, createStore } from 'redux';
 
 import rootReducer from './reducers';
 
-const store = createStore(
+const StudioStore = createStore(
   rootReducer,
   window.pageFactoryArguments
 );
 
-export default store;
+export { StudioStore };

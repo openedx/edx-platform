@@ -24,6 +24,8 @@ module.exports = {
         'js/sock': './cms/static/js/sock.js',
         AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
         NoTextbooks: './cms/static/js/es2015/components/NoTextbooks.jsx',
+        WrappedNoTextbooks: './cms/static/js/es2015/containers/WrappedNoTextbooks.jsx',
+        StudioStore: './cms/static/js/es2015/data/store.js',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',

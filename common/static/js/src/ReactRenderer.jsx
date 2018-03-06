@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 
 class ReactRendererException extends Error {
   constructor(message) {
@@ -10,12 +11,13 @@ class ReactRendererException extends Error {
 }
 
 export class ReactRenderer {
-  constructor({ component, selector, componentName, props = {} }) {
+  constructor({ component, selector, componentName, props = {}, store }) {
     Object.assign(this, {
       component,
       selector,
       componentName,
       props,
+      store,
     });
     this.handleArgumentErrors();
     this.targetElement = this.getTargetElement();
@@ -59,8 +61,17 @@ export class ReactRenderer {
   }
 
   renderComponent() {
+    let el = React.createElement(this.component, this.props, null);
+
+    if (this.store) {
+      el = React.createElement(Provider, {
+        children: el,
+        store: this.store,
+      });
+    }
+
     ReactDOM.render(
-      React.createElement(this.component, this.props, null),
+      el,
       this.targetElement,
     );
   }
