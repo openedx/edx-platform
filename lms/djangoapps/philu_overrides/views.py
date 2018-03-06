@@ -3,7 +3,9 @@ import base64
 import json
 import logging
 import urlparse
-from django.http import HttpResponseNotFound, HttpResponse
+
+from datetime import datetime, timedelta
+from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
 
 import third_party_auth
 from django.conf import settings
@@ -16,6 +18,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from philu_overrides.helpers import reactivation_email_for_user_custom
+from pytz import utc
 from student.helpers import get_next_url_for_login_page
 from django.utils.translation import ugettext as _
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
@@ -31,6 +34,7 @@ from xmodule.modulestore.django import modulestore
 from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
+from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
@@ -39,6 +43,7 @@ from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
+from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from student.models import (LoginFailures, PasswordHistory)
 from ratelimitbackend.exceptions import RateLimitException
@@ -166,7 +171,7 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
 @ensure_csrf_cookie
 @cache_if_anonymous()
-def courses(request):
+def courses_custom(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
@@ -174,7 +179,10 @@ def courses(request):
     programs_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
+        current_date = datetime.now(utc)
+        courses_list = get_courses(request.user, filter_={
+            'end__gte': current_date.date() - timedelta(days=1)
+        })
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -198,14 +206,11 @@ def courses(request):
                 course.id.to_deprecated_string())
         with modulestore().bulk_operations(course_key):
             if has_access(request.user, 'load', course):
-                first_chapter_url, first_section = get_course_related_keys(
-                    request, get_course_by_id(course_key, 0))
-                course_target = reverse('courseware_section', args=[
-                    course.id.to_deprecated_string(),
-                    first_chapter_url,
-                    first_section
-                    ])
-                course.course_target = course_target
+                course.course_target = get_last_accessed_courseware(
+                    get_course_by_id(course_key, 0),
+                    request,
+                    request.user
+                    )
             else:
                 course.course_target = '/courses/' + course.id.to_deprecated_string()
 
@@ -219,13 +224,45 @@ def courses(request):
     )
 
 
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def courses(request):
+    """
+    Render the "find courses" page. If the marketing site is enabled, redirect
+    to that. Otherwise, if subdomain branding is on, this is the university
+    profile page. Otherwise, it's the edX courseware.views.views.courses page
+    """
+
+    enable_mktg_site = configuration_helpers.get_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
+
+    if enable_mktg_site:
+        return redirect(marketing_link('COURSES'), permanent=True)
+
+    if not settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+        raise Http404
+
+    #  we do not expect this case to be reached in cases where
+    #  marketing is enabled or the courses are not browsable
+    return courses_custom(request)
+
+
 def render_404(request):
     try:
         return HttpResponseNotFound(render_to_string('custom_static_templates/404.html', {}, request=request))
     except:
         return redirect("404/")
 
-      
+
+def render_500(request):
+    try:
+        return HttpResponseServerError(render_to_string('custom_static_templates/server-error.html', {}, request=request))
+    except:
+        return redirect("500/")
+
+
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user_custom(request, error=""):  # pylint: disable=too-many-statements,unused-argument

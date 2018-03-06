@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
-from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso, get_sorted_choices_from_dict, \
+from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso, get_sorted_choices_from_dict, \
     get_actual_field_names, admin_not_assigned_or_me
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
@@ -166,10 +166,9 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         raise forms.ValidationError(ugettext_noop('Please select country of residence.'))
 
     def clean_language(self):
-        all_languages = get_onboarding_autosuggesion_data('world_languages.json')
         submitted_language = self.cleaned_data['language']
 
-        if submitted_language in all_languages:
+        if submitted_language in LANGUAGES:
             return submitted_language
 
         raise forms.ValidationError(ugettext_noop('Please select language.'))
@@ -211,7 +210,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             'language': forms.TextInput(attrs={"autocomplete": "off"}),
             'country_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
             'city_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
-            'start_month_year': forms.TextInput(attrs={'placeholder': 'mm/yy'}),
+            'start_month_year': forms.TextInput(attrs={'placeholder': 'MM/YYYY'}),
             'hours_per_week': forms.NumberInput(attrs={'max': 168})
         }
 
@@ -559,20 +558,16 @@ class RegModelForm(BaseOnboardingModelForm):
 
     is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our '
                                                    'website?'),
-                               help_text=ugettext_noop("Your organization's PhilU Administrator is responsible for "
-                                                       "maintaining your organization's profile, inviting learners "
-                                                       "from your organization to the PhilU platform, completing "
-                                                       "the Organizational Effectiveness Framework assessment and "
-                                                       "updating it over time. Your Administrator should be the most "
-                                                       "senior person in your organization responsible for "
-                                                       "organizational capacity building and learning. In a small "
-                                                       "organization with few employees, the Organization "
-                                                       "Administrator might be the Executive Director or "
-                                                       "Chief Executive. In a larger organization, the "
-                                                       "Organization Administrator might be the director or "
-                                                       "manager responsible for staff learning and development "
-                                                       "and organizational capacity assessment and development "
-                                                       "planning."),
+                               help_text=ugettext_noop("Your organization's Administrator is responsible for "
+                                                       "maintaining your organization's profile and inviting learners "
+                                                       "from your organization to the Philanthropy University platform."
+                                                       " An Administrator should be the most senior person in your "
+                                                       "organization responsible for organizational capacity building "
+                                                       "and learning. In a small organization with few employees, "
+                                                       "the Administrator might be the Executive Director or Chief "
+                                                       "Executive. In a larger organization, the Administrator might "
+                                                       "be the director or manager responsible for staff learning "
+                                                       "and development and organizational capacity development."),
                                choices=IS_POC_CHOICES,
                                widget=forms.RadioSelect)
 
@@ -811,7 +806,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
             'total_employees': ugettext_noop('Total Employees at the End of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
-            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year (Local Currency)'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
             'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)'),
             'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '
@@ -1019,7 +1014,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
             'total_clients': ugettext_noop('Total Annual Clients or Direct Beneficiaries for Last Fiscal Year'),
             'total_employees': ugettext_noop('Total Employees at the End of Last Fiscal Year'),
             'local_currency': ugettext_noop('Local Currency Code*'),
-            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year* (Local Currency)'),
+            'total_revenue': ugettext_noop('Total Annual Revenue for Last Fiscal Year (Local Currency)'),
             'total_donations': ugettext_noop('Total Donations and Grants Received Last Fiscal Year (Local Currency)'),
             'total_expenses': ugettext_noop('Total Annual Expenses for Last Fiscal Year (Local Currency)'),
             'total_program_expenses': ugettext_noop('Total Annual Program Expenses for Last Fiscal Year '

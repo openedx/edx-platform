@@ -27,7 +27,7 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
     can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, send_admin_update_email
-from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, oef_eligible_first_learner
+from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
@@ -365,16 +365,9 @@ def get_languages(request):
     Returns languages
     """
     if request.is_ajax():
-        file_path = path(os.path.join(
-            'lms', 'djangoapps', 'onboarding', 'data', 'world_languages.json'
-        )).abspath()
-        with open(file_path) as json_data:
-            q = request.GET.get('term', '')
-            all_languages = json.load(json_data)
-            filtered_languages = [language for language in all_languages if language.lower().startswith(q.lower())]
-
+        q = request.GET.get('term', '')
+        filtered_languages = [language for language in LANGUAGES if language.lower().startswith(q.lower())]
         data = json.dumps(filtered_languages)
-
     else:
         data = 'fail'
 

@@ -37,6 +37,7 @@ def get_enrolled_past_courses(course_enrollments):
     """
     Helper function to separate past courses from all enrolled courses
     """
+    #TODO move this function out of core code
     enrolled, past = [], []
 
     for course in course_enrollments:
