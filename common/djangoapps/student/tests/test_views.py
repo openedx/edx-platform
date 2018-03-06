@@ -263,7 +263,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'DASHBOARD_FACEBOOK': True,
             'DASHBOARD_TWITTER': True,
         },
-    }   
+    }
 
     def setUp(self):
         """
@@ -713,9 +713,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     run=course_detail["run"],
                     name=course_detail["name"]
                 )
-                
+
                 CourseEnrollmentFactory(course_id=course.id, user=self.user)
-            
+
             response = self.client.get(reverse('dashboard'))
             content = pq(response.content)
             css_classes = """.listing-courses .course-item .course-container
