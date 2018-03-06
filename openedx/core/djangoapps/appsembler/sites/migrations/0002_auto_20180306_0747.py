@@ -2,13 +2,12 @@
 from __future__ import unicode_literals
 
 import json
-
 from django.db import migrations, models
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 def add_hide_linked_accounts_tab_to_sass_vars(apps, schema_editor):
     #
+    SiteConfiguration = apps.get_model('site_configuration', 'SiteConfiguration')
     sites = SiteConfiguration.objects.all()
     for site in sites:
         exists = False
