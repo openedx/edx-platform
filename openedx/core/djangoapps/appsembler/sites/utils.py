@@ -52,7 +52,7 @@ def get_branding_values_from_file():
 
 
 def get_branding_labels_from_file(custom_branding=None):
-    css_output = compile_sass('brand.scss', custom_branding)
+    css_output = compile_sass('_brand.scss', custom_branding)
     css_rules = cssutils.parseString(css_output, validate=False).cssRules
     labels = []
     for rule in css_rules:
