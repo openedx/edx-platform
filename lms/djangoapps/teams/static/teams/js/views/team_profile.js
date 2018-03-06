@@ -57,6 +57,21 @@
 
                     this.renderTeamMembers();
 
+                    // TODO: WRITE THE FOLLOWING CODE USING PROPER BACKBONE LOGIC
+                    var nodeBBUrl = localStorage.getItem('nodebbUrl');
+                    var rooms = JSON.parse(localStorage.getItem('rooms'));
+                    var activeTeam = localStorage.getItem('activeTeam')
+                    var memberships = parseInt(localStorage.getItem('memberships'), 10);
+                    var teamDiscussionLink = nodeBBUrl + '/chats/' + rooms[activeTeam];
+                    var discussionLinkElem = document.getElementById('discussion-link');
+
+                    if (rooms[activeTeam] && memberships > 1) {
+                        discussionLinkElem.href = teamDiscussionLink;
+                    } else {
+                        discussionLinkElem.href = "javascript:void(0)"
+                        discussionLinkElem.innerHTML = '<h3>Not enough members to start a discussion</h3>'
+                    }
+
                     this.setFocusToHeaderFunc();
                     return this;
                 },
@@ -99,6 +114,7 @@
                                             team: view.model
                                         });
                                     });
+                                window.location = ".";
                             }).fail(function(data) {
                                 TeamUtils.parseAndShowMessage(data, view.errorMessage);
                             });
