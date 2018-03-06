@@ -122,7 +122,7 @@ def instructor_dashboard_2(request, course_id):
 
     sections = [
         _section_course_info(course, access),
-        _section_membership(course, access, is_white_label),
+        _section_membership(course, access),
         _section_cohort_management(course, access),
         _section_discussions_management(course, access),
         _section_student_admin(course, access),
@@ -480,16 +480,18 @@ def _section_course_info(course, access):
     return section_data
 
 
-def _section_membership(course, access, is_white_label):
+def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
+    enrollment_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
+                                                              settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
+
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
         'ccx_is_enabled': ccx_enabled,
-        'is_white_label': is_white_label,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
@@ -498,6 +500,7 @@ def _section_membership(course, access, is_white_label):
         'modify_access_url': reverse('modify_access', kwargs={'course_id': unicode(course_key)}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': unicode(course_key)}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
+        'enrollment_role_choices': enrollment_role_choices
     }
     return section_data
 

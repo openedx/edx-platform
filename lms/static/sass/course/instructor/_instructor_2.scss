@@ -615,6 +615,13 @@
       width: 90%;
     }
 
+    .role {
+      margin: 20px 0;
+      select {
+        margin-left: 15px;
+      }
+    }
+
     input {
       margin-right: ($baseline/4);
     }

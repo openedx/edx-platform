@@ -5,6 +5,7 @@ import datetime
 
 import ddt
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -20,6 +21,7 @@ from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserF
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
@@ -151,6 +153,49 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             org,
             content('#field-course-organization b').contents()[0].strip()
         )
+
+    def test_membership_site_configuration_role(self):
+        """
+        Verify that the role choices set via site configuration are loaded in the membership tab
+        of the instructor dashboard
+        """
+
+        configuration_values = {
+            "MANUAL_ENROLLMENT_ROLE_CHOICES": [
+                "role1",
+                "role2",
+            ]
+        }
+        site = Site.objects.first()
+        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': unicode(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertIn('<option value="role1">role1</option>', response.content)
+        self.assertIn('<option value="role2">role2</option>', response.content)
+
+    def test_membership_default_role(self):
+        """
+        Verify that in the absence of site configuration role choices, default values of role choices are loaded
+        in the membership tab of the instructor dashboard
+        """
+
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': unicode(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertIn('<option value="Learner">Learner</option>', response.content)
+        self.assertIn('<option value="Support">Support</option>', response.content)
+        self.assertIn('<option value="Partner">Partner</option>', response.content)
 
     def test_student_admin_staff_instructor(self):
         """
