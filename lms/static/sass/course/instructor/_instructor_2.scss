@@ -616,7 +616,11 @@
     }
 
     .role {
-      margin: 20px 0;
+      margin: 20px 0 0 10px;
+      select {
+        width: 200px;
+        margin-left: 15px;
+      }
     }
 
     input {
