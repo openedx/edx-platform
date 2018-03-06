@@ -557,6 +557,8 @@ class CohortManagementSection(PageObject):
         Returns whether or not the radio button is in the selected state after the click.
         """
         radio_button = self.q(css=self._bounded_selector(self.select_content_group_button_css)).results[0]
+        if not radio_button.is_enabled():
+            return False
         radio_button.click()
         return radio_button.is_selected()
 
