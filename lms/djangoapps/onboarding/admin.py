@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from lms.djangoapps.onboarding.models import (
     RoleInsideOrg,
+    Currency,
     OrgSector,
     OperationLevel,
     FocusArea,
@@ -55,6 +56,10 @@ class FunctionAreaAdmin(BaseDropdownOrderAdmin):
     pass
 
 
+class CurrencyAdmin(admin.ModelAdmin):
+    list_display = ('country', 'name', 'alphabetic_code', )
+
+
 class OraganizationAdmin(admin.ModelAdmin):
     list_display = ('label', 'admin', 'country', 'unclaimed_org_admin_email', 'founding_year', )
 
@@ -63,6 +68,7 @@ class UserExtendedProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'organization', 'country_of_employment', 'role_in_org', 'hours_per_week', )
 
 
+admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(RoleInsideOrg, RoleInsideOrgAdmin)
 admin.site.register(OrgSector, OrgSectorAdmin)
 admin.site.register(OperationLevel, OperationLevelAdmin)

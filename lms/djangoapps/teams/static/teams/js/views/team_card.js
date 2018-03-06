@@ -107,10 +107,15 @@
                 this.teamID = options.teamID;
                 this.nodeBBUrl = options.nodeBBUrl;
                 this.roomID = JSON.parse(options.roomID);
+                this.memberships = options.memberships;
             },
 
             render: function() {
-                this.$el.html(this.template({roomID: this.roomID, teamID: this.teamID, nodeBBUrl: this.nodeBBUrl}));
+                if (this.memberships > 1) {
+                    this.$el.html(this.template({roomID: this.roomID, teamID: this.teamID, nodeBBUrl: this.nodeBBUrl}));
+                } else {
+                    this.$el.html('<p class="meta-detail team-group">You can not start discussion until more members join this team.<p>');
+                }
             }
         });
 
@@ -130,6 +135,7 @@
                         roomID: this.roomID,
                         teamID: this.model.id,
                         nodeBBUrl: this.nodeBBUrl,
+                        memberships: this.model.get('membership').length
                     }),
                 ];
                 this.model.on('change:membership', function() {
@@ -142,6 +148,13 @@
             title: function() { return this.model.get('name'); },
             description: function() { return this.model.get('description'); },
             details: function() { return this.detailViews; },
+            action: function() {
+                // TODO: WRITE THE FOLLOWING CODE USING PROPER BACKBONE LOGIC
+                localStorage.setItem('memberships', this.model.get('membership').length);
+                localStorage.setItem('rooms', this.roomID);
+                localStorage.setItem('nodebbUrl', this.nodeBBUrl);
+                localStorage.setItem('activeTeam', this.model.id);
+            },
             actionClass: 'action-view',
             actionContent: function() {
                 return interpolate(

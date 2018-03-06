@@ -184,9 +184,6 @@ def courses_custom(request):
             'end__gte': current_date.date() - timedelta(days=1)
         })
 
-        # filter courses here as get_courses filter_ param not works for us, we need Q based filter
-        courses_list = filter(lambda x: (x.end and x.end.date() >= datetime.now(utc).date()) or not x.end, courses_list)
-
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
             courses_list = sort_by_start_date(courses_list)
