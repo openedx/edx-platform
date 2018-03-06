@@ -735,7 +735,7 @@ def student_dashboard(request):
         for enrollment in course_enrollments[:]:
             course_language =\
                 modulestore().get_course(enrollment.course_id).language
-                
+
             if course_language != preferred_lang:
                 course_enrollments.remove(enrollment)
 
