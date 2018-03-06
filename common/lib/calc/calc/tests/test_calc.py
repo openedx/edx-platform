@@ -440,7 +440,7 @@ class EvaluatorTest(unittest.TestCase):
         """
         Substitution of variables into simple equations
         """
-        variables = {'x': 9.72, 'y': 7.91, 'loooooong': 6.4}
+        variables = {'x': 9.72, 'y': 7.91, 'loooooong': 6.4, "f_0'": 2.0, "T_{ijk}^{123}''": 5.2}
 
         # Should not change value of constant
         # even with different numbers of variables...
@@ -452,6 +452,8 @@ class EvaluatorTest(unittest.TestCase):
         self.assertEqual(calc.evaluator(variables, {}, 'x'), 9.72)
         self.assertEqual(calc.evaluator(variables, {}, 'y'), 7.91)
         self.assertEqual(calc.evaluator(variables, {}, 'loooooong'), 6.4)
+        self.assertEqual(calc.evaluator(variables, {}, "f_0'"), 2.0)
+        self.assertEqual(calc.evaluator(variables, {}, "T_{ijk}^{123}''"), 5.2)
 
         # Test a simple equation
         self.assertAlmostEqual(

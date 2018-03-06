@@ -31,7 +31,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
-# Laura Silva <lingison@edx.org>, 2015-2017
+# Laura Silva <lingison@edx.org>, 2015-2018
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Marina Pastor <mpastor@edx.org>, 2017-2018
@@ -11489,8 +11489,8 @@ msgid ""
 msgstr ""
 "¡Esperamos que te esté gustando aprender con nosotros en "
 "<strong>%(first_course_name)s</strong>! El Certificado Verificado te permite"
-" resaltar tus nuevos conocimientos y habilidades. Los certificados "
-"de%(platform_name)s son oficiales y son fáciles de compartir en las redes "
+" resaltar tus nuevos conocimientos y habilidades. Los certificados de "
+"%(platform_name)s son oficiales y son fáciles de compartir en las redes "
 "sociales."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
