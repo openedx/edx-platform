@@ -210,16 +210,16 @@ def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
-    courses = []
+    courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses = get_courses(request.user)
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
-            courses = sort_by_start_date(courses)
+            courses_list = sort_by_start_date(courses_list)
         else:
-            courses = sort_by_announcement(courses)
+            courses_list = sort_by_announcement(courses_list)
 
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
@@ -229,13 +229,15 @@ def courses(request):
         settings.FEATURES.get("ENABLE_FILTER_COURSES_BY_USER_LANG")
     ):
         preferred_lang = request.LANGUAGE_CODE
-        courses =\
-            [course for course in courses if course.language == preferred_lang]
+        courses_list = [
+            course for course in courses_list
+            if course.language == preferred_lang
+        ]
 
     return render_to_response(
         "courseware/courses.html",
         {
-            'courses': courses,
+            'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list
         }
