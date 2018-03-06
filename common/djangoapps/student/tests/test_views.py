@@ -263,24 +263,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'DASHBOARD_FACEBOOK': True,
             'DASHBOARD_TWITTER': True,
         },
-    }
-
-    @classmethod
-    def setUpClass(cls):
-        super(StudentDashboardTests, cls).setUpClass()
-        cls.course_one = CourseFactory.create(
-            org="GotG",
-            number="001",
-            run="2018",
-            name="I am Groot"
-        )
-
-        cls.course_two = CourseFactory.create(
-            org="GotG",
-            number="002",
-            run="2018",
-            name="My name is Star Lord"
-        )
+    }   
 
     def setUp(self):
         """
@@ -289,8 +272,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         super(StudentDashboardTests, self).setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=PASSWORD)
-        CourseEnrollmentFactory(course_id=self.course_one.id, user=self.user)
-        CourseEnrollmentFactory(course_id=self.course_two.id, user=self.user)
         self.path = reverse('dashboard')
 
     def set_course_sharing_urls(self, set_marketing, set_social_sharing):
@@ -428,7 +409,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         # There should be two entitlements on the course page, one prompting for a mandatory session, but no
         # select option for the courses as there is only the single course run which has already been redeemed
-        self.assertEqual(response.content.count('<li class="course-item">'), 4)
+        self.assertEqual(response.content.count('<li class="course-item">'), 2)
         self.assertIn('You must select a session to access the course.', response.content)
         self.assertNotIn('To access the course, select a session.', response.content)
 
@@ -455,7 +436,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 2)
+        self.assertEqual(response.content.count('<li class="course-item">'), 0)
 
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
@@ -627,31 +608,121 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     @ddt.data(
         (
             {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "created"},
-            "I am Groot"
+            [
+                {
+                    "org": "Marvel",
+                    "number": "001",
+                    "run": "2008",
+                    "name": "Iron Man"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "002",
+                    "run": "2010",
+                    "name": "Iron Man 2"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "003",
+                    "run": "2013",
+                    "name": "Iron Man 3"
+                }
+            ],
+            "Iron Man"
         ),
         (
             {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "created_reverse"},
-            "My name is Star Lord"
+            [
+                {
+                    "org": "Marvel",
+                    "number": "004",
+                    "run": "2011",
+                    "name": "Thor"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "005",
+                    "run": "2013",
+                    "name": "The Dark World"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "006",
+                    "run": "2017",
+                    "name": "Ragnarok"
+                }
+            ],
+            "Ragnarok"
         ),
         (
             {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "course_name"},
-            "I am Groot"
+            [
+                {
+                    "org": "Marvel",
+                    "number": "007",
+                    "run": "2011",
+                    "name": "The First Avenger"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "008",
+                    "run": "2014",
+                    "name": "The Winter Soldier"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "009",
+                    "run": "2016",
+                    "name": "Civil War"
+                }
+            ],
+            "Civil War"
         ),
         (
             {"PREFERRED_ORDER_BY_COURSE_ENROLLMENTS": "course_name_reverse"},
-            "My name is Star Lord"
+            [
+                {
+                    "org": "Marvel",
+                    "number": "010",
+                    "run": "2016",
+                    "name": "Doctor Strange"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "011",
+                    "run": "2017",
+                    "name": "Spiderman: Homecoming"
+                },
+                {
+                    "org": "Marvel",
+                    "number": "012",
+                    "run": "2018",
+                    "name": "Black Panther"
+                }
+            ],
+            "Spiderman: Homecoming"
         ),
     )
     @ddt.unpack
-    def test_load_student_dashboard_order_by_enrollments(self, config, title):
+    def test_load_student_dashboard_order_by_enrollments(self, config, course_details, expected_course_title):
         with patch.dict('django.conf.settings.FEATURES', config):
+            for course_detail in course_details:
+                course = CourseFactory.create(
+                    org=course_detail["org"],
+                    number=course_detail["number"],
+                    run=course_detail["run"],
+                    name=course_detail["name"]
+                )
+                
+                CourseEnrollmentFactory(course_id=course.id, user=self.user)
+            
             response = self.client.get(reverse('dashboard'))
             content = pq(response.content)
             css_classes = """.listing-courses .course-item .course-container
                 .course .details .wrapper-course-details .course-title a"""
 
             course_title = content(css_classes).contents()[0]
-            self.assertEqual(title, course_title)
+            self.assertEqual(expected_course_title, course_title)
 
     @staticmethod
     def _remove_whitespace_from_html_string(html):
