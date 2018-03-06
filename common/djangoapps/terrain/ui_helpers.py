@@ -133,7 +133,7 @@ def wait_for_xmodule():
 @world.absorb
 def wait_for_mathjax():
     "Wait until MathJax is loaded and set up on the page."
-    world.wait_for_js_variable_truthy("MathJax.isReady")
+    world.wait_for_js_variable_truthy("MathJax")
 
 
 class RequireJSError(Exception):
