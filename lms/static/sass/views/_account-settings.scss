@@ -113,6 +113,26 @@
             padding-bottom: 10px;
         }
 
+        .link-account-header-subtitle {
+            font-size: em(18);
+            line-height: normal;
+            color: $dark-gray;
+            padding-bottom: 10px;
+        }
+
+        .link-account-below-button-link {
+            padding-bottom: 80px;
+        }
+
+        .link-account-social-field-section {
+           .social-field-unlinked {
+               background: none !important;
+               box-shadow: none !important;
+               padding: 0px !important;
+               margin: 0px !important;
+           }
+        }
+
         .account-settings-section-body {
 
             .u-field {
@@ -186,6 +206,10 @@
 
                     #u-field-value-username {
                         padding-top: ($baseline/2);
+                    }
+
+                    #u-field-value-name {
+                        width: 100%
                     }
                 }
 
@@ -290,7 +314,7 @@
                         font-weight: $font-semibold;
                     }
                 }
-                
+
                 .u-field-message {
                     position: relative;
                     padding: 24px 0 0 ($baseline*5);

@@ -7,7 +7,7 @@
     @include box-sizing(border-box);
     @include outer-container;
     $grid-columns: 12;
-    background: $white;
+    background: #fbfbfb;
     min-height: 100%;
     width: 100%;
     $third-party-button-height: ($baseline*1.75);
@@ -19,6 +19,11 @@
         font-family: $sans-serif;
     }
 
+    hr {
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+    
     .instructions {
         @extend %t-copy-base;
     }
@@ -31,12 +36,14 @@
 
     /* Remove autocomplete yellow background */
     input:-webkit-autofill {
-        -webkit-box-shadow:0 0 0 50px white inset;
+        border: 1px solid #e4e4e4;
+        -webkit-box-shadow:0 0 0 50px #fbfbfb inset;
         -webkit-text-fill-color: #333;
     }
 
     input:-webkit-autofill:focus {
-        -webkit-box-shadow: white, 0 0 0 50px white inset;
+        border: 1px solid #e4e4e4;
+        -webkit-box-shadow:0 0 0 50px #fbfbfb inset;
         -webkit-text-fill-color: #333;
     }
 
@@ -106,6 +113,18 @@
             text-align: center;
             text-transform: none;
         }
+    }
+
+    .description-text {
+        @extend %t-copy-sub1;
+        text-align: center;
+    }
+    
+    .description-text-small {
+        @extend .description-text;
+        margin-top: 0px;
+        padding-bottom: 10px;
+        font-size: 12px;
     }
 
     %nav-btn-base {
@@ -184,7 +203,7 @@
     }
 
     %bold-label {
-        @include font-size(16);
+        @include font-size(14);
         font-family: $sans-serif;
         font-weight: $font-semibold;
     }
@@ -211,7 +230,9 @@
         }
 
         &.select-gender,
-        &.select-year_of_birth {
+        &.select-year_of_birth,
+        &.checkbox-terms_of_service,
+        &.checkbox-disclosure_notice {
             display: inline-block;
             width: calc( 50% - 10px );
         }
@@ -244,13 +265,25 @@
             &.error {
                 color: $red;
             }
-            
+
+            &[for="register-email"],
+            &[for="register-name"],
+            &[for="register-username"],
+            &[for="register-password"],
+            &[for="login-email"],
+            &[for="login-username"],
+            &[for="login-password"] {
+                @extend %bold-label;
+            }
+
             &[for="register-data_sharing_consent"],
             &[for="register-honor_code"],
-            &[for="register-terms_of_service"] {
+            &[for="register-terms_of_service"],
+            &[for="register-disclosure_notice"] {
+                @extend %t-copy-sub1;
                 display: inline-block;
                 margin: 5px 5px 0 0;
-                width: 90%;
+                width: 85%;
                 vertical-align: top;
             }
 
@@ -307,6 +340,10 @@
             &.error {
                 border-color: tint($red,50%);
             }
+
+            &.disabled {
+                background: #F0F0F0;
+            }
         }
 
         input {
@@ -355,14 +392,14 @@
     }
 
     .action-primary {
+        @include font-size(16);
         @extend %btn-primary-blue;
         width: 100%;
         margin-top: 1em;
         padding: ($baseline/2);
         text-transform: none;
-        font-weight: 600;
+        font-weight: normal;
         letter-spacing: normal;
-
         .icon {
             @extend %sso-icon;
         }
@@ -578,6 +615,50 @@
             margin: 10px 0;
         }
     }
+
+    .link-account-header {
+        h1 {
+            color: #2e2e2e;
+            //font: normal 2em/1.4em "Segoe UI Light","Segoe UI Regular","Segoe UI",Verdana,Geneva,sans-serif,sans-serif;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: left !important;
+        }
+
+        .link-account-confirm-subtitle {
+            //font-family: "Segoe UI Bold","Segoe UI Regular","Segoe UI",sans-serif;
+            font-weight: 700;
+            margin-top:5px !important;
+        }
+    }
+
+    .link-account-confirm-section, .link-account-social-field-section {
+        padding: ($baseline*2) 0;
+
+        button.link-account-button, a.u-field-link {
+            @extend %btn-primary-blue;
+            background-color: $button-bg-color !important;
+            color: #f2f2f2 !important;
+            border-radius: 1px !important;
+            text-shadow: none;
+            text-transform: none;
+            box-shadow: none;
+            line-height: 1rem !important;
+            font-size: 16px;
+            font-weight: normal !important;
+            letter-spacing: 0px;
+            &:focus,
+            &:hover,
+            &:active {
+                background-color: $button-bg-hover-color !important;
+            }
+        }
+    }
+
+    .link-account-error-container {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
 }
 
 .finish-auth {
@@ -604,5 +685,8 @@
 }
 
 .supplemental-link {
-    margin: 1rem 0;
+    @extend %t-copy-sub1;
+    display: block;
+    margin: 0 0 ($baseline/2) 0;
+    color: $base-font-color;
 }

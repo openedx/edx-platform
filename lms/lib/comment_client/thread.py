@@ -60,13 +60,16 @@ class Thread(models.Model):
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
             if params.get('commentable_id'):
                 del params['commentable_id']
+        paged_results = True
+        if not params.get('paged_results', None):
+            paged_results = False
         response = perform_request(
             'get',
             url,
             params,
             metric_tags=[u'course_id:{}'.format(query_params['course_id'])],
             metric_action='thread.search',
-            paged_results=True
+            paged_results=paged_results
         )
         if query_params.get('text'):
             search_query = query_params['text']

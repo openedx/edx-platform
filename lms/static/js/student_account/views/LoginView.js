@@ -6,10 +6,11 @@
         'gettext',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/FormView',
+        'js/student_account/MSAMigrationStatus',
         'text!templates/student_account/form_success.underscore',
         'text!templates/student_account/form_status.underscore'
     ],
-        function($, _, gettext, HtmlUtils, FormView, formSuccessTpl, formStatusTpl) {
+        function($, _, gettext, HtmlUtils, FormView, MSAMigrationStatus, formSuccessTpl, formStatusTpl) {
             return FormView.extend({
                 el: '#login-form',
                 tpl: '#login-tpl',
@@ -37,6 +38,7 @@
                     this.platformName = data.platformName;
                     this.resetModel = data.resetModel;
                     this.supportURL = data.supportURL;
+                    this.msaMigrationEnabled = data.msaMigrationEnabled;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                     this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -69,6 +71,17 @@
                     this.$formFeedback = this.$container.find('.js-form-feedback');
                     this.$submitButton = this.$container.find(this.submitButton);
 
+                    if (this.msaMigrationEnabled) {
+                        // If we are running the msaMigration and don't currently have state
+                        // for the user, we want to only show the email field and submit button.
+                        // Once they enter an email, this step will force them through the
+                        // MSA migration pipeline
+                        this.$container.find(
+                            '.password-password, .checkbox-remember, .login-providers, .toggle-form'
+                        ).attr('aria-hidden', 'true').hide();
+                        this.$form.find('#login-password').prop('required', false);
+                    }
+
                     if (this.errorMessage) {
                         formErrorsTitle = _.sprintf(
                             gettext('An error occurred when signing you in to %s.'),
@@ -82,6 +95,7 @@
                          */
                         this.model.save();
                     }
+
                 },
 
                 forgotPassword: function(event) {
@@ -131,9 +145,57 @@
                     }
                 },
 
-                saveSuccess: function() {
-                    this.trigger('auth-complete');
-                    this.clearPasswordResetSuccess();
+                saveSuccess: function(data) {
+                    switch (data.msa_migration_pipeline_status) {
+                    case MSAMigrationStatus.LOGIN_NOT_MIGRATED:
+                        var $passwordField = this.$form.find('.password-password');  // eslint-disable-line vars-on-top
+                        $passwordField.attr('aria-hidden', 'false').show();
+                        $passwordField.find('#login-password')
+                            .val('')
+                            .focus();
+                        this.toggleDisableButton(false);
+                        this.model.msa_migration_pipeline_status = MSAMigrationStatus.LOGIN_NOT_MIGRATED;
+                        break;
+                    case MSAMigrationStatus.LOGIN_MIGRATED:
+                        // eslint-disable-next-line vars-on-top
+                        var signInMessage = 'Signing you in with your Microsoft Account...';
+                        var signInHTML = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
+                            HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
+                            gettext(signInMessage),
+                            HtmlUtils.HTML('</span>'),
+                            HtmlUtils.HTML('<span>' + signInMessage + '</span>')
+                        );
+                        this.$form.find('#login-email-desc').html(signInHTML.text);
+                        var self = this;  // eslint-disable-line vars-on-top
+                        setTimeout(function() {
+                            self.$form.find('.login-provider').click();
+                        }, 1000);
+                        break;
+                    case MSAMigrationStatus.REGISTER_NEW_USER:
+                        var msg = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
+                            _.sprintf(
+                                gettext('This email is not registered with %(platformName)s.' +
+                                        ' Please try a different email or '),
+                                {platformName: this.platformName}
+                            ),
+                            HtmlUtils.HTML(
+                                '<a href="/register" class="form-toggle btn-neutral btn-register" data-type="register">',  // eslint-disable-line max-len
+                                gettext('register'),
+                                '</a>'
+                            ),
+                            gettext(' before signing in.')
+                        );
+
+                        this.errors = ['<li>' + msg + '</li>'];
+                        this.clearPasswordResetSuccess();
+                        this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                        this.toggleDisableButton(false);
+                        break;
+                    default:
+                        this.trigger('auth-complete');
+                        this.clearPasswordResetSuccess();
+                        break;
+                    }
                 },
 
                 saveError: function(error) {

@@ -100,11 +100,6 @@ define(['backbone',
 
                 request = requests[1];
                 expect(request.method).toBe('GET');
-                expect(request.url).toBe('/user_api/v1/preferences/time_zones/?country_code=1');
-                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
-
-                request = requests[2];
-                expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_PREFERENCES_API_URL);
 
                 AjaxHelpers.respondWithError(requests, 500);
@@ -129,55 +124,18 @@ define(['backbone',
             });
 
             it('expects all fields to behave correctly', function() {
-                var i, view;
-
                 requests = AjaxHelpers.requests(this);
 
                 var accountSettingsView = createAccountSettingsPage();
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
-                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
                 AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 
                 var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
-                expect(sectionsData[0].fields.length).toBe(7);
-
-                var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
-                for (i = 0; i < textFields.length; i++) {
-                    view = textFields[i].view;
-                    FieldViewsSpecHelpers.verifyTextField(view, {
-                        title: view.options.title,
-                        valueAttribute: view.options.valueAttribute,
-                        helpMessage: view.options.helpMessage,
-                        validValue: 'My Name',
-                        invalidValue1: '',
-                        invalidValue2: '@',
-                        validationError: 'Think again!',
-                        defaultValue: ''
-                    }, requests);
-                }
-
-                expect(sectionsData[1].fields.length).toBe(4);
-                var dropdownFields = [
-                    sectionsData[1].fields[0],
-                    sectionsData[1].fields[1],
-                    sectionsData[1].fields[2]
-                ];
-                _.each(dropdownFields, function(field) {
-                    var view = field.view;
-                    FieldViewsSpecHelpers.verifyDropDownField(view, {
-                        title: view.options.title,
-                        valueAttribute: view.options.valueAttribute,
-                        helpMessage: '',
-                        validValue: Helpers.FIELD_OPTIONS[1][0],
-                        invalidValue1: Helpers.FIELD_OPTIONS[2][0],
-                        invalidValue2: Helpers.FIELD_OPTIONS[3][0],
-                        validationError: 'Nope, this will not do!',
-                        defaultValue: null
-                    }, requests);
-                });
+                expect(sectionsData[0].fields.length).toBe(1);
+                expect(sectionsData[1].fields.length).toBe(2);
             });
         });
     });

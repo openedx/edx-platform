@@ -40,13 +40,13 @@ def get_request_ip(request):
 
 def _get_request_ip(request, default=''):
     """
-        Helper method to get IP from a request's META dict, if present.
-        If SQUELCH_PII_IN_LOGS is True:
-        Anonymize the ip address to the first two octets.
-        This gives enough data to be useful for Analysis
-        without explicitly identifying user
-            e.g. 127.0.0.1 => 127.0.X.X
-        """
+    Helper method to get IP from a request's META dict, if present.
+    If SQUELCH_PII_IN_LOGS is True:
+    Anonymize the ip address to the first two octets.
+    This gives enough data to be useful for Analysis
+    without explicitly identifying user
+        e.g. 127.0.0.1 => 127.0.X.X
+    """
     if request is None:
         return default
 

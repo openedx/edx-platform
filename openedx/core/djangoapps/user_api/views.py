@@ -152,7 +152,11 @@ class LoginSessionView(APIView):
         # For the initial implementation, shim the existing login view
         # from the student Django app.
         from student.views import login_user
-        return shim_student_view(login_user, check_logged_in=True)(request)
+        if request.POST.get('msa_migration_pipeline_status') in ('EMAIL_LOOKUP', 'REGISTER_NEW_USER'):
+            check_logged_in = False
+        else:
+            check_logged_in = True
+        return shim_student_view(login_user, check_logged_in=check_logged_in)(request)
 
 
 class RegistrationView(APIView):
@@ -175,6 +179,7 @@ class RegistrationView(APIView):
         "goals",
         "honor_code",
         "terms_of_service",
+        "disclosure_notice",
     ]
 
     # This end-point is available to anonymous users,
@@ -407,7 +412,16 @@ class RegistrationView(APIView):
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Your legal name, used for any certificates you earn.")
+        name_instructions = u"Your legal name, used for any certificates you earn."
+
+        if configuration_helpers.get_value('ENABLE_MSA_MIGRATION', False):
+            name_instructions = name_instructions + \
+                u' You can update this information later from your account settings.' + \
+                u'<hr/>' + \
+                u'<p class="description-text"><strong>Provide additional information</strong></p>' + \
+                u'<p class="description-text-small">Required fields are marked with an asterisk (*).</p>'
+
+        name_instructions = _(name_instructions)
 
         form_desc.add_field(
             "name",
@@ -437,9 +451,8 @@ class RegistrationView(APIView):
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's public username.
-            u"The name that will identify you in your courses - "
-            u"{bold_start}(cannot be changed later){bold_end}"
-        ).format(bold_start=u'<strong>', bold_end=u'</strong>')
+            u"The name that will identify you in your courses - (cannot be changed later)"
+        )
 
         # Translators: This example username is used as a placeholder in
         # a field on the registration form meant to hold the user's username.
@@ -773,7 +786,7 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
+        label = _(u"I agree to the {terms_of_service}").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label
         )
@@ -816,8 +829,7 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+        label = _(u"I agree to the {terms_of_service}").format(
             terms_of_service=terms_label
         )
 
@@ -830,6 +842,48 @@ class RegistrationView(APIView):
 
         form_desc.add_field(
             "terms_of_service",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+            error_messages={
+                "required": error_msg
+            },
+            supplementalLink=terms_link,
+            supplementalText=terms_text
+        )
+
+    def _add_disclosure_notice_field(self, form_desc, required=True):
+        """Add a disclosure notice field.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This is a legal document users must agree to
+        # in order to register a new account.
+        terms_label = _(u"Disclosure Notice")
+        terms_link = marketing_link("DN")
+        terms_text = _(u"Review the Disclosure Notice")
+
+        # Translators: "Terms of service" is a legal document users must agree to
+        # in order to register a new account.
+        label = _(u"I agree to the {disclosure_notice}").format(
+            disclosure_notice=terms_label
+        )
+
+        # Translators: "Terms of service" is a legal document users must agree to
+        # in order to register a new account.
+        error_msg = _(u"You must agree to the {platform_name} {disclosure_notice}").format(
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            disclosure_notice=terms_label
+        )
+
+        form_desc.add_field(
+            "disclosure_notice",
             label=label,
             field_type="checkbox",
             default=False,

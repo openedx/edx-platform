@@ -1,7 +1,7 @@
 <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
 
-<form id="login" class="login-form" tabindex="-1" method="POST">
+<form id="login" class="login-form" tabindex="-1" method="POST" autocomplete="off">
 
     <div class="section-title lines">
         <h2>

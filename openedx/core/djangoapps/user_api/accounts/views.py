@@ -17,7 +17,7 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
-from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
+from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountUserAlreadyExists, AccountValidationError
 
 
 class AccountViewSet(ViewSet):
@@ -200,7 +200,12 @@ class AccountViewSet(ViewSet):
         """
         try:
             with transaction.atomic():
-                update_account_settings(request.user, request.data, username=username)
+                force_email_update = request.data.get('force_email_update', False)
+                if force_email_update:
+                    del request.data['force_email_update']
+                update_account_settings(
+                    request.user, request.data, username=username, force_email_update=force_email_update
+                )
                 account_settings = get_account_settings(request, [username])[0]
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
@@ -208,6 +213,8 @@ class AccountViewSet(ViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:
             return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
+        except AccountUserAlreadyExists:
+            return Response({"user_message": "An account already exists with this email."}, status=status.HTTP_400_BAD_REQUEST)
         except AccountUpdateError as err:
             return Response(
                 {

@@ -1,0 +1,21 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="pagetitle">${_("Account confirmation")}</%block>
+<div id="link-account-confirm-main" class="login-register"></div>
+<%block name="js_extra">
+<%static:require_module module_name="js/student_account/views/link_account_confirm_factory" class_name="LinkAccountConfirmFactory">
+    var disconnectUrl = ${ disconnect_url | n, dump_js_escaped_json };
+    var userAccountsApiUrl = ${ user_accounts_api_url | n, dump_js_escaped_json };
+    var userData = ${ user_data | n, dump_js_escaped_json };
+    var newFullName = ${ new_full_name | n, dump_js_escaped_json };
+    var newEmail = ${ new_email | n, dump_js_escaped_json };
+    LinkAccountConfirmFactory(disconnectUrl, userAccountsApiUrl, userData, newFullName, newEmail);
+</%static:require_module>
+</%block>

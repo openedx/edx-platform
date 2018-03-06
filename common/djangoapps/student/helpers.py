@@ -221,7 +221,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
 
     return {
         provider.provider_id: third_party_auth.pipeline.get_login_url(
-            provider.provider_id, auth_entry, redirect_url=redirect_url
+            provider.provider_id, auth_entry, redirect_url="{}?{}".format(redirect_url, urllib.urlencode({"provider": provider.provider_id}))
         ) for provider in third_party_auth.provider.Registry.displayed_for_login()
     }
 

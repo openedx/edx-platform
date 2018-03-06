@@ -1,0 +1,24 @@
+<main id="main" aria-label="Content">
+    <div class="container">
+        <div class="section link-account-header">
+          <h1 class="header-title"><%- gettext("Account update required") %></h1>
+          <div class="link-account-error-container is-hidden submission-error">
+            <p class="error-message">
+                <%- message %>
+            </p>
+          </div>
+            <div>
+                <p>Hello <%- userName %>,</p>
+                <p style="line-height: 1.4em"><%- gettext("To better protect your privacy, you are now required to sign in with a Microsoft account. (If you don’t have one, you’ll be able to create one during the sign-in process.)") %></span>
+                <p><%- gettext("Your name and email will be updated with the information in your Microsoft account, but your public username will remain the same.") %></span>
+            </div>
+            <div class="link-account-social-field-section">
+                <span class="sr"><%- title %></span>
+                <button class="link-account-button"><%- title %></button>
+            </div>
+            <div class="link-account-below-button-link">
+                <a target="_blank" href="https://privacy.microsoft.com">Read more about privacy at Microsoft</a>
+            </div>
+        </div>
+    </div>
+</main>

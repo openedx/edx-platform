@@ -80,6 +80,8 @@ from social.pipeline import partial
 from social.pipeline.social_auth import associate_by_email
 
 import student
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts as user_accounts
 
 from logging import getLogger
 
@@ -704,3 +706,35 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, *args, *
             # email address and the legitimate user would now login to the illegitimate
             # account.
             return association_response
+
+
+@partial.partial
+def update_user_profile_if_microsoft_account(auth_entry, backend, details, user, *args, **kwargs):
+    """
+    This pipeline step associates the current social auth with the user with the
+    same email address in the database.  It defers to the social library's associate_by_email
+    implementation, which verifies that only a single database user is associated with the email.
+
+    This association is done ONLY if the user entered the pipeline through a LOGIN API.
+    """
+
+    if auth_entry == AUTH_ENTRY_LOGIN and configuration_helpers.get_value('ENABLE_MSA_MIGRATION'):
+        social_full_name = details.get('fullname') or '{} {}'.format(
+            details.get('first_name'),
+            details.get('last_name')
+        )
+        social_email = details.get('email')
+
+        update = {}
+        if social_email != user.email:
+            update['email'] = social_email
+        if social_full_name != user.profile.name:
+            update['name'] = social_full_name
+
+        if update:
+            # If the user's Microsoft account details changed, update their account to reflect those details
+            try:
+                force_email_update = 'email' in update
+                user_accounts.api.update_account_settings(user, update, force_email_update=force_email_update)
+            except Exception as ex:
+                logger.error(ex)

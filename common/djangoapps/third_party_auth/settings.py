@@ -56,6 +56,7 @@ def apply_settings(django_settings):
         'social.pipeline.user.user_details',
         'third_party_auth.pipeline.set_logged_in_cookies',
         'third_party_auth.pipeline.login_analytics',
+        'third_party_auth.pipeline.update_user_profile_if_microsoft_account',
     ]
 
     # Add enterprise pipeline elements if the enterprise app is installed

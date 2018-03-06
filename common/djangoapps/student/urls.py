@@ -38,6 +38,7 @@ urlpatterns = (
         'password_reset_confirm_wrapper',
         name='password_reset_confirm',
     ),
+    url(r'^disconnect_account_link$', 'disconnect_account_link', name='disconnect'),
 
 )
 

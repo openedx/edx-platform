@@ -465,6 +465,10 @@ def shim_student_view(view_func, check_logged_in=False):
             getattr(request, 'user', None) is not None
             and request.user.is_authenticated()
         )
+
+        if check_logged_in and is_authenticated:
+            return response
+
         if check_logged_in and not is_authenticated:
             # If we get a 403 status code from the student view
             # this means we've successfully authenticated with a
@@ -480,7 +484,6 @@ def shim_student_view(view_func, check_logged_in=False):
             else:
                 response.status_code = 403
                 response.content = msg
-
         # If an error condition occurs, send a status 400
         elif response.status_code != 200 or not success:
             # The student views tend to send status 200 even when an error occurs
@@ -488,12 +491,6 @@ def shim_student_view(view_func, check_logged_in=False):
             # then we know an error occurred.
             if response.status_code == 200:
                 response.status_code = 400
-            response.content = msg
-
-        # If the response is successful, then return the content
-        # of the response directly rather than including it
-        # in a JSON-serialized dictionary.
-        else:
             response.content = msg
 
         # Return the response, preserving the original headers.

@@ -851,7 +851,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"required": True,
                 u"label": u"Public username",
                 u"placeholder": u"JaneDoe",
-                u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",  # pylint: disable=line-too-long
+                u"instructions": u"The name that will identify you in your courses - (cannot be changed later)",  # pylint: disable=line-too-long
                 u"restrictions": {
                     "min_length": USERNAME_MIN_LENGTH,
                     "max_length": USERNAME_MAX_LENGTH
@@ -981,24 +981,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     u"instructions": u"Your legal name, used for any certificates you earn.",
                     u"restrictions": {
                         "max_length": NAME_MAX_LENGTH,
-                    }
-                }
-            )
-
-            # Username should be filled in
-            self._assert_reg_field(
-                no_extra_fields_setting,
-                {
-                    u"name": u"username",
-                    u"defaultValue": u"Bob123",
-                    u"type": u"text",
-                    u"required": True,
-                    u"label": u"Public username",
-                    u"placeholder": u"JaneDoe",
-                    u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",  # pylint: disable=line-too-long
-                    u"restrictions": {
-                        "min_length": USERNAME_MIN_LENGTH,
-                        "max_length": USERNAME_MAX_LENGTH
                     }
                 }
             )
@@ -1216,7 +1198,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1240,7 +1222,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1270,7 +1252,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1292,7 +1274,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1317,7 +1299,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} Honor Code".format(
+                "label": u"I agree to the Honor Code".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "honor_code",
@@ -1336,7 +1318,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} Terms of Service".format(
+                "label": u"I agree to the Terms of Service".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "terms_of_service",

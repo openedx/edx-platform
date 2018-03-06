@@ -4,10 +4,11 @@
         'jquery',
         'underscore',
         'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/FormView',
         'text!templates/student_account/form_status.underscore'
     ],
-        function($, _, gettext, FormView, formStatusTpl) {
+        function($, _, gettext, HtmlUtils, FormView, formStatusTpl) {
             return FormView.extend({
                 el: '#register-form',
 
@@ -15,7 +16,8 @@
 
                 events: {
                     'click .js-register': 'submitForm',
-                    'click .login-provider': 'thirdPartyAuth'
+                    'click .login-provider': 'thirdPartyAuth',
+                    'click .login-provider-msa-migration': 'thirdPartyAuth'
                 },
 
                 formType: 'register',
@@ -37,6 +39,7 @@
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
+                    this.msaMigrationEnabled = data.msaMigrationEnabled;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                 },
@@ -54,19 +57,39 @@
                             currentProvider: this.currentProvider,
                             providers: this.providers,
                             hasSecondaryProviders: this.hasSecondaryProviders,
-                            platformName: this.platformName
+                            platformName: this.platformName,
+                            msaMigrationEnabled: this.msaMigrationEnabled
                         }
                     }));
 
                     this.postRender();
+
+                    if (this.msaMigrationEnabled) {
+                        // Hide all form content except the login-providers div.
+                        // We need to force users to register with their
+                        // Microsoft account
+
+
+                        if (!this.currentProvider) {
+                            this.$form.children()
+                                .slice(1)
+                                .attr('aria-hidden', 'true')
+                                .hide();
+                        }
+                        $(this.$el)
+                            .find('.toggle-form')
+                            .attr('aria-hidden', 'true')
+                            .hide();
+                    }
 
                     // Must be called after postRender, since postRender sets up $formFeedback.
                     if (this.errorMessage) {
                         this.renderErrors(formErrorsTitle, [this.errorMessage]);
                     } else if (this.currentProvider) {
                         this.renderAuthWarning();
+                        // Don't allow user to edit email or name
+                        this.$form.find('#register-email, #register-name').prop('disabled', true).addClass('disabled');
                     }
-
                     if (this.autoSubmit) {
                         $(this.el).hide();
                         $('#register-honor_code').prop('checked', true);
@@ -89,19 +112,37 @@
                 },
 
                 saveError: function(error) {
+                    var msgText, msg;
                     $(this.el).show(); // Show in case the form was hidden for auto-submission
-                    this.errors = _.flatten(
-                        _.map(
-                            // Something is passing this 'undefined'. Protect against this.
-                            JSON.parse(error.responseText || '[]'),
-                            function(errorList) {
-                                return _.map(
-                                    errorList,
-                                    function(errorItem) { return '<li>' + errorItem.user_message + '</li>'; }
-                                );
-                            }
-                        )
-                    );
+                    if (error.status === 409 && error.responseJSON.hasOwnProperty('email')) {
+                        msgText = error.responseJSON.email[0].user_message;
+                        msg = HtmlUtils.joinHtml(
+                            _.sprintf(
+                                gettext(msgText + ' If you already have an account, '),
+                                {platformName: this.platformName}
+                            ),
+                            HtmlUtils.HTML(
+                                '<a href="/logout?next=%2Flogin" class="btn-neutral btn-register" data-type="login">'
+                            ),
+                            gettext('login'),
+                            HtmlUtils.HTML('</a>'),
+                            gettext(' instead.')
+                        );
+                        this.errors = ['<li>' + msg + '</li>'];
+                    } else {
+                        this.errors = _.flatten(
+                            _.map(
+                                // Something is passing this 'undefined'. Protect against this.
+                                JSON.parse(error.responseText || '[]'),
+                                function(errorList) {
+                                    return _.map(
+                                        errorList,
+                                        function(errorItem) { return '<li>' + errorItem.user_message + '</li>'; }
+                                    );
+                                }
+                            )
+                        );
+                    }
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                     this.toggleDisableButton(false);
                 },
@@ -114,7 +155,7 @@
                 },
 
                 renderAuthWarning: function() {
-                    var msgPart1 = gettext('You\'ve successfully signed into %(currentProvider)s.'),
+                    var msgPart1 = gettext('You\'ve successfully signed in with your %(currentProvider)s.'),
                         msgPart2 = gettext(
                             'We just need a little more information before you start learning with %(platformName)s.'
                         ),

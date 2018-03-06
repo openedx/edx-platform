@@ -4,5 +4,5 @@
 </div>
 <span class="u-field-message" id="u-field-message-<%- id %>">
     <span class="u-field-message-notification" aria-live="polite"></span>
-    <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
+    <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%= message %></span>
 </span>

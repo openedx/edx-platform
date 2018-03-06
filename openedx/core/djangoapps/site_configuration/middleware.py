@@ -3,10 +3,14 @@ This file contains Django middleware related to the site_configuration app.
 """
 
 from django.conf import settings
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
+from django.core.urlresolvers import reverse
 from re import compile
+from social.apps.django_app.default.models import UserSocialAuth
+from django.shortcuts import redirect
+
+from student.models import UserProfile
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class SessionCookieDomainOverrideMiddleware(object):
@@ -107,3 +111,48 @@ class LoginRequiredMiddleware:
             path = request.path_info.lstrip('/')
             if not any(m.match(path) for m in EXEMPT_URLS):
                 return login_required(view_func)(request, view_args, view_kwargs)
+
+
+class AccountLinkingMiddleware(object):
+    """
+    Middleware that requires to enable users to linked their account with edx user account
+    other than ACCOUNT_LINK if user is authenticated.
+    """
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        """
+        If the site is configured to restrict not logged in users to the DEFAULT_ACCOUNT_LINK_EXEMPT_URLS
+        from accessing pages, wrap the next view with the django login_required middleware
+        """
+
+        enable_msa_migration = configuration_helpers.get_value(
+            "ENABLE_MSA_MIGRATION",
+            settings.ENABLE_MSA_MIGRATION
+        )
+        if request.user.is_authenticated() and enable_msa_migration:
+            try:
+                UserSocialAuth.objects.get(user=request.user, provider="live")
+            except UserSocialAuth.DoesNotExist:
+                # Redirect users to account link page if they don't have a live account linked already
+                return self._redirect_if_not_allowed_url(request, settings.MSA_ACCOUNT_LINK_URL)
+
+            try:
+                user_profile = UserProfile.objects.get(user=request.user)
+                meta = user_profile.get_meta()
+                _ = meta[settings.MSA_ACCOUNT_MIGRATION_COMPLETED_KEY]
+            except KeyError:
+                return self._redirect_if_not_allowed_url(request, settings.MSA_ACCOUNT_LINK_CONFIRM_URL)
+
+    def _redirect_if_not_allowed_url(self, request, redirect_to):
+        """
+        If not navigating to an allowed configured url, redirect to redirect_to
+        """
+        account_linking_redirect_urls = configuration_helpers.get_value(
+            "MSA_DEFAULT_ACCOUNT_LINK_REDIRECT_URLS",
+            settings.MSA_DEFAULT_ACCOUNT_LINK_REDIRECT_URLS
+        )
+        REDIRECT_URLS = [compile(expr) for expr in account_linking_redirect_urls]
+        path = request.path_info.lstrip('/')
+
+        if any(m.match(path) for m in REDIRECT_URLS) and path != redirect_to.lstrip('/'):
+            return redirect(redirect_to)

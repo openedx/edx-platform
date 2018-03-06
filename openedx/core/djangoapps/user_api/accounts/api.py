@@ -1,18 +1,25 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
+import os
+import random
+import uuid
 from django.utils.translation import ugettext as _
 from django.db import transaction, IntegrityError
 import datetime
+import hashlib
 from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, validate_slug, ValidationError
+from social.apps.django_app.default.models import UserSocialAuth
+
+from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
-
 from student.models import User, UserProfile, Registration
 from student import views as student_views
+from third_party_auth.models import UserSocialAuthMapping
 from util.model_utils import emit_setting_changed_event
 
 from openedx.core.lib.api.view_utils import add_serializer_errors
@@ -34,6 +41,10 @@ from .serializers import (
     UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from lms.lib.comment_client.thread import Thread
+from lms.lib.comment_client.user import User as ThreadUser
+from lms.djangoapps.courseware.courses import get_courses
+from discussion_api.serializers import CommentSerializer, ThreadSerializer
 
 
 # Public access point for this function.
@@ -94,7 +105,7 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def update_account_settings(requesting_user, update, username=None):
+def update_account_settings(requesting_user, update, username=None, force_email_update=False):
     """Update user account information.
 
     Note:
@@ -107,6 +118,8 @@ def update_account_settings(requesting_user, update, username=None):
         update (dict): The updated account field values.
         username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
+        force_email_update (bool): Optional flag, update the user's email address if this flag
+            is set with the ENABLE_MSA_MIGRATION flag in settings/site config
 
     Raises:
         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
@@ -227,14 +240,84 @@ def update_account_settings(requesting_user, update, username=None):
         raise AccountUpdateError(
             u"Error thrown when saving account updates: '{}'".format(err.message)
         )
-
+    meta = existing_user_profile.get_meta()
+    msa_migration_enabled = configuration_helpers.get_value(
+        "ENABLE_MSA_MIGRATION",
+        settings.FEATURES.get("ENABLE_MSA_MIGRATION", False)
+    )
     # And try to send the email change request if necessary.
     if changing_email:
+        if force_email_update and msa_migration_enabled:
+            # If MSA Migration is enabled and we're coming through
+            # the link/account/confirm page ajax call, force update the user's email.
+            with transaction.atomic():
+                address_context = {
+                    'old_email': existing_user.email,
+                    'new_email': new_email
+                }
+
+                if len(User.objects.filter(email=new_email)) != 0:
+                    transaction.set_rollback(True)
+                    raise AccountUserAlreadyExists
+
+                subject = render_to_string('emails/email_change_subject.txt', address_context)
+                subject = ''.join(subject.splitlines())
+                message = render_to_string('emails/confirm_email_change.txt', address_context)
+                if 'old_emails' not in meta:
+                    meta['old_emails'] = []
+                meta['old_emails'].append([existing_user.email, datetime.datetime.now(UTC).isoformat()])
+                existing_user_profile.set_meta(meta)
+                existing_user_profile.save()
+                # Send it to the old email...
+                try:
+                    existing_user.email_user(
+                        subject,
+                        message,
+                        configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+                    )
+                except Exception:  # pylint: disable=broad-except
+                    transaction.set_rollback(True)
+                    raise AccountUpdateError(
+                        u"Error thrown from emailing old email address for user: '{}'".format(err.message),
+                        user_message=err.message
+                    )
+
+                existing_user.email = new_email
+                # Explicitly activate any non-active user, validated through migration already
+                existing_user.is_active = True
+                existing_user.save()
+
+                # And send it to the new email...
+                try:
+                    existing_user.email_user(
+                        subject,
+                        message,
+                        configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+                    )
+                except Exception:  # pylint: disable=broad-except
+                    transaction.set_rollback(True)
+                    raise AccountUpdateError(
+                        u"Error thrown from emailing new email address for user: '{}'".format(err.message),
+                        user_message=err.message
+                    )
+        else:
+            try:
+                student_views.do_email_change_request(existing_user, new_email)
+            except ValueError as err:
+                raise AccountUpdateError(
+                    u"Error thrown from do_email_change_request: '{}'".format(err.message),
+                    user_message=err.message
+                )
+    if force_email_update and msa_migration_enabled:
         try:
-            student_views.do_email_change_request(existing_user, new_email)
-        except ValueError as err:
+            # Flag to show user has completed and confirmed Microsoft Account Migration
+            meta[settings.MSA_ACCOUNT_MIGRATION_COMPLETED_KEY] = True
+            existing_user_profile.set_meta(meta)
+            existing_user_profile.save()
+        except Exception as err:  # pylint: disable=broad-except
+            transaction.set_rollback(True)
             raise AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(err.message),
+                u"Error saving user confirmation: '{}'".format(err.message),
                 user_message=err.message
             )
 
@@ -520,3 +603,112 @@ def _validate_email(email):
         raise AccountEmailInvalid(
             u"Email '{email}' format is not valid".format(email=email)
         )
+
+
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
+def delete_user_account(user_id):
+    """
+    Soft delete a user's account.
+    Associated records that would allow the user to be identified or continue to login
+    are deleted from the database.
+    However, the data in the auth_user table is only made anonymous.
+    This allows us to keep course progress and other associated data for the user for
+    analytics and reporting without keeping any PII data.
+
+    Keyword Arguments:
+        user_id - unique id for a user
+
+    Raises:
+        UserNotFound
+
+    Example Usage:
+        >>> delete_user_account(112)
+
+    """
+
+    # Get user's existing record and profile
+    try:
+        username = User.objects.get(id=user_id).username
+    except Exception:
+        raise UserNotFound()
+
+    existing_user, existing_user_profile = _get_user_and_profile(username)
+    if not existing_user.is_active:
+        raise UserNotFound()
+
+    # If we get here the user must have a profile, delete this record
+    existing_user_profile.delete()
+
+    # Delete user's social auth records if they exist
+    social_auth_records = UserSocialAuth.objects.filter(user=existing_user)
+    for social_auth_record in social_auth_records:
+        social_auth_record.delete()
+
+    # Delete user's Microsoft Live account PUID mapping if it exists
+    try:
+        social_auth_mapping = UserSocialAuthMapping.objects.get(user=existing_user)
+        social_auth_mapping.delete()
+    except Exception:
+        # This error is most likely a *.DoesNotExist,
+        # meaning the user does not have a social auth record
+        # We don't need to do anything special here and
+        # should NOT raise an exception
+        pass
+
+    # Anonymize the user's records
+    username_mask = str(random.randint(1, 9999)) + username
+    existing_user.username = hashlib.md5(username_mask).hexdigest()
+    existing_user.email = existing_user.username + "@deleteduser.com"
+    existing_user.first_name = 'first_deleted'
+    existing_user.last_name = 'last_deleted'
+    existing_user.is_active = False
+    existing_user.is_staff = False
+    existing_user.save()
+    # Anonymize forum discussions
+    try:
+        anonymize_user_discussions(user_id, username, existing_user.username)
+    except Exception:
+        pass
+
+    # Successful user soft delete
+    return True
+
+
+def anonymize_user_discussions(user_id, username, enc_username, **kwargs):
+    """
+    Anonymize user's comments for a particular user as per GDPR norms.
+    This updates the "users" and "contents" collections of "cs_comments_service"
+    with the masked username. It also anonymizes the comments and threads of
+    this particular user.
+
+    Keyword Arguments:
+        username (unicode)
+
+    Example Usage:
+        >>> anonymize_user_discussions(122, 'staff', '570810a83dee178ca19a05f2838839')
+    """
+
+    # Getting all courses for the user
+    user = User.objects.get(id=user_id)
+    courses = get_courses(user)
+    # Updating discussion user instance
+    updated_user = ThreadUser.from_django_user(user)
+    updated_user.save()
+    # Updating each discussion entity for each course
+    query_params = {}
+    query_params['paged_results'] = False
+    query_params['author_username'] = username
+    for course in courses:
+        query_params['course_id'] = str(course.id)
+        discussion_entities = Thread.search(query_params)
+        for entity in discussion_entities.collection:
+            # 'pinned' key needs to be removed
+            # before update as its read-only
+            del entity['pinned']
+            # Initializing thread for update
+            th = Thread()
+            th.id = entity['id']
+            entity['anonymous'] = True
+            entity['anonymous_to_peers'] = True
+            # entity['author_username'] = enc_username
+            th.save(entity)

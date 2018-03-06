@@ -1189,6 +1189,8 @@ MIDDLEWARE_CLASSES = (
 
     'openedx.core.djangoapps.site_configuration.middleware.LoginRequiredMiddleware',
 
+    'openedx.core.djangoapps.site_configuration.middleware.AccountLinkingMiddleware',
+
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 )
@@ -3053,3 +3055,15 @@ ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 #To prevent the browser from guessing the content type and force it to always use the type provided in the Content-Type header,
 #we need this to be enabled as True. (Security fix)
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+############# Settings for MSA account linking ###########################
+
+ENABLE_MSA_MIGRATION = False
+MSA_ACCOUNT_LINK_URL = '/account/link'
+MSA_ACCOUNT_LINK_CONFIRM_URL = '/account/link/confirm'
+MSA_DEFAULT_ACCOUNT_LINK_REDIRECT_URLS = [
+    r'^courses.*$', r'^dashboard.*$', r'^u/.*$',
+    r'^{}*$'.format(MSA_ACCOUNT_LINK_CONFIRM_URL.lstrip('/')),
+    r'^account/settings.*$'
+]
+MSA_ACCOUNT_MIGRATION_COMPLETED_KEY = 'microsoft_account_migration_completed'

@@ -5,6 +5,8 @@ Models used to implement SAML SSO support in third_party_auth
 """
 from __future__ import absolute_import
 
+from django.conf import settings
+from social.utils import setting_name
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -24,8 +26,12 @@ from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
-
+from social.apps.django_app.default.models import UserSocialAuth
 log = logging.getLogger(__name__)
+USER_MODEL = getattr(settings, setting_name('USER_MODEL'), None) or \
+    getattr(settings, 'AUTH_USER_MODEL', None) or \
+    'auth.User'
+UID_LENGTH = getattr(settings, setting_name('UID_LENGTH'), 255)
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
@@ -212,18 +218,9 @@ class ProviderConfig(ConfigurationModel):
         # Details about the user sent back from the provider.
         details = pipeline_kwargs.get('details')
 
-        # Get the username separately to take advantage of the de-duping logic
-        # built into the pipeline. The provider cannot de-dupe because it can't
-        # check the state of taken usernames in our system. Note that there is
-        # technically a data race between the creation of this value and the
-        # creation of the user object, so it is still possible for users to get
-        # an error on submit.
-        suggested_username = pipeline_kwargs.get('username')
-
         return {
             'email': details.get('email', ''),
             'name': details.get('fullname', ''),
-            'username': suggested_username,
         }
 
     def get_authentication_backend(self):
@@ -682,3 +679,17 @@ class ProviderApiPermissions(models.Model):
         app_label = "third_party_auth"
         verbose_name = "Provider API Permission"
         verbose_name_plural = verbose_name + 's'
+
+
+class UserSocialAuthMapping(models.Model):
+    """
+    Mapping table for user social auth and puid
+    """
+    user = models.ForeignKey(USER_MODEL, related_name='third_party_auth')
+    uid = models.CharField(max_length=UID_LENGTH)
+    puid = models.CharField(max_length=200)
+
+    class Meta(object):
+        app_label = "third_party_auth"
+        unique_together = ('uid', 'puid')
+        db_table = 'third_party_auth_social_auth_mapping'
