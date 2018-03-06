@@ -15,4 +15,5 @@ urlpatterns = patterns(
         ),
         views.CourseImportView.as_view(), name='course_import'
     ),
+    url(r'^v0/check_rerun_courses/$', views.check_rerun_courses, name='check_rerun_courses'),
 )
