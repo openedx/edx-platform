@@ -25,6 +25,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('appsembler_sites', '0001_initial'),
+        ('site_configuration', '0004_auto_20161120_2325')
     ]
 
     operations = [
