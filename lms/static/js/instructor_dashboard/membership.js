@@ -593,6 +593,7 @@ such that the value can be defined later than this assignment (file load order).
             var batchEnroll = this;
             this.$container = $container;
             this.$identifier_input = this.$container.find("textarea[name='student-ids']");
+            this.$role = this.$container.find("select[name='role']");
             this.$enrollment_button = this.$container.find('.enrollment-button');
             this.$is_course_white_label = this.$container.find('#is_course_white_label').val();
             this.$reason_field = this.$container.find("textarea[name='reason-field']");
@@ -613,6 +614,7 @@ such that the value can be defined later than this assignment (file load order).
                 sendData = {
                     action: $(event.target).data('action'),
                     identifiers: batchEnroll.$identifier_input.val(),
+                    role: batchEnroll.$role.val(),
                     auto_enroll: batchEnroll.$checkbox_autoenroll.is(':checked'),
                     email_students: emailStudents,
                     reason: batchEnroll.$reason_field.val()

@@ -12,6 +12,19 @@ from openedx.core.djangolib.markup import HTML, Text
         ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
         <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
     </label>
+
+    <div class="role">
+        <label>
+            ${_("Role of the people being enrolled.")}
+            <select name="role">
+              <option value="none">None</option>
+              <option value="partner">Partner</option>
+              <option value="support">Support</option>
+              <option value="learner">Learner</option>
+            </select>
+        </label>
+    </div>
+
     <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
     % if section_data['is_white_label']:
         <label>

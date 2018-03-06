@@ -1927,15 +1927,25 @@ class ManualEnrollmentAudit(models.Model):
     """
     Table for tracking which enrollments were performed through manual enrollment.
     """
+    PARTNER = "partner"
+    SUPPORT = "support"
+    LEARNER = "learner"
+    USER_ROLE_CHOICES = (
+        (PARTNER, u"Partner"),
+        (SUPPORT, u"Support"),
+        (LEARNER, u"Learner"),
+    )
+
     enrollment = models.ForeignKey(CourseEnrollment, null=True)
     enrolled_by = models.ForeignKey(User, null=True)
     enrolled_email = models.CharField(max_length=255, db_index=True)
     time_stamp = models.DateTimeField(auto_now_add=True, null=True)
     state_transition = models.CharField(max_length=255, choices=TRANSITION_STATES)
     reason = models.TextField(null=True)
+    role = models.CharField(blank=True, max_length=10, choices=USER_ROLE_CHOICES)
 
     @classmethod
-    def create_manual_enrollment_audit(cls, user, email, state_transition, reason, enrollment=None):
+    def create_manual_enrollment_audit(cls, user, email, state_transition, reason, role, enrollment=None):
         """
         saves the student manual enrollment information
         """
@@ -1944,7 +1954,8 @@ class ManualEnrollmentAudit(models.Model):
             enrolled_email=email,
             state_transition=state_transition,
             reason=reason,
-            enrollment=enrollment
+            role=role,
+            enrollment=enrollment,
         )
 
     @classmethod
