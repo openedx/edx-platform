@@ -18,12 +18,12 @@ module.exports = {
     entry: {
         // Studio
         Import: './cms/static/js/features/import/factories/import.js',
-        CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
+        CourseOrLibraryListing: './cms/static/js/es2015/components/CourseOrLibraryListing.jsx',
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
         'js/sock': './cms/static/js/sock.js',
         AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
-        NoTextbooks: './cms/static/js/features_jsx/studio/NoTextbooks.jsx',
+        NoTextbooks: './cms/static/js/es2015/components/NoTextbooks.jsx',
 
         // LMS
         SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
