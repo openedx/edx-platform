@@ -224,6 +224,14 @@ def courses(request):
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
+    if configuration_helpers.get_value(
+        "ENABLE_FILTER_COURSES_BY_USER_LANG",
+        settings.FEATURES.get("ENABLE_FILTER_COURSES_BY_USER_LANG")
+    ):
+        preferred_lang = request.LANGUAGE_CODE
+        courses_list =\
+            filter(lambda x: x.language == preferred_lang, courses_list)
+
     return render_to_response(
         "courseware/courses.html",
         {

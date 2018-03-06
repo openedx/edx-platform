@@ -38,6 +38,7 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_displ
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.api import order_history
@@ -725,6 +726,18 @@ def student_dashboard(request):
         course_enrollments = [
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
+
+    if configuration_helpers.get_value(
+        "ENABLE_FILTER_COURSES_BY_USER_LANG",
+        settings.FEATURES.get("ENABLE_FILTER_COURSES_BY_USER_LANG")
+    ):
+        preferred_lang = request.LANGUAGE_CODE
+        for enrollment in course_enrollments[:]:
+            course_language =\
+                modulestore().get_course(enrollment.course_id).language
+                
+            if course_language != preferred_lang:
+                course_enrollments.remove(enrollment)
 
     context = {
         'urls': urls,
