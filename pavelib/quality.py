@@ -303,7 +303,10 @@ def run_complexity():
 
 
 @task
-@needs('pavelib.prereqs.install_node_prereqs')
+@needs(
+    'pavelib.prereqs.install_node_prereqs',
+    'pavelib.utils.test.utils.ensure_clean_package_lock',
+)
 @cmdopts([
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
