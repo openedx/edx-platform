@@ -47,6 +47,7 @@ from .transcripts_utils import (
     get_video_ids_info,
     Transcript,
     VideoTranscriptsMixin,
+    clean_video_id,
 )
 from .transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -96,6 +97,9 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
+
+
+EXPORT_STATIC_DIR = u'static'
 
 
 @XBlock.wants('settings', 'completion')
@@ -711,19 +715,22 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 ele.set('src', self.transcripts[transcript_language])
                 xml.append(ele)
 
-        if edxval_api:
-            external, video_ids = get_video_ids_info(self.edx_video_id, self.youtube_id_1_0, self.html5_sources)
-            if video_ids:
-                try:
-                    xml.append(
-                        edxval_api.export_to_xml(
-                            video_ids,
-                            unicode(self.runtime.course_id.for_branch(None)),
-                            external=external
-                        )
+        edx_video_id = clean_video_id(self.edx_video_id)
+        if edx_video_id:
+            try:
+                # Create static dir if not created earlier.
+                resource_fs.makedirs(EXPORT_STATIC_DIR, recreate=True)
+
+                xml.append(
+                    edxval_api.export_to_xml(
+                        video_id=edx_video_id,
+                        resource_fs=resource_fs,
+                        static_dir=EXPORT_STATIC_DIR,
+                        course_id=unicode(self.runtime.course_id.for_branch(None))
                     )
-                except edxval_api.ValVideoNotFoundError:
-                    pass
+                )
+            except edxval_api.ValVideoNotFoundError:
+                pass
 
         # handle license specifically
         self.add_license_to_xml(xml)

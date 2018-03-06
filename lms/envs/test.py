@@ -579,6 +579,16 @@ ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
+########################## VIDEO TRANSCRIPTS STORAGE ############################
+VIDEO_TRANSCRIPTS_SETTINGS = dict(
+    VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+    DIRECTORY_PREFIX='video-transcripts/',
+)
+
 ####################### Plugin Settings ##########################
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants

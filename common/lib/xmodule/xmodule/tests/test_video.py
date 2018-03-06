@@ -15,8 +15,10 @@ the course, section, subsection, unit, etc.
 import os
 import unittest
 import datetime
+import shutil
 from uuid import uuid4
 
+from tempfile import mkdtemp
 from lxml import etree
 from mock import ANY, Mock, patch, MagicMock
 import ddt
@@ -24,6 +26,7 @@ import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 
+from fs.osfs import OSFS
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
@@ -31,7 +34,7 @@ from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
-from xmodule.video_module import VideoDescriptor, create_youtube_string
+from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_STATIC_DIR
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
 from . import LogicTest
 from .test_import import DummySystem
@@ -672,11 +675,18 @@ class VideoExportTestCase(VideoDescriptorTestBase):
     """
     Make sure that VideoDescriptor can export itself to XML correctly.
     """
+    def setUp(self):
+        super(VideoExportTestCase, self).setUp()
+        self.temp_dir = mkdtemp()
+        self.file_system = OSFS(self.temp_dir)
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+
     @patch('xmodule.video_module.video_module.edxval_api')
     def test_export_to_xml(self, mock_val_api):
         """
         Test that we write the correct XML on export.
         """
+        edx_video_id = u'test_edx_video_id'
         mock_val_api.export_to_xml = Mock(return_value=etree.Element('video_asset'))
         self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
@@ -691,10 +701,10 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source1.ogg']
         self.descriptor.download_video = True
         self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
-        self.descriptor.edx_video_id = 'test_edx_video_id'
+        self.descriptor.edx_video_id = edx_video_id
         self.descriptor.runtime.course_id = MagicMock()
 
-        xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
+        xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
         xml_string = '''\
          <video url_name="SampleProblem" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
@@ -710,9 +720,10 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
         mock_val_api.export_to_xml.assert_called_once_with(
-            [u'test_edx_video_id', u'p2Q6BrNhdh8', 'source', 'source1'],
-            ANY,
-            external=False
+            video_id=edx_video_id,
+            static_dir=EXPORT_STATIC_DIR,
+            resource_fs=self.file_system,
+            course_id=unicode(self.descriptor.runtime.course_id.for_branch(None)),
         )
 
     @patch('xmodule.video_module.video_module.edxval_api')
@@ -723,7 +734,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.edx_video_id = 'test_edx_video_id'
         self.descriptor.runtime.course_id = MagicMock()
 
-        xml = self.descriptor.definition_to_xml(None)
+        xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
         xml_string = '<video url_name="SampleProblem" download_video="false"/>'
         expected = etree.XML(xml_string, parser=parser)
@@ -746,7 +757,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
         self.descriptor.download_video = True
 
-        xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
+        xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
         xml_string = '''\
          <video url_name="SampleProblem" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" download_video="true" download_track="true">
@@ -763,7 +774,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         Test XML export with defaults.
         """
-        xml = self.descriptor.definition_to_xml(None)
+        xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
@@ -774,7 +785,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         Test XML export with transcripts being overridden to None.
         """
         self.descriptor.transcripts = None
-        xml = self.descriptor.definition_to_xml(None)
+        xml = self.descriptor.definition_to_xml(self.file_system)
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
@@ -785,7 +796,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         The illegal characters in a String field are removed from the string instead.
         """
         self.descriptor.display_name = 'Display\x1eName'
-        xml = self.descriptor.definition_to_xml(None)
+        xml = self.descriptor.definition_to_xml(self.file_system)
         self.assertEqual(xml.get('display_name'), 'DisplayName')
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
@@ -794,7 +805,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         Test XML export handles the unicode characters.
         """
         self.descriptor.display_name = u'这是文'
-        xml = self.descriptor.definition_to_xml(None)
+        xml = self.descriptor.definition_to_xml(self.file_system)
         self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
 
 
