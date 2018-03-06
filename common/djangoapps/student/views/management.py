@@ -169,7 +169,8 @@ def index(request, extra_context=None, user=AnonymousUser()):
         settings.FEATURES.get("ENABLE_FILTER_COURSES_BY_USER_LANG")
     ):
         preferred_lang = request.LANGUAGE_CODE
-        courses = filter(lambda x: x.language == preferred_lang, courses)
+        courses =\
+            [course for course in courses if course.language == preferred_lang]
 
     context = {'courses': courses}
 

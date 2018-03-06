@@ -38,7 +38,6 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_displ
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.api import order_history
