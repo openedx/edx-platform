@@ -125,7 +125,10 @@ class VideoComponentPage(VideoPage):
             self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible,
                            'Video Buffering Completed')
             self._wait_for(self.is_controls_visible, 'Player Controls are Visible')
+            assert self.is_controls_visible
+            assert 3 == 2
         assert self.is_controls_visible
+        assert 1 == 10
 
     def wait_for_message(self, message_type, expected_message):
         """
