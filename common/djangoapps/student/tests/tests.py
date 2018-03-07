@@ -699,6 +699,12 @@ class UserSettingsEventTestMixin(EventTestMixin):
             **kwargs
         )
 
+    def assert_user_enrollment_occurred(self, course_key):
+        """
+        Helper method to assert that the user is enrolled in the given course.
+        """
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, CourseKey.from_string(course_key)))
+
 
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
