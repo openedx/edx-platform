@@ -373,6 +373,27 @@ def course_info(request, course_id):
         # Get the course tools enabled for this user and course
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
 
+        course_homepage_invert_title =\
+            configuration_helpers.get_value(
+                'COURSE_HOMEPAGE_INVERT_TITLE',
+                False
+            )
+
+        course_homepage_show_subtitle =\
+            configuration_helpers.get_value(
+                'COURSE_HOMEPAGE_SHOW_SUBTITLE',
+                True
+            )
+
+        course_homepage_show_org =\
+            configuration_helpers.get_value('COURSE_HOMEPAGE_SHOW_ORG', True)
+
+        course_title = course.display_number_with_default
+        course_subtitle = course.display_name_with_default
+        if course_homepage_invert_title:
+            course_title = course.display_name_with_default
+            course_subtitle = course.display_number_with_default
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -380,6 +401,10 @@ def course_info(request, course_id):
             'url_to_enroll': CourseTabView.url_to_enroll(course_key),
             'cache': None,
             'course': course,
+            'course_title': course_title,
+            'course_subtitle': course_subtitle,
+            'show_subtitle': course_homepage_show_subtitle,
+            'show_org': course_homepage_show_org,
             'staff_access': staff_access,
             'masquerade': masquerade,
             'supports_preview_menu': True,
