@@ -786,8 +786,9 @@ class YouTubeStubConfig(object):
     Configure YouTube Stub Server.
     """
 
+    YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
     PORT = 9080
-    URL = 'http://127.0.0.1:{}/'.format(PORT)
+    URL = 'http://{}:{}/'.format(YOUTUBE_HOSTNAME, PORT)
 
     @classmethod
     def configure(cls, config):

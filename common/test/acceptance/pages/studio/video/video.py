@@ -165,6 +165,18 @@ class VideoComponentPage(VideoPage):
             sync_on_notification(self)
         self.wait_for_ajax()
 
+    def scroll_to_button(self, button_name, index=0):
+        """
+        Scroll to a button specified by `button_name`
+
+        Arguments:
+            button_name (str): button name
+            index (int): query index
+
+        """
+        element = self.q(css=BUTTON_SELECTORS[button_name])[index]
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
+
     @staticmethod
     def file_path(filename):
         """
@@ -197,6 +209,7 @@ class VideoComponentPage(VideoPage):
 
         """
         asset_file_path = self.file_path(asset_filename)
+        self.scroll_to_button('upload_asset')
         self.click_button('upload_asset', index)
         self.q(css=CLASS_SELECTORS['attach_asset']).results[0].send_keys(asset_file_path)
         # Only srt format transcript files can be uploaded, If an error
