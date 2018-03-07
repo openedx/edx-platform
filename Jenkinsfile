@@ -1,3 +1,5 @@
+def dockerImage = 'gcr.io/appsembler-testing/jenkins-worker:v0.2.0'
+
 def makeNode(suite, shard) {
   return {
     echo "I am ${suite}:${shard}, and the worker is yet to be started!"
@@ -118,7 +120,7 @@ def buildParallelSteps() {
 
 podTemplate(cloud: 'jnlp', label: 'edxapp', containers: [
         containerTemplate(name: 'edxapp',
-            image: 'gcr.io/appsembler-testing/jenkins-worker:v0.2.0',
+            image: dockerImage,
             ttyEnabled: true, 
             command: 'cat')
     ]) {
