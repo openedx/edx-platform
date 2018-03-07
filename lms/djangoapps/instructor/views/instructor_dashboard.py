@@ -482,8 +482,13 @@ def _section_course_info(course, access):
 
 def _section_membership(course, access, is_white_label):
     """ Provide data for the corresponding dashboard section """
+
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
+    default_enrollment_role_choices = ['Partner', 'Support', 'Learner']
+    enrollment_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
+                                                              default_enrollment_role_choices)
+
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
@@ -498,6 +503,7 @@ def _section_membership(course, access, is_white_label):
         'modify_access_url': reverse('modify_access', kwargs={'course_id': unicode(course_key)}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': unicode(course_key)}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
+        'enrollment_role_choices': enrollment_role_choices
     }
     return section_data
 

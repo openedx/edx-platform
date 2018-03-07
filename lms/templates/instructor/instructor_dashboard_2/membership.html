@@ -17,10 +17,9 @@ from openedx.core.djangolib.markup import HTML, Text
         <label>
             ${_("Role of the people being enrolled.")}
             <select name="role">
-              <option value="none">None</option>
-              <option value="partner">Partner</option>
-              <option value="support">Support</option>
-              <option value="learner">Learner</option>
+                % for role in section_data['enrollment_role_choices']:
+                  <option value="${role}">${role}</option>
+                % endfor
             </select>
         </label>
     </div>
