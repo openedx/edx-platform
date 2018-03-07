@@ -14,12 +14,13 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
-
+from edxval.api import create_or_update_video_transcript, create_external_video
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
@@ -28,6 +29,7 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
+    clean_video_id,
     copy_or_rename_transcript,
     download_youtube_subs,
     GetTranscriptsFromYouTubeException,
@@ -38,6 +40,7 @@ from xmodule.video_module.transcripts_utils import (
     remove_subs_from_store,
     Transcript,
     TranscriptsRequestValidationException,
+    TranscriptsGenerationException,
     youtube_video_transcript_name,
     get_transcript,
     get_transcript_from_val,
@@ -45,6 +48,8 @@ from xmodule.video_module.transcripts_utils import (
 from xmodule.video_module.transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
 )
+
+from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 
 __all__ = [
     'upload_transcripts',
@@ -70,6 +75,43 @@ def error_response(response, message, status_code=400):
     return JsonResponse(response, status_code)
 
 
+def validate_transcript_upload_data(request):
+    """
+    Validates video transcript file.
+
+    Arguments:
+        request: A WSGI request's data part.
+
+    Returns:
+        Tuple containing an error and validated data
+        If there is a validation error then, validated data will be empty.
+    """
+    error, validated_data = None, {}
+    data, files = request.POST, request.FILES
+    if not data.get('locator'):
+        error = _(u'Video locator is required.')
+    elif 'transcript-file' not in files:
+        error = _(u'A transcript file is required.')
+    elif os.path.splitext(files['transcript-file'].name)[1][1:] != Transcript.SRT:
+        error = _(u'This transcript file type is not supported.')
+
+    if not error:
+        try:
+            item = _get_item(request, data)
+            if item.category != 'video':
+                error = _(u'Transcripts are supported only for "video" module.')
+            else:
+                validated_data.update({
+                    'video': item,
+                    'edx_video_id': clean_video_id(item.edx_video_id),
+                    'transcript_file': files['transcript-file']
+                })
+        except (InvalidKeyError, ItemNotFoundError):
+            error = _(u'Cannot find item by locator.')
+
+    return error, validated_data
+
+
 @login_required
 def upload_transcripts(request):
     """
@@ -80,67 +122,47 @@ def upload_transcripts(request):
         status: 'Success' and HTTP 200 or 'Error' and HTTP 400.
         subs: Value of uploaded and saved html5 sub field in video item.
     """
-    response = {
-        'status': 'Unknown server error',
-        'subs': '',
-    }
-
-    locator = request.POST.get('locator')
-    if not locator:
-        return error_response(response, 'POST data without "locator" form data.')
-
-    try:
-        item = _get_item(request, request.POST)
-    except (InvalidKeyError, ItemNotFoundError):
-        return error_response(response, "Can't find item by locator.")
-
-    if 'transcript-file' not in request.FILES:
-        return error_response(response, 'POST data without "file" form data.')
-
-    video_list = request.POST.get('video_list')
-    if not video_list:
-        return error_response(response, 'POST data without video names.')
-
-    try:
-        video_list = json.loads(video_list)
-    except ValueError:
-        return error_response(response, 'Invalid video_list JSON.')
-
-    # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
-    source_subs_filedata = request.FILES['transcript-file'].read().decode('utf-8-sig')
-    source_subs_filename = request.FILES['transcript-file'].name
-
-    if '.' not in source_subs_filename:
-        return error_response(response, "Undefined file extension.")
-
-    basename = os.path.basename(source_subs_filename)
-    source_subs_name = os.path.splitext(basename)[0]
-    source_subs_ext = os.path.splitext(basename)[1][1:]
-
-    if item.category != 'video':
-        return error_response(response, 'Transcripts are supported only for "video" modules.')
-
-    # Allow upload only if any video link is presented
-    if video_list:
-        sub_attr = source_subs_name
-        try:
-            # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
-            generate_subs_from_source({1: sub_attr}, source_subs_ext, source_subs_filedata, item)
-
-            for video_dict in video_list:
-                video_name = video_dict['video']
-                # We are creating transcripts for every video source, if in future some of video sources would be deleted.
-                # Updates item.sub with `video_name` on success.
-                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
-
-            response['subs'] = item.sub
-            response['status'] = 'Success'
-        except Exception as ex:
-            return error_response(response, text_type(ex))
+    error, validated_data = validate_transcript_upload_data(request)
+    if error:
+        response = JsonResponse({'status': error}, status=400)
     else:
-        return error_response(response, 'Empty video sources.')
+        video = validated_data['video']
+        edx_video_id = validated_data['edx_video_id']
+        transcript_file = validated_data['transcript_file']
+        # check if we need to create an external VAL video to associate the transcript
+        # and save its ID on the video component.
+        if not edx_video_id:
+            edx_video_id = create_external_video(display_name=u'external video')
+            video.edx_video_id = edx_video_id
+            video.save_with_metadata(request.user)
 
-    return JsonResponse(response)
+        try:
+            # Convert 'srt' transcript into the 'sjson' and upload it to
+            # configured transcript storage. For example, S3.
+            sjson_subs = Transcript.convert(
+                content=transcript_file.read(),
+                input_format=Transcript.SRT,
+                output_format=Transcript.SJSON
+            )
+            create_or_update_video_transcript(
+                video_id=edx_video_id,
+                language_code=u'en',
+                metadata={
+                    'provider': TranscriptProvider.CUSTOM,
+                    'file_format': Transcript.SJSON,
+                    'language_code': u'en'
+                },
+                file_data=ContentFile(sjson_subs),
+            )
+            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+
+        except (TranscriptsGenerationException, UnicodeDecodeError):
+
+            response = JsonResponse({
+                'status': _(u'There is a problem with this transcript file. Try to upload a different file.')
+            }, status=400)
+
+    return response
 
 
 @login_required

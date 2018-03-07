@@ -23,6 +23,9 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
                 el: this.$el,
                 collection: this.collection
             });
+
+            // Listen to edx_video_id update
+            this.listenTo(Backbone, 'transcripts:basicTabUpdateEdxVideoId', this.handleUpdateEdxVideoId);
         },
 
         /**
@@ -241,6 +244,11 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Synchronize other fields that has the same `field_name` property.
             Utils.syncCollections(this.collection, metadataCollection);
+        },
+
+        handleUpdateEdxVideoId: function(edxVideoId) {
+            var edxVideoIdField = Utils.getField(this.collection, 'edx_video_id');
+            edxVideoIdField.setValue(edxVideoId);
         }
 
     });
