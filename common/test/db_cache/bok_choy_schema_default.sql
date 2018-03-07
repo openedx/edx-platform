@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=405 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=408 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2864,6 +2864,7 @@ CREATE TABLE `entitlements_courseentitlementsupportdetail` (
   `entitlement_id` int(11) NOT NULL,
   `support_user_id` int(11) NOT NULL,
   `unenrolled_run_id` varchar(255) DEFAULT NULL,
+  `action` varchar(15) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `b0fed354de33791839d87a8d13813a8b` (`entitlement_id`),
   KEY `entitlements_co_support_user_id_778aba40a383c157_fk_auth_user_id` (`support_user_id`),
@@ -3887,7 +3888,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempt` (
   `last_poll_ipaddr` varchar(32) DEFAULT NULL,
   `attempt_code` varchar(255) DEFAULT NULL,
   `external_id` varchar(255) DEFAULT NULL,
-  `allowed_time_limit_mins` int(11) NOT NULL,
+  `allowed_time_limit_mins` int(11) DEFAULT NULL,
   `status` varchar(64) NOT NULL,
   `taking_as_proctored` tinyint(1) NOT NULL,
   `is_sample_attempt` tinyint(1) NOT NULL,
@@ -3935,7 +3936,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempthistory` (
   `completed_at` datetime(6) DEFAULT NULL,
   `attempt_code` varchar(255) DEFAULT NULL,
   `external_id` varchar(255) DEFAULT NULL,
-  `allowed_time_limit_mins` int(11) NOT NULL,
+  `allowed_time_limit_mins` int(11) DEFAULT NULL,
   `status` varchar(64) NOT NULL,
   `taking_as_proctored` tinyint(1) NOT NULL,
   `is_sample_attempt` tinyint(1) NOT NULL,
@@ -4688,11 +4689,14 @@ CREATE TABLE `student_courseenrollmentallowed` (
   `course_id` varchar(255) NOT NULL,
   `auto_enroll` tinyint(1) NOT NULL,
   `created` datetime(6) DEFAULT NULL,
+  `user_id` int(11),
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_courseenrollmentallowed_email_6f3eafd4a6c58591_uniq` (`email`,`course_id`),
   KEY `student_courseenrollmentallowed_0c83f57c` (`email`),
   KEY `student_courseenrollmentallowed_ea134da7` (`course_id`),
-  KEY `student_courseenrollmentallowed_e2fa5388` (`created`)
+  KEY `student_courseenrollmentallowed_e2fa5388` (`created`),
+  KEY `student_courseenrollmentallowed_e8701ad4` (`user_id`),
+  CONSTRAINT `student_courseenrollment_user_id_26b73b678aa42ad_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `student_courseenrollmentattribute`;
