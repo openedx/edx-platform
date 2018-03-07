@@ -2,6 +2,7 @@
 Specific overrides to the base prod settings to make development easier.
 """
 
+import logging
 from os.path import abspath, dirname, join
 
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
@@ -17,8 +18,6 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
 HTTPS = 'off'
 
 ################################ LOGGERS ######################################
-
-import logging
 
 # Disable noisy loggers
 for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
@@ -95,16 +94,22 @@ DEBUG_TOOLBAR_CONFIG = {
 
 
 def should_show_debug_toolbar(request):
-    # We always want the toolbar on devstack unless running tests from another Docker container
+    # We always want the toolbar on devstack unless running tests from another
+    # Docker container or actively diagnosing a memory leak
     if request.get_host().startswith('edx.devstack.studio:'):
         return False
-    return True
+    from openedx.core.djangoapps.monitoring_utils import MemoryUsageData
+    return not MemoryUsageData.tables_are_enabled
 
 
 # To see stacktraces for MongoDB queries, set this to True.
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
+############################## MEMORY MONITORING ##############################
+
+MEMORY_GRAPH_DIRECTORY = REPO_ROOT / 'test_root' / 'log' / 'memory_graphs' / 'cms_{}'.format(os.getpid())
+WSGI_APPLICATION = 'openedx.core.djangoapps.monitoring_utils.WSGIServer'
 
 ################################ MILESTONES ################################
 FEATURES['MILESTONES_APP'] = True

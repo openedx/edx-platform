@@ -83,6 +83,7 @@ INSTALLED_APPS = (
 LMS_ROOT_URL = 'http://localhost:8000'
 
 MEDIA_ROOT = tempfile.mkdtemp()
+MEMORY_GRAPH_DIRECTORY = tempfile.mkdtemp(prefix='memory_graphs')
 
 MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
 MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'

@@ -75,6 +75,7 @@ fs-s3fs==0.1.5
 futures==3.2.0 ; python_version == "2.7"
 GitPython==0.3.2.RC1
 glob2==0.3
+graphviz==0.8.2
 gunicorn==0.17.4
 help-tokens==1.0.3
 httpretty==0.8.14
@@ -84,6 +85,7 @@ mako==1.0.2
 Markdown>=2.6,<2.7
 mongoengine==0.10.0
 MySQL-python==1.2.5
+objgraph==3.4.0
 networkx==1.7
 nltk==3.2.5
 nose-xunitmp==0.3.2

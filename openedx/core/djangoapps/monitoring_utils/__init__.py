@@ -23,6 +23,7 @@ TODO: supply additional public functions for storing strings and booleans.
 from contextlib import contextmanager
 
 from . import middleware
+from .utils import MemoryUsageData, WSGIServer
 try:
     import newrelic.agent
 except ImportError:
