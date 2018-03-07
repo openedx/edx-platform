@@ -10,7 +10,8 @@ def makeNode(suite, shard) {
                 
                 timeout(time: 55, unit: 'MINUTES') {
                     echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
-                    sh """
+                    stage('install') {
+                        sh """
 npm install
 source /tmp/ve/bin/activate
 # temporary fix for openssl/cryptography==1.5.3 incompatibility on debian stretch
@@ -23,6 +24,7 @@ pip install --exists-action w pbr==0.9.0
 pip install --exists-action w -r requirements/edx/base.txt
 pip install --exists-action w -r requirements/edx/post.txt
 """
+                    }
                     try {
                         if (suite == 'quality') {
                             sh """
