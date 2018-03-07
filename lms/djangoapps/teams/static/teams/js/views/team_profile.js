@@ -65,11 +65,13 @@
                     var teamDiscussionLink = nodeBBUrl + '/chats/' + rooms[activeTeam];
                     var discussionLinkElem = document.getElementById('discussion-link');
 
-                    if (rooms[activeTeam] && memberships > 1) {
-                        discussionLinkElem.href = teamDiscussionLink;
-                    } else {
-                        discussionLinkElem.href = "javascript:void(0)"
+                    discussionLinkElem.href = 'javascript:void(0)';
+                    if (!rooms[activeTeam]) {
+                        discussionLinkElem.innerHTML = '';
+                    } else if (rooms[activeTeam] && memberships <= 1) {
                         discussionLinkElem.innerHTML = '<h3>Not enough members to start a discussion</h3>'
+                    } else {
+                        discussionLinkElem.href = teamDiscussionLink;
                     }
 
                     this.setFocusToHeaderFunc();
