@@ -1,10 +1,10 @@
 define(
     [
-        'jquery', 'underscore',
+        'jquery', 'underscore', 'backbone',
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/file_uploader',
         'xmodule', 'jquery.form'
     ],
-function($, _, Utils, FileUploader) {
+function($, _, Backbone, Utils, FileUploader) {
     'use strict';
 
     describe('Transcripts.FileUploader', function() {
@@ -34,10 +34,6 @@ function($, _, Utils, FileUploader) {
                     'MessageManager',
                     ['render', 'showError', 'hideError']
                 ),
-                videoListObject = jasmine.createSpyObj(
-                    'MetadataView.VideoList',
-                    ['render', 'getVideoObjectsList']
-                ),
                 $container = $('.transcripts-status');
 
             $container
@@ -49,7 +45,6 @@ function($, _, Utils, FileUploader) {
             view = new FileUploader({
                 el: $container,
                 messenger: messenger,
-                videoListObject: videoListObject,
                 component_locator: 'component_locator'
             });
         });
@@ -196,17 +191,17 @@ function($, _, Utils, FileUploader) {
                     status: 200,
                     responseText: JSON.stringify({
                         status: 'Success',
-                        subs: 'test'
+                        edx_video_id: 'test_video_id'
                     })
                 };
-                spyOn(Utils.Storage, 'set');
+                spyOn(Backbone, 'trigger');
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.$progress).toHaveClass('is-invisible');
                 expect(view.options.messenger.render.calls.mostRecent().args[0])
                     .toEqual('uploaded');
-                expect(Utils.Storage.set)
-                    .toHaveBeenCalledWith('sub', 'test');
+                expect(Backbone.trigger)
+                    .toHaveBeenCalledWith('transcripts:basicTabUpdateEdxVideoId', 'test_video_id');
             });
 
             var assertAjaxError = function(xhr) {

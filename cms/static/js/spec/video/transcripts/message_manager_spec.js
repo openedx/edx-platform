@@ -61,8 +61,7 @@ function($, _, Utils, MessageManager, FileUploader, sinon) {
             expect(fileUploader.initialize).toHaveBeenCalledWith({
                 el: view.$el,
                 messenger: view,
-                component_locator: view.component_locator,
-                videoListObject: view.options.parent
+                component_locator: view.component_locator
             });
         });
 

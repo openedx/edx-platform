@@ -145,6 +145,16 @@ if RELEASE_LINE == "master":
         'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
 
+########################## VIDEO TRANSCRIPTS STORAGE ############################
+VIDEO_TRANSCRIPTS_SETTINGS = dict(
+    VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+    DIRECTORY_PREFIX='video-transcripts/',
+)
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
