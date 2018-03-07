@@ -14,6 +14,7 @@ from completion.models import BlockCompletion
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 def validate_social_link(platform_name, new_social_link):
@@ -161,9 +162,13 @@ def retrieve_last_sitewide_block_completed(username):
         return
 
     lms_root = SiteConfiguration.get_value_for_org(candidate_course.org, "LMS_ROOT_URL", settings.LMS_ROOT_URL)
-    item = modulestore().get_item(candidate_block_key, depth=1)
 
-    if not lms_root:
+    try:
+        item = modulestore().get_item(candidate_block_key, depth=1)
+    except ItemNotFoundError:
+        item = None
+
+    if not (lms_root and item):
         return
 
     return u"{lms_root}/courses/{course_key}/jump_to/{location}".format(
