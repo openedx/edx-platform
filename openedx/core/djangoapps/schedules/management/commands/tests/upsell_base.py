@@ -93,5 +93,5 @@ class ScheduleUpsellTestMixin(object):
 
         self.assertEqual(
             message.context['user_schedule_upgrade_deadline_time'],
-            u'8 de Agosto de 2017',
+            u'8 de agosto de 2017',
         )
