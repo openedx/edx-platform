@@ -44,25 +44,16 @@ def check_lti_iframe_content(text):
         ))
 
 
-@step('I view the LTI and it is rendered in (.*)$')
-def lti_is_rendered(_step, rendered_in):
-    if rendered_in.strip() == 'iframe':
-        world.wait_for_present('iframe')
-        assert world.is_css_present('iframe', wait_time=2)
-        assert not world.is_css_present('.link_lti_new_window', wait_time=0)
-        assert not world.is_css_present('.error_message', wait_time=0)
+@step('I view the LTI and it is rendered in iframe$')
+def lti_is_rendered_iframe(_step):
+    world.wait_for_present('iframe')  # pylint: disable=no-member
+    assert world.is_css_present('iframe', wait_time=2)  # pylint: disable=no-member
+    assert not world.is_css_present('.link_lti_new_window', wait_time=0)  # pylint: disable=no-member
+    assert not world.is_css_present('.error_message', wait_time=0)  # pylint: disable=no-member
 
-        # iframe is visible
-        assert world.css_visible('iframe')
-        check_lti_iframe_content("This is LTI tool. Success.")
-
-    elif rendered_in.strip() == 'new page':
-        assert not world.is_css_present('iframe', wait_time=2)
-        assert world.is_css_present('.link_lti_new_window', wait_time=0)
-        assert not world.is_css_present('.error_message', wait_time=0)
-        click_and_check_lti_popup()
-    else:  # incorrect rendered_in parameter
-        assert False
+    # iframe is visible
+    assert world.css_visible('iframe')  # pylint: disable=no-member
+    check_lti_iframe_content("This is LTI tool. Success.")
 
 
 @step('I view the permission alert$')
