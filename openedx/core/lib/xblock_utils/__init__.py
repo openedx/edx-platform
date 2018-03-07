@@ -24,6 +24,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_block import VerticalBlock
@@ -500,3 +501,31 @@ def xblock_resource_pkg(block):
         return module_name
 
     return module_name.rsplit('.', 1)[0]
+
+
+def is_xblock_aside(usage_key):
+    """
+    Returns True if the given usage key is for an XBlock aside
+
+    Args:
+        usage_key (opaque_keys.edx.keys.UsageKey): A usage key
+
+    Returns:
+        bool: Whether or not the usage key is an aside key type
+    """
+    return isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2))
+
+
+def get_aside_from_xblock(xblock, aside_type):
+    """
+    Gets an instance of an XBlock aside from the XBlock that it's decorating. This also
+    configures the aside instance with the runtime and fields of the given XBlock.
+
+    Args:
+        xblock (xblock.core.XBlock): The XBlock that the desired aside is decorating
+        aside_type (str): The aside type
+
+    Returns:
+        xblock.core.XBlockAside: Instance of an xblock aside
+    """
+    return xblock.runtime.get_aside_of_type(xblock, aside_type)
