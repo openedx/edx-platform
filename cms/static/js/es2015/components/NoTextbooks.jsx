@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export class NoTextbooks extends React.Component {
+class NoTextbooks extends React.Component {
   render() {
     return (
       <div className="no-textbook-content">
@@ -18,3 +18,9 @@ export class NoTextbooks extends React.Component {
     );
   }
 }
+
+NoTextbooks.propTypes = {
+  TextbooksCollection: PropTypes.object,
+};
+
+export default NoTextbooks;

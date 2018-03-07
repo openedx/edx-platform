@@ -22,7 +22,6 @@ module.exports = {
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
         'js/sock': './cms/static/js/sock.js',
-        AccessibilityPage: './node_modules/@edx/studio-frontend/src/accessibilityIndex.jsx',
         NoTextbooks: './cms/static/js/es2015/components/NoTextbooks.jsx',
         WrappedNoTextbooks: './cms/static/js/es2015/containers/WrappedNoTextbooks.jsx',
         StudioStore: './cms/static/js/es2015/data/store.js',

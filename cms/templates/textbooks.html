@@ -56,8 +56,9 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
     <section class="content">
       <article class="content-primary" role="main">
         ${static.renderReact(
-          component="NoTextbooks",
-          id="no-textbooks-container"
+          component="WrappedNoTextbooks",
+          id="no-textbooks-container",
+          store="StudioStore"
         )}
       </article>
       <aside class="content-supplementary" role="complementary">

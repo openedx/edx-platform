@@ -5,6 +5,7 @@ define([
     return function(textbooksJson) {
         var textbooks = new TextbookCollection(textbooksJson, {parse: true}),
             tbView = new ListTextbooksView({collection: textbooks});
+        window.models.TextbookCollection = textbooks;
 
         $('.content-primary').append(tbView.render().el);
         $('.nav-actions .new-button').click(function(event) {
