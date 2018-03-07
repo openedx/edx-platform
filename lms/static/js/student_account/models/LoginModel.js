@@ -82,6 +82,12 @@
                                 }
                             }
                         }
+
+                        // take user consent for writing non-essential cookies
+                        if (window.mscc) {
+                            window.mscc.setConsent();
+                        }
+
                         model.trigger('sync', data);
                     },
                     error: function(error) {

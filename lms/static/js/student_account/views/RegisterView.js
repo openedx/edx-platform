@@ -102,6 +102,11 @@
                 thirdPartyAuth: function(event) {
                     var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
+                    // take user consent for writing non-essential cookies
+                    if (window.mscc) {
+                        window.mscc.setConsent();
+                    }
+
                     if (providerUrl) {
                         window.location.href = providerUrl;
                     }
