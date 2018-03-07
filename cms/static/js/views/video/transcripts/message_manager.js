@@ -40,8 +40,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
             this.fileUploader = new FileUploader({
                 el: this.$el,
                 messenger: this,
-                component_locator: this.component_locator,
-                videoListObject: this.options.parent
+                component_locator: this.component_locator
             });
         },
 

@@ -1,9 +1,10 @@
 """Tests for items views."""
 
 import copy
+from codecs import BOM_UTF8
 import ddt
 import json
-import os
+from mock import patch, Mock
 import tempfile
 import textwrap
 from uuid import uuid4
@@ -11,7 +12,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from mock import patch, Mock
+from edxval.api import create_video
 from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get
@@ -20,10 +21,24 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module import transcripts_utils
+from xmodule.video_module.transcripts_utils import (
+    get_video_transcript_content,
+    remove_subs_from_store,
+    Transcript,
+)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
+
+SRT_TRANSCRIPT_CONTENT = """
+1
+00:00:10,500 --> 00:00:13,000
+Elephant's Dream
+
+2
+00:00:15,000 --> 00:00:18,000
+At the left we can see...
+"""
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -96,120 +111,175 @@ class BaseTranscripts(CourseTestCase):
         }
 
 
+@ddt.ddt
 class TestUploadTranscripts(BaseTranscripts):
     """
-    Tests for '/transcripts/upload' url.
+    Tests for '/transcripts/upload' endpoint.
     """
     def setUp(self):
-        """Create initial data."""
         super(TestUploadTranscripts, self).setUp()
+        self.contents = {
+            'good': SRT_TRANSCRIPT_CONTENT,
+            'bad': 'Some BAD data',
+        }
+        # Create temporary transcript files
+        self.good_srt_file = self.create_transcript_file(content=self.contents['good'], suffix='.srt')
+        self.bad_data_srt_file = self.create_transcript_file(content=self.contents['bad'], suffix='.srt')
+        self.bad_name_srt_file = self.create_transcript_file(content=self.contents['good'], suffix='.bad')
+        self.bom_srt_file = self.create_transcript_file(content=self.contents['good'], suffix='.srt', include_bom=True)
 
-        self.good_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
-        self.good_srt_file.write(textwrap.dedent("""
-            1
-            00:00:10,500 --> 00:00:13,000
-            Elephant's Dream
+        # Setup a VEDA produced video and persist `edx_video_id` in VAL.
+        create_video({
+            'edx_video_id': u'123-456-789',
+            'status': 'upload',
+            'client_video_id': u'Test Video',
+            'duration': 0,
+            'encoded_videos': [],
+            'courses': [unicode(self.course.id)]
+        })
 
-            2
-            00:00:15,000 --> 00:00:18,000
-            At the left we can see...
-        """))
-        self.good_srt_file.seek(0)
+        # Add clean up handler
+        self.addCleanup(self.clean_temporary_transcripts)
 
-        self.bad_data_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
-        self.bad_data_srt_file.write('Some BAD data')
-        self.bad_data_srt_file.seek(0)
+    def create_transcript_file(self, content, suffix, include_bom=False):
+        """
+        Setup a transcript file with suffix and content.
+        """
+        transcript_file = tempfile.NamedTemporaryFile(suffix=suffix)
+        wrapped_content = textwrap.dedent(content)
+        if include_bom:
+            wrapped_content = wrapped_content.encode('utf-8-sig')
+            # Verify that ufeff(BOM) character is in content.
+            self.assertIn(BOM_UTF8, wrapped_content)
 
-        self.bad_name_srt_file = tempfile.NamedTemporaryFile(suffix='.BAD')
-        self.bad_name_srt_file.write(textwrap.dedent("""
-            1
-            00:00:10,500 --> 00:00:13,000
-            Elephant's Dream
+        transcript_file.write(wrapped_content)
+        transcript_file.seek(0)
 
-            2
-            00:00:15,000 --> 00:00:18,000
-            At the left we can see...
-        """))
-        self.bad_name_srt_file.seek(0)
+        return transcript_file
 
-        self.ufeff_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
+    def clean_temporary_transcripts(self):
+        """
+        Close transcript files gracefully.
+        """
+        self.good_srt_file.close()
+        self.bad_data_srt_file.close()
+        self.bad_name_srt_file.close()
+        self.bom_srt_file.close()
 
-    def test_success_video_module_source_subs_uploading(self):
-        self.item.data = textwrap.dedent("""
-            <video youtube="">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """)
+    def upload_transcript(self, locator, transcript_file):
+        """
+        Uploads a transcript for a video
+        """
+        payload = {}
+        if locator:
+            payload.update({'locator': locator})
+
+        if transcript_file:
+            payload.update({'transcript-file': transcript_file})
+
+        upload_url = reverse('upload_transcripts')
+        response = self.client.post(upload_url, payload)
+
+        return response
+
+    def assert_transcript_upload_response(self, response, expected_status_code, expected_message):
+        response_content = json.loads(response.content)
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response_content['status'], expected_message)
+
+    @ddt.data(
+        (u'123-456-789', False),
+        (u'', False),
+        (u'123-456-789', True)
+    )
+    @ddt.unpack
+    def test_transcript_upload_success(self, edx_video_id, include_bom):
+        """
+        Tests transcript file upload to video component works as
+        expected in case of following:
+
+         1. External video component
+         2. VEDA produced video component
+         3. Transcript content containing BOM character
+        """
+        # In case of an external video component, the `edx_video_id` must be empty
+        # and VEDA produced video component will have `edx_video_id` set to VAL video ID.
+        self.item.edx_video_id = edx_video_id
         modulestore().update_item(self.item, self.user.id)
 
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': self.video_usage_key,
-            'transcript-file': self.good_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Success')
+        # Upload a transcript
+        transcript_file = self.bom_srt_file if include_bom else self.good_srt_file
+        response = self.upload_transcript(self.video_usage_key, transcript_file)
 
-        item = modulestore().get_item(self.video_usage_key)
-        self.assertEqual(item.sub, filename)
+        # Verify the response
+        self.assert_transcript_upload_response(response, expected_status_code=200, expected_message='Success')
 
-        content_location = StaticContent.compute_location(
-            self.course.id, 'subs_{0}.srt.sjson'.format(filename))
-        self.assertTrue(contentstore().find(content_location))
+        # Verify the `edx_video_id` on the video component
+        json_response = json.loads(response.content)
+        expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
+        video = modulestore().get_item(self.video_usage_key)
+        self.assertEqual(video.edx_video_id, expected_edx_video_id)
 
-    def test_fail_data_without_id(self):
-        link = reverse('upload_transcripts')
-        resp = self.client.post(link, {'transcript-file': self.good_srt_file})
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "locator" form data.')
+        # Verify transcript content
+        actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
+        actual_sjson_content = json.loads(actual_transcript['content'])
+        expected_sjson_content = json.loads(Transcript.convert(
+            self.contents['good'],
+            input_format=Transcript.SRT,
+            output_format=Transcript.SJSON
+        ))
+        self.assertDictEqual(actual_sjson_content, expected_sjson_content)
 
-    def test_fail_data_without_file(self):
-        link = reverse('upload_transcripts')
-        resp = self.client.post(link, {'locator': self.video_usage_key})
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "file" form data.')
+    def test_transcript_upload_without_locator(self):
+        """
+        Test that transcript upload validation fails if the video locator is missing
+        """
+        response = self.upload_transcript(locator=None, transcript_file=self.good_srt_file)
+        self.assert_transcript_upload_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Video locator is required.'
+        )
 
-    def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': 'BAD_LOCATOR',
-            'transcript-file': self.good_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
+    def test_transcript_upload_without_file(self):
+        """
+        Test that transcript upload validation fails if transcript file is missing
+        """
+        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=None)
+        self.assert_transcript_upload_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'A transcript file is required.'
+        )
 
-        # Test for raising `ItemNotFoundError` exception.
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': '{0}_{1}'.format(self.video_usage_key, 'BAD_LOCATOR'),
-            'transcript-file': self.good_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
+    def test_transcript_upload_bad_format(self):
+        """
+        Test that transcript upload validation fails if transcript format is not SRT
+        """
+        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.bad_name_srt_file)
+        self.assert_transcript_upload_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'This transcript file type is not supported.'
+        )
 
-    def test_fail_for_non_video_module(self):
-        # non_video module: setup
+    def test_transcript_upload_bad_content(self):
+        """
+        Test that transcript upload validation fails in case of bad transcript content.
+        """
+        # Request to upload transcript for the video
+        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.bad_data_srt_file)
+        self.assert_transcript_upload_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'There is a problem with this transcript file. Try to upload a different file.'
+        )
+
+    def test_transcript_upload_unknown_category(self):
+        """
+        Test that transcript upload validation fails if item's category is other than video.
+        """
+        # non_video module setup - i.e. an item whose category is not 'video'.
         data = {
             'parent_locator': unicode(self.course.location),
             'category': 'non_video',
@@ -221,145 +291,25 @@ class TestUploadTranscripts(BaseTranscripts):
         item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
         modulestore().update_item(item, self.user.id)
 
-        # non_video module: testing
+        # Request to upload transcript for the item
+        response = self.upload_transcript(locator=usage_key, transcript_file=self.good_srt_file)
+        self.assert_transcript_upload_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Transcripts are supported only for "video" module.'
+        )
 
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': unicode(usage_key),
-            'transcript-file': self.good_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
-
-    def test_fail_bad_xml(self):
-        self.item.data = '<<<video youtube="0.75:JMD_ifUUfsU,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
-        modulestore().update_item(self.item, self.user.id)
-
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': unicode(self.video_usage_key),
-            'transcript-file': self.good_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-
-        self.assertEqual(resp.status_code, 400)
-        # incorrect xml produces incorrect item category error
-        self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
-
-    def test_fail_bad_data_srt_file(self):
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.bad_data_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': unicode(self.video_usage_key),
-            'transcript-file': self.bad_data_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Something wrong with SubRip transcripts file during parsing.')
-
-    def test_fail_bad_name_srt_file(self):
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.bad_name_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': unicode(self.video_usage_key),
-            'transcript-file': self.bad_name_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'We support only SubRip (*.srt) transcripts format.')
-
-    def test_undefined_file_extension(self):
-        srt_file = tempfile.NamedTemporaryFile(suffix='')
-        srt_file.write(textwrap.dedent("""
-            1
-            00:00:10,500 --> 00:00:13,000
-            Elephant's Dream
-
-            2
-            00:00:15,000 --> 00:00:18,000
-            At the left we can see...
-        """))
-        srt_file.seek(0)
-
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': self.video_usage_key,
-            'transcript-file': srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'Undefined file extension.')
-
-    def test_subs_uploading_with_byte_order_mark(self):
+    def test_transcript_upload_non_existent_item(self):
         """
-        Test uploading subs containing BOM(Byte Order Mark), e.g. U+FEFF
+        Test that transcript upload validation fails in case of invalid item's locator.
         """
-        filedata = textwrap.dedent("""
-            1
-            00:00:10,500 --> 00:00:13,000
-            Test ufeff characters
-
-            2
-            00:00:15,000 --> 00:00:18,000
-            At the left we can see...
-        """).encode('utf-8-sig')
-
-        # Verify that ufeff character is in filedata.
-        self.assertIn("ufeff", filedata)
-        self.ufeff_srt_file.write(filedata)
-        self.ufeff_srt_file.seek(0)
-
-        link = reverse('upload_transcripts')
-        filename = os.path.splitext(os.path.basename(self.ufeff_srt_file.name))[0]
-        resp = self.client.post(link, {
-            'locator': self.video_usage_key,
-            'transcript-file': self.ufeff_srt_file,
-            'video_list': json.dumps([{
-                'type': 'html5',
-                'video': filename,
-                'mode': 'mp4',
-            }])
-        })
-        self.assertEqual(resp.status_code, 200)
-
-        content_location = StaticContent.compute_location(
-            self.course.id, 'subs_{0}.srt.sjson'.format(filename))
-        self.assertTrue(contentstore().find(content_location))
-
-        subs_text = json.loads(contentstore().find(content_location).data).get('text')
-        self.assertIn("Test ufeff characters", subs_text)
-
-    def tearDown(self):
-        super(TestUploadTranscripts, self).tearDown()
-
-        self.good_srt_file.close()
-        self.bad_data_srt_file.close()
-        self.bad_name_srt_file.close()
-        self.ufeff_srt_file.close()
+        # Request to upload transcript for the item
+        response = self.upload_transcript(locator='non_existent_locator', transcript_file=self.good_srt_file)
+        self.assert_transcript_upload_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Cannot find item by locator.'
+        )
 
 
 class TestDownloadTranscripts(BaseTranscripts):
@@ -416,7 +366,7 @@ class TestDownloadTranscripts(BaseTranscripts):
             '0\n00:00:00,100 --> 00:00:00,200\nsubs #1\n\n1\n00:00:00,200 --> '
             '00:00:00,240\nsubs #2\n\n2\n00:00:00,240 --> 00:00:00,380\nsubs #3\n\n'
         )
-        transcripts_utils.remove_subs_from_store(subs_id, self.item)
+        remove_subs_from_store(subs_id, self.item)
 
     def test_fail_data_without_file(self):
         link = reverse('download_transcripts')
@@ -643,7 +593,7 @@ class TestCheckTranscripts(BaseTranscripts):
             }
         )
 
-        transcripts_utils.remove_subs_from_store(subs_id, self.item)
+        remove_subs_from_store(subs_id, self.item)
 
     def test_check_youtube(self):
         self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
