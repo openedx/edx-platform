@@ -595,7 +595,6 @@ such that the value can be defined later than this assignment (file load order).
             this.$identifier_input = this.$container.find("textarea[name='student-ids']");
             this.$role = this.$container.find("select[name='role']");
             this.$enrollment_button = this.$container.find('.enrollment-button');
-            this.$is_course_white_label = this.$container.find('#is_course_white_label').val();
             this.$reason_field = this.$container.find("textarea[name='reason-field']");
             this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
             this.$checkbox_emailstudents = this.$container.find("input[name='email-students']");
@@ -604,12 +603,11 @@ such that the value can be defined later than this assignment (file load order).
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$enrollment_button.click(function(event) {
                 var sendData;
-                if (batchEnroll.$is_course_white_label === 'True') {
-                    if (!batchEnroll.$reason_field.val()) {
-                        batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
-                        return false;
-                    }
+                if (!batchEnroll.$reason_field.val()) {
+                    batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
+                    return false;
                 }
+
                 emailStudents = batchEnroll.$checkbox_emailstudents.is(':checked');
                 sendData = {
                     action: $(event.target).data('action'),
