@@ -26,12 +26,6 @@ Feature: LMS.LTI component
   | False              |
   Then I view the LTI but incorrect_signature warning is rendered
 
-  #4
-  Scenario: LTI component in LMS is correctly rendered in new page
-  Given the course has correct LTI credentials with registered Instructor
-  And the course has an LTI component with correct fields
-  Then I view the LTI and it is rendered in new page
-
   #5
   Scenario: LTI component in LMS is correctly rendered in iframe
   Given the course has correct LTI credentials with registered Instructor
