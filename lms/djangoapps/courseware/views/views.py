@@ -896,7 +896,7 @@ def program_marketing(request, program_uuid):
     context = {'program': program}
 
     if program.get('is_learner_eligible_for_one_click_purchase') and skus:
-        context['buy_button_href'] = ecommerce_service.get_checkout_page_url(*skus)
+        context['buy_button_href'] = ecommerce_service.get_checkout_page_url(*skus, program_uuid=program_uuid)
 
     context['uses_bootstrap'] = True
 
