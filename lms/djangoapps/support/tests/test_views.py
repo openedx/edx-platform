@@ -7,7 +7,6 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 import ddt
 import pytest
@@ -20,8 +19,6 @@ from pytz import UTC
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from entitlements.models import CourseEntitlementSupportDetail
-from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
@@ -111,7 +108,6 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:enrollment_list',
             'support:manage_user',
             'support:manage_user_detail',
-            'support:enrollment_list'
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -140,7 +136,6 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:enrollment_list",
         "support:manage_user",
         "support:manage_user_detail",
-        "support:enrollment_list"
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
