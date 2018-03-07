@@ -1618,7 +1618,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         paid_course = self.create_paid_course()
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing..', 'role': 'learner'}
+                  'auto_enroll': False, 'reason': 'testing..', 'role': 'Learner'}
         response = self.client.post(url, params)
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -1629,7 +1629,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         UserFactory(email=self.notregistered_email)
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing', 'role': 'learner'}
+                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
         response = self.client.post(url, params)
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 2)
@@ -1673,7 +1673,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'unenroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing', 'role': 'learner'}
+                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
@@ -1744,7 +1744,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             'action': action,
             'email_students': True,
             'reason': 'change user enrollment',
-            'role': 'learner'
+            'role': 'Learner'
         }
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
