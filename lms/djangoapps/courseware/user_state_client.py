@@ -8,6 +8,8 @@ import logging
 from operator import attrgetter
 from time import time
 
+from django.conf import settings
+from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -440,22 +442,69 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
-    def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
+    def iter_all_for_block(self, block_key, scope=Scope.user_state):
         """
-        You get no ordering guarantees. Fetching will happen in batch_size
-        increments. If you're using this method, you should be running in an
-        async task.
-        """
-        if scope != Scope.user_state:
-            raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+        Return an iterator over the data stored in the block (e.g. a problem block).
 
-    def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state, batch_size=None):
-        """
-        You get no ordering guarantees. Fetching will happen in batch_size
-        increments. If you're using this method, you should be running in an
+        You get no ordering guarantees.If you're using this method, you should be running in an
         async task.
+
+        Arguments:
+            block_key: an XBlock's locator (e.g. :class:`~BlockUsageLocator`)
+            scope (Scope): must be `Scope.user_state`
+
+        Returns:
+            an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
+                object, which includes the block's contents.
         """
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+
+        results = StudentModule.objects.filter(module_state_key=block_key)
+        p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
+
+        for page_number in p.page_range:
+            page = p.page(page_number)
+
+            for sm in page.object_list:
+                state = json.loads(sm.state)
+
+                if state == {}:
+                    continue
+
+                yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)
+
+    def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state):
+        """
+        Return an iterator over all data stored in a course's blocks.
+
+        You get no ordering guarantees. If you're using this method, you should be running in an
+        async task.
+
+        Arguments:
+            course_key: a course locator
+            scope (Scope): must be `Scope.user_state`
+
+        Returns:
+            an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
+                object, which includes the block's contents.
+        """
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
+
+        results = StudentModule.objects.filter(course_id=course_key)
+        if block_type:
+            results = results.filter(module_type=block_type)
+
+        p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
+
+        for page_number in p.page_range:
+            page = p.page(page_number)
+
+            for sm in page.object_list:
+                state = json.loads(sm.state)
+
+                if state == {}:
+                    continue
+
+                yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)

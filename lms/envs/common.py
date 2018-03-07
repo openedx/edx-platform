@@ -3383,6 +3383,7 @@ COMPLETION_BY_VIEWING_DELAY_MS = 5000
 # Once a user has watched this percentage of a video, mark it as complete:
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+COMPLETION_BY_VIEWING_DELAY_MS = 5000
 
 COMPLETION_AGGREGATOR_BLOCK_TYPES = {
     'course',
@@ -3390,3 +3391,7 @@ COMPLETION_AGGREGATOR_BLOCK_TYPES = {
     'sequential',
     'vertical',
 }
+
+############### Settings for user-state-client ##################
+# Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
+USER_STATE_BATCH_SIZE = 5000
