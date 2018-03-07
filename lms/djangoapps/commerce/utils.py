@@ -55,6 +55,14 @@ class EcommerceService(object):
         """
         return urljoin(self.ecommerce_url_root, ecommerce_page_url)
 
+    def get_order_dashboard_url(self):
+        """ Return the URL to the ecommerce dashboard orders page.
+
+        Returns:
+            String: order dashboard url.
+        """
+        return self.get_absolute_ecommerce_url(CommerceConfiguration.DEFAULT_ORDER_DASHBOARD_URL)
+
     def get_receipt_page_url(self, order_number):
         """
         Gets the URL for the Order Receipt page hosted by the ecommerce service.
