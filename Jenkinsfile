@@ -1,4 +1,5 @@
 def dockerImage = 'gcr.io/appsembler-testing/jenkins-worker:v0.2.0'
+def k8sCloud = 'jnlp'
 
 def makeNode(suite, shard) {
   return {
@@ -118,7 +119,7 @@ def buildParallelSteps() {
     return parallelSteps
 }
 
-podTemplate(cloud: 'jnlp', label: 'edxapp', containers: [
+podTemplate(cloud: k8sCloud, label: 'edxapp', containers: [
         containerTemplate(name: 'edxapp',
             image: dockerImage,
             ttyEnabled: true, 
