@@ -27,7 +27,8 @@ pip install --exists-action w -r requirements/edx/post.txt
                     }
                     try {
                         if (suite == 'quality') {
-                            sh """
+                            stage('quality') {
+                                sh """
 export PYLINT_THRESHOLD=3600
 export ESLINT_THRESHOLD=9850
 export NO_PREREQ_INSTALL=true
@@ -67,9 +68,11 @@ END
 
 exit \$EXIT
 """
+                            }
                         } else {
-                            try {
-                                sh """
+                            stage('test') {
+                                try {
+                                    sh """
 # prepare environment for tests
 source /tmp/ve/bin/activate
 mkdir /tmp/mongodata
@@ -86,9 +89,10 @@ killall mongod
 curl -s https://codecov.io/bash > /tmp/codecov
 /bin/bash /tmp/codecov -t ${CODECOV_TOKEN}
 """
-                            } finally {
-                                archiveArtifacts 'reports/**, test_root/log/**'
-                                junit 'reports/**/*.xml'
+                                } finally {
+                                    archiveArtifacts 'reports/**, test_root/log/**'
+                                    junit 'reports/**/*.xml'
+                                }
                             }
                         }
                     } finally {
