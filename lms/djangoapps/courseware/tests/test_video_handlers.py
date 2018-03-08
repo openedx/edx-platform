@@ -21,7 +21,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import TranscriptException, TranscriptsGenerationException
+from xmodule.video_module.transcripts_utils import TranscriptException, TranscriptsGenerationException, Transcript
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
@@ -435,7 +435,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.video_handlers.get_transcript',
+        return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8')
+    )
     def test_download_srt_exist(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
@@ -443,7 +446,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Language'], 'en')
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'txt', 'text/plain; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.video_handlers.get_transcript',
+        return_value=('Subs!', 'txt', 'text/plain; charset=utf-8')
+    )
     def test_download_txt_exist(self, __):
         self.item.transcript_format = 'txt'
         request = Request.blank('/download')
@@ -460,7 +466,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         with self.assertRaises(NotFoundError):
             self.item.get_transcript(transcripts)
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', u"塞.srt", 'application/x-subrip; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.transcripts_utils.get_transcript_for_video',
+        return_value=(Transcript.SRT, u"塞", 'Subs!')
+    )
     def test_download_non_en_non_ascii_filename(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
@@ -614,6 +623,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
                 u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
+
         self.assertDictEqual(json.loads(response.body), calculated_0_75)
         # 1_5 will be generated from 1_0
         self.item.youtube_id_1_5 = '1_5'
