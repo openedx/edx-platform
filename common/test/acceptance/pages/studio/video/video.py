@@ -201,10 +201,9 @@ class VideoComponentPage(VideoPage):
             lang_code (str): two letter language code
 
         """
-        language_options =  self.get_drop_down_items('transcript_language', index=1)
+        language_options = self.get_drop_down_items('transcript_language', index=1)
         language = filter(lambda x: x.get_attribute('value') == lang_code, language_options)[0]
         return language.get_attribute("disabled")
-
 
     @staticmethod
     def file_path(filename):
