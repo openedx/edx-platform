@@ -27,6 +27,7 @@ def oef_dashboard(request):
     user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
 
     is_first_user = user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False
+    user_surveys = OrganizationOefScore.objects.filter(org=user_extended_profile.organization)
 
     context = {
         'user_has_organization': bool(user_extended_profile.organization),
@@ -78,7 +79,7 @@ def get_survey_by_id(request, user_survey_id):
                                                    "topics": topics,
                                                    "instructions": get_oef_instructions(),
                                                    "levels": levels,
-                                                   'organization': request.user.extended_profile.organization.label,
+                                                   'organization': organization.label,
                                                    'date': uos.modified.strftime('%m/%d/%Y')
                                                    })
 
