@@ -5,14 +5,12 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 
 import contentstore.views
-from contentstore.config.models import NewAssetsPageFlag
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.external_auth.views
 import openedx.core.djangoapps.lang_pref.views
 
-from config_models.views import ConfigurationModelCurrentAPIView
 from ratelimitbackend import admin
 
 django_autodiscover()
@@ -249,10 +247,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 # UX reference templates
 urlpatterns.append(url(r'^template/(?P<template>.+)$', openedx.core.djangoapps.debug.views.show_reference_template,
                        name='openedx.core.djangoapps.debug.views.show_reference_template'))
-
-urlpatterns += [
-    url(r'config/assets', ConfigurationModelCurrentAPIView.as_view(model=NewAssetsPageFlag)),
-]
 
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
