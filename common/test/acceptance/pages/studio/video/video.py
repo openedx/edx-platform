@@ -195,7 +195,7 @@ class VideoComponentPage(VideoPage):
 
     def is_language_disabled(self, lang_code):
         """
-        Determine whether or not a lanuage is disbaled in a drop down
+        Determine whether or not a lanuage is disabled in a drop down
 
         Arguments:
             lang_code (str): two letter language code
