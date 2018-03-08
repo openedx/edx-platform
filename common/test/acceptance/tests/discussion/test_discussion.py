@@ -993,6 +993,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         )
 
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+        self.assertEqual(self.page.get_new_post_preview_text(), 'banana')
 
     def test_mathjax_not_rendered_after_post_cancel(self):
         """
