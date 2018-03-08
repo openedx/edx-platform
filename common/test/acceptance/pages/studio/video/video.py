@@ -202,7 +202,7 @@ class VideoComponentPage(VideoPage):
 
         """
         language_options = self.get_drop_down_items('transcript_language', index=1)
-        language = filter(lambda x: x.get_attribute('value') == lang_code, language_options)[0]
+        language = [l for l in language_options if l.get_attribute('value') == lang_code][0]
         return language.get_attribute("disabled")
 
     @staticmethod
