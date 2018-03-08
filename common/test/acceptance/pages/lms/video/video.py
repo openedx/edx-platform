@@ -480,6 +480,7 @@ class VideoPage(PageObject):
 
         """
         # mouse over to video speed button
+        self.scroll_to_button('speed')
         speed_menu_selector = self.get_element_selector(VIDEO_BUTTONS['speed'])
         element_to_hover_over = self.q(css=speed_menu_selector).results[0]
         hover = ActionChains(self.browser).move_to_element(element_to_hover_over)
