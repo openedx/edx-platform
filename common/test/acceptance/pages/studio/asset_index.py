@@ -170,7 +170,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
                 lambda el: el.text == '0 files'
             ).present,
             self.q(css='.SFE-wrapper h4').filter(
-                lambda el: el.text == 'No files were found for this filter.'
+                lambda el: el.text == 'No files were found.'
             ).present,
         ])
 
@@ -178,7 +178,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
     def is_no_results_clear_filter_button_on_page(self):
         """Checks that no results clear filter button is on page."""
         return self.q(css='.SFE-wrapper button.btn').filter(
-            lambda el: el.text == 'Clear filter'
+            lambda el: el.text == 'Clear all filters'
         ).present
 
     @property
@@ -253,13 +253,13 @@ class AssetIndexPageStudioFrontend(CoursePage):
     @wait_for_js
     def click_clear_filters_button(self):
         """
-        Clicks 'Clear filters=' button.
-        Returns False if no 'Clear filter' button.
+        Clicks 'Clear all filters' button.
+        Returns False if no 'Clear all filters' button.
         """
         self.wait_for_ajax()
         if self.is_no_results_clear_filter_button_on_page():
             self.q(css='.SFE-wrapper button.btn').filter(
-                lambda el: el.text == 'Clear filter'
+                lambda el: el.text == 'Clear all filters'
             ).click()
             self.wait_for_ajax()
             return True
