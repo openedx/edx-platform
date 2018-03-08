@@ -1,7 +1,6 @@
 """
 Specific overrides to the base prod settings to make development easier.
 """
-import logging
 from os.path import abspath, dirname, join
 
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
@@ -27,6 +26,7 @@ ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ################################ LOGGERS ######################################
 
 # Silence noisy logs
+import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
@@ -88,20 +88,10 @@ DEBUG_TOOLBAR_CONFIG = {
 
 
 def should_show_debug_toolbar(request):
-    # We always want the toolbar on devstack unless running tests from another
-    # Docker container or actively diagnosing a memory leak
+    # We always want the toolbar on devstack unless running tests from another Docker container
     if request.get_host().startswith('edx.devstack.lms:'):
         return False
-    from openedx.core.djangoapps.monitoring_utils import MemoryUsageData
-    return not MemoryUsageData.tables_are_enabled
-
-
-############################## MEMORY MONITORING ##############################
-
-INSTALLED_APPS.append('openedx.core.djangoapps.monitoring_utils.apps.MonitoringUtilsConfig')
-MEMORY_GRAPH_DIRECTORY = REPO_ROOT / 'test_root' / 'log' / 'memory_graphs' / 'lms_{}'.format(os.getpid())
-MIDDLEWARE_CLASSES.insert(0, 'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware')
-WSGI_APPLICATION = 'openedx.core.djangoapps.monitoring_utils.WSGIServer'
+    return True
 
 ########################### PIPELINE #################################
 
