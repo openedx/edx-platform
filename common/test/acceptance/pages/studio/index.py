@@ -246,8 +246,9 @@ class DashboardPage(PageObject, HelpMixin):
         Click the tab to display the available libraries, and return detail of them.
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
-        self.wait_for_element_presence('#course-index-tabs .libraries-tab', "Libraries tab")
-        self.q(css='#course-index-tabs .libraries-tab').click()
+        library_tab_css = '#course-index-tabs .libraries-tab'
+        self.wait_for_element_presence(library_tab_css, "Libraries tab")
+        self.q(css=library_tab_css).click()
         if self.q(css='.list-notices.libraries-tab').present:
             # No libraries are available.
             self.wait_for_element_presence('.libraries-tab .new-library-button', "new library tab")
