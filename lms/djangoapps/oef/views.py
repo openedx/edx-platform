@@ -18,10 +18,14 @@ def oef_dashboard(request):
     View for OEF dashboard
 
     """
-    user_surveys = OrganizationOefScore.objects.filter(user_id=request.user.id)
+    user_extended_profile = request.user.extended_profile
+    user_surveys = list(OrganizationOefScore.objects.filter(user_id=request.user.id))
+    organization_surveys = list(OrganizationOefScore.objects.filter(org=user_extended_profile.organization).exclude(finish_date__isnull=True))
+    user_surveys = set(user_surveys + organization_surveys)
+
     surveys = []
     user_survey_status = get_user_survey_status(request.user, create_new_survey=False)
-    user_extended_profile = request.user.extended_profile
+
     is_first_user = user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False
 
     context = {
@@ -63,8 +67,8 @@ def get_survey_by_id(request, user_survey_id):
     """
     Get a particular survey by its id
     """
-
-    uos = OrganizationOefScore.objects.get(id=int(user_survey_id), user_id=request.user.id)
+    organization = request.user.extended_profile.organization
+    uos = OrganizationOefScore.objects.get(id=int(user_survey_id), org=organization)
     survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
     topics = get_survey_topics(uos, survey.id)
     levels = get_option_levels()
@@ -112,7 +116,7 @@ def save_answer(request):
     Save answers submitted by user
     """
     data = json.loads(request.body)
-    uos = OrganizationOefScore.objects.filter(user_id=request.user.id).latest('start_date')
+    uos = OrganizationOefScore.objects.filter(user_id=request.user.id).latest('id')
 
     for answer_data in data['answers']:
         setattr(uos, answer_data['score_name'], int(float(answer_data['answer_id'])))
