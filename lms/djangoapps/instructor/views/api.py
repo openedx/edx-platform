@@ -630,6 +630,8 @@ def students_update_enrollment(request, course_id):
     email_students = _get_boolean_param(request, 'email_students')
     is_white_label = CourseMode.is_white_label(course_id)
     reason = request.POST.get('reason')
+    role = request.POST.get('role')
+
     if is_white_label:
         if not reason:
             return JsonResponse(
@@ -729,7 +731,7 @@ def students_update_enrollment(request, course_id):
 
         else:
             ManualEnrollmentAudit.create_manual_enrollment_audit(
-                request.user, email, state_transition, reason, enrollment_obj
+                request.user, email, state_transition, reason, enrollment_obj, role
             )
             results.append({
                 'identifier': identifier,
