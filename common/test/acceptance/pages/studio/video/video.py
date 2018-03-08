@@ -50,6 +50,10 @@ BUTTON_SELECTORS = {
     'collapse_link': '.collapse-action.collapse-setting',
 }
 
+DROP_DOWN_SELECTORS = {
+    'transcript_language': '.wrapper-translations-settings .list-settings .list-settings-item select'
+}
+
 DISPLAY_NAME = "Component Display Name"
 
 DEFAULT_SETTINGS = [
@@ -176,6 +180,31 @@ class VideoComponentPage(VideoPage):
         """
         element = self.q(css=BUTTON_SELECTORS[button_name])[index]
         self.browser.execute_script("arguments[0].scrollIntoView();", element)
+
+    def get_drop_down_items(self, drop_down_name, index=0):
+        """
+        Get the items from a drop down list specified by `drop_down_name`
+
+        Arguments:
+            drop_down_name (str): name of the drop down list
+            index (int): query index
+
+        """
+        drop_downs = self.q(css=DROP_DOWN_SELECTORS[drop_down_name])
+        return drop_downs[index].find_elements_by_tag_name("option")
+
+    def is_language_disabled(self, lang_code):
+        """
+        Determine whether or not a lanuage is disbaled in a drop down
+
+        Arguments:
+            lang_code (str): two letter language code
+
+        """
+        language_options =  self.get_drop_down_items('transcript_language', index=1)
+        language = filter(lambda x: x.get_attribute('value') == lang_code, language_options)[0]
+        return language.get_attribute("disabled")
+
 
     @staticmethod
     def file_path(filename):
