@@ -13,6 +13,7 @@ from lms.djangoapps.onboarding.models import (
     Organization,
     UserExtendedProfile,
     FunctionArea,
+    OrganizationPartner,
 )
 
 
@@ -41,7 +42,7 @@ class TotalEmployeeAdmin(BaseDropdownOrderAdmin):
 
 
 class PartnerNetworkAdmin(BaseDropdownOrderAdmin):
-    pass
+    list_display = ('order', 'code', 'label', 'is_partner_affiliated')
 
 
 class EducationLevelAdmin(BaseDropdownOrderAdmin):
@@ -68,6 +69,11 @@ class UserExtendedProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'organization', 'country_of_employment', 'role_in_org', 'hours_per_week', )
 
 
+class OrganizationPartnerAdmin(admin.ModelAdmin):
+    list_display = ('organization', 'partner', 'start_date', 'end_date',)
+    list_filter = ('organization', 'partner', 'start_date', 'end_date',)
+
+
 admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(RoleInsideOrg, RoleInsideOrgAdmin)
 admin.site.register(OrgSector, OrgSectorAdmin)
@@ -80,3 +86,4 @@ admin.site.register(EnglishProficiency, EnglishProficiencyAdmin)
 admin.site.register(Organization, OraganizationAdmin)
 admin.site.register(UserExtendedProfile, UserExtendedProfileAdmin)
 admin.site.register(FunctionArea, FunctionAreaAdmin)
+admin.site.register(OrganizationPartner, OrganizationPartnerAdmin)
