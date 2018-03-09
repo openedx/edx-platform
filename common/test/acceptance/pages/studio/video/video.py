@@ -164,6 +164,7 @@ class VideoComponentPage(VideoPage):
             index (int): query index
 
         """
+        self.scroll_to_button(button_name, index)
         self.q(css=BUTTON_SELECTORS[button_name]).nth(index).click()
         if require_notification:
             sync_on_notification(self)
