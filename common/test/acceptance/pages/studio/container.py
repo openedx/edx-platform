@@ -178,6 +178,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Returns the link for publishing a unit.
         """
+        self.scroll_to_element('.action-publish')
         return self.q(css='.action-publish').first
 
     def publish(self):
