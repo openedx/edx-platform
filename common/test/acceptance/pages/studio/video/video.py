@@ -574,7 +574,9 @@ class VideoComponentPage(VideoPage):
         if self.q(css=CLASS_SELECTORS['collapse_bar']).visible is False:
             self.click_button('collapse_link')
 
-        self.q(css=CLASS_SELECTORS['url_inputs']).nth(field_number - 1).fill(url)
+        element = self.q(css=CLASS_SELECTORS['url_inputs']).nth(field_number - 1)
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
+        element.fill(url)
         time.sleep(DELAY)
         self.wait_for_ajax()
 
