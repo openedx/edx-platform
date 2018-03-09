@@ -393,7 +393,7 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             user=entitlement.user,
             course_id=course_id
         )
-        is_enrolled_in_mode = user_enrollment_mode == entitlement.mode
+        is_enrolled_in_mode = is_active and (user_enrollment_mode == entitlement.mode)
         if is_course_run_entitlement_fulfillable(course_id, entitlement, search_time):
             if (is_enrolled_in_mode and
                     entitlement.enrollment_course_run and

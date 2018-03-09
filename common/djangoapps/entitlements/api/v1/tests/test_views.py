@@ -491,6 +491,33 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is not None
 
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
+    def test_user_already_enrolled_in_unpaid_mode(self, mock_get_course_runs):
+        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        mock_get_course_runs.return_value = self.return_values
+
+        url = reverse(
+            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
+            args=[str(course_entitlement.uuid)]
+        )
+
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.AUDIT)
+        data = {
+            'course_run_id': str(self.course.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        course_entitlement.refresh_from_db()
+
+        assert response.status_code == 201
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+        (enrolled_mode, is_active) = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        assert is_active and (enrolled_mode == course_entitlement.mode)
+        assert course_entitlement.enrollment_course_run is not None
+
+    @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_cannot_enroll_in_unknown_course_run_id(self, mock_get_course_runs):
         fake_course_str = str(self.course.id) + 'fake'
         fake_course_key = CourseKey.from_string(fake_course_str)

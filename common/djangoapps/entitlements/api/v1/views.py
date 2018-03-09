@@ -21,6 +21,7 @@ from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from student.models import CourseEnrollment
 from student.models import CourseEnrollmentException, AlreadyEnrolledError
+from course_modes.models import CourseMode
 
 log = logging.getLogger(__name__)
 
@@ -261,7 +262,10 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
             enrollment = CourseEnrollment.get_enrollment(user, course_run_key)
             if enrollment.mode == entitlement.mode:
                 entitlement.set_enrollment(enrollment)
-            # Else the User is already enrolled in another Mode and we should
+            elif enrollment.mode not in [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]:
+                enrollment.update_enrollment(mode=entitlement.mode)
+                entitlement.set_enrollment(enrollment)
+            # Else the User is already enrolled in another paid Mode and we should
             # not do anything else related to Entitlements.
         except CourseEnrollmentException:
             message = (
