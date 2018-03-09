@@ -56,11 +56,9 @@ from openedx.core.djangolib.markup import HTML
     <%include file="widgets/segment-io.html" />
 
     <%block name="header_extras"></%block>
-
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
-
     <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
@@ -68,19 +66,6 @@ from openedx.core.djangolib.markup import HTML
     <%static:js group='base_vendor'/>
 
     <%static:webpack entry="commons"/>
-
-    <%block name='page_bundle'>
-      <script type="text/javascript">
-      require(['js/factories/base'], function () {
-          require(['js/models/course'], function(Course) {
-              % if context_course:
-                  window.course = new Course(window.pageFactoryArguments['ContextCourse']);
-              % endif
-              <%block name='requirejs'></%block>
-          });
-      });
-      </script>
-    </%block>
 
     <script type="text/javascript">
       window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
@@ -158,6 +143,18 @@ from openedx.core.djangolib.markup import HTML
     % if user.is_authenticated():
       <%static:invoke_page_bundle page_name='js/sock'/>
     % endif
+    <%block name='page_bundle'>
+      <script type="text/javascript">
+      require(['js/factories/base'], function () {
+          require(['js/models/course'], function(Course) {
+              % if context_course:
+                  window.course = new Course(window.pageFactoryArguments['ContextCourse']);
+              % endif
+              <%block name='requirejs'></%block>
+          });
+      });
+      </script>
+    </%block>
     <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
   </body>
