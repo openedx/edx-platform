@@ -14,6 +14,7 @@ from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
     FunctionArea,
     OrganizationPartner,
+    OrganizationMetric
 )
 
 
@@ -61,7 +62,13 @@ class CurrencyAdmin(admin.ModelAdmin):
     list_display = ('country', 'name', 'alphabetic_code', )
 
 
-class OraganizationAdmin(admin.ModelAdmin):
+class OrganizationMetricAdmin(admin.ModelAdmin):
+    list_display = ('org', 'user', 'submission_date', 'actual_data', 'effective_date', 'total_clients',
+                    'total_employees', 'local_currency', 'total_revenue', 'total_donations', 'total_expenses',
+                    'total_program_expenses')
+
+
+class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('label', 'admin', 'country', 'unclaimed_org_admin_email', 'founding_year', )
 
 
@@ -83,7 +90,8 @@ admin.site.register(TotalEmployee, TotalEmployeeAdmin)
 admin.site.register(PartnerNetwork, PartnerNetworkAdmin)
 admin.site.register(EducationLevel, EnglishProficiencyAdmin)
 admin.site.register(EnglishProficiency, EnglishProficiencyAdmin)
-admin.site.register(Organization, OraganizationAdmin)
+admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(UserExtendedProfile, UserExtendedProfileAdmin)
 admin.site.register(FunctionArea, FunctionAreaAdmin)
 admin.site.register(OrganizationPartner, OrganizationPartnerAdmin)
+admin.site.register(OrganizationMetric, OrganizationMetricAdmin)
