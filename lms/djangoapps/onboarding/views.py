@@ -217,7 +217,7 @@ def organization(request):
     initial = {
         'country': COUNTRIES.get(_organization.country),
         'is_org_url_exist': '1' if _organization.url else '0',
-        'partner_networks': _organization.organization_partners.values_list('partner', flat=True),
+        'partner_networks': _organization.get_active_partners(),
     }
 
     if request.method == 'POST':
@@ -305,9 +305,7 @@ def get_country_names(request):
 def org_detail_survey(request):
     user_extended_profile = request.user.extended_profile
     are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
-
-    latest_survey = OrganizationMetric.objects.filter(org=user_extended_profile.organization,
-                                                      user=request.user).last()
+    latest_survey = OrganizationMetric.objects.filter(org=user_extended_profile.organization).last()
 
     initial = {
         'actual_data': '1' if latest_survey and latest_survey.actual_data else '0',
@@ -392,6 +390,8 @@ def update_account_settings(request):
 
             if not are_forms_complete :
                 return redirect(reverse('organization'))
+
+            return redirect(reverse('update_account_settings'))
 
     else:
         form = forms.UpdateRegModelForm(

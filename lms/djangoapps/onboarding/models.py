@@ -2,7 +2,10 @@ import logging
 import uuid
 
 import re
-from dateutil.relativedelta import relativedelta
+
+from pytz import utc
+
+from constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
 from datetime import datetime
 from django.contrib.auth.models import User
 from simple_history import register
@@ -205,6 +208,10 @@ class Organization(TimeStampedModel):
         """
         return "%s" % self.admin.email if self.admin else "Administrator not assigned yet."
 
+    def get_active_partners(self):
+        """ Return list of active organization partners"""
+        return self.organization_partners.filter(end_date__gt=datetime.utcnow().date()).values_list('partner', flat=True)
+
     def __str__(self):
         return self.label
 
@@ -219,18 +226,37 @@ class OrganizationPartner(models.Model):
     end_date = models.DateTimeField()
 
     @classmethod
-    def update_organization_partners(cls, organization, partners):
+    def update_organization_partners(cls, organization, partners, removed_partners):
         """
         Add/Update partners data or an organization
         """
-        cls.objects.filter(organization=organization).delete()
 
-        _partners = PartnerNetwork.objects.filter(code__in=partners)
+        # Set unchecked partners end date to today
+        cls.objects.filter(organization=organization,
+            partner__in=removed_partners, end_date__gt=datetime.utcnow().date()).update(
+            end_date=datetime.now(utc).date())
 
+        # Mark removed partner affliation flag to False if not selected in any organization
+        _removed_partners = PartnerNetwork.objects.filter(code__in=removed_partners)
+        for partner in _removed_partners:
+            p = cls.objects.filter(partner=partner.code).first()
+            if not p:
+                partner.is_partner_affiliated = False
+                partner.save()
+
+        # Get already added partners for an organization
+        no_updated_selections = cls.objects.filter(organization=organization,
+            partner__in=partners, end_date__gt=datetime.utcnow().date()).values_list('partner', flat=True)
+
+        # Filter out new/reselected Partners
+        new_selections = [p for p in partners if p not in no_updated_selections]
+        _partners = PartnerNetwork.objects.filter(code__in=new_selections)
+
+        # Add new/reselected Partners and mark network as affiliated
         lst_to_create = []
         for partner in _partners:
             start_date = datetime.now()
-            end_date = start_date + relativedelta(years=100)
+            end_date = ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
             obj = cls(organization=organization, partner=partner.code, start_date=start_date, end_date=end_date)
             lst_to_create.append(obj)
 
