@@ -160,6 +160,44 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])
 
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'NUMERIC': 3})
+    def test_not_enough_numeric_characters(self):
+        self.url_params['password'] = u'thishouldfail½2'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more numbers)",
+        )
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'NUMERIC': 3})
+    def test_enough_numeric_characters(self):
+        self.url_params['password'] = u'thisShouldPass½33'  # This unicode 1/2 should count as a numeric value here
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'ALPHABETIC': 3})
+    def test_not_enough_alphabetic_characters(self):
+        self.url_params['password'] = '123456ab'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more letters)",
+        )
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'ALPHABETIC': 3})
+    def test_enough_alphabetic_characters(self):
+        self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {
         'PUNCTUATION': 3,
         'WORDS': 3,
