@@ -198,14 +198,12 @@ class CourseModeTarget(Target):
         return "{}-{}".format(self.target_type, self.track.mode_slug)  # pylint: disable=no-member
 
     def long_display(self):
-        all_modes = CourseMode.objects.filter(
-            course_id=self.track.course_id,
-            mode_slug=self.track.mode_slug,  # pylint: disable=no-member
-        )
-        return "Course mode: {}, Currencies: {}".format(
-            self.track.mode_display_name,  # pylint: disable=no-member
-            ", ".join([mode.currency for mode in all_modes])
-        )
+        course_mode = self.track
+        long_course_mode_display = 'Course mode: {}'.format(course_mode.mode_display_name)
+        if course_mode.mode_slug not in CourseMode.AUDIT_MODES:
+            mode_currency = 'Currency: {}'.format(course_mode.currency)
+            long_course_mode_display = '{}, {}'.format(long_course_mode_display, mode_currency)
+        return long_course_mode_display
 
     @classmethod
     def ensure_valid_mode(cls, mode_slug, course_id):
