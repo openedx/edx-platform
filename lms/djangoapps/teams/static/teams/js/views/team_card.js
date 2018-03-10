@@ -114,7 +114,7 @@
                 if (this.memberships > 1) {
                     this.$el.html(this.template({roomID: this.roomID, teamID: this.teamID, nodeBBUrl: this.nodeBBUrl}));
                 } else {
-                    this.$el.html('<p class="meta-detail team-group">You can not start discussion until more members join this team.<p>');
+                    this.$el.html('<p class="meta-detail team-group">You can not start discussion until more members join this team.</p>');
                 }
             }
         });

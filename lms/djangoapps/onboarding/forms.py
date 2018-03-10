@@ -500,9 +500,10 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
             organization.save()
 
         partners = request.POST.getlist('partner_networks')
+        removed_partners = request.POST.get('removed_org_partners', '').split(",")
 
-        if partners:
-            OrganizationPartner.update_organization_partners(organization, partners)
+        if partners or removed_partners:
+            OrganizationPartner.update_organization_partners(organization, partners, removed_partners)
 
 
 class RegModelForm(BaseOnboardingModelForm):
@@ -1140,7 +1141,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
 
     def save(self, request):
         user_extended_profile = request.user.extended_profile
-
+        self.instance.pk = None
         org_detail = super(OrganizationMetricModelForm, self).save(commit=False)
         org_detail.user = request.user
         org_detail.org = user_extended_profile.organization

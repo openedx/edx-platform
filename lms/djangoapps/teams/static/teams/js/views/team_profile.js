@@ -4,6 +4,7 @@
 (function(define) {
     'use strict';
     define([
+        'jquery',
         'backbone',
         'underscore',
         'gettext',
@@ -14,7 +15,7 @@
         'text!teams/templates/team-profile.underscore',
         'text!teams/templates/team-member.underscore'
     ],
-        function(Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
+        function($, Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
                   teamTemplate, teamMemberTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
@@ -81,14 +82,27 @@
                 renderTeamMembers: function() {
                     var view = this;
                     _.each(this.model.get('membership'), function(membership) {
-                        HtmlUtils.append(
-                            view.$('.members-info'),
-                            HtmlUtils.template(teamMemberTemplate)({
-                                imageUrl: membership.user.profile_image.image_url_medium,
-                                username: membership.user.username,
-                                memberProfileUrl: '/u/' + membership.user.username
-                            })
-                        );
+                        $.post({
+                            url: '/philu/api/profile/data',
+                            data: {
+                                username: membership.user.username
+                            },
+                            success: function(data) {
+                                HtmlUtils.append(
+                                    view.$('.members-info'),
+                                    HtmlUtils.template(teamMemberTemplate)({
+                                        imageUrl: data.payload.picture !== "" ?
+                                            data.payload.picture :
+                                            membership.user.profile_image.image_url_medium,
+                                        username: membership.user.username,
+                                        memberProfileUrl: data.payload.profileUrl
+                                    })
+                                );
+                            },
+                            error: function(err) {
+                                console.error("Error: " + err)
+                            }
+                        });
                     });
                 },
 
