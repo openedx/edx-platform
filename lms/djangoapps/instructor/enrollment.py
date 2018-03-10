@@ -51,11 +51,12 @@ class EmailEnrollmentState(object):
             # is_active is `None` if the user is not enrolled in the course
             exists_ce = is_active is not None and is_active
             full_name = user.profile.name
+            ceas = CourseEnrollmentAllowed.for_user(user).filter(course_id=course_id).all()
         else:
             mode = None
             exists_ce = False
             full_name = None
-        ceas = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=email).all()
+            ceas = CourseEnrollmentAllowed.objects.filter(email=email, course_id=course_id).all()
         exists_allowed = ceas.exists()
         state_auto_enroll = exists_allowed and ceas[0].auto_enroll
 

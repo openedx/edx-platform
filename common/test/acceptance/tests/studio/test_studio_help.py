@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
+from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudioFrontend
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import (
@@ -600,7 +600,7 @@ class AssetIndexHelpTest(StudioCourseTest):
     """
     def setUp(self):  # pylint: disable=arguments-differ
         super(AssetIndexHelpTest, self).setUp()
-        self.course_asset_index_page = AssetIndexPage(
+        self.course_asset_index_page = AssetIndexPageStudioFrontend(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -624,25 +624,6 @@ class AssetIndexHelpTest(StudioCourseTest):
             test=self,
             page=self.course_asset_index_page,
             href=expected_url,
-        )
-
-    def test_asset_index_side_bar_help(self):
-        """
-        Scenario: Help link in sidebar links is working on 'Files & Uploads' page
-        Given that I am on the 'Files & Uploads' page.
-        And I want help about the process
-        And I click the 'Learn more about managing files' in the sidebar links
-        Then Help link should open.
-        And help url should be correct
-        """
-        expected_url = _get_expected_documentation_url('/course_assets/course_files.html')
-
-        # Assert that help link is correct.
-        assert_side_bar_help_link(
-            test=self,
-            page=self.course_asset_index_page,
-            href=expected_url,
-            help_text='Learn more about managing files'
         )
 
 

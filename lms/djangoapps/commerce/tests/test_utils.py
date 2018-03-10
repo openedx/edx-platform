@@ -103,16 +103,43 @@ class EcommerceServiceTests(TestCase):
         self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
-    @ddt.data(['TESTSKU'], ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'])
-    def test_get_checkout_page_url(self, skus):
+    def test_get_order_dashboard_url(self):
+        """Verify that the proper order dashboard url is returned."""
+        url = EcommerceService().get_order_dashboard_url()
+        expected_url = 'http://ecommerce_url/dashboard/orders/'
+        self.assertEqual(url, expected_url)
+
+    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    @ddt.data(
+        {
+            'skus': ['TESTSKU']
+        },
+        {
+            'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3']
+        },
+        {
+            'skus': ['TESTSKU'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
+        },
+        {
+            'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
+        }
+    )
+    def test_get_checkout_page_url(self, skus, program_uuid=None):
         """ Verify the checkout page URL is properly constructed and returned. """
-        url = EcommerceService().get_checkout_page_url(*skus)
+        url = EcommerceService().get_checkout_page_url(*skus, program_uuid=program_uuid)
         config = CommerceConfiguration.current()
         expected_url = '{root}{basket_url}?{skus}'.format(
             basket_url=config.MULTIPLE_ITEMS_BASKET_PAGE_URL,
             root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
             skus=urlencode({'sku': skus}, doseq=True),
         )
+        if program_uuid:
+            expected_url = '{expected_url}&basket={program_uuid}'.format(
+                expected_url=expected_url,
+                program_uuid=program_uuid
+            )
         self.assertEqual(url, expected_url)
 
 

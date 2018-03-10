@@ -20,7 +20,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from contentstore.config.models import NewAssetsPageFlag
 from contentstore.utils import reverse_course_url
 from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
 from edxmako.shortcuts import render_to_response
@@ -102,7 +101,6 @@ def _asset_index(request, course_key):
 
     return render_to_response('asset_index.html', {
         'language_code': request.LANGUAGE_CODE,
-        'waffle_flag_enabled': NewAssetsPageFlag.feature_enabled(course_key),
         'context_course': course_module,
         'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
         'chunk_size_in_mbs': settings.UPLOAD_CHUNK_SIZE_IN_MB,

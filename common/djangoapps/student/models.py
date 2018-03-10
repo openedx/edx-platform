@@ -30,7 +30,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import IntegrityError, models
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -477,9 +477,39 @@ def user_pre_save_callback(sender, **kwargs):
 @receiver(post_save, sender=User)
 def user_post_save_callback(sender, **kwargs):
     """
-    Emit analytics events after saving the User.
+    When a user is modified and either its `is_active` state or email address
+    is changed, and the user is, in fact, active, then check to see if there
+    are any courses that it needs to be automatically enrolled in.
+
+    Additionally, emit analytics events after saving the User.
     """
     user = kwargs['instance']
+
+    changed_fields = user._changed_fields
+
+    if 'is_active' in changed_fields or 'email' in changed_fields:
+        if user.is_active:
+            ceas = CourseEnrollmentAllowed.for_user(user).filter(auto_enroll=True)
+
+            for cea in ceas:
+                enrollment = CourseEnrollment.enroll(user, cea.course_id)
+
+                manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(user.email)
+                if manual_enrollment_audit is not None:
+                    # get the enrolled by user and reason from the ManualEnrollmentAudit table.
+                    # then create a new ManualEnrollmentAudit table entry for the same email
+                    # different transition state.
+                    ManualEnrollmentAudit.create_manual_enrollment_audit(
+                        manual_enrollment_audit.enrolled_by,
+                        user.email,
+                        ALLOWEDTOENROLL_TO_ENROLLED,
+                        manual_enrollment_audit.reason,
+                        enrollment
+                    )
+
+    # Because `emit_field_changed_events` removes the record of the fields that
+    # were changed, wait to do that until after we've checked them as part of
+    # the condition on whether we want to check for automatic enrollments.
     # pylint: disable=protected-access
     emit_field_changed_events(
         user,
@@ -1067,7 +1097,7 @@ class CourseEnrollment(models.Model):
         through some sort of approval process before being activated. If you
         don't need this functionality, just call `enroll()` instead.
 
-        Returns a CoursewareEnrollment object.
+        Returns a CourseEnrollment object.
 
         `user` is a Django User object. If it hasn't been saved yet (no `.id`
                attribute), this method will automatically save it before
@@ -1077,6 +1107,9 @@ class CourseEnrollment(models.Model):
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
+
+        If the enrollment is done due to a CourseEnrollmentAllowed, the CEA will be
+        linked to the user being enrolled so that it can't be used by other users.
         """
         # If we're passing in a newly constructed (i.e. not yet persisted) User,
         # save it to the database so that it can have an ID that we can throw
@@ -1096,11 +1129,18 @@ class CourseEnrollment(models.Model):
             }
         )
 
+        # If there was an unlinked CEA, it becomes linked now
+        CourseEnrollmentAllowed.objects.filter(
+            email=user.email,
+            course_id=course_key,
+            user__isnull=True
+        ).update(user=user)
+
         return enrollment
 
     @classmethod
     def get_enrollment(cls, user, course_key):
-        """Returns a CoursewareEnrollment object.
+        """Returns a CourseEnrollment object.
 
         Args:
             user (User): The user associated with the enrollment.
@@ -1258,7 +1298,7 @@ class CourseEnrollment(models.Model):
         """
         Enroll a user in a course. This saves immediately.
 
-        Returns a CoursewareEnrollment object.
+        Returns a CourseEnrollment object.
 
         `user` is a Django User object. If it hasn't been saved yet (no `.id`
                attribute), this method will automatically save it before
@@ -1342,7 +1382,7 @@ class CourseEnrollment(models.Model):
         error rate is high. For that reason, we supress User lookup errors by
         default.
 
-        Returns a CoursewareEnrollment object. If the User does not exist and
+        Returns a CourseEnrollment object. If the User does not exist and
         `ignore_errors` is set to `True`, it will return None.
 
         `email` Email address of the User to add to enroll in the course.
@@ -1974,11 +2014,20 @@ class CourseEnrollmentAllowed(models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
     The user may or may not (yet) exist.  Enrollment by users listed in this table is allowed
-    even if the enrollment time window is past.
+    even if the enrollment time window is past.  Once an enrollment from this list effectively happens,
+    the object is marked with the student who enrolled, to prevent students from changing e-mails and
+    enrolling many accounts through the same e-mail.
     """
     email = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     auto_enroll = models.BooleanField(default=0)
+    user = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        help_text="First user which enrolled in the specified course through the specified e-mail. "
+                  "Once set, it won't change."
+    )
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
@@ -1987,6 +2036,21 @@ class CourseEnrollmentAllowed(models.Model):
 
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
+
+    @classmethod
+    def for_user(cls, user):
+        """
+        Returns the CourseEnrollmentAllowed objects that can effectively be used by a particular `user`.
+        This includes the ones that match the user's e-mail and excludes those CEA which were already consumed
+        by a different user.
+        """
+        return cls.objects.filter(email=user.email).filter(Q(user__isnull=True) | Q(user=user))
+
+    def valid_for_user(self, user):
+        """
+        Returns True if the CEA is usable by the given user, or False if it was already consumed by another user.
+        """
+        return self.user is None or self.user == user
 
     @classmethod
     def may_enroll_and_unenrolled(cls, course_id):

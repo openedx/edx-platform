@@ -1,11 +1,22 @@
 """ Unit tests for custom UserProfile properties. """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import ddt
-
 from django.test import TestCase
-from openedx.core.djangolib.testing.utils import skip_unless_lms
+from django.test.utils import override_settings
+from mock import patch
 
-from ..utils import validate_social_link, format_social_link
+from completion import models
+from completion.test_utils import CompletionWaffleTestMixin
+from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from ..utils import format_social_link, validate_social_link
 
 
 @ddt.ddt
@@ -51,3 +62,77 @@ class UserAccountSettingsTest(TestCase):
         self.assertEqual(is_valid_expected, self.validate_social_link(platform_name, link_input))
 
         self.assertEqual(formatted_link_expected, format_social_link(platform_name, link_input))
+
+
+@ddt.ddt
+class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMixin, TestCase):
+    """
+    Test completion utility functions
+    """
+    def setUp(self):
+        """
+        Creates a test course that can be used for non-destructive tests
+        """
+        super(CompletionUtilsTestCase, self).setUp()
+        self.override_waffle_switch(True)
+        self.engaged_user = UserFactory.create()
+        self.cruft_user = UserFactory.create()
+        self.course = self.create_test_course()
+        self.submit_faux_completions()
+
+    def create_test_course(self):
+        """
+        Create, populate test course.
+        """
+        course = CourseFactory.create()
+        with self.store.bulk_operations(course.id):
+            self.chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+            self.vertical1 = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+            self.vertical2 = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+        course.children = [self.chapter]
+        self.chapter.children = [self.sequential]
+        self.sequential.children = [self.vertical1, self.vertical2]
+
+        if hasattr(self, 'user_one'):
+            CourseEnrollment.enroll(self.engaged_user, course.id)
+        if hasattr(self, 'user_two'):
+            CourseEnrollment.enroll(self.cruft_user, course.id)
+        return course
+
+    def submit_faux_completions(self):
+        """
+        Submit completions (only for user_one)g
+        """
+        for block in self.course.children[0].children[0].children:
+            models.BlockCompletion.objects.submit_completion(
+                user=self.engaged_user,
+                course_key=self.course.id,
+                block_key=block.location,
+                completion=1.0
+            )
+
+    @override_settings(LMS_ROOT_URL='test_url:9999')
+    @patch('completion.waffle.get_current_site')
+    @ddt.data(True, False)
+    def test_retrieve_last_sitewide_block_completed(self, use_username, get_patched_current_site):  # pylint: disable=unused-argument
+        """
+        Test that the method returns a URL for the "last completed" block
+        when sending a user object
+        """
+        block_url = retrieve_last_sitewide_block_completed(
+            self.engaged_user.username if use_username else self.engaged_user
+        )
+        empty_block_url = retrieve_last_sitewide_block_completed(
+            self.cruft_user.username if use_username else self.cruft_user
+        )
+        self.assertEqual(
+            block_url,
+            u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+                org=self.course.location.course_key.org,
+                course=self.course.location.course_key.course,
+                run=self.course.location.course_key.run,
+                vertical_id=self.vertical2.location.block_id,
+            )
+        )
+        self.assertEqual(empty_block_url, None)

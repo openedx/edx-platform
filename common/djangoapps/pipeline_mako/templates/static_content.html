@@ -164,7 +164,7 @@ source, template_path = Loader(engine).load_template_source(path)
     </script>
 </%def>
 
-<%def name="invoke_page_bundle(page_name, class_name)">
+<%def name="invoke_page_bundle(page_name, class_name=None)">
     <%doc>
       Loads Javascript onto your page synchronously.
       Uses RequireJS in development and a plain script tag in production.
@@ -174,16 +174,18 @@ source, template_path = Loader(engine).load_template_source(path)
     <%
         body = capture(caller.body)
     %>
-    <script type="text/javascript">
-        if (typeof pageFactoryArguments == "undefined") {
-            var pageFactoryArguments = {};
-        }
-        % if body:
-        pageFactoryArguments['${class_name | n, js_escaped_string}'] = [${ body | n, decode.utf8 }];
-        % else:
-        pageFactoryArguments['${class_name | n, js_escaped_string}'] = [];
-        % endif
-    </script>
+    % if class_name:
+        <script type="text/javascript">
+            if (typeof pageFactoryArguments == "undefined") {
+                var pageFactoryArguments = {};
+            }
+            % if body:
+                pageFactoryArguments['${class_name | n, js_escaped_string}'] = [${ body | n, decode.utf8 }];
+            % else:
+                pageFactoryArguments['${class_name | n, js_escaped_string}'] = [];
+            % endif
+        </script>
+    % endif
     <%self:webpack entry="${page_name}"/>
 </%def>
 

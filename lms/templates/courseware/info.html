@@ -58,8 +58,15 @@ from openedx.core.djangolib.markup import HTML, Text
     >
       <div class="home">
         <div class="page-header-main">
-            <h2 class="hd hd-2 page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}
-              <div class="page-subtitle">${course.display_name_with_default}</div>
+            <h2 class="hd hd-2 page-title">
+              % if show_org:
+                ${_("Welcome to {org}'s {course_title}!").format(org=course.display_org_with_default, course_title=course_title)}
+              % else:
+                ${_("Welcome to {course_title}!").format(course_title=course_title)}
+              % endif
+              % if show_subtitle:
+                <div class="page-subtitle">${course_subtitle}</div>
+              % endif
             </h2>
         </div>
         % if resume_course_url and user_is_enrolled:

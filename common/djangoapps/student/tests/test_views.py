@@ -39,7 +39,7 @@ from util.milestones_helpers import (get_course_milestones,
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 PASSWORD = 'test'
 
@@ -823,7 +823,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         course_key = course.id
         block_keys = [
-            course_key.make_usage_key('video', unicode(number))
+            ItemFactory.create(
+                category='video',
+                parent_location=course.location,
+                display_name='Video {0}'.format(unicode(number))
+            ).location
             for number in xrange(5)
         ]
 
@@ -892,7 +896,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             # Submit completed course blocks in even-numbered courses.
             if isEven(i):
                 block_keys = [
-                    course_key.make_usage_key('video', unicode(number))
+                    ItemFactory.create(
+                        category='video',
+                        parent_location=course.location,
+                        display_name='Video {0}'.format(unicode(number))
+                    ).location
                     for number in xrange(5)
                 ]
                 last_completed_block_string = str(block_keys[-1])
