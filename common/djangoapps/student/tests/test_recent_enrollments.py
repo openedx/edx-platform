@@ -2,14 +2,12 @@
 Tests for the recently enrolled messaging within the Dashboard.
 """
 import datetime
-import json
 import unittest
 
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.timezone import now
-from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
