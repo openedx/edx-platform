@@ -177,8 +177,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
             response,
             "Thank you for enrolling in:".format(course_name=self.course.display_name)
         )
-        
-        # self.assertEqual(True, response.content)
+
         self.assertContains(
             response,
             ' and '.join(enrollment.course.display_name for enrollment in recent_course_enrollments[::-1])
