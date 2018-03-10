@@ -77,6 +77,7 @@ class CourseEndingTest(TestCase):
         course = Mock(
             end_of_course_survey_url=survey_url,
             certificates_display_behavior='end',
+            self_paced=False,
             id=CourseLocator(org="x", course="y", run="z"),
         )
 
@@ -172,7 +173,7 @@ class CourseEndingTest(TestCase):
         )
 
         # Test a course that doesn't have a survey specified
-        course2 = Mock(end_of_course_survey_url=None, id=CourseLocator(org="a", course="b", run="c"))
+        course2 = Mock(end_of_course_survey_url=None, self_paced=False, id=CourseLocator(org="a", course="b", run="c"))
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
             'download_url': download_url, 'mode': 'honor'
@@ -215,6 +216,33 @@ class CourseEndingTest(TestCase):
             }
         )
 
+        course_self_paced = Mock(self_paced=True, id=CourseLocator(org="n", course="m", run="o"))
+        cert_status = None
+        self.assertEqual(
+            _cert_info(user, course_self_paced, cert_status),
+            {
+                'status': 'unavailable',
+                'show_survey_button': False,
+                'can_unenroll': True,
+            }
+        )
+
+        cert_status = {
+            'status': 'unavailable',
+            'mode': 'honor',
+        }
+        self.assertEqual(
+            _cert_info(user, course_self_paced, cert_status),
+            {
+                'status': 'unavailable',
+                'show_survey_button': False,
+                'can_unenroll': True,
+                'linked_in_url': None,
+                'mode': 'honor',
+            }
+
+        )
+
     @ddt.data(
         (0.70, 0.60),
         (0.60, 0.70),
@@ -237,6 +265,7 @@ class CourseEndingTest(TestCase):
         course = Mock(
             end_of_course_survey_url=survey_url,
             certificates_display_behavior='end',
+            self_paced=False,
             id=CourseLocator(org="x", course="y", run="z"),
         )
 
@@ -271,6 +300,7 @@ class CourseEndingTest(TestCase):
         course = Mock(
             end_of_course_survey_url=survey_url,
             certificates_display_behavior='end',
+            self_paced=False,
             id=CourseLocator(org="x", course="y", run="z"),
         )
         cert_status = {'status': 'generating', 'mode': 'honor'}
