@@ -18,83 +18,6 @@ UPLOAD_SUFFIX = '/data/uploads/studio-uploads/'
 UPLOAD_FILE_DIR = Path(__file__).abspath().dirname().dirname().dirname().dirname() + UPLOAD_SUFFIX  # pylint: disable=no-value-for-parameter
 
 
-class AssetIndexPage(CoursePage):
-    """
-    The Files and Uploads page for a course in Studio
-    """
-
-    url_path = "assets"
-    type_filter_element = '#js-asset-type-col'
-
-    @property
-    def url(self):
-        """
-        Construct a URL to the page within the course.
-        """
-        # TODO - is there a better way to make this agnostic to the underlying default module store?
-        default_store = os.environ.get('DEFAULT_STORE', 'draft')
-        course_key = CourseLocator(
-            self.course_info['course_org'],
-            self.course_info['course_num'],
-            self.course_info['course_run'],
-            deprecated=(default_store == 'draft')
-        )
-        url = "/".join([BASE_URL, self.url_path, urllib.quote_plus(unicode(course_key))])
-        return url if url[-1] == '/' else url + '/'
-
-    @wait_for_js
-    def is_browser_on_page(self):
-        return all([
-            self.q(css='body.view-uploads').present,
-            self.q(css='.page-header').present,
-            not self.q(css='div.ui-loading').visible,
-        ])
-
-    @wait_for_js
-    def type_filter_on_page(self):
-        """
-        Checks that type filter is in table header.
-        """
-        return self.q(css=self.type_filter_element).present
-
-    @wait_for_js
-    def type_filter_header_label_visible(self):
-        """
-        Checks type filter label is added and visible in the pagination header.
-        """
-        return self.q(css='span.filter-column').visible
-
-    @wait_for_js
-    def click_type_filter(self):
-        """
-        Clicks type filter menu.
-        """
-        self.q(css=".filterable-column .nav-item").click()
-
-    @wait_for_js
-    def select_type_filter(self, filter_number):
-        """
-        Selects Type filter from dropdown which filters the results.
-        Returns False if no filter.
-        """
-        self.wait_for_ajax()
-        if self.q(css=".filterable-column .nav-item").is_present():
-            if not self.q(css=self.type_filter_element + " .wrapper-nav-sub").visible:
-                self.q(css=".filterable-column > .nav-item").first.click()
-            self.wait_for_element_visibility(
-                self.type_filter_element + " .wrapper-nav-sub", "Type Filter promise satisfied.")
-            self.q(css=self.type_filter_element + " .column-filter-link").nth(filter_number).click()
-            self.wait_for_ajax()
-            return True
-        return False
-
-    def return_results_set(self):
-        """
-        Returns the asset set from the page
-        """
-        return self.q(css="#asset-table-body tr").results
-
-
 class AssetIndexPageStudioFrontend(CoursePage):
     """The Files and Uploads page for a course in Studio"""
 
@@ -170,7 +93,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
                 lambda el: el.text == '0 files'
             ).present,
             self.q(css='.SFE-wrapper h4').filter(
-                lambda el: el.text == 'No files were found for this filter.'
+                lambda el: el.text == 'No files were found.'
             ).present,
         ])
 
@@ -178,7 +101,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
     def is_no_results_clear_filter_button_on_page(self):
         """Checks that no results clear filter button is on page."""
         return self.q(css='.SFE-wrapper button.btn').filter(
-            lambda el: el.text == 'Clear filter'
+            lambda el: el.text == 'Clear all filters'
         ).present
 
     @property
@@ -253,13 +176,13 @@ class AssetIndexPageStudioFrontend(CoursePage):
     @wait_for_js
     def click_clear_filters_button(self):
         """
-        Clicks 'Clear filters=' button.
-        Returns False if no 'Clear filter' button.
+        Clicks 'Clear all filters' button.
+        Returns False if no 'Clear all filters' button.
         """
         self.wait_for_ajax()
         if self.is_no_results_clear_filter_button_on_page():
             self.q(css='.SFE-wrapper button.btn').filter(
-                lambda el: el.text == 'Clear filter'
+                lambda el: el.text == 'Clear all filters'
             ).click()
             self.wait_for_ajax()
             return True

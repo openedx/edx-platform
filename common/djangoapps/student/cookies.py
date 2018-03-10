@@ -8,10 +8,12 @@ import time
 
 import six
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.dispatch import Signal
 from django.utils.http import cookie_date
 
+from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from student.models import CourseEnrollment
 
 CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
@@ -58,6 +60,8 @@ def set_logged_in_cookies(request, response, user):
         "username": "test-user",
         "header_urls": {
             "account_settings": "https://example.com/account/settings",
+            "resume_block":
+                "https://example.com//courses/org.0/course_0/Run_0/jump_to/i4x://org.0/course_0/vertical/vertical_4"
             "learner_profile": "https://example.com/u/test-user",
             "logout": "https://example.com/logout"
         }
@@ -163,6 +167,12 @@ def get_user_info_cookie_data(request):
         header_urls['account_settings'] = reverse('account_settings')
         header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.username})
     except NoReverseMatch:
+        pass
+
+    # Add 'resume course' last completed block
+    try:
+        header_urls['resume_block'] = retrieve_last_sitewide_block_completed(user)
+    except User.DoesNotExist:
         pass
 
     # Convert relative URL paths to absolute URIs

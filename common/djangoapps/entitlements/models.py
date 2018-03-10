@@ -420,6 +420,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
     """
     Table recording support interactions with an entitlement
     """
+    # Reasons deprecated
     LEAVE_SESSION = 'LEAVE'
     CHANGE_SESSION = 'CHANGE'
     LEARNER_REQUEST_NEW = 'LEARNER_NEW'
@@ -432,10 +433,21 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         (COURSE_TEAM_REQUEST_NEW, u'Course team requested entitlement for learnerg'),
         (OTHER, u'Other'),
     )
+
+    REISSUE = 'REISSUE'
+    CREATE = 'CREATE'
+    ENTITLEMENT_SUPPORT_ACTIONS = (
+        (REISSUE, 'Re-issue entitlement'),
+        (CREATE, 'Create new entitlement'),
+    )
+
     entitlement = models.ForeignKey('entitlements.CourseEntitlement')
     support_user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
+    #Deprecated: use action instead.
     reason = models.CharField(max_length=15, choices=ENTITLEMENT_SUPPORT_REASONS)
+    action = models.CharField(max_length=15, choices=ENTITLEMENT_SUPPORT_ACTIONS)
+
     comments = models.TextField(null=True)
 
     unenrolled_run = models.ForeignKey(
@@ -452,3 +464,17 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
             self.support_user,
             self.reason,
         )
+
+    @classmethod
+    def get_support_actions_list(cls):
+        """
+        Method for retrieving a serializable version of the entitlement support reasons
+
+        Returns
+            list: Containing the possible support actions
+        """
+        return [
+            action[0]  # get just the action code, not the human readable description.
+            for action
+            in cls.ENTITLEMENT_SUPPORT_ACTIONS
+        ]

@@ -260,11 +260,19 @@ def _can_enroll_courselike(user, courselike):
         reg_method_ok = True
 
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
-    # they may enroll. Note that as dictated by the legacy database schema, the filter
-    # call includes a `course_id` kwarg which requires a CourseKey.
+    # they may enroll, except if the CEA has already been used by a different user.
+    # Note that as dictated by the legacy database schema, the filter call includes
+    # a `course_id` kwarg which requires a CourseKey.
     if user is not None and user.is_authenticated():
-        if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key):
+        cea = CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key).first()
+        if cea and cea.valid_for_user(user):
             return ACCESS_GRANTED
+        elif cea:
+            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+                cea.user.id,
+                user.id,
+            ))
+            return ACCESS_DENIED
 
     if _has_staff_access_to_descriptor(user, courselike, course_key):
         return ACCESS_GRANTED

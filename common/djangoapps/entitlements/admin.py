@@ -58,7 +58,6 @@ class CourseEntitlementSupportDetailAdmin(admin.ModelAdmin):
     """
     list_display = ('entitlement',
                     'support_user',
-                    'reason',
                     'comments',
                     'unenrolled_run')
     raw_id_fields = ('unenrolled_run', 'support_user',)

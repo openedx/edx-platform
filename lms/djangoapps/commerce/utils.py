@@ -55,6 +55,14 @@ class EcommerceService(object):
         """
         return urljoin(self.ecommerce_url_root, ecommerce_page_url)
 
+    def get_order_dashboard_url(self):
+        """ Return the URL to the ecommerce dashboard orders page.
+
+        Returns:
+            String: order dashboard url.
+        """
+        return self.get_absolute_ecommerce_url(CommerceConfiguration.DEFAULT_ORDER_DASHBOARD_URL)
+
     def get_receipt_page_url(self, order_number):
         """
         Gets the URL for the Order Receipt page hosted by the ecommerce service.
@@ -88,22 +96,31 @@ class EcommerceService(object):
         """
         return self.get_absolute_ecommerce_url(self.config.single_course_checkout_page)
 
-    def get_checkout_page_url(self, *skus):
+    def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
 
         Args:
             skus (list): List of SKUs associated with products to be added to basket
+            program_uuid (string): The UUID of the program, if applicable
 
         Returns:
             Absolute path to the ecommerce checkout page showing basket that contains specified products.
 
         Example:
             http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD
+            http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD&bundle=3bdf1dd1-49be-4a15-9145-38901f578c5a
         """
-        return '{checkout_page_path}?{skus}'.format(
+        program_uuid = kwargs.get('program_uuid')
+        url = '{checkout_page_path}?{skus}'.format(
             checkout_page_path=self.get_absolute_ecommerce_url(self.config.MULTIPLE_ITEMS_BASKET_PAGE_URL),
             skus=urlencode({'sku': skus}, doseq=True),
         )
+        if program_uuid:
+            url = '{url}&bundle={program_uuid}'.format(
+                url=url,
+                program_uuid=program_uuid
+            )
+        return url
 
     def upgrade_url(self, user, course_key):
         """

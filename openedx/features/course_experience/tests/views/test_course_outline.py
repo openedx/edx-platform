@@ -3,12 +3,14 @@ Tests for the Course Outline view and supporting views.
 """
 import datetime
 import json
+import re
 
 from completion import waffle
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.test import override_settings
 from mock import Mock, patch
 from six import text_type
 
@@ -60,8 +62,16 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
                 sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
-                vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
+                vertical = ItemFactory.create(
+                    category='vertical',
+                    parent_location=sequential.location,
+                    display_name="Vertical 1"
+                )
+                vertical2 = ItemFactory.create(
+                    category='vertical',
+                    parent_location=sequential2.location,
+                    display_name="Vertical 2"
+                )
             course.children = [chapter]
             chapter.children = [sequential, sequential2]
             sequential.children = [vertical]
@@ -393,6 +403,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         ),
         active=True
     )
+    @override_settings(LMS_BASE='test_url:9999')
     @patch('completion.waffle.get_current_site')
     def test_resume_course_with_completion_api(self, get_patched_current_site):
         """
@@ -517,6 +528,40 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+
+    @override_switch(
+        '{}.{}'.format(
+            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_COMPLETION_TRACKING
+        ),
+        active=True
+    )
+    def test_course_outline_auto_open(self):
+        """
+        Tests that the course outline auto-opens to the first unit
+        in a course if a user has no completion data, and to the
+        last-accessed unit if a user does have completion data.
+        """
+        def get_sequential_button(url, is_hidden):
+            is_hidden_string = "is-hidden" if is_hidden else ""
+
+            return "<olclass=\"outline-itemaccordion-panel" + is_hidden_string + "\"" \
+                   "id=\"" + url + "_contents\"" \
+                   "role=\"region\"" \
+                   "aria-labelledby=\"" + url + "\"" \
+                   ">"
+
+        with patch('openedx.features.course_experience.waffle.new_course_outline_enabled', Mock(return_value=True)):
+            # Course tree
+            course = self.course
+            chapter = course.children[0]
+            sequential1 = chapter.children[0]
+            sequential2 = chapter.children[1]
+
+            response_content = self.client.get(course_home_url(course)).content
+            stripped_response = text_type(re.sub("\\s+", "", response_content), "utf-8")
+
+            self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
+            self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
 
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase):
