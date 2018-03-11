@@ -90,6 +90,7 @@
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
 # Diego Rojas <diego.rojas@edunext.co>, 2017
+# Eduardo Zambrano <ezambrano@edx.org>, 2018
 # Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
 # Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
@@ -8760,21 +8761,21 @@ msgstr "Certificado Comprado"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "Change or Leave Session"
-msgstr "Cambiar o Abandonar la Sesión"
+msgstr "Cambia o abandona la edición"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
-"Debe seleccionar una sesión antes de {expiration_date} para acceder al "
+"Debes seleccionar una edición antes de {expiration_date} para acceder al "
 "curso."
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You can no longer change sessions."
-msgstr "Ya no puede cambiar sesión"
+msgstr "Ya no puede cambiar ediciones."
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You can change sessions until {expiration_date}."
-msgstr "Puede cambiar sesiones hasta {expiration_date}."
+msgstr "Puede cambiar ediciones hasta {expiration_date}."
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -8798,7 +8799,7 @@ msgstr "Ver curso"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select a session:"
-msgstr "Seleccione una sesión:"
+msgstr "Selecciona una edición:"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -8830,11 +8831,11 @@ msgstr "Cambiar a una sesión diferente o salir de la sección actual."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "To access the course, select a session."
-msgstr "Para acceder al curso seleccione una sesión."
+msgstr "Para acceder al curso selecciona una edición."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Session Selection Dropdown for {courseName}"
-msgstr "Menú desplegable para seleccionar la sesión del curso {courseName}"
+msgstr "Menú desplegable para seleccionar la edición del curso {courseName}"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "{sessionDates} - Currently Selected"
@@ -8846,11 +8847,11 @@ msgstr "{sessionDates} (Abierto hasta {enrollmentEnd})"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "More sessions coming soon"
-msgstr "Próximamente más sesiones"
+msgstr "Próximamente más ediciones"
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Leave the current session and decide later"
-msgstr "Salir de la sesión actual y decidir luego."
+msgstr "Salir de la edición actual y decidir luego."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 #: test_root/staticfiles/templates/learner_dashboard/empty_programs_list.underscore

@@ -11290,7 +11290,7 @@ msgid ""
 "We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
 " know what you can look forward to in week %(week_num)s:"
 msgstr ""
-"¡Esperamos que te esté gustando<strong>%(course_name)s</strong>! Queremos "
+"¡Esperamos que te esté gustando <strong>%(course_name)s</strong>! Queremos "
 "informarte sobre lo que puedes esperar en la semana %(week_num)s:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -11411,9 +11411,9 @@ msgid ""
 "%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
 " is learning."
 msgstr ""
-"¿Recuerdas cuando te inscribiste a <strong>%(course_name)s</strong> "
-"en%(platform_name)s? Nosotros sí, ¡y nos alegra tenerte por aquí! Ven a ver "
-"lo que todo el mundo está aprendiendo."
+"¿Recuerdas cuando te inscribiste en <strong>%(course_name)s</strong> en "
+"%(platform_name)s? Nosotros sí, ¡y nos alegra tenerte por aquí! Ven a ver lo"
+" que todo el mundo está aprendiendo."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
