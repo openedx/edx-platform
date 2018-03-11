@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-05 18:47+0000\n"
-"PO-Revision-Date: 2018-03-05 18:47:02.545215\n"
+"POT-Creation-Date: 2018-03-11 20:36+0000\n"
+"PO-Revision-Date: 2018-03-11 20:36:53.092153\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -11218,17 +11218,6 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/certificates.html
-#: cms/templates/container.html cms/templates/course_outline.html
-#: cms/templates/group_configurations.html cms/templates/library.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -11237,6 +11226,17 @@ msgstr ""
 #: wiki/templates/wiki/settings.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
@@ -14394,7 +14394,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_name}!"
+msgid "Welcome to {org}'s {course_title}!"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid "Welcome to {course_title}!"
 msgstr ""
 
 #: lms/templates/courseware/info.html
@@ -16101,6 +16105,7 @@ msgid "Programs"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -16139,6 +16144,10 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
+msgstr ""
+
+#: lms/templates/header/user_dropdown.html
+msgid "Resume your last course"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -19275,88 +19284,6 @@ msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Upload New File"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Help adding Files and Uploads"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Adding Files for Your Course"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"To add files to use in your course, click {em_start}Upload New File{em_end}."
-" Then follow the prompts to upload a file from your computer."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"{em_start}Caution{em_end}: {platform_name} recommends that you limit the "
-"file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
-"audio files. You should use a third party service to host multimedia files."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"The course image, textbook chapters, and files that appear on your Course "
-"Handouts sidebar also appear in this list."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Using File URLs"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
-"image from a component, a course update, or a course handout."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}Web URL{em_end} value to reference the file or image only "
-"from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
-" Web URL no longer works for external access to a file."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"To copy a URL, double click the value in the URL column, then copy the "
-"selected text."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Learn more about managing files"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "close"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Max per-file size: {max_filesize}MB"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "URL:"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Choose File"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Your file has been deleted."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "close alert"
 msgstr ""
 
 #: cms/templates/certificates.html
