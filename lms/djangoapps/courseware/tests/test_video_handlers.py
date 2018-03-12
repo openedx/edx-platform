@@ -243,7 +243,17 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertEqual(json.loads(response.body), ['uk'])
 
-    def test_multiple_available_translations(self):
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    def test_multiple_available_translations(self, mock_get_video_transcript_content):
+        mock_get_video_transcript_content.return_value = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+
         good_sjson = _create_file(json.dumps(self.subs))
 
         # Upload english transcript.
@@ -253,12 +263,14 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         _upload_file(self.srt_file, self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
 
         self.item.sub = _get_subs_id(good_sjson.name)
+        self.item.edx_video_id = 'an-edx-video-id'
 
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
 
     @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
     @ddt.data(
         (
@@ -289,11 +301,19 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
                 'uk': True,
                 'ro': False,
             },
-            ['en', 'uk', 'de']
+            ['en', 'uk', 'de', 'ro']
         ),
     )
     @ddt.unpack
-    def test_val_available_translations(self, val_transcripts, sub, transcripts, result, mock_get_transcript_languages):
+    def test_val_available_translations(
+        self,
+        val_transcripts,
+        sub,
+        transcripts,
+        result,
+        mock_get_transcript_languages,
+        mock_get_video_transcript_content
+    ):
         """
         Tests available translations with video component's and val's transcript languages
         while the feature is enabled.
@@ -310,9 +330,18 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
             _upload_sjson_file(sjson_transcript, self.item_descriptor.location)
             sub = _get_subs_id(sjson_transcript.name)
 
+        mock_get_video_transcript_content.return_value = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
         mock_get_transcript_languages.return_value = val_transcripts
         self.item.transcripts = transcripts
         self.item.sub = sub
+        self.item.edx_video_id = 'an-edx-video-id'
         # Make request to available translations dispatch.
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
@@ -373,16 +402,12 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch=self.dispatch)
         self.assertEqual(json.loads(response.body), [lang])
 
-    @ddt.data(True, False)
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
-    def test_multiple_available_translations(self, feature_enabled,
-                                             mock_val_video_transcript_feature, mock_get_transcript_languages):
+    def test_multiple_available_translations(self, mock_get_transcript_languages):
         """
-        Verify that the available translations dispatch works as expected for multiple translations with
-        or without enabling the edx-val video transcripts feature.
+        Verify that available translations dispatch works as expected for multiple
+        translations and returns both content store and edxval translations.
         """
-        mock_val_video_transcript_feature.return_value = feature_enabled
         # Assuming that edx-val has German translation available for this video component.
         mock_get_transcript_languages.return_value = ['de']
         en_translation = _create_srt_file()
