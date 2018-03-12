@@ -646,6 +646,49 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_run=course_run_string
         )
 
+
+    @ddt.data(
+        (
+            {"ENABLE_FILTER_COURSES_BY_USER_LANG": True},
+            [
+                {
+                    "org": "DC",
+                    "number": "001",
+                    "run": "2013",
+                    "name": "Man of Steel",
+                    "language": "en"
+                },
+                {
+                    "org": "DC",
+                    "number": "002",
+                    "run": "2016",
+                    "name": "Dawn of Justice",
+                    "language": "ar"
+                },
+            ],
+            "Dawn of Justice"
+        )
+    )
+    @ddt.unpack
+    @override_settings(LANGUAGE_CODE='en')
+    def test_load_student_dashboard_filter_courses_by_user_lang(self, config, courses_detail, expected_result):
+        with patch.dict('django.conf.settings.FEATURES', config):
+            for course_detail in courses_detail:
+                course = CourseFactory(
+                    org=course_detail["org"],
+                    number=course_detail["number"],
+                    run=course_detail["run"],
+                    name=course_detail["name"]
+                )
+
+                CourseEnrollmentFactory(course_id=course.id, user=self.user)
+                course_overview = CourseOverview.get_from_id(course.id)
+                course_overview.language = course_detail["language"]
+                course_overview.save()
+            
+            response = self.client.get(self.path)
+            self.assertNotIn(response.content, expected_result)
+
     def test_view_course_appears_on_dashboard(self):
         """
         When a course doesn't have completion data, its course card should

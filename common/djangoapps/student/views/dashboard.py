@@ -35,6 +35,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_visible_sessions_for_entitlement
 )
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -732,10 +733,12 @@ def student_dashboard(request):
     ):
         preferred_lang = request.LANGUAGE_CODE
         for enrollment in course_enrollments[:]:
-            course_language = modulestore().get_course(enrollment.course_id).language
+            course = modulestore().get_course(enrollment.course_id)
+            course_overview = CourseOverview.get_from_id(course.id)
+            course_language = course_overview.language
 
             if course_language != preferred_lang:
-                course_enrollments.remove(enrollment)
+                course_enrollments.remove(enrollment)\
 
     context = {
         'urls': urls,
