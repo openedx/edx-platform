@@ -646,7 +646,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_run=course_run_string
         )
 
-
     @ddt.data(
         (
             {"ENABLE_FILTER_COURSES_BY_USER_LANG": True},
@@ -685,7 +684,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 course_overview = CourseOverview.get_from_id(course.id)
                 course_overview.language = course_detail["language"]
                 course_overview.save()
-            
+
             response = self.client.get(self.path)
             self.assertNotIn(response.content, expected_result)
 
