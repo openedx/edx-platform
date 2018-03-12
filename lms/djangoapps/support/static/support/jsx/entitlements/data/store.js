@@ -6,6 +6,10 @@ import rootReducer from './reducers/index';
 const defaultState = {
   entitlements: [],
   error: '',
+  modal: {
+    isOpen: false,
+    activeEntitlement: null
+  }
 };
 
 const configureStore = initialState =>

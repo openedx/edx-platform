@@ -3,6 +3,14 @@ export const entitlementActions = {
     SUCCESS: 'FETCH_ENTITLEMENTS_SUCCESS',
     FAILURE: 'FETCH_ENTITLEMENTS_FAILURE',
   },
+  reissue: {
+    SUCCESS: 'REISSUE_ENTITLEMENT_SUCCESS',
+    FAILURE: 'REISSUE_ENTITLEMENT_FAILURE',
+  },
+  create: {
+    SUCCESS: 'CREATE_ENTITLEMENT_SUCCESS',
+    FAILURE: 'CREATE_ENTITLEMENT_FAILURE',
+  },
 };
 
 export const errorActions = {
@@ -10,3 +18,8 @@ export const errorActions = {
   DISMISS_ERROR: 'DISMISS_ERROR',
 };
 
+export const modalActions = {
+  OPEN_REISSUE_MODAL: 'OPEN_REISSUE_MODAL',
+  OPEN_CREATION_MODAL: 'OPEN_CREATION_MODAL',
+  CLOSE_MODAL: 'CLOSE_MODAL',
+};

@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { StatusAlert } from '@edx/paragon';
+import { Button, StatusAlert } from '@edx/paragon';
 import SearchContainer from '../Search/SearchContainer.jsx';
 import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableContainer.jsx';
+import EntitlementModalContainer from '../Modal/ModalContainer.jsx';
 
 const Main = props => (
   <div>
@@ -17,13 +18,20 @@ const Main = props => (
       Entitlement Support Page
     </h2>
     <SearchContainer />
-    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} />
+    <Button
+      className={['btn', 'btn-primary']}
+      label= "Create New Entitlement"
+      onClick={props.openCreationModal}
+    />
+    <EntitlementModalContainer />
+    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} parentSelector='body'/>
   </div>
 );
 
 Main.propTypes = {
   errorMessage: PropTypes.string.isRequired,
   dismissErrorMessage: PropTypes.func.isRequired,
+  openCreationModal: PropTypes.func.isRequired,
   ecommerceUrl: PropTypes.string.isRequired,
 };
 

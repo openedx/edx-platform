@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { Hyperlink, Table } from '@edx/paragon';
+import { Button, Hyperlink, Table } from '@edx/paragon';
 
 const entitlementColumns = [
   {
@@ -45,7 +45,7 @@ const entitlementColumns = [
   },
 ];
 
-const parseEntitlementData = (entitlements, ecommerceUrl) =>
+const parseEntitlementData = (entitlements, ecommerceUrl, openReissueModal) =>
   entitlements.map((entitlement) => {
     const { expiredAt, created, modified, orderNumber } = entitlement;
     return Object.assign({}, entitlement, {
@@ -56,13 +56,17 @@ const parseEntitlementData = (entitlements, ecommerceUrl) =>
         destination={`${ecommerceUrl}${orderNumber}/`}
         content={orderNumber || ''}
       />,
-      button: <div> No Actions Currently Available </div>,
+      button: <Button
+        className = {['btn', 'btn-primary']}
+        label = "Reissue"
+        onClick = { openReissueModal.bind(entitlement)}
+      />
     });
   });
 
 const EntitlementSupportTable = props => (
   <Table
-    data={parseEntitlementData(props.entitlements, props.ecommerceUrl)}
+    data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueModal)}
     columns={entitlementColumns}
   />
 );
@@ -86,6 +90,7 @@ EntitlementSupportTable.propTypes = {
     user: PropTypes.string.isRequired,
   })).isRequired,
   ecommerceUrl: PropTypes.string.isRequired,
+  openReissueModal: PropTypes.func.isRequired
 };
 
 export default EntitlementSupportTable;
