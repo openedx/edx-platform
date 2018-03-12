@@ -360,11 +360,10 @@ class VideoStudentViewHandlers(object):
                 mimetype
             )
         elif dispatch.startswith('available_translations'):
-            feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id) and not is_bumper
             available_translations = self.available_translations(
                 transcripts,
                 verify_assets=True,
-                include_val_transcripts=feature_enabled
+                is_bumper=is_bumper
             )
             if available_translations:
                 response = Response(json.dumps(available_translations))
