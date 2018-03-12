@@ -7,6 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.pages.common.utils import click_css, sync_on_notification
+from common.test.acceptance.tests.helpers import click_and_wait_for_window
 
 NAV_HELP_NOT_SIGNED_IN_CSS = '.nav-item.nav-not-signedin-help a'
 NAV_HELP_CSS = '.nav-item.nav-account-help a'
@@ -288,8 +289,9 @@ class HelpMixin(object):
         else:
             element_css = NAV_HELP_NOT_SIGNED_IN_CSS
 
-        self.q(css=element_css).first.click()
-        return self.q(css=element_css).results[0]
+        help_element = self.q(css=element_css).results[0]
+        click_and_wait_for_window(self, help_element)
+        return help_element
 
     def get_side_bar_help_element_and_click_help(self, as_list_item=False, index=-1):
         """
@@ -313,5 +315,5 @@ class HelpMixin(object):
             element_css = SIDE_BAR_HELP_CSS
 
         help_element = self.q(css=element_css).results[index]
-        help_element.click()
+        click_and_wait_for_window(self, help_element)
         return help_element
