@@ -1070,9 +1070,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
-        transcripts_info = self.get_transcripts_info()
-        available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
+        available_translations = self.available_translations(self.get_transcripts_info())
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations

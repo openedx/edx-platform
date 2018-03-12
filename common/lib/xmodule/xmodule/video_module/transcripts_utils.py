@@ -707,7 +707,7 @@ class VideoTranscriptsMixin(object):
     This is necessary for both VideoModule and VideoDescriptor.
     """
 
-    def available_translations(self, transcripts, verify_assets=None, include_val_transcripts=None):
+    def available_translations(self, transcripts, verify_assets=None, is_bumper=False):
         """
         Return a list of language codes for which we have transcripts.
 
@@ -729,39 +729,27 @@ class VideoTranscriptsMixin(object):
 
         sub, other_langs = transcripts["sub"], transcripts["transcripts"]
 
-        # If we're not verifying the assets, we just trust our field values
-        if not verify_assets:
-            if other_langs:
-                translations = list(other_langs)
+        if verify_assets:
+            all_langs = dict(**other_langs)
+            if sub:
+                all_langs.update({'en': sub})
+
+            for language, filename in all_langs.iteritems():
+                try:
+                    # for bumper videos, transcripts are stored in content store only
+                    if is_bumper:
+                        get_transcript_for_video(self.location, filename, filename, language)
+                    else:
+                        get_transcript(self, language)
+                except NotFoundError:
+                    continue
+
+                translations.append(language)
+        else:
+            # If we're not verifying the assets, we just trust our field values
+            translations = list(other_langs)
             if not translations or sub:
                 translations += ['en']
-            return translations
-
-        # If we've gotten this far, we're going to verify that the transcripts
-        # being referenced are actually either in the contentstore or in edx-val.
-        if include_val_transcripts:
-            translations = get_available_transcript_languages(edx_video_id=self.edx_video_id)
-
-        if sub:  # check if sjson exists for 'en'.
-            try:
-                Transcript.asset(self.location, sub, 'en')
-            except NotFoundError:
-                try:
-                    Transcript.asset(self.location, None, None, sub)
-                except NotFoundError:
-                    pass
-                else:
-                    translations.append('en')
-            else:
-                translations.append('en')
-
-        for lang in other_langs:
-            try:
-                Transcript.asset(self.location, None, None, other_langs[lang])
-            except NotFoundError:
-                continue
-
-            translations.append(lang)
 
         # to clean redundant language codes.
         return list(set(translations))
@@ -848,7 +836,7 @@ class VideoTranscriptsMixin(object):
             for language_code, transcript_file in transcripts.items() if transcript_file != ''
         }
 
-        # bumper transcripts are stored in content store so we don't need check them in val
+        # bumper transcripts are stored in content store so we don't need to include val transcripts
         if not is_bumper:
             transcript_languages = get_available_transcript_languages(edx_video_id=self.edx_video_id)
             # HACK Warning! this is temporary and will be removed once edx-val take over the
@@ -892,6 +880,10 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
 def get_transcript_for_video(video_location, subs_id, file_name, language):
     """
     Get video transcript from content store.
+
+    NOTE: Transcripts can be searched from content store by two ways:
+    1. by an id(a.k.a subs_id) which will be used to construct transcript filename
+    2. by providing transcript filename
 
     Arguments:
         video_location (Locator): Video location
