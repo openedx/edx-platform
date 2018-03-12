@@ -855,7 +855,8 @@ class LoncapaProblem(object):
             if item_xhtml is not None:
                 tree.append(item_xhtml)
 
-        if tree.tag in html_transforms:
+        # Do not transform in case of text element wrapped under svg element.
+        if tree.tag in html_transforms and not (tree.tag == 'text' and problemtree.getparent().tag == 'svg'):
             tree.tag = html_transforms[problemtree.tag]['tag']
         else:
             # copy attributes over if not innocufying
