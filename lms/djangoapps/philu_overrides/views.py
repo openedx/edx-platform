@@ -206,11 +206,21 @@ def courses_custom(request):
                 course.id.to_deprecated_string())
         with modulestore().bulk_operations(course_key):
             if has_access(request.user, 'load', course):
-                course.course_target = get_last_accessed_courseware(
+                access_link = get_last_accessed_courseware(
                     get_course_by_id(course_key, 0),
                     request,
                     request.user
                     )
+
+                first_chapter_url, first_section = get_course_related_keys(
+                    request, get_course_by_id(course_key, 0))
+                first_target = reverse('courseware_section', args=[
+                        course.id.to_deprecated_string(),
+                        first_chapter_url,
+                        first_section
+                    ])
+
+                course.course_target = access_link if access_link != None else first_target
             else:
                 course.course_target = '/courses/' + course.id.to_deprecated_string()
 
