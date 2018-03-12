@@ -31,6 +31,11 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
   <%static:invoke_page_bundle page_name="js/pages/textbooks" class_name="TextbooksFactory">
      ${textbooks | n, dump_js_escaped_json}
   </%static:invoke_page_bundle>
+  ${static.renderReact(
+    component="WrappedNoTextbooks",
+    id="no-textbooks-container",
+    store="StudioStore"
+  )}
 </%block>
 
 <%block name="content">
@@ -55,11 +60,7 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
   <div class="wrapper-content wrapper">
     <section class="content">
       <article class="content-primary" role="main">
-        ${static.renderReact(
-          component="WrappedNoTextbooks",
-          id="no-textbooks-container",
-          store="StudioStore"
-        )}
+        <div id="no-textbooks-container"></div>
       </article>
       <aside class="content-supplementary" role="complementary">
         <div class="bit">
