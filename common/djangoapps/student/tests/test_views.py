@@ -578,18 +578,24 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertIn('You can no longer change sessions.', response.content)
         self.assertIn('Related Programs:', response.content)
 
-    @patch.object(CourseOverview, 'get_from_id')
+    @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
     @patch.object(BulkEmailFlag, 'feature_enabled')
-    def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_course_overview):
+    def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_get_course_runs):
         """
         Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
         """
         mock_email_feature.return_value = True
-        mock_course_overview.return_value = CourseOverviewFactory(
+        course_overview = CourseOverviewFactory(
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         course_enrollment = CourseEnrollmentFactory(user=self.user)
-        CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
+        course_runs = [{
+            'key': unicode(course_overview.id),
+            'uuid': entitlement.course_uuid
+        }]
+        mock_get_course_runs.return_value = course_runs
+
         response = self.client.get(self.path)
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
 
