@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-05 18:47+0000\n"
-"PO-Revision-Date: 2018-03-05 18:47:02.545215\n"
+"POT-Creation-Date: 2018-03-11 20:36+0000\n"
+"PO-Revision-Date: 2018-03-11 20:36:53.092153\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -12415,17 +12415,6 @@ msgstr "حشلث رخف بخعري"
 msgid "Content"
 msgstr "ذخرفثرف"
 
-#: cms/templates/asset_index.html cms/templates/certificates.html
-#: cms/templates/container.html cms/templates/course_outline.html
-#: cms/templates/group_configurations.html cms/templates/library.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "مخشيهرل"
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -12435,6 +12424,17 @@ msgstr "مخشيهرل"
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "سثففهرلس"
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "مخشيهرل"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
@@ -16012,8 +16012,12 @@ msgstr ""
 "رخص!{link_end}"
 
 #: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_name}!"
-msgstr "صثمذخوث فخ {org}'س {course_name}!"
+msgid "Welcome to {org}'s {course_title}!"
+msgstr "صثمذخوث فخ {org}'س {course_title}!"
+
+#: lms/templates/courseware/info.html
+msgid "Welcome to {course_title}!"
+msgstr "صثمذخوث فخ {course_title}!"
 
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -17942,6 +17946,7 @@ msgid "Programs"
 msgstr "حقخلقشوس"
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -17981,6 +17986,10 @@ msgstr "اخص هف صخقنس"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "سذاخخمس"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Resume your last course"
+msgstr "قثسعوث غخعق مشسف ذخعقسث"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -21464,102 +21473,6 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "بهمثس & عحمخشيس"
-
-#: cms/templates/asset_index.html
-msgid "Upload New File"
-msgstr "عحمخشي رثص بهمث"
-
-#: cms/templates/asset_index.html
-msgid "Help adding Files and Uploads"
-msgstr "اثمح شييهرل بهمثس شري عحمخشيس"
-
-#: cms/templates/asset_index.html
-msgid "Adding Files for Your Course"
-msgstr "شييهرل بهمثس بخق غخعق ذخعقسث"
-
-#: cms/templates/asset_index.html
-msgid ""
-"To add files to use in your course, click {em_start}Upload New File{em_end}."
-" Then follow the prompts to upload a file from your computer."
-msgstr ""
-"فخ شيي بهمثس فخ عسث هر غخعق ذخعقسث, ذمهذن {em_start}عحمخشي رثص بهمث{em_end}."
-" فاثر بخممخص فاث حقخوحفس فخ عحمخشي ش بهمث بقخو غخعق ذخوحعفثق."
-
-#: cms/templates/asset_index.html
-msgid ""
-"{em_start}Caution{em_end}: {platform_name} recommends that you limit the "
-"file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
-"audio files. You should use a third party service to host multimedia files."
-msgstr ""
-"{em_start}ذشعفهخر{em_end}: {platform_name} قثذخووثريس فاشف غخع مهوهف فاث "
-"بهمث سهظث فخ {em_start}10 وز{em_end}. هر شييهفهخر, يخ رخف عحمخشي دهيثخ خق "
-"شعيهخ بهمثس. غخع ساخعمي عسث ش فاهقي حشقفغ سثقدهذث فخ اخسف وعمفهوثيهش بهمثس."
-
-#: cms/templates/asset_index.html
-msgid ""
-"The course image, textbook chapters, and files that appear on your Course "
-"Handouts sidebar also appear in this list."
-msgstr ""
-"فاث ذخعقسث هوشلث, فثطفزخخن ذاشحفثقس, شري بهمثس فاشف شححثشق خر غخعق ذخعقسث "
-"اشريخعفس سهيثزشق شمسخ شححثشق هر فاهس مهسف."
-
-#: cms/templates/asset_index.html
-msgid "Using File URLs"
-msgstr "عسهرل بهمث عقمس"
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
-"image from a component, a course update, or a course handout."
-msgstr ""
-"عسث فاث {em_start}{studio_name} عقم{em_end} دشمعث فخ مهرن فخ فاث بهمث خق "
-"هوشلث بقخو ش ذخوحخرثرف, ش ذخعقسث عحيشفث, خق ش ذخعقسث اشريخعف."
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}Web URL{em_end} value to reference the file or image only "
-"from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
-" Web URL no longer works for external access to a file."
-msgstr ""
-"عسث فاث {em_start}صثز عقم{em_end} دشمعث فخ قثبثقثرذث فاث بهمث خق هوشلث خرمغ "
-"بقخو خعفسهيث خب غخعق ذخعقسث. {em_start}رخفث:{em_end} هب غخع مخذن ش بهمث, فاث"
-" صثز عقم رخ مخرلثق صخقنس بخق ثطفثقرشم شذذثسس فخ ش بهمث."
-
-#: cms/templates/asset_index.html
-msgid ""
-"To copy a URL, double click the value in the URL column, then copy the "
-"selected text."
-msgstr ""
-"فخ ذخحغ ش عقم, يخعزمث ذمهذن فاث دشمعث هر فاث عقم ذخمعور, فاثر ذخحغ فاث "
-"سثمثذفثي فثطف."
-
-#: cms/templates/asset_index.html
-msgid "Learn more about managing files"
-msgstr "مثشقر وخقث شزخعف وشرشلهرل بهمثس"
-
-#: cms/templates/asset_index.html
-msgid "close"
-msgstr "ذمخسث"
-
-#: cms/templates/asset_index.html
-msgid "Max per-file size: {max_filesize}MB"
-msgstr "وشط حثق-بهمث سهظث: {max_filesize}وز"
-
-#: cms/templates/asset_index.html
-msgid "URL:"
-msgstr "عقم:"
-
-#: cms/templates/asset_index.html
-msgid "Choose File"
-msgstr "ذاخخسث بهمث"
-
-#: cms/templates/asset_index.html
-msgid "Your file has been deleted."
-msgstr "غخعق بهمث اشس زثثر يثمثفثي."
-
-#: cms/templates/asset_index.html
-msgid "close alert"
-msgstr "ذمخسث شمثقف"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"

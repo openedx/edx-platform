@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-05 18:46+0000\n"
-"PO-Revision-Date: 2018-03-05 18:47:02.413821\n"
+"POT-Creation-Date: 2018-03-11 20:36+0000\n"
+"PO-Revision-Date: 2018-03-11 20:36:53.132079\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -104,88 +104,6 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
 msgid "Files & Uploads"
-msgstr ""
-
-#: cms/templates/asset_index.html cms/templates/asset_index.html
-msgid "Upload New File"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Help adding Files and Uploads"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Adding Files for Your Course"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"To add files to use in your course, click {em_start}Upload New File{em_end}."
-" Then follow the prompts to upload a file from your computer."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"{em_start}Caution{em_end}: {platform_name} recommends that you limit the "
-"file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
-"audio files. You should use a third party service to host multimedia files."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"The course image, textbook chapters, and files that appear on your Course "
-"Handouts sidebar also appear in this list."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Using File URLs"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
-"image from a component, a course update, or a course handout."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}Web URL{em_end} value to reference the file or image only "
-"from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
-" Web URL no longer works for external access to a file."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"To copy a URL, double click the value in the URL column, then copy the "
-"selected text."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Learn more about managing files"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "close"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Max per-file size: {max_filesize}MB"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "URL:"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Choose File"
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "Your file has been deleted."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "close alert"
 msgstr ""
 
 #: cms/templates/certificates.html
