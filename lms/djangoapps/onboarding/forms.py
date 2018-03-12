@@ -748,7 +748,7 @@ class UpdateRegModelForm(RegModelForm):
 
 
 class OrganizationMetricModelForm(BaseOnboardingModelForm):
-    can_provide_info = forms.ChoiceField(label=ugettext_noop('Are you able to provide information requested bellow?'),
+    can_provide_info = forms.ChoiceField(label=ugettext_noop('Are you able to provide information requested below?'),
                                          choices=((1, ugettext_noop('Yes')), (0, ugettext_noop('No'))),
                                          label_suffix="*",
                                          widget=forms.RadioSelect,
