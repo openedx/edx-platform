@@ -121,7 +121,7 @@ def mark_user_chat_read(request):
 def get_user_data(request):
     """ Get the user profile data from NodeBB for current user """
     data_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/data'
-    username = request.user.username
+    username = request.POST.get("username")
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
     response = requests.post(data_endpoint,
         data={'_uid': 1, 'username': username},
