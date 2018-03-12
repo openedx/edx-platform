@@ -160,14 +160,12 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
         email_field = get_form_field_by_name(registration_fields, 'email')
         org_field = get_form_field_by_name(registration_fields, 'organization_name')
-        is_currently_employed_field = get_form_field_by_name(registration_fields, 'is_currently_employed')
         is_poc_field = get_form_field_by_name(registration_fields, 'is_poc')
         email_field['defaultValue'] = admin_email
         org_field['defaultValue'] = org_name
         is_poc_field['defaultValue'] = "1"
 
-        context['fields_to_disable'] = json.dumps([email_field['name'], org_field['name'],
-                                                   is_currently_employed_field['name'], is_poc_field['name']])
+        context['fields_to_disable'] = json.dumps([email_field['name'], org_field['name'], is_poc_field['name']])
 
     return render_to_response('student_account/login_and_register.html', context)
 
