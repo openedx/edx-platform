@@ -30,11 +30,12 @@ from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPart
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
+from util.password_policy_validators import password_max_length, password_min_length
 from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from ..accounts import (
-    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
+    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
 )
 from ..accounts.api import get_account_settings
@@ -612,7 +613,7 @@ class LoginSessionViewTest(UserAPITestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "max_length": PASSWORD_MAX_LENGTH,
+                    "max_length": password_max_length(),
                 },
                 "errorMessages": {},
                 "supplementalText": "",
@@ -1055,8 +1056,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"required": True,
                 u"label": u"Password",
                 u"restrictions": {
-                    'min_length': PASSWORD_MIN_LENGTH,
-                    'max_length': PASSWORD_MAX_LENGTH
+                    'min_length': password_min_length(),
+                    'max_length': password_max_length(),
                 },
             }
         )
