@@ -2,7 +2,7 @@
   <span class="team-member">
     <a class="member-profile" href="<%= memberProfileUrl %>">
       <p class="tooltip-custom"><%= username %></p>
-      <img class="image-url" src="<%= imageUrl %>" alt="profile page" style="max-width: 55px; max-height: 55px" />
+      <img class="image-url" src="<%= imageUrl %>" alt="profile page"/>
     </a>
   </span>
 </li>
