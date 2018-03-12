@@ -102,7 +102,7 @@ from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
-from util.password_policy_validators import validate_password_length, validate_password_strength
+from util.password_policy_validators import SecurityPolicyError, validate_password
 
 log = logging.getLogger("edx.student")
 
@@ -640,10 +640,7 @@ def create_account_with_params(request, params):
         log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
 
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
-    enforce_password_policy = (
-        settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False) and
-        not do_external_auth
-    )
+    enforce_password_policy = not do_external_auth
     # Can't have terms of service for certain SHIB users, like at Stanford
     registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     tos_required = (
@@ -660,7 +657,6 @@ def create_account_with_params(request, params):
         data=params,
         extra_fields=extra_fields,
         extended_profile_fields=extended_profile_fields,
-        enforce_username_neq_password=True,
         enforce_password_policy=enforce_password_policy,
         tos_required=tos_required,
     )
@@ -1128,72 +1124,6 @@ def uidb36_to_uidb64(uidb36):
     return uidb64
 
 
-def validate_password(password):
-    """
-    Validate password overall strength if ENFORCE_PASSWORD_POLICY is enable
-    otherwise only validate the length of the password.
-
-    Args:
-        password: the user's proposed new password.
-
-    Returns:
-        err_msg: an error message if there's a violation of one of the password
-            checks. Otherwise, `None`.
-    """
-
-    try:
-        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
-            validate_password_strength(password)
-        else:
-            validate_password_length(password)
-
-    except ValidationError as err:
-        return _('Password: ') + '; '.join(err.messages)
-
-
-def validate_password_security_policy(user, password):
-    """
-    Tie in password policy enforcement as an optional level of
-    security protection
-
-    Args:
-        user: the user object whose password we're checking.
-        password: the user's proposed new password.
-
-    Returns:
-        err_msg: an error message if there's a violation of one of the password
-            checks. Otherwise, `None`.
-    """
-
-    err_msg = None
-    # also, check the password reuse policy
-    if not PasswordHistory.is_allowable_password_reuse(user, password):
-        if user.is_staff:
-            num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
-        else:
-            num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-        err_msg = ungettext(
-            "You are re-using a password that you have used recently. "
-            "You must have {num} distinct password before reusing a previous password.",
-            "You are re-using a password that you have used recently. "
-            "You must have {num} distinct passwords before reusing a previous password.",
-            num_distinct
-        ).format(num=num_distinct)
-
-    # also, check to see if passwords are getting reset too frequent
-    if PasswordHistory.is_password_reset_too_soon(user):
-        num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-        err_msg = ungettext(
-            "You are resetting passwords too frequently. Due to security policies, "
-            "{num} day must elapse between password resets.",
-            "You are resetting passwords too frequently. Due to security policies, "
-            "{num} days must elapse between password resets.",
-            num_days
-        ).format(num=num_days)
-
-    return err_msg
-
-
 def password_reset_confirm_wrapper(request, uidb36=None, token=None):
     """
     A wrapper around django.contrib.auth.views.password_reset_confirm.
@@ -1229,14 +1159,15 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
     if request.method == 'POST':
         password = request.POST['new_password1']
-        valid_link = False
-        error_message = validate_password_security_policy(user, password)
-        if not error_message:
-            # if security is not violated, we need to validate password
-            error_message = validate_password(password)
-            if error_message:
-                # password reset link will be valid if there is no security violation
-                valid_link = True
+        valid_link = True  # password reset link will be valid if there is no security violation
+        error_message = None
+        try:
+            validate_password(password, user=user)
+        except SecurityPolicyError as err:
+            error_message = err.message
+            valid_link = False
+        except ValidationError as err:
+            error_message = err.message
 
         if error_message:
             # We have a password reset attempt which violates some security

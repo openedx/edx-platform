@@ -342,17 +342,16 @@ class TestPasswordHistory(LoginEnrollmentTestCase):
         self.assertIn(success_msg, resp.content)
 
     @ddt.data(
-        ('foo', 'foobar'),
-        ('', ''),
+        ('foo', 'foobar', 'Error in resetting your password. Please try again.'),
+        ('', '', 'Password: Invalid Length'),
     )
     @ddt.unpack
-    def test_password_reset_form_invalid(self, password1, password2):
+    def test_password_reset_form_invalid(self, password1, password2, err_msg):
         """
         Tests that password reset fail when providing bad passwords and error message is displayed
         to the user.
         """
         user_email, _ = self._setup_user()
-        err_msg = 'Error in resetting your password. Please try again.'
 
         # try to reset password, it should fail
         user = User.objects.get(email=user_email)
