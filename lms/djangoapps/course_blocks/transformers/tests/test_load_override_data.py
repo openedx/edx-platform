@@ -35,7 +35,8 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestOverrideDataTransformer, cls).setUpClass()
-        cls.learner = UserFactory.create(password="test")
+        cls.learner = UserFactory.create()
+        cls.learner2 = UserFactory.create()
 
     def setUp(self):
         super(TestOverrideDataTransformer, self).setUp()
@@ -49,9 +50,16 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
             self.learner.id, subsection.location, 'html', 'new_component'
         )
         CourseEnrollmentFactory.create(user=self.learner, course_id=self.course_key, is_active=True)
+        self.block = self.store.create_child(
+            self.learner2.id, subsection.location, 'html', 'new_component'
+        )
+        CourseEnrollmentFactory.create(user=self.learner2, course_id=self.course_key, is_active=True)
 
     @ddt.data(*REQUESTED_FIELDS)
     def test_transform(self, field):
+        """
+        assert that data transformed
+        """
         override_field_for_user(
             self.learner,
             self.block,
@@ -63,13 +71,39 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
         OverrideDataTransformer.collect(self.block_structure)
 
         # transform phase
-        OverrideDataTransformer().transform(
+        OverrideDataTransformer(self.learner).transform(
             usage_info=self.course_usage_key,
             block_structure=self.block_structure,
         )
 
         # verify overridden data
         assert get_override_for_user(self.learner, self.block, field) == expected_overrides.get(field)
+
+    @ddt.data(*REQUESTED_FIELDS)
+    def test_transform_for_selected_learner(self, field):
+        """
+        assert that data transformed for selected learner
+        """
+        override_field_for_user(
+            self.learner,
+            self.block,
+            field,
+            expected_overrides.get(field)
+        )
+
+        # collect phase
+        OverrideDataTransformer.collect(self.block_structure)
+
+        # transform phase
+        OverrideDataTransformer(self.learner).transform(
+            usage_info=self.course_usage_key,
+            block_structure=self.block_structure,
+        )
+
+        # verify learner has overridden data
+        assert get_override_for_user(self.learner, self.block, field) == expected_overrides.get(field)
+        # other learner2 dont have overridden data
+        assert get_override_for_user(self.learner2, self.block, field) is None
 
     def test_transform_all_fields(self):
         """Test overriding of all fields"""
@@ -85,7 +119,7 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
         OverrideDataTransformer.collect(self.block_structure)
 
         # transform phase
-        OverrideDataTransformer().transform(
+        OverrideDataTransformer(self.learner).transform(
             usage_info=self.course_usage_key,
             block_structure=self.block_structure,
         )
@@ -93,3 +127,29 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
         # verify overridden data
         for field in REQUESTED_FIELDS:
             assert get_override_for_user(self.learner, self.block, field) == expected_overrides.get(field)
+
+    def test_transform_all_fields_for_selected_learner(self):
+        """Test overriding of all fields"""
+        for field in REQUESTED_FIELDS:
+            override_field_for_user(
+                self.learner,
+                self.block,
+                field,
+                expected_overrides.get(field)
+            )
+
+        # collect phase
+        OverrideDataTransformer.collect(self.block_structure)
+
+        # transform phase
+        OverrideDataTransformer(self.learner).transform(
+            usage_info=self.course_usage_key,
+            block_structure=self.block_structure,
+        )
+
+        # verify overridden data
+        for field in REQUESTED_FIELDS:
+            # learner has overridden data
+            assert get_override_for_user(self.learner, self.block, field) == expected_overrides.get(field)
+            # other learner2 dont have overridden data
+            assert get_override_for_user(self.learner2, self.block, field) is None
