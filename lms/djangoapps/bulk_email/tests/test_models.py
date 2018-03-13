@@ -100,7 +100,36 @@ class CourseEmailTest(ModuleStoreTestCase):
         target = email.targets.all()[0]
         self.assertEqual(target.target_type, SEND_TO_TRACK)
         self.assertEqual(target.short_display(), 'track-test')
-        self.assertEqual(target.long_display(), 'Course mode: Test, Currencies: usd')
+        self.assertEqual(target.long_display(), 'Course mode: Test, Currency: usd')
+
+    @ddt.data(
+        CourseMode.AUDIT,
+        CourseMode.HONOR,
+    )
+    def test_track_target_with_free_mode(self, free_mode):
+        """
+        Tests that when emails are sent to a free track the track display
+        should not contain currency.
+        """
+        course = CourseFactory.create()
+        mode_display_name = free_mode.capitalize
+        course_id = course.id
+        sender = UserFactory.create()
+        to_option = 'track:{}'.format(free_mode)
+        subject = "dummy subject"
+        html_message = "<html>dummy message</html>"
+        CourseMode.objects.create(
+            mode_slug=free_mode,
+            mode_display_name=mode_display_name,
+            course_id=course_id,
+        )
+
+        email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
+        self.assertEqual(len(email.targets.all()), 1)
+        target = email.targets.all()[0]
+        self.assertEqual(target.target_type, SEND_TO_TRACK)
+        self.assertEqual(target.short_display(), 'track-{}'.format(free_mode))
+        self.assertEqual(target.long_display(), 'Course mode: {}'.format(mode_display_name))
 
     def test_cohort_target(self):
         course_id = CourseKey.from_string('abc/123/doremi')

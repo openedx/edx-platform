@@ -228,6 +228,56 @@ def get_course_enrollments(user, org_whitelist, org_blacklist):
             yield enrollment
 
 
+def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
+    """
+    Given a user, return a filtered set of his or her course entitlements.
+
+    Arguments:
+        user (User): the user in question.
+        org_whitelist (list[str]): If not None, ONLY entitlements of these orgs will be returned.
+        org_blacklist (list[str]): CourseEntitlements of these orgs will be excluded.
+
+    Returns:
+        generator[CourseEntitlement]: a sequence of entitlements to be displayed
+        on the user's dashboard.
+    """
+    course_entitlement_available_sessions = {}
+    unfulfilled_entitlement_pseudo_sessions = {}
+    course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
+    filtered_entitlements = []
+    pseudo_session = None
+    course_key_str = ''
+
+    for course_entitlement in course_entitlements:
+        course_entitlement.update_expired_at()
+        available_runs = get_visible_sessions_for_entitlement(course_entitlement)
+
+        if not course_entitlement.enrollment_course_run:
+            # Unfulfilled entitlements need a mock session for metadata
+            pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
+            unfulfilled_entitlement_pseudo_sessions[str(course_entitlement.uuid)] = pseudo_session
+
+        # Check the org of the Course and filter out entitlements that are not available.
+        if available_runs:
+            course_key_str = available_runs[0]['key']
+        elif pseudo_session:
+            course_key_str = pseudo_session['key']
+
+        if course_key_str:
+            # If there is no course_key_str at this point we will be unable to determine if it should be shown.
+            # Therefore it should be excluded by default.
+            course_run_key = CourseKey.from_string(course_key_str)
+            if org_whitelist and course_run_key.org not in org_whitelist:
+                continue
+            elif org_blacklist and course_run_key.org in org_blacklist:
+                continue
+
+            course_entitlement_available_sessions[str(course_entitlement.uuid)] = available_runs
+            filtered_entitlements.append(course_entitlement)
+
+    return filtered_entitlements, course_entitlement_available_sessions, unfulfilled_entitlement_pseudo_sessions
+
+
 def complete_course_mode_info(course_id, enrollment, modes=None):
     """
     We would like to compute some more information from the given course modes
@@ -513,17 +563,14 @@ def student_dashboard(request):
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
     # If an entitlement has no available sessions, pass through a mock course overview object
-    course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
-    course_entitlement_available_sessions = {}
-    unfulfilled_entitlement_pseudo_sessions = {}
-    for course_entitlement in course_entitlements:
-        course_entitlement.update_expired_at()
-        available_sessions = get_visible_sessions_for_entitlement(course_entitlement)
-        course_entitlement_available_sessions[str(course_entitlement.uuid)] = available_sessions
-        if not course_entitlement.enrollment_course_run:
-            # Unfulfilled entitlements need a mock session for metadata
-            pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
-            unfulfilled_entitlement_pseudo_sessions[str(course_entitlement.uuid)] = pseudo_session
+
+    (course_entitlements,
+     course_entitlement_available_sessions,
+     unfulfilled_entitlement_pseudo_sessions) = get_filtered_course_entitlements(
+        user,
+        site_org_whitelist,
+        site_org_blacklist
+    )
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-05 18:47+0000\n"
-"PO-Revision-Date: 2018-03-05 18:47:02.545215\n"
+"POT-Creation-Date: 2018-03-11 20:36+0000\n"
+"PO-Revision-Date: 2018-03-11 20:36:53.092153\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -14302,17 +14302,6 @@ msgstr "Pägé nöt föünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Content"
 msgstr "Çöntént Ⱡ'σяєм ιρѕυм #"
 
-#: cms/templates/asset_index.html cms/templates/certificates.html
-#: cms/templates/container.html cms/templates/course_outline.html
-#: cms/templates/group_configurations.html cms/templates/library.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -14322,6 +14311,17 @@ msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Séttïngs Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
@@ -18289,8 +18289,12 @@ msgstr ""
 "nöw!{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_name}!"
-msgstr "Wélçömé tö {org}'s {course_name}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Welcome to {org}'s {course_title}!"
+msgstr "Wélçömé tö {org}'s {course_title}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/courseware/info.html
+msgid "Welcome to {course_title}!"
+msgstr "Wélçömé tö {course_title}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -20551,6 +20555,7 @@ msgid "Programs"
 msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -20590,6 +20595,10 @@ msgstr "Höw ït Wörks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Sçhööls Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Resume your last course"
+msgstr "Résümé ýöür läst çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -24616,114 +24625,6 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "Fïlés & Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/asset_index.html
-msgid "Upload New File"
-msgstr "Ûplöäd Néw Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/asset_index.html
-msgid "Help adding Files and Uploads"
-msgstr "Hélp äddïng Fïlés änd Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: cms/templates/asset_index.html
-msgid "Adding Files for Your Course"
-msgstr "Àddïng Fïlés för Ýöür Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: cms/templates/asset_index.html
-msgid ""
-"To add files to use in your course, click {em_start}Upload New File{em_end}."
-" Then follow the prompts to upload a file from your computer."
-msgstr ""
-"Tö ädd fïlés tö üsé ïn ýöür çöürsé, çlïçk {em_start}Ûplöäd Néw Fïlé{em_end}."
-" Thén föllöw thé prömpts tö üplöäd ä fïlé fröm ýöür çömpütér. Ⱡ'σяєм #"
-
-#: cms/templates/asset_index.html
-msgid ""
-"{em_start}Caution{em_end}: {platform_name} recommends that you limit the "
-"file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
-"audio files. You should use a third party service to host multimedia files."
-msgstr ""
-"{em_start}Çäütïön{em_end}: {platform_name} réçömménds thät ýöü lïmït thé "
-"fïlé sïzé tö {em_start}10 MB{em_end}. Ìn äddïtïön, dö nöt üplöäd vïdéö ör "
-"äüdïö fïlés. Ýöü shöüld üsé ä thïrd pärtý sérvïçé tö höst mültïmédïä fïlés. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂є#"
-
-#: cms/templates/asset_index.html
-msgid ""
-"The course image, textbook chapters, and files that appear on your Course "
-"Handouts sidebar also appear in this list."
-msgstr ""
-"Thé çöürsé ïmägé, téxtßöök çhäptérs, änd fïlés thät äppéär ön ýöür Çöürsé "
-"Händöüts sïdéßär älsö äppéär ïn thïs lïst. Ⱡ'σяєм ιρѕυм ∂σ#"
-
-#: cms/templates/asset_index.html
-msgid "Using File URLs"
-msgstr "Ûsïng Fïlé ÛRLs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
-"image from a component, a course update, or a course handout."
-msgstr ""
-"Ûsé thé {em_start}{studio_name} ÛRL{em_end} välüé tö lïnk tö thé fïlé ör "
-"ïmägé fröm ä çömpönént, ä çöürsé üpdäté, ör ä çöürsé händöüt. Ⱡ'σяєм ιρѕυм "
-"∂σłσя#"
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}Web URL{em_end} value to reference the file or image only "
-"from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
-" Web URL no longer works for external access to a file."
-msgstr ""
-"Ûsé thé {em_start}Wéß ÛRL{em_end} välüé tö référénçé thé fïlé ör ïmägé önlý "
-"fröm öütsïdé öf ýöür çöürsé. {em_start}Nöté:{em_end} Ìf ýöü löçk ä fïlé, thé"
-" Wéß ÛRL nö löngér wörks för éxtérnäl äççéss tö ä fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
-
-#: cms/templates/asset_index.html
-msgid ""
-"To copy a URL, double click the value in the URL column, then copy the "
-"selected text."
-msgstr ""
-"Tö çöpý ä ÛRL, döüßlé çlïçk thé välüé ïn thé ÛRL çölümn, thén çöpý thé "
-"séléçtéd téxt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: cms/templates/asset_index.html
-msgid "Learn more about managing files"
-msgstr "Léärn möré äßöüt mänägïng fïlés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/templates/asset_index.html
-msgid "close"
-msgstr "çlösé Ⱡ'σяєм ιρѕ#"
-
-#: cms/templates/asset_index.html
-msgid "Max per-file size: {max_filesize}MB"
-msgstr "Mäx pér-fïlé sïzé: {max_filesize}MB Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: cms/templates/asset_index.html
-msgid "URL:"
-msgstr "ÛRL: Ⱡ'σяєм ι#"
-
-#: cms/templates/asset_index.html
-msgid "Choose File"
-msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: cms/templates/asset_index.html
-msgid "Your file has been deleted."
-msgstr "Ýöür fïlé häs ßéén délétéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: cms/templates/asset_index.html
-msgid "close alert"
-msgstr "çlösé älért Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"

@@ -8,6 +8,7 @@ authored by dstufft (https://github.com/dstufft)
 from __future__ import division
 
 import string
+import unicodedata
 
 from nltk.metrics.distance import edit_distance
 from django.conf import settings
@@ -63,7 +64,9 @@ def validate_password_complexity(value):
     if complexities is None:
         return
 
+    # Sets are here intentionally
     uppercase, lowercase, digits, non_ascii, punctuation = set(), set(), set(), set(), set()
+    alphabetic, numeric = [], []
 
     for character in value:
         if character.isupper():
@@ -76,6 +79,11 @@ def validate_password_complexity(value):
             punctuation.add(character)
         else:
             non_ascii.add(character)
+
+        if character.isalpha():
+            alphabetic.append(character)
+        if 'N' in unicodedata.category(character):  # Check to see if the unicode category contains a 'N'umber
+            numeric.append(character)
 
     words = set(value.split())
 
@@ -92,6 +100,10 @@ def validate_password_complexity(value):
         errors.append(_("must contain {0} or more non ascii characters").format(complexities["NON ASCII"]))
     if len(words) < complexities.get("WORDS", 0):
         errors.append(_("must contain {0} or more unique words").format(complexities["WORDS"]))
+    if len(numeric) < complexities.get("NUMERIC", 0):
+        errors.append(_("must contain {0} or more numbers").format(complexities["NUMERIC"]))
+    if len(alphabetic) < complexities.get("ALPHABETIC", 0):
+        errors.append(_("must contain {0} or more letters").format(complexities["ALPHABETIC"]))
 
     if errors:
         raise ValidationError(message.format(u', '.join(errors)), code=code)
