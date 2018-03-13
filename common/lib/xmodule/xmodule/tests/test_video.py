@@ -894,6 +894,32 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
         student_view_data = descriptor.student_view_data()
         self.assertEquals(student_view_data, expected_student_view_data)
 
+    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course', Mock(return_value=False))
+    @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
+    @patch('edxval.api.get_video_info')
+    def test_student_view_data_with_hls_flag(self, mock_get_video_info):
+        mock_get_video_info.return_value = {
+            'url': '/edxval/video/example',
+            'edx_video_id': u'example_id',
+            'duration': 111.0,
+            'client_video_id': u'The example video',
+            'encoded_videos': [
+                {
+                    'url': u'http://www.meowmix.com',
+                    'file_size': 25556,
+                    'bitrate': 9600,
+                    'profile': u'hls'
+                }
+            ]
+        }
+
+        descriptor = instantiate_descriptor(edx_video_id='example_id', only_on_web=False)
+        descriptor.runtime.course_id = MagicMock()
+        student_view_data = descriptor.student_view_data()
+        expected_video_data = {u'hls': {'url': u'http://www.meowmix.com', 'file_size': 25556}}
+        self.assertDictEqual(student_view_data.get('encoded_videos'), expected_video_data)
+
 
 @ddt.ddt
 @patch.object(settings, 'YOUTUBE', create=True, new={
