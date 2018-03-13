@@ -246,7 +246,7 @@ def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
     course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
     filtered_entitlements = []
     pseudo_session = None
-    course_key_str = ''
+    course_key_str = None
 
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
@@ -256,6 +256,11 @@ def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
             # Unfulfilled entitlements need a mock session for metadata
             pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
             unfulfilled_entitlement_pseudo_sessions[str(course_entitlement.uuid)] = pseudo_session
+        elif course_entitlement.enrollment_course_run and not available_runs:
+            # No available sessions so we need to get a psuedo sessions to ensure that we have the course key.
+            # The course key is required to filter the entitlement out.
+            # This generally only occurs when the Discovery API is not returning sessions due to Site restrictions
+            pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
 
         # Check the org of the Course and filter out entitlements that are not available.
         if available_runs:
@@ -563,7 +568,6 @@ def student_dashboard(request):
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
     # If an entitlement has no available sessions, pass through a mock course overview object
-
     (course_entitlements,
      course_entitlement_available_sessions,
      unfulfilled_entitlement_pseudo_sessions) = get_filtered_course_entitlements(
