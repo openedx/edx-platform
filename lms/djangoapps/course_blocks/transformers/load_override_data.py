@@ -15,22 +15,24 @@ REQUESTED_FIELDS = [
 ]
 
 
-def _get_override_query(course_key, location_list):
+def _get_override_query(course_key, location_list, user_id):
     """
     returns queryset containing override data.
 
     Args:
         course_key (CourseLocator): Course locator object
         location_list (List<UsageKey>): List of usage key of all blocks
+        user_id (int): User id
     """
     return StudentFieldOverride.objects.filter(
         course_id=course_key,
         location__in=location_list,
-        field__in=REQUESTED_FIELDS
+        field__in=REQUESTED_FIELDS,
+        student__id=user_id
     )
 
 
-def override_xblock_fields(course_key, location_list, block_structure):
+def override_xblock_fields(course_key, location_list, block_structure, user_id):
     """
     loads override data of block
 
@@ -38,8 +40,9 @@ def override_xblock_fields(course_key, location_list, block_structure):
         course_key (CourseLocator): course locator object
         location_list (List<UsageKey>): list of usage key of all blocks
         block_structure (BlockStructure): block structure class
+        user_id (int): User id
     """
-    query = _get_override_query(course_key, location_list)
+    query = _get_override_query(course_key, location_list, user_id)
     for student_field_override in query:
         value = json.loads(student_field_override.value)
         field = student_field_override.field
@@ -56,6 +59,9 @@ class OverrideDataTransformer(BlockStructureTransformer):
     """
     WRITE_VERSION = 1
     READ_VERSION = 1
+
+    def __init__(self, user):
+        self.user = user
 
     @classmethod
     def name(cls):
@@ -80,5 +86,6 @@ class OverrideDataTransformer(BlockStructureTransformer):
         override_xblock_fields(
             usage_info.course_key,
             block_structure.topological_traversal(),
-            block_structure
+            block_structure,
+            self.user.id
         )
