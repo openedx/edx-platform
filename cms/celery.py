@@ -36,6 +36,7 @@ class Router(AlternateEnvironmentRouter):
         """
         # The tasks below will be routed to the default lms queue.
         return {
+            'completion_aggregator.tasks.update_aggregators': 'lms',
             'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
             'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
         }
