@@ -9,7 +9,7 @@ const HEADERS = {
   'X-CSRFToken': Cookies.get('csrftoken'),
 };
 
-const requestEntitlements = ({ username }) => fetch(
+const getEntitlements = username => fetch(
   `${entitlementApi}/?user=${username}`, {
     credentials: 'same-origin',
     method: 'get',
@@ -54,7 +54,7 @@ const updateEntitlement = ({ entitlementUuid, unenrolledRun, action, comments })
 
 
 export {
-  requestEntitlements,
+  getEntitlements,
   createEntitlement,
   updateEntitlement,
 };
