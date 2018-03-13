@@ -55,8 +55,8 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
 
 def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):
     """
-    Updates all course schedules if course hasn't started yet and
-    the updated start date is still in the future.
+    Updates all course schedules start and upgrade_deadline dates based off of
+    the new course overview start date.
     """
     upgrade_deadline = _calculate_upgrade_deadline(
         updated_course_overview.id,

@@ -12,7 +12,13 @@ class SchedulesConfig(AppConfig):
             ProjectType.LMS: {
                 PluginSignals.RECEIVERS: [{
                     PluginSignals.RECEIVER_FUNC_NAME: u'update_schedules_on_course_start_changed',
-                    PluginSignals.SIGNAL_PATH: u'openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED',
+                    PluginSignals.SIGNAL_PATH: u'openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED',  # pylint: disable=line-too-long
+                }]
+            },
+            ProjectType.CMS: {
+                PluginSignals.RECEIVERS: [{
+                    PluginSignals.RECEIVER_FUNC_NAME: u'update_schedules_on_course_start_changed',
+                    PluginSignals.SIGNAL_PATH: u'openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED',  # pylint: disable=line-too-long
                 }]
             },
         },
