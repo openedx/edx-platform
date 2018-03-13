@@ -196,7 +196,6 @@ case "$TEST_SUITE" in
         ;;
 
     "bok-choy")
-
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
 
         case "$SHARD" in
