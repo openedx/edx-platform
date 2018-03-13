@@ -44,7 +44,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             requested_student_view_data=['video'],
         )
         self.transformers = BlockStructureTransformers(
-            get_course_block_access_transformers() + [blocks_api_transformer]
+            get_course_block_access_transformers(self.user) + [blocks_api_transformer]
         )
         self.block_structure = get_course_blocks(
             self.user,
