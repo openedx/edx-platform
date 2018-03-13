@@ -307,7 +307,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
         block = VerifiedUpgradeDeadlineDate(course, user)
-        self.assertEqual(block.link, '{}?sku={}'.format(configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL, sku))
+        self.assertEqual(block.link, '{}?sku={}'.format(configuration.basket_checkout_page, sku))
 
     ## CertificateAvailableDate
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)

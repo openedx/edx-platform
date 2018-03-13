@@ -148,7 +148,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             content_type="application/json",
         )
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
-        checkout_page = configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL
+        checkout_page = configuration.basket_checkout_page
         checkout_page += "?utm_source=test"
         httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
 
