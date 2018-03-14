@@ -717,7 +717,7 @@ class UpdateRegModelForm(RegModelForm):
             prev_org = extended_profile.organization
             extended_profile.organization = organization_to_assign
 
-            if organization_to_assign.users_count() <= 1:
+            if organization_to_assign.users_count() == 0:
                 extended_profile.is_first_learner = True
 
             # Reset organizations under my administrations if i updated my organization & ask for org details
