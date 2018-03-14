@@ -148,6 +148,8 @@ source, template_path = Loader(engine).load_template_source(path)
         it will be created in-place.
         props: (dict, optional) An object containing data to pass into the
         component as props.
+        store: (string, optional) The Redux store with which to wrap this
+        component, as specified by the name of its Webpack entry point.
     </%doc>
 
     ${HTML(render_bundle(component))}
