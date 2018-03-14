@@ -9,4 +9,4 @@ syncCollections({
   TextbooksCollection: window.models.TextbookCollection,
 }, StudioStore);
 
-export { StudioStore };
+export { StudioStore }; // eslint-disable-line import/prefer-default-export

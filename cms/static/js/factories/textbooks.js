@@ -11,7 +11,7 @@ define([
         $('.nav-actions .new-button').click(function(event) {
             tbView.addOne(event);
         });
-        $(window).on('beforeunload', function() {
+        $(window).on('beforeunload', function() { // eslint-disable-line consistent-return
             var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
             if (dirty) {
                 return gettext('You have unsaved changes. Do you really want to leave this page?');

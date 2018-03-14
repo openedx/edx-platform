@@ -5,13 +5,13 @@ import React from 'react';
 
 class NoTextbooks extends React.Component {
   render() {
-    return (
+    return (this.props.TextbooksCollection.length === 0) && (
       <div className="no-textbook-content">
         <p>
           {gettext("You haven't added any textbooks to this course yet.")}
           <a href="#" className="button new-button">
-            <span className="icon fa fa-plus" aria-hidden="true"></span>
-            {gettext("Add your first textbook")}
+            <span className="icon fa fa-plus" aria-hidden="true" />
+            {gettext('Add your first textbook')}
           </a>
         </p>
       </div>
@@ -20,7 +20,7 @@ class NoTextbooks extends React.Component {
 }
 
 NoTextbooks.propTypes = {
-  TextbooksCollection: PropTypes.object,
+  TextbooksCollection: PropTypes.shape().isRequired,
 };
 
 export default NoTextbooks;

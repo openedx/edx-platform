@@ -11,4 +11,4 @@ const WrappedNoTextbooks = connect(
   mapStateToProps,
 )(NoTextbooks);
 
-export { WrappedNoTextbooks };
+export { WrappedNoTextbooks }; // eslint-disable-line import/prefer-default-export

@@ -22,7 +22,6 @@ module.exports = {
         'js/pages/login': './cms/static/js/pages/login.js',
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
         'js/sock': './cms/static/js/sock.js',
-        NoTextbooks: './cms/static/js/es2015/components/NoTextbooks.jsx',
         WrappedNoTextbooks: './cms/static/js/es2015/containers/WrappedNoTextbooks.jsx',
         StudioStore: './cms/static/js/es2015/data/store.js',
 
@@ -53,7 +52,7 @@ module.exports = {
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
 
         // Common
-        ReactRenderer: './common/static/js/src/ReactRenderer.jsx'
+        ReactRenderer: './common/static/js/es2015/ReactRenderer.jsx'
     },
 
     output: {
