@@ -41,8 +41,8 @@ class AssetIndexTestStudioFrontend(StudioCourseTest):
         assert not self.assert_table_exists()
         assert not self.assert_sortable_table_heading_elements_exist()
         assert not self.assert_pagination_element_exists()
-        assert not self.assert_status_element_exists()
 
+        assert self.assert_status_element_exists()
         assert self.assert_type_filter_exists()
         assert self.assert_upload_element_exists()
         assert self.assert_no_results_headings_exist()
