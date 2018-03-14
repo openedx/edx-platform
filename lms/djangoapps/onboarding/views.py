@@ -59,7 +59,6 @@ def user_info(request):
     is_under_age = False
 
     template = 'onboarding/tell_us_more_survey.html'
-    next_page_url = reverse('interests')
     redirect_to_next = True
 
     if request.path == reverse('additional_information'):
@@ -98,11 +97,16 @@ def user_info(request):
 
         if form.is_valid() and not is_under_age:
             form.save(request)
-
-            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+            unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
+            are_forms_complete = not (bool(unattended_surveys))
 
             if not are_forms_complete and redirect_to_next:
-                return redirect(next_page_url)
+                return redirect(unattended_surveys[0])
+
+            # this will only executed if user updated his/her employed status from account settings page
+            # redirect user to account settings page where he come from
+            if not request.path == "/myaccount/additional_information/":
+                return redirect(reverse("update_account_settings"))
 
     else:
         form = forms.UserInfoModelForm(instance=user_extended_profile, initial=initial)
@@ -386,10 +390,11 @@ def update_account_settings(request):
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
             user_extended_profile = form.save(user=user_extended_profile.user, commit=True)
-            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+            unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
+            are_forms_complete = not (bool(unattended_surveys))
 
             if not are_forms_complete :
-                return redirect(reverse('organization'))
+                return redirect(reverse(unattended_surveys[0]))
 
             return redirect(reverse('update_account_settings'))
 
