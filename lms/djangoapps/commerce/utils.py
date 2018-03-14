@@ -92,9 +92,9 @@ class EcommerceService(object):
         """ Return the URL for the checkout page.
 
         Example:
-            http://localhost:8002/basket/single_item/
+            http://localhost:8002/basket/add/
         """
-        return self.get_absolute_ecommerce_url(self.config.single_course_checkout_page)
+        return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
 
     def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
@@ -112,7 +112,7 @@ class EcommerceService(object):
         """
         program_uuid = kwargs.get('program_uuid')
         url = '{checkout_page_path}?{skus}'.format(
-            checkout_page_path=self.get_absolute_ecommerce_url(self.config.MULTIPLE_ITEMS_BASKET_PAGE_URL),
+            checkout_page_path=self.get_absolute_ecommerce_url(self.config.basket_checkout_page),
             skus=urlencode({'sku': skus}, doseq=True),
         )
         if program_uuid:

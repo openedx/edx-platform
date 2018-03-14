@@ -24,7 +24,7 @@ class TestCommerceConfigurationCommand(TestCase):
 
         self.assertTrue(commerce_configuration.enabled)
         self.assertTrue(commerce_configuration.checkout_on_ecommerce_service)
-        self.assertEqual(commerce_configuration.single_course_checkout_page, "/basket/single-item/")
+        self.assertEqual(commerce_configuration.basket_checkout_page, "/basket/add/")
         self.assertEqual(commerce_configuration.cache_ttl, 0)
 
         # Verify commerce configuration can be disabled from command

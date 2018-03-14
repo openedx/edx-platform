@@ -136,7 +136,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[unicode(prof_course.id)])
         response = self.client.get(url)
-        self.assertRedirects(response, 'http://testserver/basket/add/?sku=TEST', fetch_redirect_response=False)
+        self.assertRedirects(response, 'http://testserver/test_basket/add/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
     @httpretty.activate
