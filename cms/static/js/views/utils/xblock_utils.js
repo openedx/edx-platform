@@ -2,7 +2,7 @@
  * Provides utilities for views to work with xblocks.
  */
 define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_utils', 'js/utils/module',
-        'js/models/xblock_info', 'edx-ui-toolkit/js/utils/string-utils'],
+    'js/models/xblock_info', 'edx-ui-toolkit/js/utils/string-utils'],
     function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         'use strict';
         var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
