@@ -130,6 +130,11 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         self.fields['country_of_employment'].required = False
         self.fields['city_of_employment'].required = False
 
+        if not self.instance.organization:
+            self.fields['role_in_org'].required = False
+            self.fields['start_month_year'].required = False
+            self.fields['hours_per_week'].required = False
+
         focus_area_choices = ((field_name, label) for field_name, label in
                                 UserExtendedProfile.FUNCTIONS_LABELS.items())
 
@@ -174,12 +179,13 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         raise forms.ValidationError(ugettext_noop('Please select language.'))
 
     def clean_start_month_year(self):
-        start_month_year = datetime.strptime(
-            self.cleaned_data['start_month_year'],
-            '%m/%Y')
+        if self.instance.organization:
+            start_month_year = datetime.strptime(
+                self.cleaned_data['start_month_year'],
+                '%m/%Y')
 
-        if start_month_year > datetime.now():
-            raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
+            if start_month_year > datetime.now():
+                raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
 
         return self.cleaned_data['start_month_year']
 
@@ -711,7 +717,10 @@ class UpdateRegModelForm(RegModelForm):
             prev_org = extended_profile.organization
             extended_profile.organization = organization_to_assign
 
-            # Reset organizations under my administrations if i updated my organization + ask for org details
+            if organization_to_assign.users_count() <= 1:
+                extended_profile.is_first_learner = True
+
+            # Reset organizations under my administrations if i updated my organization & ask for org details
             if not prev_org == organization_to_assign:
                 Organization.objects.filter(admin=user).update(admin=None)
                 extended_profile.is_organization_metrics_submitted = False
@@ -730,6 +739,13 @@ class UpdateRegModelForm(RegModelForm):
             if extended_profile.organization and extended_profile.organization.admin == user:
                 extended_profile.organization.admin = None
                 extended_profile.organization.save()
+
+            if extended_profile.is_first_learner:
+                extended_profile.is_first_learner = False
+
+            extended_profile.role_in_org = None
+            extended_profile.start_month_year = None
+            extended_profile.hours_per_week = 0
 
             extended_profile.organization = None
             extended_profile.is_organization_metrics_submitted = False
