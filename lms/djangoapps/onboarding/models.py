@@ -541,7 +541,9 @@ class UserExtendedProfile(TimeStampedModel):
         """
         attended_list = []
 
-        if self.user.profile.level_of_education and self.start_month_year and self.english_proficiency:
+        if (not self.organization and self.user.profile.level_of_education and self.english_proficiency) or (
+                self.organization and self.user.profile.level_of_education and self.start_month_year and
+                self.english_proficiency):
             attended_list.append(self.SURVEYS_LIST[0])
         if self.is_interests_data_submitted:
             attended_list.append(self.SURVEYS_LIST[1])
