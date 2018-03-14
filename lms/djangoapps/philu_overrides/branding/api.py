@@ -138,9 +138,10 @@ def _auth_footer_navigation_links():
             "name": link_name,
             "title": link_title,
             "url": link_url,
+            "target": link_target,
         }
-        for link_name, link_url, link_title in [
-            ("about", "https://philanthropyu.org/", _("About Philanthropy University"))
+        for link_name, link_url, link_title, link_target in [
+            ("about", "https://philanthropyu.org/", _("About Philanthropy University"), "_blank")
         ]
         if link_url and link_url != "#"
     ]
@@ -154,10 +155,11 @@ def _auth_footer_courses_communities_links():
             "name": link_name,
             "title": link_title,
             "url": link_url,
+            "target": link_target,
         }
-        for link_name, link_url, link_title in [
-            ("explore_course", "/courses", _("Explore our Courses")),
-            ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities")),
+        for link_name, link_url, link_title, link_target in [
+            ("explore_course", "/courses", _("Explore our Courses"), "_self"),
+            ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities"), "_self"),
         ]
         if link_url and link_url != "#"
     ]
@@ -172,11 +174,12 @@ def _footer_navigation_links():
             "name": link_name,
             "title": link_title,
             "url": link_url,
+            "target": link_target,
         }
-        for link_name, link_url, link_title in [
-            ("about", "https://philanthropyu.org/", _("About Philanthropy University")),
-            ("explore_course", "/courses", _("Explore our Courses")),
-            ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities")),
+        for link_name, link_url, link_title, link_target in [
+            ("about", "https://philanthropyu.org/", _("About Philanthropy University"), "_blank"),
+            ("explore_course", "/courses", _("Explore our Courses"), "_self"),
+            ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities"), "_self"),
         ]
         if link_url and link_url != "#"
     ]
@@ -185,10 +188,9 @@ def _footer_navigation_links():
 def _auth_footer_legal_links():
     """Return the legal footer links (e.g. terms of service). """
     links = [
-        ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use")),
-        ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy")),
-        ("faq", "/faq", _("FAQ")),
-        ("disclaimir", "/disclaimer", _("Disclaimer"))
+        ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use"), "_blank"),
+        ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy"), "_blank"),
+        ("faq", "/faq", _("FAQ"), "_self")
     ]
 
     return [
@@ -196,8 +198,9 @@ def _auth_footer_legal_links():
             "name": link_name,
             "title": link_title,
             "url": link_url,
+            "target": link_target,
         }
-        for link_name, link_url, link_title in links
+        for link_name, link_url, link_title, link_target in links
         if link_url and link_url != "#"
     ]
 
@@ -206,10 +209,9 @@ def my_footer_legal_links():
     """Return the legal footer links (e.g. terms of service). """
 
     links = [
-        ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use")),
-        ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy")),
-        ("faq", "/faq", _("FAQ")),
-        ("disclaimir", "/disclaimer", _("Disclaimer"))
+        ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use"), "_blank"),
+        ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy"), "_blank"),
+        ("faq", "/faq", _("FAQ"), "_self")
     ]
 
     return [
@@ -217,8 +219,9 @@ def my_footer_legal_links():
             "name": link_name,
             "title": link_title,
             "url": link_url,
+            "target": link_target,
         }
-        for link_name, link_url, link_title in links
+        for link_name, link_url, link_title, link_target in links
         if link_url and link_url != "#"
     ]
 
