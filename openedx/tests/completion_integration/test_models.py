@@ -56,7 +56,17 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
         self.set_up_completion()
 
     def test_changed_value(self):
-        with self.assertNumQueries(4):  # Get, update, 2 * savepoints
+        with self.assertNumQueries(7):
+            # Queries:
+            #   1 * get
+            #   1 * update
+            #   2 * savepoints
+            #   Aggregation:
+            #     signal handler:
+            #       1 * Get user by ID for debug log
+            #     async task:
+            #       1 * check for outdated aggregators
+            #       1 * get user by username (celery cannot send db objects)
             completion, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 course_key=self.block_key.course_key,
@@ -83,7 +93,15 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_new_user(self):
         newuser = UserFactory()
-        with self.assertNumQueries(4):  # Get, update, 2 * savepoints
+        with self.assertNumQueries(6):
+            # Queries:
+            #   1 * get
+            #   1 * update
+            #   2 * savepoints
+            #   Aggregation:
+            #     async task:
+            #       1 * check for outdated aggregators
+            #       1 * get user by username (celery cannot send db objects)
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=newuser,
                 course_key=self.block_key.course_key,
@@ -95,7 +113,15 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_new_block(self):
         newblock = UsageKey.from_string(u'block-v1:edx+test+run+type@video+block@puppers')
-        with self.assertNumQueries(4):  # Get, update, 2 * savepoints
+        with self.assertNumQueries(6):
+            # Queries:
+            #   1 * get
+            #   1 * update
+            #   2 * savepoints
+            #   Aggregation:
+            #     async task:
+            #       1 * check for outdated aggregators
+            #       1 * get user by username (celery cannot send db objects)
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 course_key=newblock.course_key,

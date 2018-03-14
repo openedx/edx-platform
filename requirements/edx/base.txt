@@ -58,6 +58,7 @@ edx-completion==0.1.4
 edx-django-oauth2-provider==1.2.5
 edx-django-sites-extensions==2.3.1
 edx-enterprise==0.67.1
+git+https://github.com/open-craft/openedx-completion-aggregator@cliff/course-updates#egg=openedx-completion-aggregator==0.0.1
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-organizations==0.4.9

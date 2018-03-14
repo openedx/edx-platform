@@ -17,6 +17,7 @@ from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
+from xblock.completable import XBlockCompletionMode
 
 from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
@@ -64,6 +65,9 @@ class LibraryContentFields(object):
     # Please note the display_name of each field below is used in
     # common/test/acceptance/pages/studio/library.py:StudioLibraryContentXBlockEditModal
     # to locate input elements - keep synchronized
+
+    completion_mode = XBlockCompletionMode.AGGREGATOR
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
