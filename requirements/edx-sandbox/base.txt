@@ -4,10 +4,10 @@
 #
 #    make upgrade
 #
-common/lib/calc
-common/lib/chem
-common/lib/sandbox-packages
-common/lib/symmath
+-e common/lib/calc
+-e common/lib/chem
+-e common/lib/sandbox-packages
+-e common/lib/symmath
 asn1crypto==0.24.0
 backports-abc==0.5        # via tornado
 cffi==1.11.5

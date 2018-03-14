@@ -54,7 +54,7 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	pip-compile -v --no-emit-trusted-host --no-index --upgrade -o requirements/edx/development.txt requirements/edx/development.in
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh \
-        requirements/edx/pip-tools.txt \
+	    requirements/edx/pip-tools.txt \
 	    requirements/edx/coverage.txt \
 	    requirements/edx/paver.txt \
 	    requirements/edx-sandbox/shared.txt \
