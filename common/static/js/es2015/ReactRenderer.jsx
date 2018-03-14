@@ -10,7 +10,7 @@ class ReactRendererException extends Error {
   }
 }
 
-export class ReactRenderer {
+export class ReactRenderer { // eslint-disable-line import/prefer-default-export
   constructor({ component, id, componentName, props = {}, store }) {
     Object.assign(this, {
       component,
@@ -50,16 +50,16 @@ export class ReactRenderer {
   getTargetElement() {
     const elementList = document.querySelectorAll(`#${this.id}`);
     const targetList = document.querySelectorAll(
-      `#renderReact-${this.id}`
+      `#renderReact-${this.id}`,
     );
     let targetElement;
 
     if (elementList.length > 1) {
       // target element is not unique
       throw new ReactRendererException(
-        `Expected 1 target element match for id selector ` +
+        'Expected 1 target element match for id selector ' +
         `"${this.id}" but received ${elementList.length} matches. ` +
-        `Please specify a unique destination id.`,
+        'Please specify a unique destination id.',
       );
     }
 
@@ -67,8 +67,8 @@ export class ReactRenderer {
       // selector is already in use for a different component
       throw new ReactRendererException(
         `The id "${this.id}" is already in use for a different ` +
-        `React component on this page. Please specify a different ` +
-        `target id.`,
+        'React component on this page. Please specify a different ' +
+        'target id.',
       );
     }
 
@@ -92,9 +92,8 @@ export class ReactRenderer {
 
     if (this.store) {
       el = React.createElement(Provider, {
-        children: el,
         store: this.store,
-      });
+      }, el);
     }
 
     ReactDOM.render(

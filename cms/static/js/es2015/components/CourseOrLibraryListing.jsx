@@ -3,9 +3,8 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
-export function CourseOrLibraryListing(props) {
+export function CourseOrLibraryListing(props) { // eslint-disable-line import/prefer-default-export
   const allowReruns = props.allowReruns;
   const linkClass = props.linkClass;
   const idBase = props.idBase;
