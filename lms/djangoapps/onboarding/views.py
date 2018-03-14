@@ -113,7 +113,7 @@ def user_info(request):
             # this will only executed if user updated his/her employed status from account settings page
             # redirect user to account settings page where he come from
             if not request.path == "/myaccount/additional_information/":
-                return redirect(reverse('update_account_settings'))
+                return redirect(reverse("update_account_settings"))
 
     else:
         form = forms.UserInfoModelForm(instance=user_extended_profile, initial=initial)
