@@ -59,7 +59,6 @@ def user_info(request):
     is_under_age = False
 
     template = 'onboarding/tell_us_more_survey.html'
-    next_page_url = reverse('interests')
     redirect_to_next = True
 
     if request.path == reverse('additional_information'):
@@ -98,17 +97,11 @@ def user_info(request):
 
         if form.is_valid() and not is_under_age:
             form.save(request)
-
-            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+            unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
+            are_forms_complete = not (bool(unattended_surveys))
 
             if not are_forms_complete and redirect_to_next:
-                if user_extended_profile.SURVEYS_LIST[1] not in user_extended_profile.attended_surveys():
-                    # redirect to interests page when user finish this step very first time
-                    return redirect(next_page_url)
-                elif user_extended_profile.is_organization_admin or user_extended_profile.is_first_signup_in_org:
-                    # this will only executed if user updated his/her employed status & org from account settings page
-                    # redirect to organization page if user selected him as admin/first_learner of some org
-                    return redirect(reverse("organization"))
+                return redirect(unattended_surveys[0])
 
             # this will only executed if user updated his/her employed status from account settings page
             # redirect user to account settings page where he come from
@@ -397,10 +390,11 @@ def update_account_settings(request):
         form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
         if form.is_valid():
             user_extended_profile = form.save(user=user_extended_profile.user, commit=True)
-            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+            unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
+            are_forms_complete = not (bool(unattended_surveys))
 
             if not are_forms_complete :
-                return redirect(reverse('organization'))
+                return redirect(reverse(unattended_surveys[0]))
 
             return redirect(reverse('update_account_settings'))
 
