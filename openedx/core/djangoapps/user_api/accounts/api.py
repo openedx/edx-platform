@@ -311,7 +311,7 @@ def update_account_settings(requesting_user, update, username=None, force_email_
     if force_email_update and msa_migration_enabled:
         try:
             # Flag to show user has completed and confirmed Microsoft Account Migration
-            meta[settings.MSA_ACCOUNT_MIGRATION_COMPLETED_KEY] = True
+            meta[settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY] = settings.MSA_MIGRATION_STATUS_COMPLETED
             existing_user_profile.set_meta(meta)
             existing_user_profile.save()
         except Exception as err:  # pylint: disable=broad-except

@@ -124,24 +124,20 @@ class AccountLinkingMiddleware(object):
         If the site is configured to restrict not logged in users to the DEFAULT_ACCOUNT_LINK_EXEMPT_URLS
         from accessing pages, wrap the next view with the django login_required middleware
         """
-
-        enable_msa_migration = configuration_helpers.get_value(
-            "ENABLE_MSA_MIGRATION",
-            settings.ENABLE_MSA_MIGRATION
-        )
-        if request.user.is_authenticated() and enable_msa_migration:
+        if request.user.is_authenticated() and configuration_helpers.get_value("ENABLE_MSA_MIGRATION"):
+            # Check if user has associated a Microsoft account
             try:
                 UserSocialAuth.objects.get(user=request.user, provider="live")
             except UserSocialAuth.DoesNotExist:
                 # Redirect users to account link page if they don't have a live account linked already
                 return self._redirect_if_not_allowed_url(request, settings.MSA_ACCOUNT_LINK_URL)
 
-            try:
-                user_profile = UserProfile.objects.get(user=request.user)
-                meta = user_profile.get_meta()
-                _ = meta[settings.MSA_ACCOUNT_MIGRATION_COMPLETED_KEY]
-            except KeyError:
-                return self._redirect_if_not_allowed_url(request, settings.MSA_ACCOUNT_LINK_CONFIRM_URL)
+            # Check if user has already associated a Microsoft account but not confirmed account update
+            user_profile = UserProfile.objects.get(user=request.user)
+            meta = user_profile.get_meta()
+            migration_status = meta.get(settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY)
+            if migration_status == settings.MSA_MIGRATION_STATUS_STARTED_NOT_CONFIRMED:
+                self._redirect_if_not_allowed_url(request, settings.MSA_ACCOUNT_LINK_CONFIRM_URL)
 
     def _redirect_if_not_allowed_url(self, request, redirect_to):
         """
@@ -153,6 +149,6 @@ class AccountLinkingMiddleware(object):
         )
         REDIRECT_URLS = [compile(expr) for expr in account_linking_redirect_urls]
         path = request.path_info.lstrip('/')
-
         if any(m.match(path) for m in REDIRECT_URLS) and path != redirect_to.lstrip('/'):
+            print("entered into redirection {}".format(redirect_to))
             return redirect(redirect_to)

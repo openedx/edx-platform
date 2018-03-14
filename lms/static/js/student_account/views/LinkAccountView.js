@@ -28,7 +28,7 @@
             },
             render: function() {
                 var title = StringUtils.interpolate(
-                    gettext('Sign in with {providerName}.'),
+                    gettext('Sign in with {providerName}'),
                     {providerName: this.options.providerName}
                 );
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(linkAccountTpl)({

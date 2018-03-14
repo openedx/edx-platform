@@ -9,7 +9,7 @@
           </div>
             <div>
                 <p>Hello <%- userName %>,</p>
-                <p style="line-height: 1.4em"><%- gettext("To better protect your privacy, you are now required to sign in with a Microsoft account. (If you don’t have one, you’ll be able to create one during the sign-in process.)") %></span>
+                <p><%- gettext("To better protect your privacy, you are now required to sign in with a Microsoft account. (If you don’t have one, you’ll be able to create one during the sign-in process.)") %></span>
                 <p><%- gettext("Your name and email will be updated with the information in your Microsoft account, but your public username will remain the same.") %></span>
             </div>
             <div class="link-account-social-field-section">

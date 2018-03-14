@@ -700,6 +700,8 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     # It should be a dict where the key is a word passed via ?auth_entry=, and the value is a
     # dict with an arbitrary 'secret_key' and a 'url'.
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = AUTH_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
+    REDIRECT_IS_HTTPS = ENV_TOKENS.get('REDIRECT_IS_HTTPS', REDIRECT_IS_HTTPS)
+
 
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):

@@ -1,8 +1,13 @@
 """Middleware classes for third_party_auth."""
 
+from django.core.urlresolvers import reverse
+from urllib import urlencode
+
 from social.apps.django_app.middleware import SocialAuthExceptionMiddleware
+from social.exceptions import AuthCanceled
 
 from . import pipeline
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class ExceptionMiddleware(SocialAuthExceptionMiddleware):
@@ -21,6 +26,11 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware):
         # Check if we have an auth entry key we can use instead
         if auth_entry and auth_entry in pipeline.AUTH_DISPATCH_URLS:
             redirect_uri = pipeline.AUTH_DISPATCH_URLS[auth_entry]
+
+        if configuration_helpers.get_value('ENABLE_MSA_MIGRATION') and isinstance(exception, AuthCanceled):
+            logout_url = reverse('logout')
+            params = urlencode({'msa_only': True, 'next': redirect_uri})
+            redirect_uri = '{}?{}'.format(logout_url, params)
 
         return redirect_uri
 

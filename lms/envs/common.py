@@ -809,6 +809,9 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 
+# Third Party Auth Redirect
+REDIRECT_IS_HTTPS = False
+
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@example.com'
@@ -3066,4 +3069,7 @@ MSA_DEFAULT_ACCOUNT_LINK_REDIRECT_URLS = [
     r'^{}*$'.format(MSA_ACCOUNT_LINK_CONFIRM_URL.lstrip('/')),
     r'^account/settings.*$'
 ]
-MSA_ACCOUNT_MIGRATION_COMPLETED_KEY = 'microsoft_account_migration_completed'
+MSA_ACCOUNT_MIGRATION_STATUS_KEY = 'microsoft_account_migration_status'
+MSA_MIGRATION_STATUS_NOT_STARTED = 'migration_not_started'
+MSA_MIGRATION_STATUS_STARTED_NOT_CONFIRMED = 'migration_started_not_confirmed'
+MSA_MIGRATION_STATUS_COMPLETED = 'migration_completed'

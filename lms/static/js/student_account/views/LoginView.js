@@ -158,7 +158,7 @@
                         break;
                     case MSAMigrationStatus.LOGIN_MIGRATED:
                         // eslint-disable-next-line vars-on-top
-                        var signInMessage = 'Signing you in with your Microsoft Account...';
+                        var signInMessage = ' Signing you in with your Microsoft account...';
                         var signInHTML = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
                             HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                             gettext(signInMessage),

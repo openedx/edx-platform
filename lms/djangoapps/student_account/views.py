@@ -465,7 +465,7 @@ def link_account(request):
     if third_party_auth.is_enabled():
         duplicate_provider = [m.message for m in messages.get_messages(request)]
         if len(duplicate_provider) > 0:
-            context['duplicate_provider'] = 'This Microsoft Account is already in use by a different account.'
+            context['duplicate_provider'] = 'This Microsoft account is already in use by a different account.'
 
         auth_states = pipeline.get_provider_user_states(user)
         context['auth']['providers'] = [{
@@ -485,6 +485,7 @@ def link_account(request):
             # information for this provider from their edX account.
         } for state in auth_states if state.provider.display_for_login or state.has_account]
 
+        _update_microsoft_account_migration_status(user, settings.MSA_MIGRATION_STATUS_NOT_STARTED)
         if auto_link:
             return redirect(context['auth']['providers'][0]['connect_url'])
 
@@ -613,7 +614,7 @@ def link_account_confirm(request):
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'enable_account_linking': True
     }
-
+    _update_microsoft_account_migration_status(user, settings.MSA_MIGRATION_STATUS_STARTED_NOT_CONFIRMED)
     return render_to_response("student_account/link_account_confirm.html", context)
 
 
@@ -643,5 +644,21 @@ def _redirect_if_migration_complete(user):
         to view the account migration pages anymore, redirect to dashboard
     """
     meta = user.profile.get_meta()
-    if meta.get(settings.MSA_ACCOUNT_MIGRATION_COMPLETED_KEY):
+    if meta.get(settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY) == settings.MSA_MIGRATION_STATUS_STARTED_NOT_CONFIRMED:
         return redirect(reverse('dashboard'))
+
+
+def _update_microsoft_account_migration_status(user, migration_status):
+    """ Update the MSA_ACCOUNT_MIGRATION_STATUS_KEY property for the user's profile
+        meta field to the given migration status.
+    """
+    profile = user.profile
+    if configuration_helpers.get_value("ENABLE_MSA_MIGRATION"):
+        meta = profile.get_meta()
+        meta[settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY] = migration_status
+        profile.set_meta(meta)
+    try:
+        profile.save()
+    except Exception:  # pylint: disable=broad-except
+        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        raise

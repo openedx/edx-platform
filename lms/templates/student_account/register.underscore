@@ -10,7 +10,7 @@
                         <span class="text"><%- gettext("Register") %></span>
                     </h2>
                 </div>
-                <span class="description-text"><%- gettext("Sign in with or create a Microsoft Account to access courses.") %></span>
+                <span class="description-text"><%- gettext("Sign in with or create a Microsoft account to access courses.") %></span>
                 <% var provider = context.providers[0] %>
                 <button type="button" class="login-provider-msa-migration action action-primary action-update register-button button-<%- provider.id %> register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>"><%- gettext("Get Started") %></button>
             </div>
