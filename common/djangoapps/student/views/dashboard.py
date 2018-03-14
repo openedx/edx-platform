@@ -246,7 +246,7 @@ def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
     course_entitlements = list(CourseEntitlement.get_active_entitlements_for_user(user))
     filtered_entitlements = []
     pseudo_session = None
-    course_key_str = None
+    course_run_key = None
 
     for course_entitlement in course_entitlements:
         course_entitlement.update_expired_at()
@@ -256,22 +256,18 @@ def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
             # Unfulfilled entitlements need a mock session for metadata
             pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
             unfulfilled_entitlement_pseudo_sessions[str(course_entitlement.uuid)] = pseudo_session
-        elif course_entitlement.enrollment_course_run and not available_runs:
-            # No available sessions so we need to get a psuedo sessions to ensure that we have the course key.
-            # The course key is required to filter the entitlement out.
-            # This generally only occurs when the Discovery API is not returning sessions due to Site restrictions
-            pseudo_session = get_pseudo_session_for_entitlement(course_entitlement)
 
         # Check the org of the Course and filter out entitlements that are not available.
-        if available_runs:
-            course_key_str = available_runs[0]['key']
+        if course_entitlement.enrollment_course_run:
+            course_run_key = course_entitlement.enrollment_course_run.course_id
+        elif available_runs:
+            course_run_key = CourseKey.from_string(available_runs[0]['key'])
         elif pseudo_session:
-            course_key_str = pseudo_session['key']
+            course_run_key = CourseKey.from_string(pseudo_session['key'])
 
-        if course_key_str:
-            # If there is no course_key_str at this point we will be unable to determine if it should be shown.
+        if course_run_key:
+            # If there is no course_run_key at this point we will be unable to determine if it should be shown.
             # Therefore it should be excluded by default.
-            course_run_key = CourseKey.from_string(course_key_str)
             if org_whitelist and course_run_key.org not in org_whitelist:
                 continue
             elif org_blacklist and course_run_key.org in org_blacklist:
