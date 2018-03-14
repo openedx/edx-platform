@@ -102,7 +102,18 @@ def user_info(request):
             are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
             if not are_forms_complete and redirect_to_next:
-                return redirect(next_page_url)
+                if user_extended_profile.SURVEYS_LIST[1] not in user_extended_profile.attended_surveys():
+                    # redirect to interests page when user finish this step very first time
+                    return redirect(next_page_url)
+                elif user_extended_profile.is_organization_admin or user_extended_profile.is_first_signup_in_org:
+                    # this will only executed if user updated his/her employed status & org from account settings page
+                    # redirect to organization page if user selected him as admin/first_learner of some org
+                    return redirect(reverse("organization"))
+
+            # this will only executed if user updated his/her employed status from account settings page
+            # redirect user to account settings page where he come from
+            if not request.path == "/myaccount/additional_information/":
+                return redirect(reverse("update_account_settings"))
 
     else:
         form = forms.UserInfoModelForm(instance=user_extended_profile, initial=initial)
