@@ -357,6 +357,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                         user, week_num, enrollment.course_id
                     )
                 )
+                continue
 
             template_context.update({
                 'course_name': schedule.enrollment.course.display_name,
