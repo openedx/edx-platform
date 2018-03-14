@@ -83,6 +83,13 @@ class DashboardPage(PageObject, HelpMixin):
         # Clicking on course with run will trigger an ajax event
         self.wait_for_ajax()
 
+    def scroll_to_course(self, course_key):
+        """
+        Scroll down to the course element
+        """
+        element = '[data-course-key*="{}"]'.format(course_key)
+        self.scroll_to_element(element)
+
     def has_new_library_button(self):
         """
         (bool) is the "New Library" button present?
@@ -239,16 +246,18 @@ class DashboardPage(PageObject, HelpMixin):
         Click the tab to display the available libraries, and return detail of them.
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
-        self.q(css='#course-index-tabs .libraries-tab a').click()
+        library_tab_css = '#course-index-tabs .libraries-tab'
+        self.wait_for_element_presence(library_tab_css, "Libraries tab")
+        self.q(css=library_tab_css).click()
         if self.q(css='.list-notices.libraries-tab').present:
             # No libraries are available.
-            self.wait_for_element_visibility('.libraries-tab .new-library-button', "Switch to library tab")
+            self.wait_for_element_presence('.libraries-tab .new-library-button', "new library tab")
             return []
         div2info = lambda element: {
             'name': element.find_element_by_css_selector('.course-title').text,
+            'link_element': element.find_element_by_css_selector('.course-title'),
             'org': element.find_element_by_css_selector('.course-org .value').text,
             'number': element.find_element_by_css_selector('.course-num .value').text,
-            'link_element': element.find_element_by_css_selector('a.library-link'),
             'url': element.find_element_by_css_selector('a.library-link').get_attribute('href'),
         }
         self.wait_for_element_visibility('.libraries li.course-item', "Switch to library tab")
