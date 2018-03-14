@@ -1056,11 +1056,11 @@ CREATE TABLE `commerce_commerceconfiguration` (
   `change_date` datetime(6) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
   `checkout_on_ecommerce_service` tinyint(1) NOT NULL,
-  `single_course_checkout_page` varchar(255) NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
   `cache_ttl` int(10) unsigned NOT NULL,
   `receipt_page` varchar(255) NOT NULL,
   `enable_automatic_refund_approval` tinyint(1) NOT NULL,
+  `basket_checkout_page` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `commerce_commerce_changed_by_id_7441951d1c97c1d7_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `commerce_commerce_changed_by_id_7441951d1c97c1d7_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
@@ -1149,35 +1149,6 @@ CREATE TABLE `contentserver_courseassetcachettlconfig` (
   PRIMARY KEY (`id`),
   KEY `contentserver_cou_changed_by_id_3b5e5ff6c6df495d_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `contentserver_cou_changed_by_id_3b5e5ff6c6df495d_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `contentstore_coursenewassetspageflag`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `contentstore_coursenewassetspageflag` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `course_id` varchar(255) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `contentstore_cours_changed_by_id_649924e37af184c_fk_auth_user_id` (`changed_by_id`),
-  KEY `contentstore_coursenewassetspageflag_ea134da7` (`course_id`),
-  CONSTRAINT `contentstore_cours_changed_by_id_649924e37af184c_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `contentstore_newassetspageflag`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `contentstore_newassetspageflag` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `enabled_for_all_courses` tinyint(1) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `contentstore_newa_changed_by_id_30fcd15e7b674dbb_fk_auth_user_id` (`changed_by_id`),
-  CONSTRAINT `contentstore_newa_changed_by_id_30fcd15e7b674dbb_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `contentstore_pushnotificationconfig`;
@@ -2094,7 +2065,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=408 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=410 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4689,7 +4660,7 @@ CREATE TABLE `student_courseenrollmentallowed` (
   `course_id` varchar(255) NOT NULL,
   `auto_enroll` tinyint(1) NOT NULL,
   `created` datetime(6) DEFAULT NULL,
-  `user_id` int(11),
+  `user_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_courseenrollmentallowed_email_6f3eafd4a6c58591_uniq` (`email`,`course_id`),
   KEY `student_courseenrollmentallowed_0c83f57c` (`email`),
