@@ -176,7 +176,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             pool = valid_block_keys - selected
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(random.sample(pool, num_to_add))
+                rand = random.Random()
+                added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
