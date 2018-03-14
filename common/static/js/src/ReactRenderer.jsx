@@ -11,17 +11,16 @@ class ReactRendererException extends Error {
 }
 
 export class ReactRenderer {
-  constructor({ component, selector, componentName, props = {}, store }) {
+  constructor({ component, id, componentName, props = {}, store }) {
     Object.assign(this, {
       component,
-      selector,
+      id,
       componentName,
       props,
       store,
     });
     this.handleArgumentErrors();
-    this.targetElement = this.getTargetElement();
-    this.renderComponent();
+    document.addEventListener('DOMContentLoaded', this.renderComponent.bind(this));
   }
 
   handleArgumentErrors() {
@@ -49,18 +48,46 @@ export class ReactRenderer {
   }
 
   getTargetElement() {
-    const elementList = document.querySelectorAll(this.selector);
-    if (elementList.length !== 1) {
+    const elementList = document.querySelectorAll(`#${this.id}`);
+    const targetList = document.querySelectorAll(
+      `#renderReact-${this.id}`
+    );
+    let targetElement;
+
+    if (elementList.length > 1) {
+      // target element is not unique
       throw new ReactRendererException(
-        `Expected 1 element match for selector "${this.selector}" ` +
-        `but received ${elementList.length} matches.`,
+        `Expected 1 target element match for id selector ` +
+        `"${this.id}" but received ${elementList.length} matches. ` +
+        `Please specify a unique destination id.`,
       );
-    } else {
-      return elementList[0];
     }
+
+    if (targetList.length > 1) {
+      // selector is already in use for a different component
+      throw new ReactRendererException(
+        `The id "${this.id}" is already in use for a different ` +
+        `React component on this page. Please specify a different ` +
+        `target id.`,
+      );
+    }
+
+    if (elementList.length === 1) {
+      // component is being rendered into an existing element
+      targetElement = elementList[0];
+      targetList[0].parentNode.removeChild(targetList[0]);
+    } else {
+      // component is being rendered in-place
+      targetElement = document.createElement('div');
+      targetElement.id = this.id;
+      targetList[0].appendChild(targetElement);
+    }
+
+    return targetElement;
   }
 
   renderComponent() {
+    const targetElement = this.getTargetElement();
     let el = React.createElement(this.component, this.props, null);
 
     if (this.store) {
@@ -72,7 +99,7 @@ export class ReactRenderer {
 
     ReactDOM.render(
       el,
-      this.targetElement,
+      targetElement,
     );
   }
 }

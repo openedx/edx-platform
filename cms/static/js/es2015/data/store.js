@@ -1,8 +1,6 @@
 import { createStore } from 'redux';
 import { syncCollections } from 'backbone-redux';
 
-import rootReducer from './reducers';
-
 const StudioStore = createStore(
   () => {},
 );

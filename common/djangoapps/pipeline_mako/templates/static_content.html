@@ -143,7 +143,9 @@ source, template_path = Loader(engine).load_template_source(path)
         it onto the page, passing an optional context object via props.
         component: (string) The component to render, as specified by the name
         of its Webpack entry point.
-        id: (string) A unique id to apply to the component's container div.
+        id: (string) A unique id specifying the element into which the
+        component will be rendered. If the element does not already exist,
+        it will be created in-place.
         props: (dict, optional) An object containing data to pass into the
         component as props.
     </%doc>
@@ -154,14 +156,14 @@ source, template_path = Loader(engine).load_template_source(path)
       ${HTML(render_bundle(store))}
     % endif
 
-    <div id="${id}"></div>
+    <div id="renderReact-${id}"></div>
     <script type="text/javascript">
       var c;
       try { c = ${component | n, decode.utf8}; } catch (e) { c = null; }
       try { s = ${store | n, decode.utf8}; } catch (e) { s = null; }
       new ReactRenderer({
         component: c,
-        selector: '#${id | n, decode.utf8}',
+        id: '${id | n, decode.utf8}',
         componentName: '${component | n, js_escaped_string}',
         props: ${props | n, dump_js_escaped_json},
         store: s
