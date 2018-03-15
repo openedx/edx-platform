@@ -124,7 +124,7 @@ class VideoTranscripts(generics.RetrieveAPIView):
         video_descriptor = modulestore().get_item(usage_key)
         feature_enabled = is_val_transcript_feature_enabled_for_course(usage_key.course_key)
         try:
-            transcripts = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
+            transcripts = video_descriptor.get_transcripts_info()
             content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
         except (ValueError, NotFoundError):
             # Fallback mechanism for edx-val transcripts

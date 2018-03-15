@@ -21,11 +21,12 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import TranscriptException, TranscriptsGenerationException
+from xmodule.video_module.transcripts_utils import TranscriptException, TranscriptsGenerationException, Transcript
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
+
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
@@ -435,7 +436,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.video_handlers.get_transcript',
+        return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8')
+    )
     def test_download_srt_exist(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
@@ -443,7 +447,10 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Language'], 'en')
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'txt', 'text/plain; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.video_handlers.get_transcript',
+        return_value=('Subs!', 'txt', 'text/plain; charset=utf-8')
+    )
     def test_download_txt_exist(self, __):
         self.item.transcript_format = 'txt'
         request = Request.blank('/download')
@@ -460,13 +467,16 @@ class TestTranscriptDownloadDispatch(TestVideo):
         with self.assertRaises(NotFoundError):
             self.item.get_transcript(transcripts)
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', u"塞.srt", 'application/x-subrip; charset=utf-8'))
+    @patch(
+        'xmodule.video_module.transcripts_utils.get_transcript_for_video',
+        return_value=(Transcript.SRT, u"塞", 'Subs!')
+    )
     def test_download_non_en_non_ascii_filename(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.body, 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
-        self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
+        self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
     @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
@@ -600,6 +610,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # youtube 1_0 request, will generate for all speeds for existing ids
         self.item.youtube_id_1_0 = subs_id
         self.item.youtube_id_0_75 = '0_75'
+        self.store.update_item(self.item, self.user.id)
         request = Request.blank('/translation/uk?videoId={}'.format(subs_id))
         response = self.item.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body), subs)
@@ -614,9 +625,11 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
                 u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
+
         self.assertDictEqual(json.loads(response.body), calculated_0_75)
         # 1_5 will be generated from 1_0
         self.item.youtube_id_1_5 = '1_5'
+        self.store.update_item(self.item, self.user.id)
         request = Request.blank('/translation/uk?videoId={}'.format('1_5'))
         response = self.item.transcript(request=request, dispatch='translation/uk')
         calculated_1_5 = {
@@ -638,6 +651,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         subs_id = _get_subs_id(good_sjson.name)
 
         attach(self.item, subs_id)
+        self.store.update_item(self.item, self.user.id)
         request = Request.blank(url)
         response = self.item.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body), TRANSCRIPT)
@@ -798,33 +812,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # Make request to XModule transcript handler
         response = self.item.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
         # Assert the actual response
-        self.assertEqual(response.status_code, 404)
-
-    @ddt.data(True, False)
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
-    def test_translations_bumper_transcript(self, feature_enabled,
-                                            mock_val_video_transcript_feature, mock_get_video_transcript_data):
-        """
-        Tests that the translations dispatch response remains the same with or without enabling
-        video transcript feature.
-        """
-        # Mock val api util and return the valid transcript file.
-        transcript = {
-            'content': json.dumps({
-                "start": [10],
-                "end": [100],
-                "text": ["Hi, welcome to Edx."],
-            }),
-            'file_name': 'edx.sjson'
-        }
-        mock_get_video_transcript_data.return_value = transcript
-
-        mock_val_video_transcript_feature.return_value = feature_enabled
-        self.item.video_bumper = {"transcripts": {"en": "unknown.srt.sjson"}}
-        request = Request.blank('/translations/en?is_bumper=1')
-        response = self.item.transcript(request=request, dispatch='translation/en')
-        # Assert that despite the existence of val video transcripts, response remains 404.
         self.assertEqual(response.status_code, 404)
 
 
