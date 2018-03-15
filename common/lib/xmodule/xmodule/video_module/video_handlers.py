@@ -31,6 +31,8 @@ from .transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
     youtube_speed_dict,
+    get_transcript,
+    get_transcript_from_contentstore
 )
 from .transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -246,6 +248,36 @@ class VideoStudentViewHandlers(object):
         self.runtime.publish(self, "completion", data)
         return {"result": "ok"}
 
+    @staticmethod
+    def make_transcript_http_response(content, filename, language, content_type, add_attachment_header=True):
+        """
+        Construct `Response` object.
+
+        Arguments:
+            content (unicode): transcript content
+            filename (unicode): transcript filename
+            language (unicode): transcript language
+            mimetype (unicode): transcript content type
+            add_attachment_header (bool): whether to add attachment header or not
+        """
+        headerlist = [
+            ('Content-Language', language),
+        ]
+
+        if add_attachment_header:
+            headerlist.append(
+                ('Content-Disposition', 'attachment; filename="{}"'.format(filename.encode('utf-8')))
+            )
+
+        response = Response(
+            content,
+            headerlist=headerlist,
+            charset='utf8'
+        )
+        response.content_type = content_type
+
+        return response
+
     @XBlock.handler
     def transcript(self, request, dispatch):
         """
@@ -270,9 +302,8 @@ class VideoStudentViewHandlers(object):
                     For 'en' check if SJSON exists. For non-`en` check if SRT file exists.
         """
         is_bumper = request.GET.get('is_bumper', False)
-        # Currently, we don't handle video pre-load/bumper transcripts in edx-val.
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id) and not is_bumper
-        transcripts = self.get_transcripts_info(is_bumper, include_val_transcripts=feature_enabled)
+        transcripts = self.get_transcripts_info(is_bumper)
+
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 
@@ -288,85 +319,52 @@ class VideoStudentViewHandlers(object):
                 self.transcript_language = language
 
             try:
-                transcript = self.translation(request.GET.get('videoId', None), transcripts)
-            except (TypeError, TranscriptException, NotFoundError) as ex:
-                # Catching `TranscriptException` because its also getting raised at places
-                # when transcript is not found in contentstore.
-                log.debug(six.text_type(ex))
-                # Try to return static URL redirection as last resort
-                # if no translation is required
-                response = self.get_static_transcript(request, transcripts)
-                if response.status_code == 404 and feature_enabled:
-                    # Try to get transcript from edx-val as a last resort.
-                    transcript = get_video_transcript_content(self.edx_video_id, self.transcript_language)
-                    if transcript:
-                        transcript_conversion_props = dict(transcript, output_format=Transcript.SJSON)
-                        transcript = convert_video_transcript(**transcript_conversion_props)
-                        response = Response(
-                            transcript['content'],
-                            headerlist=[('Content-Language', self.transcript_language)],
-                            charset='utf8',
-                        )
-                        response.content_type = Transcript.mime_types[Transcript.SJSON]
+                if is_bumper:
+                    content, filename, mimetype = get_transcript_from_contentstore(
+                        self,
+                        self.transcript_language,
+                        Transcript.SJSON,
+                        transcripts
+                    )
+                else:
+                    content, filename, mimetype = get_transcript(
+                        self,
+                        lang=self.transcript_language,
+                        output_format=Transcript.SJSON,
+                        youtube_id=request.GET.get('videoId'),
+                    )
 
-                return response
-            except (UnicodeDecodeError, TranscriptsGenerationException) as ex:
-                log.info(six.text_type(ex))
-                response = Response(status=404)
-            else:
-                response = Response(transcript, headerlist=[('Content-Language', language)])
-                response.content_type = Transcript.mime_types['sjson']
+                response = self.make_transcript_http_response(
+                    content,
+                    filename,
+                    self.transcript_language,
+                    mimetype,
+                    add_attachment_header=False
+                )
+            except NotFoundError:
+                log.exception('[Translation Dispatch] %s', self.location)
+                response = self.get_static_transcript(request, transcripts)
 
         elif dispatch == 'download':
             lang = request.GET.get('lang', None)
+
             try:
-                transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
-                    transcripts, transcript_format=self.transcript_download_format, lang=lang
-                )
-            except (KeyError, UnicodeDecodeError):
+                content, filename, mimetype = get_transcript(self, lang)
+            except NotFoundError:
                 return Response(status=404)
-            except (ValueError, NotFoundError):
-                response = Response(status=404)
-                # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
-                if feature_enabled:
-                    # Make sure the language is set.
-                    if not lang:
-                        lang = self.get_default_transcript_language(transcripts)
 
-                    transcript = get_video_transcript_content(edx_video_id=self.edx_video_id, language_code=lang)
-                    if transcript:
-                        transcript_conversion_props = dict(transcript, output_format=self.transcript_download_format)
-                        transcript = convert_video_transcript(**transcript_conversion_props)
-                        response = Response(
-                            transcript['content'],
-                            headerlist=[
-                                ('Content-Disposition', 'attachment; filename="{filename}"'.format(
-                                    filename=transcript['filename']
-                                )),
-                                ('Content-Language', lang),
-                            ],
-                            charset='utf8',
-                        )
-                        response.content_type = Transcript.mime_types[self.transcript_download_format]
-
-                return response
-            else:
-                response = Response(
-                    transcript_content,
-                    headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename.encode('utf8'))),
-                        ('Content-Language', self.transcript_language),
-                    ],
-                    charset='utf8'
-                )
-                response.content_type = transcript_mime_type
-
+            response = self.make_transcript_http_response(
+                content,
+                filename,
+                self.transcript_language,
+                mimetype
+            )
         elif dispatch.startswith('available_translations'):
-
+            feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id) and not is_bumper
             available_translations = self.available_translations(
                 transcripts,
                 verify_assets=True,
-                include_val_transcripts=feature_enabled,
+                include_val_transcripts=feature_enabled
             )
             if available_translations:
                 response = Response(json.dumps(available_translations))
