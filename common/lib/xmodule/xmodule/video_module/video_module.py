@@ -302,8 +302,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if download_video_link and download_video_link.endswith('.m3u8'):
                 download_video_link = None
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
-        transcripts = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        transcripts = self.get_transcripts_info()
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
@@ -1072,7 +1071,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 }
 
         feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
-        transcripts_info = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        transcripts_info = self.get_transcripts_info()
         available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)

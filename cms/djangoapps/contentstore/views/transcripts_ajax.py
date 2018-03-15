@@ -39,6 +39,7 @@ from xmodule.video_module.transcripts_utils import (
     Transcript,
     TranscriptsRequestValidationException,
     youtube_video_transcript_name,
+    get_transcript,
 )
 from xmodule.video_module.transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -148,9 +149,7 @@ def download_transcripts(request):
 
     Raises Http404 if unsuccessful.
     """
-    locator = request.GET.get('locator')
-    subs_id = request.GET.get('subs_id')
-    if not locator:
+    if not request.GET.get('locator'):
         log.debug('GET data without "locator" property.')
         raise Http404
 
@@ -165,37 +164,16 @@ def download_transcripts(request):
         raise Http404
 
     try:
-        if not subs_id:
-            raise NotFoundError
-
-        filename = subs_id
-        content_location = StaticContent.compute_location(
-            item.location.course_key,
-            'subs_{filename}.srt.sjson'.format(filename=filename),
+        content, filename, mimetype = get_transcript(
+            item,
+            lang=u'en',
         )
-        input_format = Transcript.SJSON
-        transcript_content = contentstore().find(content_location).data
     except NotFoundError:
-        # Try searching in VAL for the transcript as a last resort
-        transcript = None
-        if is_val_transcript_feature_enabled_for_course(item.location.course_key):
-            transcript = get_video_transcript_content(edx_video_id=item.edx_video_id, language_code=u'en')
-
-        if not transcript:
-            raise Http404
-
-        name_and_extension = os.path.splitext(transcript['file_name'])
-        filename, input_format = name_and_extension[0], name_and_extension[1][1:]
-        transcript_content = transcript['content']
-
-    # convert sjson content into srt format.
-    transcript_content = Transcript.convert(transcript_content, input_format=input_format, output_format=Transcript.SRT)
-    if not transcript_content:
         raise Http404
 
     # Construct an HTTP response
-    response = HttpResponse(transcript_content, content_type='application/x-subrip; charset=utf-8')
-    response['Content-Disposition'] = 'attachment; filename="{filename}.srt"'.format(filename=filename)
+    response = HttpResponse(content, content_type=mimetype)
+    response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
     return response
 
 
