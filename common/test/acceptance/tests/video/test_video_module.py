@@ -1140,7 +1140,8 @@ class DragAndDropTest(VideoBaseTest):
         self.assertTrue(self.video.is_closed_captions_visible)
 
         action = ActionChains(self.browser)
-        self.video.scroll_to_element('.closed-captions')
+        import time; time.sleep(10)
+        # self.browser.wait_for_element_presence('.closed-captions', 'Wait for closed-captions to load')
         captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
 
         captions_start = captions.location
