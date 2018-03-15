@@ -397,35 +397,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.courseware_page.stop_timed_exam()
         LogoutPage(self.browser).visit()
 
-    def test_can_add_remove_allowance(self):
-        """
-        Make sure that allowances can be added and removed.
-        """
-        # Given that an exam has been configured to be a timed exam.
-        self._create_a_timed_exam_and_attempt()
-
-        # When I log in as an instructor,
-        __, __ = self.log_in_as_instructor()
-
-        # And visit the Allowance Section of Instructor Dashboard's Special Exams tab
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
-
-        # Then I can add Allowance to that exam for a student
-        self.assertTrue(allowance_section.is_add_allowance_button_visible)
-
-        # When I click the Add Allowance button
-        allowance_section.click_add_allowance_button()
-
-        # Then popup should be visible
-        self.assertTrue(allowance_section.is_add_allowance_popup_visible)
-
-        # When I fill and submit the allowance form
-        allowance_section.submit_allowance_form('10', self.USERNAME)
-
-        # Then, the added record should be visible
-        self.assertTrue(allowance_section.is_allowance_record_visible)
-
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
