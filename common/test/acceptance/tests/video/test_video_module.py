@@ -1138,10 +1138,9 @@ class DragAndDropTest(VideoBaseTest):
         self.video.show_closed_captions()
         self.video.wait_for_closed_captions()
         self.assertTrue(self.video.is_closed_captions_visible)
-
+        self.video.scroll_to_element('.closed-captions')
         action = ActionChains(self.browser)
         captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
-        self.video.scroll_to_element('.closed-captions')
 
         captions_start = captions.location
         xOffset = captions_start.get('x')
