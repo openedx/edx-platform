@@ -415,14 +415,24 @@ class RegistrationFormFactory(object):
         # meant to hold the user's password.
         password_label = _(u"Password")
 
+        restrictions = {}
+
+        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+            complexities = getattr(settings, 'PASSWORD_COMPLEXITY', {})
+            for key, value in complexities.iteritems():
+                api_key = key.lower().replace(' ', '_')
+                restrictions[api_key] = value
+
+        restrictions.update({
+            "min_length": password_min_length(),
+            "max_length": password_max_length(),
+        })
+
         form_desc.add_field(
             "password",
             label=password_label,
             field_type="password",
-            restrictions={
-                "min_length": password_min_length(),
-                "max_length": password_max_length(),
-            },
+            restrictions=restrictions,
             required=required
         )
 
