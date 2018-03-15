@@ -949,6 +949,22 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_OTHER_COURSE_SETTINGS': True})
+    def test_othercoursesettings_present(self):
+        """
+        If feature flag ENABLE_OTHER_COURSE_SETTINGS is on, show the setting in Advanced Settings.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('other_course_settings', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OTHER_COURSE_SETTINGS': False})
+    def test_othercoursesettings_not_present(self):
+        """
+        If feature flag ENABLE_OTHER_COURSE_SETTINGS is off, don't show the setting at all in Advanced Settings.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('other_course_settings', test_model)
+
     def test_allow_unsupported_xblocks(self):
         """
         allow_unsupported_xblocks is only shown in Advanced Settings if

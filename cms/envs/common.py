@@ -236,6 +236,10 @@ FEATURES = {
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
 
+    # Show a new field in "Advanced settings" that can store custom data about a
+    # course and that can be read from themes
+    'ENABLE_OTHER_COURSE_SETTINGS': False,
+
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
     'ENABLE_CONTENT_LIBRARIES': True,
