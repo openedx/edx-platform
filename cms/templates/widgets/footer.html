@@ -15,7 +15,6 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILI
         <p>&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
       </div>
 
-      % if is_any_marketing_link_set(['TOS', 'PRIVACY']) or waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
         <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
             % if is_marketing_link_set('TOS'):
@@ -33,9 +32,11 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILI
                 <a data-rel="edx.org" href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
               </li>
             %endif
+            <li class="nav-item">
+              <a data-rel="edx.org" id="lms-link" href="${settings.LMS_ROOT_URL}">${_("LMS")}</a>
+            </li>
           </ol>
         </nav>
-      % endif
     </div>
 
     <div class="footer-content-secondary" aria-label="${_("Legal")}">
