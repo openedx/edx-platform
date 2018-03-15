@@ -275,6 +275,34 @@ class TestPaverWatchAssetTasks(TestCase):
                     self.assertIsInstance(sass_watcher_args[1], list)
                     self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
 
+    def test_watch_lms_assets(self):
+        """
+        Test the Paver watch asset tasks with LMS system.
+        """
+        expected_sass_directories = [
+            path('lms/static/sass/partials'),
+            path('lms/static/sass'),
+            path('lms/static/certificates/sass')
+        ]
+
+        with patch('pavelib.assets.SassWatcher.register') as mock_register, \
+                patch('pavelib.assets.Observer.start'), \
+                patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
+                    call_task(
+                        'pavelib.assets.watch_assets',
+                        options={
+                            "background": True,
+                            "system": 'lms',
+                        },
+                    )
+                    self.assertEqual(mock_register.call_count, 2)
+                    self.assertEqual(mock_webpack.call_count, 1)
+
+                    sass_watcher_args = mock_register.call_args_list[0][0]
+                    self.assertIsInstance(sass_watcher_args[0], Observer)
+                    self.assertIsInstance(sass_watcher_args[1], list)
+                    self.assertItemsEqual(sass_watcher_args[1], expected_sass_directories)
+
 
 @ddt.ddt
 class TestCollectAssets(PaverTestCase):
