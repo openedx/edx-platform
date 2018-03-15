@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { StatusAlert } from '@edx/paragon';
 import SearchContainer from '../Search/SearchContainer.jsx';
+import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableContainer.jsx';
 
 const Main = props => (
   <div>
@@ -16,12 +17,14 @@ const Main = props => (
       Entitlement Support Page
     </h2>
     <SearchContainer />
+    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} />
   </div>
 );
 
 Main.propTypes = {
   errorMessage: PropTypes.string.isRequired,
   dismissErrorMessage: PropTypes.func.isRequired,
+  ecommerceUrl: PropTypes.string.isRequired,
 };
 
 export default Main;

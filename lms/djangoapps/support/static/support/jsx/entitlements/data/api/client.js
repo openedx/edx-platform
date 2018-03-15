@@ -16,8 +16,7 @@ const getEntitlements = username => fetch(
   },
 );
 
-
-const createEntitlement = ({ username, courseUuid, mode, action, comments }) => fetch(
+const createEntitlement = ({ username, courseUuid, mode, action, comments = null }) => fetch(
   `${entitlementApi}`, {
     credentials: 'same-origin',
     method: 'post',
@@ -34,9 +33,8 @@ const createEntitlement = ({ username, courseUuid, mode, action, comments }) => 
   },
 );
 
-
-const updateEntitlement = ({ entitlementUuid, unenrolledRun, action, comments }) => fetch(
-  `${entitlementApi}/${entitlementUuid}`, {
+const updateEntitlement = ({ uuid, action, unenrolledRun = null, comments = null }) => fetch(
+  `${entitlementApi}/${uuid}`, {
     credentials: 'same-origin',
     method: 'patch',
     headers: HEADERS,
@@ -51,7 +49,6 @@ const updateEntitlement = ({ entitlementUuid, unenrolledRun, action, comments })
     }),
   },
 );
-
 
 export {
   getEntitlements,

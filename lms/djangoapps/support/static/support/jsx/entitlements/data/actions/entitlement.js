@@ -1,5 +1,6 @@
-import { getEntitlements } from '../api/client';
+import camelize from 'camelize';
 
+import { getEntitlements } from '../api/client';
 import { entitlementActions } from './constants';
 import { displayError } from './error';
 
@@ -22,11 +23,10 @@ const fetchEntitlements = username =>
       throw new Error(response);
     })
     .then(
-      json => dispatch(fetchEntitlementsSuccess(json.results)),
+      json => dispatch(fetchEntitlementsSuccess(camelize(json.results))),
       error => dispatch(fetchEntitlementsFailure(error)),
     );
   };
-
 
 export {
   fetchEntitlements,
