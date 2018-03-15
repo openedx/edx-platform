@@ -135,7 +135,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     this.updateHtml(element, html);
                     return this.addXBlockFragmentResources(resources);
                 } catch (e) {
-                    console.error(e.stack);
+                    console.error(e, e.stack);
                     return $.Deferred().resolve();
                 }
             },

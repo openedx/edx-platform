@@ -34,6 +34,7 @@ module.exports = {
         'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
         'js/pages/container': './cms/static/js/pages/container.js',
         'js/pages/library': './cms/static/js/pages/library.js',
+        'js/pages/xblock_validation': './cms/static/js/pages/xblock_validation.js',
         'js/sock': './cms/static/js/sock.js',
 
         // LMS
@@ -318,6 +319,7 @@ module.exports = {
             'cms/djangoapps/pipeline_js/js',
             'cms/static',
             'cms/static/cms/js',
+            'lms/static',
             'common/lib/xmodule',
             'common/lib/xmodule/xmodule/js/src',
             'common/static',

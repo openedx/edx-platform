@@ -27,17 +27,13 @@ block_is_unit = is_unit(xblock)
 </script>
 </%block>
 
-<script>
-    require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
-        XBlockValidationFactory(
-            ${messages | n, dump_js_escaped_json},
-            ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
-            ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
-            ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
-            $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
-        );
-    });
-</script>
+<%static:webpack page_name="js/pages/xblock_validation" class_name="XBlockValidationFactory">
+    ${messages | n, dump_js_escaped_json},
+    ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
+    ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+    ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
+    $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
+</%static:webpack>
 
 % if isinstance(xblock, (XModule, XModuleDescriptor)):
     <%static:webpack entry="${getattr(xblock.__class__, 'unmixed_class', xblock.__class__).__name__}"/>
