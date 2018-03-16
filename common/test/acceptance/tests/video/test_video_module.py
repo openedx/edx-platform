@@ -1143,6 +1143,7 @@ class DragAndDropTest(VideoBaseTest):
         captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
 
         captions_start = captions.location
+        print captions_start
         action.drag_and_drop_by_offset(captions, 0, -15).perform()
 
         captions_end = captions.location
