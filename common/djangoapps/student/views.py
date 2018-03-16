@@ -2683,10 +2683,11 @@ class LogoutView(TemplateView):
         # only log the user out of their Microsoft account
         is_true = lambda value: bool(value) and value.lower() not in ('false', '0')
         msa_only = is_true(request.GET.get('msa_only'))
+        auto_link = is_true(request.GET.get('auto_link'))
         msa_migration_enabled = configuration_helpers.get_value("ENABLE_MSA_MIGRATION")
 
         if msa_only and third_party_auth.is_enabled() and msa_migration_enabled:
-            return self._do_microsoft_account_logout(request, msa_only=True)
+            return self._do_microsoft_account_logout(request, msa_only=msa_only, auto_link=auto_link)
 
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
         request.is_from_logout = True
@@ -2727,7 +2728,7 @@ class LogoutView(TemplateView):
         new_query_string = urlencode(query_params, doseq=True)
         return urlunsplit((scheme, netloc, path, new_query_string, fragment))
 
-    def _do_microsoft_account_logout(self, request, msa_only=False):
+    def _do_microsoft_account_logout(self, request, msa_only=False, auto_link=False):
         """
         Log the user out of Microsoft Account. Only applicable during MSA_MIGRATION
 
@@ -2745,7 +2746,9 @@ class LogoutView(TemplateView):
         lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL')
 
         if msa_only:
-            redirect_url = '{}/account/link?auto=true'.format(lms_root_url)
+            redirect_url = '{}/account/link'.format(lms_root_url)
+            if auto_link:
+                redirect_url += '?{}'.format(urlencode({'auto': True}))
         else:
             redirect_url = lms_root_url
             next_url = request.GET.get('next')

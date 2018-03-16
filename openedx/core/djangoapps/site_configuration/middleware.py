@@ -124,7 +124,10 @@ class AccountLinkingMiddleware(object):
         If the site is configured to restrict not logged in users to the DEFAULT_ACCOUNT_LINK_EXEMPT_URLS
         from accessing pages, wrap the next view with the django login_required middleware
         """
-        if request.user.is_authenticated() and configuration_helpers.get_value("ENABLE_MSA_MIGRATION"):
+        user_not_priveleged = (
+            request.user.is_authenticated() and not request.user.is_staff and not request.user.is_superuser
+        )
+        if user_not_priveleged and configuration_helpers.get_value("ENABLE_MSA_MIGRATION"):
             # Check if user has associated a Microsoft account
             try:
                 UserSocialAuth.objects.get(user=request.user, provider="live")
@@ -150,5 +153,4 @@ class AccountLinkingMiddleware(object):
         REDIRECT_URLS = [compile(expr) for expr in account_linking_redirect_urls]
         path = request.path_info.lstrip('/')
         if any(m.match(path) for m in REDIRECT_URLS) and path != redirect_to.lstrip('/'):
-            print("entered into redirection {}".format(redirect_to))
             return redirect(redirect_to)
