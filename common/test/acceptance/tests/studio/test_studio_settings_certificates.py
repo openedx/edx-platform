@@ -2,7 +2,6 @@
 Acceptance tests for Studio's Setting pages
 """
 import re
-import uuid
 
 from nose.plugins.attrib import attr
 
@@ -73,7 +72,7 @@ class CertificatesTest(StudioCourseTest):
             certificate.signatories[idx].name = signatory['name']
             certificate.signatories[idx].title = signatory['title']
             certificate.signatories[idx].organization = signatory['organization']
-            certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(uuid.uuid4().hex[:4]))
+            certificate.signatories[idx].upload_signature_image('Signature-{}.png'.format(idx))
 
             added_signatories += 1
             if len(signatories) > added_signatories:

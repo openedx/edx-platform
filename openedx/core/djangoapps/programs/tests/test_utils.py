@@ -825,7 +825,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
-    checkout_path = '/basket/add'
+    checkout_path = '/basket/add/'
     instructors = {
         'instructors': [
             {

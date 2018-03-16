@@ -218,6 +218,7 @@ class ImportTestMixin(object):
             A button will appear that contains the URL to the library or course's main page
         """
         self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
         self.assertEqual(self.import_page.finished_target_url(), self.landing_page.url)
 
     def test_bad_filename_error(self):
@@ -242,6 +243,7 @@ class ImportTestMixin(object):
         self.assertFalse(self.import_page.is_task_list_showing(), "Task list shown too early.")
         self.import_page.wait_for_tasks()
         self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
         self.import_page.wait_for_tasks(completed=True)
         self.assertTrue(self.import_page.is_task_list_showing(), "Task list did not display.")
 

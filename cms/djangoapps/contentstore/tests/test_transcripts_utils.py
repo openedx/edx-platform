@@ -760,7 +760,11 @@ class TestGetTranscript(SharedModuleStoreTestCase):
 
         self.user = UserFactory.create()
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.course.location)
-        self.video = ItemFactory.create(category='video', parent_location=self.vertical.location)
+        self.video = ItemFactory.create(
+            category='video',
+            parent_location=self.vertical.location,
+            edx_video_id=u'1234-5678-90'
+        )
 
     def create_transcript(self, subs_id, language=u'en', filename='video.srt'):
         """
@@ -774,7 +778,8 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             category='video',
             parent_location=self.vertical.location,
             sub=subs_id,
-            transcripts=transcripts
+            transcripts=transcripts,
+            edx_video_id=u'1234-5678-90'
         )
 
         if subs_id:
@@ -823,7 +828,10 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         Verify that `NotFoundError` exception is raised when transcript is not found in both the content store and val.
         """
         with self.assertRaises(NotFoundError):
-            transcripts_utils.get_transcript(self.course.id, self.video.location.block_id, lang=lang)
+            transcripts_utils.get_transcript(
+                self.video,
+                lang=lang
+            )
 
     @ddt.data(
         {
@@ -845,8 +853,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, filename)
         self.create_transcript(subs_id, language, filename)
         content, filename, mimetype = transcripts_utils.get_transcript(
-            self.course.id,
-            self.video.location.block_id,
+            self.video,
             language
         )
 
@@ -861,8 +868,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         language = u'ur'
         self.create_transcript(self.subs_id, language)
         content, filename, mimetype = transcripts_utils.get_transcript(
-            self.course.id,
-            self.video.location.block_id,
+            self.video,
             language,
             output_format=transcripts_utils.Transcript.SJSON
         )
@@ -871,10 +877,6 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.assertEqual(filename, 'ur_video_101.sjson')
         self.assertEqual(mimetype, self.sjson_mime_type)
 
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=True),
-    )
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     def test_get_transcript_from_val(self, mock_get_video_transcript_content):
         """
@@ -886,8 +888,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         }
 
         content, filename, mimetype = transcripts_utils.get_transcript(
-            self.course.id,
-            self.video.location.block_id,
+            self.video,
         )
         self.assertEqual(content, self.subs_srt)
         self.assertEqual(filename, 'edx.srt')
@@ -899,8 +900,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         """
         with self.assertRaises(NotFoundError) as invalid_format_exception:
             transcripts_utils.get_transcript(
-                self.course.id,
-                self.video.location.block_id,
+                self.video,
                 'ur',
                 output_format='mpeg'
             )
@@ -917,8 +917,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
 
         with self.assertRaises(NotFoundError) as no_content_exception:
             transcripts_utils.get_transcript(
-                self.course.id,
-                self.video.location.block_id,
+                self.video,
                 'ur'
             )
 
@@ -933,8 +932,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.store.update_item(self.video, self.user.id)
         with self.assertRaises(NotFoundError) as no_en_transcript_exception:
             transcripts_utils.get_transcript(
-                self.course.id,
-                self.video.location.block_id,
+                self.video,
                 'en'
             )
 

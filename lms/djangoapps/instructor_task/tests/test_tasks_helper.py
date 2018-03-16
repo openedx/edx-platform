@@ -1041,7 +1041,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             {
                 'user': self.staff_user,
                 'enrollment_status': ENROLLED_IN_COURSE,
-                'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
+                'grade': [u'0.0', u'Not Attempted', u'2.0', u'Not Attempted', u'2.0'],
             },
             {
                 'user': self.alpha_user,

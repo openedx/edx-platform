@@ -21,9 +21,6 @@ Feature: LMS.Answer problems
         | checkbox          | incorrect     | always        |
         | radio             | correct       | always        |
         | radio             | incorrect     | always        |
-        #| string            | correct       | always        |
-        #| string            | incorrect     | always        |
-        | numerical         | correct       | always        |
         | numerical         | incorrect     | always        |
         | formula           | correct       | always        |
         | formula           | incorrect     | always        |
