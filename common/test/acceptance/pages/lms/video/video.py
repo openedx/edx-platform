@@ -941,14 +941,14 @@ class VideoPage(PageObject):
         Wait until closed captions are rendered completely.
         """
         cc_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
-        self.wait_for_element_visibility(cc_rendered_selector, 'Closed captions rendered')
+        self.wait_for_element_presence(cc_rendered_selector, 'Closed captions rendered')
 
     def wait_for_closed_captions_to_be_hidden(self):
         """
         Waits for the closed captions to be turned off completely.
         """
         cc_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
-        self.wait_for_element_invisibility(cc_rendered_selector, 'Closed captions hidden')
+        self.wait_for_element_absence(cc_rendered_selector, 'Closed captions hidden')
 
 
 def _parse_time_str(time_str):
