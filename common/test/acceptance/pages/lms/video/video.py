@@ -674,6 +674,7 @@ class VideoPage(PageObject):
         time.sleep(1)
 
         # mouse over to transcript button
+        self.scroll_to_button("transcript_button")
         cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["transcript_button"])
         element_to_hover_over = self.q(css=cc_button_selector).results[0]
         ActionChains(self.browser).move_to_element(element_to_hover_over).perform()
@@ -940,14 +941,14 @@ class VideoPage(PageObject):
         Wait until closed captions are rendered completely.
         """
         cc_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
-        self.wait_for_element_visibility(cc_rendered_selector, 'Closed captions rendered')
+        self.wait_for_element_presence(cc_rendered_selector, 'Closed captions rendered')
 
     def wait_for_closed_captions_to_be_hidden(self):
         """
         Waits for the closed captions to be turned off completely.
         """
         cc_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['closed_captions'])
-        self.wait_for_element_invisibility(cc_rendered_selector, 'Closed captions hidden')
+        self.wait_for_element_absence(cc_rendered_selector, 'Closed captions hidden')
 
 
 def _parse_time_str(time_str):
