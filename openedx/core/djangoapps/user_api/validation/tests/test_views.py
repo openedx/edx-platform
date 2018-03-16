@@ -175,7 +175,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         msg = u'Password: Invalid Length (must be {0} characters or more)'.format(password_min_length())
         self.assertValidationDecision(
             {'password': ''},
-            {"password": text_type([msg])}
+            {"password": msg}
         )
 
     def test_password_bad_min_length_validation_decision(self):
@@ -183,7 +183,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         msg = u'Password: Invalid Length (must be {0} characters or more)'.format(password_min_length())
         self.assertValidationDecision(
             {'password': password},
-            {"password": text_type([msg])}
+            {"password": msg}
         )
 
     def test_password_bad_max_length_validation_decision(self):
@@ -191,11 +191,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         msg = u'Password: Invalid Length (must be {0} characters or fewer)'.format(password_max_length())
         self.assertValidationDecision(
             {'password': password},
-            {"password": text_type([msg])}
+            {"password": msg}
         )
 
     def test_password_equals_username_validation_decision(self):
         self.assertValidationDecision(
             {"username": "somephrase", "password": "somephrase"},
-            {"username": "", "password": text_type([u"Password cannot be the same as the username"])}
+            {"username": "", "password": u"Password cannot be the same as the username"}
         )
