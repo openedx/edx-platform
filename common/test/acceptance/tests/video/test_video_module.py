@@ -1143,9 +1143,7 @@ class DragAndDropTest(VideoBaseTest):
         captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
 
         captions_start = captions.location
-        xOffset = captions_start.get('x')
-        yOffset = captions_start.get('y') - 15
-        action.drag_and_drop_by_offset(captions, xOffset, yOffset).perform()
+        action.drag_and_drop_by_offset(captions, 0, -15).perform()
 
         captions_end = captions.location
         # We have to branch here due to unexpected behaviour of chrome.
