@@ -114,10 +114,7 @@ def login_and_registration_form(request, initial_mode="login"):
     if isinstance(third_party_auth_context, HttpResponse):
         return third_party_auth_context
 
-    enable_msa_migration = configuration_helpers.get_value(
-        "ENABLE_MSA_MIGRATION",
-        settings.FEATURES.get("ENABLE_MSA_MIGRATION", False)
-    )
+    enable_msa_migration = configuration_helpers.get_value("ENABLE_MSA_MIGRATION")
 
     # Otherwise, render the combined login/registration page
     context = {

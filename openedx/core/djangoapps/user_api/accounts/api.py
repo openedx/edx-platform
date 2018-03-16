@@ -241,10 +241,7 @@ def update_account_settings(requesting_user, update, username=None, force_email_
             u"Error thrown when saving account updates: '{}'".format(err.message)
         )
     meta = existing_user_profile.get_meta()
-    msa_migration_enabled = configuration_helpers.get_value(
-        "ENABLE_MSA_MIGRATION",
-        settings.FEATURES.get("ENABLE_MSA_MIGRATION", False)
-    )
+    msa_migration_enabled = configuration_helpers.get_value("ENABLE_MSA_MIGRATION")
     # And try to send the email change request if necessary.
     if changing_email:
         if force_email_update and msa_migration_enabled:
