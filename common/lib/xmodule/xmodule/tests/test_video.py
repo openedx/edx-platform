@@ -12,6 +12,7 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
+import json
 import os
 import unittest
 import datetime
@@ -896,9 +897,11 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course', Mock(return_value=False))
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     @patch('edxval.api.get_video_info')
-    def test_student_view_data_with_hls_flag(self, mock_get_video_info):
+    def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {
             'url': '/edxval/video/example',
             'edx_video_id': u'example_id',
@@ -914,8 +917,18 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
             ]
         }
 
+        mock_get_video_transcript_content.return_value = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+
         descriptor = instantiate_descriptor(edx_video_id='example_id', only_on_web=False)
         descriptor.runtime.course_id = MagicMock()
+        descriptor.runtime.handler_url = MagicMock()
         student_view_data = descriptor.student_view_data()
         expected_video_data = {u'hls': {'url': u'http://www.meowmix.com', 'file_size': 25556}}
         self.assertDictEqual(student_view_data.get('encoded_videos'), expected_video_data)
