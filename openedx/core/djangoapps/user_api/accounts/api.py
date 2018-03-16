@@ -657,8 +657,10 @@ def _validate_password(password, username=None):
         _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
 
         validate_password(password, username=username)
-    except (errors.AccountDataBadType, ValidationError) as invalid_password_err:
+    except errors.AccountDataBadType as invalid_password_err:
         raise errors.AccountPasswordInvalid(text_type(invalid_password_err))
+    except ValidationError as validation_err:
+        raise errors.AccountPasswordInvalid(validation_err.message)
 
 
 def _validate_country(country):
