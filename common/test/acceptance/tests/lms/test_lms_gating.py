@@ -210,6 +210,7 @@ class GatingTest(UniqueCourseTest):
 
         self.course_home_page.visit()
         self.course_home_page.preview.set_staff_view_mode('Learner')
+        self.course_home_page.wait_for_page()
         self.assertEqual(self.course_home_page.outline.num_subsections, 2)
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
         self.courseware_page.wait_for_page()
@@ -218,6 +219,7 @@ class GatingTest(UniqueCourseTest):
 
         self.course_home_page.visit()
         self.course_home_page.preview.set_staff_view_mode_specific_student(self.STUDENT_USERNAME)
+        self.course_home_page.wait_for_page()
         self.assertEqual(self.course_home_page.outline.num_subsections, 2)
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 2')
         self.courseware_page.wait_for_page()
