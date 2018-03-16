@@ -89,7 +89,6 @@ export class ReactRenderer { // eslint-disable-line import/prefer-default-export
   renderComponent() {
     const targetElement = this.getTargetElement();
     let el = React.createElement(this.component, this.props, null);
-
     if (this.store) {
       el = React.createElement(Provider, {
         store: this.store,

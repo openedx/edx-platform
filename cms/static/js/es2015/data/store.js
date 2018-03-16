@@ -6,7 +6,7 @@ const StudioStore = createStore(
 );
 
 syncCollections({
-  TextbooksCollection: window.models.TextbookCollection,
+  TextbookCollection: window.models.TextbookCollection,
 }, StudioStore);
 
 export { StudioStore }; // eslint-disable-line import/prefer-default-export

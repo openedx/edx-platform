@@ -3,7 +3,7 @@ import NoTextbooks from '../components/NoTextbooks';
 
 const mapStateToProps = state => (
   {
-    TextbooksCollection: state.TextbooksCollection,
+    TextbookCollection: state.TextbookCollection.entities,
   }
 );
 

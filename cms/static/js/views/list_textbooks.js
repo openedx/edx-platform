@@ -1,8 +1,13 @@
-define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_textbook', 'common/js/components/utils/view_utils'],
+define([
+    'js/views/baseview',
+    'jquery',
+    'js/views/edit_textbook',
+    'js/views/show_textbook',
+    'common/js/components/utils/view_utils'
+],
         function(BaseView, $, EditTextbookView, ShowTextbookView, ViewUtils) {
             var ListTextbooks = BaseView.extend({
                 initialize: function() {
-                    this.emptyTemplate = this.loadTemplate('no-textbooks');
                     this.listenTo(this.collection, 'all', this.render);
                     this.listenTo(this.collection, 'destroy', this.handleDestroy);
                 },
@@ -10,11 +15,9 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
                 className: 'textbooks-list',
                 render: function() {
                     var textbooks = this.collection;
-                    if (textbooks.length === 0) {
-                        this.$el.html(this.emptyTemplate());
-                    } else {
-                        this.$el.empty();
-                        var that = this;
+                    var that = this;
+                    this.$el.empty();
+                    if (textbooks.length > 0) {
                         textbooks.each(function(textbook) {
                             var view;
                             if (textbook.get('editing')) {
@@ -43,7 +46,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
             // activate the text box (so user can go ahead and start typing straight away)
                     $inputEl.focus().select();
                 },
-                handleDestroy: function(model, collection, options) {
+                handleDestroy: function(model, collection) {
                     collection.remove(model);
                 }
             });
