@@ -1200,10 +1200,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     user = None
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
-    msa_migration_enabled = configuration_helpers.get_value(
-        "ENABLE_MSA_MIGRATION",
-        settings.FEATURES.get("ENABLE_MSA_MIGRATION", False)
-    )
+    msa_migration_enabled = configuration_helpers.get_value("ENABLE_MSA_MIGRATION")
 
     if third_party_auth_requested and not trumped_by_first_party_auth:
         # The user has already authenticated via third-party auth and has not
