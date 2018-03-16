@@ -481,7 +481,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         #      (1) shopping cart is enabled and the user is not logged in
         #      (2) shopping cart is enabled and the user is logged in
         href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
-            uri_stem=configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL,
+            uri_stem=configuration.basket_checkout_page,
             sku=sku,
         )
 
