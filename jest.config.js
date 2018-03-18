@@ -5,12 +5,13 @@ module.exports = {
   "modulePaths": [
     "common/static/common/js/components",
   ],
+  "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js",
   "testMatch": [
-    "**/ProblemBrowser/**/*.test.jsx",
+    "/**/*.test.jsx",
     "common/static/common/js/components/**/?(*.)+(spec|test).js?(x)",
   ],
   "transform": {
     "^.+\\.jsx$": "babel-jest",
     "^.+\\.js$": "babel-jest",
   },
-}
+};
