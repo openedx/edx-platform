@@ -12,6 +12,7 @@
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Bill DeRusha <bill@edx.org>, 2017
+# BS GRUPO <soporte@bsgrupo.com>, 2018
 # Carlos Arias Fernandez <cararias@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
@@ -216,9 +217,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-02-22 07:36+0000\n"
-"PO-Revision-Date: 2018-02-16 22:21+0000\n"
-"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
+"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"PO-Revision-Date: 2018-03-13 13:51+0000\n"
+"Last-Translator: karlman72 <karlman72@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -1096,6 +1097,11 @@ msgstr ""
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
+msgid "{html_start}This account has already been activated.{html_end}"
+msgstr "{html_start}Esta cuenta ya se ha activado.{html_end}"
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
 msgstr "{html_start}Éxito{html_end} Su cuenta ha sido activada."
 
@@ -1110,11 +1116,6 @@ msgstr ""
 "actualizaciones y notificaciones nuestras por correo electrónico con "
 "relación a los cursos en los cuales está inscrito/a. Inicie Sesión para "
 "continuar."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}This account has already been activated.{html_end}"
-msgstr "{html_start}Esta cuenta ya se ha activado.{html_end}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -1714,6 +1715,16 @@ msgstr "debe contener {0} o más caracteres no ascii"
 #, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr "debe contener {0} o más palabras únicas"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "must contain {0} or more numbers"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "must contain {0} or more letters"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
@@ -7379,6 +7390,7 @@ msgstr "% de Descuento"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: wiki/plugins/attachments/forms.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "Description"
 msgstr "Descripción"
 
@@ -7983,6 +7995,10 @@ msgstr "reiniciado"
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 #: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "deleted"
 msgstr "borrado"
 
@@ -8052,6 +8068,7 @@ msgstr "Nombre de la organización"
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/djangoapps/student_account/views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
+#: wiki/templates/wiki/dir.html
 msgid "Title"
 msgstr "Título"
 
@@ -10493,6 +10510,7 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Attachments"
 msgstr "Adjuntos"
 
@@ -11820,6 +11838,10 @@ msgstr ""
 "Acepto los {tos_link_start}{terms_of_service}{tos_link_end} de "
 "{platform_name} "
 
+#: openedx/core/djangoapps/user_api/config/waffle.py
+msgid "System maintenance in progress. Please try again later."
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -12853,17 +12875,6 @@ msgstr "Página no encontrada"
 msgid "Content"
 msgstr "Contenido"
 
-#: cms/templates/asset_index.html cms/templates/certificates.html
-#: cms/templates/container.html cms/templates/course_outline.html
-#: cms/templates/group_configurations.html cms/templates/library.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Cargando"
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -12871,6 +12882,17 @@ msgstr "Cargando"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Configuración"
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Cargando"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
@@ -16519,10 +16541,15 @@ msgstr ""
 "ahora!{link_end}"
 
 #: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_name}!"
-msgstr "Bienvenido a {course_name}  {org}"
+msgid "Welcome to {org}'s {course_title}!"
+msgstr ""
 
 #: lms/templates/courseware/info.html
+msgid "Welcome to {course_title}!"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
@@ -18496,6 +18523,7 @@ msgid "Programs"
 msgstr "Programas"
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -18535,6 +18563,10 @@ msgstr "Cómo funciona"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Instituciones"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Resume your last course"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -21242,6 +21274,10 @@ msgstr "Contacte el soporte de {platform_name}"
 msgid "Student Support: Enrollment"
 msgstr "Soporte a estudiantes: Inscripciones"
 
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr ""
+
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr "Soporte a Estudiantes: Administrar Usuario"
@@ -21776,10 +21812,8 @@ msgstr "© 2012–{year} edX Inc. "
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
 "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"粤ICP备17044299号-2. "
+"ç²¤ICPå¤17044299å·-2. "
 msgstr ""
-"EdX, Open edX, y MicroMasters son marcas registradas de edX Inc. "
-"粤ICP备17044299号-2. "
 
 #: themes/edx.org/lms/templates/footer.html
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
@@ -22112,104 +22146,6 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "Administración de archivos"
-
-#: cms/templates/asset_index.html
-msgid "Upload New File"
-msgstr "Subir nuevo archivo"
-
-#: cms/templates/asset_index.html
-msgid "Help adding Files and Uploads"
-msgstr "Ayuda agregando Archivos y Cargas"
-
-#: cms/templates/asset_index.html
-msgid "Adding Files for Your Course"
-msgstr "Añadiendo Archivos a su Curso"
-
-#: cms/templates/asset_index.html
-msgid ""
-"To add files to use in your course, click {em_start}Upload New File{em_end}."
-" Then follow the prompts to upload a file from your computer."
-msgstr ""
-"Para añadir archivos para ser utilizados en el curso, haga clic en "
-"{em_start}Subir nuevo archivo{em_end}. Luego siga las instrucciones para "
-"cargar un archivo desde su computador."
-
-#: cms/templates/asset_index.html
-msgid ""
-"{em_start}Caution{em_end}: {platform_name} recommends that you limit the "
-"file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
-"audio files. You should use a third party service to host multimedia files."
-msgstr ""
-"{em_start} Precaución {em_end}: {platform_name} recomendamos que si usted limita el tamaño de sus archivos a {em_start}10 MB{em_end}. Adicionalmente, no se recomienda subir videos o archivos de audio. \n"
-"Los archivos multimedia se deben publicar utilizando servicios de terceros."
-
-#: cms/templates/asset_index.html
-msgid ""
-"The course image, textbook chapters, and files that appear on your Course "
-"Handouts sidebar also appear in this list."
-msgstr ""
-"La imagen del curso, los capítulos de libros de texto y otros archivos que "
-"aparezcan en los materiales del curso también aparecerán en esta lista."
-
-#: cms/templates/asset_index.html
-msgid "Using File URLs"
-msgstr "Usando URLs de archivo"
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
-"image from a component, a course update, or a course handout."
-msgstr ""
-"Use el valor {em_start}{studio_name} URL{em_end} para enlazarce con el "
-"archivo o imagen desde un componente, o desde una actualización de curso o "
-"desde un documento de curso."
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the {em_start}Web URL{em_end} value to reference the file or image only "
-"from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
-" Web URL no longer works for external access to a file."
-msgstr ""
-"Use el valor {em_start}Web URL{em_end} para referenciar un archivo o imagen "
-"exclusivamente desde fuera del curso. {em_start}Note:{em_end} Si usted "
-"bloquea un un archivo, la url de la Web ya no tendrá acceso a un archivo "
-"externo."
-
-#: cms/templates/asset_index.html
-msgid ""
-"To copy a URL, double click the value in the URL column, then copy the "
-"selected text."
-msgstr ""
-"Para copiar un URL, realice un doble clic en la columna del URL, luego copie"
-" el texto seleccionado."
-
-#: cms/templates/asset_index.html
-msgid "Learn more about managing files"
-msgstr "Aprenda más sobre el manejo de archivos"
-
-#: cms/templates/asset_index.html
-msgid "close"
-msgstr "cerrar"
-
-#: cms/templates/asset_index.html
-msgid "Max per-file size: {max_filesize}MB"
-msgstr "Tamaño máximo del archivo de subida es: {max_filesize}MB"
-
-#: cms/templates/asset_index.html
-msgid "URL:"
-msgstr "URL:"
-
-#: cms/templates/asset_index.html
-msgid "Choose File"
-msgstr "Elegir archivo"
-
-#: cms/templates/asset_index.html
-msgid "Your file has been deleted."
-msgstr "Su archivo ha sido borrado."
-
-#: cms/templates/asset_index.html
-msgid "close alert"
-msgstr "Cerrar alerta"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -25859,7 +25795,7 @@ msgstr ""
 msgid "No changes made. Nothing to save."
 msgstr "No se han realizado cambios."
 
-#: wiki/forms.py
+#: wiki/forms.py wiki/templates/wiki/dir.html
 msgid "Slug"
 msgstr "Slug"
 
@@ -25895,7 +25831,7 @@ msgstr "Ya existe un artículo con el slug \"%s\"."
 msgid "Yes, I am sure"
 msgstr "Si, estoy seguro."
 
-#: wiki/forms.py
+#: wiki/forms.py wiki/templates/wiki/deleted.html
 msgid "Purge"
 msgstr "Eliminar"
 
@@ -26082,7 +26018,8 @@ msgstr "dirección IP"
 msgid "user"
 msgstr "usuario"
 
-#: wiki/models/article.py
+#: wiki/models/article.py wiki/templates/wiki/article.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "locked"
 msgstr "bloqueado"
 
@@ -26280,6 +26217,132 @@ msgstr "Un archivo ha sido cambiado: %s"
 msgid "A file was deleted: %s"
 msgstr "Un archivo ha sido borrado: %s"
 
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid ""
+"\n"
+"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
+"    "
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Delete it!"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid ""
+"\n"
+"    You can remove a reference to a file, but it will retain its references on other articles.\n"
+"    "
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Remove reference"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "History of"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "User"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "File"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Action"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "<em>No description</em>"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Download"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Use this!"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#, python-format
+msgid ""
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
+"  "
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+msgid "Articles using"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#, python-format
+msgid ""
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
+"  "
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Upload replacement"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add file to"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add attachment from other article"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Main article"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add to article"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Your search did not return any results"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Adding new articles"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "An external link"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Headers"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid ""
+"Use these codes for headers and to automatically generate Tables of "
+"Contents."
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Typography"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Lists"
+msgstr ""
+
 #: wiki/plugins/images/forms.py
 #, python-format
 msgid ""
@@ -26344,6 +26407,7 @@ msgid "%(file)s has been saved."
 msgstr "%(file)s ha sido guardado."
 
 #: wiki/plugins/images/wiki_plugin.py
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Images"
 msgstr "Imágenes"
 
@@ -26352,9 +26416,132 @@ msgstr "Imágenes"
 msgid "An image was added: %s"
 msgstr "Una imagen ha sido añadida: %s"
 
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid ""
+"The following images are available for this article. Copy the markdown tag "
+"to directly refer to an image from the article text."
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Back to edit page"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "No file"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Upload new image"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Restore image"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Remove image"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Completely delete"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "Revert to this version"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+msgid "There are no images for this article."
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+#: wiki/templates/wiki/deleted.html
+msgid "Purge deletion"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+msgid "Purge image: Completely remove image file and all revisions."
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+msgid "Remove it completely!"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/render.html
+msgid "Image not found"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Replace image"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Choose an image file to replace current image."
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Image id"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "Insert"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "No images found for this article"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Manage images"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Add new image"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "Add image"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "You do not have permissions to add images."
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid "How to use images"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+msgid ""
+"After uploading an image, it is attached to this particular artice and can "
+"be used only here. Other users may replace the image, but older versions are"
+" kept. You probably want to show the image with a nice caption. To achieve "
+"this, press the Insert button and fill in the caption fields and possibly "
+"choose to have you image floating right or left of the content. You can use "
+"Markdown in the caption. The markdown code syntax for images looks like "
+"this, possible values for align are left/center/right:"
+msgstr ""
+
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
 msgstr "Vínculos"
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "Link to another wiki page"
+msgstr ""
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid ""
+"Type in something from another wiki page's title and auto-complete will help"
+" you create a tag for you wiki link. Tags for links look like this:"
+msgstr ""
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid ""
+"You can link to another website simply by inserting an address example.com "
+"or http://example.com or by using the markdown syntax:"
+msgstr ""
 
 #: wiki/plugins/notifications/forms.py
 msgid "Notifications"
@@ -26395,6 +26582,208 @@ msgstr "Artículo modificado: %s"
 #, python-format
 msgid "New article created: %s"
 msgstr "Nuevo artículo creado: %s"
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "notifications"
+msgstr ""
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "No notifications"
+msgstr ""
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "Clear notifications list"
+msgstr ""
+
+#: wiki/templates/wiki/base.html
+msgid "Search..."
+msgstr ""
+
+#: wiki/templates/wiki/base.html
+msgid "Log out"
+msgstr ""
+
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Sign up"
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "Article deleted"
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "Article Deleted"
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "The article you were looking for has been deleted."
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "You may restore this article and its children by clicking restore."
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid ""
+"You may remove this article and any children permanently and free their "
+"slugs by clicking the below button. This action cannot be undone."
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "Listing articles in"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "Up one level"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "clear"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "article,articles"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "matches,match"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+#, python-format
+msgid ""
+"\n"
+"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
+"      "
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "is,are"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+#, python-format
+msgid ""
+"\n"
+"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
+"      "
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "Last modified"
+msgstr ""
+
+#: wiki/templates/wiki/history.html
+msgid "no log message"
+msgstr ""
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Permission Denied"
+msgstr ""
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Sorry, you don't have permission to view this page."
+msgstr ""
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "Previewing revision"
+msgstr ""
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "Previewing merge between"
+msgstr ""
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "and"
+msgstr ""
+
+#: wiki/templates/wiki/source.html
+msgid "Source of"
+msgstr ""
+
+#: wiki/templates/wiki/source.html
+msgid "This article is currently locked for editing."
+msgstr ""
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Log me in..."
+msgstr ""
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Don't have an account?"
+msgstr ""
+
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Sign me up..."
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Create root article"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Congratulations!"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid ""
+"You have django-wiki installed... but there are no articles. So it's time to"
+" create the first one, the root article. In the beginning, it will only be "
+"editable by administrators, but you can define permissions after."
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Root article"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Create root"
+msgstr ""
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+msgid "You need to log in og sign up to use this function."
+msgstr ""
+
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View Source"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "Sub-articles for"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "No sub-articles"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "...and more"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "Browse articles in this level"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "New article next to"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "New article below"
+msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "restored"
+msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "unlocked"
+msgstr ""
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
