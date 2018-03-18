@@ -29,7 +29,10 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware):
 
         if configuration_helpers.get_value('ENABLE_MSA_MIGRATION') and isinstance(exception, AuthCanceled):
             logout_url = reverse('logout')
-            params = urlencode({'msa_only': True, 'next': redirect_uri})
+            params = {'next': redirect_uri}
+            if auth_entry != pipeline.AUTH_ENTRY_REGISTER:
+                params['msa_only'] = True
+            params = urlencode(params)
             redirect_uri = '{}?{}'.format(logout_url, params)
 
         return redirect_uri
