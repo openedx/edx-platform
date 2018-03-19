@@ -20,6 +20,7 @@ from email_marketing.signals import (
     add_email_marketing_cookies,
     email_marketing_register_user,
     email_marketing_user_field_changed,
+    force_unsubscribe_all,
     update_sailthru
 )
 from email_marketing.tasks import (
@@ -577,6 +578,34 @@ class EmailMarketingTests(TestCase):
         update_email_marketing_config(enabled=False)
         email_marketing_user_field_changed(None, self.user, table='auth_user', setting='email', old_value='new@a.com')
         self.assertFalse(mock_update_user.called)
+
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_sailthru_on_success(self, mock_sailthru, mock_log_error):
+        """
+        Ensure that a successful unsubscribe does not trigger an error log
+        """
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'ok': True}))
+        force_unsubscribe_all(sender=self.__class__, user=self.user)
+        self.assertTrue(mock_sailthru.called)
+        self.assertFalse(mock_log_error.called)
+
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_sailthru_on_connection_error(self, mock_sailthru, mock_log_error):
+        mock_sailthru.side_effect = SailthruClientError
+        with self.assertRaises(Exception):
+            force_unsubscribe_all(sender=self.__class__, user=self.user)
+            self.assertTrue(mock_log_error.called)
+
+    @patch('email_marketing.tasks.log.error')
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    def test_sailthru_on_bad_response(self, mock_sailthru, mock_log_error):
+        mock_sailthru.return_value = SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))
+        with self.assertRaises(Exception):
+            force_unsubscribe_all(sender=self.__class__, user=self.user)
+            self.assertTrue(mock_sailthru.called)
+            self.assertTrue(mock_log_error.called)
 
 
 class MockSailthruResponse(object):
