@@ -194,6 +194,7 @@ class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
     show_full_result_count = False
+    search_fields = ('=username', '=email')
 
     def get_readonly_fields(self, *args, **kwargs):
         """
@@ -210,7 +211,6 @@ class UserAdmin(BaseUserAdmin):
             return qs.none()
         else:
             return qs
-
 
 
 @admin.register(UserAttribute)
