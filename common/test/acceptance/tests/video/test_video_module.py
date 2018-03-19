@@ -1143,9 +1143,13 @@ class DragAndDropTest(VideoBaseTest):
         captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
 
         captions_start = captions.location
+        print captions_start
+        print action._driver.w3c
         action.drag_and_drop_by_offset(captions, 0, -15).perform()
 
         captions_end = captions.location
+        print captions_end
+        self.assertTrue(False)
         # We have to branch here due to unexpected behaviour of chrome.
         # Chrome sets the y offset of element to 834 instead of 650
         if self.browser.name == 'chrome':
