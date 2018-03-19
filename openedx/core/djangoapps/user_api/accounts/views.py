@@ -6,22 +6,28 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
 
 from django.db import transaction
+from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from six import text_type
 
-from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser
-from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.parsers import MergePatchParser
-from student.models import User
+from student.models import User, get_potentially_retired_user_by_username_and_hash
+
+from .api import get_account_settings, update_account_settings
+from .permissions import CanDeactivateUser, CanRetireUser
+from .signals import USER_RETIRE_MAILINGS
+from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
+from ..models import UserOrgTag
 
 
 class AccountViewSet(ViewSet):
@@ -249,3 +255,42 @@ class AccountDeactivationView(APIView):
         user.save()
         account_settings = get_account_settings(request, [username])[0]
         return Response(account_settings)
+
+
+class AccountRetireMailingsView(APIView):
+    """
+    Part of the retirement API, accepts POSTs to unsubscribe a user
+    from all email lists.
+    """
+    authentication_classes = (JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+
+    def post(self, request, username):
+        """
+        POST /api/user/v1/accounts/{username}/retire_mailings/
+
+        Allows an administrative user to take the following actions
+        on behalf of an LMS user:
+        -  Update UserOrgTags to opt the user out of org emails
+        -  Call Sailthru API to force opt-out the user from all email lists
+        """
+        user_model = get_user_model()
+        retired_username = request.data['retired_username']
+
+        try:
+            user = get_potentially_retired_user_by_username_and_hash(username, retired_username)
+
+            with transaction.atomic():
+                # Take care of org emails first, using the existing API for consistency
+                for preference in UserOrgTag.objects.filter(user=user, key='email-optin'):
+                    update_email_opt_in(user, preference.org, False)
+
+                # This signal allows lms' email_marketing and other 3rd party email
+                # providers to unsubscribe the user as well
+                USER_RETIRE_MAILINGS.send(sender=self.__class__, user=user)
+        except user_model.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

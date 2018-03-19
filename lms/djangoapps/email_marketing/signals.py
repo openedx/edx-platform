@@ -6,14 +6,17 @@ import logging
 from random import randint
 
 import crum
+from celery.exceptions import TimeoutError
 from django.conf import settings
 from django.dispatch import receiver
+from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
-from celery.exceptions import TimeoutError
+from six import text_type
 
 import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -94,10 +97,10 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         _log_sailthru_api_call_time(time_before_call)
 
     except TimeoutError as exc:
-        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", unicode(exc))
+        log.error("Timeout error while attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except SailthruClientError as exc:
-        log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
+        log.error("Exception attempting to obtain cookie from Sailthru: %s", text_type(exc))
         return response
     except Exception:
         log.error("Exception Connecting to celery task for %s", user.email)
@@ -226,7 +229,7 @@ def _create_sailthru_user_vars(user, profile, registration=None):
 
         if profile.year_of_birth:
             sailthru_vars['year_of_birth'] = profile.year_of_birth
-        sailthru_vars['country'] = unicode(profile.country.code)
+        sailthru_vars['country'] = text_type(profile.country.code)
 
     if registration:
         sailthru_vars['activation_key'] = registration.activation_key
@@ -258,3 +261,43 @@ def _log_sailthru_api_call_time(time_before_call):
              time_before_call.isoformat(' '),
              time_after_call.isoformat(' '),
              delta_sailthru_api_call_time.microseconds / 1000)
+
+
+@receiver(USER_RETIRE_MAILINGS)
+def force_unsubscribe_all(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Synchronously(!) unsubscribes the given user from all Sailthru email lists.
+
+    In the future this could be moved to a Celery task, however this is currently
+    only used as part of user retirement, where we need a very reliable indication
+    of success or failure.
+
+    Args:
+        user(User): Django model of type returned from get_user_model()
+    Returns:
+        None
+    """
+    user = kwargs.get('user', None)
+
+    if not user:
+        raise TypeError('Expected a User type, but received None.')
+
+    email_config = EmailMarketingConfiguration.current()
+    if not email_config.enabled:
+        return
+
+    sailthru_parms = {"id": user.email, "keys": {"optout_email": "all"}}
+
+    try:
+        sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
+        sailthru_response = sailthru_client.api_post("user", sailthru_parms)
+    except SailthruClientError as exc:
+        error_msg = "Exception attempting to opt-out user %s from Sailthru - %s" % (user.email, text_type(exc))
+        log.error(error_msg)
+        raise Exception(error_msg)
+
+    if not sailthru_response.is_ok():
+        error = sailthru_response.get_error()
+        error_msg = "Error attempting to opt-out user %s from Sailthru - %s" % (user.email, error.get_message())
+        log.error(error_msg)
+        raise Exception(error_msg)

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls import url
 
 from ..profile_images.views import ProfileImageView
-from .accounts.views import AccountDeactivationView, AccountViewSet
+from .accounts.views import AccountDeactivationView, AccountRetireMailingsView, AccountViewSet
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import PhotoVerificationStatusView
 from .validation.views import RegistrationValidationView
@@ -49,6 +49,11 @@ urlpatterns = [
         r'^v1/accounts/{}/deactivate/$'.format(settings.USERNAME_PATTERN),
         AccountDeactivationView.as_view(),
         name='accounts_deactivation'
+    ),
+    url(
+        r'^v1/accounts/{}/retire_mailings/$'.format(settings.USERNAME_PATTERN),
+        AccountRetireMailingsView.as_view(),
+        name='accounts_retire_mailings'
     ),
     url(
         r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),

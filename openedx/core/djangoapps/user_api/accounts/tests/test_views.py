@@ -15,18 +15,19 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-from mock import patch
+from mock import MagicMock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
+from openedx.core.djangoapps.user_api.models import UserPreference, UserOrgTag
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import LanguageProficiency, PendingEmailChange, UserProfile
+from student.models import PendingEmailChange, UserProfile, get_retired_username_by_username
 from student.tests.factories import (
     TEST_PASSWORD,
     ContentTypeFactory,
@@ -918,3 +919,96 @@ class TestAccountDeactivation(TestCase):
             expected_status=status.HTTP_401_UNAUTHORIZED,
             expected_activation_status=True
         )
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestAccountRetireMailings(TestCase):
+    """
+    Tests the account retire mailings endpoint.
+    """
+
+    def setUp(self):
+        super(TestAccountRetireMailings, self).setUp()
+        self.test_user = UserFactory()
+        self.test_superuser = SuperuserFactory()
+        self.test_service_user = UserFactory()
+
+        UserOrgTag.objects.create(user=self.test_user, key='email-optin', org="foo", value="True")
+        UserOrgTag.objects.create(user=self.test_user, key='email-optin', org="bar", value="True")
+
+        self.url = reverse('accounts_retire_mailings', kwargs={'username': self.test_user.username})
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = JwtBuilder(user).build_token([])
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + token
+        }
+        return headers
+
+    def build_post(self, user):
+        retired_username = get_retired_username_by_username(user.username)
+        return {'retired_username': retired_username}
+
+    def assert_status_and_tag_count(self, headers, expected_status=status.HTTP_204_NO_CONTENT, expected_tag_count=2,
+                                    expected_tag_value="False", expected_content=None):
+        """
+        Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
+        """
+        response = self.client.post(self.url, self.build_post(self.test_user), **headers)
+        self.assertEqual(response.status_code, expected_status)
+
+        # Check that the expected number of tags with the correct value exist
+        tag_count = UserOrgTag.objects.filter(user=self.test_user, value=expected_tag_value).count()
+        self.assertEqual(tag_count, expected_tag_count)
+
+        if expected_content:
+            self.assertEqual(response.content.strip('"'), expected_content)
+
+    def test_superuser_retires_user_subscriptions(self):
+        """
+        Verify a user's subscriptions are retired when a superuser posts to the retire subscriptions endpoint.
+        """
+        headers = self.build_jwt_headers(self.test_superuser)
+        self.assert_status_and_tag_count(headers)
+
+    def test_superuser_retires_user_subscriptions_no_orgtags(self):
+        """
+        Verify the call succeeds when the user doesn't have any org tags.
+        """
+        UserOrgTag.objects.all().delete()
+        headers = self.build_jwt_headers(self.test_superuser)
+        self.assert_status_and_tag_count(headers, expected_tag_count=0)
+
+    def test_unauthorized_rejection(self):
+        """
+        Verify unauthorized users cannot retire subscriptions.
+        """
+        headers = self.build_jwt_headers(self.test_user)
+
+        # User should still have 2 "True" subscriptions.
+        self.assert_status_and_tag_count(headers, expected_status=status.HTTP_403_FORBIDDEN, expected_tag_value="True")
+
+    def test_signal_failure(self):
+        """
+        Verify that if a signal fails the transaction is rolled back and a proper error message is returned.
+        """
+        headers = self.build_jwt_headers(self.test_superuser)
+
+        mock_handler = MagicMock()
+        mock_handler.side_effect = Exception("Tango")
+
+        try:
+            USER_RETIRE_MAILINGS.connect(mock_handler)
+
+            # User should still have 2 "True" subscriptions.
+            self.assert_status_and_tag_count(
+                headers,
+                expected_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                expected_tag_value="True",
+                expected_content="Tango"
+            )
+        finally:
+            USER_RETIRE_MAILINGS.disconnect(mock_handler)
