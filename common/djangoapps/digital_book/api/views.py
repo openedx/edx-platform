@@ -20,9 +20,6 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
 
     def create(self, request):
 
-        log.info(">>> request: %s", request)
-        log.info(">>> request.data: %s", request.data)
-
         order_number = request.data['order_number']
         user = request.data['user']
         book_key = request.data['book_key']
@@ -33,9 +30,6 @@ class DigitalBookViewSet(viewsets.GenericViewSet):
             username=user,
             book_key=book_key
         )
-
-        log.info(">>> book_access: %s", user_access)
-        log.info(">>> created: %s", created)
 
         return Response(
             status=status.HTTP_201_CREATED,
@@ -54,11 +48,7 @@ def digital_book_content(request, book_key_string):
     to the digital book about page.
     """
 
-    log.info(">>> calling digital_book_content")
-    log.info(">>> request: %s", request)
-    log.info(">>> book_key: %s", book_key_string)
 
-    log.info(">>> authenticating user...")
     if not (request.user.is_authenticated()):
         return redirect_to_login(request.get_full_path())
 
@@ -72,8 +62,8 @@ def digital_book_content(request, book_key_string):
 
         return render_to_response('digital_book/digital_book_content.html', context)
 
-    except Exception as exception:
-        return None
+    except DigitalBookAccessRedirect:
+        raise
 
 
 def digital_book_about(request, book_key_string):
@@ -118,4 +108,4 @@ def has_access(username, digital_book_key):
 
     digital_book_access = DigitalBookAccess()
     if not digital_book_access.has_access(username, digital_book_key):
-        raise DigitalBookAccessRedirect(reverse('about_digital_book', args=[digital_book_key]))
+        raise DigitalBookAccessRedirect(reverse('digital_book_api:digital_book_about', args=[unicode(digital_book_key)]))

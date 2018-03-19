@@ -5,8 +5,9 @@ from .views import DigitalBookViewSet
 from .views import digital_book_about
 from .views import digital_book_content
 
+
 urlpatterns = [
-    url(r'^v1/digital_books$',
+    url(r'^v1/digital_books/$',
         DigitalBookViewSet.as_view({
             'post': 'create',
         }),
@@ -17,7 +18,7 @@ urlpatterns = [
             settings.BOOK_KEY_PATTERN,
         ),
         digital_book_about,
-        name='about_digital_book',
+        name='digital_book_about',
     ),
     url(
         r'v1/digital_books/{}/book$'.format(
