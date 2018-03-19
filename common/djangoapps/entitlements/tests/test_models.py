@@ -2,6 +2,7 @@
 
 import unittest
 from datetime import timedelta
+from uuid import uuid4
 
 from django.conf import settings
 from django.test import TestCase
@@ -88,6 +89,26 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
 
         entitlement.refresh_from_db()
         assert entitlement.enrollment_course_run is None
+
+        new_course = CourseFactory()
+        CourseModeFactory(
+            course_id=new_course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=now() + timedelta(days=1)
+        )
+
+        # Return invalid uuid so that no entitlement returned for this new course
+        mock_get_course_uuid.return_value = uuid4().hex
+
+        try:
+            CourseEntitlement.check_for_existing_entitlement_and_enroll(
+                user=self.user,
+                course_run_key=new_course.id,
+            )
+            assert not CourseEnrollment.is_enrolled(user=self.user, course_key=new_course.id)
+        except AttributeError as error:
+            self.fail(error.message)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

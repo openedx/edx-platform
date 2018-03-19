@@ -334,7 +334,7 @@ class TestUsernamePasswordNonmatch(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Username and password fields cannot match",
+            "Password cannot be the same as the username",
         )
 
     def test_with_username_password_nonmatch(self):

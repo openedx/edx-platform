@@ -369,7 +369,8 @@ class CourseEntitlement(TimeStampedModel):
             course_uuid = get_course_uuid_for_course(course_run_key)
             if course_uuid:
                 entitlement = entitlements.filter(course_uuid=course_uuid).first()
-                if (is_course_run_entitlement_fulfillable(course_run_key=course_run_key, entitlement=entitlement) and
+                if (entitlement and is_course_run_entitlement_fulfillable(
+                        course_run_key=course_run_key, entitlement=entitlement) and
                         entitlement.is_entitlement_redeemable()):
                     return entitlement
         return None
