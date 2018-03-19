@@ -20,7 +20,7 @@ from django.core.validators import RegexValidator, slug_re
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from student.models import CourseEnrollmentAllowed
-from util.password_policy_validators import validate_password_strength
+from util.password_policy_validators import password_max_length, password_min_length, validate_password
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -199,10 +199,12 @@ class AccountCreationForm(forms.Form):
         }
     )
     password = forms.CharField(
-        min_length=accounts_settings.PASSWORD_MIN_LENGTH,
+        min_length=password_min_length(),
+        max_length=password_max_length(),
         error_messages={
             "required": _PASSWORD_INVALID_MSG,
             "min_length": _PASSWORD_INVALID_MSG,
+            "max_length": _PASSWORD_INVALID_MSG,
         }
     )
     name = forms.CharField(
@@ -219,7 +221,6 @@ class AccountCreationForm(forms.Form):
             data=None,
             extra_fields=None,
             extended_profile_fields=None,
-            enforce_username_neq_password=False,
             enforce_password_policy=False,
             tos_required=True
     ):
@@ -227,7 +228,6 @@ class AccountCreationForm(forms.Form):
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}
-        self.enforce_username_neq_password = enforce_username_neq_password
         self.enforce_password_policy = enforce_password_policy
         if tos_required:
             self.fields["terms_of_service"] = TrueField(
@@ -276,17 +276,8 @@ class AccountCreationForm(forms.Form):
     def clean_password(self):
         """Enforce password policies (if applicable)"""
         password = self.cleaned_data["password"]
-        if (
-                self.enforce_username_neq_password and
-                "username" in self.cleaned_data and
-                self.cleaned_data["username"] == password
-        ):
-            raise ValidationError(_("Username and password fields cannot match"))
         if self.enforce_password_policy:
-            try:
-                validate_password_strength(password)
-            except ValidationError, err:
-                raise ValidationError(_("Password: ") + "; ".join(err.messages))
+            validate_password(password, username=self.cleaned_data.get('username'))
         return password
 
     def clean_email(self):

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-11 20:36+0000\n"
-"PO-Revision-Date: 2018-03-11 20:36:53.092153\n"
+"POT-Creation-Date: 2018-03-18 20:36+0000\n"
+"PO-Revision-Date: 2018-03-18 20:36:06.141838\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -412,15 +412,6 @@ msgstr "فخ ثرقخمم, غخع وعسف بخممخص فاث اخرخق ذخي
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
 msgstr "غخع شقث وهسسهرل خرث خق وخقث قثضعهقثي بهثميس"
-
-#: common/djangoapps/student/forms.py
-msgid "Username and password fields cannot match"
-msgstr "عسثقرشوث شري حشسسصخقي بهثميس ذشررخف وشفذا"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-msgid "Password: "
-msgstr "حشسسصخقي: "
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
@@ -919,36 +910,6 @@ msgstr ""
 "{html_start}سعذذثسس! غخع اشدث شذفهدشفثي غخعق شذذخعرف.{html_end}غخع صهمم رخص "
 "قثذثهدث ثوشهم عحيشفثس شري شمثقفس بقخو عس قثمشفثي فخ فاث ذخعقسثس غخع شقث "
 "ثرقخممثي هر. سهلر هر فخ ذخرفهرعث."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct password before reusing a previous password."
-msgid_plural ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct passwords before reusing a previous password."
-msgstr[0] ""
-"غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
-" يهسفهرذف حشسسصخقي زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
-msgstr[1] ""
-"غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
-" يهسفهرذف حشسسصخقيس زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"day must elapse between password resets."
-msgid_plural ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"days must elapse between password resets."
-msgstr[0] ""
-"غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
-"يشغ وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
-msgstr[1] ""
-"غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
-"يشغس وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
 
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
@@ -1462,8 +1423,38 @@ msgstr "سغسفثو يثبهرثي وهمثسفخرث"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Invalid Length ({0})"
-msgstr "هردشمهي مثرلفا ({0})"
+msgid ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+"غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
+" يهسفهرذف حشسسصخقي زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
+msgstr[1] ""
+"غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
+" يهسفهرذف حشسسصخقيس زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+"غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
+"يشغ وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
+msgstr[1] ""
+"غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
+"يشغس وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Password: Invalid Length ({0})"
+msgstr "حشسسصخقي: هردشمهي مثرلفا ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1477,8 +1468,8 @@ msgstr "وعسف زث {0} ذاشقشذفثقس خق بثصثق"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Must be more complex ({0})"
-msgstr "وعسف زث وخقث ذخوحمثط ({0})"
+msgid "Password: Must be more complex ({0})"
+msgstr "حشسسصخقي: وعسف زث وخقث ذخوحمثط ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1511,8 +1502,24 @@ msgid "must contain {0} or more unique words"
 msgstr "وعسف ذخرفشهر {0} خق وخقث عرهضعث صخقيس"
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Too similar to a restricted dictionary word."
-msgstr "فخخ سهوهمشق فخ ش قثسفقهذفثي يهذفهخرشقغ صخقي."
+#, python-brace-format
+msgid "must contain {0} or more numbers"
+msgstr "وعسف ذخرفشهر {0} خق وخقث رعوزثقس"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "must contain {0} or more letters"
+msgstr "وعسف ذخرفشهر {0} خق وخقث مثففثقس"
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Password cannot be the same as the username"
+msgstr "حشسسصخقي ذشررخف زث فاث سشوث شس فاث عسثقرشوث"
+
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Password: Too similar to a restricted dictionary word."
+msgstr "حشسسصخقي: فخخ سهوهمشق فخ ش قثسفقهذفثي يهذفهخرشقغ صخقي."
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -5690,8 +5697,8 @@ msgid "Use the checkout page hosted by the E-Commerce service."
 msgstr "عسث فاث ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخووثقذث سثقدهذث."
 
 #: lms/djangoapps/commerce/models.py
-msgid "Path to single course checkout page hosted by the E-Commerce service."
-msgstr "حشفا فخ سهرلمث ذخعقسث ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخووثقذث سثقدهذث."
+msgid "Path to course(s) checkout page hosted by the E-Commerce service."
+msgstr "حشفا فخ ذخعقسث(س) ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخووثقذث سثقدهذث."
 
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
@@ -11189,25 +11196,6 @@ msgstr "عسثقرشوث وعسف زث زثفصثثر {min} شري {max} ذاش�
 msgid "Enter a valid email address that contains at least {min} characters."
 msgstr "ثرفثق ش دشمهي ثوشهم شييقثسس فاشف ذخرفشهرس شف مثشسف {min} ذاشقشذفثقس."
 
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter a password."
-msgstr "ثرفثق ش حشسسصخقي."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password is not long enough."
-msgstr "حشسسصخقي هس رخف مخرل ثرخعلا."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "Password cannot be longer than {max} character."
-msgstr "حشسسصخقي ذشررخف زث مخرلثق فاشر {max} ذاشقشذفثق."
-
-#. Translators: This message is shown to users who enter a password matching
-#. the username they enter(ed).
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password cannot be the same as the username."
-msgstr "حشسسصخقي ذشررخف زث فاث سشوث شس فاث عسثقرشوث."
-
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -12769,11 +12757,11 @@ msgstr "ذخرفثرف مخذنثي"
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must complete the section '{prereq_section_name}' with the required "
-"score before you are able to view this content."
+"You must earn a passing score for '{prereq_section_name}' to access this "
+"content."
 msgstr ""
-"غخع وعسف ذخوحمثفث فاث سثذفهخر '{prereq_section_name}' صهفا فاث قثضعهقثي "
-"سذخقث زثبخقث غخع شقث شزمث فخ دهثص فاهس ذخرفثرف."
+"غخع وعسف ثشقر ش حشسسهرل سذخقث بخق '{prereq_section_name}' فخ شذذثسس فاهس "
+"ذخرفثرف."
 
 #: lms/templates/_gated_content.html
 msgid "Go to Prerequisite Section"
@@ -20610,6 +20598,10 @@ msgstr "ذخرفشذف {platform_name} سعححخقف"
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "سفعيثرف سعححخقف: ثرقخمموثرف"
+
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr "ثرفهفمثوثرفس"
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"

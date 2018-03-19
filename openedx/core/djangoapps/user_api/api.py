@@ -15,6 +15,7 @@ from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
+from util.password_policy_validators import password_max_length, password_min_length
 
 
 def get_password_reset_form():
@@ -114,7 +115,7 @@ def get_login_session_form(request):
         label=password_label,
         field_type="password",
         restrictions={
-            "max_length": accounts.PASSWORD_MAX_LENGTH,
+            "max_length": password_max_length(),
         }
     )
 
@@ -419,8 +420,8 @@ class RegistrationFormFactory(object):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": accounts.PASSWORD_MIN_LENGTH,
-                "max_length": accounts.PASSWORD_MAX_LENGTH,
+                "min_length": password_min_length(),
+                "max_length": password_max_length(),
             },
             required=required
         )

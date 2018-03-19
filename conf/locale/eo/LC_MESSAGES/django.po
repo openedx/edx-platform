@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-11 20:36+0000\n"
-"PO-Revision-Date: 2018-03-11 20:36:53.092153\n"
+"POT-Creation-Date: 2018-03-18 20:36+0000\n"
+"PO-Revision-Date: 2018-03-18 20:36:06.141838\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -456,17 +456,6 @@ msgid "You are missing one or more required fields"
 msgstr ""
 "Ýöü äré mïssïng öné ör möré réqüïréd fïélds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/forms.py
-msgid "Username and password fields cannot match"
-msgstr ""
-"Ûsérnämé änd pässwörd fïélds çännöt mätçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-msgid "Password: "
-msgstr "Pässwörd:  Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
@@ -1062,36 +1051,6 @@ msgstr ""
 "σƒƒι¢ια#"
 
 #: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct password before reusing a previous password."
-msgid_plural ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct passwords before reusing a previous password."
-msgstr[0] ""
-"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
-" dïstïnçt pässwörd ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σя#"
-msgstr[1] ""
-"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
-" dïstïnçt pässwörds ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σ#"
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"day must elapse between password resets."
-msgid_plural ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"days must elapse between password resets."
-msgstr[0] ""
-"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
-"däý müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σł#"
-msgstr[1] ""
-"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
-"däýs müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "Pässwörd rését ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
@@ -1659,8 +1618,38 @@ msgstr "Sýstém défïnéd mïléstöné Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Invalid Length ({0})"
-msgstr "Ìnvälïd Léngth ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
+" dïstïnçt pässwörd ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σя#"
+msgstr[1] ""
+"Ýöü äré ré-üsïng ä pässwörd thät ýöü hävé üséd réçéntlý. Ýöü müst hävé {num}"
+" dïstïnçt pässwörds ßéföré réüsïng ä prévïöüs pässwörd. Ⱡ'σ#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
+"däý müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σł#"
+msgstr[1] ""
+"Ýöü äré réséttïng pässwörds töö fréqüéntlý. Düé tö séçürïtý pölïçïés, {num} "
+"däýs müst éläpsé ßétwéén pässwörd réséts. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Password: Invalid Length ({0})"
+msgstr "Pässwörd: Ìnvälïd Léngth ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1674,8 +1663,10 @@ msgstr "müst ßé {0} çhäräçtérs ör féwér Ⱡ'σяєм ιρѕυм ∂σ
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Must be more complex ({0})"
-msgstr "Müst ßé möré çömpléx ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "Password: Must be more complex ({0})"
+msgstr ""
+"Pässwörd: Müst ßé möré çömpléx ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1718,10 +1709,30 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Too similar to a restricted dictionary word."
+#, python-brace-format
+msgid "must contain {0} or more numbers"
 msgstr ""
-"Töö sïmïlär tö ä réstrïçtéd dïçtïönärý wörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"müst çöntäïn {0} ör möré nümßérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "must contain {0} or more letters"
+msgstr ""
+"müst çöntäïn {0} ör möré léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Password cannot be the same as the username"
+msgstr ""
+"Pässwörd çännöt ßé thé sämé äs thé üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Password: Too similar to a restricted dictionary word."
+msgstr ""
+"Pässwörd: Töö sïmïlär tö ä réstrïçtéd dïçtïönärý wörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -6641,10 +6652,10 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/commerce/models.py
-msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgid "Path to course(s) checkout page hosted by the E-Commerce service."
 msgstr ""
-"Päth tö sïnglé çöürsé çhéçköüt pägé höstéd ßý thé É-Çömmérçé sérvïçé. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Päth tö çöürsé(s) çhéçköüt pägé höstéd ßý thé É-Çömmérçé sérvïçé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
@@ -12909,29 +12920,6 @@ msgstr ""
 "Éntér ä välïd émäïl äddréss thät çöntäïns ät léäst {min} çhäräçtérs. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter a password."
-msgstr "Éntér ä pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password is not long enough."
-msgstr "Pässwörd ïs nöt löng énöügh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "Password cannot be longer than {max} character."
-msgstr ""
-"Pässwörd çännöt ßé löngér thän {max} çhäräçtér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя #"
-
-#. Translators: This message is shown to users who enter a password matching
-#. the username they enter(ed).
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password cannot be the same as the username."
-msgstr ""
-"Pässwörd çännöt ßé thé sämé äs thé üsérnämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -14671,11 +14659,11 @@ msgstr "Çöntént Löçkéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must complete the section '{prereq_section_name}' with the required "
-"score before you are able to view this content."
+"You must earn a passing score for '{prereq_section_name}' to access this "
+"content."
 msgstr ""
-"Ýöü müst çömplété thé séçtïön '{prereq_section_name}' wïth thé réqüïréd "
-"sçöré ßéföré ýöü äré äßlé tö vïéw thïs çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Ýöü müst éärn ä pässïng sçöré för '{prereq_section_name}' tö äççéss thïs "
+"çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/_gated_content.html
 msgid "Go to Prerequisite Section"
@@ -23622,6 +23610,10 @@ msgstr "Çöntäçt {platform_name} Süppört Ⱡ'σяєм ιρѕυм ∂σłσ�
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "Stüdént Süppört: Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr "Éntïtléménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"

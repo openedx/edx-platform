@@ -14,6 +14,7 @@ from six import text_type
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
 from openedx.core.lib.api import test_utils
+from util.password_policy_validators import password_max_length, password_min_length
 
 
 @ddt.ddt
@@ -171,27 +172,30 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         )
 
     def test_password_empty_validation_decision(self):
+        msg = u'Password: Invalid Length (must be {0} characters or more)'.format(password_min_length())
         self.assertValidationDecision(
             {'password': ''},
-            {"password": text_type(accounts.PASSWORD_EMPTY_MSG)}
+            {"password": msg}
         )
 
     def test_password_bad_min_length_validation_decision(self):
-        password = 'p' * (accounts.PASSWORD_MIN_LENGTH - 1)
+        password = 'p' * (password_min_length() - 1)
+        msg = u'Password: Invalid Length (must be {0} characters or more)'.format(password_min_length())
         self.assertValidationDecision(
             {'password': password},
-            {"password": text_type(accounts.PASSWORD_BAD_MIN_LENGTH_MSG)}
+            {"password": msg}
         )
 
     def test_password_bad_max_length_validation_decision(self):
-        password = 'p' * (accounts.PASSWORD_MAX_LENGTH + 1)
+        password = 'p' * (password_max_length() + 1)
+        msg = u'Password: Invalid Length (must be {0} characters or fewer)'.format(password_max_length())
         self.assertValidationDecision(
             {'password': password},
-            {"password": text_type(accounts.PASSWORD_BAD_MAX_LENGTH_MSG)}
+            {"password": msg}
         )
 
     def test_password_equals_username_validation_decision(self):
         self.assertValidationDecision(
             {"username": "somephrase", "password": "somephrase"},
-            {"username": "", "password": text_type(accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG)}
+            {"username": "", "password": u"Password cannot be the same as the username"}
         )

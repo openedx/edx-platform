@@ -17,6 +17,7 @@ from student.models import User, UserProfile, Registration
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
+from util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
@@ -655,16 +656,11 @@ def _validate_password(password, username=None):
     try:
         _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
 
-        if len(password) == 0:
-            raise errors.AccountPasswordInvalid(accounts.PASSWORD_EMPTY_MSG)
-        elif len(password) < accounts.PASSWORD_MIN_LENGTH:
-            raise errors.AccountPasswordInvalid(accounts.PASSWORD_BAD_MIN_LENGTH_MSG)
-        elif len(password) > accounts.PASSWORD_MAX_LENGTH:
-            raise errors.AccountPasswordInvalid(accounts.PASSWORD_BAD_MAX_LENGTH_MSG)
-
-        _validate_password_works_with_username(password, username)
-    except (errors.AccountDataBadType, errors.AccountDataBadLength) as invalid_password_err:
+        validate_password(password, username=username)
+    except errors.AccountDataBadType as invalid_password_err:
         raise errors.AccountPasswordInvalid(text_type(invalid_password_err))
+    except ValidationError as validation_err:
+        raise errors.AccountPasswordInvalid(validation_err.message)
 
 
 def _validate_country(country):
