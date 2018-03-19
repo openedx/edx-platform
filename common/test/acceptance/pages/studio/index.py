@@ -259,7 +259,7 @@ class DashboardPage(PageObject, HelpMixin):
             'number': element.find_element_by_css_selector('.course-num .value').text,
             'url': element.find_element_by_css_selector('a.library-link').get_attribute('href'),
         }
-        self.wait_for_element_visibility('.libraries li.course-item', "Switch to library tab")
+        self.wait_for_element_presence('.libraries li.course-item', "Switch to library tab")
         return self.q(css='.libraries li.course-item').map(div2info).results
 
     def has_library(self, **kwargs):
