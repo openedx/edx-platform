@@ -414,6 +414,7 @@
 
             DiscussionThreadListView.prototype.chooseFilter = function() {
                 this.filter = $('.forum-nav-filter-main-control :selected').val();
+                this.clearSearchAlerts();
                 return this.retrieveFirstPage();
             };
 
