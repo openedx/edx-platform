@@ -1139,12 +1139,13 @@ class DragAndDropTest(VideoBaseTest):
         self.video.show_closed_captions()
         self.video.wait_for_closed_captions()
         self.assertTrue(self.video.is_closed_captions_visible)
-
+        self.video.scroll_to_element('.closed-captions')
         action = ActionChains(self.browser)
         captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
 
         captions_start = captions.location
-        action.drag_and_drop_by_offset(captions, 0, -15).perform()
+        print captions_start
+        action.drag_and_drop_by_offset(captions, 0, -1).perform()
 
         captions_end = captions.location
         # We have to branch here due to unexpected behaviour of chrome.
