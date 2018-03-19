@@ -172,6 +172,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     list_filter = ('mode', 'is_active',)
     raw_id_fields = ('user',)
     search_fields = ('course__id', 'mode', 'user__username',)
+    show_full_result_count = False
     form = CourseEnrollmentForm
 
     def queryset(self, request):
@@ -188,6 +189,7 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
+    show_full_result_count = False
 
     def get_readonly_fields(self, *args, **kwargs):
         """
