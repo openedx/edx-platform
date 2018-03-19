@@ -416,6 +416,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         #
         # This lets all plaintext through.
         sanitized_comment = bleach.clean(self.score_comment)
+        course = self.get_course()
 
         return {
             'input_fields': self.get_input_fields(),
@@ -437,6 +438,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'ask_to_send_email': self.ask_to_send_email,
             'button_text': self.button_text,
             'accept_grades_past_due': self.accept_grades_past_due,
+            'context_title': course.display_name_with_default,
+            'context_label': course.display_org_with_default,
         }
 
     def get_html(self):
