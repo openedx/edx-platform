@@ -219,9 +219,8 @@ class DashboardPage(PageObject, HelpMixin):
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
         tab_selector = '#course-index-tabs .{} a'.format('archived-courses-tab' if archived else 'courses-tab')
-        course_tab_link = self.q(css=tab_selector)
-        if course_tab_link:
-            course_tab_link.click()
+        self.wait_for_element_presence(tab_selector, "Courses Tab")
+        self.q(css=tab_selector).click()
         div2info = lambda element: {
             'name': element.find_element_by_css_selector('.course-title').text,
             'org': element.find_element_by_css_selector('.course-org .value').text,
