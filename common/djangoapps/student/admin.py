@@ -175,8 +175,12 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     show_full_result_count = False
     form = CourseEnrollmentForm
 
-    def queryset(self, request):
-        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
+    def get_queryset(self, request):
+        qs = super(CourseEnrollmentAdmin, self).get_queryset(request)
+        if not request.GET.get("q"):
+            return qs.none()
+        else:
+            return qs
 
 
 class UserProfileInline(admin.StackedInline):
@@ -199,6 +203,14 @@ class UserAdmin(BaseUserAdmin):
 
         django_readonly = super(UserAdmin, self).get_readonly_fields(*args, **kwargs)
         return django_readonly + ('username',)
+
+    def get_queryset(self, request):
+        qs = super(UserAdmin, self).get_queryset(request)
+        if not request.GET.get("q"):
+            return qs.none()
+        else:
+            return qs
+
 
 
 @admin.register(UserAttribute)
