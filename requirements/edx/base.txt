@@ -169,7 +169,7 @@ sqlparse>=0.2.0,<0.3.0
 
 # Used for testing
 before_after==0.1.3
-git+https://github.com/edx/bok-choy@215b0bde2b0cd94dec3e9d2620aa8e44f4ee249d#egg=bok-choy==0.7.1
+git+https://github.com/edx/bok-choy@ae8c15921d81c752360bd248f9e7727729d3137b#egg=bok-choy==0.8.1
 
 chrono==1.0.2
 ddt==0.8.0
