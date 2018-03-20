@@ -40,6 +40,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptsRequestValidationException,
     youtube_video_transcript_name,
     get_transcript,
+    get_transcript_from_val,
 )
 from xmodule.video_module.transcripts_model_utils import (
     is_val_transcript_feature_enabled_for_course
@@ -222,70 +223,69 @@ def check_transcripts(request):
 
     transcripts_presence['status'] = 'Success'
 
-    filename = 'subs_{0}.srt.sjson'.format(item.sub)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
-        local_transcripts = contentstore().find(content_location).data
-        transcripts_presence['current_item_subs'] = item.sub
+        get_transcript_from_val(edx_video_id=item.edx_video_id, lang=u'en')
+        command, subs_to_use = 'found', ''
     except NotFoundError:
-        pass
-
-    # Check for youtube transcripts presence
-    youtube_id = videos.get('youtube', None)
-    if youtube_id:
-        transcripts_presence['is_youtube_mode'] = True
-
-        # youtube local
-        filename = 'subs_{0}.srt.sjson'.format(youtube_id)
+        filename = 'subs_{0}.srt.sjson'.format(item.sub)
         content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
             local_transcripts = contentstore().find(content_location).data
-            transcripts_presence['youtube_local'] = True
+            transcripts_presence['current_item_subs'] = item.sub
         except NotFoundError:
-            log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
+            pass
 
-        # youtube server
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = youtube_id
-        youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
-        if youtube_transcript_name:
-            youtube_text_api['params']['name'] = youtube_transcript_name
-        youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
+        # Check for youtube transcripts presence
+        youtube_id = videos.get('youtube', None)
+        if youtube_id:
+            transcripts_presence['is_youtube_mode'] = True
 
-        if youtube_response.status_code == 200 and youtube_response.text:
-            transcripts_presence['youtube_server'] = True
-        #check youtube local and server transcripts for equality
-        if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
+            # youtube local
+            filename = 'subs_{0}.srt.sjson'.format(youtube_id)
+            content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
-                youtube_server_subs = get_transcripts_from_youtube(
-                    youtube_id,
-                    settings,
-                    item.runtime.service(item, "i18n")
-                )
-                if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
-                    transcripts_presence['youtube_diff'] = False
-            except GetTranscriptsFromYouTubeException:
-                pass
+                local_transcripts = contentstore().find(content_location).data
+                transcripts_presence['youtube_local'] = True
+            except NotFoundError:
+                log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
 
-    # Check for html5 local transcripts presence
-    html5_subs = []
-    for html5_id in videos['html5']:
-        filename = 'subs_{0}.srt.sjson'.format(html5_id)
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
-        try:
-            html5_subs.append(contentstore().find(content_location).data)
-            transcripts_presence['html5_local'].append(html5_id)
-        except NotFoundError:
-            log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
-        if len(html5_subs) == 2:  # check html5 transcripts for equality
-            transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+            # youtube server
+            youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+            youtube_text_api['params']['v'] = youtube_id
+            youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
+            if youtube_transcript_name:
+                youtube_text_api['params']['name'] = youtube_transcript_name
+            youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
-    command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
-    if command == 'not_found':
-        # Try searching in VAL for the transcript as a last resort
-        if is_val_transcript_feature_enabled_for_course(item.location.course_key):
-            video_transcript = get_video_transcript_content(edx_video_id=item.edx_video_id, language_code=u'en')
-            command = 'found' if video_transcript else command
+            if youtube_response.status_code == 200 and youtube_response.text:
+                transcripts_presence['youtube_server'] = True
+            #check youtube local and server transcripts for equality
+            if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
+                try:
+                    youtube_server_subs = get_transcripts_from_youtube(
+                        youtube_id,
+                        settings,
+                        item.runtime.service(item, "i18n")
+                    )
+                    if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
+                        transcripts_presence['youtube_diff'] = False
+                except GetTranscriptsFromYouTubeException:
+                    pass
+
+        # Check for html5 local transcripts presence
+        html5_subs = []
+        for html5_id in videos['html5']:
+            filename = 'subs_{0}.srt.sjson'.format(html5_id)
+            content_location = StaticContent.compute_location(item.location.course_key, filename)
+            try:
+                html5_subs.append(contentstore().find(content_location).data)
+                transcripts_presence['html5_local'].append(html5_id)
+            except NotFoundError:
+                log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
+            if len(html5_subs) == 2:  # check html5 transcripts for equality
+                transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+
+        command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
 
     transcripts_presence.update({
         'command': command,
