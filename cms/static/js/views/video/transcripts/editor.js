@@ -75,7 +75,6 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             var result = [],
                 getField = Utils.getField,
                 component_locator = this.$el.closest('[data-locator]').data('locator'),
-                subs = getField(metadataCollection, 'sub'),
                 values = {},
                 videoUrl, metadata, modifiedValues;
 
@@ -88,37 +87,6 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             videoUrl = getField(this.collection, 'video_url');
 
             modifiedValues = metadataView.getModifiedMetadataValues();
-
-            var isSubsModified = (function(values) {
-                var isSubsChanged = subs.hasChanged('value');
-
-                return Boolean(
-                    isSubsChanged &&
-                    (
-                        // If the user changes the field, `values.sub` contains
-                        // string value;
-                        // If the user clicks `clear` button, the field contains
-                        // null value.
-                        // Otherwise, undefined.
-                        _.isString(values.sub) || _.isNull(subs.getValue())
-                    )
-                );
-            }(modifiedValues));
-
-            // When we change value of `sub` field in the `Advanced`,
-            // we update data on backend. That provides possibility to remove
-            // transcripts.
-            if (isSubsModified) {
-                metadata = $.extend(true, {}, modifiedValues);
-                // Save module state
-                Utils.command('save', component_locator, null, {
-                    metadata: metadata,
-                    current_subs: _.pluck(
-                        Utils.getVideoList(videoUrl.getDisplayValue()),
-                        'video'
-                    )
-                });
-            }
 
             // Get values from `Advanced` tab fields (`html5_sources`,
             // `youtube_id_1_0`) that should be synchronized.
@@ -151,17 +119,6 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Synchronize other fields that has the same `field_name` property.
             Utils.syncCollections(metadataCollection, this.collection);
-
-            if (isSubsModified) {
-                // When `sub` field is changed, clean Storage to avoid overwriting.
-                Utils.Storage.remove('sub');
-
-                // Trigger `change` event manually if `video_url` model
-                // isn't changed.
-                if (!videoUrl.hasChanged()) {
-                    videoUrl.trigger('change');
-                }
-            }
         },
 
         /**
@@ -177,8 +134,6 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         */
         syncAdvancedTab: function(metadataCollection, metadataView) {
             var getField = Utils.getField,
-                subsValue = Utils.Storage.get('sub'),
-                subs = getField(metadataCollection, 'sub'),
                 html5Sources, youtube, videoUrlValue, result;
 
             // if metadataCollection is not passed, just exit.
@@ -232,14 +187,6 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
                 }
 
                 youtube.setValue(result);
-            }
-
-            // If Utils.Storage contain some subtitles, update them.
-            if (_.isString(subsValue)) {
-                subs.setValue(subsValue);
-                // After updating should be removed, because it might overwrite
-                // subtitles added by user manually.
-                Utils.Storage.remove('sub');
             }
 
             // Synchronize other fields that has the same `field_name` property.

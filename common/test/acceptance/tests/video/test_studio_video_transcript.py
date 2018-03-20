@@ -123,40 +123,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertFalse(self.video.is_transcript_button_visible('import'))
         self.assertTrue(self.video.is_transcript_button_visible('disabled_download_to_edit'))
 
-    def test_youtube_id_w_found_state(self):
-        """
-        Scenario: Youtube id only: check "Found" state
-        Given I have created a Video component with subtitles "t_not_exist"
-
-        And I enter a "http://youtu.be/t_not_exist" source to field number 1
-        Then I see status message "Timed Transcript Found"
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
-        """
-        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
-        self.edit_component()
-
-        self.video.set_url_field('http://youtu.be/t_not_exist', 1)
-        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_not_exist'))
-
-    def test_youtube_id_w_same_local_server_subs(self):
-        """
-        Scenario: Youtube id only: check "Found" state when user sets youtube_id with same local and server subs
-        Given I have created a Video component with subtitles "t__eq_exist"
-
-        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
-        And I see status message "Timed Transcript Found"
-        And I see value "t__eq_exist" in the field "Default Timed Transcript"
-        """
-        self._create_video_component(subtitles=True, subtitle_id='t__eq_exist')
-        self.edit_component()
-
-        self.video.set_url_field('http://youtu.be/t__eq_exist', 1)
-        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't__eq_exist'))
-
     def test_youtube_id_w_different_local_server_sub(self):
         """
         Scenario: Youtube id only: check "Found" state when user sets youtube_id with different local and server subs
@@ -167,7 +133,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         And I see button "replace"
         And I click transcript button "replace"
         And I see status message "Timed Transcript Found"
-        And I see value "t_neq_exist" in the field "Default Timed Transcript"
         """
         self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
         self.edit_component()
@@ -177,8 +142,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_transcript_button_visible('replace'))
         self.video.click_button_subtitles()
         self.video.wait_for_message('status', 'Timed Transcript Found')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_neq_exist'))
+        #TODO! Incomplete test, should be completed as a part of replace_transcript
 
     def test_html5_source_w_not_found_state(self):
         """
@@ -196,45 +160,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'No Timed Transcript')
         self.open_advanced_tab()
         self.assertTrue(self.video.verify_field_value('Default Timed Transcript', ''))
-
-    def test_html5_source_w_found_state(self):
-        """
-        Scenario: html5 source only: check "Found" state
-        Given I have created a Video component with subtitles "t_not_exist"
-
-        And I enter a "t_not_exist.mp4" source to field number 1
-        Then I see status message "Timed Transcript Found"
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
-        """
-        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
-        self.edit_component()
-
-        self.video.set_url_field('t_not_exist.mp4', 1)
-        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_not_exist'))
-
-    def test_set_youtube_id_wo_server(self):
-        """
-        Scenario: User sets youtube_id w/o server but with local subs and one html5 link w/o subs
-        Given I have created a Video component with subtitles "t_not_exist"
-
-        urls = ['http://youtu.be/t_not_exist', 'test_video_name.mp4']
-        for each url in urls do the following
-            Enter `url` to field number n
-            Status message "Timed Transcript Found" is shown
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
-        """
-        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
-        self.edit_component()
-
-        urls = ['http://youtu.be/t_not_exist', 'test_video_name.mp4']
-        for index, url in enumerate(urls, 1):
-            self.video.set_url_field(url, index)
-            self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_not_exist'))
 
     def test_set_youtube_id_wo_local(self):
         """
@@ -467,7 +392,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "Timed Transcript Uploaded Successfully"
         `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
-        And I see value "t__eq_exist" in the field "Default Timed Transcript"
 
         And I enter a "http://youtu.be/t_not_exist" source to field number 2
         Then I see status message "Timed Transcript Found"
@@ -487,9 +411,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Timed Transcript Uploaded Successfully')
         self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
         self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't__eq_exist'))
-        self.open_basic_tab()
 
         self.video.set_url_field('http://youtu.be/t_not_exist', 2)
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
@@ -552,7 +473,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
 
         If i enter "t_not_exist.mp4" source to field number 1 Then I see status message "Timed Transcript Found"
         `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
         And I save changes And then edit the component
 
         If i enter "video_name_2.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
@@ -566,6 +486,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         I see button "use_existing" And I click on it
         And I see value "video_name_4" in the field "Default Timed Transcript"
         """
+        self.metadata = {'sub': 't_not_exist'}
         self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
         self.edit_component()
 
@@ -573,9 +494,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
         self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
         self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_not_exist'))
-        self.open_basic_tab()
+
         self.save_unit_settings()
         self.edit_component()
 
@@ -584,9 +503,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
         self.video.click_button('use_existing')
         self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_2'))
-        self.open_basic_tab()
 
         self.video.set_url_field('video_name_3.mp4', 1)
         self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
@@ -596,8 +512,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
         self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
         self.video.click_button('use_existing')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_4'))
+        #TODO! Incomplete test, should be completed as a part of choose transcript
 
     def test_two_fields_only(self):
         """
@@ -622,6 +537,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         And I click transcript button "use_existing"
         And I see value "video_name_3" in the field "Default Timed Transcript"
         """
+        self.metadata = {'sub': 't_not_exist'}
         self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
         self.edit_component()
 
@@ -640,8 +556,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
         self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
         self.video.click_button('use_existing')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_3'))
+        #TODO! Incomplete test, should be completed as a part of rename_transcript
 
     def test_upload_subtitles(self):
         """
@@ -754,30 +669,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.edit_component()
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
 
-    def test_advanced_tab_transcript_fields(self):
-        """
-        Scenario: Change transcripts field in Advanced tab
-        Given I have created a Video component with subtitles "t_not_exist"
-
-        After I enter a "video_name_1.mp4" source to field number 1  Then I see status message "No Timed Transcript"
-        Open tab "Advanced" and set value "t_not_exist" to the field "Default Timed Transcript"
-        After saving the changes video captions should be visible
-        When I edit the component Then I see status message "Timed Transcript Found"
-        And I see value "video_name_1" in the field "Default Timed Transcript"
-        """
-        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
-        self.edit_component()
-
-        self.video.set_url_field('video_name_1.mp4', 1)
-        self.assertEqual(self.video.message('status'), 'No Timed Transcript')
-        self.open_advanced_tab()
-        self.video.set_field_value('Default Timed Transcript', 't_not_exist')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        self.edit_component()
-        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_1'))
-
     def test_non_ascii_transcripts(self):
         """
         Scenario: Check non-ascii (chinese) transcripts
@@ -796,33 +687,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Timed Transcript Uploaded Successfully')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-
-    def test_module_metadata_save(self):
-        """
-        Scenario: Check saving module metadata on switching between tabs
-        Given I have created a Video component with subtitles "t_not_exist"
-
-        After I enter a "video_name_1.mp4" source to field number 1 I should see status message "No Timed Transcript"
-        Open tab "Advanced" and set value "t_not_exist" to the field "Default Timed Transcript"
-        When I open tab "Basic" Then I see status message "Timed Transcript Found"
-        After saving the changes video captions should be visible
-        When I edit the component I should see status message "Timed Transcript Found"
-        And I see value "video_name_1" in the field "Default Timed Transcript"
-        """
-        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
-        self.edit_component()
-
-        self.video.set_url_field('video_name_1.mp4', 1)
-        self.assertEqual(self.video.message('status'), 'No Timed Transcript')
-        self.open_advanced_tab()
-        self.video.set_field_value('Default Timed Transcript', 't_not_exist')
-        self.open_basic_tab()
-        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        self.edit_component()
-        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_1'))
 
     def test_upload_subtitles_w_different_names2(self):
         """
