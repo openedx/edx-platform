@@ -10,7 +10,7 @@ const HEADERS = {
 };
 
 const getEntitlements = username => fetch(
-  `${entitlementApi}/?user=${username}`, {
+  `${entitlementApi}?user=${username}`, {
     credentials: 'same-origin',
     method: 'get',
   },
@@ -34,7 +34,7 @@ const postEntitlement = ({ username, courseUuid, mode, action, comments = null }
 );
 
 const patchEntitlement = ({ uuid, action, unenrolledRun = null, comments = null }) => fetch(
-  `${entitlementApi}/${uuid}`, {
+  `${entitlementApi}${uuid}`, {
     credentials: 'same-origin',
     method: 'patch',
     headers: HEADERS,
