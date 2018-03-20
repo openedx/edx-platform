@@ -559,7 +559,7 @@ class Staffing(SysadminDashboardView):
                 for role in roles:
                     for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
-                                 user.profile.name]
+                                 user.profile.name.encode('utf-8')]
                         data.append(datum)
             header = [_('course_id'),
                       _('role'), _('username'),
