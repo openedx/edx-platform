@@ -824,19 +824,21 @@ class TestCheckTranscripts(BaseTranscripts):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
 
-    @ddt.data(
-        (True, 'found'),
-        (False, 'not_found')
-    )
-    @ddt.unpack
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data', Mock(return_value=True))
-    def test_command_for_fallback_transcript(self, feature_enabled, expected_command, video_transcript_feature):
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    def test_command_for_fallback_transcript(self, mock_get_video_transcript_content):
         """
-        Verify the command if a transcript is not found in content-store but
-        its there in edx-val.
+        Verify the command if a transcript is there in edx-val.
         """
-        video_transcript_feature.return_value = feature_enabled
+        mock_get_video_transcript_content.return_value = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+
+        # video_transcript_feature.return_value = feature_enabled
         self.item.data = textwrap.dedent("""
             <video youtube="" sub="" edx_video_id="123">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
@@ -868,7 +870,7 @@ class TestCheckTranscripts(BaseTranscripts):
                 u'youtube_local': False,
                 u'is_youtube_mode': False,
                 u'youtube_server': False,
-                u'command': expected_command,
+                u'command': 'found',
                 u'current_item_subs': None,
                 u'youtube_diff': True,
                 u'html5_local': [],
