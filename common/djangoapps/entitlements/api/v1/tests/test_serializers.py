@@ -31,6 +31,7 @@ class EntitlementsSerializerTests(ModuleStoreTestCase):
             'order_number': entitlement.order_number,
             'created': entitlement.created.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'modified': entitlement.modified.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'support_details': [],
         }
 
         assert serializer.data == expected
