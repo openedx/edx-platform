@@ -66,6 +66,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
 from lms.djangoapps.instructor_task.models import InstructorTask
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
@@ -563,7 +564,7 @@ def certificate_status(generated_certificate):
         return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
 
 
-def certificate_info_for_user(user, grade, user_is_whitelisted, user_certificate):
+def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_certificate):
     """
     Returns the certificate info for a user for grade report.
     """
@@ -573,8 +574,9 @@ def certificate_info_for_user(user, grade, user_is_whitelisted, user_certificate
         else 'N'
 
     status = certificate_status(user_certificate)
+    can_have_certificate = CourseOverview.get_from_id(course_id).may_certify()
     certificate_generated = status['status'] == CertificateStatuses.downloadable
-    if certificate_generated:
+    if certificate_generated and can_have_certificate:
         certificate_is_delivered = 'Y'
         certificate_type = status['mode']
 

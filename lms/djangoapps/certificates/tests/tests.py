@@ -1,7 +1,9 @@
 """
 Tests for the certificates models.
 """
+from datetime import datetime, timedelta
 from ddt import data, ddt, unpack
+from pytz import UTC
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
@@ -28,6 +30,22 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     Tests for the GeneratedCertificate model
     """
 
+    def setUp(self):
+        super(CertificatesModelTest, self).setUp()
+
+        today = datetime.now(UTC)
+        self.instructor_paced_course = CourseFactory.create(
+            org='edx', number='instructor', display_name='Instructor Paced Course',
+            start=today - timedelta(days=30),
+            end=today - timedelta(days=2),
+            certificate_available_date=today - timedelta(days=1),
+            self_paced=False
+        )
+        self.self_paced_course = CourseFactory.create(
+            org='edx', number='self',
+            display_name='Self Paced Course', self_paced=True
+        )
+
     def test_certificate_status_for_student(self):
         student = UserFactory()
         course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
@@ -49,11 +67,21 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Verify that certificate_info_for_user works.
         """
         student = UserFactory()
-        _ = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
         student.profile.allow_certificate = allow_certificate
         student.profile.save()
 
-        certificate_info = certificate_info_for_user(student, grade, whitelisted, user_certificate=None)
+        # for instructor paced course
+        certificate_info = certificate_info_for_user(
+            student, self.instructor_paced_course.id, grade,
+            whitelisted, user_certificate=None
+        )
+        self.assertEqual(certificate_info, output)
+
+        # for self paced course
+        certificate_info = certificate_info_for_user(
+            student, self.self_paced_course.id, grade,
+            whitelisted, user_certificate=None
+        )
         self.assertEqual(certificate_info, output)
 
     @unpack
@@ -72,17 +100,35 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         of time.
         """
         student = UserFactory()
-        course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
         student.profile.allow_certificate = allow_certificate
         student.profile.save()
 
-        certificate = GeneratedCertificateFactory.create(
+        certificate1 = GeneratedCertificateFactory.create(
             user=student,
-            course_id=course.id,
+            course_id=self.instructor_paced_course.id,
             status=CertificateStatuses.downloadable,
             mode='honor'
         )
-        certificate_info = certificate_info_for_user(student, grade, whitelisted, certificate)
+
+        certificate2 = GeneratedCertificateFactory.create(
+            user=student,
+            course_id=self.self_paced_course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # for instructor paced course
+        certificate_info = certificate_info_for_user(
+            student, self.instructor_paced_course.id, grade,
+            whitelisted, certificate1
+        )
+        self.assertEqual(certificate_info, output)
+
+        # for self paced course
+        certificate_info = certificate_info_for_user(
+            student, self.self_paced_course.id, grade,
+            whitelisted, certificate2
+        )
         self.assertEqual(certificate_info, output)
 
     def test_course_ids_with_certs_for_user(self):

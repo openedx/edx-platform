@@ -12,7 +12,7 @@ import os
 import shutil
 import tempfile
 import urllib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ddt
 import unicodecsv
@@ -396,7 +396,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_request_cache()
 
-        expected_query_count = 36
+        expected_query_count = 41
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -1809,12 +1809,19 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
 class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTaskModuleTestCase):
     """
-    Test that grade report has correct user enrolment, verification, and certificate information.
+    Test that grade report has correct user enrollment, verification, and certificate information.
     """
     def setUp(self):
         super(TestGradeReportEnrollmentAndCertificateInfo, self).setUp()
 
-        self.initialize_course()
+        today = datetime.now(UTC)
+        course_factory_kwargs = {
+            'start': today - timedelta(days=30),
+            'end': today - timedelta(days=2),
+            'certificate_available_date': today - timedelta(days=1)
+        }
+
+        self.initialize_course(course_factory_kwargs)
 
         self.create_problem()
 
