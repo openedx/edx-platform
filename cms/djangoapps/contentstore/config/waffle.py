@@ -10,6 +10,7 @@ WAFFLE_NAMESPACE = u'studio'
 # Switches
 ENABLE_ACCESSIBILITY_POLICY_PAGE = u'enable_policy_page'
 ENABLE_ASSETS_SEARCH = u'enable_assets_search'
+ENABLE_IN_CONTEXT_IMAGE_SELECTION = u'enable_in_context_image_selection'
 
 
 def waffle():

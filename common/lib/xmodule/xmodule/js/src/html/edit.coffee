@@ -29,6 +29,7 @@ class @HTMLEditingDescriptor
     @element = element
     @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
     @editor_choice = @element.find("#editor-tab").data('editor')
+    @new_image_modal = window.STUDIO_FRONTEND_IN_CONTEXT_IMAGE_SELECTION
     if @base_asset_url == undefined
       @base_asset_url = null
 
@@ -81,7 +82,9 @@ class @HTMLEditingDescriptor
         },
         image_advtab: true,
         # We may want to add "styleselect" when we collect all styles used throughout the LMS
-        toolbar: "formatselect | fontselect | bold italic underline forecolor wrapAsCode | bullist numlist outdent indent blockquote | link unlink image | code",
+        toolbar: "formatselect | fontselect | bold italic underline forecolor wrapAsCode | " +
+          "bullist numlist outdent indent blockquote | link unlink " +
+          "#{if @new_image_modal then 'insertImage' else 'image'} | code",
         block_formats: interpolate("%(paragraph)s=p;%(preformatted)s=pre;%(heading3)s=h3;%(heading4)s=h4;%(heading5)s=h5;%(heading6)s=h6", {
             paragraph: gettext("Paragraph"),
             preformatted: gettext("Preformatted"),
@@ -931,13 +934,26 @@ class @HTMLEditingDescriptor
 
   setupTinyMCE: (ed) =>
     ed.addButton('wrapAsCode', {
-      title : 'Code block',
+      ###
+      Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
+      ###
+      title : gettext('Code block'),
       image : "#{baseUrl}/images/ico-tinymce-code.png",
       onclick : () ->
         ed.formatter.toggle('code')
     })
 
+    ed.addButton('insertImage', {
+      ###
+      Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
+      ###
+      title : gettext('Insert/Edit Image'),
+      icon: 'image',
+      onclick : @openImageModal
+    })
+
     @visualEditor = ed
+    @imageModal = $('#edit-image-modal .modal')
 
     # These events were added to the plugin code as the TinyMCE PluginManager
     # does not fire any events when plugins are opened or closed.
@@ -948,6 +964,8 @@ class @HTMLEditingDescriptor
     ed.on('ShowCodeEditor', @showCodeEditor)
     ed.on('SaveCodeEditor', @saveCodeEditor)
 
+    @imageModal.on('submitForm', @editImageSubmit)
+
   editImage: (data) =>
     # Called when the image plugin will be shown. Input arg is the JSON version of the image data.
     if data['src']
@@ -957,6 +975,32 @@ class @HTMLEditingDescriptor
     # Called when the image plugin is saved. Input arg is the JSON version of the image data.
     if data['src']
       data['src'] = rewriteStaticLinks(data['src'], '/static/', @base_asset_url)
+
+  openImageModal: () =>
+    img = $(@visualEditor.selection.getNode())
+    imgAttrs =
+      baseAssetUrl: @base_asset_url
+    if img && img.is('img')
+      imgAttrs['src'] = rewriteStaticLinks(img.attr('src'), @base_asset_url, '/static/')
+      imgAttrs['alt'] = img.attr('alt')
+      imgAttrs['width'] = parseInt(img.attr('width'), 10) || img[0].naturalWidth
+      imgAttrs['height'] = parseInt(img.attr('height'), 10) || img[0].naturalHeight
+      imgAttrs['style'] = img.attr('style')
+    @imageModal[0].dispatchEvent(new CustomEvent('openModal', {bubbles: true, detail: imgAttrs}))
+
+  closeImageModal: () =>
+    @imageModal[0].dispatchEvent(new CustomEvent('closeModal', {bubbles: true}))
+
+  saveImageFromModal: (data) =>
+    # Insert img node from studio-frontend modal form data passed as a javascript object
+    if data['src']
+      data['src'] = rewriteStaticLinks(data['src'], '/static/', @base_asset_url)
+
+    @visualEditor.insertContent(@visualEditor.dom.createHTML('img', data))
+
+  editImageSubmit: (event) =>
+    if event.detail
+      @saveImageFromModal(event.detail)
 
   editLink: (data) =>
     # Called when the link plugin will be shown. Input arg is the JSON version of the link data.

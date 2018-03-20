@@ -150,6 +150,7 @@ def container_handler(request, usage_key_string):
                 index += 1
 
             return render_to_response('container.html', {
+                'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
                 'action': action,
                 'xblock': xblock,
