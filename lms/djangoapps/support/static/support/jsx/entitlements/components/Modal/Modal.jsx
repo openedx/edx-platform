@@ -64,8 +64,8 @@ class EntitlementModal extends React.Component{
     }
     else { // if there is no active entitlement we are creating a new entitlement
 
-      const {courseUuid, user, mode, comments} = this.state;
-      console.log('creating new entitlement ', courseUuid, user, mode, comments);
+      const {courseUuid, username, mode, comments} = this.state;
+      console.log('creating new entitlement ', courseUuid, username, mode, comments);
       this.props.createEntitlement({courseUuid, username, mode, comments});
     }
   }
