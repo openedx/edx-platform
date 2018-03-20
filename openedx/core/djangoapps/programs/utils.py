@@ -28,6 +28,7 @@ from openedx.core.djangoapps.catalog.utils import get_programs, get_fulfillable_
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
@@ -670,10 +671,17 @@ def get_certificates(user, extended_program):
     program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
     # only include a program certificate if a certificate is available for every course
     if program_credentials and (len(certificates) == len(extended_program['courses'])):
+        enabled_force_program_cert_auth = configuration_helpers.get_value(
+            'force_program_cert_auth',
+            True
+        )
+        cert_url = program_credentials[0]['certificate_url']
+        url = get_logged_in_program_certificate_url(cert_url) if enabled_force_program_cert_auth else cert_url
+
         certificates.append({
             'type': 'program',
             'title': extended_program['title'],
-            'url': get_logged_in_program_certificate_url(program_credentials[0]['certificate_url']),
+            'url': url,
         })
 
     return certificates
