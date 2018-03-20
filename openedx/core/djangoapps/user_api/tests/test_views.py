@@ -1055,6 +1055,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"type": u"password",
                 u"required": True,
                 u"label": u"Password",
+                u"instructions": u'Your password must contain at least {} characters.'.format(password_min_length()),
                 u"restrictions": {
                     'min_length': password_min_length(),
                     'max_length': password_max_length(),
@@ -1072,6 +1073,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 u'name': u'password',
                 u'label': u'Password',
+                u'instructions': u'Your password must contain at least {} characters.'.format(password_min_length()),
                 u'restrictions': {
                     'min_length': password_min_length(),
                     'max_length': password_max_length(),
@@ -1081,11 +1083,14 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         # Now with an enabled password policy
         with mock.patch.dict(settings.FEATURES, {'ENFORCE_PASSWORD_POLICY': True}):
+            msg = u'Your password must contain at least {} characters, including '\
+                  u'3 uppercase letters & 1 symbol.'.format(password_min_length())
             self._assert_reg_field(
                 no_extra_fields_setting,
                 {
                     u'name': u'password',
                     u'label': u'Password',
+                    u'instructions': msg,
                     u'restrictions': {
                         'min_length': password_min_length(),
                         'max_length': password_max_length(),

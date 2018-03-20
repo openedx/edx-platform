@@ -57,7 +57,7 @@ class RegistrationValidationView(APIView):
             >>> {
             >>>     "validation_decisions": {
             >>>         "username": "",
-            >>>         "password": "Password cannot be the same as the username"
+            >>>         "password": "Password cannot be the same as the username."
             >>>     }
             >>> }
 
