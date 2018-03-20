@@ -59,6 +59,7 @@ class EntitlementModal extends React.Component{
     if(this.state.isReissue) {//if there is an active entitlement we are updating an entitlement
       const { comments } = this.state;
       const { entitlement } = this.props;
+      console.log('trying to reissue entitlement: ', entitlement)
       this.props.reissueEntitlement({entitlement, comments});
     }
     else { // if there is no active entitlement we are creating a new entitlement
