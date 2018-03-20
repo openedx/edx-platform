@@ -43,7 +43,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 6 characters or more)",
+            "Enter a password with at least 6 characters.",
         )
 
     @override_settings(PASSWORD_MIN_LENGTH=6)
@@ -62,7 +62,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 12 characters or fewer)",
+            "Enter a password with at most 12 characters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -73,7 +73,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more uppercase characters)",
+            "Enter a password with at least 3 uppercase letters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -92,7 +92,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more lowercase characters)",
+            "Enter a password with at least 3 lowercase letters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
@@ -111,7 +111,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more digits)",
+            "Enter a password with at least 3 digits.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'DIGITS': 3})
@@ -130,7 +130,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more punctuation characters)",
+            "Enter a password with at least 3 punctuation marks.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'PUNCTUATION': 3})
@@ -149,7 +149,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more unique words)",
+            "Enter a password with at least 3 words.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'WORDS': 3})
@@ -168,7 +168,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more numbers)",
+            "Enter a password with at least 3 numbers.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'NUMERIC': 3})
@@ -187,7 +187,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more letters)",
+            "Enter a password with at least 3 letters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'ALPHABETIC': 3})
@@ -211,12 +211,11 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
         errstring = (
-            "Password: Must be more complex ("
-            "must contain 3 or more uppercase characters, "
-            "must contain 3 or more digits, "
-            "must contain 3 or more punctuation characters, "
-            "must contain 3 or more unique words"
-            ")"
+            "Enter a password with at least "
+            "3 uppercase letters & "
+            "3 digits & "
+            "3 punctuation marks & "
+            "3 words."
         )
         self.assertEqual(obj['value'], errstring)
 
@@ -243,7 +242,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            "Password is too similar to a dictionary word.",
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -255,7 +254,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            "Password is too similar to a dictionary word.",
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -267,7 +266,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            "Password is too similar to a dictionary word.",
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -334,7 +333,7 @@ class TestUsernamePasswordNonmatch(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password cannot be the same as the username",
+            "Password cannot be the same as the username.",
         )
 
     def test_with_username_password_nonmatch(self):

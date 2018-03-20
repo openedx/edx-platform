@@ -172,7 +172,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         )
 
     def test_password_empty_validation_decision(self):
-        msg = u'Password: Invalid Length (must be {0} characters or more)'.format(password_min_length())
+        msg = u'Enter a password with at least {0} characters.'.format(password_min_length())
         self.assertValidationDecision(
             {'password': ''},
             {"password": msg}
@@ -180,7 +180,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
 
     def test_password_bad_min_length_validation_decision(self):
         password = 'p' * (password_min_length() - 1)
-        msg = u'Password: Invalid Length (must be {0} characters or more)'.format(password_min_length())
+        msg = u'Enter a password with at least {0} characters.'.format(password_min_length())
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
@@ -188,7 +188,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
 
     def test_password_bad_max_length_validation_decision(self):
         password = 'p' * (password_max_length() + 1)
-        msg = u'Password: Invalid Length (must be {0} characters or fewer)'.format(password_max_length())
+        msg = u'Enter a password with at most {0} characters.'.format(password_max_length())
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
@@ -197,5 +197,5 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_password_equals_username_validation_decision(self):
         self.assertValidationDecision(
             {"username": "somephrase", "password": "somephrase"},
-            {"username": "", "password": u"Password cannot be the same as the username"}
+            {"username": "", "password": u"Password cannot be the same as the username."}
         )

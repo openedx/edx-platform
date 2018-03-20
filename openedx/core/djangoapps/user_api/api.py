@@ -15,7 +15,9 @@ from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
-from util.password_policy_validators import password_max_length, password_min_length
+from util.password_policy_validators import (
+    password_complexity, password_instructions, password_max_length, password_min_length
+)
 
 
 def get_password_reset_form():
@@ -415,23 +417,21 @@ class RegistrationFormFactory(object):
         # meant to hold the user's password.
         password_label = _(u"Password")
 
-        restrictions = {}
-
-        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
-            complexities = getattr(settings, 'PASSWORD_COMPLEXITY', {})
-            for key, value in complexities.iteritems():
-                api_key = key.lower().replace(' ', '_')
-                restrictions[api_key] = value
-
-        restrictions.update({
+        restrictions = {
             "min_length": password_min_length(),
             "max_length": password_max_length(),
-        })
+        }
+
+        complexities = password_complexity()
+        for key, value in complexities.iteritems():
+            api_key = key.lower().replace(' ', '_')
+            restrictions[api_key] = value
 
         form_desc.add_field(
             "password",
             label=password_label,
             field_type="password",
+            instructions=password_instructions(),
             restrictions=restrictions,
             required=required
         )

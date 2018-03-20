@@ -299,11 +299,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     @ddt.data(
         {
             'password': '1',
-            'error_message': 'Password: Invalid Length (must be 2 characters or more)',
+            'error_message': 'Enter a password with at least 2 characters.',
         },
         {
             'password': '01234567891',
-            'error_message': 'Password: Invalid Length (must be 10 characters or fewer)'
+            'error_message': 'Enter a password with at most 10 characters.',
         }
     )
     def test_password_reset_with_invalid_length(self, password_dict):

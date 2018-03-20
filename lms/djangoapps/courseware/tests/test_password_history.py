@@ -343,7 +343,7 @@ class TestPasswordHistory(LoginEnrollmentTestCase):
 
     @ddt.data(
         ('foo', 'foobar', 'Error in resetting your password. Please try again.'),
-        ('', '', 'Password: Invalid Length'),
+        ('', '', 'Enter a password with at least'),
     )
     @ddt.unpack
     def test_password_reset_form_invalid(self, password1, password2, err_msg):
