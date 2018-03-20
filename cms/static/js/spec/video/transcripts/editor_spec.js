@@ -362,31 +362,6 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                     }).getValue();
                     expect(youtubeValue).toEqual('');
                 });
-
-                it('Timed Transcript field is updated', function() {
-                    Utils.Storage.set('sub', 'test_value');
-
-                    transcripts.syncAdvancedTab(metadataCollection);
-
-                    var collection = metadataCollection.models,
-                        subValue = collection[1].getValue();
-
-                    expect(subValue).toEqual('test_value');
-                });
-
-                it('Timed Transcript field is updated just once', function() {
-                    Utils.Storage.set('sub', 'test_value');
-
-                    var collection = metadataCollection.models,
-                        subModel = collection[1];
-
-                    spyOn(subModel, 'setValue');
-
-                    transcripts.syncAdvancedTab(metadataCollection);
-                    transcripts.syncAdvancedTab(metadataCollection);
-                    transcripts.syncAdvancedTab(metadataCollection);
-                    expect(subModel.setValue.calls.count()).toEqual(1);
-                });
             });
         });
     });
