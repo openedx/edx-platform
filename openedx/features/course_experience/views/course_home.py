@@ -24,6 +24,7 @@ from lms.djangoapps.course_goals.api import (
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
@@ -48,6 +49,7 @@ class CourseHomeView(CourseTabView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
+    @method_decorator(add_maintenance_banner)
     def get(self, request, course_id, **kwargs):
         """
         Displays the home page for the specified course.

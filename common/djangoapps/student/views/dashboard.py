@@ -38,6 +38,7 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_displ
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.api import order_history
@@ -527,6 +528,7 @@ def _get_urls_for_resume_buttons(user, enrollments):
 
 @login_required
 @ensure_csrf_cookie
+@add_maintenance_banner
 def student_dashboard(request):
     """
     Provides the LMS dashboard view
