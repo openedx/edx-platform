@@ -264,6 +264,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'DASHBOARD_TWITTER': True,
         },
     }
+    MOCK_SETTINGS_HIDE_COURSES = {
+        'FEATURES': {
+            'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': True,
+        }
+    }
 
     def setUp(self):
         """
@@ -610,6 +615,23 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         CourseEntitlementFactory(user=self.user)
         response = self.client.get(self.path)
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)
+
+    @patch.multiple('django.conf.settings', **MOCK_SETTINGS_HIDE_COURSES)
+    def test_hide_dashboard_courses_until_activated(self):
+        """
+        Verify that when the HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED feature is enabled,
+        inactive users don't see the Courses list, but active users still do.
+        """
+        # Ensure active users see the course list
+        self.assertTrue(self.user.is_active)
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('You are not enrolled in any courses yet.', response.content)
+
+        # Ensure inactive users don't see the course list
+        self.user.is_active = False
+        self.user.save()
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotIn('You are not enrolled in any courses yet.', response.content)
 
     @staticmethod
     def _remove_whitespace_from_html_string(html):

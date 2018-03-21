@@ -137,6 +137,9 @@ FEATURES = {
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
+    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
+    'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
+
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
