@@ -104,8 +104,8 @@ class EntitlementModal extends React.Component {
           options={[
             { label: '--', value: '' },
             { label: 'Verified', value: 'verified' },
-            { label: 'Professional', value: 'professional' }
-          ],}
+            { label: 'Professional', value: 'professional' },
+          ]}
           onChange={this.handleModeChange}
         />
         <TextArea
