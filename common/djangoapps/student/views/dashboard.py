@@ -563,6 +563,9 @@ def student_dashboard(request):
         'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED',
         settings.FEATURES.get('HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED', False)
     )
+    empty_dashboard_message = configuration_helpers.get_value(
+        'EMPTY_DASHBOARD_MESSAGE', None
+    )
 
     # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
@@ -811,6 +814,7 @@ def student_dashboard(request):
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
+        'empty_dashboard_message': empty_dashboard_message,
     }
 
     if ecommerce_service.is_enabled(request.user):
