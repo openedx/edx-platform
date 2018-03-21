@@ -29,9 +29,10 @@ class ConfigurationModelStrategy(DjangoStrategy):
             setting 'name' is configured via LTIProviderConfig.
         """
         if isinstance(backend, OAuthAuth):
-            provider_config = OAuth2ProviderConfig.current(backend.name)
-            if not provider_config.enabled_for_current_site:
+            providers = [p for p in Registry.displayed_for_login() if p.backend_name == backend.name]
+            if not providers:
                 raise Exception("Can't fetch setting of a disabled backend/provider.")
+            provider_config = providers[0]
             try:
                 return provider_config.get_setting(name)
             except KeyError:
