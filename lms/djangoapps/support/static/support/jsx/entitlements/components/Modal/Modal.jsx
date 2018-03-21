@@ -139,7 +139,7 @@ class EntitlementModal extends React.Component {
 }
 
 EntitlementModal.propTypes = {
-  isOpen: PropTypes.boolean.isRequired
+  isOpen: PropTypes.bool.isRequired,
   entitlement: PropTypes.shape({
     uuid: PropTypes.string.isRequired,
     courseUuid: PropTypes.string.isRequired,
