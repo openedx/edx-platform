@@ -46,7 +46,7 @@ const entitlementColumns = [
 ];
 
 const parseEntitlementData = (entitlements, ecommerceUrl, openReissueModal) =>
-  entitlements.map((entitlement) => {
+  entitlements.map((entitlement, index) => {
     const { expiredAt, created, modified, orderNumber } = entitlement;
     return Object.assign({}, entitlement, {
       expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
@@ -59,7 +59,7 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueModal) =>
       button: <Button
         className = {['btn', 'btn-primary']}
         label = "Reissue"
-        onClick = { openReissueModal.bind(entitlement)}
+        onClick = { openReissueModal.bind(this, entitlement)}
       />
     });
   });
