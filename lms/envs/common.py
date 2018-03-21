@@ -376,9 +376,6 @@ FEATURES = {
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
 
-    # Whether to display account activation notification on dashboard.
-    'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
-
     # Allow users to change their email address.
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 

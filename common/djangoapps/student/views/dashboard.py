@@ -599,16 +599,9 @@ def student_dashboard(request):
     )
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
+    # Display activation message in sidebar
     sidebar_account_activation_message = ''
-    banner_account_activation_message = ''
-    display_account_activation_message_on_sidebar = configuration_helpers.get_value(
-        'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR',
-        settings.FEATURES.get('DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR', False)
-    )
-
-    # Display activation message in sidebar if DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR
-    # flag is active. Otherwise display existing message at the top.
-    if display_account_activation_message_on_sidebar and not user.is_active:
+    if not user.is_active:
         sidebar_account_activation_message = render_to_string(
             'registration/account_activation_sidebar_notice.html',
             {
@@ -616,11 +609,6 @@ def student_dashboard(request):
                 'platform_name': platform_name,
                 'activation_email_support_link': activation_email_support_link
             }
-        )
-    elif not user.is_active:
-        banner_account_activation_message = render_to_string(
-            'registration/activate_account_notice.html',
-            {'email': user.email}
         )
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
@@ -789,7 +777,6 @@ def student_dashboard(request):
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
         'course_optouts': course_optouts,
-        'banner_account_activation_message': banner_account_activation_message,
         'sidebar_account_activation_message': sidebar_account_activation_message,
         'staff_access': staff_access,
         'errored_courses': errored_courses,

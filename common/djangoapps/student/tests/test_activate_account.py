@@ -112,7 +112,6 @@ class TestActivateAccount(TestCase):
     def test_activation_without_keys(self, mock_segment_identify):
         self.assert_no_tracking(mock_segment_identify)
 
-    @override_settings(FEATURES=dict(settings.FEATURES, DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR=True))
     def test_account_activation_message(self):
         """
         Verify that account correct activation message is displayed.
@@ -145,33 +144,6 @@ class TestActivateAccount(TestCase):
                 'platform_name': self.platform_name,
                 'activation_email_support_link': self.activation_email_support_link
             }
-        )
-        response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, expected_message, html=True)
-
-    @override_settings(FEATURES=dict(settings.FEATURES, DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR=False))
-    def test_account_activation_message_disabled(self):
-        """
-        Verify that old account activation message is displayed when
-        DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR is disabled.
-        """
-        # Log in with test user.
-        self.login()
-        expected_message = render_to_string(
-            'registration/activate_account_notice.html',
-            {'email': self.user.email}
-        )
-
-        response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, expected_message, html=True)
-
-        # Now make sure account activation message goes away when user activated the account
-        self.user.is_active = True
-        self.user.save()
-        self.login()
-        expected_message = render_to_string(
-            'registration/activate_account_notice.html',
-            {'email': self.user.email}
         )
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, expected_message, html=True)
