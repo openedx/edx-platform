@@ -205,17 +205,11 @@ function($, _, Backbone, Utils, FileUploader) {
             });
 
             var assertAjaxError = function(xhr) {
-                spyOn(Utils.Storage, 'set');
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.options.messenger.showError).toHaveBeenCalled();
                 expect(view.$progress).toHaveClass('is-invisible');
-                expect(view.options.messenger.render)
-                    .not
-                    .toHaveBeenCalled();
-                expect(Utils.Storage.set)
-                    .not
-                    .toHaveBeenCalledWith('sub', 'test');
+                expect(view.options.messenger.render).not.toHaveBeenCalled();
             };
 
             it('Ajax transport Error', function() {

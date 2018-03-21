@@ -22,6 +22,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import (
+    GetTranscriptsFromYouTubeException,
     get_video_transcript_content,
     remove_subs_from_store,
     Transcript,
@@ -30,15 +31,21 @@ from xmodule.video_module.transcripts_utils import (
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
-SRT_TRANSCRIPT_CONTENT = """
-1
+SRT_TRANSCRIPT_CONTENT = """0
 00:00:10,500 --> 00:00:13,000
 Elephant's Dream
 
-2
+1
 00:00:15,000 --> 00:00:18,000
 At the left we can see...
+
 """
+
+SJSON_TRANSCRIPT_CONTENT = Transcript.convert(
+    SRT_TRANSCRIPT_CONTENT,
+    Transcript.SRT,
+    Transcript.SJSON,
+)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -109,6 +116,28 @@ class BaseTranscripts(CourseTestCase):
             1.25: item.youtube_id_1_25,
             1.5: item.youtube_id_1_5
         }
+
+    def create_non_video_module(self):
+        """
+        Setup non video module for tests.
+        """
+        data = {
+            'parent_locator': unicode(self.course.location),
+            'category': 'non_video',
+            'type': 'non_video'
+        }
+        response = self.client.ajax_post('/xblock/', data)
+        usage_key = self._get_usage_key(response)
+        item = modulestore().get_item(usage_key)
+        item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
+        modulestore().update_item(item, self.user.id)
+
+        return usage_key
+
+    def assert_response(self, response, expected_status_code, expected_message):
+        response_content = json.loads(response.content)
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response_content['status'], expected_message)
 
 
 @ddt.ddt
@@ -182,11 +211,6 @@ class TestUploadTranscripts(BaseTranscripts):
 
         return response
 
-    def assert_transcript_upload_response(self, response, expected_status_code, expected_message):
-        response_content = json.loads(response.content)
-        self.assertEqual(response.status_code, expected_status_code)
-        self.assertEqual(response_content['status'], expected_message)
-
     @ddt.data(
         (u'123-456-789', False),
         (u'', False),
@@ -212,7 +236,7 @@ class TestUploadTranscripts(BaseTranscripts):
         response = self.upload_transcript(self.video_usage_key, transcript_file)
 
         # Verify the response
-        self.assert_transcript_upload_response(response, expected_status_code=200, expected_message='Success')
+        self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
         json_response = json.loads(response.content)
@@ -235,7 +259,7 @@ class TestUploadTranscripts(BaseTranscripts):
         Test that transcript upload validation fails if the video locator is missing
         """
         response = self.upload_transcript(locator=None, transcript_file=self.good_srt_file)
-        self.assert_transcript_upload_response(
+        self.assert_response(
             response,
             expected_status_code=400,
             expected_message=u'Video locator is required.'
@@ -246,7 +270,7 @@ class TestUploadTranscripts(BaseTranscripts):
         Test that transcript upload validation fails if transcript file is missing
         """
         response = self.upload_transcript(locator=self.video_usage_key, transcript_file=None)
-        self.assert_transcript_upload_response(
+        self.assert_response(
             response,
             expected_status_code=400,
             expected_message=u'A transcript file is required.'
@@ -257,7 +281,7 @@ class TestUploadTranscripts(BaseTranscripts):
         Test that transcript upload validation fails if transcript format is not SRT
         """
         response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.bad_name_srt_file)
-        self.assert_transcript_upload_response(
+        self.assert_response(
             response,
             expected_status_code=400,
             expected_message=u'This transcript file type is not supported.'
@@ -269,7 +293,7 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         # Request to upload transcript for the video
         response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.bad_data_srt_file)
-        self.assert_transcript_upload_response(
+        self.assert_response(
             response,
             expected_status_code=400,
             expected_message=u'There is a problem with this transcript file. Try to upload a different file.'
@@ -280,23 +304,13 @@ class TestUploadTranscripts(BaseTranscripts):
         Test that transcript upload validation fails if item's category is other than video.
         """
         # non_video module setup - i.e. an item whose category is not 'video'.
-        data = {
-            'parent_locator': unicode(self.course.location),
-            'category': 'non_video',
-            'type': 'non_video'
-        }
-        resp = self.client.ajax_post('/xblock/', data)
-        usage_key = self._get_usage_key(resp)
-        item = modulestore().get_item(usage_key)
-        item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
-        modulestore().update_item(item, self.user.id)
-
+        usage_key = self.create_non_video_module()
         # Request to upload transcript for the item
         response = self.upload_transcript(locator=usage_key, transcript_file=self.good_srt_file)
-        self.assert_transcript_upload_response(
+        self.assert_response(
             response,
             expected_status_code=400,
-            expected_message=u'Transcripts are supported only for "video" module.'
+            expected_message=u'Transcripts are supported only for "video" modules.'
         )
 
     def test_transcript_upload_non_existent_item(self):
@@ -305,10 +319,382 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         # Request to upload transcript for the item
         response = self.upload_transcript(locator='non_existent_locator', transcript_file=self.good_srt_file)
-        self.assert_transcript_upload_response(
+        self.assert_response(
             response,
             expected_status_code=400,
             expected_message=u'Cannot find item by locator.'
+        )
+
+
+@ddt.ddt
+class TestChooseTranscripts(BaseTranscripts):
+    """
+    Tests for '/transcripts/choose' endpoint.
+    """
+    def setUp(self):
+        super(TestChooseTranscripts, self).setUp()
+
+        # Create test transcript in contentstore
+        self.chosen_html5_id = 'test_html5_subs'
+        self.sjson_subs = Transcript.convert(SRT_TRANSCRIPT_CONTENT, Transcript.SRT, Transcript.SJSON)
+        self.save_subs_to_store(json.loads(self.sjson_subs), self.chosen_html5_id)
+
+        # Setup a VEDA produced video and persist `edx_video_id` in VAL.
+        create_video({
+            'edx_video_id': u'123-456-789',
+            'status': 'upload',
+            'client_video_id': u'Test Video',
+            'duration': 0,
+            'encoded_videos': [],
+            'courses': [unicode(self.course.id)]
+        })
+
+    def choose_transcript(self, locator, chosen_html5_id):
+        """
+        Make an endpoint call to choose transcript
+        """
+        payload = {}
+        if locator:
+            payload.update({'locator': unicode(locator)})
+
+        if chosen_html5_id:
+            payload.update({'html5_id': chosen_html5_id})
+
+        choose_transcript_url = reverse('choose_transcripts')
+        response = self.client.get(choose_transcript_url, {'data': json.dumps(payload)})
+        return response
+
+    @ddt.data(u'123-456-789', u'')
+    def test_choose_transcript_success(self, edx_video_id):
+        """
+        Verify that choosing transcript file in video component basic tab works as
+        expected in case of following:
+
+         1. External video component
+         2. VEDA produced video component
+        """
+        # In case of an external video component, the `edx_video_id` must be empty
+        # and VEDA produced video component will have `edx_video_id` set to VAL video ID.
+        self.item.edx_video_id = edx_video_id
+        modulestore().update_item(self.item, self.user.id)
+
+        # Make call to choose a transcript
+        response = self.choose_transcript(self.video_usage_key, self.chosen_html5_id)
+
+        # Verify the response
+        self.assert_response(response, expected_status_code=200, expected_message='Success')
+
+        # Verify the `edx_video_id` on the video component
+        json_response = json.loads(response.content)
+        expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
+        video = modulestore().get_item(self.video_usage_key)
+        self.assertEqual(video.edx_video_id, expected_edx_video_id)
+
+        # Verify transcript content
+        actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
+        actual_sjson_content = json.loads(actual_transcript['content'])
+        expected_sjson_content = json.loads(self.sjson_subs)
+        self.assertDictEqual(actual_sjson_content, expected_sjson_content)
+
+    def test_choose_transcript_fails_without_data(self):
+        """
+        Verify that choose transcript fails if we do not provide video data in request.
+        """
+        response = self.choose_transcript(locator=None, chosen_html5_id=None)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Incoming video data is empty.'
+        )
+
+    def test_choose_transcript_fails_without_locator(self):
+        """
+        Verify that choose transcript fails if video locator is missing in request.
+        """
+        response = self.choose_transcript(locator=None, chosen_html5_id=self.chosen_html5_id)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Cannot find item by locator.'
+        )
+
+    def test_choose_transcript_with_no_html5_transcript(self):
+        """
+        Verify that choose transcript fails if the chosen html5 ID don't
+        have any transcript associated in contentstore.
+        """
+        response = self.choose_transcript(locator=self.video_usage_key, chosen_html5_id='non-existent-html5-id')
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u"No such transcript."
+        )
+
+    def test_choose_transcript_fails_on_unknown_category(self):
+        """
+        Test that transcript choose validation fails if item's category is other than video.
+        """
+        # non_video module setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_module()
+        # Request to choose transcript for the item
+        response = self.choose_transcript(locator=usage_key, chosen_html5_id=self.chosen_html5_id)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Transcripts are supported only for "video" modules.'
+        )
+
+
+@ddt.ddt
+class TestRenameTranscripts(BaseTranscripts):
+    """
+    Tests for '/transcripts/rename' endpoint.
+    """
+    def setUp(self):
+        super(TestRenameTranscripts, self).setUp()
+
+        # Create test transcript in contentstore and update item's sub.
+        self.item.sub = 'test_video_subs'
+        self.sjson_subs = Transcript.convert(SRT_TRANSCRIPT_CONTENT, Transcript.SRT, Transcript.SJSON)
+        self.save_subs_to_store(json.loads(self.sjson_subs), self.item.sub)
+        modulestore().update_item(self.item, self.user.id)
+
+        # Setup a VEDA produced video and persist `edx_video_id` in VAL.
+        create_video({
+            'edx_video_id': u'123-456-789',
+            'status': 'upload',
+            'client_video_id': u'Test Video',
+            'duration': 0,
+            'encoded_videos': [],
+            'courses': [unicode(self.course.id)]
+        })
+
+    def rename_transcript(self, locator):
+        """
+        Make an endpoint call to rename transcripts.
+        """
+        payload = {}
+        if locator:
+            payload.update({'locator': unicode(locator)})
+
+        rename_transcript_url = reverse('rename_transcripts')
+        response = self.client.get(rename_transcript_url, {'data': json.dumps(payload)})
+        return response
+
+    @ddt.data(u'123-456-789', u'')
+    def test_rename_transcript_success(self, edx_video_id):
+        """
+        Verify that "use current transcript" in video component basic tab works as
+        expected in case of following:
+
+         1. External video component
+         2. VEDA produced video component
+        """
+        # In case of an external video component, the `edx_video_id` must be empty
+        # and VEDA produced video component will have `edx_video_id` set to VAL video ID.
+        self.item.edx_video_id = edx_video_id
+        modulestore().update_item(self.item, self.user.id)
+
+        # Make call to use current transcript from contentstore
+        response = self.rename_transcript(self.video_usage_key)
+
+        # Verify the response
+        self.assert_response(response, expected_status_code=200, expected_message='Success')
+
+        # Verify the `edx_video_id` on the video component
+        json_response = json.loads(response.content)
+        expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
+        video = modulestore().get_item(self.video_usage_key)
+        self.assertEqual(video.edx_video_id, expected_edx_video_id)
+
+        # Verify transcript content
+        actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
+        actual_sjson_content = json.loads(actual_transcript['content'])
+        expected_sjson_content = json.loads(self.sjson_subs)
+        self.assertDictEqual(actual_sjson_content, expected_sjson_content)
+
+    def test_rename_transcript_fails_without_data(self):
+        """
+        Verify that use current transcript fails if we do not provide video data in request.
+        """
+        response = self.rename_transcript(locator=None)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Incoming video data is empty.'
+        )
+
+    def test_rename_transcript_fails_with_invalid_locator(self):
+        """
+        Verify that use current transcript fails if video locator is missing in request.
+        """
+        response = self.rename_transcript(locator='non-existent-locator')
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Cannot find item by locator.'
+        )
+
+    def test_rename_transcript_with_non_existent_sub(self):
+        """
+        Verify that rename transcript fails if the `item.sub` don't
+        have any transcript associated in contentstore.
+        """
+        # Update item's sub to an id who does not have any
+        # transcript associated in contentstore.
+        self.item.sub = 'non-existent-sub'
+        modulestore().update_item(self.item, self.user.id)
+
+        response = self.rename_transcript(locator=self.video_usage_key)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u"No such transcript."
+        )
+
+    def test_rename_transcript_fails_on_unknown_category(self):
+        """
+        Test that validation fails if item's category is other than video.
+        """
+        # non_video module setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_module()
+        # Make call to use current transcript from contentstore.
+        response = self.rename_transcript(usage_key)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Transcripts are supported only for "video" modules.'
+        )
+
+
+@ddt.ddt
+@patch('contentstore.views.transcripts_ajax.download_youtube_subs', Mock(return_value=SJSON_TRANSCRIPT_CONTENT))
+class TestReplaceTranscripts(BaseTranscripts):
+    """
+    Tests for '/transcripts/replace' endpoint.
+    """
+    def setUp(self):
+        super(TestReplaceTranscripts, self).setUp()
+        self.youtube_id = 'test_yt_id'
+
+        # Setup a VEDA produced video and persist `edx_video_id` in VAL.
+        create_video({
+            'edx_video_id': u'123-456-789',
+            'status': 'upload',
+            'client_video_id': u'Test Video',
+            'duration': 0,
+            'encoded_videos': [],
+            'courses': [unicode(self.course.id)]
+        })
+
+    def replace_transcript(self, locator, youtube_id):
+        """
+        Make an endpoint call to replace transcripts with youtube ones.
+        """
+        payload = {}
+        if locator:
+            payload.update({'locator': unicode(locator)})
+
+        if youtube_id:
+            payload.update({
+                'videos': [
+                    {
+                        'type': 'youtube',
+                        'video': youtube_id
+                    }
+                ]
+            })
+
+        replace_transcript_url = reverse('replace_transcripts')
+        response = self.client.get(replace_transcript_url, {'data': json.dumps(payload)})
+        return response
+
+    @ddt.data(u'123-456-789', u'')
+    def test_replace_transcript_success(self, edx_video_id):
+        """
+        Verify that "import from youtube" in video component basic tab works as
+        expected in case of following:
+
+         1. External video component
+         2. VEDA produced video component
+        """
+        # In case of an external video component, the `edx_video_id` must be empty
+        # and VEDA produced video component will have `edx_video_id` set to VAL video ID.
+        self.item.edx_video_id = edx_video_id
+        modulestore().update_item(self.item, self.user.id)
+
+        # Make call to replace transcripts from youtube
+        response = self.replace_transcript(self.video_usage_key, self.youtube_id)
+
+        # Verify the response
+        self.assert_response(response, expected_status_code=200, expected_message='Success')
+
+        # Verify the `edx_video_id` on the video component
+        json_response = json.loads(response.content)
+        expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
+        video = modulestore().get_item(self.video_usage_key)
+        self.assertEqual(video.edx_video_id, expected_edx_video_id)
+
+        # Verify transcript content
+        actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
+        actual_sjson_content = json.loads(actual_transcript['content'])
+        expected_sjson_content = json.loads(SJSON_TRANSCRIPT_CONTENT)
+        self.assertDictEqual(actual_sjson_content, expected_sjson_content)
+
+    def test_replace_transcript_fails_without_data(self):
+        """
+        Verify that replace transcript fails if we do not provide video data in request.
+        """
+        response = self.replace_transcript(locator=None, youtube_id=None)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Incoming video data is empty.'
+        )
+
+    def test_replace_transcript_fails_with_invalid_locator(self):
+        """
+        Verify that replace transcript fails if a video locator does not exist.
+        """
+        response = self.replace_transcript(locator='non-existent-locator', youtube_id=self.youtube_id)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Cannot find item by locator.'
+        )
+
+    def test_replace_transcript_fails_without_yt_id(self):
+        """
+        Verify that replace transcript fails if youtube id is not provided.
+        """
+        response = self.replace_transcript(locator=self.video_usage_key, youtube_id=None)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'YouTube ID is required.'
+        )
+
+    def test_replace_transcript_no_transcript_on_yt(self):
+        """
+        Verify that replace transcript fails if YouTube does not have transcript for the given youtube id.
+        """
+        error_message = u'YT ID not found.'
+        with patch('contentstore.views.transcripts_ajax.download_youtube_subs') as mock_download_youtube_subs:
+            mock_download_youtube_subs.side_effect = GetTranscriptsFromYouTubeException(error_message)
+            response = self.replace_transcript(locator=self.video_usage_key, youtube_id='non-existent-yt-id')
+            self.assertContains(response, text=error_message, status_code=400)
+
+    def test_replace_transcript_fails_on_unknown_category(self):
+        """
+        Test that validation fails if item's category is other than video.
+        """
+        # non_video module setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_module()
+        response = self.replace_transcript(usage_key, youtube_id=self.youtube_id)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Transcripts are supported only for "video" modules.'
         )
 
 
@@ -316,227 +702,86 @@ class TestDownloadTranscripts(BaseTranscripts):
     """
     Tests for '/transcripts/download' url.
     """
-    def test_success_download_youtube(self):
-        self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
-        modulestore().update_item(self.item, self.user.id)
-
-        subs = {
-            'start': [100, 200, 240],
-            'end': [200, 240, 380],
-            'text': [
-                'subs #1',
-                'subs #2',
-                'subs #3'
-            ]
-        }
-        self.save_subs_to_store(subs, 'JMD_ifUUfsU')
-
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': self.video_usage_key, 'subs_id': "JMD_ifUUfsU"})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.content, """0\n00:00:00,100 --> 00:00:00,200\nsubs #1\n\n1\n00:00:00,200 --> 00:00:00,240\nsubs #2\n\n2\n00:00:00,240 --> 00:00:00,380\nsubs #3\n\n""")
-
-    def test_success_download_nonyoutube(self):
-        subs_id = str(uuid4())
-        self.item.data = textwrap.dedent("""
-            <video youtube="" sub="{}">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """.format(subs_id))
-        modulestore().update_item(self.item, self.user.id)
-
-        subs = {
-            'start': [100, 200, 240],
-            'end': [200, 240, 380],
-            'text': [
-                'subs #1',
-                'subs #2',
-                'subs #3'
-            ]
-        }
-        self.save_subs_to_store(subs, subs_id)
-
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': self.video_usage_key, 'subs_id': subs_id})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(
-            resp.content,
-            '0\n00:00:00,100 --> 00:00:00,200\nsubs #1\n\n1\n00:00:00,200 --> '
-            '00:00:00,240\nsubs #2\n\n2\n00:00:00,240 --> 00:00:00,380\nsubs #3\n\n'
-        )
-        remove_subs_from_store(subs_id, self.item)
-
-    def test_fail_data_without_file(self):
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': ''})
-        self.assertEqual(resp.status_code, 404)
-
-        resp = self.client.get(link, {})
-        self.assertEqual(resp.status_code, 404)
-
-    def test_fail_data_with_bad_locator(self):
-        # Test for raising `InvalidLocationError` exception.
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': 'BAD_LOCATOR'})
-        self.assertEqual(resp.status_code, 404)
-
-        # Test for raising `ItemNotFoundError` exception.
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': '{0}_{1}'.format(self.video_usage_key, 'BAD_LOCATOR')})
-        self.assertEqual(resp.status_code, 404)
-
-    def test_fail_for_non_video_module(self):
-        # Video module: setup
-        data = {
-            'parent_locator': unicode(self.course.location),
-            'category': 'videoalpha',
-            'type': 'videoalpha'
-        }
-        resp = self.client.ajax_post('/xblock/', data)
-        usage_key = self._get_usage_key(resp)
-        subs_id = str(uuid4())
-        item = modulestore().get_item(usage_key)
-        item.data = textwrap.dedent("""
-            <videoalpha youtube="" sub="{}">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </videoalpha>
-        """.format(subs_id))
-        modulestore().update_item(item, self.user.id)
-
-        subs = {
-            'start': [100, 200, 240],
-            'end': [200, 240, 380],
-            'text': [
-                'subs #1',
-                'subs #2',
-                'subs #3'
-            ]
-        }
-        self.save_subs_to_store(subs, subs_id)
-
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': unicode(usage_key)})
-        self.assertEqual(resp.status_code, 404)
-
-    def test_fail_nonyoutube_subs_dont_exist(self):
-        self.item.data = textwrap.dedent("""
-            <video youtube="" sub="UNDEFINED">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """)
-        modulestore().update_item(self.item, self.user.id)
-
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': self.video_usage_key})
-        self.assertEqual(resp.status_code, 404)
-
-    def test_empty_youtube_attr_and_sub_attr(self):
-        self.item.data = textwrap.dedent("""
-            <video youtube="">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """)
-        modulestore().update_item(self.item, self.user.id)
-
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': self.video_usage_key})
-
-        self.assertEqual(resp.status_code, 404)
-
-    def test_fail_bad_sjson_subs(self):
-        subs_id = str(uuid4())
-        self.item.data = textwrap.dedent("""
-            <video youtube="" sub="{}">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """.format(subs_id))
-        modulestore().update_item(self.item, self.user.id)
-
-        subs = {
-            'start': [100, 200, 240],
-            'end': [200, 240, 380],
-            'text': [
-                'subs #1'
-            ]
-        }
-        self.save_subs_to_store(subs, 'JMD_ifUUfsU')
-
-        link = reverse('download_transcripts')
-        resp = self.client.get(link, {'locator': self.video_usage_key})
-
-        self.assertEqual(resp.status_code, 404)
-
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    def test_download_fallback_transcript(self, mock_get_video_transcript_data):
+    def update_video_component(self, sub=None, youtube_id=None):
         """
-        Verify that the val transcript is returned if its not found in content-store.
+        Updates video component with `sub` and `youtube_id`.
         """
-        mock_get_video_transcript_data.return_value = {
-            'content': json.dumps({
-                "start": [10],
-                "end": [100],
-                "text": ["Hi, welcome to Edx."],
-            }),
-            'file_name': 'edx.sjson'
-        }
+        sjson_transcript = json.loads(SJSON_TRANSCRIPT_CONTENT)
+        self.item.sub = sub
+        if sub:
+            self.save_subs_to_store(sjson_transcript, sub)
+        self.item.youtube_id_1_0 = youtube_id
+        if youtube_id:
+            self.save_subs_to_store(sjson_transcript, youtube_id)
 
-        self.item.data = textwrap.dedent("""
-            <video youtube="" sub="" edx_video_id="123">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """)
         modulestore().update_item(self.item, self.user.id)
 
-        download_transcripts_url = reverse('download_transcripts')
-        response = self.client.get(download_transcripts_url, {'locator': self.video_usage_key})
-
-        # Expected response
-        expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
-        expected_headers = {
-            'content-disposition': 'attachment; filename="edx.srt"',
-            'content-type': 'application/x-subrip; charset=utf-8'
-        }
-
-        # Assert the actual response
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, expected_content)
-        for attribute, value in expected_headers.iteritems():
-            self.assertEqual(response.get(attribute), value)
-
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    def test_download_fallback_transcript_feature_disabled(self):
+    def download_transcript(self, locator):
         """
-        Verify the transcript download when feature is disabled.
+        Makes a call to download transcripts.
         """
-        self.item.data = textwrap.dedent("""
-            <video youtube="" sub="">
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
-                <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </video>
-        """)
-        modulestore().update_item(self.item, self.user.id)
+        payload = {}
+        if locator:
+            payload.update({'locator': unicode(locator)})
 
-        download_transcripts_url = reverse('download_transcripts')
-        response = self.client.get(download_transcripts_url, {'locator': self.video_usage_key})
-        # Assert the actual response
-        self.assertEqual(response.status_code, 404)
+        download_transcript_url = reverse('download_transcripts')
+        response = self.client.get(download_transcript_url, payload)
+        return response
+
+    def assert_download_response(self, response, expected_status_code, expected_content=None):
+        """
+        Verify transcript download response.
+        """
+        self.assertEqual(response.status_code, expected_status_code)
+        if expected_content:
+            self.assertEqual(response.content, expected_content)
+
+    def test_download_youtube_transcript_success(self):
+        """
+        Verify that the transcript associated to YT id is downloaded successfully.
+        """
+        self.update_video_component(youtube_id='JMD_ifUUfsU')
+        response = self.download_transcript(locator=self.video_usage_key)
+        self.assert_download_response(response, expected_content=SRT_TRANSCRIPT_CONTENT, expected_status_code=200)
+
+    def test_download_non_youtube_transcript_success(self):
+        """
+        Verify that the transcript associated to item's `sub` is downloaded successfully.
+        """
+        self.update_video_component(sub='test_subs')
+        response = self.download_transcript(locator=self.video_usage_key)
+        self.assert_download_response(response, expected_content=SRT_TRANSCRIPT_CONTENT, expected_status_code=200)
+
+    def test_download_transcript_404_without_locator(self):
+        """
+        Verify that download transcript returns 404 without locator.
+        """
+        response = self.download_transcript(locator=None)
+        self.assert_download_response(response, expected_status_code=404)
+
+    def test_download_transcript_404_with_bad_locator(self):
+        """
+        Verify that download transcript returns 404 with invalid locator.
+        """
+        response = self.download_transcript(locator='invalid-locator')
+        self.assert_download_response(response, expected_status_code=404)
+
+    def test_download_transcript_404_for_non_video_module(self):
+        """
+        Verify that download transcript returns 404 for a non video module.
+        """
+        usage_key = self.create_non_video_module()
+        response = self.download_transcript(locator=usage_key)
+        self.assert_download_response(response, expected_status_code=404)
+
+    def test_download_transcript_404_for_no_yt_and_no_sub(self):
+        """
+        Verify that download transcript returns 404 when video component
+        does not have sub and youtube id.
+        """
+        self.update_video_component(sub=None, youtube_id=None)
+        response = self.download_transcript(locator=self.video_usage_key)
+        self.assert_download_response(response, expected_status_code=404)
 
 
 @ddt.ddt

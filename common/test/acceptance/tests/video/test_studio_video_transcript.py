@@ -133,6 +133,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         And I see button "replace"
         And I click transcript button "replace"
         And I see status message "Timed Transcript Found"
+        Then I save video component And captions are visible.
         """
         self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
         self.edit_component()
@@ -142,7 +143,8 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_transcript_button_visible('replace'))
         self.video.click_button_subtitles()
         self.video.wait_for_message('status', 'Timed Transcript Found')
-        #TODO! Incomplete test, should be completed as a part of replace_transcript
+        self.save_unit_settings()
+        self.assertTrue(self.video.is_captions_visible())
 
     def test_html5_source_w_not_found_state(self):
         """
@@ -433,8 +435,9 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         And I enter a "t__eq_exist.webm" source to field number 2
         Then I see status message "Timed Transcript Conflict"
         `Timed Transcript from t_not_exist.mp4` and `Timed Transcript from t__eq_exist.webm` buttons are shown
-        And I click transcript button "Timed Transcript from t_not_exist.webm"
-        And I see value "uk_transcripts|t_not_exist" in the field "Default Timed Transcript"
+        And I click transcript button "Timed Transcript from t_not_exist.mp4"
+        Then I see status message "Timed Transcript Found" And I save video component
+        Then I see that the captions are visible.
         """
         # Setup a course, navigate to the unit containing
         # video component and edit the video component.
@@ -461,7 +464,11 @@ class VideoTranscriptTest(CMSVideoBaseTest):
             button_text='Timed Transcript from t_not_exist.mp4'
         ))
 
-        # TODO: Incomplete – working on `choose_transcript` handler will complete this test.
+        self.video.click_button('choose', index=1)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.save_unit_settings()
+
+        self.assertTrue(self.video.is_captions_visible())
 
     def test_one_field_only(self):
         """
@@ -476,15 +483,16 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         And I save changes And then edit the component
 
         If i enter "video_name_2.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
-        I see button "use_existing" And I click on it
-        And I see value "video_name_2" in the field "Default Timed Transcript"
+        I see button "use_existing"
 
         If i enter "video_name_3.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
         And I see button "use_existing"
 
         If i enter a "video_name_4.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
-        I see button "use_existing" And I click on it
-        And I see value "video_name_4" in the field "Default Timed Transcript"
+        I see button "use_existing" And I click on it And I see status message "Timed Transcript Found"
+
+        I save video component And see that the captions are visible
+        Then I edit video component And I see status message "Timed Transcript Found"
         """
         self.metadata = {'sub': 't_not_exist'}
         self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
@@ -494,14 +502,12 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
         self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
         self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
-
         self.save_unit_settings()
-        self.edit_component()
 
+        self.edit_component()
         self.video.set_url_field('video_name_2.mp4', 1)
         self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
         self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
-        self.video.click_button('use_existing')
         self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
 
         self.video.set_url_field('video_name_3.mp4', 1)
@@ -512,7 +518,12 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
         self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
         self.video.click_button('use_existing')
-        #TODO! Incomplete test, should be completed as a part of choose transcript
+
+        self.save_unit_settings()
+        self.assertTrue(self.video.is_captions_visible())
+
+        self.edit_component()
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
 
     def test_two_fields_only(self):
         """
@@ -535,7 +546,10 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         Then I see status message "Confirm Timed Transcript"
         And I see button "use_existing"
         And I click transcript button "use_existing"
-        And I see value "video_name_3" in the field "Default Timed Transcript"
+        And I see status message "Timed Transcript Found"
+
+        I save video component And see that the captions are visible
+        Then I edit video component And I see status message "Timed Transcript Found"
         """
         self.metadata = {'sub': 't_not_exist'}
         self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
@@ -556,7 +570,13 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
         self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
         self.video.click_button('use_existing')
-        #TODO! Incomplete test, should be completed as a part of rename_transcript
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+
+        self.save_unit_settings()
+        self.video.is_captions_visible()
+
+        self.edit_component()
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
 
     def test_upload_subtitles(self):
         """
