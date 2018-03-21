@@ -160,6 +160,12 @@ def validate_password(password, user=None, username=None):
         user: A User model object, if available. Required to check against security policy.
         username: The user-provided username, if available. Taken from 'user' if not provided.
     """
+    if not isinstance(password, text_type):
+        try:
+            password = text_type(password, encoding='utf8')  # some checks rely on unicode semantics (e.g. length)
+        except UnicodeDecodeError:
+            raise ValidationError(_('Invalid password.'))  # no reason to get into weeds
+
     username = username or (user and user.username)
 
     if user:
@@ -308,7 +314,7 @@ def _validate_password_dictionary(value):
 
     if password_max_edit_distance and password_dictionary:
         for word in password_dictionary:
-            edit_distance = distance(text_type(value), text_type(word))
+            edit_distance = distance(value, text_type(word))
             if edit_distance <= password_max_edit_distance:
                 raise ValidationError(_("Password is too similar to a dictionary word."),
                                       code="dictionary_word")
