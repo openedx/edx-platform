@@ -196,7 +196,9 @@ from student.models import CourseEnrollment
           % else:
             <div class="empty-dashboard-message">
               <p>${_("You are not enrolled in any courses yet.")}</p>
-
+              % if empty_dashboard_message:
+                <p class="custom-message">${empty_dashboard_message | n, decode.utf8}</p>
+              %endif
               % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
                 <a class="btn btn-primary" href="${marketing_link('COURSES')}">
                   ${_("Explore courses")}
