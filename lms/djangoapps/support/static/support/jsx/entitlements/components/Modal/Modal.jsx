@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { Modal, Button, InputSelect, InputText, TextArea } from '@edx/paragon';
 
 
@@ -137,7 +139,7 @@ class EntitlementModal extends React.Component {
   }
 }
 
-EntitlementSupportTable.propTypes = {
+EntitlementModal.propTypes = {
   entitlement: PropTypes.shape({
     uuid: PropTypes.string.isRequired,
     courseUuid: PropTypes.string.isRequired,
@@ -154,12 +156,10 @@ EntitlementSupportTable.propTypes = {
       unenrolledRun: PropTypes.string,
     })),
     user: PropTypes.string.isRequired,
-  })).isRequired,
+  }).isRequired,
   createEntitlement: PropTypes.func.isRequired,
   reissueEntitlement: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
 };
-
-export default EntitlementSupportTable;
 
 export default EntitlementModal;
