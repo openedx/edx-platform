@@ -156,7 +156,7 @@ EntitlementModal.propTypes = {
       unenrolledRun: PropTypes.string,
     })),
     user: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   createEntitlement: PropTypes.func.isRequired,
   reissueEntitlement: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,

@@ -14,12 +14,12 @@ const entitlementColumns = [
     key: 'courseUuid',
   },
   {
-    label: 'Enrollment',
-    key: 'enrollmentCourseRun',
-  },
-  {
     label: 'Mode',
     key: 'mode',
+  },
+  {
+    label: 'Enrollment',
+    key: 'enrollmentCourseRun',
   },
   {
     label: 'Expired At',

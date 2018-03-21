@@ -40,7 +40,7 @@ const patchEntitlement = ({ uuid, action, unenrolledRun = null, comments = null 
     headers: HEADERS,
     body: JSON.stringify({
       expired_at: null,
-      enrollment_run: null,
+      enrollment_course_run: null,
       support_details: [{
         unenrolled_run: unenrolledRun,
         action,
