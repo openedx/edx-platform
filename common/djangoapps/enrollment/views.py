@@ -74,9 +74,12 @@ class ApiKeyPermissionMixIn(object):
 
 class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     """Limit the number of requests users can make to the enrollment API."""
+    # The staff Throttle rate is currently being adjusted to meet the needs of the eCommerce API calls.
+    # This should be reviewed for performance and we should determine the optimum throttle for the needs of this API.
+    # https://openedx.atlassian.net/wiki/spaces/LEARNER/pages/645923004/eCommerce+Guild
     THROTTLE_RATES = {
         'user': '40/minute',
-        'staff': '1200/minute',
+        'staff': '2000/minute',  # Decided on by looking at number of API calls to the Enrollment API from Staff users
     }
 
     def allow_request(self, request, view):
