@@ -14,7 +14,6 @@
                 render: function() {
                     var discussionInlineView = new DiscussionInlineView({
                         el: this.$el,
-                        showByDefault: true,
                         readOnly: this.readOnly,
                         startHeader: 3
                     });
