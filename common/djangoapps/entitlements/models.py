@@ -27,7 +27,7 @@ class CourseEntitlementPolicy(models.Model):
     Represents the Entitlement's policy for expiration, refunds, and regaining a used certificate
     """
 
-    DEFAULT_EXPIRATION_PERIOD_DAYS = 450
+    DEFAULT_EXPIRATION_PERIOD_DAYS = 730
     DEFAULT_REFUND_PERIOD_DAYS = 60
     DEFAULT_REGAIN_PERIOD_DAYS = 14
 
