@@ -66,8 +66,7 @@ class EntitlementModal extends React.Component {
       const { comments } = this.state;
       const { entitlement } = this.props;
       this.props.reissueEntitlement({ entitlement, comments });
-    }
-    else { // if there is no active entitlement we are creating a new entitlement
+    } else { // if there is no active entitlement we are creating a new entitlement
       const { courseUuid, username, mode, comments } = this.state;
       this.props.createEntitlement({ courseUuid, username, mode, comments });
     }
@@ -106,7 +105,7 @@ class EntitlementModal extends React.Component {
             { label: '--', value: '' },
             { label: 'Verified', value: 'verified' },
             { label: 'Professional', value: 'professional' }
-          ]}
+          ],}
           onChange={this.handleModeChange}
         />
         <TextArea
@@ -116,12 +115,12 @@ class EntitlementModal extends React.Component {
           onChange={this.handleCommentsChange}
         />
       </div>
-    )
+    );
 
     return (
       <div>
-        <Modal  
-          open={this.props.isOpen} 
+        <Modal
+          open={this.props.isOpen}
           className="entitlement-modal"
           title={title}
           body={body}
@@ -135,11 +134,12 @@ class EntitlementModal extends React.Component {
           onClose={this.onClose}
         />
       </div>
-    )
+    );
   }
 }
 
 EntitlementModal.propTypes = {
+  isOpen: PropTypes.boolean.isRequired
   entitlement: PropTypes.shape({
     uuid: PropTypes.string.isRequired,
     courseUuid: PropTypes.string.isRequired,

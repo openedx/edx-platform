@@ -8,8 +8,8 @@ const defaultState = {
   error: '',
   modal: {
     isOpen: false,
-    activeEntitlement: null
-  }
+    activeEntitlement: null,
+  },
 };
 
 const configureStore = initialState =>

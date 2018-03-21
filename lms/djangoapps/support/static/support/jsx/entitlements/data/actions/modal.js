@@ -2,7 +2,7 @@ import { modalActions } from './constants';
 
 const openReissueModal = entitlement => ({
   type: modalActions.OPEN_REISSUE_MODAL,
-  entitlement
+  entitlement,
 });
 
 const openCreationModal = () => ({

@@ -46,8 +46,8 @@ const entitlementColumns = [
 ];
 
 const parseEntitlementData = (entitlements, ecommerceUrl, openReissueModal) =>
-  entitlements.map((entitlement, index) => {
-    const { expiredAt, created, modified, orderNumber } = entitlement;
+  entitlements.map((entitlement) => {
+    const { expiredAt, created, modified, orderNumber, enrollmentCourseRun } = entitlement;
     return Object.assign({}, entitlement, {
       expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
       createdAt: moment(created).format('lll'),
@@ -57,10 +57,11 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueModal) =>
         content={orderNumber || ''}
       />,
       button: <Button
-        className = {['btn', 'btn-primary']}
-        label = "Reissue"
-        onClick = { openReissueModal.bind(this, entitlement)}
-      />
+        disabled={!enrollmentCourseRun}
+        className={['btn', 'btn-primary']}
+        label="Reissue"
+        onClick={openReissueModal.bind(this, entitlement)}
+      />,
     });
   });
 
@@ -90,7 +91,7 @@ EntitlementSupportTable.propTypes = {
     user: PropTypes.string.isRequired,
   })).isRequired,
   ecommerceUrl: PropTypes.string.isRequired,
-  openReissueModal: PropTypes.func.isRequired
+  openReissueModal: PropTypes.func.isRequired,
 };
 
 export default EntitlementSupportTable;

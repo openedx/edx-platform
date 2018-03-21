@@ -8,11 +8,10 @@ const entitlements = (state = [], action) => {
       return [...state, action.entitlement];
     case entitlementActions.reissue.SUCCESS:
       return state.map((entitlement) => {
-        if(entitlement.uuid === action.entitlement.uuid) {
+        if (entitlement.uuid === action.entitlement.uuid) {
           return action.entitlement;
-        } else {
-          return entitlement;
         }
+        return entitlement;
       });
     default:
       return state;

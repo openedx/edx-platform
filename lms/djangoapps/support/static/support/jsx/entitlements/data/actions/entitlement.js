@@ -37,9 +37,9 @@ const reissueEntitlementFailure = error =>
   dispatch =>
     dispatch(displayError('Error Reissuing Entitlement', error));
 
-const reissueEntitlement = ({entitlement, comments}) =>
+const reissueEntitlement = ({ entitlement, comments }) =>
   (dispatch) => {
-    patchEntitlement({ 
+    patchEntitlement({
       uuid: entitlement.uuid,
       action: 'REISSUE',
       unenrolledRun: entitlement.enrollmentCourseRun,
@@ -66,9 +66,9 @@ const createEntitlementFailure = error =>
   dispatch =>
     dispatch(displayError('Error Creating Entitlement', error));
 
-const createEntitlement = ({username, courseUuid, mode, comments}) =>
+const createEntitlement = ({ username, courseUuid, mode, comments }) =>
   (dispatch) => {
-    postEntitlement({ 
+    postEntitlement({
       username,
       courseUuid,
       mode,
