@@ -191,7 +191,9 @@ class TestYoutubeSubsBase(SharedModuleStoreTestCase):
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
-    """Tests for `download_youtube_subs` function."""
+    """
+    Tests for `download_youtube_subs` function.
+    """
 
     org = 'MITx'
     number = '999'
@@ -238,13 +240,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
 
-        # Check asset status after import of transcript.
-        filename = 'subs_{0}.srt.sjson'.format(good_youtube_sub)
-        content_location = StaticContent.compute_location(self.course.id, filename)
-        self.assertTrue(contentstore().find(content_location))
-
-        self.clear_sub_content(good_youtube_sub)
-
     def test_subs_for_html5_vid_with_periods(self):
         """
         This is to verify a fix whereby subtitle files uploaded against
@@ -268,16 +263,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.download_youtube_subs(bad_youtube_sub, self.course, settings)
-
-        # Check asset status after import of transcript.
-        filename = 'subs_{0}.srt.sjson'.format(bad_youtube_sub)
-        content_location = StaticContent.compute_location(
-            self.course.id, filename
-        )
-        with self.assertRaises(NotFoundError):
-            contentstore().find(content_location)
-
-        self.clear_sub_content(bad_youtube_sub)
 
     def test_success_downloading_chinese_transcripts(self):
 
@@ -366,13 +351,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             'http://video.google.com/timedtext',
             params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
         )
-
-        # Check asset status after import of transcript.
-        filename = 'subs_{0}.srt.sjson'.format(good_youtube_sub)
-        content_location = StaticContent.compute_location(self.course.id, filename)
-        self.assertTrue(contentstore().find(content_location))
-
-        self.clear_sub_content(good_youtube_sub)
 
 
 class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):

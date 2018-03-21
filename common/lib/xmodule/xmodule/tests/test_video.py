@@ -36,7 +36,7 @@ from xblock.fields import ScopeIds
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_STATIC_DIR
-from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
+from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store, save_subs_to_store
 from . import LogicTest
 from .test_import import DummySystem
 
@@ -1014,9 +1014,10 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
               <handout src="http://www.example.com/handout"/>
             </video>
         '''
-
+        yt_subs_id = 'OEoXaMPEzfM'
         descriptor = instantiate_descriptor(data=xml_data_sub)
-        download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
+        subs = download_youtube_subs(yt_subs_id, descriptor, settings)
+        save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {
                 "display_name": "Test Video",
@@ -1045,9 +1046,10 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
               <transcript language="ge" src="subs_grmtran1.srt" />
             </video>
         '''
-
+        yt_subs_id = 'OEoXaMPEzfM'
         descriptor = instantiate_descriptor(data=xml_data_sub_transcript)
-        download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
+        subs = download_youtube_subs(yt_subs_id, descriptor, settings)
+        save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {

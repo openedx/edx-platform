@@ -179,7 +179,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
 
 def download_youtube_subs(youtube_id, video_descriptor, settings):
     """
-    Download transcripts from Youtube and save them to assets.
+    Download transcripts from Youtube.
 
     Args:
         youtube_id: str, actual youtube_id of the video.
@@ -188,7 +188,7 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):
     We save transcripts for 1.0 speed, as for other speed conversion is done on front-end.
 
     Returns:
-        None, if transcripts were successfully downloaded and saved.
+        Serialized sjson transcript content, if transcripts were successfully downloaded and saved.
 
     Raises:
         GetTranscriptsFromYouTubeException, if fails.
@@ -197,9 +197,7 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):
     _ = i18n.ugettext
 
     subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
-    save_subs_to_store(subs, youtube_id, video_descriptor)
-
-    log.info("Transcripts for youtube_id %s for 1.0 speed are downloaded and saved.", youtube_id)
+    return json.dumps(subs, indent=2)
 
 
 def remove_subs_from_store(subs_id, item, lang='en'):
