@@ -1,10 +1,11 @@
 """Admin forms for Course Entitlements"""
 from django import forms
 from django.contrib import admin
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
 from xmodule.modulestore.django import modulestore
+
 from .models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
 
 
@@ -72,4 +73,5 @@ class CourseEntitlementPolicyAdmin(admin.ModelAdmin):
     list_display = ('expiration_period',
                     'refund_period',
                     'regain_period',
+                    'mode',
                     'site')

@@ -1,6 +1,7 @@
 import logging
 
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
@@ -8,22 +9,21 @@ from edx_rest_framework_extensions.authentication import JwtAuthentication
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions, viewsets, status
+from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
+from course_modes.models import CourseMode
 from entitlements.api.v1.filters import CourseEntitlementFilter
 from entitlements.api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import CourseEntitlementSerializer
-from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from student.models import CourseEnrollment
-from student.models import CourseEnrollmentException, AlreadyEnrolledError
-from course_modes.models import CourseMode
+from student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +89,27 @@ def _process_revoke_and_unenroll_entitlement(course_entitlement, is_refund=False
             raise IntegrityError
 
 
+def set_entitlement_policy(entitlement, site):
+    """
+    Assign the appropriate CourseEntitlementPolicy to the given CourseEntitlement based on its mode and site.
+
+    Arguments:
+        entitlement: Course Entitlement object
+        site: string representation of a Site object
+
+    Notes:
+        Site-specific, mode-agnostic policies take precedence over mode-specific, site-agnostic policies.
+        If no appropriate CourseEntitlementPolicy is found, the default CourseEntitlementPolicy is assigned.
+    """
+    policy_mode = entitlement.mode
+    if CourseMode.is_professional_slug(policy_mode):
+        policy_mode = CourseMode.PROFESSIONAL
+    filter_query = (Q(site=site) | Q(site__isnull=True)) & (Q(mode=policy_mode) | Q(mode__isnull=True))
+    policy = CourseEntitlementPolicy.objects.filter(filter_query).order_by('-site', '-mode').first()
+    entitlement.policy = policy if policy else None
+    entitlement.save()
+
+
 class EntitlementViewSet(viewsets.ModelViewSet):
     ENTITLEMENT_UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 
@@ -127,6 +148,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
 
         entitlement = serializer.instance
+        set_entitlement_policy(entitlement, request.site)
 
         if support_details:
             for support_detail in support_details:

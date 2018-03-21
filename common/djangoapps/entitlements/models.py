@@ -6,18 +6,18 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.db import models
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.timezone import now
+from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
+from course_modes.models import CourseMode
+from entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.catalog.utils import get_course_uuid_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment
-from student.models import CourseEnrollmentException
+from student.models import CourseEnrollment, CourseEnrollmentException
 from util.date_utils import strftime_localized
-from entitlements.utils import is_course_run_entitlement_fulfillable
 
 log = logging.getLogger("common.entitlements.models")
 
@@ -30,6 +30,7 @@ class CourseEntitlementPolicy(models.Model):
     DEFAULT_EXPIRATION_PERIOD_DAYS = 730
     DEFAULT_REFUND_PERIOD_DAYS = 60
     DEFAULT_REGAIN_PERIOD_DAYS = 14
+    MODES = Choices((None, '---------'), CourseMode.VERIFIED, CourseMode.PROFESSIONAL)
 
     # Use a DurationField to calculate time as it returns a timedelta, useful in performing operations with datetimes
     expiration_period = models.DurationField(
@@ -48,7 +49,8 @@ class CourseEntitlementPolicy(models.Model):
                    "it is no longer able to be regained by a user."),
         null=False
     )
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, null=True)
+    mode = models.CharField(max_length=32, choices=MODES, null=True)
 
     def get_days_until_expiration(self, entitlement):
         """
@@ -131,11 +133,12 @@ class CourseEntitlementPolicy(models.Model):
                 and not entitlement.expired_at)
 
     def __unicode__(self):
-        return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}'\
+        return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}, mode: {}'\
             .format(
                 self.expiration_period,
                 self.refund_period,
                 self.regain_period,
+                self.mode
             )
 
 
