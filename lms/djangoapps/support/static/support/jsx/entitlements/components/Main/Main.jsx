@@ -20,11 +20,11 @@ const Main = props => (
     <SearchContainer />
     <Button
       className={['btn', 'btn-primary']}
-      label= "Create New Entitlement"
+      label="Create New Entitlement"
       onClick={props.openCreationModal}
     />
     <EntitlementModalContainer />
-    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} parentSelector='body'/>
+    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} />
   </div>
 );
 

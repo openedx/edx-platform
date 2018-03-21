@@ -12,7 +12,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   dismissErrorMessage: () => dispatch(dismissError()),
-  openCreationModal: () => dispatch(openCreationModal())
+  openCreationModal: () => dispatch(openCreationModal()),
 });
 
 const MainContainer = connect(
