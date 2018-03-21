@@ -217,10 +217,10 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
 
             xhr = Utils.command(action, component_locator, videoList, extraParam)
                 .done(function(resp) {
-                    var sub = resp.subs;
+                    var edxVideoID = resp.edx_video_id;
 
                     self.render('found', resp);
-                    Utils.Storage.set('sub', sub);
+                    Backbone.trigger('transcripts:basicTabUpdateEdxVideoId', edxVideoID);
                 })
                 .fail(function(resp) {
                     var message = resp.status || errorMessage;
