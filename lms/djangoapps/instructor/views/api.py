@@ -628,16 +628,19 @@ def students_update_enrollment(request, course_id):
     identifiers = _split_input_list(identifiers_raw)
     auto_enroll = _get_boolean_param(request, 'auto_enroll')
     email_students = _get_boolean_param(request, 'email_students')
-    is_white_label = CourseMode.is_white_label(course_id)
     reason = request.POST.get('reason')
-    if is_white_label:
-        if not reason:
-            return JsonResponse(
-                {
-                    'action': action,
-                    'results': [{'error': True}],
-                    'auto_enroll': auto_enroll,
-                }, status=400)
+    role = request.POST.get('role')
+
+    allowed_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
+                                                           settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
+    if role and role not in allowed_role_choices:
+        return JsonResponse(
+            {
+                'action': action,
+                'results': [{'error': True, 'message': 'Not a valid role choice'}],
+                'auto_enroll': auto_enroll,
+            }, status=400)
+
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
 
@@ -729,7 +732,7 @@ def students_update_enrollment(request, course_id):
 
         else:
             ManualEnrollmentAudit.create_manual_enrollment_audit(
-                request.user, email, state_transition, reason, enrollment_obj
+                request.user, email, state_transition, reason, enrollment_obj, role
             )
             results.append({
                 'identifier': identifier,

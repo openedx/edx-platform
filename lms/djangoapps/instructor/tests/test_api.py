@@ -1585,32 +1585,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         CourseInstructorRole(paid_course.id).add_users(self.instructor)
         return paid_course
 
-    def test_reason_field_should_not_be_empty(self):
-        """
-        test to check that reason field should not be empty when
-        manually enrolling the students for the paid courses.
-        """
-        paid_course = self.create_paid_course()
-        url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
-        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False}
-        response = self.client.post(url, params)
-        manual_enrollments = ManualEnrollmentAudit.objects.all()
-        self.assertEqual(manual_enrollments.count(), 0)
-
-        # test the response data
-        expected = {
-            "action": "enroll",
-            "auto_enroll": False,
-            "results": [
-                {
-                    "error": True
-                }
-            ]
-        }
-        res_json = json.loads(response.content)
-        self.assertEqual(res_json, expected)
-
     def test_unenrolled_allowed_to_enroll_user(self):
         """
         test to unenroll allow to enroll user.
@@ -1618,7 +1592,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         paid_course = self.create_paid_course()
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing..'}
+                  'auto_enroll': False, 'reason': 'testing..', 'role': 'Learner'}
         response = self.client.post(url, params)
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -1629,7 +1603,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         UserFactory(email=self.notregistered_email)
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing'}
+                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
         response = self.client.post(url, params)
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 2)
@@ -1673,7 +1647,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'unenroll', 'email_students': False,
-                  'auto_enroll': False, 'reason': 'testing'}
+                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
@@ -1730,6 +1704,21 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
         self.assertEqual(course_enrollment.mode, CourseMode.DEFAULT_MODE_SLUG)
 
+    def test_role_and_reason_are_persisted(self):
+        """
+        test that role and reason fields are persisted in the database
+        """
+        paid_course = self.create_paid_course()
+        url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
+        params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
+                  'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
+        response = self.client.post(url, params)
+
+        manual_enrollment = ManualEnrollmentAudit.objects.first()
+        self.assertEqual(manual_enrollment.reason, 'testing')
+        self.assertEqual(manual_enrollment.role, 'Learner')
+        self.assertEqual(response.status_code, 200)
+
     def _change_student_enrollment(self, user, course, action):
         """
         Helper function that posts to 'students_update_enrollment' to change
@@ -1743,7 +1732,8 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             'identifiers': user.email,
             'action': action,
             'email_students': True,
-            'reason': 'change user enrollment'
+            'reason': 'change user enrollment',
+            'role': 'Learner'
         }
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
