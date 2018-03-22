@@ -348,28 +348,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
-    def test_country_field(self):
-        """
-        Test behaviour of `Country` field.
-
-        Given that I am a registered user.
-        And I visit my Profile page.
-        And I set the profile visibility to public and set default values for public fields.
-        Then I set country value to `Pakistan`.
-        Then displayed country should be `Pakistan` and country field mode should be `display`
-        And I reload the page.
-        Then displayed country should be `Pakistan` and country field mode should be `display`
-        And I make `country` field editable
-        Then `country` field mode should be `edit`
-        And `country` field icon should be visible.
-        """
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        self._test_dropdown_field(profile_page, 'country', 'Pakistan', 'Pakistan', 'display')
-
-        profile_page.make_field_editable('country')
-        self.assertEqual(profile_page.mode_for_field('country'), 'edit')
-
     def test_about_me_field(self):
         """
         Test behaviour of `About Me` field.
