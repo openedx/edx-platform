@@ -1153,37 +1153,6 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         self.browser.get(url)
         self._assert_dashboard_message()
 
-    def test_login_redirect(self):
-        """
-        Test that the user is correctly redirected after logistration when
-        attempting to enroll in a closed course.
-        """
-        url = '{base_url}/register?{params}'.format(
-            base_url=BASE_URL,
-            params=urllib.urlencode({
-                'course_id': self.course_id,
-                'enrollment_action': 'enroll',
-                'email_opt_in': 'false'
-            })
-        )
-        self.browser.get(url)
-        register_page = CombinedLoginAndRegisterPage(
-            self.browser,
-            start_page="register",
-            course_id=self.course_id
-        )
-        register_page.wait_for_page()
-        register_page.register(
-            email="email@example.com",
-            password="password",
-            username="username",
-            full_name="Test User",
-            country="US",
-            favorite_movie="Mad Max: Fury Road",
-            terms_of_service=True
-        )
-        self._assert_dashboard_message()
-
 
 @attr(shard=1)
 class LMSLanguageTest(UniqueCourseTest):
