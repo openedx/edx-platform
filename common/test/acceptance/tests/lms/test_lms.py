@@ -326,6 +326,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.register_page.visit().toggle_form()
         self.assertEqual(self.register_page.current_form, "login")
 
+
 @attr(shard=8)
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""

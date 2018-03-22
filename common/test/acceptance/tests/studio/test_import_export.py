@@ -230,23 +230,6 @@ class ImportTestMixin(object):
         self.import_page.upload_tarball('funny_cat_video.mp4')
         self.import_page.wait_for_filename_error()
 
-    def test_task_list(self):
-        """
-        Scenario: I should see feedback checkpoints when uploading a course or library
-            Given that I am on an import page
-            No task checkpoint list should be showing
-            When I upload a valid tarball
-            Each task in the checklist should be marked confirmed
-            And the task list should be visible
-        """
-        # The task list shouldn't be visible to start.
-        self.assertFalse(self.import_page.is_task_list_showing(), "Task list shown too early.")
-        self.import_page.wait_for_tasks()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.import_page.wait_for_tasks(completed=True)
-        self.assertTrue(self.import_page.is_task_list_showing(), "Task list did not display.")
-
     def test_bad_import(self):
         """
         Scenario: I should see a failed checklist when uploading an invalid course or library
