@@ -297,27 +297,6 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         ).install()
 
-    def test_register_success(self):
-        # Navigate to the registration page
-        self.register_page.visit()
-
-        # Fill in the form and submit it
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
-        self.register_page.register(
-            email=email,
-            password="password",
-            username=username,
-            full_name="Test User",
-            country="US",
-            favorite_movie="Mad Max: Fury Road",
-            terms_of_service=True
-        )
-
-        # Expect that we reach the dashboard and we're auto-enrolled in the course
-        course_names = self.dashboard_page.wait_for_page().available_courses
-        self.assertIn(self.course_info["display_name"], course_names)
-
     def test_register_failure(self):
         # Navigate to the registration page
         self.register_page.visit()
