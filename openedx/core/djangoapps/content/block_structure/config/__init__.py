@@ -15,7 +15,6 @@ WAFFLE_NAMESPACE = u'block_structure'
 INVALIDATE_CACHE_ON_PUBLISH = u'invalidate_cache_on_publish'
 STORAGE_BACKING_FOR_CACHE = u'storage_backing_for_cache'
 RAISE_ERROR_WHEN_NOT_FOUND = u'raise_error_when_not_found'
-PRUNE_OLD_VERSIONS = u'prune_old_versions'
 
 
 def waffle():

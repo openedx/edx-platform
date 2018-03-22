@@ -1977,10 +1977,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
 
-    # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
-    # STORAGE_KWARGS=dict(bucket='nim-beryl-test'),
-    # DIRECTORY_PREFIX='/modeltest/',
+    # Backend storage options
+    PRUNING_ACTIVE=False,
 )
 
 ################################ Bulk Email ###################################
