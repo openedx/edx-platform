@@ -6,7 +6,6 @@ from __future__ import print_function
 import os
 import re
 
-from xsslint.rules import Rules
 from xsslint.utils import StringLines
 
 
@@ -238,13 +237,16 @@ class SummaryResults(object):
     Contains the summary results for all violations.
     """
 
-    def __init__(self):
+    def __init__(self, ruleset):
         """
         Init method.
+
+        Arguments:
+            ruleset: A RuleSet object containing all of the possible Rules.
         """
         self.total_violations = 0
         self.totals_by_rule = dict.fromkeys(
-            [rule.rule_id for rule in Rules.__members__.values()], 0
+            [rule.rule_id for rule in ruleset.rules.values()], 0
         )
 
     def add_violation(self, violation):
