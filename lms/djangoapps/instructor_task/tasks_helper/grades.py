@@ -401,6 +401,7 @@ class CourseGradeReport(object):
         is_whitelisted = user.id in bulk_certs.whitelisted_user_ids
         certificate_info = certificate_info_for_user(
             user,
+            context.course_id,
             course_grade.letter_grade,
             is_whitelisted,
             bulk_certs.certificates_by_user.get(user.id),
