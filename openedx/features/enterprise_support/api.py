@@ -22,7 +22,8 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from enterprise.models import EnterpriseCustomer
+    from consent.models import DataSharingConsent
+    from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 except ImportError:
     pass
 
@@ -428,6 +429,31 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         request.session[consent_key] = False
 
     return consent_needed
+
+
+def consent_needed_for_courses(user, course_ids):
+    """
+    For a list of course_ids, this function determines if the user needs to grant
+    data sharing permissions before accessing the course.
+    Note that this function makes use of the Enterprise models directly instead of using the API calls
+    """
+    result = {course_id: False for course_id in course_ids}
+    if not enterprise_enabled():
+        return result
+
+    enterprise_learner = EnterpriseCustomerUser.objects.filter(user_id=user.id).first()
+    if not enterprise_learner or not enterprise_learner.enterprise_customer:
+        return result
+
+    enterprise_uuid = enterprise_learner.enterprise_customer.uuid
+    data_sharing_consent = DataSharingConsent.objects.filter(username=user.username,
+                                                             course_id__in=course_ids,
+                                                             enterprise_customer__uuid=enterprise_uuid)
+
+    for consent in data_sharing_consent:
+        result[consent.course_id] = consent.consent_required()
+
+    return result
 
 
 def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False):

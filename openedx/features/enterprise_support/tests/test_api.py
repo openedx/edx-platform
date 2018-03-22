@@ -14,11 +14,13 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 
+from consent.models import DataSharingConsent
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
     consent_needed_for_course,
+    consent_needed_for_courses,
     data_sharing_consent_required,
     EnterpriseApiClient,
     EnterpriseApiServiceClient,
@@ -28,6 +30,7 @@ from openedx.features.enterprise_support.api import (
     insert_enterprise_pipeline_elements,
     enterprise_enabled,
 )
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import get_cache_key
 from student.tests.factories import UserFactory
@@ -182,6 +185,31 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # isn't cached, we'll fail spectacularly.)
         httpretty.reset()
         self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
+
+    @httpretty.activate
+    @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
+    def test_consent_needed_for_courses(self, mock_catalog_contains_course):
+        mock_catalog_contains_course.return_value = True
+        user = UserFactory()
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
+
+        course_id = 'fake-course'
+        data_sharing_consent = DataSharingConsent(
+            course_id=course_id,
+            enterprise_customer=enterprise_customer_user.enterprise_customer,
+            username=user.username,
+            granted=False
+        )
+        data_sharing_consent.save()
+        consent_required = consent_needed_for_courses(user, [course_id])
+        self.assertTrue(consent_required[course_id])
+
+        # now grant consent and call our method again
+        data_sharing_consent = DataSharingConsent.objects.filter(course_id=course_id, username=user.username).first()
+        data_sharing_consent.granted = True
+        data_sharing_consent.save()
+        consent_required = consent_needed_for_courses(user, [course_id])
+        self.assertFalse(consent_required[course_id])
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')
