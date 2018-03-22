@@ -6,6 +6,11 @@ import rootReducer from './reducers/index';
 const defaultState = {
   entitlements: [],
   error: '',
+  form: {
+    formType: '',
+    isOpen: false,
+    activeEntitlement: null,
+  },
 };
 
 const configureStore = initialState =>

@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { Hyperlink, Table } from '@edx/paragon';
+import { Button, Hyperlink, Table } from '@edx/paragon';
 
 const entitlementColumns = [
   {
@@ -14,12 +14,12 @@ const entitlementColumns = [
     key: 'courseUuid',
   },
   {
-    label: 'Enrollment',
-    key: 'enrollmentCourseRun',
-  },
-  {
     label: 'Mode',
     key: 'mode',
+  },
+  {
+    label: 'Enrollment',
+    key: 'enrollmentCourseRun',
   },
   {
     label: 'Expired At',
@@ -45,9 +45,9 @@ const entitlementColumns = [
   },
 ];
 
-const parseEntitlementData = (entitlements, ecommerceUrl) =>
+const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) =>
   entitlements.map((entitlement) => {
-    const { expiredAt, created, modified, orderNumber } = entitlement;
+    const { expiredAt, created, modified, orderNumber, enrollmentCourseRun } = entitlement;
     return Object.assign({}, entitlement, {
       expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
       createdAt: moment(created).format('lll'),
@@ -56,13 +56,18 @@ const parseEntitlementData = (entitlements, ecommerceUrl) =>
         destination={`${ecommerceUrl}${orderNumber}/`}
         content={orderNumber || ''}
       />,
-      button: <div> No Actions Currently Available </div>,
+      button: <Button
+        disabled={!enrollmentCourseRun}
+        className={['btn', 'btn-primary']}
+        label="Reissue"
+        onClick={() => openReissueForm(entitlement)}
+      />,
     });
   });
 
 const EntitlementSupportTable = props => (
   <Table
-    data={parseEntitlementData(props.entitlements, props.ecommerceUrl)}
+    data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueForm)}
     columns={entitlementColumns}
   />
 );
@@ -86,6 +91,7 @@ EntitlementSupportTable.propTypes = {
     user: PropTypes.string.isRequired,
   })).isRequired,
   ecommerceUrl: PropTypes.string.isRequired,
+  openReissueForm: PropTypes.func.isRequired,
 };
 
 export default EntitlementSupportTable;
