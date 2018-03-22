@@ -83,23 +83,3 @@ class ArchivedCourseTest(StudioCourseTest):
             'start_date': course_start_date,
             'end_date': course_end_date
         })
-
-    def test_archived_course(self):
-        """
-        Scenario: Ensure that an archived course displays in its own list and can be clicked on.
-        """
-        self.dashboard_page.visit()
-        self.assertTrue(self.dashboard_page.has_course(
-            org=self.course_info['org'], number=self.course_info['number'], run=self.course_info['run'],
-            archived=True
-        ))
-
-        # Click on the archived course and make sure that the Studio course outline appears.
-        self.dashboard_page.click_course_run(self.course_info['run'])
-        course_outline_page = CourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-        course_outline_page.wait_for_page()
