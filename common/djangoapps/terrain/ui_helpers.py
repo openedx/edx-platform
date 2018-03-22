@@ -48,7 +48,7 @@ REQUIREJS_WAIT = {
 
     # Dashboard
     re.compile(r'^Studio Home \|'): [
-        "js/sock", "gettext", "js/base",
+        "gettext", "js/base",
         "jquery.ui", "cms/js/main", "underscore"],
 
     # Pages
@@ -66,12 +66,10 @@ def wait(seconds):
 
 @world.absorb
 def wait_for_js_to_load():
-    requirements = None
     for test, req in REQUIREJS_WAIT.items():
         if test.search(world.browser.title):
-            requirements = req
+            world.wait_for_requirejs(req)
             break
-    world.wait_for_requirejs(requirements)
 
 
 # Selenium's `execute_async_script` function pauses Selenium's execution

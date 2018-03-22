@@ -27,12 +27,14 @@ block_is_unit = is_unit(xblock)
 </script>
 </%block>
 
-<%static:webpack page_name="js/pages/xblock_validation" class_name="XBlockValidationFactory">
-    ${messages | n, dump_js_escaped_json},
-    ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
-    ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
-    ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
-    $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
+<%static:webpack entry="js/factories/xblock_validation">
+    XBlockValidationFactory(
+        ${messages | n, dump_js_escaped_json},
+        ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
+        ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+        ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
+        $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
 </%static:webpack>
 
 % if isinstance(xblock, (XModule, XModuleDescriptor)):

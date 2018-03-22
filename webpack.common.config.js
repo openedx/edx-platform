@@ -30,11 +30,12 @@ module.exports = {
         // Studio
         Import: './cms/static/js/features/import/factories/import.js',
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-        'js/pages/login': './cms/static/js/pages/login.js',
-        'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
-        'js/pages/container': './cms/static/js/pages/container.js',
-        'js/pages/library': './cms/static/js/pages/library.js',
-        'js/pages/xblock_validation': './cms/static/js/pages/xblock_validation.js',
+        'js/factories/login': './cms/static/js/factories/login.js',
+        'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
+        'js/factories/container': './cms/static/js/factories/container.js',
+        'js/factories/context_course': './cms/static/js/factories/context_course.js',
+        'js/factories/library': './cms/static/js/factories/library.js',
+        'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
         'js/sock': './cms/static/js/sock.js',
 
         // LMS
