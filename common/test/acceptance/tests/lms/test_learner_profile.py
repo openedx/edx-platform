@@ -44,6 +44,9 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
         Fill in the public profile fields of a user.
         """
+        # These value_for_dropdown_field method calls used to include
+        # focus_out = True, but a change in selenium is focusing out of the
+        # drop down after selection without any more action needed.
         profile_page.value_for_dropdown_field('language_proficiencies', 'English')
         profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
