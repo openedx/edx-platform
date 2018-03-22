@@ -100,15 +100,6 @@ CELERY_QUEUES = {
 }
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
-
-# If we're a worker on the high_mem queue, set ourselves to die after processing
-# one request to avoid having memory leaks take down the worker server. This env
-# var is set in /etc/init/edx-workers.conf -- this should probably be replaced
-# with some celery API call to see what queue we started listening to, but I
-# don't know what that call is or if it's active at this point in the code.
-if os.environ.get('QUEUE') == 'high_mem':
-    CELERYD_MAX_TASKS_PER_CHILD = 1
-
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
 
 ########################## NON-SECURE ENV CONFIG ##############################
