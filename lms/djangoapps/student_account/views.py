@@ -449,7 +449,9 @@ def link_account(request):
 
     auto_link = request.GET.get('auto', False)
     user = request.user
-    _redirect_if_migration_complete(user)
+    redirect_response = _redirect_if_migration_complete(user)
+    if redirect_response:
+        return redirect_response
 
     context = {
         'auth': {},
@@ -575,7 +577,9 @@ def account_settings_context(request):
 @ensure_csrf_cookie
 def link_account_confirm(request):
     user = request.user
-    _redirect_if_migration_complete(user)
+    redirect_response = _redirect_if_migration_complete(user)
+    if redirect_response:
+        return redirect_response
 
     auth_states = pipeline.get_provider_user_states(user)
     live_auth_state = [{

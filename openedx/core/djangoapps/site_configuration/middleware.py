@@ -4,12 +4,11 @@ This file contains Django middleware related to the site_configuration app.
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from re import compile
 from social.apps.django_app.default.models import UserSocialAuth
 from django.shortcuts import redirect
 
-from student.models import UserProfile
+from student.models import UserProfile, CourseAccessRole
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -124,7 +123,7 @@ class AccountLinkingMiddleware(object):
         If the site is configured to restrict not logged in users to the DEFAULT_ACCOUNT_LINK_EXEMPT_URLS
         from accessing pages, wrap the next view with the django login_required middleware
         """
-        if request.user.is_authenticated() and configuration_helpers.get_value("ENABLE_MSA_MIGRATION"):
+        if configuration_helpers.get_value("ENABLE_MSA_MIGRATION") and self._is_learner(request.user):
             # Check if user has associated a Microsoft account
             try:
                 UserSocialAuth.objects.get(user=request.user, provider="live")
@@ -135,9 +134,21 @@ class AccountLinkingMiddleware(object):
             # Check if user has already associated a Microsoft account but not confirmed account update
             user_profile = UserProfile.objects.get(user=request.user)
             meta = user_profile.get_meta()
-            migration_status = meta.get(settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY)
-            if migration_status == settings.MSA_MIGRATION_STATUS_STARTED_NOT_CONFIRMED:
+            if meta.get(settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY) != settings.MSA_MIGRATION_STATUS_COMPLETED:
                 self._redirect_if_not_allowed_url(request, settings.MSA_ACCOUNT_LINK_CONFIRM_URL)
+
+    def _is_learner(self, user):
+        """
+        Checks if user is course staff or instructor, global staff or global superuser
+        returns
+            True if user is privileged
+            False if user is just a learner
+        """
+        user_is_course_staff = CourseAccessRole.objects.filter(user_id=user.id).exists()
+
+        return user.is_authenticated() and not (
+            user_is_course_staff or user.is_staff or user.is_superuser
+        )
 
     def _redirect_if_not_allowed_url(self, request, redirect_to):
         """
