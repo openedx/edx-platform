@@ -602,45 +602,6 @@ class UnitAccessTest(CourseOutlineTest):
         staff_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_units, 2)
 
-    def test_restricted_sections_for_enrollment_track_users_in_lms(self):
-        """
-        Verify that those who are in an enrollment track with access to a restricted unit are able
-        to see that unit in lms, and those who are in an enrollment track without access to a restricted
-        unit are not able to see that unit in lms
-        """
-        # Add just 1 enrollment track to verify the enrollment option isn't available in the modal
-        add_enrollment_course_modes(self.browser, self.course_id, ["audit"])
-        self.course_outline_page.visit()
-        self.course_outline_page.expand_all_subsections()
-        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        enrollment_select_options = unit.get_enrollment_select_options()
-        self.assertFalse('Enrollment Track Groups' in enrollment_select_options)
-
-        # Add the additional enrollment track so the unit access toggles should now be available
-        add_enrollment_course_modes(self.browser, self.course_id, ["verified"])
-        self.course_outline_page.visit()
-        self.course_outline_page.expand_all_subsections()
-        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        unit.toggle_unit_access('Enrollment Track Groups', [1])  # Hard coded 1 for audit ID
-        self.course_outline_page.view_live()
-
-        course_home_page = CourseHomePage(self.browser, self.course_id)
-        course_home_page.visit()
-        course_home_page.resume_course_from_header()
-        self.assertEqual(course_home_page.outline.num_units, 2)
-
-        # Test for a user without additional content available
-        staff_page = StaffCoursewarePage(self.browser, self.course_id)
-        staff_page.set_staff_view_mode('Learner in Verified')
-        staff_page.wait_for_page()
-        self.assertEqual(course_home_page.outline.num_units, 1)
-
-        # Test for a user with additional content available
-        staff_page = StaffCoursewarePage(self.browser, self.course_id)
-        staff_page.set_staff_view_mode('Learner in Audit')
-        staff_page.wait_for_page()
-        self.assertEqual(course_home_page.outline.num_units, 2)
-
 
 @attr(shard=3)
 class StaffLockTest(CourseOutlineTest):
@@ -871,27 +832,6 @@ class StaffLockTest(CourseOutlineTest):
         subsection = self.course_outline_page.section_at(0).subsection_at(0)
         subsection.unit_at(0).set_staff_lock(True)
         self.assertFalse(subsection.has_staff_lock_warning)
-
-    def test_locked_subsections_do_not_appear_in_lms(self):
-        """
-        Scenario: A locked subsection is not visible to students in the LMS
-            Given I have a course with two subsections
-            When I enable explicit staff lock on one subsection
-            And I click the View Live button to switch to staff view
-            And I visit the course home with the outline
-            Then I see two subsections in the outline
-            And when I switch the view mode to student view
-            Then I see one subsection in the outline
-        """
-        self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(1).set_staff_lock(True)
-        self.course_outline_page.view_live()
-
-        course_home_page = CourseHomePage(self.browser, self.course_id)
-        course_home_page.visit()
-        self.assertEqual(course_home_page.outline.num_subsections, 2)
-        course_home_page.preview.set_staff_view_mode('Learner')
-        self.assertEqual(course_home_page.outline.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
         """

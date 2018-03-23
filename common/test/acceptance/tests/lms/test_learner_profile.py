@@ -348,41 +348,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
-    def test_about_me_field(self):
-        """
-        Test behaviour of `About Me` field.
-
-        Given that I am a registered user.
-        And I visit my Profile page.
-        And I set the profile visibility to public and set default values for public fields.
-        Then I set about me value to `ThisIsIt`.
-        Then displayed about me should be `ThisIsIt` and about me field mode should be `display`
-        And I reload the page.
-        Then displayed about me should be `ThisIsIt` and about me field mode should be `display`
-        Then I set empty value for about me.
-        Then displayed about me should be `Tell other edX learners a little about yourself: where you live,
-        what your interests are, why you're taking courses on edX, or what you hope to learn.` and about me
-        field mode should be `placeholder`
-        And I reload the page.
-        Then displayed about me should be `Tell other edX learners a little about yourself: where you live,
-        what your interests are, why you're taking courses on edX, or what you hope to learn.` and about me
-        field mode should be `placeholder`
-        And I make `about me` field editable
-        Then `about me` field mode should be `edit`
-        """
-        placeholder_value = (
-            "Tell other learners a little about yourself: where you live, what your interests are, "
-            "why you're taking courses, or what you hope to learn."
-        )
-
-        username, __ = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-        self._test_textarea_field(profile_page, 'bio', 'ThisIsIt', 'ThisIsIt', 'display')
-        self._test_textarea_field(profile_page, 'bio', '', placeholder_value, 'placeholder')
-
-        profile_page.make_field_editable('bio')
-        self.assertTrue(profile_page.mode_for_field('bio'), 'edit')
-
     def test_birth_year_not_set(self):
         """
         Verify message if birth year is not set.
