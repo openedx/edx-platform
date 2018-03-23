@@ -161,17 +161,6 @@ class ImportTestMixin(object):
         """
         return []
 
-    def test_upload(self):
-        """
-        Scenario: I want to upload a course or library for import.
-            Given that I have a library or course to import into
-            And I have a valid .tar.gz file containing data to replace it with
-            I can select the file and upload it
-            And the page will give me confirmation that it uploaded successfully
-        """
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-
     def test_bad_import(self):
         """
         Scenario: I should see a failed checklist when uploading an invalid course or library
