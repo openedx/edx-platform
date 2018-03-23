@@ -18,7 +18,7 @@ class CourseAccessRedirect(Redirect):
 
     Arguments:
         url (string): The redirect url.
-        access_error (AccessErro): The AccessError that caused the redirect.
+        access_error (AccessError): The AccessError that caused the redirect.
             The AccessError contains messages for developers and users explaining why
             the user was denied access. These strings can then be exposed to the user.
     """

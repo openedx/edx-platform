@@ -725,6 +725,10 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
 
+# TODO: we will need to make some rules about what are acceptable strings for book-keys
+# for now, book keys can contain letters and '-' (dashes)
+# TODO: enforce whatever rules we decide on when we create a book key
+BOOK_KEY_PATTERN = r'(?P<book_key_string>[-\w]+)'
 
 ############################## HEARTBEAT ######################################
 
@@ -2215,6 +2219,9 @@ INSTALLED_APPS = [
 
     # Entitlement API
     'entitlements',
+
+    # Digital Book API
+    'digital_book',
 
     # Bulk Enrollment API
     'bulk_enroll',
