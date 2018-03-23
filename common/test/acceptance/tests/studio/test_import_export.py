@@ -212,25 +212,6 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
-    def test_course_updated(self):
-        """
-        Given that I visit an empty course before import
-        I should not see a section named 'Section'
-        When I visit the import page
-        And I upload a course that has a section named 'Section'
-        And I visit the course outline page again
-        The section named 'Section' should now be available
-        """
-        self.landing_page.visit()
-        # Should not exist yet.
-        self.assertRaises(IndexError, self.landing_page.section, "Section")
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.landing_page.visit()
-        # There's a section named 'Section' in the tarball.
-        self.landing_page.section("Section")
-
     def test_header(self):
         """
         Scenario: I should see the correct text when importing a course.
