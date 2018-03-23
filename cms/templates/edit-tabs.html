@@ -22,7 +22,7 @@
 <%block name="page_bundle">
     <%static:webpack entry="js/factories/edit_tabs">
         EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('tabs_handler', kwargs={'course_key_string': context_course.id})}");
-    });
+    </%static:webpack>
 </%block>
 
 <%block name="content">

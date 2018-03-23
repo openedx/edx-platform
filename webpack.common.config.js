@@ -36,6 +36,7 @@ module.exports = {
         'js/factories/context_course': './cms/static/js/factories/context_course.js',
         'js/factories/library': './cms/static/js/factories/library.js',
         'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
+        'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',
         'js/sock': './cms/static/js/sock.js',
 
         // LMS
