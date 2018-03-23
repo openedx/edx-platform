@@ -44,7 +44,7 @@
             'jquery.fileupload-validate': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate',   // eslint-disable-line max-len
             'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',   // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'xmodule_js/common_static/js/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
@@ -72,7 +72,7 @@
             'mock-ajax': 'xmodule_js/common_static/js/vendor/mock-ajax',
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
-            'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'js/src/ajax_prefix': 'xmodule_js/common_static/js/src/ajax_prefix',
             'js/spec/test_utils': 'js/spec/test_utils'
         },
         shim: {
@@ -218,9 +218,9 @@
                 deps: ['jquery']
             },
             'cms/js/main': {
-                deps: ['coffee/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix']
             },
-            'coffee/src/ajax_prefix': {
+            'js/src/ajax_prefix': {
                 deps: ['jquery']
             }
         }
@@ -231,17 +231,17 @@
     testFiles = [
         'cms/js/spec/main_spec',
         'cms/js/spec/xblock/cms.runtime.v1_spec',
-        'coffee/spec/models/course_spec',
-        'coffee/spec/models/metadata_spec',
-        'coffee/spec/models/section_spec',
-        'coffee/spec/models/settings_course_grader_spec',
-        'coffee/spec/models/settings_grading_spec',
-        'coffee/spec/models/textbook_spec',
-        'coffee/spec/models/upload_spec',
-        'coffee/spec/views/course_info_spec',
-        'coffee/spec/views/metadata_edit_spec',
-        'coffee/spec/views/textbook_spec',
-        'coffee/spec/views/upload_spec',
+        'js/spec/models/course_spec',
+        'js/spec/models/metadata_spec',
+        'js/spec/models/section_spec',
+        'js/spec/models/settings_course_grader_spec',
+        'js/spec/models/settings_grading_spec',
+        'js/spec/models/textbook_spec',
+        'js/spec/models/upload_spec',
+        'js/spec/views/course_info_spec',
+        'js/spec/views/metadata_edit_spec',
+        'js/spec/views/textbook_spec',
+        'js/spec/views/upload_spec',
         'js/spec/video/transcripts/utils_spec',
         'js/spec/video/transcripts/editor_spec',
         'js/spec/video/transcripts/videolist_spec',

@@ -26,7 +26,7 @@
             'jquery.fileupload': 'js/vendor/jQuery-File-Upload/js/jquery.fileupload',
             'jquery.iframe-transport': 'js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
             'jquery.inputnumber': 'js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'js/src/jquery.immediateDescendents',
             'jquery.simulate': 'js/vendor/jquery.simulate',
             'jquery.url': 'js/vendor/url.min',
             'sinon': 'common/js/vendor/sinon',

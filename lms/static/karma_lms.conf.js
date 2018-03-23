@@ -26,7 +26,6 @@ var options = {
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'course_bookmarks/**/!(*spec).js'},
         {pattern: 'course_search/**/!(*spec).js'},
         {pattern: 'discussion/js/**/!(*spec).js'},

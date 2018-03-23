@@ -69,7 +69,7 @@
          */
         paths: {
             gettext: 'empty:',
-            'coffee/src/ajax_prefix': 'empty:',
+            'js/src/ajax_prefix': 'empty:',
             jquery: 'empty:',
             'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',

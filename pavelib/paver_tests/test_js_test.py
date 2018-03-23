@@ -18,10 +18,6 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
 
     EXPECTED_DELETE_JAVASCRIPT_REPORT_COMMAND = u'find {platform_root}/reports/javascript -type f -delete'
     EXPECTED_INSTALL_NPM_ASSETS_COMMAND = u'install npm_assets'
-    EXPECTED_COFFEE_COMMAND = (
-        u'node_modules/.bin/coffee --compile `find {platform_root}/lms {platform_root}/cms '
-        u'{platform_root}/common -type f -name "*.coffee"`'
-    )
     EXPECTED_KARMA_OPTIONS = (
         u"{config_file} "
         u"--single-run={single_run} "
@@ -120,7 +116,6 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
                 platform_root=self.platform_root
             ))
         expected_messages.append(self.EXPECTED_INSTALL_NPM_ASSETS_COMMAND)
-        expected_messages.append(self.EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
 
         for suite in suites:
             # Karma test command

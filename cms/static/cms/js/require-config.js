@@ -104,7 +104,7 @@
             'jquery.fileupload-validate': 'js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate',
             'jquery.iframe-transport': 'js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
             'jquery.inputnumber': 'js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'js/src/jquery.immediateDescendents',
             'datepair': 'js/vendor/timepicker/datepair',
             'date': 'js/vendor/date',
             moment: 'common/js/vendor/moment-with-locales',
@@ -304,11 +304,11 @@
                 deps: ['xblock/core']
             },
             'cms/js/main': {
-                deps: ['coffee/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix']
             },
             'js/src/logger': {
                 exports: 'Logger',
-                deps: ['coffee/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix']
             },
 
             // the following are all needed for annotation tools

@@ -642,7 +642,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     show_in_read_only_mode = True
 
     js = {
-        'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')],
+        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
     }
     js_module_name = "SequenceDescriptor"
 
