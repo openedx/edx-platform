@@ -10,13 +10,13 @@ const HEADERS = {
 };
 
 const getEntitlements = username => fetch(
-  `${entitlementApi}/?user=${username}`, {
+  `${entitlementApi}?user=${username}`, {
     credentials: 'same-origin',
     method: 'get',
   },
 );
 
-const createEntitlement = ({ username, courseUuid, mode, action, comments = null }) => fetch(
+const postEntitlement = ({ username, courseUuid, mode, action, comments = null }) => fetch(
   `${entitlementApi}`, {
     credentials: 'same-origin',
     method: 'post',
@@ -33,14 +33,13 @@ const createEntitlement = ({ username, courseUuid, mode, action, comments = null
   },
 );
 
-const updateEntitlement = ({ uuid, action, unenrolledRun = null, comments = null }) => fetch(
-  `${entitlementApi}/${uuid}`, {
+const patchEntitlement = ({ uuid, action, unenrolledRun = null, comments = null }) => fetch(
+  `${entitlementApi}${uuid}`, {
     credentials: 'same-origin',
     method: 'patch',
     headers: HEADERS,
     body: JSON.stringify({
       expired_at: null,
-      enrollment_run: null,
       support_details: [{
         unenrolled_run: unenrolledRun,
         action,
@@ -52,6 +51,6 @@ const updateEntitlement = ({ uuid, action, unenrolledRun = null, comments = null
 
 export {
   getEntitlements,
-  createEntitlement,
-  updateEntitlement,
+  postEntitlement,
+  patchEntitlement,
 };

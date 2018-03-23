@@ -1,4 +1,4 @@
-import { errorActions, entitlementActions } from '../actions/constants';
+import { errorActions, entitlementActions } from '../constants/actionTypes';
 
 const error = (state = '', action) => {
   switch (action.type) {
