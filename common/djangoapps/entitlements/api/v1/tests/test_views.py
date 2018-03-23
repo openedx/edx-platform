@@ -2,7 +2,7 @@ import json
 import logging
 import unittest
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -53,7 +53,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             "user": user.username,
             "mode": "verified",
             "course_uuid": course_uuid,
-            "order_number": "EDX-1001"
+            "order_number": "EDX-1001",
         }
 
     def test_auth_required(self):
@@ -109,6 +109,33 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
     def test_add_entitlement(self):
         course_uuid = uuid.uuid4()
         entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        results = response.data
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        assert results == CourseEntitlementSerializer(course_entitlement).data
+
+    def test_add_entitlement_with_support_detail(self):
+        """
+        Verify that an EntitlementSupportDetail entry is made when the request includes support interaction information.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['support_details'] = [
+            {
+                "action": "CREATE",
+                "comments": "Family emergency."
+            },
+        ]
 
         response = self.client.post(
             self.entitlements_list_url,
@@ -332,6 +359,38 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert course_entitlement.expired_at is not None
         assert course_entitlement.enrollment_course_run is None
+
+    def test_reinstate_entitlement(self):
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True)
+        expired_entitlement = CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment, expired_at=datetime.now()
+        )
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(expired_entitlement.uuid)])
+
+        update_data = {
+            'expired_at': None,
+            'enrollment_course_run': None,
+            'support_details': [
+                {
+                    'unenrolled_run': str(enrollment.course.id),
+                    'action': 'REISSUE',
+                    'comments': 'Severe illness.'
+                }
+            ]
+        }
+
+        response = self.client.patch(
+            url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+
+        results = response.data
+        reinstated_entitlement = CourseEntitlement.objects.get(
+            uuid=expired_entitlement.uuid
+        )
+        assert results == CourseEntitlementSerializer(reinstated_entitlement).data
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

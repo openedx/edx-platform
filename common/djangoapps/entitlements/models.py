@@ -263,23 +263,6 @@ class CourseEntitlement(TimeStampedModel):
         self.enrollment_course_run = enrollment
         self.save()
 
-    def reinstate(self):
-        """
-        Unenrolls a user from the run in which they have spent the given entitlement and
-        sets the entitlement's expired_at date to null.
-
-        Returns:
-            CourseOverview: course run from which the user has been unenrolled
-        """
-        unenrolled_run = self.enrollment_course_run.course
-        self.expired_at = None
-        CourseEnrollment.unenroll(
-            user=self.enrollment_course_run.user, course_id=unenrolled_run.id, skip_refund=True
-        )
-        self.enrollment_course_run = None
-        self.save()
-        return unenrolled_run
-
     @classmethod
     def unexpired_entitlements_for_user(cls, user):
         return cls.objects.filter(user=user, expired_at=None).select_related('user')

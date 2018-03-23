@@ -15,6 +15,14 @@ class CourseEntitlementSerializer(serializers.ModelSerializer):
         source='enrollment_course_run.course_id',
         read_only=True
     )
+    support_details = serializers.SerializerMethodField()
+
+    def get_support_details(self, model):
+        """
+        Returns a serialized set of all support interactions with the course entitlement
+        """
+        qset = CourseEntitlementSupportDetail.objects.filter(entitlement=model).order_by('-created')
+        return CourseEntitlementSupportDetailSerializer(qset, many=True).data
 
     class Meta:
         model = CourseEntitlement
@@ -27,7 +35,8 @@ class CourseEntitlementSerializer(serializers.ModelSerializer):
             'created',
             'modified',
             'mode',
-            'order_number'
+            'order_number',
+            'support_details'
         )
 
 
@@ -44,25 +53,7 @@ class CourseEntitlementSupportDetailSerializer(serializers.ModelSerializer):
         model = CourseEntitlementSupportDetail
         fields = (
             'support_user',
-            'reason',
+            'action',
             'comments',
             'unenrolled_run'
         )
-
-
-class SupportCourseEntitlementSerializer(CourseEntitlementSerializer):
-    """
-    Serialize a learner's course entitlement with details from all support team interactions with that entitlement.
-    """
-    support_details = serializers.SerializerMethodField()
-
-    def get_support_details(self, model):
-        """
-        Returns a serialized set of all support interactions with the course entitlement
-        """
-        qset = CourseEntitlementSupportDetail.objects.filter(entitlement=model).order_by('-created')
-        return CourseEntitlementSupportDetailSerializer(qset, many=True).data
-
-    class Meta:
-        model = CourseEntitlement
-        fields = CourseEntitlementSerializer.Meta.fields + ('support_details', )
