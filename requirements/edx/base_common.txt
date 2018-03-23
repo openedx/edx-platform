@@ -8,5 +8,6 @@
 # own requirements files built, which will remove the need for this file.
 wrapt==1.10.5
 edx-opaque-keys==0.4.3
-requests==2.9.1
+requests==2.18.4
+pyOpenSSL==17.5.0
 mock==1.0.1

@@ -87,8 +87,8 @@ else:
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
-    'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
+    'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.imgmath',
+    'sphinx.ext.viewcode']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

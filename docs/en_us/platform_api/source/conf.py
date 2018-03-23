@@ -164,8 +164,9 @@ MOCK_MODULES = [
     'jsonfield.fields',
 ]
 
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+if 0:
+    for mod_name in MOCK_MODULES:
+        sys.modules[mod_name] = mock.Mock()
 
 if "DJANGO_SETTINGS_MODULE" not in os.environ:
     docs_path = os.getcwd()
@@ -209,22 +210,23 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 root = path('../../../..').abspath()
 sys.path.insert(0, root)
-sys.path.append(root / "common/lib/xmodule")
+#sys.path.append(root / "common/lib/xmodule")
 sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "lms/djangoapps")
-sys.path.append(root / "lms/envs")
+#sys.path.append(root / "lms/envs")
 sys.path.append(root / "openedx/core/djangoapps")
-sys.path.append(root / "openedx/features")
+#sys.path.append(root / "openedx/features")
 
-sys.path.insert(
-    0,
-    os.path.abspath(
-        os.path.normpath(
-            os.path.dirname(__file__) + '/../../../'
+if 0:
+    sys.path.insert(
+        0,
+        os.path.abspath(
+            os.path.normpath(
+                os.path.dirname(__file__) + '/../../../'
+            )
         )
     )
-)
-sys.path.append('.')
+    sys.path.append('.')
 
 #  django configuration  - careful here
 if on_rtd:
@@ -239,8 +241,8 @@ else:
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-    'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
-    'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
+    'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.imgmath',
+    'sphinx.ext.viewcode']
 
 project = 'Open edX Platform APIs'
 
