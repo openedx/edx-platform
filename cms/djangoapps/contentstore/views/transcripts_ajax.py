@@ -36,7 +36,6 @@ from xmodule.video_module.transcripts_utils import (
     get_video_transcript_content,
     generate_subs_from_source,
     get_transcripts_from_youtube,
-    manage_video_subtitles_save,
     remove_subs_from_store,
     Transcript,
     TranscriptsRequestValidationException,
@@ -58,7 +57,6 @@ __all__ = [
     'choose_transcripts',
     'replace_transcripts',
     'rename_transcripts',
-    'save_transcripts',
 ]
 
 log = logging.getLogger(__name__)
@@ -238,6 +236,7 @@ def check_transcripts(request):
         'current_item_subs': None,
         'status': 'Error',
     }
+
     try:
         __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
@@ -247,7 +246,7 @@ def check_transcripts(request):
 
     try:
         get_transcript_from_val(edx_video_id=item.edx_video_id, lang=u'en')
-        command, subs_to_use = 'found', ''
+        command = 'found'
     except NotFoundError:
         filename = 'subs_{0}.srt.sjson'.format(item.sub)
         content_location = StaticContent.compute_location(item.location.course_key, filename)
@@ -307,12 +306,9 @@ def check_transcripts(request):
             if len(html5_subs) == 2:  # check html5 transcripts for equality
                 transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
 
-        command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
+        command, __ = _transcripts_logic(transcripts_presence, videos)
 
-    transcripts_presence.update({
-        'command': command,
-        'subs': subs_to_use,
-    })
+    transcripts_presence.update({'command': command})
     return JsonResponse(transcripts_presence)
 
 
@@ -512,48 +508,6 @@ def rename_transcripts(request):
     response['status'] = 'Success'
     response['subs'] = item.sub  # item.sub has been changed, it is not equal to old_name.
     log.debug("Updated item.sub to %s", item.sub)
-    return JsonResponse(response)
-
-
-@login_required
-def save_transcripts(request):
-    """
-    Saves video module with updated values of fields.
-
-    Returns: status `Success` or status `Error` and HTTP 400.
-    """
-    response = {'status': 'Error'}
-
-    data = json.loads(request.GET.get('data', '{}'))
-    if not data:
-        return error_response(response, 'Incoming video data is empty.')
-
-    try:
-        item = _get_item(request, data)
-    except (InvalidKeyError, ItemNotFoundError):
-        return error_response(response, "Can't find item by locator.")
-
-    metadata = data.get('metadata')
-    if metadata is not None:
-        new_sub = metadata.get('sub')
-
-        for metadata_key, value in metadata.items():
-            setattr(item, metadata_key, value)
-
-        item.save_with_metadata(request.user)  # item becomes updated with new values
-
-        if new_sub:
-            manage_video_subtitles_save(item, request.user)
-        else:
-            # If `new_sub` is empty, it means that user explicitly does not want to use
-            # transcripts for current video ids and we remove all transcripts from storage.
-            current_subs = data.get('current_subs')
-            if current_subs is not None:
-                for sub in current_subs:
-                    remove_subs_from_store(sub, item)
-
-        response['status'] = 'Success'
-
     return JsonResponse(response)
 
 

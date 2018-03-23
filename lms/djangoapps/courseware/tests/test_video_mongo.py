@@ -1246,7 +1246,6 @@ class TestEditorSavedMethod(BaseTestXmodule):
         # calling editor_saved will generate new file subs_video.srt.sjson for html5_sources
         item.editor_saved(self.user, old_metadata, None)
         self.assertIsInstance(Transcript.get_asset(item.location, 'subs_3_yD_cEKoCk.srt.sjson'), StaticContent)
-        self.assertIsInstance(Transcript.get_asset(item.location, 'subs_video.srt.sjson'), StaticContent)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_editor_saved_when_youtube_and_html5_subs_exist(self, default_store):

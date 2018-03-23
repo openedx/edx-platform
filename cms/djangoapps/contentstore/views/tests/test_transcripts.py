@@ -581,7 +581,6 @@ class TestCheckTranscripts(BaseTranscripts):
             json.loads(resp.content),
             {
                 u'status': u'Success',
-                u'subs': unicode(subs_id),
                 u'youtube_local': False,
                 u'is_youtube_mode': False,
                 u'youtube_server': False,
@@ -618,13 +617,14 @@ class TestCheckTranscripts(BaseTranscripts):
                 'mode': 'youtube',
             }]
         }
+
         resp = self.client.get(link, {'data': json.dumps(data)})
+
         self.assertEqual(resp.status_code, 200)
         self.assertDictEqual(
             json.loads(resp.content),
             {
                 u'status': u'Success',
-                u'subs': u'JMD_ifUUfsU',
                 u'youtube_local': True,
                 u'is_youtube_mode': True,
                 u'youtube_server': False,
@@ -676,7 +676,6 @@ class TestCheckTranscripts(BaseTranscripts):
             json.loads(resp.content),
             {
                 u'status': u'Success',
-                u'subs': u'good_id_2',
                 u'youtube_local': True,
                 u'is_youtube_mode': True,
                 u'youtube_server': True,
@@ -816,7 +815,6 @@ class TestCheckTranscripts(BaseTranscripts):
             json.loads(response.content),
             {
                 u'status': u'Success',
-                u'subs': u'',
                 u'youtube_local': False,
                 u'is_youtube_mode': False,
                 u'youtube_server': False,
@@ -827,63 +825,3 @@ class TestCheckTranscripts(BaseTranscripts):
                 u'html5_equal': False,
             }
         )
-
-
-class TestSaveTranscripts(BaseTranscripts):
-    """
-    Tests for '/transcripts/save' url.
-    """
-    def assert_current_subs(self, expected_subs):
-        """
-        Asserts the current subtitles set on the video module.
-
-        Arguments:
-            expected_subs (String): Expected current subtitles for video.
-        """
-        item = modulestore().get_item(self.video_usage_key)
-        self.assertEqual(item.sub, expected_subs)
-
-    def test_prioritize_youtube_sub_on_save(self):
-        """
-        Test that the '/transcripts/save' endpoint prioritises youtube subtitles over html5 ones
-        while deciding the current subs for video module.
-        """
-        # Update video module to contain 1 youtube and 2 html5 sources.
-        youtube_id = str(uuid4())
-        self.item.data = textwrap.dedent(
-            """
-            <video youtube="1:{youtube_id}" sub="">
-                <source src="http://www.testvid.org/html5/videos/testvid.mp4"/>
-                <source src="http://www.testvid2.org/html5/videos/testvid2.webm"/>
-            </video>
-            """.format(youtube_id=youtube_id)
-        )
-        modulestore().update_item(self.item, self.user.id)
-        self.assert_current_subs(expected_subs='')
-
-        # Save new subs in the content store.
-        subs = {
-            'start': [100, 200, 240],
-            'end': [200, 240, 380],
-            'text': [
-                'subs #1',
-                'subs #2',
-                'subs #3'
-            ]
-        }
-        self.save_subs_to_store(subs, youtube_id)
-
-        # Now, make request to /transcripts/save endpoint with new subs.
-        data = {
-            'locator': unicode(self.video_usage_key),
-            'metadata': {
-                'sub': youtube_id
-            }
-        }
-        resp = self.client.get(reverse('save_transcripts'), {'data': json.dumps(data)})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(json.loads(resp.content), {"status": "Success"})
-
-        # Now check item.sub, it should be same as youtube id because /transcripts/save prioritize
-        # youtube subs over html5 ones.
-        self.assert_current_subs(expected_subs=youtube_id)

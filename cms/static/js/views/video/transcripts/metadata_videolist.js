@@ -104,7 +104,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                     self.messenger.render(resp.command, params);
                     self.checkIsUniqVideoTypes();
                     // Synchronize transcripts field in the `Advanced` tab.
-                    Utils.Storage.set('sub', resp.subs);
+                    // Utils.Storage.set('sub', resp.subs);
                 })
                 .fail(showServerError);
         },

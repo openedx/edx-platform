@@ -361,7 +361,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
     This whole action ensures that after user changes video fields, proper `sub` files, corresponding
     to new values of video fields, will be presented in system.
 
-    # 2 convert /static/filename.srt  to filename.srt in self.transcripts.
+    # 2. convert /static/filename.srt  to filename.srt in self.transcripts.
     (it is done to allow user to enter both /static/filename.srt and filename.srt)
 
     # 3. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
@@ -371,33 +371,32 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
         (To avoid confusing situation if you attempt to correct a translation by uploading
         a new version of the SRT file with same name).
     """
-
     _ = item.runtime.service(item, "i18n").ugettext
 
-    # 1.
-    html5_ids = get_html5_ids(item.html5_sources)
+    # # 1.
+    # html5_ids = get_html5_ids(item.html5_sources)
 
-    # Youtube transcript source should always have a higher priority than html5 sources. Appending
-    # `youtube_id_1_0` at the end helps achieve this when we read transcripts list.
-    possible_video_id_list = html5_ids + [item.youtube_id_1_0]
-    sub_name = item.sub
-    for video_id in possible_video_id_list:
-        if not video_id:
-            continue
-        if not sub_name:
-            remove_subs_from_store(video_id, item)
-            continue
-        # copy_or_rename_transcript changes item.sub of module
-        try:
-            # updates item.sub with `video_id`, if it is successful.
-            copy_or_rename_transcript(video_id, sub_name, item, user=user)
-        except NotFoundError:
-            # subtitles file `sub_name` is not presented in the system. Nothing to copy or rename.
-            log.debug(
-                "Copying %s file content to %s name is failed, "
-                "original file does not exist.",
-                sub_name, video_id
-            )
+    # # Youtube transcript source should always have a higher priority than html5 sources. Appending
+    # # `youtube_id_1_0` at the end helps achieve this when we read transcripts list.
+    # possible_video_id_list = html5_ids + [item.youtube_id_1_0]
+    # sub_name = item.sub
+    # for video_id in possible_video_id_list:
+    #     if not video_id:
+    #         continue
+    #     if not sub_name:
+    #         remove_subs_from_store(video_id, item)
+    #         continue
+    #     # copy_or_rename_transcript changes item.sub of module
+    #     try:
+    #         # updates item.sub with `video_id`, if it is successful.
+    #         copy_or_rename_transcript(video_id, sub_name, item, user=user)
+    #     except NotFoundError:
+    #         # subtitles file `sub_name` is not presented in the system. Nothing to copy or rename.
+    #         log.debug(
+    #             "Copying %s file content to %s name is failed, "
+    #             "original file does not exist.",
+    #             sub_name, video_id
+    #         )
 
     # 2.
     if generate_translation:
@@ -408,6 +407,9 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
     if generate_translation:
         old_langs = set(old_metadata.get('transcripts', {})) if old_metadata else set()
         new_langs = set(item.transcripts)
+
+        html5_ids = get_html5_ids(item.html5_sources)
+        possible_video_id_list = html5_ids + [item.youtube_id_1_0]
 
         for lang in old_langs.difference(new_langs):  # 3a
             for video_id in possible_video_id_list:
