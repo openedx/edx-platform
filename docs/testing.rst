@@ -92,10 +92,10 @@ Test Locations
 
 -  Javascript unit tests: Located in ``spec`` folders. For example,
    ``common/lib/xmodule/xmodule/js/spec`` and
-   ``{cms,lms}/static/coffee/spec`` For consistency, you should use the
+   ``{cms,lms}/static/js/spec`` For consistency, you should use the
    same directory structure for implementation and test. For example,
-   the test for ``src/views/module.coffee`` should be written in
-   ``spec/views/module_spec.coffee``.
+   the test for ``src/views/module.js`` should be written in
+   ``spec/views/module_spec.js``.
 
 -  UI acceptance tests:
 
@@ -151,8 +151,8 @@ For example, this command runs all the python test scripts::
     paver test_python
 
 It also runs ``collectstatic``, which prepares the
-static files used by the site (for example, compiling CoffeeScript to
-JavaScript).
+static files used by the site (for example, compiling Sass to
+CSS).
 
 You can re-run all failed python tests by running this command (see note at end of
 section)::
@@ -332,7 +332,6 @@ To run a specific set of JavaScript tests and print the results to the
 console, run these commands::
 
     paver test_js_run -s lms
-    paver test_js_run -s lms-coffee
     paver test_js_run -s cms
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
@@ -342,7 +341,6 @@ console, run these commands::
 To run JavaScript tests in a browser, run these commands::
 
     paver test_js_dev -s lms
-    paver test_js_dev -s lms-coffee
     paver test_js_dev -s cms
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule

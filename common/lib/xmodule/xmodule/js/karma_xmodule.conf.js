@@ -18,7 +18,7 @@ var options = {
     // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
         // Load the core JavaScript dependencies
-        {pattern: 'common_static/coffee/src/ajax_prefix.js', included: true},
+        {pattern: 'common_static/js/src/ajax_prefix.js', included: true},
         {pattern: 'common_static/common/js/vendor/underscore.js', included: true},
         {pattern: 'common_static/common/js/vendor/backbone.js', included: true},
         {pattern: 'common_static/js/vendor/CodeMirror/codemirror.js', included: true},

@@ -27,7 +27,7 @@
             'jquery.fileupload-validate': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate',   // eslint-disable-line max-len
             'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',   // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'xmodule_js/common_static/js/src/jquery.immediateDescendents',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
@@ -49,7 +49,7 @@
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
-            'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix'
+            'js/src/ajax_prefix': 'xmodule_js/common_static/js/src/ajax_prefix'
         },
         shim: {
             'gettext': {
@@ -174,9 +174,9 @@
                 deps: ['xblock/core']
             },
             'cms/js/main': {
-                deps: ['coffee/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix']
             },
-            'coffee/src/ajax_prefix': {
+            'js/src/ajax_prefix': {
                 deps: ['jquery']
             }
         }
@@ -185,7 +185,7 @@
     jasmine.getFixtures().fixturesPath = '/base/templates';
 
     testFiles = [
-        'coffee/spec/views/assets_spec',
+        'js/spec/views/assets_squire_spec',
         'js/spec/video/translations_editor_spec',
         'js/spec/video/file_uploader_editor_spec',
         'js/spec/models/group_configuration_spec'

@@ -65,7 +65,6 @@ var commonFiles = {
         {pattern: 'common/js/vendor/**/*.js'},
         {pattern: 'edx-pattern-library/js/**/*.js'},
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
-        {pattern: 'xmodule_js/common_static/coffee/src/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/src/**/*.js'}

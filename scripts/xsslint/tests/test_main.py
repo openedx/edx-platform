@@ -77,8 +77,6 @@ class TestXSSLinter(TestCase):
         output = self.out.getvalue()
         # Assert violation details are displayed.
         self.assertIsNotNone(re.search('test\.html.*{}'.format(self.ruleset.mako_missing_default.rule_id), output))
-        self.assertIsNotNone(re.search('test\.coffee.*{}'.format(self.ruleset.javascript_concat_html.rule_id), output))
-        self.assertIsNotNone(re.search('test\.coffee.*{}'.format(self.ruleset.underscore_not_escaped.rule_id), output))
         self.assertIsNotNone(re.search('test\.js.*{}'.format(self.ruleset.javascript_concat_html.rule_id), output))
         self.assertIsNotNone(re.search('test\.js.*{}'.format(self.ruleset.underscore_not_escaped.rule_id), output))
         lines_with_rule = 0

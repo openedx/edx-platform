@@ -1241,7 +1241,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         ]
 
     # Provide human-friendly and translatable names for these features. These names
-    # will be displayed in the table generated in data_download.coffee. It is not (yet)
+    # will be displayed in the table generated in data_download.js. It is not (yet)
     # used as the header row in the CSV, but could be in the future.
     query_features_names = {
         'id': _('User ID'),

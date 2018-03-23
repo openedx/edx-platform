@@ -66,9 +66,8 @@ out when files are missing (added when we started dynamically scanning XBlocks
 for assets).
 
 The ``django-pipeline`` config is aware of CSS files for the purposes of
-concatenation, but it does *not* know about the source Sass files (or handful of
-remaining CoffeeScript files). Those are processed with paver tasks before
-``django-pipeline`` ever sees them.
+concatenation, but it does *not* know about the source Sass files.
+Those are processed with paver tasks before ``django-pipeline`` ever sees them.
 
 We also have the following custom extensions to Django's builtin ``STATICFILES``
 mechanism:
@@ -168,8 +167,7 @@ also be responsible for the optimization/minification of JavaScript assets, but
 those optimized assets would only appear under the ``/webpack`` directory. Third
 party assets that Webpack is not aware of may have hash suffixes applied to them
 by the Django collectstatic layer, but will not otherwise be processed or
-optimized in any way -- so no coffeescript/sass compilation, no uglifyjs
-minification, etc.
+optimized in any way -- so no sass compilation, no uglifyjs minification, etc.
 
 The django-pipeline dependency should be removed altogether.
 

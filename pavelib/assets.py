@@ -28,7 +28,6 @@ from .utils.timer import timed
 # setup baseline paths
 
 ALL_SYSTEMS = ['lms', 'studio']
-COFFEE_DIRS = ['lms', 'cms', 'common']
 
 LMS = 'lms'
 CMS = 'cms'
@@ -301,32 +300,6 @@ def debounce(seconds=1):
     return decorator
 
 
-class CoffeeScriptWatcher(PatternMatchingEventHandler):
-    """
-    Watches for coffeescript changes
-    """
-    ignore_directories = True
-    patterns = ['*.coffee']
-
-    def register(self, observer):
-        """
-        register files with observer
-        """
-        dirnames = set()
-        for filename in sh(coffeescript_files(), capture=True).splitlines():
-            dirnames.add(path(filename).dirname())
-        for dirname in dirnames:
-            observer.schedule(self, dirname)
-
-    @debounce()
-    def on_any_event(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            compile_coffeescript(event.src_path)
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-
 class SassWatcher(PatternMatchingEventHandler):
     """
     Watches for sass file changes
@@ -401,28 +374,6 @@ class XModuleAssetsWatcher(PatternMatchingEventHandler):
 
         # To refresh the hash values of static xmodule content
         restart_django_servers()
-
-
-def coffeescript_files():
-    """
-    return find command for paths containing coffee files
-    """
-    dirs = " ".join(Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS)
-    return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
-
-
-@task
-@no_help
-@timed
-def compile_coffeescript(*files):
-    """
-    Compile CoffeeScript to JavaScript.
-    """
-    if not files:
-        files = ["`{}`".format(coffeescript_files())]
-    sh(cmd(
-        "node_modules/.bin/coffee", "--compile", *files
-    ))
 
 
 @task
@@ -736,7 +687,6 @@ def collect_assets(systems, settings, **kwargs):
 
         # We compile these out, don't need the source files in staticfiles
         "sass",
-        "*.coffee",
     ]
 
     ignore_args = " ".join(
@@ -906,7 +856,6 @@ def watch_assets(options):
     sass_directories = get_watcher_dirs(theme_dirs, themes)
     observer = Observer(timeout=wait)
 
-    CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
     XModuleSassWatcher().register(observer, ['common/lib/xmodule/'])
     XModuleAssetsWatcher().register(observer)
@@ -936,7 +885,7 @@ def watch_assets(options):
 @timed
 def update_assets(args):
     """
-    Compile CoffeeScript and Sass, then collect static assets.
+    Compile Sass, then collect static assets.
     """
     parser = argparse.ArgumentParser(prog='paver update_assets')
     parser.add_argument(
@@ -980,7 +929,6 @@ def update_assets(args):
 
     process_xmodule_assets()
     process_npm_assets()
-    compile_coffeescript()
 
     # Build Webpack
     call_task('pavelib.assets.webpack', options={'settings': args.settings})

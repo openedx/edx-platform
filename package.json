@@ -19,8 +19,6 @@
     "bootstrap": "4.0.0-beta.2",
     "camelize": "1.0.0",
     "classnames": "2.2.5",
-    "coffee-loader": "0.7.3",
-    "coffee-script": "1.6.1",
     "css-loader": "0.28.8",
     "edx-pattern-library": "0.18.1",
     "edx-ui-toolkit": "1.5.2",

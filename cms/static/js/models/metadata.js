@@ -1,7 +1,7 @@
 define(['backbone'], function(Backbone) {
     /**
      * Model used for metadata setting editors. This model does not do its own saving,
-     * as that is done by module_edit.coffee.
+     * as that is done by module_edit.js.
      */
     var Metadata = Backbone.Model.extend({
         defaults: {

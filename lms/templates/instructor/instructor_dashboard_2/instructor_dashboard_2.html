@@ -16,9 +16,9 @@ from openedx.core.djangolib.markup import HTML
 ##   add in a definition of 'xxx_url' in the right section_data for whatever page your
 ##   feature is on.
 ## 3. Add a url() entry in api_urls.py
-## 4. Over in lms/static/coffee/src/instructor_dashboard/ there there are .coffee files
-##   for each page which define the .js. Edit this to make your input do something
-##   when clicked. The .coffee files use the name=xx to pick out inputs, not id=
+## 4. Over in lms/static/js/instructor_dashboard/ there are .js files for each page.
+##   Edit this to make your input do something when clicked. The .js files use the
+##   name=xx to pick out inputs, not id=
 ## 5. Implement your standard django/python in lms/djangoapps/instructor/views/api.py
 ## 6. And tests go in lms/djangoapps/instructor/tests/
 
@@ -110,7 +110,7 @@ from openedx.core.djangolib.markup import HTML
           </div>
 
         ## links which are tied to idash-sections below.
-        ## the links are activated and handled in instructor_dashboard.coffee
+        ## the links are activated and handled in instructor_dashboard.js
         ## when the javascript loads, it clicks on the first section
         <ul class="instructor-nav">
           % for section_data in sections:
