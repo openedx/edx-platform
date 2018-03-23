@@ -556,111 +556,15 @@ class ProblemResponses(object):
 
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
-        """
-        Generate a tuple of display names, block location paths and block keys
-        for all problem blocks under the ``root`` block.
-
-        Arguments:
-            course_blocks (BlockStructureBlockData): Block structure for a course.
-            root (UsageKey): This block and its children will be used to generate
-                the problem list
-            path (List[str]): The list of display names for the parent of root block
-
-        Yields:
-            Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
-                usage key
-        """
-        display_name = course_blocks.get_xblock_field(root, 'display_name')
         if path is None:
-            path = [display_name]
-
-        yield display_name, path, root
-
+            path = [course_blocks.get_xblock_field(root, 'display_name')]
         for block in course_blocks.get_children(root):
             display_name = course_blocks.get_xblock_field(block, 'display_name')
-            for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
-                yield result
-
-    @classmethod
-    def _build_student_data(cls, user_id, course_key, usage_key_str):
-        """
-        Generate a list of problem responses for all problem under the
-        ``problem_location`` root.
-
-        Arguments:
-            user_id (int): The user id for the user generating the report
-            course_key (CourseKey): The ``CourseKey`` for the course whose report
-                is being generated
-            usage_key_str (str): The generated report will include this
-                block and it child blocks.
-
-        Returns:
-              Tuple[List[Dict], List[str]]: Returns a list of dictionaries
-                containing the student data which will be included in the
-                final csv, and the features/keys to include in that CSV.
-        """
-        usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
-        user = get_user_model().objects.get(pk=user_id)
-        course_blocks = get_course_blocks(user, usage_key)
-
-        student_data = []
-        max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-
-        store = modulestore()
-        user_state_client = DjangoXBlockUserStateClient()
-
-        student_data_keys = set()
-
-        with store.bulk_operations(course_key):
-            for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
-                # Chapter and sequential blocks are filtered out since they include state
-                # which isn't useful for this report.
-                if block_key.block_type in ('sequential', 'chapter'):
-                    continue
-
-                block = store.get_item(block_key)
-                generated_report_data = {}
-
-                # Blocks can implement the generate_report_data method to provide their own
-                # human-readable formatting for user state.
-                if hasattr(block, 'generate_report_data'):
-                    try:
-                        user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                        generated_report_data = {
-                            username: state
-                            for username, state in
-                            block.generate_report_data(user_state_iterator, max_count)
-                        }
-                    except NotImplementedError:
-                        pass
-
-                responses = list_problem_responses(course_key, block_key, max_count)
-
-                student_data += responses
-                for response in responses:
-                    response['title'] = title
-                    # A human-readable location for the current block
-                    response['location'] = ' > '.join(path)
-                    # A machine-friendly location for the current block
-                    response['block_key'] = str(block_key)
-                    user_data = generated_report_data.get(response['username'], {})
-                    response.update(user_data)
-                    student_data_keys = student_data_keys.union(user_data.keys())
-                if max_count is not None:
-                    max_count -= len(responses)
-                    if max_count <= 0:
-                        break
-
-        # Keep the keys in a useful order, starting with username, title and location,
-        # then the columns returned by the xblock report generator in sorted order and
-        # finally end with the more machine friendly block_key and state.
-        student_data_keys_list = (
-            ['username', 'title', 'location'] +
-            sorted(student_data_keys) +
-            ['block_key', 'state']
-        )
-
-        return student_data, student_data_keys_list
+            if block.block_type == 'problem':
+                yield display_name, path, block
+            else:
+                for result in ProblemResponses._build_problem_list(course_blocks, block, path + [display_name]):
+                    yield result
 
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
@@ -686,16 +590,17 @@ class ProblemResponses(object):
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-
-        for block in course_blocks:
-            if block.block_type == 'problem':
-                problem_responses = list_problem_responses(course_id, block, max_count)
-                student_data += problem_responses
-                max_count -= len(problem_responses)
+        for title, path, block in ProblemResponses._build_problem_list(course_blocks, problem_key):
+            problem_responses = list_problem_responses(course_id, block, max_count)
+            student_data += problem_responses
+            for response in problem_responses:
+                response['title'] = title
+                response['location'] = ' > '.join(path)
+            max_count -= len(problem_responses)
             if max_count <= 0:
                 break
 
-        features = ['username', 'state']
+        features = ['username', 'title', 'location', 'state']
         header, rows = format_dictlist(student_data, features)
 
         task_progress.attempted = task_progress.succeeded = len(rows)
