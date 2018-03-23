@@ -221,15 +221,6 @@ class ImportTestMixin(object):
         self.import_page.wait_for_upload()
         self.assertEqual(self.import_page.finished_target_url(), self.landing_page.url)
 
-    def test_bad_filename_error(self):
-        """
-        Scenario: I should be reprimanded for trying to upload something that isn't a .tar.gz file.
-            Given that I select a file that is an .mp4 for upload
-            An error message will appear
-        """
-        self.import_page.upload_tarball('funny_cat_video.mp4')
-        self.import_page.wait_for_filename_error()
-
     def test_bad_import(self):
         """
         Scenario: I should see a failed checklist when uploading an invalid course or library
