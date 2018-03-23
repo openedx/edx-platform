@@ -172,45 +172,6 @@ class ImportTestMixin(object):
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
-    def test_import_timestamp(self):
-        """
-        Scenario: I perform a course / library import
-            On import success, the page displays a UTC timestamp previously not visible
-            And if I refresh the page, the timestamp is still displayed
-        """
-        self.assertFalse(self.import_page.is_timestamp_visible())
-
-        # Get the time when the import has started.
-        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
-        # keep the comparison consistent
-        upload_start_time = datetime.utcnow().replace(microsecond=0, second=0)
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-
-        # Get the time when the import has finished.
-        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
-        # keep the comparison consistent
-        upload_finish_time = datetime.utcnow().replace(microsecond=0, second=0)
-
-        import_timestamp = self.import_page.parsed_timestamp
-        self.import_page.wait_for_timestamp_visible()
-
-        # Verify that 'import_timestamp' is between start and finish upload time
-        self.assertLessEqual(
-            upload_start_time,
-            import_timestamp,
-            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
-        )
-        self.assertGreaterEqual(
-            upload_finish_time,
-            import_timestamp,
-            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
-        )
-
-        self.import_page.visit()
-        self.import_page.wait_for_tasks(completed=True)
-        self.import_page.wait_for_timestamp_visible()
-
     def test_landing_url(self):
         """
         Scenario: When uploading a library or course, a link appears for me to view the changes.
