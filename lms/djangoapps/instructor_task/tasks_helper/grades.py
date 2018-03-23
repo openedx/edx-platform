@@ -8,10 +8,14 @@ from datetime import datetime
 from itertools import chain, izip, izip_longest
 from time import time
 
+from django.contrib.auth import get_user_model
+from django.conf import settings
 from lazy import lazy
+from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
 
+from course_blocks.api import get_course_blocks
 from courseware.courses import get_course_by_id
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
@@ -563,7 +567,23 @@ class ProblemResponses(object):
 
         # Compute result table and format it
         problem_location = task_input.get('problem_location')
-        student_data = list_problem_responses(course_id, problem_location)
+        problem_key = UsageKey.from_string(problem_location)
+
+        user_id = task_input.get('user_id')
+        user = get_user_model().objects.get(pk=user_id)
+        course_blocks = get_course_blocks(user, problem_key)
+
+        student_data = []
+        max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
+
+        for block in course_blocks:
+            if block.block_type == 'problem':
+                problem_responses = list_problem_responses(course_id, block, max_count)
+                student_data += problem_responses
+                max_count -= len(problem_responses)
+            if max_count <= 0:
+                break
+
         features = ['username', 'state']
         header, rows = format_dictlist(student_data, features)
 
