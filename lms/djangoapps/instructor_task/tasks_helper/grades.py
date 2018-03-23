@@ -677,17 +677,26 @@ class ProblemResponses(object):
         problem_location = task_input.get('problem_location')
 
         # Compute result table and format it
-        student_data, student_data_keys = cls._build_student_data(
-            user_id=task_input.get('user_id'),
-            course_key=course_id,
-            usage_key_str=problem_location
-        )
+        problem_location = task_input.get('problem_location')
+        problem_key = UsageKey.from_string(problem_location)
 
-        for data in student_data:
-            for key in student_data_keys:
-                data.setdefault(key, '')
+        user_id = task_input.get('user_id')
+        user = get_user_model().objects.get(pk=user_id)
+        course_blocks = get_course_blocks(user, problem_key)
 
-        header, rows = format_dictlist(student_data, student_data_keys)
+        student_data = []
+        max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
+
+        for block in course_blocks:
+            if block.block_type == 'problem':
+                problem_responses = list_problem_responses(course_id, block, max_count)
+                student_data += problem_responses
+                max_count -= len(problem_responses)
+            if max_count <= 0:
+                break
+
+        features = ['username', 'state']
+        header, rows = format_dictlist(student_data, features)
 
         task_progress.attempted = task_progress.succeeded = len(rows)
         task_progress.skipped = task_progress.total - task_progress.attempted
