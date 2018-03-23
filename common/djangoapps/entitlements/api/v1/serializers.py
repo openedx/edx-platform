@@ -55,5 +55,6 @@ class CourseEntitlementSupportDetailSerializer(serializers.ModelSerializer):
             'support_user',
             'action',
             'comments',
-            'unenrolled_run'
+            'unenrolled_run',
+            'created'
         )
