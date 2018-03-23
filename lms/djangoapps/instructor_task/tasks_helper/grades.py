@@ -552,6 +552,19 @@ class ProblemGradeReport(object):
 
 
 class ProblemResponses(object):
+
+    @classmethod
+    def _build_problem_list(cls, course_blocks, root, path=None):
+        if path is None:
+            path = [course_blocks.get_xblock_field(root, 'display_name')]
+        for block in course_blocks.get_children(root):
+            display_name = course_blocks.get_xblock_field(block, 'display_name')
+            if block.block_type == 'problem':
+                yield display_name, path, block
+            else:
+                for result in ProblemResponses._build_problem_list(course_blocks, block, path + [display_name]):
+                    yield result
+
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
         """
@@ -575,16 +588,17 @@ class ProblemResponses(object):
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-
-        for block in course_blocks:
-            if block.block_type == 'problem':
-                problem_responses = list_problem_responses(course_id, block, max_count)
-                student_data += problem_responses
-                max_count -= len(problem_responses)
+        for title, path, block in ProblemResponses._build_problem_list(course_blocks, problem_key):
+            problem_responses = list_problem_responses(course_id, block, max_count)
+            student_data += problem_responses
+            for response in problem_responses:
+                response['title'] = title
+                response['location'] = ' > '.join(path)
+            max_count -= len(problem_responses)
             if max_count <= 0:
                 break
 
-        features = ['username', 'state']
+        features = ['username', 'title', 'location', 'state']
         header, rows = format_dictlist(student_data, features)
 
         task_progress.attempted = task_progress.succeeded = len(rows)
