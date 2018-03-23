@@ -1119,49 +1119,6 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
-@attr(shard=4)
-class DragAndDropTest(VideoBaseTest):
-    """
-    Tests draggability of closed captions within videos.
-    """
-    def test_if_captions_are_draggable(self):
-        """
-        Loads transcripts so that closed-captioning is available.
-        Ensures they are draggable by checking start and dropped location.
-        """
-        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-        data = {'sub': '3_yD_cEKoCk'}
-
-        self.metadata = self.metadata_for_mode('html5', additional_data=data)
-        self.navigate_to_video()
-        self.assertTrue(self.video.is_video_rendered('html5'))
-        self.video.show_closed_captions()
-        self.video.wait_for_closed_captions()
-        self.assertTrue(self.video.is_closed_captions_visible)
-
-        action = ActionChains(self.browser)
-        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
-
-        captions_start = captions.location
-        action.drag_and_drop_by_offset(captions, 0, -15).perform()
-
-        captions_end = captions.location
-        # We have to branch here due to unexpected behaviour of chrome.
-        # Chrome sets the y offset of element to 834 instead of 650
-        if self.browser.name == 'chrome':
-            self.assertEqual(
-                captions_end.get('y') - 168,
-                captions_start.get('y'),
-                'Closed captions did not get dragged.'
-            )
-        else:
-            self.assertEqual(
-                captions_end.get('y') + 16,
-                captions_start.get('y'),
-                'Closed captions did not get dragged.'
-            )
-
-
 @attr('a11y')
 class LMSVideoModuleA11yTest(VideoBaseTest):
     """

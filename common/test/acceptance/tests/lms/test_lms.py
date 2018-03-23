@@ -297,27 +297,6 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         ).install()
 
-    def test_register_success(self):
-        # Navigate to the registration page
-        self.register_page.visit()
-
-        # Fill in the form and submit it
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
-        self.register_page.register(
-            email=email,
-            password="password",
-            username=username,
-            full_name="Test User",
-            country="US",
-            favorite_movie="Mad Max: Fury Road",
-            terms_of_service=True
-        )
-
-        # Expect that we reach the dashboard and we're auto-enrolled in the course
-        course_names = self.dashboard_page.wait_for_page().available_courses
-        self.assertIn(self.course_info["display_name"], course_names)
-
     def test_register_failure(self):
         # Navigate to the registration page
         self.register_page.visit()
@@ -346,58 +325,6 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()
         self.assertEqual(self.register_page.current_form, "login")
-
-    def test_third_party_register(self):
-        """
-        Test that we can register using third party credentials, and that the
-        third party account gets linked to the edX account.
-        """
-        # Navigate to the register page
-        self.register_page.visit()
-        # Baseline screen-shots are different for chrome and firefox.
-        #self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name), .25)
-        # The line above is commented out temporarily see SOL-1937
-
-        # Try to authenticate using the "Dummy" provider
-        self.register_page.click_third_party_dummy_provider()
-
-        # The user will be redirected somewhere and then back to the register page:
-        msg_text = self.register_page.wait_for_auth_status_message()
-        self.assertEqual(self.register_page.current_form, "register")
-        self.assertIn("You've successfully signed into Dummy", msg_text)
-        self.assertIn("We just need a little more information", msg_text)
-
-        # Now the form should be pre-filled with the data from the Dummy provider:
-        self.assertEqual(self.register_page.email_value, "adama@fleet.colonies.gov")
-        self.assertEqual(self.register_page.full_name_value, "William Adama")
-        self.assertIn("Galactica1", self.register_page.username_value)
-
-        # Set country, accept the terms, and submit the form:
-        self.register_page.register(country="US", favorite_movie="Battlestar Galactica", terms_of_service=True)
-
-        # Expect that we reach the dashboard and we're auto-enrolled in the course
-        course_names = self.dashboard_page.wait_for_page().available_courses
-        self.assertIn(self.course_info["display_name"], course_names)
-
-        # Now logout and check that we can log back in instantly (because the account is linked):
-        LogoutPage(self.browser).visit()
-
-        login_page = CombinedLoginAndRegisterPage(self.browser, start_page="login")
-        login_page.visit()
-        login_page.click_third_party_dummy_provider()
-
-        self.dashboard_page.wait_for_page()
-
-        # Now unlink the account (To test the account settings view and also to prevent cross-test side effects)
-        account_settings = AccountSettingsPage(self.browser).visit()
-        # switch to "Linked Accounts" tab
-        account_settings.switch_account_settings_tabs('accounts-tab')
-
-        field_id = "auth-oa2-dummy"
-        account_settings.wait_for_field(field_id)
-        self.assertEqual("Unlink This Account", account_settings.link_title_for_link_field(field_id))
-        account_settings.click_on_link_in_link_field(field_id)
-        account_settings.wait_for_message(field_id, "Successfully unlinked")
 
 
 @attr(shard=8)
@@ -1151,37 +1078,6 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         AutoAuthPage(self.browser).visit()
         url = BASE_URL + "/course_modes/choose/" + self.course_id
         self.browser.get(url)
-        self._assert_dashboard_message()
-
-    def test_login_redirect(self):
-        """
-        Test that the user is correctly redirected after logistration when
-        attempting to enroll in a closed course.
-        """
-        url = '{base_url}/register?{params}'.format(
-            base_url=BASE_URL,
-            params=urllib.urlencode({
-                'course_id': self.course_id,
-                'enrollment_action': 'enroll',
-                'email_opt_in': 'false'
-            })
-        )
-        self.browser.get(url)
-        register_page = CombinedLoginAndRegisterPage(
-            self.browser,
-            start_page="register",
-            course_id=self.course_id
-        )
-        register_page.wait_for_page()
-        register_page.register(
-            email="email@example.com",
-            password="password",
-            username="username",
-            full_name="Test User",
-            country="US",
-            favorite_movie="Mad Max: Fury Road",
-            terms_of_service=True
-        )
         self._assert_dashboard_message()
 
 

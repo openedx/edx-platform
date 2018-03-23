@@ -230,23 +230,6 @@ class ImportTestMixin(object):
         self.import_page.upload_tarball('funny_cat_video.mp4')
         self.import_page.wait_for_filename_error()
 
-    def test_task_list(self):
-        """
-        Scenario: I should see feedback checkpoints when uploading a course or library
-            Given that I am on an import page
-            No task checkpoint list should be showing
-            When I upload a valid tarball
-            Each task in the checklist should be marked confirmed
-            And the task list should be visible
-        """
-        # The task list shouldn't be visible to start.
-        self.assertFalse(self.import_page.is_task_list_showing(), "Task list shown too early.")
-        self.import_page.wait_for_tasks()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.import_page.wait_for_tasks(completed=True)
-        self.assertTrue(self.import_page.is_task_list_showing(), "Task list did not display.")
-
     def test_bad_import(self):
         """
         Scenario: I should see a failed checklist when uploading an invalid course or library
@@ -272,48 +255,6 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
 
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
-
-    def test_course_updated_with_entrance_exam(self):
-        """
-        Given that I visit an empty course before import
-        I should not see a section named 'Section' or 'Entrance Exam'
-        When I visit the import page
-        And I upload a course that has an entrance exam section named 'Entrance Exam'
-        And I visit the course outline page again
-        The section named 'Entrance Exam' should now be available
-        When I visit the LMS Course Home page
-        Then I should see a section named 'Section' or 'Entrance Exam'
-        When I switch the view mode to student view
-        Then I should only see a section named 'Entrance Exam'
-        When I visit the courseware page
-        Then a message regarding the 'Entrance Exam'
-        """
-        self.landing_page.visit()
-        # Should not exist yet.
-        self.assertRaises(IndexError, self.landing_page.section, "Section")
-        self.assertRaises(IndexError, self.landing_page.section, "Entrance Exam")
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.landing_page.visit()
-        # There should be two sections. 'Entrance Exam' and 'Section' on the landing page.
-        self.landing_page.section("Entrance Exam")
-        self.landing_page.section("Section")
-
-        self.landing_page.view_live()
-
-        course_home = CourseHomePage(self.browser, self.course_id)
-        course_home.visit()
-        self.assertEqual(course_home.outline.num_sections, 2)
-        course_home.preview.set_staff_view_mode('Learner')
-        self.assertEqual(course_home.outline.num_sections, 1)
-
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.visit()
-        StaffCoursewarePage(self.browser, self.course_id).set_staff_view_mode('Learner')
-        self.assertIn(
-            "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]
-        )
 
 
 @attr(shard=7)
