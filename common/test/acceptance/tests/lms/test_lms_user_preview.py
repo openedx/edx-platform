@@ -414,23 +414,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         add_cohort_with_student("Cohort Beta", "beta", student_b_username)
         cohort_management_page.wait_for_ajax()
 
-    @attr(shard=3)
-    def test_as_specific_student(self):
-        student_a_username = 'tass_student_a'
-        student_b_username = 'tass_student_b'
-        AutoAuthPage(self.browser, username=student_a_username, course_id=self.course_id, no_login=True).visit()
-        AutoAuthPage(self.browser, username=student_b_username, course_id=self.course_id, no_login=True).visit()
-        self.create_cohorts_and_assign_students(student_a_username, student_b_username)
-
-        # Masquerade as learner in alpha cohort:
-        course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode_specific_student(student_a_username)
-        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.audit_text, self.everyone_text])
-
-        # Masquerade as learner in beta cohort:
-        course_page.set_staff_view_mode_specific_student(student_b_username)
-        verify_expected_problem_visibility(self, course_page, [self.beta_text, self.audit_text, self.everyone_text])
-
     @attr('a11y')
     def test_course_page(self):
         """
