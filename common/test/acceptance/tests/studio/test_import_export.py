@@ -254,27 +254,6 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     def page_args(self):
         return [self.browser, self.library_key]
 
-    def test_library_updated(self):
-        """
-        Given that I visit an empty library
-        No XBlocks should be shown
-        When I visit the import page
-        And I upload a library that contains three XBlocks
-        And I visit the library page
-        Three XBlocks should be shown
-        """
-        self.landing_page.visit()
-        self.landing_page.wait_until_ready()
-        # No items should be in the library to start.
-        self.assertEqual(len(self.landing_page.xblocks), 0)
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.landing_page.visit()
-        self.landing_page.wait_until_ready()
-        # There are three blocks in the tarball.
-        self.assertEqual(len(self.landing_page.xblocks), 3)
-
     def test_header(self):
         """
         Scenario: I should see the correct text when importing a library.
