@@ -35,9 +35,9 @@ def add_maintenance_banner(func):
     @wraps(func)
     def _decorated(request, *args, **kwargs):  # pylint: disable=missing-docstring
         if waffle().is_enabled(DISPLAY_MAINTENANCE_WARNING):
-            if hasattr(settings, 'EDXAPP_MAINTENANCE_BANNER_TEXT') and settings.EDXAPP_MAINTENANCE_BANNER_TEXT:
+            if hasattr(settings, 'MAINTENANCE_BANNER_TEXT') and settings.MAINTENANCE_BANNER_TEXT:
                 # The waffle switch is enabled and the banner text is defined
                 # and non-empty.  We can now register the message:
-                PageLevelMessages.register_warning_message(request, settings.EDXAPP_MAINTENANCE_BANNER_TEXT)
+                PageLevelMessages.register_warning_message(request, settings.MAINTENANCE_BANNER_TEXT)
         return func(request, *args, **kwargs)
     return _decorated
