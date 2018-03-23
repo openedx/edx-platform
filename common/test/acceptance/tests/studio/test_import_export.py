@@ -172,16 +172,6 @@ class ImportTestMixin(object):
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
-    def test_landing_url(self):
-        """
-        Scenario: When uploading a library or course, a link appears for me to view the changes.
-            Given that I upload a library or course
-            A button will appear that contains the URL to the library or course's main page
-        """
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.assertEqual(self.import_page.finished_target_url(), self.landing_page.url)
-
     def test_bad_import(self):
         """
         Scenario: I should see a failed checklist when uploading an invalid course or library
