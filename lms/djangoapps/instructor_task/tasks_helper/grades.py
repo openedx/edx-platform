@@ -594,11 +594,12 @@ class ProblemResponses(object):
             for response in problem_responses:
                 response['title'] = title
                 response['location'] = ' > '.join(path)
+                response['block_id'] = block.block_id
             max_count -= len(problem_responses)
             if max_count <= 0:
                 break
 
-        features = ['username', 'title', 'location', 'state']
+        features = ['username', 'title', 'location', 'block_id', 'state']
         header, rows = format_dictlist(student_data, features)
 
         task_progress.attempted = task_progress.succeeded = len(rows)
