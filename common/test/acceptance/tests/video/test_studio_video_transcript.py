@@ -153,15 +153,12 @@ class VideoTranscriptTest(CMSVideoBaseTest):
 
         And I enter a "t_not_exist.mp4" source to field number 1
         Then I see status message "No Timed Transcript"
-        And I see value "" in the field "Default Timed Transcript"
         """
         self._create_video_component()
         self.edit_component()
 
         self.video.set_url_field('t_not_exist.mp4', 1)
         self.assertEqual(self.video.message('status'), 'No Timed Transcript')
-        self.open_advanced_tab()
-        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', ''))
 
     def test_set_youtube_id_wo_local(self):
         """
@@ -761,7 +758,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
 
         After i enter a "/gizmo.webm" source to field number 1 Then I see status message "No Timed Transcript"
         After I upload the transcripts file "uk_transcripts.srt" I see message "Timed Transcript Uploaded Successfully"
-        And I see value "gizmo" in the field "Default Timed Transcript"
         After saving the changes video captions should be visible
         After I edit the component I should see status message "Timed Transcript Found"
         """

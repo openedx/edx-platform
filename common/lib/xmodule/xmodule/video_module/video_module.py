@@ -360,7 +360,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'streams': self.youtube_streams,
-            'sub': self.sub,
             'sources': sources,
             'poster': poster,
             'duration': video_duration,
@@ -603,6 +602,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             editable_fields['source']['non_editable'] = True
         else:
             editable_fields.pop('source')
+
+        # Default Timed Transcript a.k.a `sub` has been deprecated and end users shall
+        # not be able to modify it.
+        editable_fields.pop('sub')
 
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])

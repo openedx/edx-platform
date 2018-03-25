@@ -64,7 +64,6 @@ DEFAULT_SETTINGS = [
 
     # advanced
     [DISPLAY_NAME, 'Video', False],
-    ['Default Timed Transcript', '', False],
     ['Download Transcript Allowed', 'False', False],
     ['Downloadable Transcript URL', '', False],
     ['Show Transcript', 'True', False],

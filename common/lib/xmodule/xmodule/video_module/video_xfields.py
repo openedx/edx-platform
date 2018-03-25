@@ -104,6 +104,8 @@ class VideoFields(object):
         scope=Scope.settings,
         default=False
     )
+    # `sub` is deprecated field and should not be used in future. Now, transcripts are primarily handled in VAL and
+    # backward compatibility for the video modules already using this field has been ensured.
     sub = String(
         help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. This transcript should be in English. You don't have to change this setting."),  # pylint: disable=line-too-long
         display_name=_("Default Timed Transcript"),
