@@ -604,6 +604,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        # Default Timed Transcript a.k.a `sub` has been deprecated and end users shall
+        # not be able to modify it.
+        editable_fields.pop('sub')
+
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
         editable_fields['transcripts']['languages'] = languages
