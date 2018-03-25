@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-18 20:36+0000\n"
-"PO-Revision-Date: 2018-03-18 20:36:06.141838\n"
+"POT-Creation-Date: 2018-03-25 20:36+0000\n"
+"PO-Revision-Date: 2018-03-25 20:36:17.029505\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1616,6 +1616,103 @@ msgstr ""
 msgid "System defined milestone"
 msgstr "Sýstém défïnéd mïléstöné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} letter"
+msgid_plural "{num} letters"
+msgstr[0] "{num} léttér Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgstr[1] "{num} léttérs Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} uppercase letter"
+msgid_plural "{num} uppercase letters"
+msgstr[0] "{num} üppérçäsé léttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgstr[1] "{num} üppérçäsé léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} lowercase letter"
+msgid_plural "{num} lowercase letters"
+msgstr[0] "{num} löwérçäsé léttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgstr[1] "{num} löwérçäsé léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} digit"
+msgid_plural "{num} digits"
+msgstr[0] "{num} dïgït Ⱡ'σяєм ιρѕυм ∂σł#"
+msgstr[1] "{num} dïgïts Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} number"
+msgid_plural "{num} numbers"
+msgstr[0] "{num} nümßér Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgstr[1] "{num} nümßérs Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} punctuation mark"
+msgid_plural "{num} punctuation marks"
+msgstr[0] "{num} pünçtüätïön märk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgstr[1] "{num} pünçtüätïön märks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} symbol"
+msgid_plural "{num} symbols"
+msgstr[0] "{num} sýmßöl Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgstr[1] "{num} sýmßöls Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} word"
+msgid_plural "{num} words"
+msgstr[0] "{num} wörd Ⱡ'σяєм ιρѕυм ∂#"
+msgstr[1] "{num} wörds Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Your password must contain at least {num} character."
+msgid_plural "Your password must contain at least {num} characters."
+msgstr[0] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+msgstr[1] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"Your password must contain at least {num} character, including "
+"{requirements}."
+msgid_plural ""
+"Your password must contain at least {num} characters, including "
+"{requirements}."
+msgstr[0] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtér, ïnçlüdïng "
+"{requirements}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgstr[1] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtérs, ïnçlüdïng "
+"{requirements}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Enter a password with at least {requirements}."
+msgstr ""
+"Éntér ä pässwörd wïth ät léäst {requirements}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid ""
@@ -1648,91 +1745,35 @@ msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Password: Invalid Length ({0})"
-msgstr "Pässwörd: Ìnvälïd Léngth ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "{num} character"
+msgid_plural "{num} characters"
+msgstr[0] "{num} çhäräçtér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgstr[1] "{num} çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or more"
-msgstr "müst ßé {0} çhäräçtérs ör möré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must be {0} characters or fewer"
-msgstr "müst ßé {0} çhäräçtérs ör féwér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Password: Must be more complex ({0})"
-msgstr ""
-"Pässwörd: Müst ßé möré çömpléx ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more uppercase characters"
-msgstr ""
-"müst çöntäïn {0} ör möré üppérçäsé çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+msgid "Enter a password with at most {num} character."
+msgid_plural "Enter a password with at most {num} characters."
+msgstr[0] ""
+"Éntér ä pässwörd wïth ät möst {num} çhäräçtér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more lowercase characters"
-msgstr ""
-"müst çöntäïn {0} ör möré löwérçäsé çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more digits"
-msgstr "müst çöntäïn {0} ör möré dïgïts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more punctuation characters"
-msgstr ""
-"müst çöntäïn {0} ör möré pünçtüätïön çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more non ascii characters"
-msgstr ""
-"müst çöntäïn {0} ör möré nön äsçïï çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more unique words"
-msgstr ""
-"müst çöntäïn {0} ör möré ünïqüé wörds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more numbers"
-msgstr ""
-"müst çöntäïn {0} ör möré nümßérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more letters"
-msgstr ""
-"müst çöntäïn {0} ör möré léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+msgstr[1] ""
+"Éntér ä pässwörd wïth ät möst {num} çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя #"
 
 #. Translators: This message is shown to users who enter a password matching
 #. the username they enter(ed).
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password cannot be the same as the username"
+msgid "Password cannot be the same as the username."
 msgstr ""
-"Pässwörd çännöt ßé thé sämé äs thé üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Pässwörd çännöt ßé thé sämé äs thé üsérnämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password: Too similar to a restricted dictionary word."
+msgid "Password is too similar to a dictionary word."
 msgstr ""
-"Pässwörd: Töö sïmïlär tö ä réstrïçtéd dïçtïönärý wörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Pässwörd ïs töö sïmïlär tö ä dïçtïönärý wörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -14446,7 +14487,6 @@ msgid "Reset"
 msgstr "Rését Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "Légäl Ⱡ'σяєм ιρѕ#"
@@ -21831,6 +21871,11 @@ msgstr ""
 " spéllïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Role of the users being enrolled."
+msgstr ""
+"Rölé öf thé üsérs ßéïng énrölléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr ""
@@ -24215,26 +24260,6 @@ msgstr ""
 "ÉdX, Öpén édX, änd MïçröMästérs äré régïstéréd trädémärks öf édX Ìnç. "
 "ç²¤ÌÇPå¤17044299å·-2.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr "Àßöüt édX Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid ""
-"© 2012–{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
-"edX and the edX and Open edX logos are registered trademarks or trademarks "
-"of edX Inc."
-msgstr ""
-"© 2012–{year} édX Ìnç.  Àll rïghts résérvéd éxçépt whéré nötéd.  ÉdX, Öpén "
-"édX änd thé édX änd Öpén édX lögös äré régïstéréd trädémärks ör trädémärks "
-"öf édX Ìnç. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт#"
-
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr "Àßöüt édX Vérïfïéd Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
@@ -24254,6 +24279,10 @@ msgstr ""
 "α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт #"
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
+msgstr "Àßöüt édX Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""

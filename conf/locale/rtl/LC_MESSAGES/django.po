@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-18 20:36+0000\n"
-"PO-Revision-Date: 2018-03-18 20:36:06.141838\n"
+"POT-Creation-Date: 2018-03-25 20:36+0000\n"
+"PO-Revision-Date: 2018-03-25 20:36:17.029505\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1421,6 +1421,97 @@ msgstr "ذخعقسث {course_id} قثضعهقثس {prerequisite_course_id}"
 msgid "System defined milestone"
 msgstr "سغسفثو يثبهرثي وهمثسفخرث"
 
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} letter"
+msgid_plural "{num} letters"
+msgstr[0] "{num} مثففثق"
+msgstr[1] "{num} مثففثقس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} uppercase letter"
+msgid_plural "{num} uppercase letters"
+msgstr[0] "{num} عححثقذشسث مثففثق"
+msgstr[1] "{num} عححثقذشسث مثففثقس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} lowercase letter"
+msgid_plural "{num} lowercase letters"
+msgstr[0] "{num} مخصثقذشسث مثففثق"
+msgstr[1] "{num} مخصثقذشسث مثففثقس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} digit"
+msgid_plural "{num} digits"
+msgstr[0] "{num} يهلهف"
+msgstr[1] "{num} يهلهفس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} number"
+msgid_plural "{num} numbers"
+msgstr[0] "{num} رعوزثق"
+msgstr[1] "{num} رعوزثقس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} punctuation mark"
+msgid_plural "{num} punctuation marks"
+msgstr[0] "{num} حعرذفعشفهخر وشقن"
+msgstr[1] "{num} حعرذفعشفهخر وشقنس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} symbol"
+msgid_plural "{num} symbols"
+msgstr[0] "{num} سغوزخم"
+msgstr[1] "{num} سغوزخمس"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} word"
+msgid_plural "{num} words"
+msgstr[0] "{num} صخقي"
+msgstr[1] "{num} صخقيس"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Your password must contain at least {num} character."
+msgid_plural "Your password must contain at least {num} characters."
+msgstr[0] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثق."
+msgstr[1] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"Your password must contain at least {num} character, including "
+"{requirements}."
+msgid_plural ""
+"Your password must contain at least {num} characters, including "
+"{requirements}."
+msgstr[0] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثق, هرذمعيهرل "
+"{requirements}."
+msgstr[1] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثقس, هرذمعيهرل "
+"{requirements}."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Enter a password with at least {requirements}."
+msgstr "ثرفثق ش حشسسصخقي صهفا شف مثشسف {requirements}."
+
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid ""
@@ -1453,73 +1544,27 @@ msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Password: Invalid Length ({0})"
-msgstr "حشسسصخقي: هردشمهي مثرلفا ({0})"
+msgid "{num} character"
+msgid_plural "{num} characters"
+msgstr[0] "{num} ذاشقشذفثق"
+msgstr[1] "{num} ذاشقشذفثقس"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or more"
-msgstr "وعسف زث {0} ذاشقشذفثقس خق وخقث"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must be {0} characters or fewer"
-msgstr "وعسف زث {0} ذاشقشذفثقس خق بثصثق"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Password: Must be more complex ({0})"
-msgstr "حشسسصخقي: وعسف زث وخقث ذخوحمثط ({0})"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more uppercase characters"
-msgstr "وعسف ذخرفشهر {0} خق وخقث عححثقذشسث ذاشقشذفثقس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more lowercase characters"
-msgstr "وعسف ذخرفشهر {0} خق وخقث مخصثقذشسث ذاشقشذفثقس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more digits"
-msgstr "وعسف ذخرفشهر {0} خق وخقث يهلهفس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more punctuation characters"
-msgstr "وعسف ذخرفشهر {0} خق وخقث حعرذفعشفهخر ذاشقشذفثقس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more non ascii characters"
-msgstr "وعسف ذخرفشهر {0} خق وخقث رخر شسذهه ذاشقشذفثقس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more unique words"
-msgstr "وعسف ذخرفشهر {0} خق وخقث عرهضعث صخقيس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more numbers"
-msgstr "وعسف ذخرفشهر {0} خق وخقث رعوزثقس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more letters"
-msgstr "وعسف ذخرفشهر {0} خق وخقث مثففثقس"
+msgid "Enter a password with at most {num} character."
+msgid_plural "Enter a password with at most {num} characters."
+msgstr[0] "ثرفثق ش حشسسصخقي صهفا شف وخسف {num} ذاشقشذفثق."
+msgstr[1] "ثرفثق ش حشسسصخقي صهفا شف وخسف {num} ذاشقشذفثقس."
 
 #. Translators: This message is shown to users who enter a password matching
 #. the username they enter(ed).
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password cannot be the same as the username"
-msgstr "حشسسصخقي ذشررخف زث فاث سشوث شس فاث عسثقرشوث"
+msgid "Password cannot be the same as the username."
+msgstr "حشسسصخقي ذشررخف زث فاث سشوث شس فاث عسثقرشوث."
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password: Too similar to a restricted dictionary word."
-msgstr "حشسسصخقي: فخخ سهوهمشق فخ ش قثسفقهذفثي يهذفهخرشقغ صخقي."
+msgid "Password is too similar to a dictionary word."
+msgstr "حشسسصخقي هس فخخ سهوهمشق فخ ش يهذفهخرشقغ صخقي."
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -12555,7 +12600,6 @@ msgid "Reset"
 msgstr "قثسثف"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "مثلشم"
@@ -19032,6 +19076,10 @@ msgstr ""
 " سحثممهرل."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Role of the users being enrolled."
+msgstr "قخمث خب فاث عسثقس زثهرل ثرقخممثي."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr ""
@@ -21139,21 +21187,6 @@ msgstr ""
 "ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ. "
 "ç²¤هذحå¤17044299å·-2. "
 
-#: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr "شزخعف ثيط"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid ""
-"© 2012–{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
-"edX and the edX and Open edX logos are registered trademarks or trademarks "
-"of edX Inc."
-msgstr ""
-"© 2012–{year} ثيط هرذ.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر "
-"ثيط شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس "
-"خب ثيط هرذ."
-
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr "شزخعف ثيط دثقهبهثي ذثقفهبهذشفثس"
@@ -21169,6 +21202,10 @@ msgstr ""
 "زغ فاث ثيط اخرخق ذخيث شري ذخوحمثفثي شمم خب فاث قثضعهقثي فشسنس خب فاهس ذخعقسث"
 " عريثق هفس لعهيثمهرثس, شس صثمم شس اشدهرل فاثهق حاخفخ هي ذاثذنثي فخ دثقهبغ "
 "فاثهق هيثرفهفغ."
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
+msgstr "شزخعف ثيط"
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
