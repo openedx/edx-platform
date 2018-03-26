@@ -344,19 +344,3 @@ class CMSVideoA11yTest(CMSVideoBaseTest):
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
             super(CMSVideoA11yTest, self).setUp()
-
-    def test_video_player_a11y(self):
-        # we're loading a shorter transcript to ensure both skip links are available
-        self._create_course_unit(subtitles=True)
-        self.edit_component()
-        self.video.upload_transcript('english_single_transcript.srt')
-
-        self.save_unit_settings()
-        self.video.wait_for_captions()
-        self.assertTrue(self.video.is_captions_visible())
-
-        # limit the scope of the audit to the video player only.
-        self.outline.a11y_audit.config.set_scope(
-            include=["div.video"]
-        )
-        self.outline.a11y_audit.check_for_accessibility_errors()
