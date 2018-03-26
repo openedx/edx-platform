@@ -210,7 +210,7 @@ class Organization(TimeStampedModel):
 
     def get_active_partners(self):
         """ Return list of active organization partners"""
-        return self.organization_partners.filter(end_date__gt=datetime.utcnow().date()).values_list('partner', flat=True)
+        return self.organization_partners.filter(end_date__gt=datetime.utcnow()).values_list('partner', flat=True)
 
     def __str__(self):
         return self.label
@@ -233,8 +233,8 @@ class OrganizationPartner(models.Model):
 
         # Set unchecked partners end date to today
         cls.objects.filter(organization=organization,
-            partner__in=removed_partners, end_date__gt=datetime.utcnow().date()).update(
-            end_date=datetime.now(utc).date())
+            partner__in=removed_partners, end_date__gt=datetime.utcnow()).update(
+            end_date=datetime.now(utc))
 
         # Mark removed partner affliation flag to False if not selected in any organization
         _removed_partners = PartnerNetwork.objects.filter(code__in=removed_partners)
@@ -246,7 +246,7 @@ class OrganizationPartner(models.Model):
 
         # Get already added partners for an organization
         no_updated_selections = cls.objects.filter(organization=organization,
-            partner__in=partners, end_date__gt=datetime.utcnow().date()).values_list('partner', flat=True)
+            partner__in=partners, end_date__gt=datetime.utcnow()).values_list('partner', flat=True)
 
         # Filter out new/reselected Partners
         new_selections = [p for p in partners if p not in no_updated_selections]
@@ -541,7 +541,9 @@ class UserExtendedProfile(TimeStampedModel):
         """
         attended_list = []
 
-        if self.user.profile.level_of_education and self.start_month_year and self.english_proficiency:
+        if (not self.organization and self.user.profile.level_of_education and self.english_proficiency) or (
+                self.organization and self.user.profile.level_of_education and self.start_month_year and
+                self.english_proficiency):
             attended_list.append(self.SURVEYS_LIST[0])
         if self.is_interests_data_submitted:
             attended_list.append(self.SURVEYS_LIST[1])
