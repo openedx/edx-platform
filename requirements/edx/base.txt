@@ -122,6 +122,7 @@ sortedcontainers==0.9.2
 stevedore==1.10.0
 sure==1.2.3
 sympy==0.7.1
+user-util==0.1.1
 xmltodict==0.4.1
 django-ratelimit-backend==1.1.1
 unicodecsv==0.14.1
