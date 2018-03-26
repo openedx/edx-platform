@@ -3,22 +3,26 @@ Views to show a course outline.
 """
 import re
 import datetime
-import pytz
 
+from completion import waffle as completion_waffle
 from django.contrib.auth.models import User
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
+from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import waffle as course_experience_waffle
-from completion import waffle as completion_waffle
 from student.models import CourseEnrollment
 
-from ..utils import get_course_outline_block_tree, get_resume_block
 from util.milestones_helpers import get_course_content_milestones
+from ..utils import get_course_outline_block_tree, get_resume_block
+
+
+DEFAULT_COMPLETION_TRACKING_START = datetime.datetime(2018, 1, 24, tzinfo=UTC)
 
 
 class CourseOutlineFragmentView(EdxFragmentView):
@@ -143,7 +147,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         before this date, they may see incomplete collection data. This is a temporary
         check until all active enrollments are created after the date.
         """
-        begin_collection_date = datetime.datetime(2018, 01, 24, tzinfo=pytz.utc)
         user = User.objects.get(username=user)
         try:
             user_enrollment = CourseEnrollment.objects.get(
@@ -151,9 +154,20 @@ class CourseOutlineFragmentView(EdxFragmentView):
                 course_id=course_key,
                 is_active=True
             )
-            return user_enrollment.created > begin_collection_date
+            return user_enrollment.created > self._completion_data_collection_start()
         except CourseEnrollment.DoesNotExist:
             return False
+
+    def _completion_data_collection_start(self):
+        """
+        Returns the date that the ENABLE_COMPLETION_TRACKING waffle switch was enabled.
+        """
+        # pylint: disable=protected-access
+        switch_name = completion_waffle.waffle()._namespaced_name(completion_waffle.ENABLE_COMPLETION_TRACKING)
+        try:
+            return Switch.objects.get(name=switch_name).created
+        except Switch.DoesNotExist:
+            return DEFAULT_COMPLETION_TRACKING_START
 
     def mark_first_unit_to_resume(self, block_node):
         children = block_node.get('children')
