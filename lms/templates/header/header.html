@@ -13,8 +13,6 @@ from openedx.core.djangolib.markup import HTML, Text
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
-# app that handles site status messages
-from status.status import get_site_status_msg
 from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
 
@@ -29,21 +27,6 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
     </%static:require_module>
     </%block>
 % endif
-
-<%block>
-<%
-course_id = course.id if course else None
-site_status_msg = get_site_status_msg(course_id)
-%>
-% if site_status_msg:
-  <div class="site-status">
-    <div class="inner-wrapper">
-      <span class="icon fa fa-warning" aria-hidden="true"></span>
-      <p>${site_status_msg}</p>
-    </div>
-  </div>
-% endif
-</%block>
 
 <header class="global-header ${'slim' if course else ''}">
     <div class="main-header">
