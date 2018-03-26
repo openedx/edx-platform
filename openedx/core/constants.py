@@ -1,5 +1,5 @@
 """
-Constants that are relevant all of Open edX
+Constants that are relevant to all of Open edX
 """
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.

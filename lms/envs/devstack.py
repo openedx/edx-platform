@@ -41,12 +41,6 @@ for log_name, log_level in LOG_OVERRIDES:
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-########################## ANALYTICS TESTING ########################
-
-# Set this to the dashboard URL in order to display the link from the
-# dashboard to the Analytics Dashboard.
-ANALYTICS_DASHBOARD_URL = None
-
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
 

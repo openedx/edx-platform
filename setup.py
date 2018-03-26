@@ -71,9 +71,9 @@ setup(
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
-            "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
             "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
+            "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
