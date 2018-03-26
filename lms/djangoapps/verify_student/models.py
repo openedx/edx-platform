@@ -19,7 +19,6 @@ from email.utils import formatdate
 import pytz
 import requests
 import six
-from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -43,7 +42,6 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangolib.model_mixins import DeprecatedModelMixin
 from openedx.core.storage import get_storage
 
 
@@ -1121,74 +1119,3 @@ class VerificationDeadline(TimeStampedModel):
 def invalidate_deadline_caches(sender, **kwargs):  # pylint: disable=unused-argument
     """Invalidate the cached verification deadline information. """
     cache.delete(VerificationDeadline.ALL_DEADLINES_CACHE_KEY)
-
-
-class VerificationCheckpoint(DeprecatedModelMixin, models.Model):  # pylint: disable=model-missing-unicode
-    """
-    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
-    """
-    course_id = CourseKeyField(max_length=255, db_index=True)
-    checkpoint_location = models.CharField(max_length=255)
-    photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
-
-    class Meta(object):
-        app_label = "verify_student"
-        unique_together = ('course_id', 'checkpoint_location')
-
-
-class VerificationStatus(DeprecatedModelMixin, models.Model):  # pylint: disable=model-missing-unicode
-    """
-    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
-    """
-    SUBMITTED_STATUS = "submitted"
-    APPROVED_STATUS = "approved"
-    DENIED_STATUS = "denied"
-    ERROR_STATUS = "error"
-
-    VERIFICATION_STATUS_CHOICES = (
-        (SUBMITTED_STATUS, SUBMITTED_STATUS),
-        (APPROVED_STATUS, APPROVED_STATUS),
-        (DENIED_STATUS, DENIED_STATUS),
-        (ERROR_STATUS, ERROR_STATUS)
-    )
-
-    checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="checkpoint_status")
-    user = models.ForeignKey(User)
-    status = models.CharField(choices=VERIFICATION_STATUS_CHOICES, db_index=True, max_length=32)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    response = models.TextField(null=True, blank=True)
-    error = models.TextField(null=True, blank=True)
-
-    class Meta(object):
-        app_label = "verify_student"
-        get_latest_by = "timestamp"
-        verbose_name = "Verification Status"
-        verbose_name_plural = "Verification Statuses"
-
-
-class InCourseReverificationConfiguration(DeprecatedModelMixin, ConfigurationModel):  # pylint: disable=model-missing-unicode
-    """
-    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
-    """
-    pass
-
-
-class IcrvStatusEmailsConfiguration(DeprecatedModelMixin, ConfigurationModel):  # pylint: disable=model-missing-unicode
-    """
-    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
-    """
-    pass
-
-
-class SkippedReverification(DeprecatedModelMixin, models.Model):  # pylint: disable=model-missing-unicode
-    """
-    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
-    """
-    user = models.ForeignKey(User)
-    course_id = CourseKeyField(max_length=255, db_index=True)
-    checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta(object):
-        app_label = "verify_student"
-        unique_together = (('user', 'course_id'),)
