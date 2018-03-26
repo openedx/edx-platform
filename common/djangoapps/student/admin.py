@@ -165,7 +165,13 @@ class CourseEnrollmentForm(forms.ModelForm):
         fields = '__all__'
 
 
-@admin.register(CourseEnrollment)
+# Page disabled because it makes DB quries that impact performance enough to
+# cause a site outage. It may be re-enabled when it is updated to make more
+# efficent DB queries
+# https://openedx.atlassian.net/browse/OPS-2943
+# Learner ticket to add functionality to /support
+# https://openedx.atlassian.net/browse/LEARNER-4744
+#@admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
