@@ -89,7 +89,6 @@ class TestVideoYouTube(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'duration': None,
                 'poster': None,
@@ -171,7 +170,6 @@ class TestVideoNonYouTube(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'duration': None,
                 'poster': None,
@@ -229,7 +227,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saveStateUrl': '',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'streams': '1.00:3_yD_cEKoCk',
-            'sub': 'a_sub_file.srt.sjson',
             'sources': '[]',
             'duration': 111.0,
             'poster': None,
@@ -360,7 +357,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'sub': data['sub'],
             })
             expected_context.update({
                 'transcript_download_format': (
@@ -1772,7 +1768,6 @@ class TestVideoWithBumper(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'poster': None,
                 'duration': None,
@@ -1844,7 +1839,6 @@ class TestAutoAdvanceVideo(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': [u'example.mp4', u'example.webm'],
                 'duration': None,
                 'poster': None,
