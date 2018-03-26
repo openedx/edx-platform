@@ -192,6 +192,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Discards draft changes (which will then re-render the page).
         """
+        self.scroll_to_element('a.action-discard')
         click_css(self, 'a.action-discard', 0, require_notification=False)
         confirm_prompt(self)
         self.wait_for_ajax()
