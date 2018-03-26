@@ -18,6 +18,7 @@ from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 
 REQUIRED_CREATION_FIELDS = ['course_uuid', 'reason', 'mode']
+# EntitlementSupportPage Feature Branch
 
 
 class EntitlementSupportView(View):
