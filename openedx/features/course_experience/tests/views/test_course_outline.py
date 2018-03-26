@@ -13,6 +13,8 @@ from django.core.urlresolvers import reverse
 from django.test import override_settings
 from mock import Mock, patch
 from six import text_type
+from waffle.models import Switch
+from waffle.testutils import override_switch
 
 from courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
@@ -21,10 +23,12 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.lib.gating import api as gating_api
+from openedx.features.course_experience.views.course_outline import (
+    CourseOutlineFragmentView, DEFAULT_COMPLETION_TRACKING_START
+)
 from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from waffle.testutils import override_switch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -562,6 +566,31 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
             self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
             self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
+
+    def test_user_enrolled_after_completion_collection(self):
+        """
+        Tests that the _completion_data_collection_start() method returns the created
+        time of the waffle switch that enables completion data tracking.
+        """
+        view = CourseOutlineFragmentView()
+        switches = waffle.waffle()
+        # pylint: disable=protected-access
+        switch_name = switches._namespaced_name(waffle.ENABLE_COMPLETION_TRACKING)
+        switch, _ = Switch.objects.get_or_create(name=switch_name)  # pylint: disable=unpacking-non-sequence
+
+        self.assertEqual(switch.created, view._completion_data_collection_start())
+
+        switch.delete()
+
+    def test_user_enrolled_after_completion_collection_default(self):
+        """
+        Tests that the _completion_data_collection_start() method returns a default constant
+        when no Switch object exists for completion data tracking.
+        """
+        view = CourseOutlineFragmentView()
+
+        # pylint: disable=protected-access
+        self.assertEqual(DEFAULT_COMPLETION_TRACKING_START, view._completion_data_collection_start())
 
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase):
