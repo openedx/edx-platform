@@ -503,6 +503,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Clicks the "View Live" link and switches to the new tab
         """
         click_css(self, '.view-live-button', require_notification=False)
+        self.wait_for_page()
         self.browser.switch_to_window(self.browser.window_handles[-1])
 
     def section(self, title):
