@@ -7,6 +7,7 @@ import os
 import sys
 
 from xsslint.reporting import SummaryResults
+from xsslint.rules import RuleSet
 from xsslint.utils import is_skip_dir
 
 
@@ -16,6 +17,23 @@ def _load_config_module(module_path):
         # Enable config module to be imported relative to wherever the script was run from.
         sys.path.append(cwd)
     return importlib.import_module(module_path)
+
+
+def _build_ruleset(template_linters):
+    """
+    Combines the RuleSets from the provided template_linters into a single, aggregate RuleSet.
+
+    Arguments:
+        template_linters: A list of linting objects.
+
+    Returns:
+        The combined RuleSet.
+    """
+    return reduce(
+        lambda combined, current: combined + current.ruleset,
+        template_linters,
+        RuleSet()
+    )
 
 
 def _process_file(full_path, template_linters, options, summary_results, out):
@@ -148,9 +166,10 @@ def main():
         'verbose': args.verbose,
         'skip_dirs': getattr(config, 'SKIP_DIRS', ())
     }
-    summary_results = SummaryResults()
     template_linters = getattr(config, 'LINTERS', ())
     if not template_linters:
         raise ValueError("LINTERS is empty or undefined in the config module ({}).".format(args.config))
 
+    ruleset = _build_ruleset(template_linters)
+    summary_results = SummaryResults(ruleset)
     _lint(args.path, template_linters, options, summary_results, out=sys.stdout)

@@ -5,8 +5,18 @@ import ast
 import re
 
 from xsslint.reporting import ExpressionRuleViolation
-from xsslint.rules import Rules
+from xsslint.rules import RuleSet
 from xsslint.utils import Expression, ParseString, StringLines
+
+
+ruleset = RuleSet(
+    python_concat_html='python-concat-html',
+    python_deprecated_display_name='python-deprecated-display-name',
+    python_requires_html_or_text='python-requires-html-or-text',
+    python_close_before_format='python-close-before-format',
+    python_wrap_html='python-wrap-html',
+    python_interpolate_html='python-interpolate-html',
+)
 
 
 class BaseVisitor(ast.NodeVisitor):
@@ -238,7 +248,7 @@ class OuterFormatVisitor(BaseVisitor):
             visitor.visit(node)
             for unsafe_html_string_node in visitor.unsafe_html_string_nodes:
                 self.results.violations.append(ExpressionRuleViolation(
-                    Rules.python_wrap_html, self.node_to_expression(unsafe_html_string_node)
+                    ruleset.python_wrap_html, self.node_to_expression(unsafe_html_string_node)
                 ))
             # Do not continue processing child nodes of this format() node.
         else:
@@ -264,7 +274,7 @@ class AllNodeVisitor(BaseVisitor):
         """
         if node.attr == 'display_name_with_default_escaped':
             self.results.violations.append(ExpressionRuleViolation(
-                Rules.python_deprecated_display_name, self.node_to_expression(node)
+                ruleset.python_deprecated_display_name, self.node_to_expression(node)
             ))
         self.generic_visit(node)
 
@@ -293,14 +303,14 @@ class AllNodeVisitor(BaseVisitor):
                 # Text() or HTML().
                 if is_caller_html_or_text is False:
                     self.results.violations.append(ExpressionRuleViolation(
-                        Rules.python_requires_html_or_text, self.node_to_expression(node.func)
+                        ruleset.python_requires_html_or_text, self.node_to_expression(node.func)
                     ))
         elif isinstance(node.func, ast.Name) and node.func.id in ['HTML', 'Text']:
             visitor = ContainsFormatVisitor(self.file_contents, self.results)
             visitor.visit(node)
             if visitor.contains_format_call:
                 self.results.violations.append(ExpressionRuleViolation(
-                    Rules.python_close_before_format, self.node_to_expression(node.func)
+                    ruleset.python_close_before_format, self.node_to_expression(node.func)
                 ))
 
         self.generic_visit(node)
@@ -313,9 +323,9 @@ class AllNodeVisitor(BaseVisitor):
         """
         rule = None
         if isinstance(node.op, ast.Mod):
-            rule = Rules.python_interpolate_html
+            rule = ruleset.python_interpolate_html
         elif isinstance(node.op, ast.Add):
-            rule = Rules.python_concat_html
+            rule = ruleset.python_concat_html
         if rule is not None:
             visitor = HtmlStringVisitor(self.file_contents, self.results)
             visitor.visit(node.left)
