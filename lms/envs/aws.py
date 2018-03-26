@@ -19,7 +19,6 @@ Common traits:
 
 import datetime
 import json
-import warnings
 
 import dateutil
 
@@ -179,14 +178,6 @@ LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
-
-# Backward compatibility for deprecated feature names
-if 'ENABLE_S3_GRADE_DOWNLOADS' in FEATURES:
-    warnings.warn(
-        "'ENABLE_S3_GRADE_DOWNLOADS' is deprecated. Please use 'ENABLE_GRADE_DOWNLOADS' instead",
-        DeprecationWarning,
-    )
-    FEATURES['ENABLE_GRADE_DOWNLOADS'] = FEATURES['ENABLE_S3_GRADE_DOWNLOADS']
 
 CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
 
@@ -574,10 +565,6 @@ DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
 # TODO: deprecated (compatibility with previous settings)
 if 'DATADOG_API' in AUTH_TOKENS:
     DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
-
-# Analytics Dashboard
-ANALYTICS_DASHBOARD_URL = ENV_TOKENS.get("ANALYTICS_DASHBOARD_URL", ANALYTICS_DASHBOARD_URL)
-ANALYTICS_DASHBOARD_NAME = ENV_TOKENS.get("ANALYTICS_DASHBOARD_NAME", ANALYTICS_DASHBOARD_NAME)
 
 # Analytics API
 ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", ANALYTICS_API_KEY)

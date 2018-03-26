@@ -204,20 +204,8 @@ FEATURES = {
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
-    # Disable instructor dash buttons for downloading course data
-    # when enrollment exceeds this number
-    'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
-
-    # Grade calculation started from the instructor dashboard will write grades
-    # CSV files to the configured storage backend and give links for downloads.
-    'ENABLE_GRADE_DOWNLOADS': False,
-
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': True,
-
-    # Give course staff unrestricted access to grade downloads (if set to False,
-    # only edX superusers can perform the downloads)
-    'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
     'ENABLED_PAYMENT_REPORTS': [
         "refund_report",
@@ -278,14 +266,6 @@ FEATURES = {
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
 
-    # Show a section in the membership tab of the instructor dashboard
-    # to allow an upload of a CSV file that contains a list of new accounts to create
-    # and register for course.
-    'ALLOW_AUTOMATED_SIGNUPS': False,
-
-    # Enable display of enrollment counts in instructor dash, analytics section
-    'DISPLAY_ANALYTICS_ENROLLMENTS': True,
-
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
@@ -328,9 +308,6 @@ FEATURES = {
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
-
-    # Batch-Generated Certificates from Instructor Dashboard
-    'CERTIFICATES_INSTRUCTOR_GENERATION': False,
 
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
@@ -382,11 +359,6 @@ FEATURES = {
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
 
-    # Display the 'Analytics' tab in the instructor dashboard for CCX courses.
-    # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
-    #       because without that setting, the tab does not show up for any courses.
-    'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
-
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
 
@@ -409,10 +381,6 @@ FEATURES = {
 
     # Allow users to change their email address.
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
-
-    # Whether to check the "Notify users by email" checkbox in the batch enrollment form
-    # in the instructor dashboard.
-    'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
 
     # Whether the bulk enrollment view is enabled.
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
@@ -2127,7 +2095,6 @@ INSTALLED_APPS = [
     'util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'dashboard',
-    'lms.djangoapps.instructor.apps.InstructorConfig',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
@@ -2968,10 +2935,6 @@ ADVANCED_SECURITY_CONFIG = {}
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
-
-### Analytics Dashboard (Insights) settings
-ANALYTICS_DASHBOARD_URL = ""
-ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
 ### Analytics API
 ANALYTICS_API_KEY = ""

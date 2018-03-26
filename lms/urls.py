@@ -483,11 +483,6 @@ urlpatterns += [
         name='set_course_mode_price',
     ),
     url(
-        r'^courses/{}/instructor/api/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include('lms.djangoapps.instructor.views.api_urls')),
-    url(
         r'^courses/{}/remove_coupon$'.format(
             settings.COURSE_ID_PATTERN,
         ),
