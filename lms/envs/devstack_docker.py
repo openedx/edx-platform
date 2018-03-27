@@ -49,10 +49,10 @@ MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:80
 MKTG_URLS = {
     'ABOUT': '/about',
     'ACCESSIBILITY': '/accessibility',
-    'AFFILIATES': '/affiliates',
+    'AFFILIATES': '/affiliate-program',
     'BLOG': '/blog',
     'CAREERS': '/careers',
-    'CONTACT': 'https://courses.edx.org/support/contact_us',
+    'CONTACT': '/support/contact_us',
     'COURSES': '/course',
     'DONATE': '/donate',
     'ENTERPRISE': '/enterprise',
