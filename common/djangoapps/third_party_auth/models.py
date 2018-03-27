@@ -147,6 +147,12 @@ class ProviderConfig(ConfigurationModel):
             "email, and their account will be activated immediately upon registration."
         ),
     )
+    send_welcome_email = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users will be sent a welcome email upon registration."
+        ),
+    )
     visible = models.BooleanField(
         default=False,
         help_text=_(
