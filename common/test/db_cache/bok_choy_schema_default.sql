@@ -2065,7 +2065,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=413 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=414 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4796,7 +4796,7 @@ CREATE TABLE `student_manualenrollmentaudit` (
   `reason` longtext,
   `enrolled_by_id` int(11) DEFAULT NULL,
   `enrollment_id` int(11) DEFAULT NULL,
-  `role` varchar(64),
+  `role` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `student_manualenr_enrolled_by_id_729cecdc9f746e2_fk_auth_user_id` (`enrolled_by_id`),
   KEY `st_enrollment_id_60349e74284df0d6_fk_student_courseenrollment_id` (`enrollment_id`),
@@ -5468,50 +5468,6 @@ CREATE TABLE `verified_track_content_verifiedtrackcohortedcourse` (
   UNIQUE KEY `course_key` (`course_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `verify_student_icrvstatusemailsconfiguration`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `verify_student_icrvstatusemailsconfiguration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `verify_student_icr_changed_by_id_52e319582f18ea3_fk_auth_user_id` (`changed_by_id`),
-  CONSTRAINT `verify_student_icr_changed_by_id_52e319582f18ea3_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `verify_student_incoursereverificationconfiguration`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `verify_student_incoursereverificationconfiguration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `verify_student_in_changed_by_id_1f3e3fa462a6ded6_fk_auth_user_id` (`changed_by_id`),
-  CONSTRAINT `verify_student_in_changed_by_id_1f3e3fa462a6ded6_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `verify_student_skippedreverification`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `verify_student_skippedreverification` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` varchar(255) NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `checkpoint_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `verify_student_skippedreverificati_user_id_1e8af5a5e735aa1a_uniq` (`user_id`,`course_id`),
-  KEY `verify_student_skippedreverification_ea134da7` (`course_id`),
-  KEY `verify_student_skippedreverification_bef2d98a` (`checkpoint_id`),
-  KEY `verify_student_skippedreverification_e8701ad4` (`user_id`),
-  CONSTRAINT `D759ffa5ca66ef1a2c8c200f7a21365b` FOREIGN KEY (`checkpoint_id`) REFERENCES `verify_student_verificationcheckpoint` (`id`),
-  CONSTRAINT `verify_student_skippedr_user_id_6752b392e3d3c501_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `verify_student_softwaresecurephotoverification`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -5548,32 +5504,6 @@ CREATE TABLE `verify_student_softwaresecurephotoverification` (
   CONSTRAINT `verify_student_software_user_id_61ffab9c12020106_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `verify_student_verificationcheckpoint`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `verify_student_verificationcheckpoint` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` varchar(255) NOT NULL,
-  `checkpoint_location` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `verify_student_verificationcheck_course_id_2c6a1f5c22b4cc19_uniq` (`course_id`,`checkpoint_location`),
-  KEY `verify_student_verificationcheckpoint_ea134da7` (`course_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `verify_student_verificationcheckpoint_photo_verification`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `verify_student_verificationcheckpoint_photo_verification` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `verificationcheckpoint_id` int(11) NOT NULL,
-  `softwaresecurephotoverification_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `verificationcheckpoint_id` (`verificationcheckpoint_id`,`softwaresecurephotoverification_id`),
-  KEY `c7846aea49a044a1161a4b9b6d70e050` (`softwaresecurephotoverification_id`),
-  CONSTRAINT `c7846aea49a044a1161a4b9b6d70e050` FOREIGN KEY (`softwaresecurephotoverification_id`) REFERENCES `verify_student_softwaresecurephotoverification` (`id`),
-  CONSTRAINT `e4d180f9ca43c3b66693c416a36cfb9d` FOREIGN KEY (`verificationcheckpoint_id`) REFERENCES `verify_student_verificationcheckpoint` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `verify_student_verificationdeadline`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -5586,25 +5516,6 @@ CREATE TABLE `verify_student_verificationdeadline` (
   `deadline_is_explicit` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_key` (`course_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `verify_student_verificationstatus`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `verify_student_verificationstatus` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `status` varchar(32) NOT NULL,
-  `timestamp` datetime(6) NOT NULL,
-  `response` longtext,
-  `error` longtext,
-  `checkpoint_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `D4cefb6d3d71c9b26af2a5ece4c37277` (`checkpoint_id`),
-  KEY `verify_student_verifica_user_id_5c19fcd6dc05f211_fk_auth_user_id` (`user_id`),
-  KEY `verify_student_verificationstatus_9acb4454` (`status`),
-  CONSTRAINT `D4cefb6d3d71c9b26af2a5ece4c37277` FOREIGN KEY (`checkpoint_id`) REFERENCES `verify_student_verificationcheckpoint` (`id`),
-  CONSTRAINT `verify_student_verifica_user_id_5c19fcd6dc05f211_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `video_config_coursehlsplaybackenabledflag`;
