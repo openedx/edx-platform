@@ -177,5 +177,5 @@ class LibraryToolsService(object):
         """
         return [
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
-            for lib in self.store.get_libraries()
+            for lib in self.store.get_library_summaries()
         ]
