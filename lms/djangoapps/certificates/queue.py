@@ -298,14 +298,16 @@ class XQueueCertInterface(object):
                 u"Certificate generated for student %s in the course: %s with template: %s. "
                 u"given template: %s, "
                 u"user is verified: %s, "
-                u"mode is verified: %s"
+                u"mode is verified: %s,"
+                u"generate_pdf is: %s"
             ),
             student.username,
             unicode(course_id),
             template_pdf,
             template_file,
             user_is_verified,
-            mode_is_verified
+            mode_is_verified,
+            generate_pdf
         )
 
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
@@ -442,6 +444,8 @@ class XQueueCertInterface(object):
             cert.verify_uuid = uuid4().hex
 
         cert.save()
+        logging.info(u'certificate generated for user: %s with generate_pdf status: %s',
+                     student.username, generate_pdf)
 
         if generate_pdf:
             try:
