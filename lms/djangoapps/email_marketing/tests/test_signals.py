@@ -17,6 +17,7 @@ from testfixtures import LogCapture
 
 from email_marketing.models import EmailMarketingConfiguration
 from email_marketing.signals import (
+    _create_sailthru_user_vars,
     add_email_marketing_cookies,
     email_marketing_register_user,
     email_marketing_user_field_changed,
@@ -228,17 +229,17 @@ class EmailMarketingTests(TestCase):
         self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
 
     @patch('email_marketing.tasks.SailthruClient.api_post')
-    def test_email_not_sent_to_enterprise_learners(self, mock_sailthru_post):
+    @patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')
+    def test_email_not_sent_to_enterprise_learners(self, mock_get_enterprise_learner_data, mock_sailthru_post):
         """
-        tests that welcome email is not sent to the enterprise learner
+        Tests that welcome email is not sent to the enterprise learner
         """
+        mock_get_enterprise_learner_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
         mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
         update_user.delay(
-            sailthru_vars={
-                'is_enterprise_learner': True,
-                'enterprise_name': 'test name',
-            },
-            email=self.user.email
+            _create_sailthru_user_vars(self.user, self.user.profile),
+            email=self.user.email,
+            activation=True
         )
         self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
 
