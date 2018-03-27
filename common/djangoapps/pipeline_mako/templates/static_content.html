@@ -115,8 +115,8 @@ source, template_path = Loader(engine).load_template_source(path)
     % if settings.STUDIO_FRONTEND_CONTAINER_URL:
         <script type="text/javascript" src="${settings.STUDIO_FRONTEND_CONTAINER_URL}/${entry}.js"></script>
     % else:
-        <script type="text/javascript" src="${url('common/js/vendor/manifest.min.js')}"></script>
-        <script type="text/javascript" src="${url('common/js/vendor/vendor.min.js')}"></script>
+        <script type="text/javascript" src="${url('common/js/vendor/runtime.min.js')}"></script>
+        <script type="text/javascript" src="${url('common/js/vendor/common.min.js')}"></script>
         <script type="text/javascript" src="${url('common/js/vendor/{}.min.js'.format(entry))}"></script>
     % endif
 </%def>
