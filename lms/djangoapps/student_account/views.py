@@ -536,6 +536,7 @@ def account_settings_context(request):
             }
         },
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'msa_migration_enabled': configuration_helpers.get_value('ENABLE_MSA_MIGRATION', False),
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,
