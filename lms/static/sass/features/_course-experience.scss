@@ -320,14 +320,14 @@
       border-bottom: 1px solid $border-color;
 
       .section-name {
-        padding: ($baseline / 2) 0 ($baseline / 2) 0;
+        padding: ($baseline / 2) 0 ($baseline / 2) 2px;
 
         .section-title {
-          font-weight: $font-bold;
+          font-weight: $font-regular;
           font-size: 1.1rem;
           margin: 0;
           display: inline;
-          padding-left: $baseline;
+          padding-left: $baseline - 2;
         }
       }
 
@@ -341,12 +341,12 @@
         .subsection {
           list-style-type: none;
           border-top: 1px solid $border-color;
-          margin: 0 0 ($baseline / 4) 35px;
+          margin: 0 0 0 35px;
 
           .subsection-title {
             margin: 0;
-            font-weight: $font-bold;
-            margin-left: $baseline;
+            font-weight: $font-regular;
+            margin-left: $baseline - 2;
           }
 
           .subsection-text {
@@ -419,6 +419,7 @@ button.accordion-trigger, button.prerequisite-button {
   text-align: left;
   margin: 0px;
   background: none;
+  cursor: pointer;
 
   .fa {
     color: $blue;
