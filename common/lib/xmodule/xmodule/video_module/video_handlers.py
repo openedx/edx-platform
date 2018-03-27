@@ -20,19 +20,21 @@ from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 from opaque_keys.edx.locator import CourseLocator
 
-from edxval.api import create_or_update_video_transcript, create_external_video
+from edxval.api import create_or_update_video_transcript, create_external_video, delete_video_transcript
 from .transcripts_utils import (
     clean_video_id,
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
-    get_video_transcript_content,
+    save_to_store,
     subs_filename,
     Transcript,
     TranscriptException,
     TranscriptsGenerationException,
     youtube_speed_dict,
     get_transcript,
-    get_transcript_from_contentstore
+    get_transcript_from_contentstore,
+    remove_subs_from_store,
+    get_html5_ids
 )
 
 log = logging.getLogger(__name__)
@@ -488,6 +490,36 @@ class VideoStudioViewHandlers(object):
                             },
                             status=400
                         )
+            elif request.method == 'DELETE':
+                request_data = request.json
+
+                if 'lang' not in request_data or 'edx_video_id' not in request_data:
+                    return Response(status=400)
+
+                language = request_data['lang']
+                edx_video_id = clean_video_id(request_data['edx_video_id'])
+
+                if edx_video_id:
+                    delete_video_transcript(video_id=edx_video_id, language_code=language)
+
+                if language == u'en':
+                    # remove any transcript file from content store for the video ids
+                    possible_sub_ids = [
+                        self.sub,  # pylint: disable=access-member-before-definition
+                        self.youtube_id_1_0
+                    ] + get_html5_ids(self.html5_sources)
+                    for sub_id in possible_sub_ids:
+                        remove_subs_from_store(sub_id, self, language)
+
+                    # update metadata as `en` can also be present in `transcripts` field
+                    remove_subs_from_store(self.transcripts.pop(language, None), self, language)
+
+                    # also empty `sub` field
+                    self.sub = ''  # pylint: disable=attribute-defined-outside-init
+                else:
+                    remove_subs_from_store(self.transcripts.pop(language, None), self, language)
+
+                return Response(status=200)
 
             elif request.method == 'GET':
                 language = request.GET.get('language_code')

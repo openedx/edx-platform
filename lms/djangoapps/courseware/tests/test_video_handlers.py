@@ -9,6 +9,7 @@ from datetime import timedelta
 
 import ddt
 import freezegun
+from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
@@ -22,12 +23,13 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import (
-    TranscriptException,
-    TranscriptsGenerationException,
     Transcript,
-    edxval_api
+    edxval_api,
+    subs_filename,
 )
 from xmodule.x_module import STUDENT_VIEW
+
+from edxval import api
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -1009,6 +1011,138 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
             response.json["error"],
             "There is a problem with this transcript file. Try to upload a different file."
         )
+
+
+@attr(shard=1)
+@ddt.ddt
+class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
+    """
+    Test studio video handler that provide translation transcripts.
+
+    Tests for `translation` dispatch DELETE HTTP method.
+    """
+    EDX_VIDEO_ID, LANGUAGE_CODE_UK, LANGUAGE_CODE_EN = u'an_edx_video_id', u'uk', u'en'
+    REQUEST_META = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'DELETE'}
+    SRT_FILE = _create_srt_file()
+
+    @ddt.data(
+        {
+            'params': {'lang': 'uk'}
+        },
+        {
+            'params': {'edx_video_id': '12345'}
+        },
+        {
+            'params': {}
+        },
+    )
+    @ddt.unpack
+    def test_translation_missing_required_params(self, params):
+        """
+        Verify that DELETE dispatch works as expected when required args are missing from request
+        """
+        request = Request(self.REQUEST_META, body=json.dumps(params))
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        self.assertEqual(response.status_code, 400)
+
+    def test_translation_delete_w_edx_video_id(self):
+        """
+        Verify that DELETE dispatch works as expected when video has edx_video_id
+        """
+        request_body = json.dumps({'lang': self.LANGUAGE_CODE_UK, 'edx_video_id': self.EDX_VIDEO_ID})
+        api.create_video({
+            'edx_video_id': self.EDX_VIDEO_ID,
+            'status': 'upload',
+            'client_video_id': 'awesome.mp4',
+            'duration': 0,
+            'encoded_videos': [],
+            'courses': [unicode(self.course.id)]
+        })
+        api.create_video_transcript(
+            video_id=self.EDX_VIDEO_ID,
+            language_code=self.LANGUAGE_CODE_UK,
+            file_format='srt',
+            content=ContentFile(SRT_content)
+        )
+
+        # verify that a video transcript exists for expected data
+        self.assertTrue(api.get_video_transcript_data(video_id=self.EDX_VIDEO_ID, language_code=self.LANGUAGE_CODE_UK))
+
+        request = Request(self.REQUEST_META, body=request_body)
+        self.item_descriptor.edx_video_id = self.EDX_VIDEO_ID
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        self.assertEqual(response.status_code, 200)
+
+        # verify that a video transcript dose not exist for expected data
+        self.assertFalse(api.get_video_transcript_data(video_id=self.EDX_VIDEO_ID, language_code=self.LANGUAGE_CODE_UK))
+
+    def test_translation_delete_wo_edx_video_id(self):
+        """
+        Verify that DELETE dispatch works as expected when video has no edx_video_id
+        """
+        request_body = json.dumps({'lang': self.LANGUAGE_CODE_UK, 'edx_video_id': ''})
+        srt_file_name_uk = subs_filename('ukrainian_translation.srt', lang=self.LANGUAGE_CODE_UK)
+        request = Request(self.REQUEST_META, body=request_body)
+
+        # upload and verify that srt file exists in assets
+        _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_uk)
+        self.assertTrue(_check_asset(self.item_descriptor.location, srt_file_name_uk))
+
+        # verify transcripts field
+        self.assertNotEqual(self.item_descriptor.transcripts, {})
+        self.assertTrue(self.LANGUAGE_CODE_UK in self.item_descriptor.transcripts)
+
+        # make request and verify response
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        self.assertEqual(response.status_code, 200)
+
+        # verify that srt file is deleted
+        self.assertEqual(self.item_descriptor.transcripts, {})
+        self.assertFalse(_check_asset(self.item_descriptor.location, srt_file_name_uk))
+
+    def test_translation_delete_w_english_lang(self):
+        """
+        Verify that DELETE dispatch works as expected for english language translation
+        """
+        request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
+        srt_file_name_en = subs_filename('english_translation.srt', lang=self.LANGUAGE_CODE_EN)
+        self.item_descriptor.transcripts['en'] = 'english_translation.srt'
+        request = Request(self.REQUEST_META, body=request_body)
+
+        # upload and verify that srt file exists in assets
+        _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_en)
+        self.assertTrue(_check_asset(self.item_descriptor.location, srt_file_name_en))
+
+        # make request and verify response
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        self.assertEqual(response.status_code, 200)
+
+        # verify that srt file is deleted
+        self.assertTrue(self.LANGUAGE_CODE_EN not in self.item_descriptor.transcripts)
+        self.assertFalse(_check_asset(self.item_descriptor.location, srt_file_name_en))
+
+    def test_translation_delete_w_sub(self):
+        """
+        Verify that DELETE dispatch works as expected when translation is present against `sub` field
+        """
+        request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
+        sub_file_name = subs_filename(self.item_descriptor.sub, lang=self.LANGUAGE_CODE_EN)
+        request = Request(self.REQUEST_META, body=request_body)
+
+        # sub should not be empy
+        self.assertFalse(self.item_descriptor.sub == u'')
+
+        # upload and verify that srt file exists in assets
+        _upload_file(self.SRT_FILE, self.item_descriptor.location, sub_file_name)
+        self.assertTrue(_check_asset(self.item_descriptor.location, sub_file_name))
+
+        # make request and verify response
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        self.assertEqual(response.status_code, 200)
+
+        # verify that sub is empty and transcript is deleted also
+        self.assertTrue(self.item_descriptor.sub == u'')
+        self.assertFalse(_check_asset(self.item_descriptor.location, sub_file_name))
 
 
 @attr(shard=1)

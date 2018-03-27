@@ -1,9 +1,9 @@
 define(
     [
         'jquery', 'underscore', 'edx-ui-toolkit/js/utils/html-utils', 'js/views/video/transcripts/utils',
-        'js/views/abstract_editor', 'js/models/uploads', 'js/views/uploads'
+        'js/views/abstract_editor', 'common/js/components/utils/view_utils', 'js/models/uploads', 'js/views/uploads'
     ],
-function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDialog) {
+function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload, UploadDialog) {
     'use strict';
 
     var VideoUploadDialog = UploadDialog.extend({
@@ -18,7 +18,6 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
 
     var Translations = AbstractEditor.extend({
         events: {
-            'click .setting-clear': 'clear',
             'click .create-setting': 'addEntry',
             'click .remove-setting': 'removeEntry',
             'click .upload-setting': 'upload',
@@ -48,7 +47,6 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
                 languageMap[lang] = lang;
             });
             TranscriptUtils.Storage.set('languageMap', languageMap);
-
             AbstractEditor.prototype.initialize.apply(this, arguments);
         },
 
@@ -128,7 +126,7 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
             _.each(values, function(value, newLang) {
                 var html = $(self.templateItem({
                     newLang: newLang,
-                    originalLang: _.findKey(languageMap, function(lang){ return lang === newLang}) || '',
+                    originalLang: _.findKey(languageMap, function(lang) { return lang === newLang; }) || '',
                     value: value,
                     url: self.model.get('urlRoot')
                 })).prepend(dropdown.clone().val(newLang))[0];
@@ -148,26 +146,49 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
         },
 
         removeEntry: function(event) {
-            event.preventDefault();
-            var $currentListItemEl = $(event.currentTarget).parent(),
+            var self = this,
+                $currentListItemEl = $(event.currentTarget).parent(),
                 originalLang = $currentListItemEl.data('original-lang'),
                 selectedLang = $currentListItemEl.find('select option:selected').val(),
-                languageMap = TranscriptUtils.Storage.get('languageMap');
+                languageMap = TranscriptUtils.Storage.get('languageMap'),
+                edxVideoIdField = TranscriptUtils.getField(self.model.collection, 'edx_video_id');
 
-            // re-render dropdowns
-            this.setValueInEditor(this.getAllLanguageDropdownElementsData(false, selectedLang));
+            event.preventDefault();
 
-            // remvove the `originalLang` from `languageMap`
+            /*
+            There is a scenario when a user adds an empty video translation item and
+            removes it. In such cases, omitting will have no harm on the model
+            values or languages map.
+            */
             if (originalLang) {
-                TranscriptUtils.Storage.set('languageMap', _.omit(languageMap, originalLang));
+                ViewUtils.confirmThenRunOperation(
+                    gettext('Are you sure you want to remove this transcript?'),
+                    gettext('If you remove this transcript, the transcript will not be available for this component.'),
+                    gettext('Remove Transcript'),
+                    function() {
+                        ViewUtils.runOperationShowingMessage(
+                            gettext('Removing'),
+                            function() {
+                                return $.ajax({
+                                    url: self.model.get('urlRoot'),
+                                    type: 'DELETE',
+                                    data: JSON.stringify({lang: originalLang, edx_video_id: edxVideoIdField.getValue()})
+                                }).done(function() {
+                                    self.setValueInEditor(self.getAllLanguageDropdownElementsData(false, selectedLang));
+                                    TranscriptUtils.Storage.set('languageMap', _.omit(languageMap, originalLang));
+                                });
+                            }
+                        );
+                    }
+                );
+            } else {
+                this.setValueInEditor(this.getAllLanguageDropdownElementsData(false, selectedLang));
             }
 
             this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         upload: function(event) {
-            event.preventDefault();
-
             var self = this,
                 $target = $(event.currentTarget),
                 $listItem = $target.parents('li.list-settings-item'),
@@ -178,10 +199,12 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
                 uploadData,
                 videoUploadDialog;
 
+            event.preventDefault();
+
             // That's the case when an author is
             // uploading a new transcript.
             if (!originalLang) {
-                originalLang = newLang
+                originalLang = newLang;
             }
 
             // Transcript data payload
@@ -208,7 +231,7 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
                     // new language entry to be added to languageMap
                     newLangObject[newLang] = newLang;
 
-                    //Update edx-video-id
+                    // Update edx-video-id
                     edxVideoIdField.setValue(response.edx_video_id);
 
                     // Update language map by omitting original lang and adding new lang
@@ -226,13 +249,6 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
 
         enableAdd: function() {
             this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
-        },
-
-        clear: function() {
-            AbstractEditor.prototype.clear.apply(this, arguments);
-            if (_.isNull(this.model.getValue())) {
-                this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
-            }
         },
 
         onChangeHandler: function(event) {
@@ -266,27 +282,26 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDia
             // data object will mirror the languageMap. `data` will contain lang to lang map as explained below
             // {originalLang: originalLang};            original lang not changed
             // {newLang: originalLang};                 original lang changed to a new lang
-            // {selectedLang: ""};                      new lang to be added, no entry in languageMap
-            _.each(languageDropdownElements, function(languageDropdown, index){
+            // {selectedLang: ''};                      new lang to be added, no entry in languageMap
+            _.each(languageDropdownElements, function(languageDropdown) {
                 var language = $(languageDropdown).find(':selected').val();
-                data[language] = _.findKey(languageMap, function(lang){ return lang === language}) || "";
+                data[language] = _.findKey(languageMap, function(lang) { return lang === language; }) || '';
             });
 
             // This is needed to render an empty item that
             // will be further used to upload a transcript.
             if (isNew) {
-                data[""] = "";
+                data[''] = '';
             }
 
             // This Omits a language from the dropdown's data. It is
             // needed when an item is going to be removed.
             if (typeof(omittedLanguage) !== 'undefined') {
-                data = _.omit(data, omittedLanguage)
+                data = _.omit(data, omittedLanguage);
             }
 
             return data;
         }
-
     });
 
     return Translations;
