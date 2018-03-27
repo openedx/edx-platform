@@ -2681,6 +2681,7 @@ class LogoutView(TemplateView):
         is_true = lambda value: bool(value) and value.lower() not in ('false', '0')
         msa_only = is_true(request.GET.get('msa_only'))
         auto_link = is_true(request.GET.get('auto_link'))
+        msa_registration = is_true(request.GET.get('msa_registration'))
         msa_migration_enabled = configuration_helpers.get_value("ENABLE_MSA_MIGRATION")
 
         if msa_only and third_party_auth.is_enabled() and msa_migration_enabled:
@@ -2697,7 +2698,7 @@ class LogoutView(TemplateView):
             meta = requesting_user.profile.get_meta()
             user_has_started_migration = msa_migration_enabled and meta.get(settings.MSA_ACCOUNT_MIGRATION_STATUS_KEY)
         except User.DoesNotExist:
-            user_has_started_migration = False
+            user_has_started_migration = msa_registration
 
         logout(request)
 

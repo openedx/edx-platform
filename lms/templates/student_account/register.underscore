@@ -64,7 +64,7 @@
             </h2>
         </div>
         <p class="description-text"><strong><%- gettext("Verify your Microsoft account information") %></strong></p>
-        <p class="description-text-small"><%- gettext("If this is not the account you want to use, ") %><a href="/logout">sign in with a different account</a></p>
+        <p class="description-text-small"><%- gettext("If this is not the account you want to use, ") %><a href="/logout?msa_registration=true">sign in with a different account</a></p>
     <% } %>
 
     <%= context.fields %>
