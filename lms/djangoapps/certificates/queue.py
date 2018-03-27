@@ -445,7 +445,7 @@ class XQueueCertInterface(object):
 
         cert.save()
         logging.info(u'certificate generated for user: %s with generate_pdf status: %s',
-                     student.id, generate_pdf)
+                     student.username, generate_pdf)
 
         if generate_pdf:
             try:
