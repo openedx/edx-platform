@@ -58,7 +58,7 @@ class TestFooter(TestCase):
         "TOS_AND_HONOR": "/edx-terms-service",
         "PRIVACY": "/edx-privacy-policy",
         "ACCESSIBILITY": "/accessibility",
-        "AFFILIATES": '/affiliates',
+        "AFFILIATES": '/affiliate-program',
         "MEDIA_KIT": "/media-kit",
         "ENTERPRISE": "/enterprise"
     })
@@ -85,7 +85,7 @@ class TestFooter(TestCase):
             'business_links': [
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
                 {'url': 'https://edx.org/enterprise', 'name': 'enterprise', 'title': '\xe9dX for Business'},
-                {'url': 'https://edx.org/affiliates', 'name': 'affiliates', 'title': 'Affiliates'},
+                {'url': 'https://edx.org/affiliate-program', 'name': 'affiliates', 'title': 'Affiliates'},
                 {'url': 'http://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
@@ -99,7 +99,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/accessibility',
                  'name': 'accessibility_policy',
                  'title': 'Accessibility Policy'},
-                {'url': 'https://edx.org/trademarks', 'name': 'trademarks', 'title': 'Trademarks'},
+                {'url': 'https://edx.org/trademarks', 'name': 'trademarks', 'title': 'Trademark Policy'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
 
             ],
