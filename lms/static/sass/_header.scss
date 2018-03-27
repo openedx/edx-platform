@@ -11,6 +11,7 @@
   border-bottom: 1px solid theme-color("primary");
   box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
   background: theme-color("inverse");
+  line-height: 1.5;
 
   /*
     Logo and course identification block
@@ -102,7 +103,7 @@
             font-weight: $font-weight-normal;
             display: inline-block;
             margin-bottom: -1*$baseline/2;
-            border-bottom: 4px hidden theme-color("dark");
+            border-bottom: 4px solid transparent;
             cursor: pointer;
 
             &.active,
