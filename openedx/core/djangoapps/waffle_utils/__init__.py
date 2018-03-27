@@ -368,9 +368,31 @@ class CourseWaffleFlag(WaffleFlag):
 
         return course_override_callback
 
+    def _is_enabled(self, course_key=None):
+        """
+        Returns whether or not the flag is enabled without error checking.
+
+        Arguments:
+            course_key (CourseKey): The course to check for override before
+            checking waffle.
+        """
+        return self.waffle_namespace.is_flag_active(
+            self.flag_name,
+            check_before_waffle_callback=self._get_course_override_callback(course_key),
+            flag_undefined_default=self.flag_undefined_default
+        )
+
+    def is_enabled_without_course_context(self):
+        """
+        Returns whether or not the flag is enabled outside the context of a given course.
+        This should only be used when a course waffle flag must be used outside of a course.
+        If this is intended for use with a simple global setting, use simple waffle flag instead.
+        """
+        return self._is_enabled()
+
     def is_enabled(self, course_key=None):
         """
-        Returns whether or not the flag is enabled.
+        Returns whether or not the flag is enabled within the context of a given course.
 
         Arguments:
             course_key (CourseKey): The course to check for override before
@@ -381,8 +403,4 @@ class CourseWaffleFlag(WaffleFlag):
             str(course_key)
         )
 
-        return self.waffle_namespace.is_flag_active(
-            self.flag_name,
-            check_before_waffle_callback=self._get_course_override_callback(course_key),
-            flag_undefined_default=self.flag_undefined_default
-        )
+        return self._is_enabled(course_key)

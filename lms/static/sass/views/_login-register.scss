@@ -308,7 +308,8 @@
     label,
     input,
     select,
-    textarea {
+    textarea,
+    .plaintext-field {
       height: auto;
       line-height: 1.5em;
       border-radius: 0;
