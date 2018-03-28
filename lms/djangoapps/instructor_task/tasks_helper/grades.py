@@ -580,9 +580,10 @@ class ProblemResponses(object):
                 response['title'] = title
                 response['location'] = ' > '.join(path)
                 response['block_id'] = block.block_id
-            max_count -= len(problem_responses)
-            if max_count <= 0:
-                break
+            if max_count is not None:
+                max_count -= len(problem_responses)
+                if max_count <= 0:
+                    break
 
         return student_data
 
