@@ -2,9 +2,7 @@
 from six import text_type
 
 import settings
-
 import models
-
 import utils
 
 
@@ -169,6 +167,19 @@ class User(models.Model):
                 raise
         self._update_from_response(response)
 
+    def retire(self, retired_username):
+        url = _url_for_retire(self.id)
+        params = {'retired_username': retired_username}
+
+        utils.perform_request(
+            'post',
+            url,
+            params,
+            raw=True,
+            metric_action='user.retire',
+            metric_tags=self._metric_tags
+        )
+
 
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
@@ -195,3 +206,10 @@ def _url_for_read(user_id):
     Returns cs_comments_service url endpoint to mark thread as read for given user_id
     """
     return "{prefix}/users/{user_id}/read".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_retire(user_id):
+    """
+    Returns cs_comments_service url endpoint to retire a user (remove all post content, etc.)
+    """
+    return "{prefix}/users/{user_id}/retire".format(prefix=settings.PREFIX, user_id=user_id)
