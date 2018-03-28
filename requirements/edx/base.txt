@@ -54,7 +54,7 @@ edx-lint==0.5.4
 git+https://github.com/cpennington/pylint-django@fix-field-inference-during-monkey-patching#egg=pylint-django==0.0
 
 enum34==1.1.6
-edx-completion==0.1.1
+edx-completion==0.1.4
 edx-django-oauth2-provider==1.2.5
 edx-django-sites-extensions==2.3.1
 edx-enterprise==0.67.0

@@ -2,7 +2,7 @@
 Test models, managers, and validators.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from completion import models, waffle
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
