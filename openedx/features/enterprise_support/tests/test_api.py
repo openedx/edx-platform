@@ -20,7 +20,7 @@ from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
     consent_needed_for_course,
-    consent_needed_for_courses,
+    get_consent_required_courses,
     data_sharing_consent_required,
     EnterpriseApiClient,
     EnterpriseApiServiceClient,
@@ -188,7 +188,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     @httpretty.activate
     @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
-    def test_consent_needed_for_courses(self, mock_catalog_contains_course):
+    def test_get_consent_required_courses(self, mock_catalog_contains_course):
         mock_catalog_contains_course.return_value = True
         user = UserFactory()
         enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
@@ -201,15 +201,15 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             granted=False
         )
         data_sharing_consent.save()
-        consent_required = consent_needed_for_courses(user, [course_id])
-        self.assertTrue(consent_required[course_id])
+        consent_required = get_consent_required_courses(user, [course_id])
+        self.assertTrue(course_id in consent_required)
 
         # now grant consent and call our method again
         data_sharing_consent = DataSharingConsent.objects.filter(course_id=course_id, username=user.username).first()
         data_sharing_consent.granted = True
         data_sharing_consent.save()
-        consent_required = consent_needed_for_courses(user, [course_id])
-        self.assertFalse(consent_required[course_id])
+        consent_required = get_consent_required_courses(user, [course_id])
+        self.assertFalse(course_id in consent_required)
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')

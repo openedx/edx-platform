@@ -431,13 +431,12 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     return consent_needed
 
 
-def consent_needed_for_courses(user, course_ids):
+def get_consent_required_courses(user, course_ids):
     """
-    For a list of course_ids, this function determines if the user needs to grant
-    data sharing permissions before accessing the course.
+    Returns a set of course_ids that require consent
     Note that this function makes use of the Enterprise models directly instead of using the API calls
     """
-    result = {course_id: False for course_id in course_ids}
+    result = []
     if not enterprise_enabled():
         return result
 
@@ -451,7 +450,8 @@ def consent_needed_for_courses(user, course_ids):
                                                              enterprise_customer__uuid=enterprise_uuid)
 
     for consent in data_sharing_consent:
-        result[consent.course_id] = consent.consent_required()
+        if consent.consent_required():
+            result.append(consent.course_id)
 
     return result
 
