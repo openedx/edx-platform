@@ -59,14 +59,14 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
-def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
+def update_user(self, sailthru_vars, email, site=None, new_user=False, send_welcome_email=False):
     """
     Adds/updates Sailthru profile information for a user.
      Args:
         sailthru_vars(dict): User profile information to pass as 'vars' to Sailthru
         email(str): User email address
         new_user(boolean): True if new registration
-        activation(boolean): True if activation request
+        send_welcome_email(boolean): True if a welcome email should be sent
     Returns:
         None
     """
@@ -95,8 +95,7 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
                              max_retries=email_config.sailthru_max_retries)
         return
 
-    # if activating user, send welcome email
-    if activation and email_config.sailthru_welcome_template and is_default_site(site) and not \
+    if send_welcome_email and email_config.sailthru_welcome_template and is_default_site(site) and not \
             sailthru_vars.get('is_enterprise_learner'):
 
         scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)

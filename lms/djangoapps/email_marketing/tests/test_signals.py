@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.client import RequestFactory
 from freezegun import freeze_time
-from mock import ANY, patch
+from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
@@ -280,14 +280,14 @@ class EmailMarketingTests(TestCase):
         # force Sailthru API exception on 2nd call
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})), SailthruClientError]
-        update_user.delay({}, self.user.email, activation=True)
+        update_user.delay({}, self.user.email, send_welcome_email=True)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API error return on 2nd call
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})),
                                      SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))]
-        update_user.delay({}, self.user.email, activation=True)
+        update_user.delay({}, self.user.email, send_welcome_email=True)
         self.assertTrue(mock_log_error.called)
 
     @patch('email_marketing.tasks.update_user.retry')
@@ -509,6 +509,7 @@ class EmailMarketingTests(TestCase):
         email_marketing_register_user(None, user=self.user, registration=self.registration)
         self.assertEqual(mock_update_user.call_args[0][0]['ui_lang'], 'es-419')
 
+    @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @patch('email_marketing.signals.crum.get_current_request')
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     @ddt.data(('auth_userprofile', 'gender', 'f', True),
@@ -523,6 +524,26 @@ class EmailMarketingTests(TestCase):
         mock_get_current_request.return_value = self.request
         email_marketing_user_field_changed(None, self.user, table=table, setting=setting, new_value=value)
         self.assertEqual(mock_update_user.called, result)
+
+    @patch('email_marketing.tasks.SailthruClient.api_post')
+    @patch('email_marketing.signals.third_party_auth.provider.Registry.get_from_pipeline')
+    @patch('email_marketing.signals.third_party_auth.pipeline.get')
+    @patch('email_marketing.signals.crum.get_current_request')
+    @ddt.data(True, False)
+    def test_modify_field_with_sso(self, send_welcome_email, mock_get_current_request,
+                                   mock_pipeline_get, mock_registry_get_from_pipeline, mock_sailthru_post):
+        """
+        Test that welcome email is sent appropriately in the context of SSO registration
+        """
+        mock_get_current_request.return_value = self.request
+        mock_pipeline_get.return_value = 'saml-idp'
+        mock_registry_get_from_pipeline.return_value = Mock(send_welcome_email=send_welcome_email)
+        mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
+        email_marketing_user_field_changed(None, self.user, table='auth_user', setting='is_active', new_value=True)
+        if send_welcome_email:
+            self.assertEqual(mock_sailthru_post.call_args[0][0], "send")
+        else:
+            self.assertNotEqual(mock_sailthru_post.call_args[0][0], "send")
 
     @patch('lms.djangoapps.email_marketing.tasks.update_user.delay')
     def test_modify_language_preference(self, mock_update_user):

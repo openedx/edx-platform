@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from sailthru.sailthru_error import SailthruClientError
 from celery.exceptions import TimeoutError
 
+import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
@@ -177,9 +178,27 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         if not email_config.enabled:
             return
 
+        # Is the status of the user account changing to active?
+        is_activation = (setting == 'is_active') and new_value is True
+
+        # Is this change in the context of an SSO-initiated registration?
+        third_party_provider = None
+        if third_party_auth.is_enabled():
+            running_pipeline = third_party_auth.pipeline.get(crum.get_current_request())
+            if running_pipeline:
+                third_party_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+
+        # Send a welcome email if the user account is being activated
+        # and we are not in a SSO registration flow whose associated
+        # identity provider is configured to allow for the sending
+        # of a welcome email.
+        send_welcome_email = is_activation and (
+            third_party_provider is None or third_party_provider.send_welcome_email
+        )
+
         # set the activation flag when the user is marked as activated
         update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(),
-                          new_user=False, activation=(setting == 'is_active') and new_value is True)
+                          new_user=False, send_welcome_email=send_welcome_email)
 
     elif setting == 'email':
         # email update is special case
