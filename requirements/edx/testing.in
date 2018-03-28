@@ -1,0 +1,30 @@
+# This requirements file is only for python packages that need to be installed
+# for the edx-platform in testing environments. This includes:
+#   * Jenkins
+#   * devstack
+# Please do not use this file for packages that are needed in production
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should:
+#   * verify that the dependency has a license compatible with AGPLv3
+#   * confirm that it has no system requirements beyond what we already install
+#   * run "make upgrade" to update the detailed requirements files
+
+-r base.txt               # Core edx-platform production dependencies
+-r coverage.txt           # Utilities for calculating test coverage
+
+edx-lint==0.5.4           # pylint extensions for Open edX repositories
+isort==4.2.5              # For checking and fixing the order of imports
+pa11ycrawler              # Python crawler (using Scrapy) that uses Pa11y to check accessibility of pages as it crawls
+pylint-django==0.7.2      # via edx-lint
+pysqlite                  # DB-API 2.0 interface for SQLite 3.x (used as the relational database for most tests)
+pytest==3.1.3             # Testing framework
+pytest-attrib             # Select tests based on attributes
+pytest-catchlog           # pytest plugin to catch log messages; merged into pytest 3.3.0
+pytest-cov                # pytest plugin for measuring code coverage
+pytest-django             # Django support for pytest
+pytest-randomly==1.2.1    # pytest plugin to randomly order tests
+pytest-xdist==1.20.0      # Parallel execution of tests on multiple CPU cores or hosts
+tox==2.8.2                # virtualenv management for tests
+tox-battery               # Makes tox aware of requirements file changes
