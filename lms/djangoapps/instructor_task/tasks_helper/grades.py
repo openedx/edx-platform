@@ -562,7 +562,7 @@ class ProblemResponses(object):
             if block.block_type == 'problem':
                 yield display_name, path, block
             else:
-                for result in ProblemResponses._build_problem_list(course_blocks, block, path + [display_name]):
+                for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
                     yield result
 
     @classmethod
@@ -573,7 +573,7 @@ class ProblemResponses(object):
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-        for title, path, block in ProblemResponses._build_problem_list(course_blocks, problem_key):
+        for title, path, block in cls._build_problem_list(course_blocks, problem_key):
             problem_responses = list_problem_responses(course_id, block, max_count)
             student_data += problem_responses
             for response in problem_responses:
@@ -587,7 +587,6 @@ class ProblemResponses(object):
 
         return student_data
 
-
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
         """
@@ -600,11 +599,12 @@ class ProblemResponses(object):
         task_progress = TaskProgress(action_name, num_reports, start_time)
         current_step = {'step': 'Calculating students answers to problem'}
         task_progress.update_task_state(extra_meta=current_step)
+        problem_location = task_input.get('problem_location')
 
         # Compute result table and format it
         student_data = cls._build_student_data(user_id=task_input.get('user_id'),
                                                course_id=course_id,
-                                               problem_location=task_input.get('problem_location'))
+                                               problem_location=problem_location)
 
         features = ['username', 'title', 'location', 'block_id', 'state']
         header, rows = format_dictlist(student_data, features)
