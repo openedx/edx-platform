@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1059 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1062 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1888,6 +1888,7 @@ CREATE TABLE `degreed_degreedenterprisecustomerconfiguration` (
   `secret` varchar(255) NOT NULL,
   `degreed_company_id` varchar(255) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `D8dff51a65b4ed0c3cf73b425e343929` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -1946,6 +1947,7 @@ CREATE TABLE `degreed_historicaldegreedenterprisecustomerconfiguration` (
   `history_type` varchar(1) NOT NULL,
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `degreed_histori_history_user_id_20efd88dd0a8765a_fk_auth_user_id` (`history_user_id`),
   KEY `degreed_historicaldegreedenterprisecustomerconfiguration_b803fed` (`id`),
@@ -2054,7 +2056,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=352 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=353 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2065,7 +2067,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=414 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=419 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2817,7 +2819,8 @@ CREATE TABLE `entitlements_courseentitlementpolicy` (
   `expiration_period` bigint(20) NOT NULL,
   `refund_period` bigint(20) NOT NULL,
   `regain_period` bigint(20) NOT NULL,
-  `site_id` int(11) NOT NULL,
+  `site_id` int(11) DEFAULT NULL,
+  `mode` varchar(32),
   PRIMARY KEY (`id`),
   KEY `entitlements_courseen_site_id_5256b0e7f6e039cc_fk_django_site_id` (`site_id`),
   CONSTRAINT `entitlements_courseen_site_id_5256b0e7f6e039cc_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -3077,6 +3080,22 @@ CREATE TABLE `integrated_channel_catalogtransmissionaudit` (
   `audit_summary` longtext NOT NULL,
   `channel` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `integrated_channel_contentmetadataitemtransmission`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `integrated_channel_contentmetadataitemtransmission` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `integrated_channel_code` varchar(30) NOT NULL,
+  `content_id` varchar(255) NOT NULL,
+  `channel_metadata` longtext NOT NULL,
+  `enterprise_customer_id` char(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `integrated_channel__enterprise_customer_id_325d3446d26e69b3_uniq` (`enterprise_customer_id`,`integrated_channel_code`,`content_id`),
+  CONSTRAINT `D98d981b6d5096f178a0a75cbefdfa1e` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `integrated_channel_learnerdatatransmissionaudit`;
@@ -3972,6 +3991,7 @@ CREATE TABLE `sap_success_factors_historicalsapsuccessfactorsenterprisecus80ad` 
   `sapsf_user_id` varchar(255) NOT NULL,
   `user_type` varchar(20) NOT NULL,
   `history_change_reason` varchar(100) DEFAULT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `sap_success_fac_history_user_id_2cd9fa0a2a669e26_fk_auth_user_id` (`history_user_id`),
   KEY `sap_success_factors_historicalsapsuccessfactorsenterprisecus4cf7` (`id`),
@@ -3993,6 +4013,7 @@ CREATE TABLE `sap_success_factors_sapsuccessfactorsenterprisecustomerconfidb8a` 
   `sapsf_company_id` varchar(255) NOT NULL,
   `sapsf_user_id` varchar(255) NOT NULL,
   `user_type` varchar(20) NOT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `ce017234bb371f21da2524ecc3c0dbc4` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -5167,6 +5188,7 @@ CREATE TABLE `third_party_auth_ltiproviderconfig` (
   `skip_hinted_login_dialog` tinyint(1) NOT NULL,
   `send_to_registration_first` tinyint(1) NOT NULL,
   `sync_learner_profile_data` tinyint(1) NOT NULL,
+  `send_welcome_email` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_7749e09fd5f71ab0_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_ltiproviderconfig_fe8da584` (`lti_hostname`),
@@ -5200,6 +5222,7 @@ CREATE TABLE `third_party_auth_oauth2providerconfig` (
   `skip_hinted_login_dialog` tinyint(1) NOT NULL,
   `send_to_registration_first` tinyint(1) NOT NULL,
   `sync_learner_profile_data` tinyint(1) NOT NULL,
+  `send_welcome_email` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_17044d1cd96e8d57_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_oauth2providerconfig_abcd61c0` (`backend_name`),
@@ -5280,6 +5303,7 @@ CREATE TABLE `third_party_auth_samlproviderconfig` (
   `sync_learner_profile_data` tinyint(1) NOT NULL,
   `archived` tinyint(1) NOT NULL,
   `saml_configuration_id` int(11) DEFAULT NULL,
+  `send_welcome_email` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_508190ecd0b0e845_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_samlproviderconfig_098674f1` (`idp_slug`),
