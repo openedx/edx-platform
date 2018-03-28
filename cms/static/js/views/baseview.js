@@ -37,8 +37,8 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_b
                 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc
                 if (!Math.trunc) {
                     Math.trunc = function(v) {
-                        v = +v;
-                        return (v - v % 1)   ||   (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
+                        v = +v;  // eslint-disable-line no-param-reassign
+                        return (v - v % 1) || (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
                     };
                 }
                 this.options = options;
