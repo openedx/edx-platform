@@ -32,6 +32,15 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_b
                 if (this.options) {
                     options = _.extend({}, _.result(this, 'options'), options);
                 }
+
+                // trunc is not available in IE, and it provides polyfill for it.
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc
+                if (!Math.trunc) {
+                    Math.trunc = function(v) {
+                        v = +v;  // eslint-disable-line no-param-reassign
+                        return (v - v % 1) || (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
+                    };
+                }
                 this.options = options;
 
                 var _this = this;
