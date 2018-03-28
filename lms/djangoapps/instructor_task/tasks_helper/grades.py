@@ -566,23 +566,8 @@ class ProblemResponses(object):
                     yield result
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
-        """
-        For a given `course_id`, generate a CSV file containing
-        all student answers to a given problem, and store using a `ReportStore`.
-        """
-        start_time = time()
-        start_date = datetime.now(UTC)
-        num_reports = 1
-        task_progress = TaskProgress(action_name, num_reports, start_time)
-        current_step = {'step': 'Calculating students answers to problem'}
-        task_progress.update_task_state(extra_meta=current_step)
-
-        # Compute result table and format it
-        problem_location = task_input.get('problem_location')
+    def _build_student_data(cls, user_id, course_id, problem_location):
         problem_key = UsageKey.from_string(problem_location)
-
-        user_id = task_input.get('user_id')
         user = get_user_model().objects.get(pk=user_id)
         course_blocks = get_course_blocks(user, problem_key)
 
@@ -598,6 +583,27 @@ class ProblemResponses(object):
             max_count -= len(problem_responses)
             if max_count <= 0:
                 break
+
+        return student_data
+
+
+    @classmethod
+    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+        """
+        For a given `course_id`, generate a CSV file containing
+        all student answers to a given problem, and store using a `ReportStore`.
+        """
+        start_time = time()
+        start_date = datetime.now(UTC)
+        num_reports = 1
+        task_progress = TaskProgress(action_name, num_reports, start_time)
+        current_step = {'step': 'Calculating students answers to problem'}
+        task_progress.update_task_state(extra_meta=current_step)
+
+        # Compute result table and format it
+        student_data = cls._build_student_data(user_id=task_input.get('user_id'),
+                                               course_id=course_id,
+                                               problem_location=task_input.get('problem_location'))
 
         features = ['username', 'title', 'location', 'block_id', 'state']
         header, rows = format_dictlist(student_data, features)
