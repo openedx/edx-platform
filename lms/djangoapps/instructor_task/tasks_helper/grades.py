@@ -555,6 +555,10 @@ class ProblemResponses(object):
 
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
+        """
+        Generate a tuple of display names, block location paths and block keys
+        for all problem blocks under the ``root`` block.
+        """
         if path is None:
             path = [course_blocks.get_xblock_field(root, 'display_name')]
         for block in course_blocks.get_children(root):
@@ -562,33 +566,40 @@ class ProblemResponses(object):
             if block.block_type == 'problem':
                 yield display_name, path, block
             else:
-                for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
+                for result in cls._build_problem_list(course_blocks, block,
+                                                      path + [display_name]):
                     yield result
 
     @classmethod
     def _build_student_data(cls, user_id, course_id, problem_location):
+        """
+        Generate a list of problem responses for all problem under the
+        ``problem_location`` root.
+        """
         problem_key = UsageKey.from_string(problem_location)
         user = get_user_model().objects.get(pk=user_id)
         course_blocks = get_course_blocks(user, problem_key)
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-        for title, path, block in cls._build_problem_list(course_blocks, problem_key):
-            problem_responses = list_problem_responses(course_id, block, max_count)
-            student_data += problem_responses
-            for response in problem_responses:
+        for title, path, block in cls._build_problem_list(course_blocks,
+                                                          problem_key):
+            responses = list_problem_responses(course_id, block, max_count)
+            student_data += responses
+            for response in responses:
                 response['title'] = title
                 response['location'] = ' > '.join(path)
                 response['block_id'] = block.block_id
             if max_count is not None:
-                max_count -= len(problem_responses)
+                max_count -= len(responses)
                 if max_count <= 0:
                     break
 
         return student_data
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input,
+                 action_name):
         """
         For a given `course_id`, generate a CSV file containing
         all student answers to a given problem, and store using a `ReportStore`.
@@ -602,9 +613,10 @@ class ProblemResponses(object):
         problem_location = task_input.get('problem_location')
 
         # Compute result table and format it
-        student_data = cls._build_student_data(user_id=task_input.get('user_id'),
-                                               course_id=course_id,
-                                               problem_location=problem_location)
+        student_data = cls._build_student_data(
+            user_id=task_input.get('user_id'),
+            course_id=course_id,
+            problem_location=problem_location)
 
         features = ['username', 'title', 'location', 'block_id', 'state']
         header, rows = format_dictlist(student_data, features)
