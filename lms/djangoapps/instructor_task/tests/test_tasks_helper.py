@@ -16,23 +16,39 @@ from datetime import datetime, timedelta
 
 import ddt
 import unicodecsv
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from courseware.tests.factories import InstructorFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from freezegun import freeze_time
+from instructor_analytics.basic import UNAVAILABLE
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    InvoiceTransaction,
+    Order,
+    PaidCourseRegistration
+)
 from six import text_type
+from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from survey.models import SurveyAnswer, SurveyForm
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.partitions.partitions import Group, UserPartition
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import InstructorFactory
-from instructor_analytics.basic import UNAVAILABLE
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
@@ -64,26 +80,9 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
-from shoppingcart.models import (
-    Coupon,
-    CourseRegistrationCode,
-    CourseRegistrationCodeInvoiceItem,
-    Invoice,
-    InvoiceTransaction,
-    Order,
-    PaidCourseRegistration
-)
-from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from survey.models import SurveyAnswer, SurveyForm
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.partitions.partitions import Group, UserPartition
-
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
 
@@ -462,19 +461,51 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
 
 
-class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
+class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Tests that generation of CSV files listing student answers to a
     given problem works.
     """
     def setUp(self):
         super(TestProblemResponsesReport, self).setUp()
-        self.course = CourseFactory.create()
+        self.initialize_course()
+        # self.course = CourseFactory.create()
+        self.instructor = self.create_instructor('instructor')
+        self.student = self.create_student('student')
+
+    @patch.dict("django.conf.settings.FEATURES", {"MAX_PROBLEM_RESPONSES_COUNT": 4})
+    def test_build_student_data_limit(self):
+        self.define_option_problem(u'Problem1')
+        for ctr in range(5):
+            student = self.create_student('student{}'.format(ctr))
+            self.submit_student_answer(student.username, u'Problem1', ['Option 1'])
+
+        student_data = ProblemResponses._build_student_data(user_id=self.instructor.id,
+                                                            course_id=self.course.id,
+                                                            problem_location=str(self.course.location))
+
+        self.assertEquals(len(student_data), 4)
+
+    def test_build_student_data(self):
+        self.define_option_problem(u'Problem1')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+
+        student_data = ProblemResponses._build_student_data(user_id=self.instructor.id,
+                                                            course_id=self.course.id,
+                                                            problem_location=str(self.course.location))
+        self.assertEquals(len(student_data), 1)
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection',
+            'block_id': 'Problem1',
+            'title': 'Problem1',
+        }, student_data[0])
 
     def test_success(self):
-        task_input = {'problem_location': ''}
+        task_input = {'problem_location': str(self.course.location), 'user_id': self.instructor.id}
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            with patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses') as patched_data_source:
+            with patch('lms.djangoapps.instructor_task.tasks_helper.grades'
+                       '.ProblemResponses._build_student_data') as patched_data_source:
                 patched_data_source.return_value = [
                     {'username': 'user0', 'state': u'state0'},
                     {'username': 'user1', 'state': u'state1'},
