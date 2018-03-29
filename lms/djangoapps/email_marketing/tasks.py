@@ -15,9 +15,10 @@ from email_marketing.models import EmailMarketingConfiguration
 
 log = logging.getLogger(__name__)
 SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
+ACE_ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
-@task(bind=True)
+@task(bind=True, routing_key=ACE_ROUTING_KEY)
 def get_email_cookies_via_sailthru(self, user_email, post_parms):
     """
     Adds/updates Sailthru cookie information for a new user.
@@ -58,7 +59,7 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
 
 
 # pylint: disable=not-callable
-@task(bind=True, default_retry_delay=3600, max_retries=24)
+@task(bind=True, default_retry_delay=3600, max_retries=24, routing_key=ACE_ROUTING_KEY)
 def update_user(self, sailthru_vars, email, site=None, new_user=False, send_welcome_email=False):
     """
     Adds/updates Sailthru profile information for a user.
@@ -134,7 +135,7 @@ def is_default_site(site):
 
 
 # pylint: disable=not-callable
-@task(bind=True, default_retry_delay=3600, max_retries=24)
+@task(bind=True, default_retry_delay=3600, max_retries=24, routing_key=ACE_ROUTING_KEY)
 def update_user_email(self, new_email, old_email):
     """
     Adds/updates Sailthru when a user email address is changed
@@ -294,7 +295,7 @@ def _retryable_sailthru_error(error):
     return code == 9 or code == 43
 
 
-@task(bind=True)
+@task(bind=True, routing_key=ACE_ROUTING_KEY)
 def update_course_enrollment(self, email, course_key, mode):
     """Adds/updates Sailthru when a user adds to cart/purchases/upgrades a course
          Args:
