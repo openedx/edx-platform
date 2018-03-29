@@ -688,13 +688,11 @@ def get_module_system_for_user(
             # the result would always be "False".
             masquerade_settings = user.real_user.masquerade_settings
             del user.real_user.masquerade_settings
-            instructor_access = bool(has_access(user.real_user, 'instructor', descriptor, course_id))
             user.real_user.masquerade_settings = masquerade_settings
         else:
             staff_access = has_access(user, 'staff', descriptor, course_id)
-            instructor_access = bool(has_access(user, 'instructor', descriptor, course_id))
         if staff_access:
-            block_wrappers.append(partial(add_staff_markup, user, instructor_access, disable_staff_debug_info))
+            block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

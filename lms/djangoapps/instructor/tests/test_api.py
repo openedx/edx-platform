@@ -205,6 +205,7 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'spent_registration_codes',
     'students_update_enrollment',
     'update_forum_role_membership',
+    'override_problem_score',
 ])
 
 
@@ -386,11 +387,37 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
     def setUpClass(cls):
         super(TestInstructorAPIDenyLevels, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.problem_location = msk_from_problem_urlname(
-            cls.course.id,
-            'robot-some-problem-urlname'
+        cls.chapter = ItemFactory.create(
+            parent=cls.course,
+            category='chapter',
+            display_name="Chapter",
+            publish_item=True,
+            start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.problem_urlname = text_type(cls.problem_location)
+        cls.sequential = ItemFactory.create(
+            parent=cls.chapter,
+            category='sequential',
+            display_name="Lesson",
+            publish_item=True,
+            start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
+            metadata={'graded': True, 'format': 'Homework'},
+        )
+        cls.vertical = ItemFactory.create(
+            parent=cls.sequential,
+            category='vertical',
+            display_name='Subsection',
+            publish_item=True,
+            start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
+        )
+        cls.problem = ItemFactory.create(
+            category="problem",
+            parent=cls.vertical,
+            display_name="A Problem Block",
+            weight=1,
+            publish_item=True,
+        )
+
+        cls.problem_urlname = text_type(cls.problem.location)
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
 
     @classmethod
@@ -406,7 +433,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         _module = StudentModule.objects.create(
             student=self.user,
             course_id=self.course.id,
-            module_state_key=self.problem_location,
+            module_state_key=self.problem.location,
             state=json.dumps({'attempts': 10}),
         )
 
@@ -417,8 +444,6 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_grading_config', {}),
             ('get_students_features', {}),
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
-            ('reset_student_attempts',
-             {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
             ('update_forum_role_membership',
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
@@ -435,15 +460,28 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
             ('export_ora2_data', {}),
-
+            ('rescore_problem',
+             {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+            ('override_problem_score',
+             {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email, 'score': 0}),
+            ('reset_student_attempts',
+             {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+            (
+                'reset_student_attempts',
+                {
+                    'problem_to_reset': self.problem_urlname,
+                    'unique_student_identifier': self.user.email,
+                    'delete_module': True
+                }
+            ),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
             ('bulk_beta_modify_access', {'identifiers': 'foo@example.org', 'action': 'add'}),
             ('modify_access', {'unique_student_identifier': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
             ('list_course_role_members', {'rolename': 'beta'}),
-            ('rescore_problem',
-             {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+            ('rescore_problem', {'problem_to_reset': self.problem_urlname, 'all_students': True}),
+            ('reset_student_attempts', {'problem_to_reset': self.problem_urlname, 'all_students': True}),
         ]
 
     def _access_endpoint(self, endpoint, args, status_code, msg):
@@ -569,10 +607,6 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         for endpoint, args in self.instructor_level_endpoints:
             expected_status = 200
-
-            # TODO: make this work
-            if endpoint in ['rescore_problem']:
-                continue
             self._access_endpoint(
                 endpoint,
                 args,

@@ -1907,13 +1907,16 @@ def reset_student_attempts(request, course_id):
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
+    all_students = _get_boolean_param(request, 'all_students')
+
+    if all_students and not has_access(request.user, 'instructor', course):
+        return HttpResponseForbidden("Requires instructor access.")
 
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = _get_boolean_param(request, 'all_students')
     delete_module = _get_boolean_param(request, 'delete_module')
 
     # parameter combinations
@@ -1925,11 +1928,6 @@ def reset_student_attempts(request, course_id):
         return HttpResponseBadRequest(
             "all_students and delete_module are mutually exclusive."
         )
-
-    # instructor authorization
-    if all_students or delete_module:
-        if not has_access(request.user, 'instructor', course):
-            return HttpResponseForbidden("Requires instructor access.")
 
     try:
         module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
@@ -2044,13 +2042,13 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_post_params(problem_to_reset="problem urlname to reset")
 @common_exceptions_400
 def rescore_problem(request, course_id):
     """
     Starts a background process a students attempts counter. Optionally deletes student state for a problem.
-    Limited to instructor access.
+    Rescore for all students is limited to instructor access.
 
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
@@ -2060,14 +2058,18 @@ def rescore_problem(request, course_id):
     all_students and unique_student_identifier cannot both be present.
     """
     course_id = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'staff', course_id)
+    all_students = _get_boolean_param(request, 'all_students')
+
+    if all_students and not has_access(request.user, 'instructor', course):
+        return HttpResponseForbidden("Requires instructor access.")
+
+    only_if_higher = _get_boolean_param(request, 'only_if_higher')
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-
-    all_students = _get_boolean_param(request, 'all_students')
-    only_if_higher = _get_boolean_param(request, 'only_if_higher')
 
     if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
@@ -2116,7 +2118,7 @@ def rescore_problem(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
 @common_exceptions_400
 def override_problem_score(request, course_id):
@@ -2142,7 +2144,7 @@ def override_problem_score(request, course_id):
         return _create_error_response(request, "Unable to parse problem id {}.".format(problem_to_reset))
 
     # check the user's access to this specific problem
-    if not has_access(request.user, "instructor", modulestore().get_item(usage_key)):
+    if not has_access(request.user, "staff", modulestore().get_item(usage_key)):
         _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
             request.user.id,
             problem_to_reset
