@@ -461,6 +461,7 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
 
 
+# pylint: disable=protected-access
 class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Tests that generation of CSV files listing student answers to a
