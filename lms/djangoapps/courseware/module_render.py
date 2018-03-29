@@ -46,7 +46,7 @@ from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.verify_student.services import VerificationService
+from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
@@ -756,7 +756,7 @@ def get_module_system_for_user(
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            'verification': VerificationService(),
+            'verification': XBlockVerificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),

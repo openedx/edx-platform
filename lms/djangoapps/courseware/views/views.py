@@ -70,7 +70,7 @@ from lms.djangoapps.experiments.utils import get_experiment_user_metadata_contex
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -1017,7 +1017,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
 
 def _missing_required_verification(student, enrollment_mode):
     return (
-        enrollment_mode in CourseMode.VERIFIED_MODES and not SoftwareSecurePhotoVerification.user_is_verified(student)
+        enrollment_mode in CourseMode.VERIFIED_MODES and not IDVerificationService.user_is_verified(student)
     )
 
 

@@ -40,7 +40,7 @@ class GenerateUserCertificateTest(TestCase):
                 generate_certificate.apply_async(kwargs=kwargs).get()
 
     @patch('lms.djangoapps.certificates.tasks.generate_user_certificates')
-    @patch('lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_status')
+    @patch('lms.djangoapps.verify_student.services.IDVerificationService.user_status')
     def test_retry_until_verification_status_updates(self, user_status_mock, generate_user_certs_mock):
         course_key = 'course-v1:edX+CS101+2017_T2'
         student = UserFactory()
