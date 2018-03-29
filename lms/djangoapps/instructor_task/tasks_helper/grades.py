@@ -576,7 +576,7 @@ class ProblemResponses(object):
         Generate a list of problem responses for all problem under the
         ``problem_location`` root.
         """
-        problem_key = UsageKey.from_string(problem_location)
+        problem_key = UsageKey.from_string(problem_location).map_into_course(course_id)
         user = get_user_model().objects.get(pk=user_id)
         course_blocks = get_course_blocks(user, problem_key)
 
