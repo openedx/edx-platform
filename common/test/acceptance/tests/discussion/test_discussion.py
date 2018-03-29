@@ -1053,7 +1053,9 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
 
     def setup_thread_page(self, thread_id):
-        self.discussion_page.expand_discussion()
+        self.browser.refresh()
+        if not self.discussion_page.is_discussion_expanded():
+            self.discussion_page.expand_discussion()
         self.discussion_page.show_thread(thread_id)
         self.thread_page = self.discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
@@ -1098,10 +1100,9 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.discussion_page.is_new_post_button_visible())
 
     def test_initial_render(self):
-        self.assertFalse(self.discussion_page.is_discussion_expanded())
+        self.assertTrue(self.discussion_page.is_discussion_expanded())
 
-    def test_expand_discussion_empty(self):
-        self.discussion_page.expand_discussion()
+    def test_discussion_empty(self):
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
 
     def check_anonymous_to_peers(self, is_staff):
@@ -1151,16 +1152,14 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
 
-        # Expand the first discussion, click to add a post
-        self.discussion_page.expand_discussion()
+        # Click to add a post to the first discussion
         self.discussion_page.click_new_post_button()
 
         # Verify that only the first discussion's form is shown
         self.assertIsNotNone(self.discussion_page.new_post_form)
         self.assertIsNone(self.additional_discussion_page.new_post_form)
 
-        # Expand the second discussion, click to add a post
-        self.additional_discussion_page.expand_discussion()
+        # Click to add a post to the second discussion
         self.additional_discussion_page.click_new_post_button()
 
         # Verify that both discussion's forms are shown
