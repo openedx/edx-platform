@@ -19,7 +19,8 @@ from pytz import utc
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages, UPGRADE_DEADLINE_MESSAGE
@@ -626,7 +627,8 @@ class VerificationDeadlineDate(DateSummary):
     @lazy
     def verification_status(self):
         """Return the verification status for this user."""
-        return SoftwareSecurePhotoVerification.user_status(self.user)[0]
+        status, _ = IDVerificationService.user_status(self.user)
+        return status
 
     def must_retry(self):
         """Return True if the user must re-submit verification, False otherwise."""

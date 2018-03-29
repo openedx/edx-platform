@@ -35,8 +35,9 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.utils import send_verification_status_email
+from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, send_verification_status_email
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -645,7 +646,7 @@ class PayAndVerifyView(View):
         Returns:
             datetime object in string format
         """
-        photo_verifications = SoftwareSecurePhotoVerification.verification_valid_or_pending(user)
+        photo_verifications = IDVerificationService.verification_valid_or_pending(user)
         # return 'expiration_datetime' of latest photo verification if found,
         # otherwise implicitly return ''
         if photo_verifications:
@@ -664,7 +665,7 @@ class PayAndVerifyView(View):
         submitted photos within the expiration period.
 
         """
-        return SoftwareSecurePhotoVerification.user_has_valid_or_pending(user)
+        return IDVerificationService.user_has_valid_or_pending(user)
 
     def _check_enrollment(self, user, course_key):
         """Check whether the user has an active enrollment and has paid.
@@ -1202,12 +1203,12 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        status, __ = SoftwareSecurePhotoVerification.user_status(request.user)
+        status, __ = IDVerificationService.user_status(request.user)
 
-        expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(request.user)
+        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user)
         can_reverify = False
         if expiration_datetime:
-            if SoftwareSecurePhotoVerification.is_verification_expiring_soon(expiration_datetime):
+            if is_verification_expiring_soon(expiration_datetime):
                 # The user has an active verification, but the verification
                 # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
                 # In this case user can resubmit photos for reverification.

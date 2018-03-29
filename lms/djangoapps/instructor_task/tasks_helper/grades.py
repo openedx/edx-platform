@@ -20,7 +20,7 @@ from lms.djangoapps.grades.context import grading_context, grading_context_for_c
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.teams.models import CourseTeamMembership
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
@@ -170,8 +170,7 @@ class _EnrollmentBulkContext(object):
     def __init__(self, context, users):
         CourseEnrollment.bulk_fetch_enrollment_states(users, context.course_id)
         self.verified_users = [
-            verified.user.id for verified in
-            SoftwareSecurePhotoVerification.verified_query().filter(user__in=users).select_related('user')
+            verified.user.id for verified in IDVerificationService.get_verified_users(users)
         ]
 
 
@@ -386,9 +385,8 @@ class CourseGradeReport(object):
         given user.
         """
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(user, context.course_id)[0]
-        verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
+        verification_status = IDVerificationService.verification_status_for_user(
             user,
-            context.course_id,
             enrollment_mode,
             user_is_verified=user.id in bulk_enrollments.verified_users,
         )

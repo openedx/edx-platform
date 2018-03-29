@@ -1363,7 +1363,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.store.update_item(self.course, self.user.id)
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
 
@@ -1412,7 +1412,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
 
@@ -1472,7 +1472,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
         with patch(
-            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+            'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = user_verified
             with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
@@ -1520,7 +1520,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.store.update_item(self.course, self.user.id)
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
 
@@ -1568,7 +1568,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
 
@@ -1593,7 +1593,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
 
@@ -1675,7 +1675,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
 
@@ -1723,7 +1723,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
         with patch(
-                'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as user_verify:
             user_verify.return_value = True
             with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
