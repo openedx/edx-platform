@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('third_party_auth', '0016_auto_20180130_0938'),
+        ('third_party_auth', '0017_remove_icon_class_image_secondary_fields'),
     ]
 
     operations = [
