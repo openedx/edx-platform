@@ -9,8 +9,24 @@ const HEADERS = {
     'X-CSRFToken': Cookies.get('csrftoken'),
 };
 
+function buildQueryString(data) {
+    return Object.keys(data)
+        .map(key => {
+            const value = Array.isArray(data[key])
+                ? data[key].map((item) => encodeURIComponent(item)).join(',')
+                : encodeURIComponent(data[key]);
+            return `${encodeURIComponent(key)}=${value}`;
+        })
+        .join('&');
+}
+
 const getCourseBlocks = (courseId) => fetch(
-    `${COURSE_BLOCKS_API}/?course_id=${encodeURIComponent(courseId)}&all_blocks=true&depth=all&requested_fields=name,display_name,block_type,children`, {
+    `${COURSE_BLOCKS_API}/?${buildQueryString({
+        course_id: courseId,
+        all_blocks: true,
+        depth: 'all',
+        requested_fields: ['name', 'display_name', 'block_type', 'children'],
+    })}`, {
         credentials: 'same-origin',
         method: 'get',
         headers: HEADERS,
