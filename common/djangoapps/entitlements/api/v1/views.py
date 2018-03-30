@@ -141,6 +141,32 @@ class EntitlementViewSet(viewsets.ModelViewSet):
         # to Admin users
         return CourseEntitlement.objects.all().select_related('user').select_related('enrollment_course_run')
 
+    def get_upgradeable_enrollments_for_entitlement(self, entitlement):
+        """
+        Retrieve all the CourseEnrollments that are upgradeable for a given CourseEntitlement
+
+        Arguments:
+            entitlement: CourseEntitlement that we are requesting the CourseEnrollments for.
+
+        Returns:
+            list: List of upgradeable CourseEnrollments
+        """
+        # find all course_runs within the course
+        course_runs = get_course_runs_for_course(entitlement.course_uuid)
+
+        # check if the user has enrollments for any of the course_runs
+        upgradeable_enrollments = []
+        for course_run in course_runs:
+            course_run_id = CourseKey.from_string(course_run.get('key'))
+            enrollment = CourseEnrollment.get_enrollment(entitlement.user, course_run_id)
+
+            if (enrollment and
+                    enrollment.is_active and
+                    is_course_run_entitlement_fulfillable(course_run_id, entitlement)):
+                upgradeable_enrollments.append(enrollment)
+
+        return upgradeable_enrollments
+
     def create(self, request, *args, **kwargs):
         support_details = request.data.pop('support_details', [])
         serializer = self.get_serializer(data=request.data)
@@ -157,29 +183,12 @@ class EntitlementViewSet(viewsets.ModelViewSet):
                 CourseEntitlementSupportDetail.objects.create(**support_detail)
         else:
             user = entitlement.user
+            upgradeable_enrollments = self.get_upgradeable_enrollments_for_entitlement(entitlement)
 
-            # find all course_runs within the course
-            course_runs = get_course_runs_for_course(entitlement.course_uuid)
-
-            # check if the user has enrollments for any of the course_runs
-            user_run_enrollments = [
-                CourseEnrollment.get_enrollment(user, CourseKey.from_string(course_run.get('key')))
-                for course_run
-                in course_runs
-                if CourseEnrollment.get_enrollment(user, CourseKey.from_string(course_run.get('key')))
-            ]
-
-            # filter to just enrollments that can be upgraded.
-            upgradeable_enrollments = [
-                enrollment
-                for enrollment
-                in user_run_enrollments
-                if enrollment.is_active and enrollment.upgrade_deadline and enrollment.upgrade_deadline > timezone.now()
-            ]
-
-            # if there is only one upgradeable enrollment, convert it from audit to the entitlement.mode
+            # if there is only one upgradeable enrollment, update the mode to the paid entitlement.mode
             # if there is any ambiguity about which enrollment to upgrade
-            # (i.e. multiple upgradeable enrollments or no available upgradeable enrollment), dont enroll
+            # (i.e. multiple upgradeable enrollments or no available upgradeable enrollment), don't alter
+            # the enrollment
             if len(upgradeable_enrollments) == 1:
                 enrollment = upgradeable_enrollments[0]
                 log.info(
