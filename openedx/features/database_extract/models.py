@@ -3,11 +3,11 @@ from django.db import models
 
 class TargetCourse(models.Model):
     """
-    These courses are marked for data extraction.
+    These courses are marked for data extraction. These will be used to determine data of which courses is to be extracted
 
     @course_id: (string) id of the course
     """
-    course_id = models.TextField(max_length=255)
+    course_id = models.CharField(max_length=255)
 
     def __unicode__(self):
         return '{}'.format(self.course_id)
