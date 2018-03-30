@@ -1,3 +1,4 @@
+/* global gettext */
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import * as classnames from 'classnames';
@@ -12,7 +13,10 @@ const BlockList = ({blocks, selectedBlock, onSelectBlock, onChangeRoot}) => (
                     {block.display_name}
                 </button>
                 {block.children &&
-                <button className="block-child" onClick={() => onChangeRoot(block.id)}>&gt;</button>}
+                <button className="block-child" onClick={() => onChangeRoot(block.id)}>
+                    <span className="icon fa fa-arrow-right" aria-hidden="true"/>
+                    <span className="sr">{gettext('View child items')}</span>
+                </button>}
             </li>
         ))}
     </ul>
@@ -23,17 +27,18 @@ export const BlockBrowser = ({blocks, selectedBlock, onSelectBlock, onChangeRoot
         <div className={classnames("block-browser", className)}>
             <div className="header">
                 <button className="block-child"
+                        disabled={!blocks.parent}
                         onClick={() => blocks.parent && onChangeRoot(blocks.parent)}>
-                    ^
+                    <span className="icon fa fa-arrow-up" aria-hidden="true"/>
+                    <span className="sr">{gettext('Navigate up')}</span>
                 </button>
-                <span className="block-type">{blocks.type}: </span>
-                <span className="block-name">{blocks.display_name}</span>
+                {gettext(`Browsing ${blocks.type}`)} {blocks.display_name}:
             </div>
             <BlockList blocks={blocks.children}
                        selectedBlock={selectedBlock}
                        onSelectBlock={onSelectBlock}
                        onChangeRoot={onChangeRoot}/>
-            </div>
+        </div>
     );
 
 BlockBrowser.propTypes = {
