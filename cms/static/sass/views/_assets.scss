@@ -3,7 +3,7 @@
 
 .view-uploads {
   .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .content-primary {

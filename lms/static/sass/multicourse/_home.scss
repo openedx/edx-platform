@@ -9,7 +9,7 @@ $course-search-input-height: ($button-size);
   padding: 0;
 
   > .container {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     width: flex-grid(12);
   }
@@ -43,7 +43,7 @@ $course-search-input-height: ($button-size);
     .title {
       @include span-columns(8);
       @include shift(2);
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       @include transition(all 0.2s linear 0s);
 
       position: relative;
@@ -81,7 +81,7 @@ $course-search-input-height: ($button-size);
 
       > .heading-group {
         @include left(0);
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include transition(all 0.2s linear 0s);
         @include text-align(left);
 
@@ -171,7 +171,7 @@ $course-search-input-height: ($button-size);
       border: 1px solid $border-color-3;
 
       @include border-left(0);
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       // box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
       height: 120px;
 
@@ -201,7 +201,7 @@ $course-search-input-height: ($button-size);
           border-radius: 4px;
           box-shadow: 0 1px 12px 0 $shadow-d1;
 
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           border: 2px solid rgba(255, 255, 255, 0.8);
           height: 60px;
@@ -260,7 +260,7 @@ $course-search-input-height: ($button-size);
   }
 
   .highlighted-courses {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     margin-bottom: ($baseline*2);
     position: relative;
@@ -456,19 +456,19 @@ $course-search-input-height: ($button-size);
     }
 
     &.university-partners2x6 {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       width: flex-grid(12, 12);
 
       .partners {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include clearfix();
         @include margin-left(60px);
 
         padding: 12px 0;
 
         .partner {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           width: flex-grid(2, 12);
           display: block;
@@ -550,7 +550,7 @@ $course-search-input-height: ($button-size);
     }
 
     .news {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
       padding: 20px;
@@ -567,7 +567,7 @@ $course-search-input-height: ($button-size);
           border: 1px dotted transparent;
           border-color: $border-color-2;
 
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include clearfix();
           @include float(left);
           @include margin-right(flex-gutter());
@@ -592,7 +592,7 @@ $course-search-input-height: ($button-size);
           .post-graphics {
             border: 1px solid $border-color-1;
 
-            @include box-sizing(border-box);
+            box-sizing: border-box;
 
             display: block;
 
