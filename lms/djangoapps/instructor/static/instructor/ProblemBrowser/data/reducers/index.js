@@ -1,12 +1,16 @@
 import {combineReducers} from 'redux';
 import {courseBlocksActions} from '../actions/constants';
 
+const BLOCK_TYPES = ['course', 'chapter', 'sequential', 'vertical', 'problem'];
+
 export const buildBlockTree = (blocks) => {
     if (!(blocks && blocks.root)) return null;
     const blockTree = (root, parent) => {
         const tree = Object.assign({parent}, blocks.blocks[root]);
         if (tree.children) {
-            tree.children = tree.children.map(block => blockTree(block, root));
+            tree.children = tree.children
+                .map(block => blockTree(block, root))
+                .filter(block => BLOCK_TYPES.includes(block.type));
         }
         return tree;
     };
