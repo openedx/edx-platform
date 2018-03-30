@@ -401,11 +401,11 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.assertEqual(actual_url, expected_url)
 
     @ddt.data(
-        (False, {'real': 'enterprise', 'uuid': ''}, 'course', [], []),
-        (True, {}, 'course', [], []),
-        (True, {'real': 'enterprise'}, None, [], []),
-        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [], []),
-        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [MockEnrollment(course_id='other-id')], []),
+        (False, {'real': 'enterprise', 'uuid': ''}, 'course', [], [], "", ""),
+        (True, {}, 'course', [], [], "", ""),
+        (True, {'real': 'enterprise'}, None, [], [], "", ""),
+        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [], [], "", ""),
+        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [MockEnrollment(course_id='other-id')], [], "", ""),
         (
             True,
             {'name': 'GriffCo', 'uuid': 'real-uuid'},
@@ -421,13 +421,33 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             [
                 'If you have concerns about sharing your data, please contact your administrator at GriffCo.',
                 'Enrollment in My Cool Course was not complete.'
-            ]
+            ],
+            "", ""
+        ),
+        (
+            True,
+            {'name': 'GriffCo', 'uuid': 'real-uuid'},
+            'real-course',
+            [
+                MockEnrollment(
+                    course_id='real-course',
+                    course_overview=mock.MagicMock(
+                        display_name='My Cool Course'
+                    )
+                )
+            ],
+            [
+                'If you have concerns about sharing your data, please contact your administrator at GriffCo.',
+                'Enrollment in My Cool Course was not complete.'
+            ],
+            "Title from DataSharingConsentPage modal", "Message from DataSharingConsentPage modal"
         ),
 
     )
     @ddt.unpack
     @mock.patch('openedx.features.enterprise_support.api.ConsentApiClient')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.get_consent_notification_data')
     def test_get_dashboard_consent_notification(
             self,
             consent_return_value,
@@ -435,12 +455,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             course_id,
             enrollments,
             expected_substrings,
+            notification_title,
+            notification_message,
+            consent_notification_data,
             ec_for_request,
             consent_client_class
     ):
         request = mock.MagicMock(
             GET={'consent_failed': course_id}
         )
+        consent_notification_data.return_value = notification_title, notification_message
         consent_client = consent_client_class.return_value
         consent_client.consent_required.return_value = consent_return_value
 
@@ -452,7 +476,10 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             request, user, enrollments,
         )
 
-        if expected_substrings:
+        if notification_message and notification_title:
+            self.assertIn(notification_title, notification_string)
+            self.assertIn(notification_message, notification_string)
+        elif expected_substrings:
             for substr in expected_substrings:
                 self.assertIn(substr, notification_string)
         else:

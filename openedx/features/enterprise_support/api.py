@@ -22,7 +22,7 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from consent.models import DataSharingConsent
+    from consent.models import DataSharingConsent, DataSharingConsentPage
     from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 except ImportError:
     pass
@@ -525,6 +525,25 @@ def get_enterprise_customer_for_learner(site, user):
     return {}
 
 
+def get_consent_notification_data(enterprise_customer):
+    """
+    Returns the consent notification data from DataSharingConsentPage modal
+    """
+    title_template = None
+    message_template = None
+    try:
+        consent_page = DataSharingConsentPage.objects.get(enterprise_customer_id=enterprise_customer['uuid'])
+        title_template = consent_page.declined_notification_title
+        message_template = consent_page.declined_notification_message
+    except DataSharingConsentPage.DoesNotExist:
+        LOGGER.info(
+            "DataSharingConsentPage object doesn't exit for {enterprise_customer_name}".format(
+                enterprise_customer_name=enterprise_customer['name']
+            )
+        )
+    return title_template, message_template
+
+
 def get_dashboard_consent_notification(request, user, course_enrollments):
     """
     If relevant to the request at hand, create a banner on the dashboard indicating consent failed.
@@ -564,18 +583,22 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
 
     if consent_needed and enrollment:
 
-        message_template = _(
-            'If you have concerns about sharing your data, please contact your administrator '
-            'at {enterprise_customer_name}.'
-        )
+        title_template, message_template = get_consent_notification_data(enterprise_customer)
+        if not title_template:
+            title_template = _(
+                'Enrollment in {course_title} was not complete.'
+            )
+        if not message_template:
+            message_template = _(
+                'If you have concerns about sharing your data, please contact your administrator '
+                'at {enterprise_customer_name}.'
+            )
 
+        title = title_template.format(
+            course_title=enrollment.course_overview.display_name,
+        )
         message = message_template.format(
             enterprise_customer_name=enterprise_customer['name'],
-        )
-        title = _(
-            'Enrollment in {course_name} was not complete.'
-        ).format(
-            course_name=enrollment.course_overview.display_name,
         )
 
         return render_to_string(
