@@ -1504,12 +1504,14 @@
   }
 
   .block-browser {
-    width: 600px;
-
     .header {
       display: flex;
       flex-direction: row;
       align-items: center;
+
+      .title {
+        margin: 0 0.5em;
+      }
     }
 
     ul {
@@ -1522,11 +1524,11 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin: 5px 0;
+        margin: 0.25em 0;
 
         .block-name {
           flex-grow: 1;
-          margin-right: 5px;
+          margin-right: 0.5em;
           text-align: left;
         }
       }
@@ -1541,10 +1543,10 @@
       box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     }
 
-    .problem-location {
+    input {
       max-width: 800px;
       width: 100%;
-      margin: 0;
+      margin-bottom: 0;
     }
   }
 }

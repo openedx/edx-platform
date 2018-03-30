@@ -26,13 +26,15 @@ export const BlockBrowser = ({blocks, selectedBlock, onSelectBlock, onChangeRoot
     !!blocks && (
         <div className={classnames("block-browser", className)}>
             <div className="header">
-                <button className="block-child"
+                <button className="block-parent"
                         disabled={!blocks.parent}
                         onClick={() => blocks.parent && onChangeRoot(blocks.parent)}>
                     <span className="icon fa fa-arrow-up" aria-hidden="true"/>
                     <span className="sr">{gettext('Navigate up')}</span>
                 </button>
-                {gettext(`Browsing ${blocks.type}`)} {blocks.display_name}:
+                <span className="title">
+                    {gettext(`Browsing ${blocks.type}`)} "{blocks.display_name}":
+                </span>
             </div>
             <BlockList blocks={blocks.children}
                        selectedBlock={selectedBlock}
