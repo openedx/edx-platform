@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
-import {BlockBrowserContainer} from "../BlockBrowser/BlockBrowserContainer";
+import {BlockBrowserContainer} from '../BlockBrowser/BlockBrowserContainer';
 
 export default class Main extends React.Component {
     constructor(props) {
@@ -16,6 +16,10 @@ export default class Main extends React.Component {
         this.setState({showDropdown: !this.state.showDropdown});
     }
 
+    hideDropdown() {
+        this.setState({showDropdown: false});
+    }
+
     render() {
         const {selectedBlock, onSelectBlock} = this.props;
 
@@ -24,7 +28,10 @@ export default class Main extends React.Component {
                 <button onClick={this.handleToggleDropdown}>Select Problem</button>
                 <input type="text" name="problem-location" value={selectedBlock} disabled/>
                 {this.state.showDropdown &&
-                <BlockBrowserContainer onSelectBlock={onSelectBlock}/>}
+                <BlockBrowserContainer onSelectBlock={(blockId) => {
+                    this.hideDropdown();
+                    onSelectBlock(blockId);
+                }}/>}
             </div>
         );
     }
