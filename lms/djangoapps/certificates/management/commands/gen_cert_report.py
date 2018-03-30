@@ -2,8 +2,6 @@
 Generate a report of certificate statuses
 """
 
-from optparse import make_option
-
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
@@ -37,16 +35,16 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=None,
-                    help='Only generate for COURSE_ID'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-c', '--course',
+            metavar='COURSE_ID',
+            dest='course',
+            default=None,
+            help='Only generate for COURSE_ID'
+        )
 
     def handle(self, *args, **options):
-
         # Find all courses that have ended
 
         if options['course']:
