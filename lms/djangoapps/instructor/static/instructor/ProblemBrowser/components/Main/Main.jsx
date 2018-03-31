@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
+import {Button} from '@edx/paragon';
 import {BlockBrowserContainer} from '../BlockBrowser/BlockBrowserContainer';
 
 export default class Main extends React.Component {
@@ -25,7 +26,7 @@ export default class Main extends React.Component {
 
         return (
             <div className="problem-browser">
-                <button onClick={this.handleToggleDropdown}>Select Problem</button>
+                <Button onClick={this.handleToggleDropdown} label={gettext("Pick course block")}/>
                 <input type="text" name="problem-location" value={selectedBlock} disabled/>
                 {this.state.showDropdown &&
                 <BlockBrowserContainer onSelectBlock={(blockId) => {
