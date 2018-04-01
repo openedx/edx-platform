@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-18 20:35+0000\n"
-"PO-Revision-Date: 2018-03-18 20:36:05.979346\n"
+"POT-Creation-Date: 2018-04-01 20:35+0000\n"
+"PO-Revision-Date: 2018-04-01 20:36:10.994975\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2821,6 +2821,12 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+"Rölé fïéld shöüld nöt ßé léft ünséléçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr ""
 "Érrör énröllïng/ünénröllïng üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
@@ -3575,39 +3581,6 @@ msgstr ""
 msgid "Could not override problem score for {user}."
 msgstr ""
 "Çöüld nöt övérrïdé prößlém sçöré för {user}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "Thé dätä çöüld nöt ßé sävéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr ""
-"Pléäsé éntér ä välïd émäïl äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "Pléäsé éntér ä välïd pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"Pässwörd rését émäïl sént. Föllöw thé lïnk ïn thé émäïl tö çhängé ýöür "
-"pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr ""
-"Wé wérén't äßlé tö sénd ýöü ä pässwörd rését émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr ""
-"Pléäsé çhéçk ýöür émäïl tö çönfïrm thé çhängé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/static/js/student_account/tos_modal.js

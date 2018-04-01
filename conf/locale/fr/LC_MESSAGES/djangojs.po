@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: moocit-france <contact@moocit.fr>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -2555,6 +2555,10 @@ msgid "Reason field should not be left blank."
 msgstr "Le champ Raison ne doit pas être laissé vide."
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Erreur lors de l'inscription/désinscription d'utilisateurs."
 
@@ -3158,36 +3162,6 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "Les données n'ont pas pu être enregistrées"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "Veuillez entrer une adresse email valide"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "Veuillez entrer un mot de passe valide"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"Email de réinitialisation du mot de passe envoyé. Suivez le lien dans "
-"l'email pour changer votre mot de passe."
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr ""
-"Il ne nous a pas été possible de vous envoyer un mail de réinitialisation du"
-" mot de passe."
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "Veuillez vérifier votre email pour confirmer les changements"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

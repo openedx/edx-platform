@@ -190,7 +190,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: San <github@zhujunsan.net>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2406,6 +2406,10 @@ msgid "Reason field should not be left blank."
 msgstr "原因不能为空。"
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "用户选课／放弃选课时出错。"
 
@@ -2960,32 +2964,6 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "该数据无法保存。"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "请输入一个有效的电子邮件地址。"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "请输入一个有效的密码。"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr "密码重置邮件已经发送。请通过点击邮件中的链接更改你的密码。"
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr "密码重置邮件发送失败。"
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "请检查您的邮件以确认修改"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

@@ -202,7 +202,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: Mariana Jó de Souza <mariana.jsouza@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -2509,6 +2509,10 @@ msgid "Reason field should not be left blank."
 msgstr "O campo de motivo não deve ser deixado em branco."
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Erro ao fazer inscrição/cancelar inscrição de usuários."
 
@@ -3096,34 +3100,6 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "Não foi possível salvar os dados."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "Insira um endereço de e-mail válido"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "Insira uma senha válida"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"Email de recuperação de senha enviado. Siga o link no email para mudar sua "
-"senha"
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr "Não foi possível enviar um e-mail para redefinição de sua senha."
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "Por favor verifique seu email para confirmar a alteração"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

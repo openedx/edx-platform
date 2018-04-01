@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-18 20:35+0000\n"
-"PO-Revision-Date: 2018-03-18 20:36:05.979346\n"
+"POT-Creation-Date: 2018-04-01 20:35+0000\n"
+"PO-Revision-Date: 2018-04-01 20:36:10.994975\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2270,6 +2270,10 @@ msgid "Reason field should not be left blank."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr ""
 
@@ -2823,32 +2827,6 @@ msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
 msgstr ""
 
 #: lms/static/js/student_account/tos_modal.js

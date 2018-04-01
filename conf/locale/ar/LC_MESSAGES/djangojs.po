@@ -138,7 +138,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: Roy Zakka\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -2615,6 +2615,10 @@ msgid "Reason field should not be left blank."
 msgstr "لا يمكن ترك حقل السبب فارغًا."
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "نأسف لحدوث خطأ في تسجيل/إلغاء تسجيل المستخدمين."
 
@@ -3228,35 +3232,6 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "تعذّر حفظ البيانات."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "يُرجى إدخال عنوان صحيح للبريد الإلكتروني."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "يُرجى إدخال كلمة مرور صحيحة. "
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"تم إرسال بريد إلكتروني لتغيير كلمة المرور. يُرجى اتّباع الرابط الوارد في "
-"الرسالة لاستكمال العملية . "
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr ""
-"عذرًا، لم نتمكّن من مراسلتك عبر البريد الإلكتروني لتغيير كلمة المرور. "
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "يُرجى التحقق من بريدك الإلكتروني لتأكيد التغيير."
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

@@ -140,7 +140,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2604,6 +2604,10 @@ msgid "Reason field should not be left blank."
 msgstr "El campo de Razón no pude dejarse vacío."
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Error al inscribir o desinscribir  usuarios."
 
@@ -3262,34 +3266,6 @@ msgstr ""
 msgid "Could not override problem score for {user}."
 msgstr ""
 "No fue posible sobreescribir el puntaje del problema para el usuario {user}."
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "Los datos no pudieron ser guardados."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "Por favor ingresa una dirección de correo electrónico válida."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "Por favor ingresa una contraseña válida"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"Se ha enviado el correo para restablecer tu contraseña.  Sigue el vínculo "
-"enviado en el correo para realizar el cambio."
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr "No se ha podido enviar el correo para restablecer tu contraseña."
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "Por favor revisa tu correo para confirmar el cambio"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

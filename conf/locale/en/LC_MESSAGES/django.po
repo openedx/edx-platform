@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-18 20:36+0000\n"
-"PO-Revision-Date: 2018-03-18 20:36:06.141838\n"
+"POT-Creation-Date: 2018-04-01 20:36+0000\n"
+"PO-Revision-Date: 2018-04-01 20:36:11.596134\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -922,6 +922,12 @@ msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
+"If this option is selected, users will be sent a welcome email upon "
+"registration."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
@@ -1337,6 +1343,93 @@ msgstr ""
 msgid "System defined milestone"
 msgstr ""
 
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} letter"
+msgid_plural "{num} letters"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} uppercase letter"
+msgid_plural "{num} uppercase letters"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} lowercase letter"
+msgid_plural "{num} lowercase letters"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} digit"
+msgid_plural "{num} digits"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} number"
+msgid_plural "{num} numbers"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} punctuation mark"
+msgid_plural "{num} punctuation marks"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} symbol"
+msgid_plural "{num} symbols"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} word"
+msgid_plural "{num} words"
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Your password must contain at least {num} character."
+msgid_plural "Your password must contain at least {num} characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"Your password must contain at least {num} character, including "
+"{requirements}."
+msgid_plural ""
+"Your password must contain at least {num} characters, including "
+"{requirements}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Enter a password with at least {requirements}."
+msgstr ""
+
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid ""
@@ -1361,72 +1454,26 @@ msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Password: Invalid Length ({0})"
-msgstr ""
+msgid "{num} character"
+msgid_plural "{num} characters"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or more"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must be {0} characters or fewer"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Password: Must be more complex ({0})"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more uppercase characters"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more lowercase characters"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more digits"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more punctuation characters"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more non ascii characters"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more unique words"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more numbers"
-msgstr ""
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more letters"
-msgstr ""
+msgid "Enter a password with at most {num} character."
+msgid_plural "Enter a password with at most {num} characters."
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: This message is shown to users who enter a password matching
 #. the username they enter(ed).
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password cannot be the same as the username"
+msgid "Password cannot be the same as the username."
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password: Too similar to a restricted dictionary word."
+msgid "Password is too similar to a dictionary word."
 msgstr ""
 
 #: common/djangoapps/xblock_django/admin.py
@@ -4631,7 +4678,7 @@ msgid "Open edX"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Trademarks"
+msgid "Trademark Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -6096,6 +6143,10 @@ msgid ""
 "A proctored exam attempt for {exam_name} in {course_name} by username: "
 "{student_username} was reviewed as {review_status} by the proctored exam "
 "review provider."
+msgstr ""
+
+#: lms/djangoapps/instructor/settings/common.py
+msgid "Your Platform Insights"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -8318,6 +8369,15 @@ msgstr ""
 msgid "Disable User Account"
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "View, create, and reissue learner entitlements"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -8639,10 +8699,6 @@ msgstr ""
 #: lms/envs/common.py
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Your Platform Insights"
 msgstr ""
 
 #: lms/envs/common.py
@@ -11358,7 +11414,6 @@ msgid "Reset"
 msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr ""
@@ -17108,6 +17163,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Role of the users being enrolled."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr ""
@@ -18508,10 +18567,6 @@ msgstr ""
 msgid "Student Support: Enrollment"
 msgstr ""
 
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr ""
-
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr ""
@@ -19003,21 +19058,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"ç²¤ICPå¤17044299å·-2. "
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-msgid ""
-"© 2012–{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
-"edX and the edX and Open edX logos are registered trademarks or trademarks "
-"of edX Inc."
+msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -19030,6 +19071,10 @@ msgid ""
 "by the edX honor code and completed all of the required tasks of this course"
 " under its guidelines, as well as having their photo ID checked to verify "
 "their identity."
+msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
@@ -22174,6 +22219,10 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "Accessibility Accommodation Request"
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "LMS"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
