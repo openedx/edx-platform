@@ -513,8 +513,8 @@ class VideoComponentPage(VideoPage):
             list: list of translation language codes
 
         """
-        translations_selector = '.metadata-video-translations .remove-setting'
-        return self.q(css=translations_selector).attrs('data-lang')
+        translations_selector = '.metadata-video-translations .list-settings-item'
+        return self.q(css=translations_selector).attrs('data-original-lang')
 
     def download_translation(self, language_code, text_to_search):
         """
@@ -529,7 +529,7 @@ class VideoComponentPage(VideoPage):
 
         """
         mime_type = 'application/x-subrip'
-        lang_code = '/{}?'.format(language_code)
+        lang_code = '?language_code={}'.format(language_code)
         link = [link for link in self.q(css='.download-action').attrs('href') if lang_code in link]
         result, headers, content = self._get_transcript(link[0])
 

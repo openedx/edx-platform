@@ -1,10 +1,9 @@
 define(
     [
-        'jquery', 'underscore',
+        'jquery', 'underscore', 'edx-ui-toolkit/js/utils/html-utils', 'js/views/video/transcripts/utils',
         'js/views/abstract_editor', 'js/models/uploads', 'js/views/uploads'
-
     ],
-function($, _, AbstractEditor, FileUpload, UploadDialog) {
+function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, FileUpload, UploadDialog) {
     'use strict';
 
     var VideoUploadDialog = UploadDialog.extend({
@@ -31,13 +30,25 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
 
         initialize: function() {
             var templateName = _.result(this, 'templateItemName'),
-                tpl = document.getElementById(templateName).text;
+                tpl = document.getElementById(templateName).text,
+                languageMap = {};
 
             if (!tpl) {
                 console.error("Couldn't load template for item: " + templateName);
             }
 
             this.templateItem = _.template(tpl);
+
+            // Initialize language map. Keys in this map represent language codes present on
+            // server. Values will change if user changes the language from a dropdown.
+            // For example: Initially map will look like {'ar': 'ar', 'zh': 'zh'} and corresponding
+            // dropdowns will show language names `Arabic` and `Chinese`. If user changes `Chinese`
+            // to `Russian` then map will become {'ar': 'ar', 'zh': 'ru'}
+            _.each(this.model.getDisplayValue(), function(value, lang) {
+                languageMap[lang] = lang;
+            });
+            TranscriptUtils.Storage.set('languageMap', languageMap);
+
             AbstractEditor.prototype.initialize.apply(this, arguments);
         },
 
@@ -111,14 +122,16 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
         setValueInEditor: function(values) {
             var self = this,
                 frag = document.createDocumentFragment(),
-                dropdown = self.getDropdown(values);
+                dropdown = self.getDropdown(values),
+                languageMap = TranscriptUtils.Storage.get('languageMap');
 
-            _.each(values, function(value, key) {
+            _.each(values, function(value, newLang) {
                 var html = $(self.templateItem({
-                    lang: key,
+                    newLang: newLang,
+                    originalLang: _.findKey(languageMap, function(lang){ return lang === newLang}) || '',
                     value: value,
-                    url: self.model.get('urlRoot') + '/' + key
-                })).prepend(dropdown.clone().val(key))[0];
+                    url: self.model.get('urlRoot')
+                })).prepend(dropdown.clone().val(newLang))[0];
 
                 frag.appendChild(html);
             });
@@ -130,18 +143,25 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             event.preventDefault();
             // We don't call updateModel here since it's bound to the
             // change event
-            var dict = $.extend(true, {}, this.model.get('value'));
-            dict[''] = '';
-            this.setValueInEditor(dict);
+            this.setValueInEditor(this.getAllLanguageDropdownElementsData(true));
             this.$el.find('.create-setting').addClass('is-disabled').attr('aria-disabled', true);
         },
 
         removeEntry: function(event) {
             event.preventDefault();
+            var $currentListItemEl = $(event.currentTarget).parent(),
+                originalLang = $currentListItemEl.data('original-lang'),
+                selectedLang = $currentListItemEl.find('select option:selected').val(),
+                languageMap = TranscriptUtils.Storage.get('languageMap');
 
-            var entry = $(event.currentTarget).data('lang');
-            this.setValueInEditor(_.omit(this.model.get('value'), entry));
-            this.updateModel();
+            // re-render dropdowns
+            this.setValueInEditor(this.getAllLanguageDropdownElementsData(false, selectedLang));
+
+            // remvove the `originalLang` from `languageMap`
+            if (originalLang) {
+                TranscriptUtils.Storage.set('languageMap', _.omit(languageMap, originalLang));
+            }
+
             this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
@@ -150,26 +170,58 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
 
             var self = this,
                 $target = $(event.currentTarget),
-                lang = $target.data('lang'),
-                model = new FileUpload({
-                    title: gettext('Upload translation'),
-                    fileFormats: ['srt']
-                }),
-                view = new VideoUploadDialog({
-                    model: model,
-                    url: self.model.get('urlRoot') + '/' + lang,
-                    parentElement: $target.closest('.xblock-editor'),
-                    onSuccess: function(response) {
-                        if (!response.filename) { return; }
+                $listItem = $target.parents('li.list-settings-item'),
+                originalLang = $listItem.data('original-lang'),
+                newLang = $listItem.find(':selected').val(),
+                edxVideoIdField = TranscriptUtils.getField(self.model.collection, 'edx_video_id'),
+                fileUploadModel,
+                uploadData,
+                videoUploadDialog;
 
-                        var dict = $.extend(true, {}, self.model.get('value'));
+            // That's the case when an author is
+            // uploading a new transcript.
+            if (!originalLang) {
+                originalLang = newLang
+            }
 
-                        dict[lang] = response.filename;
-                        self.model.setValue(dict);
-                    }
-                });
+            // Transcript data payload
+            uploadData = {
+                edx_video_id: edxVideoIdField.getValue(),
+                language_code: originalLang,
+                new_language_code: newLang
+            };
 
-            view.show();
+            fileUploadModel = new FileUpload({
+                title: gettext('Upload translation'),
+                fileFormats: ['srt']
+            });
+
+            videoUploadDialog = new VideoUploadDialog({
+                model: fileUploadModel,
+                url: this.model.get('urlRoot'),
+                parentElement: $target.closest('.xblock-editor'),
+                uploadData: uploadData,
+                onSuccess: function(response) {
+                    var languageMap = TranscriptUtils.Storage.get('languageMap'),
+                        newLangObject = {};
+
+                    // new language entry to be added to languageMap
+                    newLangObject[newLang] = newLang;
+
+                    //Update edx-video-id
+                    edxVideoIdField.setValue(response.edx_video_id);
+
+                    // Update language map by omitting original lang and adding new lang
+                    // if languageMap is empty then newLang will be added
+                    // if an original lang is replaced with new lang then omit the original lang and the add new lang
+                    languageMap = _.extend(_.omit(languageMap, originalLang), newLangObject);
+                    TranscriptUtils.Storage.set('languageMap', languageMap);
+
+                    // re-render the whole view
+                    self.setValueInEditor(self.getAllLanguageDropdownElementsData());
+                }
+            });
+            videoUploadDialog.show();
         },
 
         enableAdd: function() {
@@ -184,10 +236,57 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
         },
 
         onChangeHandler: function(event) {
-            this.showClearButton();
+            var $target = $(event.currentTarget),
+                $listItem = $target.parents('li.list-settings-item'),
+                originalLang = $listItem.data('original-lang'),
+                newLang = $listItem.find('select option:selected').val(),
+                languageMap = TranscriptUtils.Storage.get('languageMap');
+
+            // To protect against any new/unsaved language code in the map.
+            if (originalLang in languageMap) {
+                languageMap[originalLang] = newLang;
+                TranscriptUtils.Storage.set('languageMap', languageMap);
+
+                // an existing saved lang is changed, no need to re-render the whole view
+                return;
+            }
+
             this.enableAdd();
-            this.updateModel();
+            this.setValueInEditor(this.getAllLanguageDropdownElementsData());
+        },
+
+        /**
+         * Constructs data extracted from each dropdown. This will be used to re-render the whole view.
+         */
+        getAllLanguageDropdownElementsData: function(isNew, omittedLanguage) {
+            var data = {},
+                languageDropdownElements = this.$el.find('select'),
+                languageMap = TranscriptUtils.Storage.get('languageMap');
+
+            // data object will mirror the languageMap. `data` will contain lang to lang map as explained below
+            // {originalLang: originalLang};            original lang not changed
+            // {newLang: originalLang};                 original lang changed to a new lang
+            // {selectedLang: ""};                      new lang to be added, no entry in languageMap
+            _.each(languageDropdownElements, function(languageDropdown, index){
+                var language = $(languageDropdown).find(':selected').val();
+                data[language] = _.findKey(languageMap, function(lang){ return lang === language}) || "";
+            });
+
+            // This is needed to render an empty item that
+            // will be further used to upload a transcript.
+            if (isNew) {
+                data[""] = "";
+            }
+
+            // This Omits a language from the dropdown's data. It is
+            // needed when an item is going to be removed.
+            if (typeof(omittedLanguage) !== 'undefined') {
+                data = _.omit(data, omittedLanguage)
+            }
+
+            return data;
         }
+
     });
 
     return Translations;
