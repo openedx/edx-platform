@@ -562,8 +562,7 @@ class ProblemResponses(object):
         display_name = course_blocks.get_xblock_field(root, 'display_name')
         if path is None:
             path = [display_name]
-        if root.block_type == 'problem':
-            yield display_name, path, root
+        yield display_name, path, root
         for block in course_blocks.get_children(root):
             display_name = course_blocks.get_xblock_field(block, 'display_name')
             if block.block_type == 'problem':
