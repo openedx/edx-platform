@@ -559,15 +559,17 @@ class ProblemResponses(object):
         Generate a tuple of display names, block location paths and block keys
         for all problem blocks under the ``root`` block.
         """
+        display_name = course_blocks.get_xblock_field(root, 'display_name')
         if path is None:
-            path = [course_blocks.get_xblock_field(root, 'display_name')]
+            path = [display_name]
+        if root.block_type == 'problem':
+            yield display_name, path, root
         for block in course_blocks.get_children(root):
             display_name = course_blocks.get_xblock_field(block, 'display_name')
             if block.block_type == 'problem':
                 yield display_name, path, block
             else:
-                for result in cls._build_problem_list(course_blocks, block,
-                                                      path + [display_name]):
+                for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
                     yield result
 
     @classmethod
@@ -582,8 +584,7 @@ class ProblemResponses(object):
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-        for title, path, block in cls._build_problem_list(course_blocks,
-                                                          problem_key):
+        for title, path, block in cls._build_problem_list(course_blocks, problem_key):
             responses = list_problem_responses(course_id, block, max_count)
             student_data += responses
             for response in responses:
@@ -598,8 +599,7 @@ class ProblemResponses(object):
         return student_data
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input,
-                 action_name):
+    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
         """
         For a given `course_id`, generate a CSV file containing
         all student answers to a given problem, and store using a `ReportStore`.
@@ -616,7 +616,8 @@ class ProblemResponses(object):
         student_data = cls._build_student_data(
             user_id=task_input.get('user_id'),
             course_id=course_id,
-            problem_location=problem_location)
+            problem_location=problem_location
+        )
 
         features = ['username', 'title', 'location', 'block_id', 'state']
         header, rows = format_dictlist(student_data, features)
