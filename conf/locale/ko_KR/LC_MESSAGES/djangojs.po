@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: kmooc <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -2230,6 +2230,10 @@ msgid "Reason field should not be left blank."
 msgstr "이유를 입력하는 필드는 비워둘 수 없습니다."
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "사용자 등록/삭제 시 발생한 오류"
 
@@ -2788,32 +2792,6 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "자료가 저장되지 않았습니다."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "유효한 이메일 주소를 입력하세요."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "유효한 비밀번호를 입력하세요."
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr "비밀번호를 재설정하기 위한 이메일을 보냈습니다.  비밀번호를 변경하기 위해 이메일에 있는 링크를 클릭하세요."
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr "귀하에게 비밀번호 재설정 이메일을 보낼 수 없었습니다."
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "변경을 확인하기 위해 이메일을 확인하세요."
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

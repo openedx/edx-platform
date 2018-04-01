@@ -154,7 +154,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:50+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -2572,6 +2572,10 @@ msgid "Reason field should not be left blank."
 msgstr "Поле «Причина» не должно быть пустым."
 
 #: lms/static/js/instructor_dashboard/membership.js
+msgid "Role field should not be left unselected."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Ошибка при регистрации/отмене регистрации пользователей:"
 
@@ -3168,34 +3172,6 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr ""
-
-#: lms/static/js/student_account/account.js
-msgid "The data could not be saved."
-msgstr "Не удалось сохранить ваши данные."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "Пожалуйста, введите корректный электронный адрес"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "Пожалуйста, введите корректный пароль"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"Отправлено электронное сообщение для сброса пароля.  Проследуйте по ссылке, "
-"данной в сообщении, чтобы сменить пароль."
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr "Нам не удалось отправить вам электронное сообщение для сброса пароля."
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "Проверьте электронную почту для подтверждения изменений"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

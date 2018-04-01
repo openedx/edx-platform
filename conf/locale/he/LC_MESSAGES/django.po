@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-03-25 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: Nadav Stark <nadav@yeda.org.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -453,15 +453,6 @@ msgstr "על מנת להירשם, עליך לפעול בהתאם לקוד האת
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
 msgstr "שכחת למלא אחד משדות החובה"
-
-#: common/djangoapps/student/forms.py
-msgid "Username and password fields cannot match"
-msgstr "שם משתמש וסיסמה אינם יכולים להיות זהים"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-msgid "Password: "
-msgstr "סיסמה:"
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
@@ -953,36 +944,6 @@ msgid ""
 msgstr ""
 "{html_start}הצלחה! הפעלת את החשבון שלך.{html_end} את/ה תקבל/י מאיתנו עדכונים"
 " והתראות הקשורים לקורסים שאת/ה רשומ/ה אליהם. להמשך התחבר/י."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct password before reusing a previous password."
-msgid_plural ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct passwords before reusing a previous password."
-msgstr[0] ""
-"אתה ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור סיסמה ייחודית {num} לפני "
-"שתמחזר סיסמה קודמת."
-msgstr[1] ""
-"הינך ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור {num} סיסמאות ייחודיות בטרם "
-"תמחזר סיסמה קודמת."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"day must elapse between password resets."
-msgid_plural ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"days must elapse between password resets."
-msgstr[0] ""
-"אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייב לעבור יום {num} "
-"בין איפוסי הסיסמה."
-msgstr[1] ""
-"אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייבים לעבור {num} "
-"ימים בין איפוסי הסיסמה."
 
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
@@ -1485,69 +1446,146 @@ msgstr "קורס {course_id} מחייב {prerequisite_course_id}"
 msgid "System defined milestone"
 msgstr "אבן דרך שהוגדרה בידי המערכת"
 
+#. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Invalid Length ({0})"
-msgstr "אורך לא תקין ({0})"
+msgid "{num} letter"
+msgid_plural "{num} letters"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} uppercase letter"
+msgid_plural "{num} uppercase letters"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} lowercase letter"
+msgid_plural "{num} lowercase letters"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} digit"
+msgid_plural "{num} digits"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} number"
+msgid_plural "{num} numbers"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} punctuation mark"
+msgid_plural "{num} punctuation marks"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} symbol"
+msgid_plural "{num} symbols"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} word"
+msgid_plural "{num} words"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or more"
-msgstr "חייב להיות {0} תווים או יותר "
+msgid "Your password must contain at least {num} character."
+msgid_plural "Your password must contain at least {num} characters."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or fewer"
-msgstr "חייב להיות {0} תווים או פחות"
+msgid ""
+"Your password must contain at least {num} character, including "
+"{requirements}."
+msgid_plural ""
+"Your password must contain at least {num} characters, including "
+"{requirements}."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Must be more complex ({0})"
-msgstr "חייב להיות מסובך יותר ({0})"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more uppercase characters"
-msgstr "חייב להכיל {0} אותיות גדולות או יותר "
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more lowercase characters"
-msgstr "חייב להכיל {0} או יותר אותיות קטנות"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more digits"
-msgstr "חייב להכיל {0} מספרים או יותר "
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more punctuation characters"
-msgstr "חייב להכיל {0} או יותר סימני פיסוק "
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more non ascii characters"
-msgstr "חייב להכיל {0}תווי ASCII או יותר "
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more unique words"
-msgstr "חייב להכיל {0} מילים ייחודיות  או יותר"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more numbers"
+msgid "Enter a password with at least {requirements}."
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must contain {0} or more letters"
+msgid ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+"אתה ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור סיסמה ייחודית {num} לפני "
+"שתמחזר סיסמה קודמת."
+msgstr[1] ""
+"הינך ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור {num} סיסמאות ייחודיות בטרם "
+"תמחזר סיסמה קודמת."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+"אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייב לעבור יום {num} "
+"בין איפוסי הסיסמה."
+msgstr[1] ""
+"אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייבים לעבור {num} "
+"ימים בין איפוסי הסיסמה."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} character"
+msgid_plural "{num} characters"
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Enter a password with at most {num} character."
+msgid_plural "Enter a password with at most {num} characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Password cannot be the same as the username."
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Too similar to a restricted dictionary word."
-msgstr "דומה מדי למילה אסורה במילון."
+msgid "Password is too similar to a dictionary word."
+msgstr ""
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -5591,8 +5629,8 @@ msgid "Use the checkout page hosted by the E-Commerce service."
 msgstr "השתמש בעמוד היציאה המאוחסן בשירות מסחר אלקטרוני."
 
 #: lms/djangoapps/commerce/models.py
-msgid "Path to single course checkout page hosted by the E-Commerce service."
-msgstr "נתיב לקורס יחיד בעמוד היציאה המאוחסן בשירות מסחר אלקטרוני."
+msgid "Path to course(s) checkout page hosted by the E-Commerce service."
+msgstr ""
 
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
@@ -10801,25 +10839,6 @@ msgstr ""
 msgid "Enter a valid email address that contains at least {min} characters."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter a password."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password is not long enough."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "Password cannot be longer than {max} character."
-msgstr ""
-
-#. Translators: This message is shown to users who enter a password matching
-#. the username they enter(ed).
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password cannot be the same as the username."
-msgstr ""
-
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -12124,7 +12143,6 @@ msgid "Reset"
 msgstr "אתחל"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "משפטי"
@@ -12320,8 +12338,8 @@ msgstr ""
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must complete the section '{prereq_section_name}' with the required "
-"score before you are able to view this content."
+"You must earn a passing score for '{prereq_section_name}' to access this "
+"content."
 msgstr ""
 
 #: lms/templates/_gated_content.html
@@ -12567,7 +12585,7 @@ msgid ""
 msgstr ""
 "יש לך {strong_start}שאלות כלליות על {platform_name}{strong_end}? בקרוב נוסיף"
 " עמוד שאלות ותשובות ובו תוכל למצוא מידע רב ומועיל ב{platform_name} "
-"{link_start}שאלות הנפוצות{link_end}."
+"{link_start}שאלות נפוצות{link_end}."
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -18371,6 +18389,10 @@ msgstr ""
 "האיות. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Role of the users being enrolled."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter the reason why the students are to be manually enrolled or unenrolled."
 msgstr "הזן את הסיבה שבגללה נרשמו הסטודנטים ידנית או לא נרשמו כלל."
@@ -20385,18 +20407,6 @@ msgid ""
 "ç²¤ICPå¤17044299å·-2. "
 msgstr ""
 
-#: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr "אודות edX"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid ""
-"© 2012–{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
-"edX and the edX and Open edX logos are registered trademarks or trademarks "
-"of edX Inc."
-msgstr ""
-
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
 msgstr ""
@@ -20408,6 +20418,10 @@ msgid ""
 " under its guidelines, as well as having their photo ID checked to verify "
 "their identity."
 msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
+msgstr "אודות edX"
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
