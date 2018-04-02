@@ -198,7 +198,7 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
 
         # set the activation flag when the user is marked as activated
         update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(),
-                          new_user=False, send_welcome_email=send_welcome_email)
+                          new_user=False, activation=send_welcome_email)
 
     elif setting == 'email':
         # email update is special case
