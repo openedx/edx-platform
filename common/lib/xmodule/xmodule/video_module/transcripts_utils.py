@@ -637,7 +637,7 @@ class Transcript(object):
                     # With error handling (set to 'ERROR_RAISE'), we will be getting
                     # the exception if something went wrong in parsing the transcript.
                     srt_subs = SubRipFile.from_string(
-                        content.decode('utf8'),
+                        content.decode('utf-8-sig'),
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
@@ -944,7 +944,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         transcripts['en'] = sub
     elif video.youtube_id_1_0:
         transcripts['en'] = video.youtube_id_1_0
-    elif language == u'en':
+    elif language == u'en' and not transcripts.get(language, False):
         raise NotFoundError('No transcript for `en` language')
 
     try:
