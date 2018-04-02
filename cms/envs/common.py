@@ -127,6 +127,11 @@ from lms.envs.common import (
     VIDEO_IMAGE_SETTINGS,
     VIDEO_TRANSCRIPTS_SETTINGS,
 
+    RETIRED_USERNAME_FMT,
+    RETIRED_EMAIL_FMT,
+    RETIRED_USER_SALTS,
+    RETIREMENT_SERVICE_WORKER_USERNAME,
+
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,

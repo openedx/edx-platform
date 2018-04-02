@@ -574,6 +574,14 @@ ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
     ENTERPRISE_REPORTING_SECRET
 )
 
+############### Settings for Retirement #####################
+RETIRED_USERNAME_FMT = ENV_TOKENS.get('RETIRED_USERNAME_FMT', RETIRED_USERNAME_FMT)
+RETIRED_EMAIL_FMT = ENV_TOKENS.get('RETIRED_EMAIL_FMT', RETIRED_EMAIL_FMT)
+RETIREMENT_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
+    'RETIREMENT_SERVICE_WORKER_USERNAME',
+    RETIREMENT_SERVICE_WORKER_USERNAME
+)
+
 ####################### Plugin Settings ##########################
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants

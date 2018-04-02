@@ -3408,6 +3408,12 @@ COMPLETION_BY_VIEWING_DELAY_MS = 5000
 RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
 
+############### Settings for Retirement #####################
+RETIRED_USERNAME_FMT = 'retired__user_{}'
+RETIRED_EMAIL_FMT = 'retired__user_{}@retired.invalid'
+RETIRED_USER_SALTS = ['abc', '123']
+RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
+
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
     'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',

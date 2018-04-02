@@ -46,6 +46,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
+from user_util import user_util
 
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
@@ -154,9 +155,9 @@ def anonymous_id_for_user(user, course_id, save=True):
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
     hasher.update(settings.SECRET_KEY)
-    hasher.update(unicode(user.id))
+    hasher.update(text_type(user.id))
     if course_id:
-        hasher.update(unicode(course_id).encode('utf-8'))
+        hasher.update(text_type(course_id).encode('utf-8'))
     digest = hasher.hexdigest()
 
     if not hasattr(user, '_anonymous_id'):
@@ -197,6 +198,74 @@ def user_by_anonymous_id(uid):
         return User.objects.get(anonymoususerid__anonymous_user_id=uid)
     except ObjectDoesNotExist:
         return None
+
+
+def is_username_retired(username):
+    """
+    Checks to see if the given username has been previously retired
+    """
+    locally_hashed_usernames = user_util.get_all_retired_usernames(
+        username,
+        settings.RETIRED_USER_SALTS,
+        settings.RETIRED_USERNAME_FMT
+    )
+
+    return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
+
+
+def get_retired_username_by_username(username):
+    """
+    Returns a "retired username" hashed using the newest configured salt
+    """
+    return user_util.get_retired_username(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
+
+
+def get_retired_email_by_email(email):
+    """
+    Returns a "retired email" hashed using the newest configured salt
+    """
+    return user_util.get_retired_email(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
+
+
+def get_all_retired_usernames_by_username(username):
+    """
+    Returns a generator of "retired usernames", one hashed with each
+    configured salt. Used for finding out if the given username has
+    ever been used and retired.
+    """
+    return user_util.get_all_retired_usernames(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
+
+
+def get_all_retired_emails_by_email(email):
+    """
+    Returns a generator of "retired emails", one hashed with each
+    configured salt. Used for finding out if the given email has
+    ever been used and retired.
+    """
+    return user_util.get_all_retired_emails(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
+
+
+def get_potentially_retired_user_by_username_and_hash(username, hashed_username):
+    """
+    To assist in the retirement process this method will:
+    - Confirm that any locally hashed username matches the passed in one
+      (in case of salt mismatches with the upstream script).
+    - Attempt to return a User object based on the username, or if it
+      does not exist, the any hashed username salted with the historical
+      salts.
+    """
+    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+
+    if hashed_username not in locally_hashed_usernames:
+        raise Exception('Mismatched hashed_username, bad salt?')
+
+    try:
+        return User.objects.get(username=username)
+    except User.DoesNotExist:
+        # The 2nd DoesNotExist will bubble up from here if necessary,
+        # an assumption is being made here that our hashed username format
+        # is something that a user cannot create for themselves.
+        return User.objects.get(username__in=locally_hashed_usernames)
 
 
 class UserStanding(models.Model):
@@ -1329,7 +1398,7 @@ class CourseEnrollment(models.Model):
         Also emits relevant events for analytics purposes.
         """
         if mode is None:
-            mode = _default_course_mode(unicode(course_key))
+            mode = _default_course_mode(text_type(course_key))
         # All the server-side checks for whether a user is allowed to enroll.
         try:
             course = CourseOverview.get_from_id(course_key)
@@ -1337,7 +1406,7 @@ class CourseEnrollment(models.Model):
             # This is here to preserve legacy behavior which allowed enrollment in courses
             # announced before the start of content creation.
             if check_access:
-                log.warning(u"User %s failed to enroll in non-existent course %s", user.username, unicode(course_key))
+                log.warning(u"User %s failed to enroll in non-existent course %s", user.username, text_type(course_key))
                 raise NonExistentCourseError
 
         if check_access:
@@ -1490,7 +1559,7 @@ class CourseEnrollment(models.Model):
         assert isinstance(course_id_partial, CourseKey)
         assert not course_id_partial.run  # None or empty string
         course_key = CourseKey.from_string('/'.join([course_id_partial.org, course_id_partial.course, '']))
-        querystring = unicode(course_key)
+        querystring = text_type(course_key)
         try:
             return cls.objects.filter(
                 user=user,
@@ -1881,7 +1950,7 @@ class CourseEnrollment(models.Model):
         Returns:
             Unicode cache key
         """
-        return cls.COURSE_ENROLLMENT_CACHE_KEY.format(user_id, unicode(course_key))
+        return cls.COURSE_ENROLLMENT_CACHE_KEY.format(user_id, text_type(course_key))
 
     @classmethod
     def _get_enrollment_state(cls, user, course_key):
@@ -1958,7 +2027,7 @@ def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: dis
 
     cache_key = CourseEnrollment.cache_key_name(
         instance.user.id,
-        unicode(instance.course_id)
+        text_type(instance.course_id)
     )
     cache.delete(cache_key)
 
@@ -2412,7 +2481,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         return (
             u"{partner}-{course_key}_{cert_mode}-{target}".format(
                 partner=self.trk_partner_name,
-                course_key=unicode(course_key),
+                course_key=text_type(course_key),
                 cert_mode=cert_mode,
                 target=target
             )
