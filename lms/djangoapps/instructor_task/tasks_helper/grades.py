@@ -577,13 +577,8 @@ class ProblemResponses(object):
 
         for block in course_blocks.get_children(root):
             display_name = course_blocks.get_xblock_field(block, 'display_name')
-            # Sequential blocks are filtered out since they include position state
-            # which isn't useful in this report.
-            if block.block_type != 'sequential':
-                yield display_name, path, block
-            else:
-                for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
-                    yield result
+            for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
+                yield result
 
     @classmethod
     def _build_student_data(cls, user_id, course_id, problem_location):
@@ -609,6 +604,10 @@ class ProblemResponses(object):
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
         for title, path, block_key in cls._build_problem_list(course_blocks, problem_key):
+            # Sequential blocks are filtered out since they include position state
+            # which isn't useful in this report.
+            if block_key.block_type == 'sequential':
+                continue
             responses = list_problem_responses(course_id, block_key, max_count)
             student_data += responses
             for response in responses:
