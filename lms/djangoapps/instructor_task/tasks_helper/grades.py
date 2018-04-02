@@ -558,14 +558,28 @@ class ProblemResponses(object):
         """
         Generate a tuple of display names, block location paths and block keys
         for all problem blocks under the ``root`` block.
+
+        Arguments:
+            course_blocks (BlockStructureBlockData): Block structure for a course.
+            root (UsageKey): This block and its children will be used to generate
+                the problem list
+            path (List[str]): The list of display names for the parent of root block
+
+        Yields:
+            Tuple[str, List[str], UsageKey]: tuple of a blocks display name, path, and
+                usage key
         """
         display_name = course_blocks.get_xblock_field(root, 'display_name')
         if path is None:
             path = [display_name]
+
         yield display_name, path, root
+
         for block in course_blocks.get_children(root):
             display_name = course_blocks.get_xblock_field(block, 'display_name')
-            if block.block_type == 'problem':
+            # Sequential blocks are filtered out since they include position state
+            # which isn't useful in this report.
+            if block.block_type != 'sequential':
                 yield display_name, path, block
             else:
                 for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
@@ -576,6 +590,17 @@ class ProblemResponses(object):
         """
         Generate a list of problem responses for all problem under the
         ``problem_location`` root.
+
+        Arguments:
+            user_id (int): The user id for the user generating the report
+            course_id (UsageKey): The UsageKey for the course whose report is
+                being generated
+            problem_location (str): The generated report will include this
+                block and it child blocks.
+
+        Returns:
+              List[Dict]: Returns a list of dictionaries containing the student
+                data which will be included in the final csv.
         """
         problem_key = UsageKey.from_string(problem_location).map_into_course(course_id)
         user = get_user_model().objects.get(pk=user_id)
@@ -583,13 +608,13 @@ class ProblemResponses(object):
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-        for title, path, block in cls._build_problem_list(course_blocks, problem_key):
-            responses = list_problem_responses(course_id, block, max_count)
+        for title, path, block_key in cls._build_problem_list(course_blocks, problem_key):
+            responses = list_problem_responses(course_id, block_key, max_count)
             student_data += responses
             for response in responses:
                 response['title'] = title
                 response['location'] = ' > '.join(path)
-                response['block_id'] = block.block_id
+                response['block_key'] = str(block_key)
             if max_count is not None:
                 max_count -= len(responses)
                 if max_count <= 0:
@@ -618,7 +643,7 @@ class ProblemResponses(object):
             problem_location=problem_location
         )
 
-        features = ['username', 'title', 'location', 'block_id', 'state']
+        features = ['username', 'title', 'location', 'block_key', 'state']
         header, rows = format_dictlist(student_data, features)
 
         task_progress.attempted = task_progress.succeeded = len(rows)
