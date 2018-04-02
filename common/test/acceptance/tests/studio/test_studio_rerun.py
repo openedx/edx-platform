@@ -19,7 +19,7 @@ class CourseRerunTest(StudioCourseTest):
     """
     Feature: Courses can be rerun
     """
-
+    shard = 21
     __test__ = True
 
     SECTION_NAME = 'Rerun Section'

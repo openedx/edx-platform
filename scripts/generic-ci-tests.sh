@@ -205,11 +205,11 @@ case "$TEST_SUITE" in
                 $TOX paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            [1-9]|10)
+            [1-9]|1[0-9]|2[0-1])
                 $TOX paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
                 ;;
 
-            11|"noshard")
+            22|"noshard")
                 $TOX paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
                 ;;
 

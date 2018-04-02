@@ -311,7 +311,7 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
             self.assertEqual(self.thread_page.q(css=".forum-nav-thread-title").text[0], 'dummy thread title')
 
 
-@attr(shard=2)
+@attr(shard=19)
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread

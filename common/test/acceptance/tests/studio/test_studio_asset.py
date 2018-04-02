@@ -10,6 +10,7 @@ from common.test.acceptance.pages.studio.asset_index import UPLOAD_FILE_DIR
 
 class AssetIndexTestStudioFrontend(StudioCourseTest):
     """Tests for the Asset index page."""
+    shard = 21
 
     def setUp(self, is_staff=False):  # pylint: disable=arguments-differ
         super(AssetIndexTestStudioFrontend, self).setUp()

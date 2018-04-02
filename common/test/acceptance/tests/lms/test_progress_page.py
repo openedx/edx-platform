@@ -127,7 +127,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
-@attr(shard=9)
+@attr(shard=22)
 @ddt.ddt
 class PersistentGradesTest(ProgressPageBaseTest):
     """
@@ -275,7 +275,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
-@attr(shard=9)
+@attr(shard=22)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field

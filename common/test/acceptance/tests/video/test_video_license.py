@@ -12,7 +12,7 @@ from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=2)
+@attr(shard=22)
 class VideoLicenseTest(StudioCourseTest):
     """
     Tests for video module-level licensing (that is, setting the license,

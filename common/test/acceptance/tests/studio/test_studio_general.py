@@ -26,6 +26,8 @@ class LoggedOutTest(AcceptanceTest):
     """
     Smoke test for pages in Studio that are visible when logged out.
     """
+    shard = 21
+
     def setUp(self):
         super(LoggedOutTest, self).setUp()
         self.pages = [LoginPage(self.browser), IndexPage(self.browser), SignupPage(self.browser),
@@ -45,6 +47,8 @@ class LoggedInPagesTest(AcceptanceTest):
     """
     Verify the pages in Studio that you can get to when logged in and do not have a course yet.
     """
+    shard = 21
+
     def setUp(self):
         super(LoggedInPagesTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
@@ -64,6 +68,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
     """
     Test studio sign-up and sign-in
     """
+    shard = 21
+
     def setUp(self):  # pylint: disable=arguments-differ
         super(SignUpAndSignInTest, self).setUp()
         self.sign_up_page = SignupPage(self.browser)
@@ -215,7 +221,7 @@ class CoursePagesTest(StudioCourseTest):
     Tests that verify the pages in Studio that you can get to when logged
     in and have a course.
     """
-
+    shard = 21
     COURSE_ID_SEPARATOR = "."
 
     def setUp(self):
@@ -267,6 +273,7 @@ class DiscussionPreviewTest(StudioCourseTest):
     """
     Tests that Inline Discussions are rendered with a custom preview in Studio
     """
+    shard = 21
 
     def setUp(self):
         super(DiscussionPreviewTest, self).setUp()

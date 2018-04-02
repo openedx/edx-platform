@@ -603,7 +603,7 @@ class UnitAccessTest(CourseOutlineTest):
         self.assertEqual(course_home_page.outline.num_units, 2)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class StaffLockTest(CourseOutlineTest):
     """
     Feature: Sections, subsections, and units can be locked and unlocked from the course outline.
@@ -946,7 +946,7 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class EditNamesTest(CourseOutlineTest):
     """
     Feature: Click-to-edit section/subsection names
@@ -1062,7 +1062,7 @@ class EditNamesTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class CreateSectionsTest(CourseOutlineTest):
     """
     Feature: Create new sections/subsections/units
@@ -1149,7 +1149,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
-@attr(shard=3)
+@attr(shard=14)
 class DeleteContentTest(CourseOutlineTest):
     """
     Feature: Deleting sections/subsections/units
@@ -1261,7 +1261,7 @@ class DeleteContentTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
     """
     Feature: Courses with multiple sections can expand and collapse all sections.
@@ -1397,7 +1397,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class ExpandCollapseSingleSectionTest(CourseOutlineTest):
     """
     Feature: Courses with a single section can expand and collapse all sections.
@@ -1437,7 +1437,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class ExpandCollapseEmptyTest(CourseOutlineTest):
     """
     Feature: Courses with no sections initially can expand and collapse all sections after addition.
@@ -1475,7 +1475,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with an empty course
@@ -1500,7 +1500,7 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
-@attr(shard=3)
+@attr(shard=14)
 class DefaultStatesContentTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with a course with content
@@ -1525,7 +1525,7 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
 
-@attr(shard=3)
+@attr(shard=7)
 class UnitNavigationTest(CourseOutlineTest):
     """
     Feature: Navigate to units
@@ -1546,7 +1546,7 @@ class UnitNavigationTest(CourseOutlineTest):
         unit.wait_for_page()
 
 
-@attr(shard=3)
+@attr(shard=7)
 class PublishSectionTest(CourseOutlineTest):
     """
     Feature: Publish sections.
@@ -1673,7 +1673,7 @@ class PublishSectionTest(CourseOutlineTest):
         return (section, subsection, unit)
 
 
-@attr(shard=3)
+@attr(shard=7)
 class DeprecationWarningMessageTest(CourseOutlineTest):
     """
     Feature: Verify deprecation warning message.

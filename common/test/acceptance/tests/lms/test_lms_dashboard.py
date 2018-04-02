@@ -141,6 +141,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         self.dashboard_page.visit()
 
 
+@attr(shard=9)
 class LmsDashboardPageTest(BaseLmsDashboardTest):
     """ Test suite for the LMS Student Dashboard page """
 
