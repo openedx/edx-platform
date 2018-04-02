@@ -4,8 +4,6 @@ user/course
 """
 from __future__ import print_function
 
-from optparse import make_option
-
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
@@ -53,25 +51,28 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-a', '--add',
-                    metavar='USER',
-                    dest='add',
-                    default=False,
-                    help='user or list of users to add to the certificate whitelist'),
-
-        make_option('-d', '--del',
-                    metavar='USER',
-                    dest='del',
-                    default=False,
-                    help='user or list of users to remove from the certificate whitelist'),
-
-        make_option('-c', '--course-id',
-                    metavar='COURSE_ID',
-                    dest='course_id',
-                    default=False,
-                    help="course id to query"),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-a', '--add',
+            metavar='USER',
+            dest='add',
+            default=False,
+            help='user or list of users to add to the certificate whitelist'
+        )
+        parser.add_argument(
+            '-d', '--del',
+            metavar='USER',
+            dest='del',
+            default=False,
+            help='user or list of users to remove from the certificate whitelist'
+        )
+        parser.add_argument(
+            '-c', '--course-id',
+            metavar='COURSE_ID',
+            dest='course_id',
+            default=False,
+            help="course id to query"
+        )
 
     def handle(self, *args, **options):
         course_id = options['course_id']
