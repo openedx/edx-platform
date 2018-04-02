@@ -30,6 +30,7 @@ module.exports = {
         UpsellExperimentModal: './lms/static/common/js/components/UpsellExperimentModal.jsx',
         PortfolioExperimentUpsellModal: './lms/static/common/js/components/PortfolioExperimentUpsellModal.jsx',
         EntitlementSupportPage: './lms/djangoapps/support/static/support/jsx/entitlements/index.jsx',
+        PasswordResetConfirmation: './lms/static/js/student_account/components/PasswordResetConfirmation.jsx',
 
         // Learner Dashboard
         EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',

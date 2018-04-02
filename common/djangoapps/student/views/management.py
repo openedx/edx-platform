@@ -1159,25 +1159,18 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
     if request.method == 'POST':
         password = request.POST['new_password1']
-        valid_link = True  # password reset link will be valid if there is no security violation
-        error_message = None
+
         try:
             validate_password(password, user=user)
-        except SecurityPolicyError as err:
-            error_message = err.message
-            valid_link = False
         except ValidationError as err:
-            error_message = err.message
-
-        if error_message:
             # We have a password reset attempt which violates some security
             # policy, or any other validation. Use the existing Django template to communicate that
             # back to the user.
             context = {
-                'validlink': valid_link,
+                'validlink': True,
                 'form': None,
                 'title': _('Password reset unsuccessful'),
-                'err_msg': error_message,
+                'err_msg': err.message,
             }
             context.update(platform_name)
             return TemplateResponse(
