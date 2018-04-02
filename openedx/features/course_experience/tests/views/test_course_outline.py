@@ -131,7 +131,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                         self.assertIn(sequential.format, response_content)
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:
-                        self.assertNotIn(vertical.display_name, response_content)
+                        self.assertIn(vertical.display_name, response_content)
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -230,21 +230,21 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         lock_icon = response_content('.fa-lock')
         self.assertTrue(lock_icon, "lock icon is not present, but should be")
 
-        subsection = lock_icon.parents('.subsection-title')
+        subsection = lock_icon.parents('.subsection-text')
 
         # check that subsection-title-name is the display name
         gated_subsection_title = self.course_blocks['gated_content'].display_name
-        self.assertIn(gated_subsection_title, subsection.children('.subsection-title-name').html())
+        self.assertIn(gated_subsection_title, subsection.children('.subsection-title').html())
 
         # check that it says prerequisite required
-        self.assertIn(self.PREREQ_REQUIRED, subsection.children('.details').html())
+        self.assertIn("Prerequisite:", subsection.children('.details').html())
 
         # check that there is not a screen reader message
         self.assertFalse(subsection.children('.sr'))
 
     def test_content_unlocked(self):
         """
-        Test that a sequential/subsection with unmet prereqs correctly indicated that its content is locked
+        Test that a sequential/subsection with met prereqs correctly indicated that its content is unlocked
         """
         course = self.course
         self.setup_gated_section(self.course_blocks['gated_content'], self.course_blocks['prerequisite'])
@@ -263,24 +263,23 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
 
         response_content = pq(response.content)
 
-        # check unlock icon is present
+        # check unlock icon is not present
         unlock_icon = response_content('.fa-unlock')
-        self.assertTrue(unlock_icon, "unlock icon is not present, but should be")
+        self.assertFalse(unlock_icon, "unlock icon is present, yet shouldn't be.")
 
-        subsection = unlock_icon.parents('.subsection-title')
+        gated_subsection_title = self.course_blocks['gated_content'].display_name
+        every_subsection_on_outline = response_content('.subsection-title')
+
+        subsection_has_gated_text = False
+        says_prerequisite_required = False
+
+        for subsection_contents in every_subsection_on_outline.contents():
+            subsection_has_gated_text = gated_subsection_title in subsection_contents
+            says_prerequisite_required = "Prerequisite:" in subsection_contents
 
         # check that subsection-title-name is the display name of gated content section
-        gated_subsection_title = self.course_blocks['gated_content'].display_name
-        self.assertIn(gated_subsection_title, subsection.children('.subsection-title-name').html())
-
-        # check that it doesn't say prerequisite required
-        self.assertNotIn(self.PREREQ_REQUIRED, subsection.children('.subsection-title-name').html())
-
-        # check that there is a screen reader message
-        self.assertTrue(subsection.children('.sr'))
-
-        # check that the screen reader message is correct
-        self.assertIn(self.UNLOCKED, subsection.children('.sr').html())
+        self.assertTrue(subsection_has_gated_text)
+        self.assertFalse(says_prerequisite_required)
 
 
 class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
@@ -397,7 +396,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         self.visit_sequential(course, chapter, sequential)
 
         # check resume course buttons
-        response = self.visit_course_home(course, resume_count=2)
+        response = self.visit_course_home(course, resume_count=1)
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
 
@@ -433,7 +432,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         )
 
         # Test for 'resume' link
-        response = self.visit_course_home(course, resume_count=2)
+        response = self.visit_course_home(course, resume_count=1)
 
         # Test for 'resume' link URL - should be vertical 1
         content = pq(response.content)
@@ -448,7 +447,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
             block_key=block_key,
             completion=completion
         )
-        response = self.visit_course_home(course, resume_count=2)
+        response = self.visit_course_home(course, resume_count=1)
 
         # Test for 'resume' link URL - should be vertical 2
         content = pq(response.content)
@@ -459,7 +458,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         self.visit_sequential(course, course.children[0], course.children[0].children[0])
 
         # Test for 'resume' link URL - should be vertical 2 (last completed block, NOT last visited)
-        response = self.visit_course_home(course, resume_count=2)
+        response = self.visit_course_home(course, resume_count=1)
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name))
 
@@ -483,7 +482,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
             self.store.delete_item(sequential.location, self.user.id)
 
         # check resume course buttons
-        response = self.visit_course_home(course, resume_count=2)
+        response = self.visit_course_home(course, resume_count=1)
 
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential2.url_name))

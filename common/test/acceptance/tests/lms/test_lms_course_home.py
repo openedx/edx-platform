@@ -91,8 +91,8 @@ class CourseHomeTest(CourseHomeBaseTest):
 
         # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {
-            'Test Section': ['Test Subsection'],
-            'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
+            u'Test Section': [u'Test Subsection'],
+            u'Test Section 2': [u'Test Subsection 2', u'Test Subsection 3']
         }
 
         actual_sections = self.course_home_page.outline.sections
@@ -101,7 +101,7 @@ class CourseHomeTest(CourseHomeBaseTest):
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
 
         # Navigate to a particular section
-        self.course_home_page.outline.go_to_section('Test Section', 'Test Subsection')
+        self.course_home_page.outline.go_to_section(u'Test Section', u'Test Subsection')
 
         # Check the sequence items on the courseware page
         EXPECTED_ITEMS = ['Test Problem 1', 'Test Problem 2', 'Test HTML']
