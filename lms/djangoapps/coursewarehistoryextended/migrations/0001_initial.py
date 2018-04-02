@@ -53,5 +53,5 @@ class Migration(migrations.Migration):
                 'get_latest_by': 'created',
             },
         ),
-        migrations.RunPython(bump_pk_start, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(bump_pk_start, reverse_code=migrations.RunPython.noop, atomic=False),
     ]
