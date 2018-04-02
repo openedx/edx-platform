@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@edx/edx-bootstrap": "0.4.3",
-    "@edx/paragon": "1.7.1",
+    "@edx/paragon": "2.5.6",
     "@edx/studio-frontend": "1.7.0",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",

@@ -172,7 +172,7 @@
       &::after {
         position: absolute;
         left: 0;
-        top: ($baseline/2);
+        top: 50%;
         width: 100%;
         height: 1px;
         background: $gray-l3;
@@ -182,10 +182,11 @@
 
       .text {
         position: relative;
-        top: -2px; // Aligns center of text with center of line (CR)
+        top: -1px; // Aligns center of text with center of line (CR)
         z-index: 6;
         padding: 0 $baseline;
         background: $white;
+        font-size: $baseline;
       }
     }
 
