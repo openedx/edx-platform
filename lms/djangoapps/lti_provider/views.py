@@ -3,6 +3,7 @@ LTI Provider view functions
 """
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -19,6 +20,7 @@ from third_party_auth.models import UserSocialAuthMapping
 from openedx.core.djangoapps.user_api.accounts.api import delete_user_account
 
 log = logging.getLogger("edx.lti_provider")
+USER_MODEL = get_user_model()
 
 
 # LTI launch parameters that must be present for a successful launch
@@ -266,10 +268,8 @@ def users_delete_user_account(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed('POST')
 
-    # Check the LTI parameters, and return 400 if any required parameters are
-    # missing
-
-    additional_params = ['puid']
+    # Check the LTI parameters, and return 400 if any required parameters are missing
+    additional_params = ['puid', 'email']
     params = get_required_lti_parameters(request.POST, additional_params)
     if not params:
         return HttpResponseBadRequest()
@@ -284,17 +284,26 @@ def users_delete_user_account(request):
     if not SignatureValidator(lti_consumer).verify(request):
         return HttpResponseForbidden()
 
-    puid = params["puid"]
-    # First verify the mapping is already exist sanity check
-    try:
-        social_auth_mapping = UserSocialAuthMapping.objects.get(puid=puid)
-    except UserSocialAuthMapping.DoesNotExist:
-        return HttpResponse(-1)
+    user_puid = params.get('puid')
+    user_email = params.get('email')
+    found_user = None
 
-    user_id = social_auth_mapping.user_id
+    # First verify the mapping is already exist sanity check
+    if user_puid:
+        try:
+            social_auth_mapping = UserSocialAuthMapping.objects.get(puid=user_puid)
+            found_user = USER_MODEL.objects.get(id=social_auth_mapping.user_id)
+        except UserSocialAuthMapping.DoesNotExist:
+            return HttpResponse(-1)
+    elif user_email:
+        try:
+            found_user = USER_MODEL.objects.get(email=user_email)
+        except USER_MODEL.DoesNotExist:
+            return HttpResponse(-1)
+
     try:
-        delete_user_account(user_id)
+        delete_user_account(found_user.username)
     except Exception:
         raise Http404
 
-    return HttpResponse(user_id)
+    return HttpResponse(found_user.id)

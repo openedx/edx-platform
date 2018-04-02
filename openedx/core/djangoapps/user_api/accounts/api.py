@@ -603,7 +603,7 @@ def _validate_email(email):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def delete_user_account(user_id):
+def delete_user_account(username):
     """
     Soft delete a user's account.
     Associated records that would allow the user to be identified or continue to login
@@ -613,21 +613,15 @@ def delete_user_account(user_id):
     analytics and reporting without keeping any PII data.
 
     Keyword Arguments:
-        user_id - unique id for a user
+        username - username of user to delete
 
     Raises:
         UserNotFound
 
     Example Usage:
-        >>> delete_user_account(112)
+        >>> delete_user_account('karen2112')
 
     """
-
-    # Get user's existing record and profile
-    try:
-        username = User.objects.get(id=user_id).username
-    except Exception:
-        raise UserNotFound()
 
     existing_user, existing_user_profile = _get_user_and_profile(username)
     if not existing_user.is_active:
@@ -663,7 +657,7 @@ def delete_user_account(user_id):
     existing_user.save()
     # Anonymize forum discussions
     try:
-        anonymize_user_discussions(user_id, username, existing_user.username)
+        anonymize_user_discussions(existing_user, username)
     except Exception:
         pass
 
@@ -671,7 +665,7 @@ def delete_user_account(user_id):
     return True
 
 
-def anonymize_user_discussions(user_id, username, enc_username, **kwargs):
+def anonymize_user_discussions(user, old_username):
     """
     Anonymize user's comments for a particular user as per GDPR norms.
     This updates the "users" and "contents" collections of "cs_comments_service"
@@ -686,15 +680,15 @@ def anonymize_user_discussions(user_id, username, enc_username, **kwargs):
     """
 
     # Getting all courses for the user
-    user = User.objects.get(id=user_id)
     courses = get_courses(user)
     # Updating discussion user instance
     updated_user = ThreadUser.from_django_user(user)
     updated_user.save()
     # Updating each discussion entity for each course
-    query_params = {}
-    query_params['paged_results'] = False
-    query_params['author_username'] = username
+    query_params = {
+        'paged_results': False,
+        'author_username': old_username
+    }
     for course in courses:
         query_params['course_id'] = str(course.id)
         discussion_entities = Thread.search(query_params)
@@ -707,5 +701,5 @@ def anonymize_user_discussions(user_id, username, enc_username, **kwargs):
             th.id = entity['id']
             entity['anonymous'] = True
             entity['anonymous_to_peers'] = True
-            # entity['author_username'] = enc_username
+            entity['author_username'] = user.username
             th.save(entity)

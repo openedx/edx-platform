@@ -15,7 +15,7 @@ import unittest
 from student.tests.factories import UserFactory
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core import mail
+from django.core import exceptions, mail
 from django.test.client import RequestFactory
 from student.models import PendingEmailChange
 from student.tests.tests import UserSettingsEventTestMixin
@@ -24,7 +24,8 @@ from ...errors import (
     AccountUserAlreadyExists, AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid, AccountRequestError
 )
 from ..api import (
-    get_account_settings, update_account_settings, create_account, activate_account, request_password_change
+    get_account_settings, update_account_settings, create_account,
+    activate_account, request_password_change, delete_user_account
 )
 from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PRIVATE_VISIBILITY
 
@@ -440,3 +441,38 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
             return False
         else:
             return True
+
+
+@attr(shard=2)
+@unittest.skipUnless(settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'), 'third party auth not enabled')
+class UserDeleteTest(TestCase):
+    """
+    Test student account deletion api
+    """
+    def test_delete_user_account(self):
+        """
+        Test if a user is deleted and all values are after creation
+        """
+        user = UserFactory.create(username='test', email='test@edx.org')
+        user.set_password('test_password')
+        user.save()
+
+        with self.assertRaises(UserNotFound):
+            delete_user_account('non-existent-username')
+
+        user_id = user.id
+        username = user.username
+
+        response = delete_user_account(username)
+
+        deleted_user = User.objects.get(id=user_id)
+        with self.assertRaises(exceptions.ObjectDoesNotExist):
+            _ = deleted_user.profile
+
+        self.assertTrue(response)
+        self.assertEqual(deleted_user.id, user_id)
+        self.assertNotEqual(deleted_user.username, username)
+        self.assertEqual(deleted_user.first_name, 'first_deleted')
+        self.assertEqual(deleted_user.last_name, 'last_deleted')
+        self.assertFalse(deleted_user.is_active)
+        self.assertFalse(deleted_user.is_staff)
