@@ -7,4 +7,4 @@
 setuptools==24.0.3
 
 # OpenStack swift backend for django storage API
-git+https://github.com/open-craft/django-storage-swift.git@jill/content_length_from_fd#egg=django-storage-swift==1.2.19
+django-storage-swift==1.2.19
