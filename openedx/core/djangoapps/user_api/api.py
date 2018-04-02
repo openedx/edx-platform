@@ -12,6 +12,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.features.course_experience import ENABLE_GDPR_COMPAT_FLAG
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
@@ -796,8 +797,10 @@ class RegistrationFormFactory(object):
         Keyword Arguments:
             required (bool): Whether this field is required; defaults to True
         """
+
+        separate_honor_and_tos = self._is_field_visible("terms_of_service")
         # Separate terms of service and honor code checkboxes
-        if self._is_field_visible("terms_of_service"):
+        if separate_honor_and_tos:
             terms_label = _(u"Honor Code")
             terms_link = marketing_link("HONOR")
 
@@ -825,11 +828,29 @@ class RegistrationFormFactory(object):
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label
         )
+        field_type = 'checkbox'
+
+        if ENABLE_GDPR_COMPAT_FLAG.is_enabled_without_course_context() and not separate_honor_and_tos:
+            field_type = 'plaintext'
+            pp_link = marketing_link("PRIVACY")
+            label = Text(_(
+                u"By creating an account with {platform_name}, you agree \
+                  to abide by our {platform_name} \
+                  {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} \
+                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+            )).format(
+                platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+                terms_of_service=terms_label,
+                terms_of_service_link_start=HTML("<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
+                terms_of_service_link_end=HTML("</a>"),
+                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
+                privacy_policy_link_end=HTML("</a>"),
+            )
 
         form_desc.add_field(
             "honor_code",
             label=label,
-            field_type="checkbox",
+            field_type=field_type,
             default=False,
             required=required,
             error_messages={
