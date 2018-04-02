@@ -280,14 +280,14 @@ class EmailMarketingTests(TestCase):
         # force Sailthru API exception on 2nd call
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})), SailthruClientError]
-        update_user.delay({}, self.user.email, send_welcome_email=True)
+        update_user.delay({}, self.user.email, activation=True)
         self.assertTrue(mock_log_error.called)
 
         # force Sailthru API error return on 2nd call
         mock_log_error.reset_mock()
         mock_sailthru.side_effect = [SailthruResponse(JsonResponse({'ok': True})),
                                      SailthruResponse(JsonResponse({'error': 100, 'errormsg': 'Got an error'}))]
-        update_user.delay({}, self.user.email, send_welcome_email=True)
+        update_user.delay({}, self.user.email, activation=True)
         self.assertTrue(mock_log_error.called)
 
     @patch('email_marketing.tasks.update_user.retry')
