@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 
 import Main from './Main.jsx';
-import {selectBlock, fetchCourseBlocks} from "../../data/actions/courseBlocks";
+import {fetchCourseBlocks, selectBlock} from '../../data/actions/courseBlocks';
 
 const mapStateToProps = state => ({
     selectedBlock: state.selectedBlock,
@@ -10,7 +10,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     onSelectBlock: blockId => dispatch(selectBlock(blockId)),
-    fetchCourseBlocks: courseId => dispatch(fetchCourseBlocks(courseId)),
+    fetchCourseBlocks: (courseId, excludeBlockTypes) =>
+        dispatch(fetchCourseBlocks(courseId, excludeBlockTypes))
 });
 
 const MainContainer = connect(

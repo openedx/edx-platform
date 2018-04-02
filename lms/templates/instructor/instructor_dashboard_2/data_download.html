@@ -65,6 +65,7 @@ from openedx.core.djangolib.markup import HTML, Text
           id="react-block-listing",
           props={
             "courseId": course.id,
+            "excludeBlockTypes": ['html', 'video', 'discussion']
           }
         )}
       </div>

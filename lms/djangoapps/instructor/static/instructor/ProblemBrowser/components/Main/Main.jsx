@@ -13,7 +13,7 @@ export default class Main extends React.Component {
     }
 
     handleToggleDropdown() {
-        this.props.fetchCourseBlocks(this.props.courseId);
+        this.props.fetchCourseBlocks(this.props.courseId, this.props.excludeBlockTypes);
         this.setState({showDropdown: !this.state.showDropdown});
     }
 
@@ -40,6 +40,7 @@ export default class Main extends React.Component {
 
 Main.propTypes = {
     courseId: PropTypes.string.isRequired,
+    excludeBlockTypes: PropTypes.arrayOf(PropTypes.string),
     fetchCourseBlocks: PropTypes.func.isRequired,
     onSelectBlock: PropTypes.func.isRequired,
     selectedBlock: PropTypes.string.isRequired,

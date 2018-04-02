@@ -1,9 +1,10 @@
 import {courseBlocksActions} from './constants';
 import {getCourseBlocks} from "../api/client";
 
-const fetchCourseBlocksSuccess = blocks => ({
+const fetchCourseBlocksSuccess = (blocks, excludeBlockTypes) => ({
     type: courseBlocksActions.fetch.SUCCESS,
     blocks,
+    excludeBlockTypes,
 });
 
 const selectBlock = blockId => ({
@@ -16,7 +17,7 @@ const changeRoot = blockId => ({
     blockId,
 });
 
-const fetchCourseBlocks = courseId => (dispatch) =>
+const fetchCourseBlocks = (courseId, excludeBlockTypes) => (dispatch) =>
     getCourseBlocks(courseId)
         .then((response) => {
             if (response.ok) {
@@ -25,7 +26,7 @@ const fetchCourseBlocks = courseId => (dispatch) =>
             throw new Error(response);
         })
         .then(
-            json => dispatch(fetchCourseBlocksSuccess(json)),
+            json => dispatch(fetchCourseBlocksSuccess(json, excludeBlockTypes)),
             error => console.log(error),
         );
 
