@@ -289,4 +289,4 @@ class NoOpMigrationModules(object):
         return True
 
     def __getitem__(self, item):
-        return "notmigrations"
+        return None
