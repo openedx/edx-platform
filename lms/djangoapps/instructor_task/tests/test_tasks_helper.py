@@ -470,7 +470,6 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     def setUp(self):
         super(TestProblemResponsesReport, self).setUp()
         self.initialize_course()
-        # self.course = CourseFactory.create()
         self.instructor = self.create_instructor('instructor')
         self.student = self.create_student('student')
 
@@ -481,9 +480,11 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             student = self.create_student('student{}'.format(ctr))
             self.submit_student_answer(student.username, u'Problem1', ['Option 1'])
 
-        student_data = ProblemResponses._build_student_data(user_id=self.instructor.id,
-                                                            course_id=self.course.id,
-                                                            problem_location=str(self.course.location))
+        student_data = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_id=self.course.id,
+            problem_location=str(self.course.location),
+        )
 
         self.assertEquals(len(student_data), 4)
 
@@ -491,19 +492,24 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
 
-        student_data = ProblemResponses._build_student_data(user_id=self.instructor.id,
-                                                            course_id=self.course.id,
-                                                            problem_location=str(self.course.location))
+        student_data = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_id=self.course.id,
+            problem_location=str(self.course.location),
+        )
         self.assertEquals(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
-            'location': 'test_course > Section > Subsection',
-            'block_id': 'Problem1',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
         }, student_data[0])
 
     def test_success(self):
-        task_input = {'problem_location': str(self.course.location), 'user_id': self.instructor.id}
+        task_input = {
+            'problem_location': str(self.course.location),
+            'user_id': self.instructor.id
+        }
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch('lms.djangoapps.instructor_task.tasks_helper.grades'
                        '.ProblemResponses._build_student_data') as patched_data_source:
@@ -512,7 +518,9 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
                     {'username': 'user1', 'state': u'state1'},
                     {'username': 'user2', 'state': u'state2'},
                 ]
-                result = ProblemResponses.generate(None, None, self.course.id, task_input, 'calculated')
+                result = ProblemResponses.generate(
+                    None, None, self.course.id, task_input, 'calculated'
+                )
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 
