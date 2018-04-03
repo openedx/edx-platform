@@ -614,17 +614,17 @@ def student_dashboard(request):
     activate_account_message = ''
     if not user.is_active:
         activate_account_message = Text(_(
-          "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
-          "If you need help, contact {link_start}{platform_name} Support{link_end}."
+            "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
+            "If you need help, contact {link_start}{platform_name} Support{link_end}."
         )).format(
-          platform_name=platform_name,
-          email_start=HTML("<strong>"),
-          email_end=HTML("</strong>"),
-          email=user.email,
-          link_start=HTML("<a target='_blank' href='{activation_email_support_link}'>").format(
-            activation_email_support_link=activation_email_support_link,
-          ),
-          link_end=HTML("</a>"),
+            platform_name=platform_name,
+            email_start=HTML("<strong>"),
+            email_end=HTML("</strong>"),
+            email=user.email,
+            link_start=HTML("<a target='_blank' href='{activation_email_support_link}'>").format(
+                activation_email_support_link=activation_email_support_link,
+            ),
+            link_end=HTML("</a>"),
         )
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
@@ -825,7 +825,7 @@ def student_dashboard(request):
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
-        'display_sidebar_account_activation_message': (not user.is_active and not hide_dashboard_courses_until_activated),
+        'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
     }
