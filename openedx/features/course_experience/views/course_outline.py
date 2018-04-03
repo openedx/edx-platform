@@ -19,6 +19,7 @@ from openedx.features.course_experience import waffle as course_experience_waffl
 from student.models import CourseEnrollment
 
 from util.milestones_helpers import get_course_content_milestones
+from xmodule.modulestore.django import modulestore
 from ..utils import get_course_outline_block_tree, get_resume_block
 
 
@@ -36,6 +37,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course_overview = get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        course = modulestore().get_course(course_key)
 
         course_block_tree = get_course_outline_block_tree(request, course_id)
         if not course_block_tree:
@@ -51,7 +53,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
             'csrf': csrf(request)['csrf_token'],
             'course': course_overview,
             'blocks': course_block_tree,
-            'show_visual_progress': show_visual_progress
+            'show_visual_progress': show_visual_progress,
+            'due_date_display_format': course.due_date_display_format,
         }
 
         # TODO: EDUCATOR-2283 Remove this check when the waffle flag is turned on in production
