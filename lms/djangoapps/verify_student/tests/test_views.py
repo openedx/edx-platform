@@ -1668,6 +1668,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.attempt.save()
         self.receipt_id = self.attempt.receipt_id
         self.client = Client()
+        self.client.login(username=self.user.username, password='test')
 
     def mocked_has_valid_signature(method, headers_dict, body_dict, access_key, secret_key):  # pylint: disable=no-self-argument, unused-argument
         """
@@ -1779,6 +1780,30 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
+        self.assertEqual(len(mail.outbox), 1)
+
+    @mock.patch(
+        'lms.djangoapps.verify_student.utils.send_mail',
+        mock.Mock(side_effect=Exception())
+    )
+    def test_verification_status_email_not_sent(self):
+        """
+        Test email is not sent in case of exception
+        """
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+        json_data = json.dumps(data)
+        self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+        self.assertEqual(len(mail.outbox), 0)
 
     @mock.patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
