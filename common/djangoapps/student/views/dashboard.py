@@ -40,6 +40,7 @@ from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramP
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
@@ -606,16 +607,21 @@ def student_dashboard(request):
     )
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
-    # Display activation message in sidebar
-    sidebar_account_activation_message = ''
+    # Display activation message
+    activate_account_message = ''
     if not user.is_active:
-        sidebar_account_activation_message = render_to_string(
-            'registration/account_activation_sidebar_notice.html',
-            {
-                'email': user.email,
-                'platform_name': platform_name,
-                'activation_email_support_link': activation_email_support_link
-            }
+        activate_account_message = Text(_(
+          "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
+          "If you need help, contact {link_start}{platform_name} Support{link_end}."
+        )).format(
+          platform_name=platform_name,
+          email_start=HTML("<strong>"),
+          email_end=HTML("</strong>"),
+          email=user.email,
+          link_start=HTML("<a target='_blank' href='{activation_email_support_link}'>").format(
+            activation_email_support_link=activation_email_support_link,
+          ),
+          link_end=HTML("</a>"),
         )
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
@@ -779,12 +785,12 @@ def student_dashboard(request):
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'account_activation_messages': account_activation_messages,
+        'activate_account_message': activate_account_message,
         'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
         'course_optouts': course_optouts,
-        'sidebar_account_activation_message': sidebar_account_activation_message,
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
@@ -813,6 +819,7 @@ def student_dashboard(request):
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
+        'display_sidebar_account_activation_message': (not user.is_active and not hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
     }
