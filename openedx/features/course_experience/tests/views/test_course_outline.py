@@ -567,6 +567,10 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
             self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
             self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
 
+            content = pq(response_content)
+            button = content('#expand-collapse-outline-all-button')
+            self.assertEqual('Expand All', button.children()[0].text)
+
     def test_user_enrolled_after_completion_collection(self):
         """
         Tests that the _completion_data_collection_start() method returns the created
