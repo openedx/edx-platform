@@ -113,9 +113,8 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             )
 
     @override_settings(LMS_ROOT_URL='test_url:9999')
-    @patch('completion.waffle.get_current_site')
     @ddt.data(True, False)
-    def test_retrieve_last_sitewide_block_completed(self, use_username, get_patched_current_site):  # pylint: disable=unused-argument
+    def test_retrieve_last_sitewide_block_completed(self, use_username):
         """
         Test that the method returns a URL for the "last completed" block
         when sending a user object

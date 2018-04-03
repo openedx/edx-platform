@@ -210,8 +210,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         if dispatch == 'get_completion':
             completion_service = self.runtime.service(self, 'completion')
-            if not completion_service.visual_progress_enabled():
-                return None
 
             usage_key = data.get('usage_key', None)
             item = self.get_child(UsageKey.from_string(usage_key))
@@ -472,8 +470,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'path': " > ".join(display_names + [item.display_name_with_default]),
             }
 
-            if is_user_authenticated and completion_service.visual_progress_enabled():
-                iteminfo['complete'] = completion_service.vertical_is_complete(item)
+            if is_user_authenticated:
+                if item.location.block_type == 'vertical':
+                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
 
             contents.append(iteminfo)
 

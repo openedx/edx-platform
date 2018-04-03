@@ -280,22 +280,6 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         # assert content shown as normal
         self._assert_ungated(html, self.sequence_1_2)
 
-    def test_handle_ajax_get_completion_disabled(self):
-        """
-        Test when completion service is turned off by waffle, the ajax call returns correct
-        None value
-        """
-        completion_waffle_mock = Mock()
-        completion_waffle_mock.return_value.visual_progress_enabled.return_value = False
-        self.sequence_3_1.xmodule_runtime._services['completion'] = completion_waffle_mock  # pylint: disable=protected-access
-        for child in self.sequence_3_1.get_children():
-            usage_key = unicode(child.location)
-            completion_return = self.sequence_3_1.handle_ajax(
-                'get_completion',
-                {'usage_key': usage_key}
-            )
-            self.assertIs(completion_return, None)
-
     def test_handle_ajax_get_completion_success(self):
         """
         Test that the completion data is returned successfully on

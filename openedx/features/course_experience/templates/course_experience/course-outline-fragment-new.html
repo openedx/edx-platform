@@ -37,7 +37,7 @@ from openedx.core.djangolib.markup import HTML, Text
                             id="${ section['id'] }">
                         <span class="fa fa-chevron-right ${ 'fa-rotate-90' if section_is_auto_opened else '' }" aria-hidden="true"></span>
                         <h3 class="section-title">${ section['display_name'] }</h3>
-                        % if show_visual_progress and section.get('complete'):
+                        % if section.get('complete'):
                             <span class="complete-checkmark fa fa-check"></span>
                         % endif
                     </button>
@@ -83,7 +83,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                         <span class="subsection-title">
                                             ${ subsection['display_name'] }
                                         </span>
-                                        % if subsection.get('complete') and show_visual_progress:
+                                        % if subsection.get('complete'):
                                             <span class="complete-checkmark fa fa-check"></span>
                                         % endif
                                     % endif
@@ -168,7 +168,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                         ${ vertical['display_name'] }
                                                     </span>
                                                 </div>
-                                                % if vertical.get('complete') and show_visual_progress:
+                                                % if vertical.get('complete'):
                                                     <span class="complete-checkmark fa fa-check"></span>
                                                 % endif
                                             </a>
