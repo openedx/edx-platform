@@ -2,13 +2,19 @@
 Discussion API views
 """
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions
+from rest_framework import status
 from rest_framework.exceptions import UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from six import text_type
 
+from lms.lib import comment_client
 from discussion_api.api import (
     create_comment,
     create_thread,
@@ -26,6 +32,8 @@ from discussion_api.api import (
 from discussion_api.forms import CommentGetForm, CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from student.models import get_potentially_retired_user_by_username_and_hash
 from xmodule.modulestore.django import modulestore
 
 
@@ -512,3 +520,48 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
         return Response(update_comment(request, comment_id, request.data))
+
+
+class RetireUserView(APIView):
+    """
+    **Use Cases**
+
+        A superuser or the user with the settings.RETIREMENT_SERVICE_WORKER_USERNAME
+        can "retire" the user's data from the comments service, which will remove
+        personal information and blank all posts / comments the user has made.
+
+    **Example Requests**:
+        POST /api/discussion/v1/retire_user/
+        {
+            "retired_username": "old_user_name"
+        }
+
+    **Example Response**:
+        Empty string
+    """
+
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+
+    def post(self, request, username):
+        """
+        Implements the retirement endpoint.
+        """
+        user_model = get_user_model()
+        retired_username = request.data['retired_username']
+
+        try:
+            user = get_potentially_retired_user_by_username_and_hash(username, retired_username)
+            cc_user = comment_client.User.from_django_user(user)
+
+            # We can't count on the LMS username being un-retired at this point,
+            # so we pass the old username as a parameter to describe which
+            # user to retire. This will either succeed or throw an error which
+            # should be good to raise from here.
+            cc_user.retire(username)
+        except user_model.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
