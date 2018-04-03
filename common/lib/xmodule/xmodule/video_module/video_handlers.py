@@ -332,9 +332,8 @@ class VideoStudentViewHandlers(object):
                 transcript_content, filename, mime_type = get_transcript_from_contentstore(
                     video=self,
                     language=lang,
-                    output_format=Transcript.SJSON,
-                    transcripts_info=transcripts,
-                    youtube_id=request.GET.get('videoId', None)
+                    output_format=Transcript.SRT,
+                    transcripts_info=transcripts
                 )
             except (TranscriptsGenerationException, UnicodeDecodeError, NotFoundError):
                 response = Response(status=404)
