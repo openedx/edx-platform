@@ -79,6 +79,7 @@ class ThirdPartyAuthTestMixin(object):
     def configure_oauth_provider(**kwargs):
         """ Update the settings for an OAuth2-based third party auth provider """
         kwargs.setdefault('provider_slug', kwargs['backend_name'])
+        kwargs.setdefault('slug', kwargs['backend_name'])
         obj = OAuth2ProviderConfig(**kwargs)
         obj.save()
         return obj
