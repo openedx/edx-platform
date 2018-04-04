@@ -79,21 +79,21 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
       toggleAllButton.addEventListener('click', (event) => {
         const toggleAllExpanded = toggleAllButton.getAttribute('aria-expanded') === 'true';
         let sectionAction;
-        let newSpanValue;
         if (toggleAllExpanded) {
           toggleAllButton.setAttribute('aria-expanded', 'false');
-          newSpanValue = 'Expand All';
           sectionAction = collapseSection;
+          toggleAllSpan.classList.add('extra-padding-outline');
+          toggleAllSpan.innerText = 'Expand All';
         } else {
           toggleAllButton.setAttribute('aria-expanded', 'true');
-          newSpanValue = 'Collapse All';
           sectionAction = expandSection;
+          toggleAllSpan.classList.remove('extra-padding-outline');
+          toggleAllSpan.innerText = 'Collapse All';
         }
         const sections = Array.prototype.slice.call(document.querySelectorAll('.accordion-trigger'));
         sections.forEach((sectionToggleButton) => {
           sectionAction(sectionToggleButton);
         });
-        toggleAllSpan.innerText = newSpanValue;
         event.stopImmediatePropagation();
       });
     }
