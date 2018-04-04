@@ -83,6 +83,8 @@ from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from third_party_auth.utils import user_exists
+from lms.djangoapps.verify_student.models import SSOVerification
+from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 
 from . import provider
 
@@ -774,3 +776,29 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 except SMTPException:
                     logger.exception('Error sending IdP learner data sync-initiated email change '
                                      'notification email for user [%s].', user.username)
+
+
+def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):
+    """
+    Use the user's authentication with the provider, if configured, as evidence of their identity being verified.
+    """
+    current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
+    if user and current_provider.enable_sso_id_verification:
+        # Get previous valid, non expired verification attempts for this SSO Provider and user
+        verifications = SSOVerification.objects.filter(
+            user=user,
+            status="approved",
+            created_at__gte=earliest_allowed_verification_date(),
+            identity_provider_type=current_provider.full_class_name,
+            identity_provider_slug=current_provider.slug,
+        )
+
+        # If there is none, create a new approved verification for the user.
+        if not verifications:
+            SSOVerification.objects.create(
+                user=user,
+                status="approved",
+                name=user.profile.name,
+                identity_provider_type=current_provider.full_class_name,
+                identity_provider_slug=current_provider.slug,
+            )

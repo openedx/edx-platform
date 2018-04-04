@@ -196,6 +196,10 @@ class ProviderConfig(ConfigurationModel):
             "with their account is changed as a part of this synchronization."
         )
     )
+    enable_sso_id_verification = models.BooleanField(
+        default=False,
+        help_text="Use the presence of a profile from a trusted third party as proof of identity verification.",
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
@@ -222,6 +226,11 @@ class ProviderConfig(ConfigurationModel):
     def backend_class(self):
         """ Get the python-social-auth backend class used for this provider """
         return _PSA_BACKENDS[self.backend_name]
+
+    @property
+    def full_class_name(self):
+        """ Get the fully qualified class name of this provider. """
+        return '{}.{}'.format(self.__module__, self.__class__.__name__)
 
     def get_url_params(self):
         """ Get a dict of GET parameters to append to login links for this provider """
