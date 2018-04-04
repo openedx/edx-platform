@@ -5,7 +5,7 @@
                 data-user-create-comment="<%- !readOnly %>"
                 data-user-create-subcomment="<%- !readOnly %>">
                 <a id="discussion-link" href="#">
-                    <h3>Click Here to Engage in Team Discussion</h3>
+                    <h3 class="link">Click Here to Engage in Team Discussion</h3>
                 </a>
         </div>
     </div>

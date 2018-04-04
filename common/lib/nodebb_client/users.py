@@ -34,6 +34,14 @@ class ForumUser(User):
         kwargs['kwargs']['username'] = username
         return self.client.post('/api/v2/users/update', **kwargs['kwargs'])
 
+    def delete_user(self, username, kwargs):
+        """
+        Delete user from NodBB database
+        """
+        kwargs['username'] = username
+        kwargs['_uid'] = 1
+        return self.client.delete('/api/v2/user/delete', **kwargs)
+
     def update_onboarding_surveys_status(self, username):
         """
         Update NodeBB when user successfully completed all required onboarding surveys

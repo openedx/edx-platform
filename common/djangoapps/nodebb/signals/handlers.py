@@ -90,6 +90,17 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         log_action_response(instance, status_code, response_body)
 
 
+@receiver(post_delete, sender=User)
+def delete_user_from_nodebb(sender, **kwargs):
+    """
+    Delete User from NodeBB when deleted at edx (either deleted via admin-panel OR user is under age)
+    """
+    instance = kwargs['instance']
+
+    status_code, response_body = NodeBBClient().users.delete_user(instance.username, kwargs={})
+    log_action_response(instance, status_code, response_body)
+
+
 @receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
 def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
     """
