@@ -79,7 +79,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     # https://openedx.atlassian.net/wiki/spaces/LEARNER/pages/645923004/eCommerce+Guild
     THROTTLE_RATES = {
         'user': '40/minute',
-        'staff': '2000/minute',  # Decided on by looking at number of API calls to the Enrollment API from Staff users
+        'staff': '3000/minute',  # Decided on by looking at number of API calls to the Enrollment API from Staff users
     }
 
     def allow_request(self, request, view):
