@@ -14,17 +14,20 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <main role="main" class="course-outline-visualprogress" id="main" tabindex="-1">
     % if blocks.get('children'):
-        <button class="btn btn-primary"
-                id="expand-collapse-outline-all-button"
-                aria-expanded="false"
-                aria-controls="course-outline-block-tree"
-                >
-          <span id="expand-collapse-outline-all-span">${_("Expand All")}</span>
-        </button>
         <ol class="block-tree accordion"
             id="course-outline-block-tree"
-            role="presentation"
-            aria-labeledby="expand-collapse-outline-all-button">
+            role="presentation">
+        <li class="outline-item section" role="heading">
+          <button class="section-name"
+                  id="expand-collapse-outline-all-button"
+                  aria-expanded="false"
+                  >
+            <span class="fa fa-chevron-right" aria-hidden="true" id="expand-collapse-all-arrow"></span>
+            <h3 class="section-title">
+              <span id="expand-collapse-outline-all-span">${_("Expand All")}</span>
+            </h3>
+          </button>
+        </li>
             % for section in blocks.get('children'):
                 <% section_is_auto_opened = section.get('resume_block') is True %>
                 <li
