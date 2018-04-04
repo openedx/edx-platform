@@ -566,7 +566,7 @@ class ProblemResponses(object):
             path (List[str]): The list of display names for the parent of root block
 
         Yields:
-            Tuple[str, List[str], UsageKey]: tuple of a blocks display name, path, and
+            Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
                 usage key
         """
         display_name = course_blocks.get_xblock_field(root, 'display_name')
@@ -588,8 +588,8 @@ class ProblemResponses(object):
 
         Arguments:
             user_id (int): The user id for the user generating the report
-            course_id (UsageKey): The UsageKey for the course whose report is
-                being generated
+            course_id (CourseKey): The ``CourseKey`` for the course whose report
+                is being generated
             problem_location (str): The generated report will include this
                 block and it child blocks.
 
