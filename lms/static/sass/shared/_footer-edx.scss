@@ -19,6 +19,14 @@ footer#footer-edx-v3 {
   padding: $baseline*0.75 0;
   border-top: 1px solid $courseware-button-border-color;
 
+  // There is a generic style similar applying div and box shadow on the wiki page of course.
+  // so disabling that design for footer in the lines below
+  .container > div {
+    border: none;
+    box-shadow: none;
+    background: inherit;
+  }
+
   .column-styles {
     position: relative;
     width: 100%;
