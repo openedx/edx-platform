@@ -41,6 +41,23 @@ from openedx.core.release import RELEASE_LINE
       jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
     %>
 
+    % if getattr(settings, 'CAPTURE_CONSOLE_LOG', False):
+        <script type="text/javascript">
+            var oldOnError = window.onerror;
+            window.localStorage.setItem('console_log_capture', JSON.stringify([]));
+
+            window.onerror = function (message, url, lineno, colno, error) {
+                if (oldOnError) {
+                    oldOnError.apply(this, arguments);
+                }
+
+                var messages = JSON.parse(window.localStorage.getItem('console_log_capture'));
+                messages.push([message, url, lineno, colno, (error || {}).stack]);
+                window.localStorage.setItem('console_log_capture', JSON.stringify(messages));
+            }
+        </script>
+    % endif
+
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
