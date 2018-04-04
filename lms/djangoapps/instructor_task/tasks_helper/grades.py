@@ -604,9 +604,9 @@ class ProblemResponses(object):
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
         for title, path, block_key in cls._build_problem_list(course_blocks, problem_key):
-            # Sequential blocks are filtered out since they include position state
-            # which isn't useful in this report.
-            if block_key.block_type == 'sequential':
+            # Chapter and sequential blocks are filtered out since they include state
+            # which isn't useful for this report.
+            if block_key.block_type in ('sequential', 'chapter'):
                 continue
             responses = list_problem_responses(course_id, block_key, max_count)
             student_data += responses
