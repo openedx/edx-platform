@@ -426,6 +426,18 @@ button.accordion-trigger, button.prerequisite-button {
   }
 }
 
+#expand-collapse-outline-all-button {
+  float: right;
+  background-color: $white;
+  color: $black;
+  cursor: pointer;
+}
+
+// extra padding for expand/collapse text change
+.extra-padding-outline {
+  padding: 0 4px 0 4px
+}
+
 .accordion-panel.is-hidden {
   display: none;
 }
