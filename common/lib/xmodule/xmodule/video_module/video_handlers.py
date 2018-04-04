@@ -329,10 +329,11 @@ class VideoStudentViewHandlers(object):
                 lang = self.get_default_transcript_language(transcripts)
 
             try:
+                output_format = self.transcript_download_format if self.transcript_download_format else Transcript.SRT
                 transcript_content, filename, mime_type = get_transcript_from_contentstore(
                     video=self,
                     language=lang,
-                    output_format=Transcript.SRT,
+                    output_format=output_format,
                     transcripts_info=transcripts
                 )
             except (TranscriptsGenerationException, UnicodeDecodeError, NotFoundError):

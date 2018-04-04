@@ -436,7 +436,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.status, '404 Not Found')
 
     @patch(
-        'xmodule.video_module.transcripts_utils.get_transcript_from_contentstore',
+        'xmodule.video_module.video_handlers.get_transcript_from_contentstore',
         return_value=('Subs!', 'test_filename.srt', 'application/x-subrip; charset=utf-8')
     )
     def test_download_srt_exist(self, __):
@@ -447,7 +447,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Language'], 'en')
 
     @patch(
-        'xmodule.video_module.transcripts_utils.get_transcript_from_contentstore',
+        'xmodule.video_module.video_handlers.get_transcript_from_contentstore',
         return_value=('Subs!', 'txt', 'text/plain; charset=utf-8')
     )
     def test_download_txt_exist(self, __):
@@ -467,7 +467,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
             self.item.get_transcript(transcripts)
 
     @patch(
-        'xmodule.video_module.transcripts_utils.get_transcript_from_contentstore',
+        'xmodule.video_module.video_handlers.get_transcript_from_contentstore',
         return_value=('Subs!', u"塞.srt", 'application/x-subrip; charset=utf-8')
     )
     def test_download_non_en_non_ascii_filename(self, __):
