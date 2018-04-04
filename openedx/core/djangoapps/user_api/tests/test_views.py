@@ -171,7 +171,7 @@ class RoleTestCase(UserApiTestCase):
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpOK(self.client.get(self.LIST_URI))
+        self.assertHttpForbidden(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=False)
     @override_settings(EDX_API_KEY=TEST_API_KEY)
@@ -256,7 +256,7 @@ class UserViewSetTest(UserApiTestCase):
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpOK(self.client.get(self.LIST_URI))
+        self.assertHttpForbidden(self.client.get(self.LIST_URI))
 
     @override_settings(DEBUG=False)
     @override_settings(EDX_API_KEY=TEST_API_KEY)
@@ -372,7 +372,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpOK(self.client.get(self.LIST_URI))
+        self.assertHttpForbidden(self.client.get(self.LIST_URI))
 
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
@@ -509,7 +509,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
     @override_settings(DEBUG=True)
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
-        self.assertHttpOK(self.client.get(self.LIST_URI))
+        self.assertHttpForbidden(self.client.get(self.LIST_URI))
 
     def test_get_basic(self):
         result = self.get_json(self.LIST_URI)
