@@ -2067,7 +2067,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=426 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=427 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3065,22 +3065,6 @@ CREATE TABLE `instructor_task_instructortask` (
   KEY `instructor_task_instructortask_57746cc8` (`task_id`),
   KEY `instructor_task_instructortask_76980a94` (`task_state`),
   CONSTRAINT `instructor_task_instructortask_requester_id_307f955d_fk` FOREIGN KEY (`requester_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `integrated_channel_catalogtransmissionaudit`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `integrated_channel_catalogtransmissionaudit` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `enterprise_customer_uuid` char(32) NOT NULL,
-  `total_courses` int(10) unsigned NOT NULL,
-  `status` varchar(100) NOT NULL,
-  `error_message` longtext NOT NULL,
-  `created` datetime(6) NOT NULL,
-  `modified` datetime(6) NOT NULL,
-  `audit_summary` longtext NOT NULL,
-  `channel` varchar(30) NOT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `integrated_channel_contentmetadataitemtransmission`;
