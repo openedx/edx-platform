@@ -154,9 +154,12 @@ def check_verify_status_by_course(user, course_enrollments):
 
             # By default, don't show any status related to verification
             status = None
+            should_display = True
 
             # Check whether the user was approved or is awaiting approval
             if relevant_verification is not None:
+                should_display = relevant_verification.should_display_status_to_user()
+
                 if relevant_verification.status == "approved":
                     if verification_expiring_soon:
                         status = VERIFY_STATUS_NEED_TO_REVERIFY
@@ -214,7 +217,8 @@ def check_verify_status_by_course(user, course_enrollments):
 
                 status_by_course[enrollment.course_id] = {
                     'status': status,
-                    'days_until_deadline': days_until_deadline
+                    'days_until_deadline': days_until_deadline,
+                    'should_display': should_display,
                 }
 
     if recent_verification_datetime:

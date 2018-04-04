@@ -716,8 +716,8 @@ def student_dashboard(request):
 
     # Verification Attempts
     # Used to generate the "you must reverify for course x" banner
-    verification_status, verification_error_codes = IDVerificationService.user_status(user)
-    verification_errors = get_verification_error_reasons_for_display(verification_error_codes)
+    verification_status = IDVerificationService.user_status(user)
+    verification_errors = get_verification_error_reasons_for_display(verification_status['error'])
 
     # Gets data for midcourse reverifications, if any are necessary or have failed
     statuses = ["approved", "denied", "pending", "must_reverify"]
@@ -770,7 +770,9 @@ def student_dashboard(request):
         redirect_message = ''
 
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
-    display_sidebar_on_dashboard = len(order_history_list) or verification_status in valid_verification_statuses
+    display_sidebar_on_dashboard = (len(order_history_list) or
+                                    (verification_status['status'] in valid_verification_statuses and
+                                    verification_status['should_display']))
 
     # Filter out any course enrollment course cards that are associated with fulfilled entitlements
     for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
@@ -802,7 +804,8 @@ def student_dashboard(request):
         'credit_statuses': _credit_statuses(user, course_enrollments),
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
-        'verification_status': verification_status,
+        'verification_display': verification_status['should_display'],
+        'verification_status': verification_status['status'],
         'verification_status_by_course': verify_status_by_course,
         'verification_errors': verification_errors,
         'block_courses': block_courses,

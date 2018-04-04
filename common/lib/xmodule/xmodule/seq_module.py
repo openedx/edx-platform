@@ -598,9 +598,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             # inject verification status
             if verification_service:
-                verification_status, __ = verification_service.get_status(user_id)
+                verification_status = verification_service.get_status(user_id)
                 context.update({
-                    'verification_status': verification_status,
+                    'verification_status': verification_status['status'],
                     'reverify_url': verification_service.reverify_url(),
                 })
 

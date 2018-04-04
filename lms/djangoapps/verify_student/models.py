@@ -21,6 +21,8 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
@@ -117,6 +119,73 @@ class IDVerificationAttempt(StatusModel):
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         return self.created_at + timedelta(days=days_good_for)
 
+    def should_display_status_to_user(self):
+        """Whether or not the status from this attempt should be displayed to the user."""
+        raise NotImplementedError
+
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expiration datetime is after today).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at < deadline and
+            self.expiration_datetime > datetime.now(pytz.UTC)
+        )
+
+
+class IDVerificationAggregate(IDVerificationAttempt):
+    """
+    IDVerificationAggregate is the source of truth for all instances of IDVerificationAttempt. This
+    includes all types of verification, including PhotoVerification and SSOVerification. A generic
+    relation is used to refer to the appropriate Model object.
+    """
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    # override these fields so we can set the value
+    created_at = models.DateTimeField(db_index=True)
+    updated_at = models.DateTimeField(db_index=True)
+
+    class Meta(object):
+        app_label = "verify_student"
+        ordering = ['-created_at']
+
+    def __unicode__(self):
+        return 'IDVerificationAggregate for {name} - type: {type}, status: {status}'.format(
+            name=self.name,
+            type=self.content_type,
+            status=self.status,
+        )
+
+    def should_display_status_to_user(self):
+        """Whether or not the status from this attempt should be displayed to the user."""
+        return self.content_object.should_display_status_to_user()
+
+
+def post_save_id_verification(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+    """
+    Post save handler to create/update IDVerificationAttempt instances.
+    """
+    content_type = ContentType.objects.get_for_model(instance)
+    try:
+        id_verification = IDVerificationAggregate.objects.get(content_type=content_type, object_id=instance.id)
+    except IDVerificationAggregate.DoesNotExist:
+        id_verification = IDVerificationAggregate(content_type=content_type, object_id=instance.id)
+    id_verification.status = instance.status
+    id_verification.user = instance.user
+    id_verification.name = instance.name
+    id_verification.created_at = instance.created_at
+    id_verification.updated_at = instance.updated_at
+    id_verification.save()
+
 
 class SSOVerification(IDVerificationAttempt):
     """
@@ -158,6 +227,12 @@ class SSOVerification(IDVerificationAttempt):
             name=self.name,
             status=self.status,
         )
+
+    def should_display_status_to_user(self):
+        """Whether or not the status from this attempt should be displayed to the user."""
+        return False
+
+models.signals.post_save.connect(post_save_id_verification, sender=SSOVerification)
 
 
 class PhotoVerification(IDVerificationAttempt):
@@ -251,22 +326,6 @@ class PhotoVerification(IDVerificationAttempt):
         app_label = "verify_student"
         abstract = True
         ordering = ['-created_at']
-
-    def active_at_datetime(self, deadline):
-        """Check whether the verification was active at a particular datetime.
-
-        Arguments:
-            deadline (datetime): The date at which the verification was active
-                (created before and expiration datetime is after today).
-
-        Returns:
-            bool
-
-        """
-        return (
-            self.created_at < deadline and
-            self.expiration_datetime > datetime.now(pytz.UTC)
-        )
 
     def parsed_error_msg(self):
         """
@@ -819,6 +878,12 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         log.debug("Return message:\n\n{}\n\n".format(response.text))
 
         return response
+
+    def should_display_status_to_user(self):
+        """Whether or not the status from this attempt should be displayed to the user."""
+        return True
+
+models.signals.post_save.connect(post_save_id_verification, sender=SoftwareSecurePhotoVerification)
 
 
 class VerificationDeadline(TimeStampedModel):
