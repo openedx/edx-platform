@@ -5,6 +5,7 @@ source to be used throughout the API.
 import logging
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -219,6 +220,21 @@ def get_enrollment_attributes(user_id, course_id):
     user = _get_user(user_id)
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     return CourseEnrollmentAttribute.get_enrollment_attributes(enrollment)
+
+
+def unenroll_user_from_all_courses(user_id):
+    """
+    Set all of a user's enrollments to inactive.
+    :param user_id: The user being unenrolled.
+    :return: A list of all courses from which the user was unenrolled.
+    """
+    user = _get_user(user_id)
+    enrollments = CourseEnrollment.objects.filter(user=user)
+    with transaction.atomic():
+        for enrollment in enrollments:
+            _update_enrollment(enrollment, is_active=False)
+
+    return set([str(enrollment.course_id.org) for enrollment in enrollments])
 
 
 def _get_user(user_id):
