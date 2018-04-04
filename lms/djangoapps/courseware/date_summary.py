@@ -627,8 +627,8 @@ class VerificationDeadlineDate(DateSummary):
     @lazy
     def verification_status(self):
         """Return the verification status for this user."""
-        status, _ = IDVerificationService.user_status(self.user)
-        return status
+        verification_status = IDVerificationService.user_status(self.user)
+        return verification_status['status']
 
     def must_retry(self):
         """Return True if the user must re-submit verification, False otherwise."""
