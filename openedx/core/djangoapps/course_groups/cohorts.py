@@ -258,17 +258,10 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             else:
                 course_user_group = get_random_cohort(course_key)
 
-            membership, created = CohortMembership.objects.get_or_create(
+            membership = CohortMembership.objects.create(
                 user=user,
                 course_user_group=course_user_group,
             )
-            if not created:
-                # EDUCATOR-2549: Adding temporary log to test if we hit a situation where user already has
-                # a member ship group.
-                log.info(
-                    "COHORT_MEMBERSHIP_FOUND: Membership found %s for course %s and user %s",
-                    membership.course_user_group, course_key, user.id
-                )
 
             return cache.setdefault(cache_key, membership.course_user_group)
     except IntegrityError as integrity_error:
