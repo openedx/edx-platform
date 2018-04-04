@@ -95,6 +95,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                         <span
                                                             class="localized-datetime subtitle-name"
                                                             data-datetime="${subsection.get('due')}"
+                                                            data-format= "${due_date_display_format}"
                                                             data-string="${data_string}"
                                                             data-timezone="${user_timezone}"
                                                             data-language="${user_language}"
@@ -106,6 +107,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                     <span
                                                         class="localized-datetime subtitle-name"
                                                         data-datetime="${subsection.get('due')}"
+                                                        data-format= "${due_date_display_format}"
                                                         data-string="${data_string}"
                                                         data-timezone="${user_timezone}"
                                                         data-language="${user_language}"
