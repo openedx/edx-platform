@@ -75,6 +75,20 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
             entitlement
         )
 
+    def test_course_run_not_fulfillable_no_start_date(self):
+        course_overview = self.create_course(
+            start_from_now=-2,
+            end_from_now=2,
+            enrollment_start_from_now=-1,
+            enrollment_end_from_now=1
+        )
+        course_overview.start = None
+        course_overview.save()
+
+        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
+
     def test_course_run_not_fulfillable_run_ended(self):
         course_overview = self.create_course(
             start_from_now=-3,
@@ -93,6 +107,18 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
             end_from_now=2,
             enrollment_start_from_now=-2,
             enrollment_end_from_now=-1
+        )
+
+        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
+
+    def test_course_run_not_fulfillable_enrollment_start_in_future(self):
+        course_overview = self.create_course(
+            start_from_now=-3,
+            end_from_now=2,
+            enrollment_start_from_now=2,
+            enrollment_end_from_now=4
         )
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
