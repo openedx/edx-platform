@@ -88,7 +88,79 @@ def status_before_must_be(*valid_start_statuses):
     return decorator_func
 
 
-class PhotoVerification(StatusModel):
+class IDVerificationAttempt(StatusModel):
+    """
+    Each IDVerificationAttempt represents a Student's attempt to establish
+    their identity through one of several methods that inherit from this Model,
+    including PhotoVerification and SSOVerification.
+    """
+    STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
+    user = models.ForeignKey(User, db_index=True)
+
+    # They can change their name later on, so we want to copy the value here so
+    # we always preserve what it was at the time they requested. We only copy
+    # this value during the mark_ready() step. Prior to that, you should be
+    # displaying the user's name from their user.profile.name.
+    name = models.CharField(blank=True, max_length=255)
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    class Meta(object):
+        app_label = "verify_student"
+        abstract = True
+        ordering = ['-created_at']
+
+    @property
+    def expiration_datetime(self):
+        """Datetime that the verification will expire. """
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        return self.created_at + timedelta(days=days_good_for)
+
+
+class SSOVerification(IDVerificationAttempt):
+    """
+    Each SSOVerification represents a Student's attempt to establish their identity
+    by signing in with SSO. ID verification through SSO bypasses the need for
+    photo verification.
+    """
+
+    OAUTH2 = 'third_party_auth.models.OAuth2ProviderConfig'
+    SAML = 'third_party_auth.models.SAMLProviderConfig'
+    LTI = 'third_party_auth.models.LTIProviderConfig'
+    IDENTITY_PROVIDER_TYPE_CHOICES = (
+        (OAUTH2, 'OAuth2 Provider'),
+        (SAML, 'SAML Provider'),
+        (LTI, 'LTI Provider'),
+    )
+
+    identity_provider_type = models.CharField(
+        max_length=100,
+        blank=False,
+        choices=IDENTITY_PROVIDER_TYPE_CHOICES,
+        default=SAML,
+        help_text=(
+            'Specifies which type of Identity Provider this verification originated from.'
+        )
+    )
+
+    identity_provider_slug = models.SlugField(
+        max_length=30, db_index=True, default='default',
+        help_text=(
+            'The slug uniquely identifying the Identity Provider this verification originated from.'
+        ))
+
+    class Meta(object):
+        app_label = "verify_student"
+
+    def __unicode__(self):
+        return 'SSOIDVerification for {name}, status: {status}'.format(
+            name=self.name,
+            status=self.status,
+        )
+
+
+class PhotoVerification(IDVerificationAttempt):
     """
     Each PhotoVerification represents a Student's attempt to establish
     their identity by uploading a photo of themselves and a picture ID. An
@@ -122,7 +194,8 @@ class PhotoVerification(StatusModel):
         student cannot re-open this attempt -- they have to create another
         attempt and submit it instead.
 
-    Because this Model inherits from StatusModel, we can also do things like::
+    Because this Model inherits from IDVerificationAttempt, which inherits
+    from StatusModel, we can also do things like:
 
         attempt.status == PhotoVerification.STATUS.created
         attempt.status == "created"
@@ -130,15 +203,6 @@ class PhotoVerification(StatusModel):
     """
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
-    STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
-    user = models.ForeignKey(User, db_index=True)
-
-    # They can change their name later on, so we want to copy the value here so
-    # we always preserve what it was at the time they requested. We only copy
-    # this value during the mark_ready() step. Prior to that, you should be
-    # displaying the user's name from their user.profile.name.
-    name = models.CharField(blank=True, max_length=255)
-
     # Where we place the uploaded image files (e.g. S3 URLs)
     face_image_url = models.URLField(blank=True, max_length=255)
     photo_id_image_url = models.URLField(blank=True, max_length=255)
@@ -151,9 +215,6 @@ class PhotoVerification(StatusModel):
         default=generateUUID,
         max_length=255,
     )
-
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     # Indicates whether or not a user wants to see the verification status
     # displayed on their dash.  Right now, only relevant for allowing students
@@ -190,12 +251,6 @@ class PhotoVerification(StatusModel):
         app_label = "verify_student"
         abstract = True
         ordering = ['-created_at']
-
-    @property
-    def expiration_datetime(self):
-        """Datetime that the verification will expire. """
-        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        return self.created_at + timedelta(days=days_good_for)
 
     def active_at_datetime(self, deadline):
         """Check whether the verification was active at a particular datetime.
