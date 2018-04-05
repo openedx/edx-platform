@@ -1,6 +1,6 @@
-"""
-Test creation of aggregate completions when a user works through a course.
-"""
+# Module docstring missing to break quality tests, so we don't accidentally merge
+#
+# Test creation of aggregate completions when a user works through a course.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
