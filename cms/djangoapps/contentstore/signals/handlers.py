@@ -102,7 +102,7 @@ def handle_item_deleted(**kwargs):
             # Remove prerequisite milestone data
             gating_api.remove_prerequisite(module.location)
             # Remove any 'requires' course content milestone relationships
-            gating_api.set_required_content(course_key, module.location, None, None)
+            gating_api.set_required_content(course_key, module.location, None, None, None)
 
 
 @receiver(GRADING_POLICY_CHANGED)

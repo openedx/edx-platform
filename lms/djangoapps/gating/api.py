@@ -18,9 +18,9 @@ log = logging.getLogger(__name__)
 def evaluate_prerequisite(course, subsection_grade, user):
     """
     Evaluates any gating milestone relationships attached to the given
-    subsection. If the subsection_grade meets the minimum score required
-    by dependent subsections, the related milestone will be marked
-    fulfilled for the user.
+    subsection. If the subsection_grade and subsection_completion meets
+    the minimum score required by dependent subsections, the related
+    milestone will be marked fulfilled for the user.
     """
     prereq_milestone = gating_api.get_gating_milestone(course.id, subsection_grade.location, 'fulfills')
     if prereq_milestone:
@@ -30,8 +30,13 @@ def evaluate_prerequisite(course, subsection_grade, user):
 
         gated_content = gated_content_milestones.get(prereq_milestone['id'])
         if gated_content:
+            grade_percentage = subsection_grade.percent_graded * 100.0 \
+                if hasattr(subsection_grade, 'percent_graded') else None
+
             for milestone in gated_content:
-                gating_api.update_milestone(milestone, subsection_grade, prereq_milestone, user.id)
+                gating_api.update_milestone(
+                    milestone, subsection_grade.location, prereq_milestone, user, grade_percentage
+                )
 
 
 def evaluate_entrance_exam(course_grade, user):

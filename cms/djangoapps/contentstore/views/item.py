@@ -135,7 +135,9 @@ def xblock_handler(request, usage_key_string):
                 :isPrereq: Set this xblock as a prerequisite which can be used to limit access to other xblocks
                 :prereqUsageKey: Use the xblock identified by this usage key to limit access to this xblock
                 :prereqMinScore: The minimum score that needs to be achieved on the prerequisite xblock
-                        identifed by prereqUsageKey
+                        identifed by prereqUsageKey. Ranging from 0 to 100.
+                :prereqMinCompletion: The minimum completion percentage that needs to be achieved on the
+                        prerequisite xblock identifed by prereqUsageKey. Ranging from 0 to 100.
                 :publish: can be:
                   'make_public': publish the content
                   'republish': publish this item *only* if it was previously published
@@ -199,6 +201,7 @@ def xblock_handler(request, usage_key_string):
                 is_prereq=request.json.get('isPrereq'),
                 prereq_usage_key=request.json.get('prereqUsageKey'),
                 prereq_min_score=request.json.get('prereqMinScore'),
+                prereq_min_completion=request.json.get('prereqMinCompletion'),
                 publish=request.json.get('publish'),
                 fields=request.json.get('fields'),
             )
@@ -480,7 +483,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
                  grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None,
-                 publish=None, fields=None):
+                 prereq_min_completion=None, publish=None, fields=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
@@ -621,7 +624,11 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
             if prereq_usage_key is not None:
                 gating_api.set_required_content(
-                    xblock.location.course_key, xblock.location, prereq_usage_key, prereq_min_score
+                    xblock.location.course_key,
+                    xblock.location,
+                    prereq_usage_key,
+                    prereq_min_score,
+                    prereq_min_completion
                 )
 
         # If publish is set to 'republish' and this item is not in direct only categories and has previously been
@@ -1050,12 +1057,13 @@ def _get_gating_info(course, xblock):
         info["prereqs"] = [
             p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
         ]
-        prereq, prereq_min_score = gating_api.get_required_content(
+        prereq, prereq_min_score, prereq_min_completion = gating_api.get_required_content(
             course.id,
             xblock.location
         )
         info["prereq"] = prereq
         info["prereq_min_score"] = prereq_min_score
+        info["prereq_min_completion"] = prereq_min_completion
         if prereq:
             info["visibility_state"] = VisibilityState.gated
     return info

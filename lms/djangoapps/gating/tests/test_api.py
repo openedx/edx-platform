@@ -68,44 +68,58 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         super(TestEvaluatePrerequisite, self).setUp()
         self.user_dict = {'id': self.user.id}
         self.prereq_milestone = None
-        self.subsection_grade = Mock(location=self.seq1.location)
+        self.subsection_grade = Mock(location=self.seq1.location, percent_graded=0.5)
 
-    def _setup_gating_milestone(self, min_score):
+    def _setup_gating_milestone(self, min_score, min_completion):
         """
         Setup a gating milestone for testing
         """
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
-        gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, min_score)
+        gating_api.set_required_content(
+            self.course.id, self.seq2.location, self.seq1.location, min_score, min_completion
+        )
         self.prereq_milestone = gating_api.get_gating_milestone(self.course.id, self.seq1.location, 'fulfills')
 
-    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
-    @data((50, True), (100, True), (0, False))
+    @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage')
+    @data(
+        (50, 0, 50, 0, True),
+        (50, 0, 10, 0, False),
+        (0, 50, 0, 50, True),
+        (0, 50, 0, 10, False),
+        (50, 50, 50, 10, False),
+        (50, 50, 10, 50, False),
+        (50, 50, 50, 50, True),
+    )
     @unpack
-    def test_min_score_achieved(self, module_score, result, mock_score):
-        self._setup_gating_milestone(50)
-        mock_score.return_value = module_score
+    def test_min_score_achieved(
+            self, min_score, min_completion, module_score, module_completion, result, mock_completion
+    ):
+        self._setup_gating_milestone(min_score, min_completion)
+        mock_completion.return_value = module_completion
+        self.subsection_grade.percent_graded = module_score / 100.0
 
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
 
-    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage')
     @patch('openedx.core.lib.gating.api._get_minimum_required_percentage')
-    @data((50, False), (100, True))
+    @data((50, 50, False), (100, 50, False), (50, 100, False), (100, 100, True))
     @unpack
-    def test_invalid_min_score(self, module_score, result, mock_min_score, mock_score):
-        self._setup_gating_milestone(None)
-        mock_score.return_value = module_score
-        mock_min_score.return_value = 100
+    def test_invalid_min_score(self, module_score, module_completion, result, mock_min_score, mock_completion):
+        self._setup_gating_milestone(None, None)
+        mock_completion.return_value = module_completion
+        self.subsection_grade.percent_graded = module_score / 100.0
+        mock_min_score.return_value = 100, 100
 
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
 
-    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage')
     def test_no_prerequisites(self, mock_score):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         self.assertFalse(mock_score.called)
 
-    @patch('openedx.core.lib.gating.api._get_subsection_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage')
     def test_no_gated_content(self, mock_score):
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
 
