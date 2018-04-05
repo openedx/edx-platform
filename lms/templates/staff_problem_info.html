@@ -80,7 +80,6 @@ ${block_content}
         <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
         |
         % endif
-        % if has_instructor_access:
         <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Learner\'s State')}</button>
         % if can_rescore_problem:
         |
@@ -91,7 +90,6 @@ ${block_content}
         % endif
         % if can_override_problem_score:
         <button type="button" class="btn-link staff-debug-override-score">${_('Override Score')}</button>
-        % endif
         % endif
         ]
       </div>
