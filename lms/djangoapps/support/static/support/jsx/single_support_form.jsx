@@ -124,6 +124,7 @@ class RenderForm extends React.Component {
       userElement = (<LoggedOutUser
         platformName={this.props.context.platformName}
         loginQuery={this.props.context.loginQuery}
+        supportEmail={this.props.context.supportEmail}
       />);
     }
 
