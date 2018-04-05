@@ -35,6 +35,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.utils import send_verification_status_email
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -1152,10 +1153,16 @@ def results_callback(request):
     except SoftwareSecurePhotoVerification.DoesNotExist:
         log.error("Software Secure posted back for receipt_id %s, but not found", receipt_id)
         return HttpResponseBadRequest("edX ID {} not found".format(receipt_id))
+    context = {'user': request.user}
     if result == "PASS":
         log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
+        context['subject'] = _("Your {platform_name} ID Verification Approved").format(
+            platform_name=settings.PLATFORM_NAME
+        )
+        context['message'] = 'emails/successfull_verification_email.txt'
+        send_verification_status_email(context)
 
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
