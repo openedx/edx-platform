@@ -88,6 +88,8 @@ class ProviderConfig(ConfigurationModel):
     """
     Abstract Base Class for configuring a third_party_auth provider
     """
+    KEY_FIELDS = ('slug',)
+
     icon_class = models.CharField(
         max_length=50,
         blank=True,
@@ -109,6 +111,12 @@ class ProviderConfig(ConfigurationModel):
         ),
     )
     name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
+    slug = models.SlugField(
+        max_length=30, db_index=True, default='default',
+        help_text=(
+            'A short string uniquely identifying this provider. '
+            'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
+        ))
     secondary = models.BooleanField(
         default=False,
         help_text=_(
@@ -312,7 +320,6 @@ class OAuth2ProviderConfig(ProviderConfig):
     Also works for OAuth1 providers.
     """
     prefix = 'oa2'
-    KEY_FIELDS = ('provider_slug', )  # Backend name is unique
     backend_name = models.CharField(
         max_length=50, blank=False, db_index=True,
         help_text=(
@@ -514,7 +521,6 @@ class SAMLProviderConfig(ProviderConfig):
     Configuration Entry for a SAML/Shibboleth provider.
     """
     prefix = 'saml'
-    KEY_FIELDS = ('idp_slug', )
     backend_name = models.CharField(
         max_length=50, default='tpa-saml', blank=False,
         help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
@@ -603,26 +609,26 @@ class SAMLProviderConfig(ProviderConfig):
 
     def get_url_params(self):
         """ Get a dict of GET parameters to append to login links for this provider """
-        return {'idp': self.idp_slug}
+        return {'idp': self.slug}
 
     def is_active_for_pipeline(self, pipeline):
         """ Is this provider being used for the specified pipeline? """
-        return self.backend_name == pipeline['backend'] and self.idp_slug == pipeline['kwargs']['response']['idp_name']
+        return self.backend_name == pipeline['backend'] and self.slug == pipeline['kwargs']['response']['idp_name']
 
     def match_social_auth(self, social_auth):
         """ Is this provider being used for this UserSocialAuth entry? """
-        prefix = self.idp_slug + ":"
+        prefix = self.slug + ":"
         return self.backend_name == social_auth.provider and social_auth.uid.startswith(prefix)
 
     def get_remote_id_from_social_auth(self, social_auth):
         """ Given a UserSocialAuth object, return the remote ID used by this provider. """
         assert self.match_social_auth(social_auth)
         # Remove the prefix from the UID
-        return social_auth.uid[len(self.idp_slug) + 1:]
+        return social_auth.uid[len(self.slug) + 1:]
 
     def get_social_auth_uid(self, remote_id):
         """ Get social auth uid from remote id by prepending idp_slug to the remote id """
-        return '{}:{}'.format(self.idp_slug, remote_id)
+        return '{}:{}'.format(self.slug, remote_id)
 
     def get_config(self):
         """
@@ -648,7 +654,7 @@ class SAMLProviderConfig(ProviderConfig):
             log.error(
                 'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
                 'Run "manage.py saml pull" to fix or debug.',
-                self.name, self.entity_id, self.idp_slug
+                self.name, self.entity_id, self.slug
             )
             raise AuthNotConfigured(provider_name=self.name)
         conf['x509cert'] = data.public_key
@@ -660,7 +666,7 @@ class SAMLProviderConfig(ProviderConfig):
             SAMLConfiguration.current(self.site.id, 'default')
         )
         idp_class = get_saml_idp_class(self.identity_provider_type)
-        return idp_class(self.idp_slug, **conf)
+        return idp_class(self.slug, **conf)
 
 
 class SAMLProviderData(models.Model):
