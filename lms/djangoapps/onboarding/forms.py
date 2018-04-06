@@ -94,11 +94,12 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                                widget=forms.RadioSelect)
 
     language = forms.CharField(label=ugettext_noop('Native Language'), label_suffix="*", required=True,
-                               error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format('Language'))})
-    country = forms.CharField(label="Country of Residence", label_suffix="*",
+                               error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format('Language'))},
+                               widget=forms.HiddenInput())
+    country = forms.CharField(label="Country of Residence", label_suffix="*", widget=forms.HiddenInput(),
                               error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
     })
-    city = forms.CharField(label=ugettext_noop('City of Residence'), required=False)
+    city = forms.CharField(label=ugettext_noop('City of Residence'), required=False, widget=forms.HiddenInput())
     is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of '
                                                                        'employment is different from your country '
                                                                        'and/or city of residence.'),
@@ -210,12 +211,9 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         }
         widgets = {
             'year_of_birth': forms.TextInput,
-            'country': forms.TextInput(attrs={"autocomplete": "off"}),
             'not_listed_gender': forms.TextInput(attrs={'placeholder': ugettext_noop('Identify your gender here')}),
-            'city': forms.TextInput(attrs={"autocomplete": "off"}),
-            'language': forms.TextInput(attrs={"autocomplete": "off"}),
-            'country_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
-            'city_of_employment': forms.TextInput(attrs={"autocomplete": "off"}),
+            'country_of_employment': forms.HiddenInput(),
+            'city_of_employment': forms.HiddenInput(),
             'start_month_year': forms.TextInput(attrs={'placeholder': 'MM/YYYY'}),
             'hours_per_week': forms.NumberInput(attrs={'max': 168})
         }
@@ -425,8 +423,8 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
                   'org_type', 'level_of_operation', 'total_employees', 'alternate_admin_email', 'partner_networks']
 
         widgets = {
-            'country': forms.TextInput(attrs={"autocomplete": "off"}),
-            'city': forms.TextInput(attrs={"autocomplete": "off"}),
+            'country': forms.HiddenInput(),
+            'city': forms.HiddenInput(),
             'url': forms.TextInput,
             'founding_year': forms.NumberInput,
             'alternate_admin_email': forms.TextInput,
@@ -811,7 +809,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
             'effective_date': forms.TextInput,
             'total_clients': forms.NumberInput,
             'total_employees': forms.NumberInput,
-            'local_currency': forms.TextInput(attrs={"autocomplete": "off"}),
+            'local_currency': forms.HiddenInput(),
             'total_revenue': forms.NumberInput,
             'total_donations': forms.NumberInput,
             'total_expenses': forms.NumberInput,
@@ -916,7 +914,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
         currency_input = self.cleaned_data['local_currency']
 
         if can_provide_info and not currency_input in all_currency_codes:
-            raise forms.ValidationError(ugettext_noop('Please select currency code.'))
+            raise forms.ValidationError(ugettext_noop('Please select Currency Code.'))
 
         return currency_input
 
@@ -1019,7 +1017,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
             'effective_date': forms.TextInput,
             'total_clients': forms.NumberInput,
             'total_employees': forms.NumberInput,
-            'local_currency': forms.TextInput,
+            'local_currency': forms.HiddenInput(),
             'total_revenue': forms.NumberInput,
             'total_donations': forms.NumberInput,
             'total_expenses': forms.NumberInput,
