@@ -307,11 +307,6 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
         cls.site = Site.objects.get_current()
-        SiteConfiguration.objects.get_or_create(
-            site=cls.site,
-            enabled=True,
-            values={waffle.ENABLE_SITE_VISUAL_PROGRESS: True}
-        )
 
     @classmethod
     def create_test_course(cls):
@@ -354,6 +349,27 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         )
         self.assertEqual(200, self.client.get(last_accessed_url).status_code)
 
+    @override_switch(
+        '{}.{}'.format(
+            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_COMPLETION_TRACKING
+        ),
+        active=True
+    )
+    def complete_sequential(self, course, sequential):
+        """
+        Completes provided sequential.
+        """
+        course_key = CourseKey.from_string(str(course.id))
+        # Fake a visit to sequence2/vertical2
+        block_key = UsageKey.from_string(unicode(sequential.location))
+        completion = 1.0
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            course_key=course_key,
+            block_key=block_key,
+            completion=completion
+        )
+
     def visit_course_home(self, course, start_count=0, resume_count=0):
         """
         Helper function to navigates to course home page, test for resume buttons
@@ -384,37 +400,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
 
-    def test_resume_course(self):
-        """
-        Tests that two resume course buttons appear when the course has been accessed.
-        """
-        course = self.course
-
-        # first navigate to a sequential to make it the last accessed
-        chapter = course.children[0]
-        sequential = chapter.children[0]
-        vertical = sequential.children[0]
-        self.visit_sequential(course, chapter, sequential)
-
-        # check resume course buttons
-        response = self.visit_course_home(course, resume_count=2)
-        content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name))
-
-    @override_switch(
-        '{}.{}'.format(
-            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_VISUAL_PROGRESS
-        ),
-        active=True
-    )
     @override_settings(LMS_BASE='test_url:9999')
-    @patch('completion.waffle.get_current_site')
-    def test_resume_course_with_completion_api(self, get_patched_current_site):
+    def test_resume_course_with_completion_api(self):
         """
         Tests completion API resume button functionality
         """
         self.override_waffle_switch(True)
-        get_patched_current_site.return_value = self.site
 
         # Course tree
         course = self.course
@@ -422,16 +413,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         vertical1 = course.children[0].children[0].children[0]
         vertical2 = course.children[0].children[1].children[0]
 
-        # Fake a visit to sequence1/vertical1
-        block_key = UsageKey.from_string(unicode(vertical1.location))
-        completion = 1.0
-        BlockCompletion.objects.submit_completion(
-            user=self.user,
-            course_key=course_key,
-            block_key=block_key,
-            completion=completion
-        )
-
+        self.complete_sequential(self.course, vertical1)
         # Test for 'resume' link
         response = self.visit_course_home(course, resume_count=2)
 
@@ -439,15 +421,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         content = pq(response.content)
         self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical1.url_name))
 
-        # Fake a visit to sequence2/vertical2
-        block_key = UsageKey.from_string(unicode(vertical2.location))
-        completion = 1.0
-        BlockCompletion.objects.submit_completion(
-            user=self.user,
-            course_key=course_key,
-            block_key=block_key,
-            completion=completion
-        )
+        self.complete_sequential(self.course, vertical2)
+        # Test for 'resume' link
         response = self.visit_course_home(course, resume_count=2)
 
         # Test for 'resume' link URL - should be vertical 2
@@ -465,7 +440,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
     def test_resume_course_deleted_sequential(self):
         """
-        Tests resume course when the last accessed sequential is deleted and
+        Tests resume course when the last completed sequential is deleted and
         there is another sequential in the vertical.
 
         """
@@ -476,7 +451,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         self.assertGreaterEqual(len(chapter.children), 2)
         sequential = chapter.children[0]
         sequential2 = chapter.children[1]
-        self.visit_sequential(course, chapter, sequential)
+        self.complete_sequential(course, sequential)
+        self.complete_sequential(course, sequential2)
 
         # remove one of the sequentials from the chapter
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
@@ -490,7 +466,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
     def test_resume_course_deleted_sequentials(self):
         """
-        Tests resume course when the last accessed sequential is deleted and
+        Tests resume course when the last completed sequential is deleted and
         there are no sequentials left in the vertical.
 
         """
@@ -500,7 +476,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         chapter = course.children[0]
         self.assertEqual(len(chapter.children), 2)
         sequential = chapter.children[0]
-        self.visit_sequential(course, chapter, sequential)
+        self.complete_sequential(course, sequential)
 
         # remove all sequentials from chapter
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
@@ -508,22 +484,14 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
                 self.store.delete_item(sequential.location, self.user.id)
 
         # check resume course buttons
-        self.visit_course_home(course, resume_count=1)
+        self.visit_course_home(course, start_count=1, resume_count=0)
 
-    @override_switch(
-        '{}.{}'.format(
-            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_VISUAL_PROGRESS
-        ),
-        active=True
-    )
-    @patch('completion.waffle.get_current_site')
-    def test_course_home_for_global_staff(self, get_patched_current_site):
+    def test_course_home_for_global_staff(self):
         """
         Tests that staff user can access the course home without being enrolled
         in the course.
         """
         course = self.course
-        get_patched_current_site.return_value = self.site
         self.user.is_staff = True
         self.user.save()
 

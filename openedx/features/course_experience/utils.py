@@ -2,7 +2,6 @@
 Common utilities for the course experience, including course outline.
 """
 from completion.models import BlockCompletion
-from completion.waffle import visual_progress_enabled
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
@@ -154,14 +153,11 @@ def get_course_outline_block_tree(request, course_id):
         populate_children(course_outline_root_block, all_blocks['blocks'])
         set_last_accessed_default(course_outline_root_block)
 
-        if visual_progress_enabled(course_key=course_key):
-            mark_blocks_completed(
-                block=course_outline_root_block,
-                user=request.user,
-                course_key=course_key
-            )
-        else:
-            mark_last_accessed(request.user, course_key, course_outline_root_block)
+        mark_blocks_completed(
+            block=course_outline_root_block,
+            user=request.user,
+            course_key=course_key
+        )
     return course_outline_root_block
 
 

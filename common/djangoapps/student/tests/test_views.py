@@ -720,8 +720,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         submit_completions_for_testing(self.user, course_key, block_keys)
 
-        with patch('completion.utilities.visual_progress_enabled', return_value=True):
-            response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('dashboard'))
 
         course_key_string = str(course_key)
         resume_block_key_string = str(block_keys[-1])
@@ -808,8 +807,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 )
             )
 
-        with patch('completion.utilities.visual_progress_enabled', return_value=True):
-            response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('dashboard'))
 
         html_for_view_buttons = [
             self._remove_whitespace_from_html_string(button)

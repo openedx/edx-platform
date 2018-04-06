@@ -43,18 +43,11 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if not course_block_tree:
             return None
 
-        # TODO: EDUCATOR-2283 Remove 'show_visual_progress' from context
-        # and remove the check for it in the HTML file
-        show_visual_progress = (
-            completion_waffle.visual_progress_enabled(course_key) and
-            self.user_enrolled_after_completion_collection(request.user, course_key)
-        )
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course_overview,
-            'blocks': course_block_tree,
-            'show_visual_progress': show_visual_progress,
             'due_date_display_format': course.due_date_display_format,
+            'blocks': course_block_tree
         }
 
         # TODO: EDUCATOR-2283 Remove this check when the waffle flag is turned on in production
