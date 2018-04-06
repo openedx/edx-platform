@@ -181,7 +181,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-@attr(shard=1)
+@attr(shard=16)
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
@@ -414,7 +414,11 @@ class BaseGroupConfigurationsTest(ContainerBase):
         self.assertFalse(component.has_validation_error)
 
 
+@attr(shard=21)
 class UnitAccessContainerTest(BaseGroupConfigurationsTest):
+    """
+    Tests unit level access
+    """
     GROUP_RESTRICTED_MESSAGE = 'Access to this unit is restricted to: Dogs'
 
     def _toggle_container_unit_access(self, group_ids, unit):
@@ -467,7 +471,7 @@ class UnitAccessContainerTest(BaseGroupConfigurationsTest):
         self._verify_container_unit_access_message([self.id_base + 1], self.GROUP_RESTRICTED_MESSAGE)
 
 
-@attr(shard=3)
+@attr(shard=9)
 class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
     """
     Tests of the visibility settings modal for components on the unit
@@ -698,7 +702,7 @@ class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
         self.verify_component_group_visibility_messsage(self.html_component, "Audit Track")
 
 
-@attr(shard=1)
+@attr(shard=16)
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
@@ -1228,7 +1232,7 @@ class ProblemCategoryTabsTest(ContainerBase):
         self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)
 
 
-@attr(shard=1)
+@attr(shard=16)
 @ddt.ddt
 class MoveComponentTest(ContainerBase):
     """

@@ -19,6 +19,8 @@ class DashboardSearchTest(AcceptanceTest):
     """
     Test dashboard search.
     """
+    shard = 7
+
     USERNAME = 'STUDENT_TESTER'
     EMAIL = 'student101@example.com'
 

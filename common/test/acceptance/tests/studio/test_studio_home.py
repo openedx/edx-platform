@@ -32,6 +32,8 @@ class CreateLibraryTest(AcceptanceTest):
 
 class StudioLanguageTest(AcceptanceTest):
     """ Test suite for the Studio Language """
+    shard = 21
+
     def setUp(self):
         super(StudioLanguageTest, self).setUp()
         self.dashboard_page = DashboardPage(self.browser)

@@ -58,6 +58,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
         )
 
 
+@attr(shard=21)
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
@@ -188,7 +189,7 @@ class VideoHLSEventsTest(VideoEventsTestMixin):
         self.assert_events_match(expected_events, captured_events)
 
 
-@attr(shard=8)
+@attr(shard=19)
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """

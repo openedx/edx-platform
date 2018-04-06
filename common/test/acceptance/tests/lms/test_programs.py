@@ -62,6 +62,7 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         cache_programs_page.visit()
 
 
+@attr(shard=21)
 class ProgramListingPageTest(ProgramPageBase):
     """Verify user-facing behavior of the program listing page."""
     def setUp(self):

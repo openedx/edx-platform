@@ -14,6 +14,7 @@ class CrowdsourcehinterProblemTest(UniqueCourseTest):
     """
     Test scenario for the hinter.
     """
+    shard = 21
     USERNAME = "STAFF_TESTER"
     EMAIL = "johndoe@example.com"
 

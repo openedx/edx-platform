@@ -6,6 +6,7 @@ from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
 
 class VideoTimesTest(VideoBaseTest):
     """ Test Video Player Times """
+    shard = 21
 
     def test_video_start_time(self):
         """

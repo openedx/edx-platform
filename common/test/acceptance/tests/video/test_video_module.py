@@ -215,7 +215,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video.wait_for_video_player_render()
 
 
-@attr(shard=4)
+@attr(shard=13)
 @ddt
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
@@ -871,7 +871,7 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(tab1_video_names)
 
 
-@attr(shard=4)
+@attr(shard=13)
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -889,7 +889,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
-@attr(shard=4)
+@attr(shard=19)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1074,7 +1074,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
-@attr(shard=4)
+@attr(shard=13)
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1157,7 +1157,7 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
         self.video.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=4)
+@attr(shard=11)
 class VideoPlayOrderTest(VideoBaseTest):
     """
     Test video play order with multiple videos
@@ -1201,7 +1201,7 @@ class VideoPlayOrderTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('hls'))
 
 
-@attr(shard=4)
+@attr(shard=11)
 class HLSVideoTest(VideoBaseTest):
     """
     Tests related to HLS video
