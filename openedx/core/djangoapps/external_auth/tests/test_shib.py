@@ -302,7 +302,6 @@ class ShibSPTest(CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @data(*gen_all_identities())
-    @pytest.mark.django111_expected_failure
     def test_registration_form_submit(self, identity):
         """
         Tests user creation after the registration form that pops is submitted.  If there is no shib
@@ -332,20 +331,22 @@ class ShibSPTest(CacheIsolationTestCase):
         self.assertEquals(len(audit_log_calls), 3)
         method_name, args, _kwargs = audit_log_calls[0]
         self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 1)
-        self.assertIn(u'Login success on new account creation', args[0])
-        self.assertIn(u'post_username', args[0])
-        method_name, args, _kwargs = audit_log_calls[1]
-        self.assertEquals(method_name, 'info')
         self.assertEquals(len(args), 2)
         self.assertIn(u'User registered with external_auth', args[0])
         self.assertEquals(u'post_username', args[1])
-        method_name, args, _kwargs = audit_log_calls[2]
+
+        method_name, args, _kwargs = audit_log_calls[1]
         self.assertEquals(method_name, 'info')
         self.assertEquals(len(args), 3)
         self.assertIn(u'Updated ExternalAuthMap for ', args[0])
         self.assertEquals(u'post_username', args[1])
         self.assertEquals(u'test_user@stanford.edu', args[2].external_id)
+
+        method_name, args, _kwargs = audit_log_calls[2]
+        self.assertEquals(method_name, 'info')
+        self.assertEquals(len(args), 1)
+        self.assertIn(u'Login success on new account creation', args[0])
+        self.assertIn(u'post_username', args[0])
 
         user = User.objects.get(id=self.client.session['_auth_user_id'])
 
