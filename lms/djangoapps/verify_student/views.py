@@ -1154,16 +1154,10 @@ def results_callback(request):
     except SoftwareSecurePhotoVerification.DoesNotExist:
         log.error("Software Secure posted back for receipt_id %s, but not found", receipt_id)
         return HttpResponseBadRequest("edX ID {} not found".format(receipt_id))
-    context = {'user': request.user}
     if result == "PASS":
         log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
-        context['subject'] = _("Your {platform_name} ID Verification Approved").format(
-            platform_name=settings.PLATFORM_NAME
-        )
-        context['message'] = 'emails/successfull_verification_email.txt'
-        send_verification_status_email(context)
 
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
