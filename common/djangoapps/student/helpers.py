@@ -10,10 +10,10 @@ from datetime import datetime
 
 import django
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.core.validators import ValidationError, validate_email
-from django.contrib.auth import authenticate, load_backend, login, logout
+from django.core.validators import ValidationError
+from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
 from django.utils import http
@@ -35,13 +35,14 @@ from lms.djangoapps.certificates.models import (  # pylint: disable=import-error
     certificate_status_for_student
 )
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from student.models import (
-    CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     PasswordHistory,
     Registration,
@@ -111,18 +112,18 @@ def check_verify_status_by_course(user, course_enrollments):
 
     # Retrieve all verifications for the user, sorted in descending
     # order by submission datetime
-    verifications = SoftwareSecurePhotoVerification.objects.filter(user=user)
+    verifications = IDVerificationService.verifications_for_user(user)
 
     # Check whether the user has an active or pending verification attempt
     # To avoid another database hit, we re-use the queryset we have already retrieved.
-    has_active_or_pending = SoftwareSecurePhotoVerification.user_has_valid_or_pending(
+    has_active_or_pending = IDVerificationService.user_has_valid_or_pending(
         user, queryset=verifications
     )
 
     # Retrieve expiration_datetime of most recent approved verification
     # To avoid another database hit, we re-use the queryset we have already retrieved.
-    expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(user, verifications)
-    verification_expiring_soon = SoftwareSecurePhotoVerification.is_verification_expiring_soon(expiration_datetime)
+    expiration_datetime = IDVerificationService.get_expiration_datetime(user, verifications)
+    verification_expiring_soon = is_verification_expiring_soon(expiration_datetime)
 
     # Retrieve verification deadlines for the enrolled courses
     enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
@@ -140,7 +141,7 @@ def check_verify_status_by_course(user, course_enrollments):
             # This could be None if the course doesn't have a deadline.
             deadline = course_deadlines.get(enrollment.course_id)
 
-            relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
+            relevant_verification = verification_for_datetime(deadline, verifications)
 
             # Picking the max verification datetime on each iteration only with approved status
             if relevant_verification is not None and relevant_verification.status == "approved":
@@ -177,13 +178,12 @@ def check_verify_status_by_course(user, course_enrollments):
             )
             if status is None and not submitted:
                 if deadline is None or deadline > datetime.now(UTC):
-                    if SoftwareSecurePhotoVerification.user_is_verified(user):
-                        if verification_expiring_soon:
-                            # The user has an active verification, but the verification
-                            # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
-                            # Tell the student to reverify.
-                            status = VERIFY_STATUS_NEED_TO_REVERIFY
-                    else:
+                    if IDVerificationService.user_is_verified(user) and verification_expiring_soon:
+                        # The user has an active verification, but the verification
+                        # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+                        # Tell the student to reverify.
+                        status = VERIFY_STATUS_NEED_TO_REVERIFY
+                    elif not IDVerificationService.user_is_verified(user):
                         status = VERIFY_STATUS_NEED_TO_VERIFY
                 else:
                     # If a user currently has an active or pending verification,
@@ -525,7 +525,7 @@ def _cert_info(user, course_overview, cert_status):
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if not status == default_status and course_overview.end_of_course_survey_url is not None:
+    if status != default_status and course_overview.end_of_course_survey_url is not None:
         status_dict.update({
             'show_survey_button': True,
             'survey_url': process_survey_link(course_overview.end_of_course_survey_url, user)})
