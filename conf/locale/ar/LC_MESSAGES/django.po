@@ -198,7 +198,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-25 20:42+0000\n"
+"POT-Creation-Date: 2018-04-01 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: ali fakih <mr.fakih@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -1142,6 +1142,12 @@ msgid ""
 msgstr ""
 "إذا جرى تحديد هذا الخيار، لن يُطلب من المستخدمين تأكيد صحّة بريدهم "
 "الإلكتروني بل سيُفعّل حسابهم على الفور بمجرّد التسجيل."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is selected, users will be sent a welcome email upon "
+"registration."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -5437,7 +5443,7 @@ msgid "Open edX"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Trademarks"
+msgid "Trademark Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -6984,6 +6990,10 @@ msgid ""
 "A proctored exam attempt for {exam_name} in {course_name} by username: "
 "{student_username} was reviewed as {review_status} by the proctored exam "
 "review provider."
+msgstr ""
+
+#: lms/djangoapps/instructor/settings/common.py
+msgid "Your Platform Insights"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -9479,6 +9489,15 @@ msgstr ""
 msgid "Disable User Account"
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "View, create, and reissue learner entitlements"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -9808,10 +9827,6 @@ msgstr "يوتيوب"
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "اشترك في قناة منصّة {platform_name} على موقع يوتيوب."
-
-#: lms/envs/common.py
-msgid "Your Platform Insights"
-msgstr ""
 
 #: lms/envs/common.py
 msgid "Kosovo"
@@ -20528,10 +20543,6 @@ msgstr ""
 msgid "Student Support: Enrollment"
 msgstr "دعم الطلاب: التسجيل"
 
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr ""
-
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr ""
@@ -21042,9 +21053,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"ç²¤ICPå¤17044299å·-2. "
+msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -24637,6 +24646,10 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "Accessibility Accommodation Request"
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "LMS"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX

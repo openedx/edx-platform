@@ -218,7 +218,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-25 20:42+0000\n"
+"POT-Creation-Date: 2018-04-01 20:42+0000\n"
 "PO-Revision-Date: 2018-03-23 23:51+0000\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -1189,6 +1189,12 @@ msgid ""
 msgstr ""
 "Si se selecciona esta opción, los usuarios no tendrán que confirmar su "
 "correo, y sus cuentas estarán activadas inmediatamente después del registro."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is selected, users will be sent a welcome email upon "
+"registration."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -5546,8 +5552,8 @@ msgid "Open edX"
 msgstr "Open edX"
 
 #: lms/djangoapps/branding/api.py
-msgid "Trademarks"
-msgstr "Marcas"
+msgid "Trademark Policy"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -7168,6 +7174,10 @@ msgstr ""
 "Un intento de examen supervisado para el examen {exam_name} en {course_name}"
 " por el usuario: {student_username} fue revisado y marcado como "
 "{review_status} por el proveedor de revisiones de exámenes supervisados."
+
+#: lms/djangoapps/instructor/settings/common.py
+msgid "Your Platform Insights"
+msgstr "Tu Plataforma Insights"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -9744,6 +9754,15 @@ msgstr "Administrar Usuario"
 msgid "Disable User Account"
 msgstr "Desactivar Cuenta de Usuario"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "View, create, and reissue learner entitlements"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -10075,10 +10094,6 @@ msgstr "Youtube"
 #, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "Suscríbase al canal YouTube de {platform_name}."
-
-#: lms/envs/common.py
-msgid "Your Platform Insights"
-msgstr "Tu Plataforma Insights"
 
 #: lms/envs/common.py
 msgid "Kosovo"
@@ -21293,10 +21308,6 @@ msgstr "Contacte el soporte de {platform_name}"
 msgid "Student Support: Enrollment"
 msgstr "Soporte a estudiantes: Inscripciones"
 
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr ""
-
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr "Soporte a Estudiantes: Administrar Usuario"
@@ -21829,9 +21840,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr "© 2012–{year} edX Inc. "
 
 #: themes/edx.org/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"ç²¤ICPå¤17044299å·-2. "
+msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -25623,6 +25632,10 @@ msgstr "Poliíticas"
 #: cms/templates/widgets/footer.html
 msgid "Accessibility Accommodation Request"
 msgstr "Solicitud de Acomodación de accesibilidad"
+
+#: cms/templates/widgets/footer.html
+msgid "LMS"
+msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
