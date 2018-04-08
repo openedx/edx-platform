@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-01 20:36+0000\n"
-"PO-Revision-Date: 2018-04-01 20:36:11.596134\n"
+"POT-Creation-Date: 2018-04-08 20:36+0000\n"
+"PO-Revision-Date: 2018-04-08 20:36:06.062255\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -9476,11 +9476,6 @@ msgstr ""
 "فاث عسثق {username} هس رخف ثرقخممثي هر فاث ذخعقسث شسسخذهشفثي صهفا فاهس فثشو."
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "فاث ذخعقسث بخق صاهذا فاهس يثشيمهرث شححمهثس"
 
@@ -9491,6 +9486,11 @@ msgid ""
 msgstr ""
 "فاث يشفثفهوث شبفثق صاهذا عسثقس شقث رخ مخرلثق شممخصثي فخ سعزوهف حاخفخس بخق "
 "دثقهبهذشفهخر."
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -11440,6 +11440,21 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr "غخع وعسف شلقثث فخ فاث {platform_name} {terms_of_service}"
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+"زغ ذقثشفهرل شر شذذخعرف صهفا {platform_name}, غخع شلقثث                   فخ "
+"شزهيث زغ خعق {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   شري شلقثث فخ خعق {privacy_policy_link_start}حقهدشذغ "
+"حخمهذغ{privacy_policy_link_end}."
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -13037,7 +13052,6 @@ msgid "This is the e-mail address you used to register with {platform}"
 msgstr "فاهس هس فاث ث-وشهم شييقثسس غخع عسثي فخ قثلهسفثق صهفا {platform}"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "قثسثف وغ حشسسصخقي"
 
@@ -20086,34 +20100,6 @@ msgid "Reset Your {platform_name} Password"
 msgstr "قثسثف غخعق {platform_name} حشسسصخقي"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "ثققخق قثسثففهرل حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr "غخع وعسف ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr "فاث فثطف هر زخفا حشسسصخقي بهثميس وعسف وشفذا."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "قثسثف غخعق حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr "ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "رثص حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "ذخربهقو حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "هردشمهي حشسسصخقي قثسثف مهرن"
 
@@ -20977,6 +20963,10 @@ msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
 msgstr "عحلقشيث ({price})"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Expand All"
+msgstr "ثطحشري شمم"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
 msgid "Prerequisite: "

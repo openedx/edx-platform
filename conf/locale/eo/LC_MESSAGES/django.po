@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-01 20:36+0000\n"
-"PO-Revision-Date: 2018-04-01 20:36:11.596134\n"
+"POT-Creation-Date: 2018-04-08 20:36+0000\n"
+"PO-Revision-Date: 2018-04-08 20:36:06.062255\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10937,13 +10937,6 @@ msgstr ""
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr ""
-"Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr ""
 "Thé çöürsé för whïçh thïs déädlïné äpplïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -10956,6 +10949,13 @@ msgid ""
 msgstr ""
 "Thé dätétïmé äftér whïçh üsérs äré nö löngér ällöwéd tö süßmït phötös för "
 "vérïfïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr ""
+"Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -13183,6 +13183,27 @@ msgstr ""
 "Ýöü müst ägréé tö thé {platform_name} {terms_of_service} Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢#"
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+"Bý çréätïng än äççöünt wïth {platform_name}, ýöü ägréé                   tö "
+"äßïdé ßý öür {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   änd ägréé tö öür {privacy_policy_link_start}Prïväçý "
+"Pölïçý{privacy_policy_link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒι¢ια#"
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -14952,7 +14973,6 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "Rését Mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -23020,40 +23040,6 @@ msgid "Reset Your {platform_name} Password"
 msgstr "Rését Ýöür {platform_name} Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "Érrör Réséttïng Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr ""
-"Ýöü müst éntér änd çönfïrm ýöür néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr ""
-"Thé téxt ïn ßöth pässwörd fïélds müst mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "Rését Ýöür Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr ""
-"Éntér änd çönfïrm ýöür néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "Néw Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "Çönfïrm Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Ìnvälïd Pässwörd Rését Lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
@@ -24024,6 +24010,10 @@ msgstr "Pürsüé ä vérïfïéd çértïfïçäté Ⱡ'σяєм ιρѕυм ∂
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
 msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Expand All"
+msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
 msgid "Prerequisite: "
