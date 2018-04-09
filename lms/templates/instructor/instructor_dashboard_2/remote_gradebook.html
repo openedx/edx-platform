@@ -1,0 +1,79 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<section>
+  <p class="gradebook-name">
+    <span class="copy-confirm">${_("Gradebook name:")} <strong>${ section_data['remote_gradebook_name'] }</strong></span>
+  </p>
+
+  <hr>
+
+  <h4 class="hd hd-4">${_("Remote gradebook enrollments")}</h4>
+  <p>
+    <input type="button" name="list-remote-enrolled-students" value="List enrolled students matching remote gradebook" data-endpoint="${ section_data['list_remote_enrolled_students_url'] }">
+  </p>
+  <p>
+    <label for="section-name">${_("Section name:")}</label>
+    <select name="section-name" id="section-name" disabled="disabled" data-endpoint="${ section_data['get_remote_gradebook_sections_url'] }">
+    </select>
+  </p>
+  <p>
+    <input type="button" name="list-remote-students-in-section" value="List students in section in remote gradebook" data-endpoint="${ section_data['list_remote_students_in_section_url'] }">
+    <input type="button" name="merge-enrolled-students-in-section" value="Merge enrollment list using remote gradebook"
+           data-unenroll-current="false" data-endpoint="${ section_data['add_enrollments_using_remote_gradebook_url'] }">
+    <input type="button" name="overload-enrolled-students-in-section" value="Overload enrollment list using remote gradebook"
+           data-unenroll-current="true" data-endpoint="${ section_data['add_enrollments_using_remote_gradebook_url'] }"
+           data-enrolled-users-endpoint="${ section_data['get_non_staff_enrollments_url'] }">
+  </p>
+
+  <hr>
+
+  <h4 class="hd hd-4">${_("Export grades to remote gradebook")}</h4>
+  <p>
+    ${_("The assignments defined for this course should match the ones stored in the gradebook, for this to work properly!")}
+  </p>
+  <p>
+    <input type="button" name="list-remote-assignments" value="List assignments available in remote gradebook" data-endpoint="${ section_data['list_remote_assignments_url'] }">
+  </p>
+  <p>
+    <label for="assignment-name">${_("Assignment name:")}</label>
+    <select name="assignment-name" id="assignment-name" disabled="disabled" data-endpoint="${ section_data['get_assignment_names_url'] }">
+    </select>
+  </p>
+  <p>
+    <input type="button" name="display-assignment-grades" value="Display grades for assignment" data-endpoint="${ section_data['display_assignment_grades_url'] }">
+    <input type="button" name="export-assignment-grades-to-rg" value="Export grades for assignment to remote gradebook" data-endpoint="${ section_data['export_assignment_grades_to_rg_url'] }">
+    <input type="button" name="export-assignment-grades-csv" value="Export CSV file of grades for assignment" data-endpoint="${ section_data['export_assignment_grades_csv_url'] }">
+  </p>
+
+  <hr>
+
+  <div id="errors" class="errors"></div>
+  <div id="results"></div>
+  <br/>
+  <div class="reports-download-container action-type-container">
+    ## Translators: a table of URL links to report files appears after this sentence.
+    <p>
+        ${Text(_("{strong_start}Note{strong_end}: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")).format(
+            strong_start=HTML("<strong>"),
+            strong_end=HTML("</strong>"),
+        )}
+    </p><br>
+
+    <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['list_report_downloads_url'] }" ></div>
+  </div>
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+  </div>
+%endif
+</section>
