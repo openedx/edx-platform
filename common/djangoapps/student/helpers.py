@@ -26,11 +26,11 @@ from pytz import UTC
 from six import iteritems, text_type
 import third_party_auth
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import (  # pylint: disable=import-error
+from lms.djangoapps.certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled
 )
-from lms.djangoapps.certificates.models import (  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     certificate_status_for_student
 )
@@ -647,12 +647,12 @@ def do_create_account(form, custom_form=None):
         # AccountValidationError and a consistent user message returned (i.e. both should
         # return "It looks like {username} belongs to an existing account. Try again with a
         # different username.")
-        if len(User.objects.filter(username=user.username)) > 0:
+        if User.objects.filter(username=user.username):
             raise AccountValidationError(
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
                 field="username"
             )
-        elif len(User.objects.filter(email=user.email)) > 0:
+        elif User.objects.filter(email=user.email):
             raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
@@ -680,7 +680,7 @@ def do_create_account(form, custom_form=None):
         profile.meta = json.dumps(extended_profile)
     try:
         profile.save()
-    except Exception:  # pylint: disable=broad-except
+    except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
