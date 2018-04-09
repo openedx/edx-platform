@@ -6,8 +6,10 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
+import datetime
 import hashlib
 from collections import Counter
+from pytz import UTC
 
 from celery.states import READY_STATES
 
@@ -39,8 +41,9 @@ from lms.djangoapps.instructor_task.tasks import (
     proctored_exam_results_csv,
     rescore_problem,
     reset_problem_attempts,
-    send_bulk_course_email
+    send_bulk_course_email,
 )
+from remote_gradebook.constants import RGB_TASK_TYPES
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
@@ -63,6 +66,24 @@ def get_running_instructor_tasks(course_id):
     for state in READY_STATES:
         instructor_tasks = instructor_tasks.exclude(task_state=state)
     return instructor_tasks.order_by('-id')
+
+
+def get_running_instructor_rgb_tasks(course_id, user):
+    """
+    Returns a query of InstructorTask objects of running tasks for a given course
+    including remote gradebook-specific tasks.
+    """
+    instructor_tasks = get_running_instructor_tasks(course_id)
+    now = datetime.datetime.now(UTC)
+    rgb_tasks = InstructorTask.objects.filter(
+        course_id=course_id,
+        task_type__in=RGB_TASK_TYPES,
+        updated__lte=now,
+        updated__gte=now - datetime.timedelta(days=2),
+        requester=user
+    ).order_by('-updated')[0:3]
+
+    return (instructor_tasks | rgb_tasks).distinct()
 
 
 def get_instructor_task_history(course_id, usage_key=None, student=None, task_type=None):
