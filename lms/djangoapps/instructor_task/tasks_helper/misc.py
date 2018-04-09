@@ -301,3 +301,10 @@ def upload_ora2_data(
     TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
 
     return UPDATE_STATUS_SUCCEEDED
+
+
+def _progress_error(error_msg, task_progress):
+    task_progress.failed = 1
+    curr_step = {'step': error_msg}
+    task_progress.update_task_state(extra_meta=curr_step)
+    return UPDATE_STATUS_FAILED

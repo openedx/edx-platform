@@ -50,7 +50,8 @@
             enableColumnReorder: false,
             autoHeight: true,
             rowHeight: 100,
-            forceFitColumns: true
+            forceFitColumns: true,
+            enableTextSelectionOnCells: true
         };
         columns = [
             {
@@ -475,7 +476,8 @@
                 enableCellNavigation: true,
                 enableColumnReorder: false,
                 rowHeight: 30,
-                forceFitColumns: true
+                forceFitColumns: true,
+                enableTextSelectionOnCells: true
             };
             columns = [
                 {

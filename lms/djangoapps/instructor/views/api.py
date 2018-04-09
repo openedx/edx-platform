@@ -76,7 +76,10 @@ from lms.djangoapps.instructor.enrollment import (
     unenroll_email
 )
 from lms.djangoapps.instructor.views import INVOICE_KEY
-from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+from lms.djangoapps.instructor.views.instructor_task_helpers import (
+    extract_email_features,
+    extract_task_features,
+)
 from lms.djangoapps.instructor_task.api import submit_override_score
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
@@ -135,7 +138,7 @@ from .tools import (
     parse_datetime,
     require_student_from_identifier,
     set_due_date_extension,
-    strip_if_string
+    strip_if_string,
 )
 
 log = logging.getLogger(__name__)
@@ -569,7 +572,9 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
     except Exception as ex:  # pylint: disable=broad-except
         log.exception(type(ex).__name__)
         errors.append({
-            'username': username, 'email': email, 'response': type(ex).__name__,
+            'username': username,
+            'email': email,
+            'response': type(ex).__name__
         })
     else:
         try:
@@ -2291,6 +2296,7 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
+    include_remote_gradebook = request.GET.get('include_remote_gradebook') is not None
     course_id = CourseKey.from_string(course_id)
     problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
     student = request.POST.get('unique_student_identifier', None)
@@ -2313,6 +2319,11 @@ def list_instructor_tasks(request, course_id):
         else:
             # Specifying for single problem's history
             tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, module_state_key)
+    elif include_remote_gradebook:
+        tasks = lms.djangoapps.instructor_task.api.get_running_instructor_rgb_tasks(
+            course_id,
+            user=request.user
+        )
     else:
         # If no problem or student, just get currently running tasks
         tasks = lms.djangoapps.instructor_task.api.get_running_instructor_tasks(course_id)
@@ -2461,11 +2472,18 @@ def problem_grade_report(request, course_id):
     updated.
     """
     course_key = CourseKey.from_string(course_id)
-    report_type = _('problem grade')
-    lms.djangoapps.instructor_task.api.submit_problem_grade_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-    return JsonResponse({"status": success_status})
+    try:
+        lms.djangoapps.instructor_task.api.submit_problem_grade_report(request, course_key)
+        success_status = _("The problem grade report is being created."
+                           " To view the status of the report, see Pending Tasks below.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A problem grade report is already being generated."
+                                   " To view the status of the report, see Pending Tasks below."
+                                   " You will be able to download the report when it is complete.")
+        return JsonResponse({
+            "status": already_running_status
+        })
 
 
 @require_POST

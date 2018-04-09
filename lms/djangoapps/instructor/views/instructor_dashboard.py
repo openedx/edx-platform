@@ -132,6 +132,9 @@ def instructor_dashboard_2(request, course_id):
         _section_data_download(course, access),
     ]
 
+    if settings.FEATURES.get('ENABLE_INSTRUCTOR_REMOTE_GRADEBOOK_CONTROLS', False):
+        sections.append(_section_remote_gradebook(course))
+
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
@@ -641,6 +644,57 @@ def _section_data_download(course, access):
         'course_has_survey': True if course.course_survey_name else False,
         'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': unicode(course_key)}),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': unicode(course_key)}),
+    }
+    return section_data
+
+
+def _section_remote_gradebook(course):
+    """ Provide data for the corresponding dashboard section """
+    rg_course_setting = course.remote_gradebook or {}
+    rg_name = rg_course_setting.get('name') or settings.REMOTE_GRADEBOOK.get('DEFAULT_NAME')
+    section_data = {
+        'section_key': 'remote_gradebook',
+        'section_display_name': _('Remote Gradebook'),
+        'course': course,
+        'remote_gradebook_name': rg_name,
+        'get_remote_gradebook_sections_url': reverse(
+            'get_remote_gradebook_sections', kwargs={'course_id': unicode(course.id)}
+        ),
+        'get_assignment_names_url': reverse(
+            'get_assignment_names', kwargs={'course_id': unicode(course.id)}
+        ),
+        'get_non_staff_enrollments_url': reverse(
+            'get_non_staff_enrollments', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_remote_enrolled_students_url': reverse(
+            'list_remote_enrolled_students', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_remote_students_in_section_url': reverse(
+            'list_remote_students_in_section', kwargs={'course_id': unicode(course.id)}
+        ),
+        'add_enrollments_using_remote_gradebook_url': reverse(
+            'add_enrollments_using_remote_gradebook', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_remote_assignments_url': reverse(
+            'list_remote_assignments', kwargs={'course_id': unicode(course.id)}
+        ),
+        'display_assignment_grades_url': reverse(
+            'display_assignment_grades', kwargs={'course_id': unicode(course.id)}
+        ),
+        'export_assignment_grades_to_rg_url': reverse(
+            'export_assignment_grades_to_rg', kwargs={'course_id': unicode(course.id)}
+        ),
+        'export_assignment_grades_csv_url': reverse(
+            'export_assignment_grades_csv', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_instructor_tasks_url': '{}?include_remote_gradebook=true'.format(
+            reverse(
+                'list_instructor_tasks', kwargs={'course_id': unicode(course.id)}
+            )
+        ),
+        'list_report_downloads_url': reverse(
+            'list_report_downloads', kwargs={'course_id': unicode(course.id)}
+        ),
     }
     return section_data
 
