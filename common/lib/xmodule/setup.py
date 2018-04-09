@@ -49,14 +49,6 @@ setup(
     name="XModule",
     version="0.1.1",
     packages=find_packages(exclude=["tests"]),
-    install_requires=[
-        'setuptools',
-        'docopt',
-        'capa',
-        'path.py',
-        'webob',
-        'edx-opaque-keys>=0.4.0,<1.0.0',
-    ],
     package_data={
         'xmodule': ['js/module/*'],
     },

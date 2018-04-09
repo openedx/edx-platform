@@ -23,9 +23,6 @@ setup(
     name='xblock-discussion',
     version='0.1',
     description='XBlock - Discussion',
-    install_requires=[
-        'XBlock',
-    ],
     entry_points={
         'xblock.v1': [
             'discussion = xblock_discussion:DiscussionXBlock'
