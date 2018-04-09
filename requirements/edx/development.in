@@ -1,0 +1,16 @@
+# Dependencies that are used in development environments.
+# Please do not use this file for packages that are needed in production or for test runs.
+#
+# These are installed automatically in devstack, and can also be installed manually using:
+#
+#    pip install -r requirements/edx/development.txt
+#
+
+-r pip-tools.txt                    # pip-tools and its dependencies, for managing requirements files
+-r testing.txt                      # Dependencies for running the various test suites
+
+click                               # Used for perf_tests utilities in modulestore
+pyinotify                           # More efficient checking for runserver reload trigger events
+
+# Performance timer used in modulestore/perf_tests/test_asset_import_export.py
+-e git+https://github.com/doctoryes/code_block_timer.git@f3d0629f086bcc649c3c77f4bc5b9c2c8172c3bf#egg=code_block_timer
