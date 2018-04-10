@@ -271,7 +271,7 @@ class AccountRetireMailingsView(APIView):
     authentication_classes = (JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
-    def post(self, request, username):
+    def post(self, request):
         """
         POST /api/user/v1/accounts/{username}/retire_mailings/
 
@@ -280,40 +280,39 @@ class AccountRetireMailingsView(APIView):
         -  Update UserOrgTags to opt the user out of org emails
         -  Call Sailthru API to force opt-out the user from all email lists
         """
-        user_model = get_user_model()
-        retired_username = request.data['retired_username']
+        username = request.data['username']
 
         try:
-            user = get_potentially_retired_user_by_username_and_hash(username, retired_username)
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
 
             with transaction.atomic():
                 # Take care of org emails first, using the existing API for consistency
-                for preference in UserOrgTag.objects.filter(user=user, key='email-optin'):
-                    update_email_opt_in(user, preference.org, False)
+                for preference in UserOrgTag.objects.filter(user=retirement.user, key='email-optin'):
+                    update_email_opt_in(retirement.user, preference.org, False)
 
                 # This signal allows lms' email_marketing and other 3rd party email
                 # providers to unsubscribe the user as well
-                USER_RETIRE_MAILINGS.send(sender=self.__class__, user=user)
-        except user_model.DoesNotExist:
+                USER_RETIRE_MAILINGS.send(sender=self.__class__, user=retirement.user)
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class DeactivateLogoutView(APIView):
     """
     POST /api/user/v1/accounts/deactivate_logout/
     {
-        "user": "example_username",
+        "username": "example_username",
     }
 
     **POST Parameters**
 
       A POST request must include the following parameter.
 
-      * user: Required. The username of the user being deactivated.
+      * username: Required. The username of the user being deactivated.
 
     **POST Response Values**
 
@@ -345,18 +344,11 @@ class DeactivateLogoutView(APIView):
         Marks the user as having no password set for deactivation purposes,
         and logs the user out.
         """
-        username = request.data.get('user', None)
-        if not username:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND,
-                data={
-                    'message': u'The user was not specified.'
-                }
-            )
-
+        username = None
         user_model = get_user_model()
         try:
-            # make sure the specified user exists
+            # Get the username from the request and check that it exists
+            username = request.data['username']
             user = user_model.objects.get(username=username)
 
             with transaction.atomic():
@@ -367,12 +359,13 @@ class DeactivateLogoutView(APIView):
                 user.save()
                 _set_unusable_password(user)
                 # 3. Unlink social accounts & change password on each IDA, still to be implemented
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except KeyError:
+            return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(u'The user "{}" does not exist.'.format(username), status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def _set_unusable_password(user):

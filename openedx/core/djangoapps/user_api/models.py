@@ -268,5 +268,26 @@ class UserRetirementStatus(TimeStampedModel):
         self.responses += "\n Moved from {} to {}:\n{}\n".format(old_state, self.current_state, update['response'])
         self.save()
 
+    @classmethod
+    def get_retirement_for_retirement_action(cls, username):
+        """
+        Convenience method to get a UseRetirementStatus for a particular user with some checking
+        to make sure they're in a state that is acceptable to be acted upon. The user should be
+        in a "working state" (not a dead end state, PENDING, or *_COMPLETE). This should help
+        a bit with situations like the retirement driver accidentally trying to act upon the
+        same user twice at the same time, or trying to take action on an errored user.
+
+        Can raise UserRetirementStatus.DoesNotExist or RetirementStateError, otherwise should
+        return a UserRetirementStatus
+        """
+        retirement = cls.objects.get(original_username=username)
+        state = retirement.current_state
+
+        if state.required or state.state_name.endswith('_COMPLETE'):
+            raise RetirementStateError('{} is in {}, not a valid state to perform retirement '
+                                       'actions on.'.format(retirement, state.state_name))
+
+        return retirement
+
     def __unicode__(self):
         return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)

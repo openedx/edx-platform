@@ -17,7 +17,7 @@ urlpatterns = [
         CourseView.as_view(),
         name="discussion_course"
     ),
-    url(r"^v1/users/{}".format(settings.USERNAME_PATTERN), RetireUserView.as_view(), name="retire_discussion_user"),
+    url(r"^v1/accounts/retire_forum", RetireUserView.as_view(), name="retire_discussion_user"),
     url(
         r"^v1/course_topics/{}".format(settings.COURSE_ID_PATTERN),
         CourseTopicsView.as_view(),
