@@ -36,11 +36,6 @@ REQUIREJS_WAIT = {
         "jquery", "js/base", "js/models/course", "js/models/settings/advanced",
         "js/views/settings/advanced", "codemirror"],
 
-    # Unit page
-    re.compile(r'^Unit \|'): [
-        "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
-        "js/collections/component_template", "xmodule", "cms/js/main", "xblock/cms.runtime.v1"],
-
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
     re.compile(r'^Course Outline \|'): [
@@ -62,9 +57,11 @@ TRUTHY_WAIT = {
     re.compile(r'^Pages \|'): [
         'XBlock'
     ],
-    re.compile(r'^Studio Home \|'): [
-        'toggle_sock'
+    # Unit page
+    re.compile(r'Unit \|'): [
+        "jQuery", "XBlock", "ContainerFactory"
     ],
+
 }
 
 
