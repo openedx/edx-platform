@@ -62,6 +62,9 @@ TRUTHY_WAIT = {
     re.compile(r'^Pages \|'): [
         'XBlock'
     ],
+    re.compile(r'^Studio Home \|'): [
+        'toggle_sock'
+    ],
 }
 
 
