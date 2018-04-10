@@ -37,10 +37,12 @@ urlpatterns = [
         views.password_reset_confirm_wrapper,
         name='password_reset_confirm',
     ),
+
+    url(r'accounts/verify_password', views.verify_user_password, name='verify_password'),
+
     url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
         views.course_run_refund_status,
         name="course_run_refund_status"),
-
 ]
 
 # enable automatic login
