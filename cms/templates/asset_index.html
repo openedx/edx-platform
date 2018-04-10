@@ -6,7 +6,6 @@
   from django.utils.translation import ugettext as _
   from openedx.core.djangolib.markup import HTML, Text
   from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
-  from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ASSETS_SEARCH
 %>
 <%block name="title">${_("Files & Uploads")}</%block>
 <%block name="bodyclass">is-signedin course uploads view-uploads</%block>
@@ -49,9 +48,6 @@
                 },
                 "upload_settings": {
                     "max_file_size_in_mbs": ${max_file_size_in_mbs|n, dump_js_escaped_json}
-                },  
-                "search_settings": {   
-                    "enabled": ${waffle().is_enabled(ENABLE_ASSETS_SEARCH) | n, dump_js_escaped_json}
                 }
             }
         </%static:studiofrontend>

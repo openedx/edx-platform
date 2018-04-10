@@ -78,6 +78,11 @@ class AssetIndexPageStudioFrontend(CoursePage):
         return self.q(css='.pagination').present
 
     @wait_for_js
+    def is_search_element_on_page(self):
+        """Checks that search bar is on the page."""
+        return self.q(css="[name='search']").present
+
+    @wait_for_js
     def is_status_alert_element_on_page(self):
         """Checks that status alert is hidden on page."""
         return all([
