@@ -11,7 +11,14 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils.http import urlquote_plus
 from six import text_type
+
+from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
 %>
+
+<%
+username = get_enterprise_learner_generic_name(request) or student.username
+%>
+
 <%block name="bodyclass">view-in-course view-progress</%block>
 
 <%block name="headextra">
@@ -54,7 +61,7 @@ from six import text_type
                 </div>
                 % endif
                 <h2 class="hd hd-2 progress-certificates-title">
-                    ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}
+                    ${_("Course Progress for Student '{username}' ({email})").format(username=username, email=student.email)}
                 </h2>
 
                 <div class="wrapper-msg wrapper-auto-cert">
