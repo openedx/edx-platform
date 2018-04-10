@@ -70,7 +70,7 @@ urlpatterns = [
         name='accounts_deactivation'
     ),
     url(
-        r'^v1/accounts/{}/retire_mailings/$'.format(settings.USERNAME_PATTERN),
+        r'^v1/accounts/retire_mailings/$',
         AccountRetireMailingsView.as_view(),
         name='accounts_retire_mailings'
     ),
