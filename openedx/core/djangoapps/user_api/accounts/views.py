@@ -4,6 +4,7 @@ An API for retrieving user account information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
+import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -15,6 +16,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 from social_django.models import UserSocialAuth
+import pytz
 
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import (
@@ -22,13 +24,19 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.parsers import MergePatchParser
-from student.models import User, get_potentially_retired_user_by_username_and_hash, get_retired_email_by_email
+from student.models import (
+    User,
+    get_retired_email_by_email,
+    get_potentially_retired_user_by_username_and_hash,
+    get_potentially_retired_user_by_username
+)
 
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanRetireUser
+from .serializers import UserRetirementStatusSerializer
 from .signals import USER_RETIRE_MAILINGS
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
-from ..models import UserOrgTag
+from ..models import UserOrgTag, RetirementState, RetirementStateError, UserRetirementStatus
 
 
 class AccountViewSet(ViewSet):
@@ -374,3 +382,97 @@ def _set_unusable_password(user):
     """
     user.set_unusable_password()
     user.save()
+
+
+class AccountRetirementView(ViewSet):
+    """
+    Provides API endpoints for managing the user retirement process.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser, )
+    parser_classes = (MergePatchParser, )
+    serializer_class = UserRetirementStatusSerializer
+
+    def retirement_queue(self, request):
+        """
+        GET /api/user/v1/accounts/accounts_to_retire/
+        {'cool_off_days': 7, 'states': ['PENDING', 'COMPLETE']}
+
+        Returns the list of RetirementStatus users in the given states that were
+        created in the retirement queue at least `cool_off_days` ago.
+        """
+        try:
+            cool_off_days = int(request.GET['cool_off_days'])
+            states = request.GET['states'].split(',')
+
+            if cool_off_days < 0:
+                raise RetirementStateError('Invalid argument for cool_off_days, must be greater than 0.')
+
+            state_objs = RetirementState.objects.filter(state_name__in=states)
+            if state_objs.count() != len(states):
+                found = [s.state_name for s in state_objs]
+                raise RetirementStateError('Unknown state. Requested: {} Found: {}'.format(states, found))
+
+            earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
+
+            retirements = UserRetirementStatus.objects.select_related(
+                'user', 'current_state', 'last_state'
+            ).filter(
+                current_state__in=state_objs, created__lt=earliest_datetime
+            ).order_by(
+                'id'
+            )
+            serializer = UserRetirementStatusSerializer(retirements, many=True)
+            return Response(serializer.data)
+        # This should only occur on the int() converstion of cool_off_days at this point
+        except ValueError:
+            return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as exc:
+            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, username):  # pylint: disable=unused-argument
+        """
+        GET /api/user/v1/accounts/{username}/retirement_status/
+        Returns the RetirementStatus of a given user, or 404 if that row
+        doesn't exist.
+        """
+        try:
+            user = get_potentially_retired_user_by_username(username)
+            retirement = UserRetirementStatus.objects.select_related(
+                'user', 'current_state', 'last_state'
+            ).get(user=user)
+            serializer = UserRetirementStatusSerializer(instance=retirement)
+            return Response(serializer.data)
+        except (UserRetirementStatus.DoesNotExist, User.DoesNotExist):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def partial_update(self, request):
+        """
+        PATCH /api/user/v1/accounts/update_retirement_status/
+
+        {
+            'username': 'user_to_retire',
+            'new_state': 'LOCKING_COMPLETE',
+            'response': 'User account locked and logged out.'
+        }
+
+        Updates the RetirementStatus row for the given user to the new
+        status, and append any messages to the message log.
+
+        Note that this implementation is the "merge patch" implementation proposed in
+        https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
+        else an error response with status code 415 will be returned.
+        """
+        try:
+            username = request.data['username']
+            retirement = UserRetirementStatus.objects.get(user__username=username)
+            retirement.update_state(request.data)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
