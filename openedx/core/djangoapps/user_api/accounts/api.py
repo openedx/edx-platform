@@ -624,8 +624,6 @@ def delete_user_account(username):
     """
 
     existing_user, existing_user_profile = _get_user_and_profile(username)
-    if not existing_user.is_active:
-        raise UserNotFound()
 
     # If we get here the user must have a profile, delete this record
     existing_user_profile.delete()
