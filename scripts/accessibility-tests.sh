@@ -29,11 +29,11 @@ echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
 
 echo "Running explicit accessibility tests..."
-SELENIUM_BROWSER=phantomjs $TOX paver test_a11y
+SELENIUM_BROWSER=phantomjs $TOX paver test_a11y || true
+cp common/static/bundles/*.js test_root/log/
 
 # The settings that we use are installed with the pa11ycrawler module
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
 echo "Running pa11ycrawler against test course..."
 $TOX paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
-cp common/static/bundles/*.js test_root/log/
