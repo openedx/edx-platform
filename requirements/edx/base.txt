@@ -150,7 +150,7 @@ watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.106.1.88
+newrelic==3.2.0.91
 
 # Used for documentation gathering
 sphinx==1.1.3
