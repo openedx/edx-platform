@@ -30,7 +30,6 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
     site = SubFactory(SiteFactory)
 
     enabled = True
-    idp_slug = "test-shib"
     slug = "test-shib"
     name = "TestShib College"
 

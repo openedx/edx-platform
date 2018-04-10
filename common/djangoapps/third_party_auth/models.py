@@ -328,12 +328,6 @@ class OAuth2ProviderConfig(ProviderConfig):
             # To be precise, it's set by AUTHENTICATION_BACKENDS - which aws.py sets from THIRD_PARTY_AUTH_BACKENDS
         )
     )
-    provider_slug = models.SlugField(
-        max_length=30, db_index=True,
-        help_text=(
-            'A short string uniquely identifying this provider. '
-            'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
-        ))
     key = models.TextField(blank=True, verbose_name="Client ID")
     secret = models.TextField(
         blank=True,
@@ -524,12 +518,6 @@ class SAMLProviderConfig(ProviderConfig):
     backend_name = models.CharField(
         max_length=50, default='tpa-saml', blank=False,
         help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
-    idp_slug = models.SlugField(
-        max_length=30, db_index=True,
-        help_text=(
-            'A short string uniquely identifying this provider. '
-            'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
-        ))
     entity_id = models.CharField(
         max_length=255, verbose_name="Entity ID", help_text="Example: https://idp.testshib.org/idp/shibboleth")
     metadata_source = models.CharField(
