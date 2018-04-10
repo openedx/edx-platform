@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.models import CourseEnrollment
@@ -27,7 +28,7 @@ log = logging.getLogger(__name__)
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
     from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.models import CourseEntitlement, CourseEntitlementPolicy
+    from entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
     from entitlements.api.v1.serializers import CourseEntitlementSerializer
     from entitlements.api.v1.views import set_entitlement_policy
 
@@ -606,7 +607,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             'support_details': [
                 {
                     'unenrolled_run': str(enrollment.course.id),
-                    'action': 'REISSUE',
+                    'action': CourseEntitlementSupportDetail.REISSUE,
                     'comments': 'Severe illness.'
                 }
             ]
@@ -624,6 +625,74 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             uuid=expired_entitlement.uuid
         )
         assert results == CourseEntitlementSerializer(reinstated_entitlement).data
+
+    def test_reinstate_refundable_entitlement(self):
+        """ Verify that an entitlement that is refundable stays refundable when support reinstates it. """
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True, course=CourseOverviewFactory(start=now()))
+        fulfilled_entitlement = CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment
+        )
+        assert fulfilled_entitlement.is_entitlement_refundable() is True
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(fulfilled_entitlement.uuid)])
+
+        update_data = {
+            'expired_at': None,
+            'enrollment_course_run': None,
+            'support_details': [
+                {
+                    'unenrolled_run': str(enrollment.course.id),
+                    'action': CourseEntitlementSupportDetail.REISSUE,
+                    'comments': 'Severe illness.'
+                }
+            ]
+        }
+
+        response = self.client.patch(
+            url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+
+        reinstated_entitlement = CourseEntitlement.objects.get(
+            uuid=fulfilled_entitlement.uuid
+        )
+        assert reinstated_entitlement.refund_locked is False
+        assert reinstated_entitlement.is_entitlement_refundable() is True
+
+    def test_reinstate_unrefundable_entitlement(self):
+        """ Verify that a no longer refundable entitlement does not become refundable when support reinstates it. """
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True)
+        expired_entitlement = CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment, expired_at=datetime.now()
+        )
+        assert expired_entitlement.is_entitlement_refundable() is False
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(expired_entitlement.uuid)])
+
+        update_data = {
+            'expired_at': None,
+            'enrollment_course_run': None,
+            'support_details': [
+                {
+                    'unenrolled_run': str(enrollment.course.id),
+                    'action': CourseEntitlementSupportDetail.REISSUE,
+                    'comments': 'Severe illness.'
+                }
+            ]
+        }
+
+        response = self.client.patch(
+            url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+
+        reinstated_entitlement = CourseEntitlement.objects.get(
+            uuid=expired_entitlement.uuid
+        )
+        assert reinstated_entitlement.refund_locked is True
+        assert reinstated_entitlement.is_entitlement_refundable() is False
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
