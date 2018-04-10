@@ -245,6 +245,17 @@ def get_all_retired_emails_by_email(email):
     return user_util.get_all_retired_emails(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
+def get_potentially_retired_user_by_username(username):
+    """
+    Attempt to return a User object based on the username, or if it
+    does not exist, then any hashed username salted with the historical
+    salts.
+    """
+    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames.append(username)
+    return User.objects.get(username__in=locally_hashed_usernames)
+
+
 def get_potentially_retired_user_by_username_and_hash(username, hashed_username):
     """
     To assist in the retirement process this method will:
@@ -259,13 +270,8 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
     if hashed_username not in locally_hashed_usernames:
         raise Exception('Mismatched hashed_username, bad salt?')
 
-    try:
-        return User.objects.get(username=username)
-    except User.DoesNotExist:
-        # The 2nd DoesNotExist will bubble up from here if necessary,
-        # an assumption is being made here that our hashed username format
-        # is something that a user cannot create for themselves.
-        return User.objects.get(username__in=locally_hashed_usernames)
+    locally_hashed_usernames.append(username)
+    return User.objects.get(username__in=locally_hashed_usernames)
 
 
 class UserStanding(models.Model):
