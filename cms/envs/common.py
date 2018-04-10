@@ -166,6 +166,10 @@ FEATURES = {
     'ENABLE_TEXTBOOK': True,
     'ENABLE_STUDENT_NOTES': True,
 
+    # DO NOT SET TO True IN THIS FILE
+    # Doing so will cause all courses to be released on production
+    'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
+
     'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
