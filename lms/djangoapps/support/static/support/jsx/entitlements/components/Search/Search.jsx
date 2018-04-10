@@ -24,7 +24,7 @@ class Search extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} className="col-md-3 search-form">
         <InputText
           name="username"
           label="Search by Username"
