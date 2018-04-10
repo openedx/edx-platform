@@ -1,0 +1,13 @@
+# Dependencies that are used solely for calculating test coverage.
+# These are split out so that if you are only calculating coverage
+# then you don't need to install all the rest of the prereqs.
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should:
+#   * verify that the dependency has a license compatible with AGPLv3
+#   * confirm that it has no system requirements beyond what we already install
+#   * run "make upgrade" to update the detailed requirements files
+#
+coverage==4.2                       # Code coverage testing for Python
+diff-cover==0.9.8                   # Automatically find diff lines that need test coverage
