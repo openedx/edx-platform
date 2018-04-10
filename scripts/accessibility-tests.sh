@@ -36,3 +36,4 @@ export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
 echo "Running pa11ycrawler against test course..."
 $TOX paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
+cp common/static/bundles/*.js test_root/log/
