@@ -521,22 +521,21 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
                    "aria-labelledby=\"" + url + "\"" \
                    ">"
 
-        with patch('openedx.features.course_experience.waffle.new_course_outline_enabled', Mock(return_value=True)):
-            # Course tree
-            course = self.course
-            chapter = course.children[0]
-            sequential1 = chapter.children[0]
-            sequential2 = chapter.children[1]
+        # Course tree
+        course = self.course
+        chapter = course.children[0]
+        sequential1 = chapter.children[0]
+        sequential2 = chapter.children[1]
 
-            response_content = self.client.get(course_home_url(course)).content
-            stripped_response = text_type(re.sub("\\s+", "", response_content), "utf-8")
+        response_content = self.client.get(course_home_url(course)).content
+        stripped_response = text_type(re.sub("\\s+", "", response_content), "utf-8")
 
-            self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
-            self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
+        self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
+        self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
 
-            content = pq(response_content)
-            button = content('#expand-collapse-outline-all-button')
-            self.assertEqual('Expand All', button.children()[0].text)
+        content = pq(response_content)
+        button = content('#expand-collapse-outline-all-button')
+        self.assertEqual('Expand All', button.children()[0].text)
 
     def test_user_enrolled_after_completion_collection(self):
         """

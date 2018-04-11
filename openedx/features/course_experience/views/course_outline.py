@@ -15,7 +15,6 @@ from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.features.course_experience import waffle as course_experience_waffle
 from student.models import CourseEnrollment
 
 from util.milestones_helpers import get_course_content_milestones
@@ -50,11 +49,9 @@ class CourseOutlineFragmentView(EdxFragmentView):
             'blocks': course_block_tree
         }
 
-        # TODO: EDUCATOR-2283 Remove this check when the waffle flag is turned on in production
-        if course_experience_waffle.new_course_outline_enabled(course_key=course_key):
-            resume_block = get_resume_block(course_block_tree)
-            if not resume_block:
-                self.mark_first_unit_to_resume(course_block_tree)
+        resume_block = get_resume_block(course_block_tree)
+        if not resume_block:
+            self.mark_first_unit_to_resume(course_block_tree)
 
         xblock_display_names = self.create_xblock_id_and_name_dict(course_block_tree)
         gated_content = self.get_content_milestones(request, course_key)
