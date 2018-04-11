@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import BrokenPromise
+from six import text_type
 
 from .bookmarks import BookmarksPage
 from .course_page import CoursePage
@@ -158,7 +159,7 @@ class CourseOutlinePage(PageObject):
                              for sub_webel in subsection_webelements]
 
         try:
-            subsection_index = subsection_titles.index(unicode(subsection_title))
+            subsection_index = subsection_titles.index(text_type(subsection_title))
         except ValueError:
             raise ValueError("Could not find subsection '{0}' in section '{1}'".format(
                 subsection_title, section_title
@@ -317,13 +318,6 @@ class CourseOutlinePage(PageObject):
         self.wait_for_element_visibility(
             fold_selector, "'{}' is visible".format(fold_selector)
         )
-
-        # import time
-        # for element in folds_as_elements:
-        #     i = 0
-        #     while not element.is_displayed() and i < 10:
-        #         time.sleep(1)
-        #         i+=1
 
         for fold_element in folds_as_elements:
             if not self._is_html_element_aria_expanded(fold_element):
