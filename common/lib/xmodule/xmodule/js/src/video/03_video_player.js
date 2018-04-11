@@ -141,7 +141,8 @@ function(HTML5Video, Resizer) {
             showinfo: 0,
             enablejsapi: 1,
             modestbranding: 1,
-            cc_load_policy: 0
+            cc_load_policy: 0,
+            playsinline: 1
         };
 
         if (!state.isFlashMode()) {
