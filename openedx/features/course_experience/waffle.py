@@ -46,18 +46,18 @@ def waffle_flag():
     )
 
 
-def new_course_outline_enabled(course_key):
-    """
-    Returns whether the new course outline is enabled.
-    """
-    try:
-        current_site = get_current_site()
-        if not current_site.configuration.get_value(ENABLE_NEW_COURSE_OUTLINE_FOR_SITE, False):
-            return
-    except SiteConfiguration.DoesNotExist:
-        return
+# def new_course_outline_enabled(course_key):
+#     """
+#     Returns whether the new course outline is enabled.
+#     """
+#     try:
+#         current_site = get_current_site()
+#         if not current_site.configuration.get_value(ENABLE_NEW_COURSE_OUTLINE_FOR_SITE, False):
+#             return
+#     except SiteConfiguration.DoesNotExist:
+#         return
 
-    if not waffle_switch().is_enabled(ENABLE_NEW_COURSE_OUTLINE):
-        return waffle_flag().is_enabled(course_key)
+#     if not waffle_switch().is_enabled(ENABLE_NEW_COURSE_OUTLINE):
+#         return waffle_flag().is_enabled(course_key)
 
-    return True
+#     return True

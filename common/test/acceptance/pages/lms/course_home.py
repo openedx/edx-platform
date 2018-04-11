@@ -159,7 +159,11 @@ class CourseOutlinePage(PageObject):
                              for sub_webel in subsection_webelements]
 
         try:
+<<<<<<< HEAD
             subsection_index = subsection_titles.index(text_type(subsection_title))
+=======
+            subsection_index = subsection_titles.index(unicode(subsection_title))
+>>>>>>> no-waffle-py
         except ValueError:
             raise ValueError("Could not find subsection '{0}' in section '{1}'".format(
                 subsection_title, section_title

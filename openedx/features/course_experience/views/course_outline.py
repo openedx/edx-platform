@@ -15,7 +15,6 @@ from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.features.course_experience import waffle as course_experience_waffle
 from student.models import CourseEnrollment
 
 from util.milestones_helpers import get_course_content_milestones
