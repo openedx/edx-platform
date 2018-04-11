@@ -77,7 +77,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
         # making the master course chapters easily available
-        self.master_course_chapters = courses.get_course_chapters(self.master_course_key)
+        self.master_course_chapters = courses.get_course_chapter_ids(self.master_course_key)
 
     def get_auth_token(self, app_grant, app_client):
         """

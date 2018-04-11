@@ -595,7 +595,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
     return child
 
 
-def get_course_chapters(course_key):
+def get_course_chapter_ids(course_key):
     """
     Extracts the chapter block keys from a course structure.
 
@@ -605,7 +605,8 @@ def get_course_chapters(course_key):
         list (string): The list of string representations of the chapter block keys in the course.
     """
     try:
-        chapters = modulestore().get_items(course_key, qualifiers={'category': 'chapter'})
+        chapter_keys = modulestore().get_course(course_key).children
     except Exception:  # pylint: disable=broad-except
+        log.exception('Failed to retrieve course from modulestore.')
         return []
-    return [unicode(chapter.location) for chapter in chapters]
+    return [unicode(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
