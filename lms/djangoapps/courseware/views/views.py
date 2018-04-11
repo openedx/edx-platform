@@ -418,6 +418,7 @@ def course_info(request, course_id):
             get_experiment_user_metadata_context(
                 course,
                 user,
+                request
             )
         )
 
@@ -626,6 +627,7 @@ class CourseTabView(EdxFragmentView):
             get_experiment_user_metadata_context(
                 course,
                 request.user,
+                request
             )
         )
         return context
@@ -991,6 +993,7 @@ def _progress(request, course_key, student_id):
         get_experiment_user_metadata_context(
             course,
             student,
+            request
         )
     )
 

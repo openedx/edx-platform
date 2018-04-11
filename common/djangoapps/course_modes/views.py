@@ -159,6 +159,7 @@ class ChooseModeView(View):
             get_experiment_user_metadata_context(
                 course,
                 request.user,
+                request
             )
         )
 

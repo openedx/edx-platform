@@ -5,6 +5,7 @@ from course_modes.models import (
 from courseware.date_summary import (
     verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 )
+from openedx.features.enterprise_support.api import enterprise_customer_uuid_for_request
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -40,13 +41,17 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     return (None, None)
 
 
-def get_experiment_user_metadata_context(course, user):
+def get_experiment_user_metadata_context(course, user, request=None):
     """
     Return a context dictionary with the keys used by the user_metadata.html.
     """
     enrollment_mode = None
     enrollment_time = None
     enrollment = None
+
+    if request:
+        enterprise = True if enterprise_customer_uuid_for_request(request) else False
+
     try:
         enrollment = CourseEnrollment.objects.select_related(
             'course'
@@ -69,4 +74,5 @@ def get_experiment_user_metadata_context(course, user):
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
+        'enterprise': enterprise
     }
