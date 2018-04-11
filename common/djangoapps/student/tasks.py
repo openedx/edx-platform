@@ -40,11 +40,11 @@ def send_activation_email(self, subject, message, from_address, dest_addr):
                 dest_addr,
                 exc_info=True
             )
-    except Exception:  # pylint: disable=bare-except
+    except Exception as e:
         log.exception(
             'Unable to send activation email to user from "%s" to "%s"',
             from_address,
             dest_addr,
             exc_info=True
         )
-        raise Exception
+        raise e
