@@ -499,7 +499,6 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         kwargs.setdefault('name', provider_name)
         kwargs.setdefault('enabled', True)
         kwargs.setdefault('visible', True)
-        kwargs.setdefault('idp_slug', idp_slug)
         kwargs.setdefault('slug', idp_slug)
         kwargs.setdefault('entity_id', 'https://idp.testshib.org/idp/shibboleth')
         kwargs.setdefault('metadata_source', 'https://mock.testshib.org/metadata/testshib-providers.xml')

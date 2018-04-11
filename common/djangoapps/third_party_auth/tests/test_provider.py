@@ -58,7 +58,6 @@ class RegistryTest(testutil.TestCase):
         self.configure_saml_provider(
             enabled=True,
             name="Disallowed",
-            idp_slug="test",
             slug="test",
             backend_name="disallowed"
         )
