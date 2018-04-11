@@ -43,7 +43,8 @@ define(
                         duration: 42,
                         created: '2014-11-25T23:13:05',
                         edx_video_id: 'dummy_id',
-                        status: 'uploading'
+                        status: 'uploading',
+                        transcripts: []
                     },
                     collection = new Backbone.Collection(_.map(_.range(numVideos), function(num, index) {
                         return new Backbone.Model(
@@ -61,7 +62,10 @@ define(
                         max_height: VIDEO_IMAGE_MAX_HEIGHT,
                         supported_file_formats: VIDEO_IMAGE_SUPPORTED_FILE_FORMATS,
                         video_image_upload_enabled: videoImageUploadEnabled
-                    }
+                    },
+                    transcriptAvailableLanguages: [],
+                    videoSupportedFileFormats: [],
+                    videoTranscriptSettings: {}
                 });
                 $videoListEl = videoListView.render().$el;
 

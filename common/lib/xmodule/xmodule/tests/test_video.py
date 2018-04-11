@@ -901,19 +901,16 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course')
-    def test_student_view_data(self, field_data, expected_student_view_data, mock_transcript_feature):
+    def test_student_view_data(self, field_data, expected_student_view_data):
         """
         Ensure that student_view_data returns the expected results for video modules.
         """
-        mock_transcript_feature.return_value = False
         descriptor = instantiate_descriptor(**field_data)
         descriptor.runtime.course_id = MagicMock()
         student_view_data = descriptor.student_view_data()
         self.assertEquals(student_view_data, expected_student_view_data)
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course', Mock(return_value=False))
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')

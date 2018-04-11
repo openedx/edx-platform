@@ -45,9 +45,6 @@ from xmodule.video_module.transcripts_utils import (
     get_transcript,
     get_transcript_from_val,
 )
-from xmodule.video_module.transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
 
 from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 
