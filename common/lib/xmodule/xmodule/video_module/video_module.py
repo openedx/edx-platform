@@ -51,9 +51,7 @@ from .transcripts_utils import (
     subs_filename,
     get_transcript_for_video
 )
-from .transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
+
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields

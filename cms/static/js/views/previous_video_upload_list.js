@@ -11,7 +11,6 @@ define(
                 this.template = HtmlUtils.template(previousVideoUploadListTemplate);
                 this.encodingsDownloadUrl = options.encodingsDownloadUrl;
                 this.videoImageUploadEnabled = options.videoImageSettings.video_image_upload_enabled;
-                this.isVideoTranscriptEnabled = options.isVideoTranscriptEnabled;
                 this.itemViews = this.collection.map(function(model) {
                     return new PreviousVideoUploadView({
                         videoImageUploadURL: options.videoImageUploadURL,
@@ -21,8 +20,7 @@ define(
                         videoTranscriptSettings: options.videoTranscriptSettings,
                         model: model,
                         transcriptAvailableLanguages: options.transcriptAvailableLanguages,
-                        videoSupportedFileFormats: options.videoSupportedFileFormats,
-                        isVideoTranscriptEnabled: options.isVideoTranscriptEnabled
+                        videoSupportedFileFormats: options.videoSupportedFileFormats
                     });
                 });
             },
@@ -35,8 +33,7 @@ define(
                     this.$el,
                     this.template({
                         encodingsDownloadUrl: this.encodingsDownloadUrl,
-                        videoImageUploadEnabled: this.videoImageUploadEnabled,
-                        isVideoTranscriptEnabled: this.isVideoTranscriptEnabled
+                        videoImageUploadEnabled: this.videoImageUploadEnabled
                     })
                 );
 

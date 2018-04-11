@@ -224,7 +224,15 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             original_video = self.previous_uploads[-(i + 1)]
             self.assertEqual(
                 set(response_video.keys()),
-                set(['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url'])
+                set([
+                    'edx_video_id',
+                    'client_video_id',
+                    'created',
+                    'duration',
+                    'status',
+                    'course_video_image_url',
+                    'transcripts'
+                ])
             )
             dateutil.parser.parse(response_video['created'])
             for field in ['edx_video_id', 'client_video_id', 'duration']:
@@ -236,13 +244,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
 
     @ddt.data(
         (
-            False,
-            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url'],
-            [],
-            []
-        ),
-        (
-            True,
             ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
                 'transcripts'],
             [
@@ -257,7 +258,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             ['en']
         ),
         (
-            True,
             ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
                 'transcripts'],
             [
@@ -280,14 +280,10 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         )
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
-    def test_get_json_transcripts(self, is_video_transcript_enabled, expected_video_keys, uploaded_transcripts,
-                                  expected_transcripts, video_transcript_feature):
+    def test_get_json_transcripts(self, expected_video_keys, uploaded_transcripts, expected_transcripts):
         """
         Test that transcripts are attached based on whether the video transcript feature is enabled.
         """
-        video_transcript_feature.return_value = is_video_transcript_enabled
-
         for transcript in uploaded_transcripts:
             create_or_update_video_transcript(
                 transcript['video_id'],
