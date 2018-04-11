@@ -35,13 +35,6 @@ function(VideoPlayer, i18n, moment, _) {
                 if (state.isYoutubeType()) {
                     state.parseSpeed();
                 }
-                // On iPhones and iPods native controls are used.
-                if (/iP(hone|od)/i.test(state.isTouch[0])) {
-                    _hideWaitPlaceholder(state);
-                    state.el.trigger('initialize', arguments);
-
-                    return false;
-                }
 
                 _initializeModules(state, i18n)
                     .done(function() {
