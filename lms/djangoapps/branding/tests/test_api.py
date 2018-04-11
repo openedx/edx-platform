@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import mock
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -65,9 +66,6 @@ class TestFooter(TestCase):
     @override_settings(PLATFORM_NAME='\xe9dX')
     def test_get_footer(self):
         actual_footer = get_footer(is_secure=True)
-        import pprint
-        pprint.pprint(actual_footer)
-        print('******************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!*******************************************')
         expected_footer = {
             'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
                          ' EdX, Open edX and their respective logos are '
@@ -105,7 +103,8 @@ class TestFooter(TestCase):
             ],
             'connect_links': [
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
-                {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact Us'},
+                # pylint: disable=line-too-long
+                {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
                 {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
@@ -149,5 +148,4 @@ class TestFooter(TestCase):
                 'text': 'Take free online courses at edX.org',
             },
         }
-        pprint.pprint(expected_footer)
         self.assertEqual(actual_footer, expected_footer)
