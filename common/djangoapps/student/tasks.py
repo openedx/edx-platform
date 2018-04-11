@@ -8,6 +8,7 @@ from celery.exceptions import MaxRetriesExceededError
 from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core import mail
+from mobileapps.models import MobileApp
 from student.models import CourseEnrollment
 from edx_notifications.lib.publisher import bulk_publish_notification_to_users
 
