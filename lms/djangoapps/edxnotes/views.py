@@ -24,7 +24,7 @@ from edxnotes.helpers import (
     get_course_position,
     get_edxnotes_id_token,
     get_notes,
-    is_feature_enabled
+    is_feature_enabled,
 )
 from util.json_request import JsonResponse, JsonResponseBadRequest
 
