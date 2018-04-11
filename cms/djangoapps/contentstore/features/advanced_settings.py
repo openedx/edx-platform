@@ -17,6 +17,8 @@ DEPRECATED_SETTINGS = ["CSS Class for Course Reruns", "Hide Progress Tab", "XQA 
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
 
+    world.wait_for_js_to_load()
+    world.wait_for_js_variable_truthy('window.studioNavMenuActive')
     world.click_course_settings()
 
     # The click handlers are set up so that if you click <body>

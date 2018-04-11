@@ -97,6 +97,8 @@ define([
                 });
                 dropdownMenuView.postRender();
             }
+
+            window.studioNavMenuActive = true;
         });
 
         function smoothScrollLink(e) {
