@@ -318,13 +318,6 @@ class CourseOutlinePage(PageObject):
             fold_selector, "'{}' is visible".format(fold_selector)
         )
 
-        # import time
-        # for element in folds_as_elements:
-        #     i = 0
-        #     while not element.is_displayed() and i < 10:
-        #         time.sleep(1)
-        #         i+=1
-
         for fold_element in folds_as_elements:
             if not self._is_html_element_aria_expanded(fold_element):
                 fold_element.click()
