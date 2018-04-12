@@ -275,6 +275,11 @@ class EntitlementViewSet(viewsets.ModelViewSet):
             )
         support_details = request.data.pop('support_details', [])
 
+        # If a patch request does not explicitly update an entitlement's refundability status, we want to ensure that
+        # changes made to other attributes of the entitlement do not implicitly change its ability to be refunded.
+        if request.data.get('refund_locked') is None:
+            request.data['refund_locked'] = not entitlement.is_entitlement_refundable()
+
         for support_detail in support_details:
             support_detail['entitlement'] = entitlement
             support_detail['support_user'] = request.user

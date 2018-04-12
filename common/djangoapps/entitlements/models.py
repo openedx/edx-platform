@@ -162,6 +162,7 @@ class CourseEntitlement(TimeStampedModel):
         blank=True
     )
     order_number = models.CharField(max_length=128, null=True)
+    refund_locked = models.BooleanField(default=False)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True)
 
     @property
@@ -226,7 +227,7 @@ class CourseEntitlement(TimeStampedModel):
         """
         Returns a boolean as to whether or not the entitlement can be refunded based on the entitlement's policy
         """
-        return self.policy.is_entitlement_refundable(self)
+        return not self.refund_locked and self.policy.is_entitlement_refundable(self)
 
     def is_entitlement_redeemable(self):
         """
