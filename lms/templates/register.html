@@ -85,7 +85,7 @@ import calendar
         $submitButton.
           removeClass('is-disabled').
           attr('aria-disabled', false).
-          removeProp('disabled').
+          prop('disabled', false).
           html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
       }
       else {
