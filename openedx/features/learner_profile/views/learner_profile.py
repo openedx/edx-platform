@@ -20,6 +20,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFo
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.journals.api import journals_enabled
 from student.models import User
 
 from .. import SHOW_PROFILE_MESSAGE
@@ -137,6 +138,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'social_platforms': settings.SOCIAL_PLATFORMS,
         },
         'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_journal_listing': journals_enabled(),
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'nav_hidden': True,

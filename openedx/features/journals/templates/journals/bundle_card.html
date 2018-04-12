@@ -1,0 +1,48 @@
+<%def name="online_help_token()"><% return "course" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from six import text_type
+from urlparse import urljoin
+%>
+<%page args="bundle" expression_filter="h"/>
+<article class="bundle" id="${bundle.get('uuid')}" role="region" aria-label="${bundle.get('title')}">
+    <%
+        images = []
+        orgs = []
+
+        for journal in bundle['journals']:
+            images.append(journal.get('card_image_url', ''))
+            orgs.append(journal.get('organization', ''))
+
+        for course in bundle['courses']:
+            if course.get('image'):
+                images.append(course['image'].get('src', ''))
+            orgs.append(course.get('partner', ''))
+
+        card_img = next((img for img in images if img), '')
+        organization = next((org for org in orgs if org), '')
+    %>
+    <a class="journals-listing-item" href="${reverse('openedx.journals.bundle_about', kwargs={'bundle_uuid':bundle['uuid']})}">
+        <header class="journal-image">
+            <div class="cover-image">
+            <img src="${card_img}" alt="${bundle.get('title')}" />
+            <div class="learn-more" aria-hidden="true">${_("LEARN MORE")}</div>
+            </div>
+        </header>
+        <div class="banner">
+            ${_("Bundle")}
+        </div>
+        <div class="journal-info" aria-hidden="true">
+            <span class="journal-org">${organization}</span>
+            <h3 class="journal-title">${bundle.get('title')}</h3>
+        </div>
+        <div class="sr">
+            <ul>
+                <li>${organization}</li>
+                <li>${bundle.get('title')}</li>
+            </ul>
+        </div>
+    </a>
+</article>
