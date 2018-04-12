@@ -14,6 +14,7 @@ from dateutil.parser import parse as parse_datetime
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
+from student.models import UserProfile
 from student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -27,7 +28,7 @@ from ...errors import (
     PreferenceUpdateError,
     CountryCodeError,
 )
-from ...models import UserProfile, UserOrgTag
+from ...models import UserOrgTag
 from ...preferences.api import (
     get_user_preference,
     get_user_preferences,
