@@ -399,6 +399,9 @@ FEATURES = {
 
     # Set this to true to make API docs available at /api-docs/.
     'ENABLE_API_DOCS': False,
+
+    # Set to enable Journal integration
+    'ENABLE_JOURNAL_INTEGRATION': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -2308,6 +2311,7 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.learner_analytics',
     'openedx.features.portfolio_project',
+    'openedx.features.journals.apps.JournalsConfig',
 
     'experiments',
 
@@ -2911,6 +2915,9 @@ OPTIONAL_APPS = [
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
+
+    # Journals
+    ('journals', None)
 ]
 
 for app_name, insert_before in OPTIONAL_APPS:
@@ -3465,6 +3472,9 @@ FERNET_KEYS = [
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
 
+############## Settings for Journals ######################
+JOURNALS_API_URL = 'http://journals.app:18606/api/v1/'
+JOURNALS_ROOT_URL = 'http://localhost:18606'
 
 ############## Plugin Django Apps #########################
 

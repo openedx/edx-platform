@@ -1,0 +1,40 @@
+<%def name="online_help_token()"><% return "course" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from six import text_type
+from urlparse import urljoin
+%>
+<%page args="journal, journals_root_url" expression_filter="h"/>
+<article class="course" id="${journal.get('slug')}" role="region" aria-label="${journal.get('title')}">
+  <a href="${urljoin(journals_root_url, journal.get('slug'))}">
+    <header class="course-image">
+      <div class="cover-image">
+        <img src="${journal.get('card_image_url')}" alt="${journal.get('title')}" />
+        <div class="learn-more" aria-hidden="true">${_("LEARN MORE")}</div>
+      </div>
+    </header>
+    <div class="course-info" aria-hidden="true">
+      <h2 class="course-name">
+        <span class="course-organization">${journal.get('organization')}</span>
+        <span class="course-title">${journal.get('title')}</span>
+      </h2>
+      <%
+      if journal.get('access_length') is not None:
+          access_length_string = '{} months'.format(int(journal.get('access_length')/30))
+      else:
+          access_length_string = _("unlimited")
+      %>
+
+      <div class="course-date" aria-hidden="true">${_("Access Length")}: ${access_length_string}</div>
+    </div>
+    <div class="sr">
+      <ul>
+        <li>${journal.get('organization')}</li>
+        <li>${journal.get('title')}</li>
+        <li>${_("Access Length")}: ${access_length_string}</li>
+      </ul>
+    </div>
+  </a>
+</article>
