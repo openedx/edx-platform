@@ -10,7 +10,7 @@ from opaque_keys.edx.locator import CourseLocator
 
 from django_comment_client.base.views import add_truncated_title_to_event_data
 from django_comment_client.permissions import get_team
-from django_comment_client.utils import get_cached_discussion_id_map_by_course_id
+from django_comment_client.utils import get_discussion_id_map_by_course_id
 from track.transformers import EventTransformer, EventTransformerRegistry
 from track.views.segmentio import (
     BI_SCREEN_VIEWED_EVENT_NAME,
@@ -125,7 +125,7 @@ class ForumThreadViewedEventTransformer(EventTransformer):
 
         # If in a category, add category name and ID
         if course_id and commentable_id and user:
-            id_map = get_cached_discussion_id_map_by_course_id(course_id, [commentable_id], user)
+            id_map = get_discussion_id_map_by_course_id(course_id, user)
             if commentable_id in id_map:
                 self.event['category_name'] = id_map[commentable_id]['title']
                 self.event['category_id'] = commentable_id

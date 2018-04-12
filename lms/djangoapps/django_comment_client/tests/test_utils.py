@@ -275,38 +275,13 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             discussion_target=None
         )
 
-    def test_cache_returns_correct_key(self):
-        usage_key = utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
-        self.assertEqual(usage_key, self.discussion.location)
-
-    def test_cache_returns_none_if_id_is_not_present(self):
-        usage_key = utils.get_cached_discussion_key(self.course.id, 'bogus_id')
-        self.assertIsNone(usage_key)
-
-    def test_cache_raises_exception_if_course_structure_not_cached(self):
-        CourseStructure.objects.all().delete()
-        with self.assertRaises(utils.DiscussionIdMapIsNotCached):
-            utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
-
-    def test_cache_raises_exception_if_discussion_id_not_cached(self):
-        cache = CourseStructure.objects.get(course_id=self.course.id)
-        cache.discussion_id_map_json = None
-        cache.save()
-
-        with self.assertRaises(utils.DiscussionIdMapIsNotCached):
-            utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
-
     def test_xblock_does_not_have_required_keys(self):
         self.assertTrue(utils.has_required_keys(self.discussion))
         self.assertFalse(utils.has_required_keys(self.bad_discussion))
 
     def verify_discussion_metadata(self):
         """Retrieves the metadata for self.discussion and self.discussion2 and verifies that it is correct"""
-        metadata = utils.get_cached_discussion_id_map(
-            self.course,
-            ['test_discussion_id', 'test_discussion_id_2'],
-            self.user
-        )
+        metadata = utils.get_discussion_id_map(self.course, self.user)
         discussion1 = metadata[self.discussion.discussion_id]
         discussion2 = metadata[self.discussion2.discussion_id]
         self.assertEqual(discussion1['location'], self.discussion.location)
@@ -314,28 +289,20 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         self.assertEqual(discussion2['location'], self.discussion2.location)
         self.assertEqual(discussion2['title'], 'Chapter 2 / Discussion 2')
 
-    def test_get_discussion_id_map_from_cache(self):
+    def test_get_discussion_id_map(self):
         self.verify_discussion_metadata()
 
-    def test_get_discussion_id_map_without_cache(self):
-        CourseStructure.objects.all().delete()
-        self.verify_discussion_metadata()
-
-    def test_get_missing_discussion_id_map_from_cache(self):
-        metadata = utils.get_cached_discussion_id_map(self.course, ['bogus_id'], self.user)
+    def test_get_missing_discussion_id_map(self):
+        metadata = utils.get_discussion_id_map(self.course, self.user)
         self.assertEqual(metadata, {})
 
-    def test_get_discussion_id_map_from_cache_without_access(self):
+    def test_get_discussion_id_map_without_access(self):
         user = UserFactory.create()
 
-        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], self.user)
+        metadata = utils.get_discussion_id_map(self.course, self.user)
         self.assertEqual(metadata['private_discussion_id']['title'], 'Chapter 3 / Beta Testing')
 
-        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], user)
-        self.assertEqual(metadata, {})
-
-    def test_get_bad_discussion_id(self):
-        metadata = utils.get_cached_discussion_id_map(self.course, ['bad_discussion_id'], self.user)
+        metadata = utils.get_discussion_id_map(self.course, user)
         self.assertEqual(metadata, {})
 
     def test_discussion_id_accessible(self):
