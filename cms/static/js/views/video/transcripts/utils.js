@@ -311,6 +311,26 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             };
         }());
 
+        /**
+         * Combine data from two fields and send `check_transcript` request.
+         * @function
+         * @param {String} Video Componenet Locator
+         * @param {Array} Data from one field
+         * @param {senderFieldName} Sender field name
+         */
+        var _sendCheckRequest = function(locator, data, senderFieldName) {
+            var allFieldNames = ['edx_video_id', 'video_url'],
+                otherFieldName = _.filter(allFieldNames, function(fieldName){ return fieldName !== senderFieldName; }),
+                otherFieldData;
+
+            if (otherFieldName.length !== 1) {
+                throw "Invalid fieldName";
+            }
+
+            otherFieldData = Storage.get(otherFieldName[0]) || [];
+            return _command('check', locator, otherFieldData.concat(data));
+        };
+
         return {
             getField: _getField,
             parseYoutubeLink: _youtubeParser,
@@ -320,6 +340,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             syncCollections: _syncCollections,
             command: _command,
             getVideoList: _getVideoList,
+            sendCheckRequest: _sendCheckRequest,
             Storage: {
                 set: Storage.set,
                 get: Storage.get,

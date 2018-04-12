@@ -4,10 +4,11 @@ define(
         'js/models/uploads', 'js/views/uploads',
         'js/models/license', 'js/views/license',
         'js/views/video/transcripts/metadata_videolist',
-        'js/views/video/translations_editor'
+        'js/views/video/translations_editor',
+        'js/views/video/transcripts/utils'
     ],
 function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-         LicenseModel, LicenseView, VideoList, VideoTranslations) {
+         LicenseModel, LicenseView, VideoList, VideoTranslations, TranscriptUtils) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
@@ -117,6 +118,41 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
         setValueInEditor: function(value) {
             this.$el.find('input').val(value);
+        }
+    });
+
+    Metadata.VideoID = Metadata.String.extend({
+        // Delay between check_transcript requests
+        requestDelay: 300,
+
+        initialize: function() {
+            Metadata.String.prototype.initialize.apply(this, arguments);
+
+            this.$el.on(
+                'input',
+                'input',
+                _.debounce(_.bind(this.sendCheckTranscriptRequest, this), this.requestDelay)
+            );
+        },
+
+        render: function() {
+            Metadata.String.prototype.render.apply(this);
+            this.sendCheckTranscriptRequest();
+        },
+
+        sendCheckTranscriptRequest: function() {
+            var fieldName = this.model.getFieldName(),
+                locator = this.$el.closest('[data-locator]').data('locator')
+                data = [{'mode': 'edx_video_id', 'type': 'edx_video_id', 'video': this.getValueFromEditor()}];
+
+            TranscriptUtils.Storage.set(fieldName, data);
+            TranscriptUtils.sendCheckRequest(locator, data, fieldName)
+                .done(function(response) {
+                    Backbone.trigger('transcripts:basicTabUpdateMessage', true, response);
+                })
+                .fail(function(response) {
+                    Backbone.trigger('transcripts:basicTabUpdateMessage', false, response);
+                });
         }
     });
 

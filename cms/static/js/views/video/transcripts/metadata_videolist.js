@@ -49,6 +49,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
             this.component_locator = this.$el.closest('[data-locator]')
                                                             .data('locator');
+
+            // Listen to message update
+            this.listenTo(Backbone, 'transcripts:basicTabUpdateMessage', this.updateMessage);
         },
 
         render: function() {
@@ -57,21 +60,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                 .apply(this, arguments);
 
             var self = this,
-                component_locator = this.$el.closest('[data-locator]')
-                                                            .data('locator'),
-                videoList = this.getVideoObjectsList(),
-
-                showServerError = function(response) {
-                    var errorMessage = response.status ||
-                        gettext('Error: Connection with server failed.');
-
-                    self.messenger
-                        .render('not_found')
-                        .showError(
-                            errorMessage,
-                            true // hide buttons
-                        );
-                };
+                fieldName = this.model.getFieldName(),
+                component_locator = this.$el.closest('[data-locator]').data('locator'),
+                videoList = this.getVideoObjectsList();
 
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
@@ -87,7 +78,8 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             }
 
             // Check current state of Timed Transcripts.
-            Utils.command('check', component_locator, videoList)
+            Utils.Storage.set(fieldName, videoList);
+            Utils.sendCheckRequest(component_locator, videoList, fieldName)
                 .done(function(resp) {
                     var params = resp,
                         len = videoList.length,
@@ -104,7 +96,31 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                     self.messenger.render(resp.command, params);
                     self.checkIsUniqVideoTypes();
                 })
-                .fail(showServerError);
+                .fail(this.showServerError);
+        },
+
+        /**
+         * Updates the message with error.
+         */
+        showServerError: function(response) {
+            var errorMessage = response.status || gettext('Error: Connection with server failed.');
+            this.messenger
+                .render('not_found')
+                .showError(
+                    errorMessage,
+                    true // hide buttons
+                );
+        },
+
+        /**
+         * Updates the message to show the current state of transcripts.
+         */
+        updateMessage: function(status, response) {
+            if (status) {
+                this.messenger.render(response.command, response);
+            } else {
+                this.showServerError(response);
+            }
         },
 
         /**
