@@ -63,6 +63,13 @@
             </li>
             %endfor
           </ul>
+          <ul class="courses-listing">
+            %for journal in journals:
+            <li class="courses-listing-item">
+              <%include file="../journal.html" args="journal=journal, journals_root_url=journals_root_url" />
+            </li>
+          %endfor
+          </ul>
         </div>
 
 

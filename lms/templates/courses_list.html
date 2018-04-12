@@ -16,6 +16,17 @@
         %endfor
         </ul>
       </section>
+
+      <section class="courses">
+        <ul class="courses-listing">
+          %for journal in journals:
+          <li class="courses-listing-item">
+              <%include file="journal.html" args="journal=journal, journals_root_url=journals_root_url" />
+          </li>
+          %endfor
+        </ul>
+      </section>
+
     ## in case there are courses that are not shown on the homepage, a 'View all Courses' link should appear
       % if homepage_course_max and len(courses) > homepage_course_max:
       <div class="courses-more">
