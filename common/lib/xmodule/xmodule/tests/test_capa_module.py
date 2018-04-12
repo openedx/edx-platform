@@ -15,6 +15,7 @@ import unittest
 
 import ddt
 from django.utils.encoding import smart_text
+from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
 from mock import Mock, patch, DEFAULT
 import six
@@ -3133,3 +3134,79 @@ class TestProblemCheckTracking(unittest.TestCase):
         problem.runtime.replace_jump_to_id_urls = Mock()
         problem.get_answer(data)
         self.assertTrue(problem.runtime.replace_jump_to_id_urls.called)
+
+
+class TestCapaDescriptorReportGeneration(unittest.TestCase):
+    """
+    Ensure that Capa report generation works correctly
+    """
+
+    def setUp(self):
+        self.find_question_label_patcher = patch(
+            'capa.capa_problem.LoncapaProblem.find_question_label',
+            lambda self, answer_id: answer_id
+        )
+        self.find_answer_text_patcher = patch(
+            'capa.capa_problem.LoncapaProblem.find_answer_text',
+            lambda self, answer_id, current_answer: current_answer
+        )
+        self.find_question_label_patcher.start()
+        self.find_answer_text_patcher.start()
+        self.addCleanup(self.find_question_label_patcher.stop)
+        self.addCleanup(self.find_answer_text_patcher.stop)
+
+    def _mock_user_state_generator(self, user_count=1, response_count=10):
+        for uid in range(user_count):
+            yield self._user_state(username='user{}'.format(uid), response_count=response_count)
+
+    def _user_state(self, username='testuser', response_count=10, suffix=''):
+        return XBlockUserState(
+            username=username,
+            state={
+                'student_answers': {
+                    '{}_answerid_{}{}'.format(username, aid, suffix): '{}_answer_{}'.format(username, aid)
+                    for aid in range(response_count)
+                },
+                'seed': 1,
+                'correct_map': {},
+            },
+            block_key=None,
+            updated=None,
+            scope=None,
+        )
+
+    def _get_descriptor(self):
+        scope_ids = Mock(block_type='problem')
+        descriptor = CapaDescriptor(get_test_system(), scope_ids=scope_ids)
+        descriptor.runtime = Mock()
+        descriptor.data = '<problem/>'
+        return descriptor
+
+    def test_generate_report_data_not_implemented(self):
+        scope_ids = Mock(block_type='noproblem')
+        descriptor = CapaDescriptor(get_test_system(), scope_ids=scope_ids)
+        with self.assertRaises(NotImplementedError):
+            next(descriptor.generate_report_data(iter([])))
+
+    def test_generate_report_data_limit_responses(self):
+        descriptor = self._get_descriptor()
+        report_data = list(descriptor.generate_report_data(self._mock_user_state_generator(), 2))
+        self.assertEquals(2, len(report_data))
+
+    def test_generate_report_data_dont_limit_responses(self):
+        descriptor = self._get_descriptor()
+        user_count = 5
+        response_count = 10
+        report_data = list(descriptor.generate_report_data(
+            self._mock_user_state_generator(
+                user_count=user_count,
+                response_count=response_count,
+            )
+        ))
+        self.assertEquals(user_count * response_count, len(report_data))
+
+    def test_generate_report_data_skip_dynamath(self):
+        descriptor = self._get_descriptor()
+        iterator = iter([self._user_state(suffix='_dynamath')])
+        report_data = list(descriptor.generate_report_data(iterator))
+        self.assertEquals(0, len(report_data))

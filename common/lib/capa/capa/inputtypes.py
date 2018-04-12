@@ -518,12 +518,14 @@ class ChoiceGroup(InputTypeBase):
                 'name_array_suffix': self.suffix}
 
     @staticmethod
-    def extract_choices(element, i18n):
+    def extract_choices(element, i18n, text_only=False):
         """
         Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
         CheckboxGroup.
 
         returns list of (choice_name, choice_text) tuples
+
+        By default it will return any XML tag in the choice (e.g. <choicehint>) unless text_only=True is passed.
 
         TODO: allow order of choices to be randomized, following lon-capa spec.  Use
         "location" attribute, ie random, top, bottom.
@@ -534,7 +536,11 @@ class ChoiceGroup(InputTypeBase):
 
         for choice in element:
             if choice.tag == 'choice':
-                choices.append((choice.get("name"), stringify_children(choice)))
+                if not text_only:
+                    text = stringify_children(choice)
+                else:
+                    text = choice.text
+                choices.append((choice.get("name"), text))
             else:
                 if choice.tag != 'compoundhint':
                     msg = Text('[capa.inputtypes.extract_choices] {error_message}').format(
