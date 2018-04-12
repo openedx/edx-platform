@@ -502,6 +502,7 @@ class CourseTabView(EdxFragmentView):
                 self.register_user_access_warning_messages(request, course_key)
 
                 set_custom_metrics_for_course_key(course_key)
+                # no response here?
                 return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
             except Exception as exception:  # pylint: disable=broad-except
                 return CourseTabView.handle_exceptions(request, course, exception)
@@ -995,14 +996,16 @@ def _progress(request, course_key, student_id):
     context.update(
         get_experiment_user_metadata_context(
             course,
-            student,
-            request
+            student
         )
     )
 
     with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
 
+    if not request.COOKIES.get('is_enterprise'):
+        enterprise = True if enterprise_customer_uuid_for_request(request) else False
+        set_experiments_is_enterprise_cookie(request, response, enterprise)
     return response
 
 

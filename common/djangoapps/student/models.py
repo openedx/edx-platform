@@ -2246,11 +2246,6 @@ def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=un
     else:
         AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
 
-@receiver(user_logged_in)
-def set_enterprise_cookie(sender, request, user, **kwargs):  # pylint: disable=unused-argument
-    """Handler to set enterprise cookie when logins have occurred successfully."""
-    set_experiments_is_enterprise_cookie(request, )
-
 
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=unused-argument

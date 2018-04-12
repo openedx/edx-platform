@@ -476,8 +476,7 @@ def _create_discussion_board_context(request, base_context, thread=None):
     context.update(
         get_experiment_user_metadata_context(
             course,
-            user,
-            request
+            user
         )
     )
     return context
@@ -703,6 +702,8 @@ class DiscussionBoardFragmentView(EdxFragmentView):
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)
             else:
                 html = render_to_string('discussion/discussion_board_fragment.html', context)
+
+            # no response here?
 
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
