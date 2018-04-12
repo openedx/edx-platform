@@ -1065,7 +1065,7 @@ class SubmitPhotosView(View):
             'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         }
 
-        subject = _("Verification photos received")
+        subject = _("{platform_name} ID Verification Photos Received").format(platform_name=context['platform_name'])
         message = render_to_string('emails/photo_submission_confirmation.txt', context)
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         to_address = user.email

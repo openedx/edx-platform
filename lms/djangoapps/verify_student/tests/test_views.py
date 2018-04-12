@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
@@ -1623,8 +1624,11 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
+            subject = _("{platform_name} ID Verification Photos Received").format(
+                platform_name=settings.PLATFORM_NAME
+            )
             self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual("Verification photos received", mail.outbox[0].subject)
+            self.assertEqual(subject, mail.outbox[0].subject)
         else:
             # Verify that photo submission confirmation email was not sent
             self.assertEqual(len(mail.outbox), 0)
