@@ -1,10 +1,11 @@
 import datetime
-
+import logging
 from django.conf import settings
 
 from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, OptionLevel, OrganizationOefScore, Instruction
 from lms.djangoapps.oef.messages import NON_APPLICABLE_OEF, PENDING_DRAFT
 
+log = logging.getLogger("edx.oef")
 
 def get_user_survey_status(user, create_new_survey=True):
     """
@@ -68,6 +69,7 @@ def get_user_survey(user, latest_survey):
         uos.user = user
         uos.org = user.extended_profile.organization
         uos.start_date = datetime.date.today()
+        log.info(datetime.datetime.now())
         uos.save()
 
     return uos
