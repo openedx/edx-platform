@@ -10,6 +10,7 @@ from django.core.management.base import BaseCommand, CommandError
 from contentstore.management.commands.utils import user_from_str
 from contentstore.views.course import create_new_course_in_store
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import DuplicateCourseError
 
 
 MODULESTORE_CHOICES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -75,12 +76,16 @@ class Command(BaseCommand):
         }
         if name:
             fields["display_name"] = name
-        new_course = create_new_course_in_store(
-            storetype,
-            user,
-            org,
-            number,
-            run,
-            fields
-        )
-        self.stdout.write(u"Created {}".format(text_type(new_course.id)))
+
+        try:
+            new_course = create_new_course_in_store(
+                storetype,
+                user,
+                org,
+                number,
+                run,
+                fields
+            )
+            self.stdout.write(u"Created {}".format(text_type(new_course.id)))
+        except DuplicateCourseError:
+            self.stdout.write(u"Course already exists")

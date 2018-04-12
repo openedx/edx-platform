@@ -1,6 +1,7 @@
 """
 Unittests for creating a course in an chosen modulestore
 """
+from StringIO import StringIO
 import ddt
 from django.core.management import CommandError, call_command
 from django.test import TestCase
@@ -58,6 +59,29 @@ class TestCreateCourse(ModuleStoreTestCase):
         )
         # pylint: disable=protected-access
         self.assertEqual(store, modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type())
+
+    def test_duplicate_course(self):
+        """
+        Test that creating a duplicate course exception is properly handled
+        """
+        call_command(
+            "create_course",
+            "split",
+            str(self.user.email),
+            "org", "course", "run", "dummy-course-name"
+        )
+
+        # create the course again
+        out = StringIO()
+        call_command(
+            "create_course",
+            "split",
+            str(self.user.email),
+            "org", "course", "run", "dummy-course-name",
+            stderr=out
+        )
+        expected = u"Course already exists"
+        self.assertIn(out.getvalue().strip(), expected)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_get_course_with_different_case(self, default_store):
