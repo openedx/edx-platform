@@ -455,7 +455,7 @@ def submit_feedback(request):
     context = get_feedback_form_context(request)
 
     #Update the tag info with 'enterprise_learner' if the user belongs to an enterprise customer.
-    enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
+    enterprise_learner_data = enterprise_api.get_enterprise_learner_data(request.user)
     if enterprise_learner_data:
         context["tags"]["learner_type"] = "enterprise_learner"
 

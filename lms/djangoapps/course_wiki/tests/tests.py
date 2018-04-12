@@ -205,10 +205,14 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.assertEqual(resp.status_code, 200)
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
-    def test_consent_required(self):
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    def test_consent_required(self, mock_enterprise_customer_for_request):
         """
         Test that enterprise data sharing consent is required when enabled for the various courseware views.
         """
+        # ENT-924: Temporary solution to replace sensitive SSO usernames.
+        mock_enterprise_customer_for_request.return_value = None
+
         # Public wikis can be accessed by non-enrolled users, and so direct access is not gated by the consent page
         course = CourseFactory.create()
         course.allow_public_wiki_access = False
