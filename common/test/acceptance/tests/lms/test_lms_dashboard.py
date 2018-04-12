@@ -412,3 +412,9 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         course_listings = self.dashboard_page.get_courses()
         self.assertEqual(len(course_listings), 3)
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()
+
+
+class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTest):
+    """ Test suite for course entitlements cards on the Student Dashboard page """
+
+    
