@@ -36,8 +36,9 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace, WaffleFl
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default_course_url_name
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
-from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.enterprise_support.api import data_sharing_consent_required, enterprise_customer_uuid_for_request
 from shoppingcart.models import CourseRegistrationCode
+from student.cookies import set_experiments_is_enterprise_cookie
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
@@ -178,7 +179,11 @@ class CoursewareIndex(View):
                 )
             )
 
-        return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
+        response = render_to_response('courseware/courseware.html', self._create_courseware_context(request))
+        if not request.COOKIES.get('is_enterprise'):
+            enterprise = True if enterprise_customer_uuid_for_request(request) else False
+            set_experiments_is_enterprise_cookie(request, response, enterprise)
+        return response
 
     def _redirect_if_not_requested_section(self):
         """
@@ -386,7 +391,7 @@ class CoursewareIndex(View):
         courseware_context.update(
             get_experiment_user_metadata_context(
                 self.course,
-                self.effective_user,
+                self.effective_user
             )
         )
         table_of_contents = toc_for_course(

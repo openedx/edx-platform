@@ -63,6 +63,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+from student.cookies import set_experiments_is_enterprise_cookie
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -2229,6 +2230,13 @@ def create_comments_service_user(user):
 # page to login.  These are currently the only signals available, so we need to continue
 # identifying and logging failures separately (in views).
 
+@receiver(user_logged_in)
+def set_enterprise_cookie(sender, request, user, **kwargs):  # pylint: disable=unused-argument
+    """Set enterprise cookie."""
+    if not request.COOKIES.get('is_enterprise'):
+        enterprise = True if enterprise_customer_uuid_for_request(request) else False
+        # trigger middleware in experiments app which will call this function
+        # set_experiments_is_enterprise_cookie(request, response, enterprise)
 
 @receiver(user_logged_in)
 def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=unused-argument
@@ -2237,6 +2245,11 @@ def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=un
         AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
     else:
         AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+
+@receiver(user_logged_in)
+def set_enterprise_cookie(sender, request, user, **kwargs):  # pylint: disable=unused-argument
+    """Handler to set enterprise cookie when logins have occurred successfully."""
+    set_experiments_is_enterprise_cookie(request, )
 
 
 @receiver(user_logged_out)

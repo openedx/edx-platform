@@ -28,6 +28,8 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.features.enterprise_support.api import enterprise_customer_uuid_for_request
+from student.cookies import set_experiments_is_enterprise_cookie
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -158,8 +160,7 @@ class ChooseModeView(View):
         context.update(
             get_experiment_user_metadata_context(
                 course,
-                request.user,
-                request
+                request.user
             )
         )
 
@@ -195,7 +196,12 @@ class ChooseModeView(View):
                     context['currency_data'] = json.dumps(currency_data)
                 except TypeError:
                     pass
-        return render_to_response("course_modes/choose.html", context)
+
+        response = render_to_response("course_modes/choose.html", context)
+        if not request.COOKIES.get('is_enterprise'):
+            enterprise = True if enterprise_customer_uuid_for_request(request) else False
+            set_experiments_is_enterprise_cookie(request, response, enterprise)
+        return response
 
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)

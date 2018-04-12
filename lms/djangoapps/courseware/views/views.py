@@ -90,8 +90,9 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
-from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.enterprise_support.api import data_sharing_consent_required, enterprise_customer_uuid_for_request
 from shoppingcart.utils import is_shopping_cart_enabled
+from student.cookies import set_experiments_is_enterprise_cookie
 from student.models import CourseEnrollment, UserTestGroup
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
@@ -417,8 +418,7 @@ def course_info(request, course_id):
         context.update(
             get_experiment_user_metadata_context(
                 course,
-                user,
-                request
+                user
             )
         )
 
@@ -626,8 +626,7 @@ class CourseTabView(EdxFragmentView):
         context.update(
             get_experiment_user_metadata_context(
                 course,
-                request.user,
-                request
+                request.user
             )
         )
         return context
@@ -648,9 +647,13 @@ class CourseTabView(EdxFragmentView):
         tab = page_context['tab']
         page_context['fragment'] = fragment
         if self.uses_bootstrap(request, course, tab=tab):
-            return render_to_response('courseware/tab-view.html', page_context)
+            response = render_to_response('courseware/tab-view.html', page_context)
         else:
-            return render_to_response('courseware/tab-view-v2.html', page_context)
+            response = render_to_response('courseware/tab-view-v2.html', page_context)
+        if not request.COOKIES.get('is_enterprise'):
+            enterprise = True if enterprise_customer_uuid_for_request(request) else False
+            set_experiments_is_enterprise_cookie(request, response, enterprise)
+        return response
 
 
 @ensure_csrf_cookie
