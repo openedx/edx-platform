@@ -91,6 +91,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_h
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.journals.api import get_journals, get_journals_root_url
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from util.cache import cache, cache_if_anonymous
@@ -224,12 +225,17 @@ def courses(request):
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
+    journals = get_journals(request.site)
+    journals_root_url = get_journals_root_url()
+
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
-            'programs_list': programs_list
+            'programs_list': programs_list,
+            'journals': journals,
+            'journals_root_url': journals_root_url
         }
     )
 
