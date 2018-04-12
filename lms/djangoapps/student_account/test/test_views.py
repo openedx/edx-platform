@@ -682,12 +682,16 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
             welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-            expected_message = welcome_message.format(
-                start_bold=u'<b>',
-                end_bold=u'</b>',
-                line_break=u'<br/>',
+            expected_message = Text(welcome_message).format(
+                start_bold=HTML('<b>'),
+                end_bold=HTML('</b>'),
+                line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
-                platform_name=settings.PLATFORM_NAME
+                platform_name=settings.PLATFORM_NAME,
+                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+                    pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+                ),
+                privacy_policy_link_end=HTML("</a>"),
             )
             self.assertContains(response, expected_message)
             if logo_url:
