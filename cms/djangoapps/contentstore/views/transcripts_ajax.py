@@ -310,7 +310,8 @@ def check_transcripts(request):
     transcripts_presence['status'] = 'Success'
 
     try:
-        get_transcript_from_val(edx_video_id=item.edx_video_id, lang=u'en')
+        edx_video_id = clean_video_id(videos.get('edx_video_id'))
+        get_transcript_from_val(edx_video_id=edx_video_id, lang=u'en')
         command = 'found'
     except NotFoundError:
         filename = 'subs_{0}.srt.sjson'.format(item.sub)
@@ -465,6 +466,9 @@ def _validate_transcripts_data(request):
     for video_data in data.get('videos'):
         if video_data['type'] == 'youtube':
             videos['youtube'] = video_data['video']
+        elif video_data['type'] == 'edx_video_id':
+            if clean_video_id(video_data['video']):
+                videos['edx_video_id'] = video_data['video']
         else:  # do not add same html5 videos
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']
