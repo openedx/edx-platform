@@ -19,17 +19,24 @@ def i_select_advanced_settings(step):
 
     world.wait_for_js_to_load()
     world.wait_for_js_variable_truthy('window.studioNavMenuActive')
-    world.click_course_settings()
 
-    # The click handlers are set up so that if you click <body>
-    # the menu disappears.  This means that if we're even a *little*
-    # bit off on the last item ('Advanced Settings'), the menu
-    # will close and the test will fail.
-    # For this reason, we retrieve the link and visit it directly
-    # This is what the browser *should* be doing, since it's just a native
-    # link with no JavaScript involved.
-    link_css = 'li.nav-course-settings-advanced a'
-    world.wait_for_visible(link_css)
+    for _ in range(5):
+        world.click_course_settings()
+
+        # The click handlers are set up so that if you click <body>
+        # the menu disappears.  This means that if we're even a *little*
+        # bit off on the last item ('Advanced Settings'), the menu
+        # will close and the test will fail.
+        # For this reason, we retrieve the link and visit it directly
+        # This is what the browser *should* be doing, since it's just a native
+        # link with no JavaScript involved.
+        link_css = 'li.nav-course-settings-advanced a'
+        try:
+            world.wait_for_visible(link_css)
+            break
+        except AssertionError:
+            continue
+
     link = world.css_find(link_css).first['href']
     world.visit(link)
 
