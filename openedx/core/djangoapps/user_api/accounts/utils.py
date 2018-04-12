@@ -1,7 +1,9 @@
 """
 Utility methods for the account settings.
 """
+import random
 import re
+import string
 from urlparse import urlparse
 
 from django.conf import settings
@@ -176,3 +178,17 @@ def retrieve_last_sitewide_block_completed(username):
         course_key=text_type(item.location.course_key),
         location=text_type(item.location),
     )
+
+
+def generate_password(length=12, chars=string.letters + string.digits):
+    """Generate a valid random password"""
+    if length < 8:
+        raise ValueError("password must be at least 8 characters")
+
+    choice = random.SystemRandom().choice
+
+    password = ''
+    password += choice(string.digits)
+    password += choice(string.letters)
+    password += ''.join([choice(chars) for _i in xrange(length - 2)])
+    return password
