@@ -61,8 +61,6 @@ import base64
 import hashlib
 import hmac
 import json
-import random
-import string
 import urllib
 from collections import OrderedDict
 from logging import getLogger
@@ -148,8 +146,6 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_REGISTER_API,
 ] + AUTH_ENTRY_CUSTOM.keys())
 
-_DEFAULT_RANDOM_PASSWORD_LENGTH = 12
-_PASSWORD_CHARSET = string.letters + string.digits
 
 logger = getLogger(__name__)
 
@@ -428,27 +424,6 @@ def get_provider_user_states(user):
             )
 
     return states
-
-
-def make_random_password(length=None, choice_fn=random.SystemRandom().choice):
-    """Makes a random password.
-
-    When a user creates an account via a social provider, we need to create a
-    placeholder password for them to satisfy the ORM's consistency and
-    validation requirements. Users don't know (and hence cannot sign in with)
-    this password; that's OK because they can always use the reset password
-    flow to set it to a known value.
-
-    Args:
-        choice_fn: function or method. Takes an iterable and returns a random
-            element.
-        length: int. Number of chars in the returned value. None to use default.
-
-    Returns:
-        String. The resulting password.
-    """
-    length = length if length is not None else _DEFAULT_RANDOM_PASSWORD_LENGTH
-    return ''.join(choice_fn(_PASSWORD_CHARSET) for _ in xrange(length))
 
 
 def running(request):

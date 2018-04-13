@@ -45,6 +45,7 @@ from eventtracking import tracker
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.features.course_experience import course_home_url_name
 from student.cookies import delete_logged_in_cookies, set_logged_in_cookies
 from student.forms import AccountCreationForm
@@ -585,10 +586,11 @@ def auto_auth(request):
 
     # Generate a unique name to use if none provided
     generated_username = uuid.uuid4().hex[0:30]
+    generated_password = generate_password()
 
     # Use the params from the request, otherwise use these defaults
     username = request.GET.get('username', generated_username)
-    password = request.GET.get('password', username)
+    password = request.GET.get('password', generated_password)
     email = request.GET.get('email', username + "@example.com")
     full_name = request.GET.get('full_name', username)
     is_staff = str2bool(request.GET.get('staff', False))
