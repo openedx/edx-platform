@@ -23,7 +23,6 @@ from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     assign_staff_role_to_ccx,
-    get_course_chapters,
     is_email
 )
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
@@ -187,9 +186,7 @@ def valid_course_modules(course_module_list, master_course_key):
     Returns:
         bool: whether or not all the course module strings belong to the master course
     """
-    course_chapters = get_course_chapters(master_course_key)
-    if course_chapters is None:
-        return False
+    course_chapters = courses.get_course_chapter_ids(master_course_key)
     return set(course_module_list).intersection(set(course_chapters)) == set(course_module_list)
 
 
