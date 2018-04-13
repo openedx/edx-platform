@@ -91,8 +91,11 @@ def fetch_survey(request):
 
     """
     survey_info = get_user_survey_status(request.user)
+    user_extended_profile = request.user.extended_profile
     if not survey_info['survey']:
-        return redirect(reverse('oef_dashboard'))
+        last_finished_survey = OrganizationOefScore.objects.filter(org=user_extended_profile.organization).exclude(
+            finish_date__isnull=True).last()
+        return redirect('/oef/%s' % last_finished_survey.id)
 
     uos = get_user_survey(request.user, survey_info['survey'])
     survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
