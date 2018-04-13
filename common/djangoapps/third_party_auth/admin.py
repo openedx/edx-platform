@@ -66,7 +66,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         with transaction.atomic():
             for obj in queryset:
-                self.model.objects.filter(pk=obj.pk).update(archived=True)
+                self.model.objects.filter(pk=obj.pk).update(archived=True, enabled=False)
         self.message_user(request, _("Deleted the selected configuration(s)."))
 
     def get_list_display(self, request):
