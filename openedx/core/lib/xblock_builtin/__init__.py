@@ -13,10 +13,10 @@ def get_css_dependencies(group):
 
     Respects `PIPELINE_ENABLED` setting.
     """
-    if settings.PIPELINE_ENABLED:
-        return [settings.PIPELINE_CSS[group]['output_filename']]
+    if settings.PIPELINE['PIPELINE_ENABLED']:
+        return [settings.PIPELINE['STYLESHEETS'][group]['output_filename']]
     else:
-        return settings.PIPELINE_CSS[group]['source_filenames']
+        return settings.PIPELINE['STYLESHEETS'][group]['source_filenames']
 
 
 def get_js_dependencies(group):
@@ -25,7 +25,7 @@ def get_js_dependencies(group):
 
     Respects `PIPELINE_ENABLED` setting.
     """
-    if settings.PIPELINE_ENABLED:
-        return [settings.PIPELINE_JS[group]['output_filename']]
+    if settings.PIPELINE['PIPELINE_ENABLED']:
+        return [settings.PIPELINE['JAVASCRIPT'][group]['output_filename']]
     else:
-        return settings.PIPELINE_JS[group]['source_filenames']
+        return settings.PIPELINE['JAVASCRIPT'][group]['source_filenames']
