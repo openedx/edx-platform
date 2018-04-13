@@ -19,8 +19,6 @@ __ https://github.com/edx/codejail/blob/master/README.rst
    need to install the requirements from requirements/edx-sandbox::
 
     $ pip install -r requirements/edx-sandbox/base.txt
-    $ pip install -r requirements/edx-sandbox/local.txt
-    $ pip install -r requirements/edx-sandbox/post.txt
 
 2. At the instruction to create the AppArmor profile, you'll need a line in
    the profile for the sandbox packages.  <EDXPLATFORM> is the full path to

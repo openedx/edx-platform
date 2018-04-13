@@ -1,12 +1,4 @@
-# Python libraries to install that are local to the edx-platform repo
--e .
--e common/lib/calc
--e common/lib/capa
--e common/lib/chem
--e common/lib/dogstats
--e common/lib/safe_lxml
--e common/lib/sandbox-packages
--e common/lib/symmath
--e common/lib/xmodule
-
--e openedx/core/lib/xblock_builtin/xblock_discussion
+# Placeholder for code which hasn't yet been updated to no longer use this file.
+# The requirements which were here have been moved to local.in, and are now
+# incorporated into the appropriate full requirements files (base.txt,
+# testing.txt, etc.)
