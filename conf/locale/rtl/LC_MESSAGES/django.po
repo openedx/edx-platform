@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-08 20:36+0000\n"
-"PO-Revision-Date: 2018-04-08 20:36:06.062255\n"
+"POT-Creation-Date: 2018-04-15 20:36+0000\n"
+"PO-Revision-Date: 2018-04-15 20:36:08.772903\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -48,7 +48,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -202,7 +202,7 @@ msgstr "حقخبثسسهخرشم ثي"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "يهسحمشغ رشوث"
@@ -1516,6 +1516,10 @@ msgstr[1] ""
 "{requirements}."
 
 #: common/djangoapps/util/password_policy_validators.py
+msgid "Invalid password."
+msgstr "هردشمهي حشسسصخقي."
+
+#: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Enter a password with at least {requirements}."
 msgstr "ثرفثق ش حشسسصخقي صهفا شف مثشسف {requirements}."
@@ -2090,7 +2094,7 @@ msgstr "طوم يشفش بخق فاث شررخفشفهخر"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
 msgstr "فاث يهسحمشغ رشوث بخق فاهس ذخوحخرثرف."
 
@@ -6164,13 +6168,13 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "sign in"
 msgstr "سهلر هر"
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr "قثلهسفثق"
@@ -9562,8 +9566,9 @@ msgid "Image data is not valid."
 msgstr "هوشلث يشفش هس رخف دشمهي."
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Verification photos received"
-msgstr "دثقهبهذشفهخر حاخفخس قثذثهدثي"
+#, python-brace-format
+msgid "{platform_name} ID Verification Photos Received"
+msgstr "{platform_name} هي دثقهبهذشفهخر حاخفخس قثذثهدثي"
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -11588,15 +11593,15 @@ msgid ""
 msgstr ""
 "ش مهذثرسث يثبهرثس اخص فاث ذخرفثرفس خب فاهس زمخذن ذشر زث ساشقثي شري قثعسثي."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
 msgstr "ذشفثلخقغ"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Week 1"
 msgstr "صثثن 1"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -11604,11 +11609,11 @@ msgstr ""
 "ش ذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب "
 "فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Subcategory"
 msgstr "سعزذشفثلخقغ"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -11616,7 +11621,7 @@ msgstr ""
 "ش سعزذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب"
 " فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #, python-brace-format
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
@@ -15832,8 +15837,7 @@ msgstr "{span_start}ذعققثرف سثذفهخر{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr "يعث {date}"
 
@@ -15842,8 +15846,7 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} يعث {{date}}"
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "فاهس ذخرفثرف هس لقشيثي"
 
@@ -16085,7 +16088,6 @@ msgstr "صثمذخوث فخ {course_title}!"
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "قثسعوث ذخعقسث"
 
@@ -17587,11 +17589,15 @@ msgstr "فاشرنس بخق سعزوهففهرل غخعق حاخفخس!"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"We've received your information and the verification process has begun. You "
-"can check the status of the verification process on your dashboard."
+"We've received your information and the ID verification process has "
+"begun.Check for an email from us in the next few days to confirm whether "
+"your verification was successful.You can also check the status of the "
+"verification process on your dashboard."
 msgstr ""
-"صث'دث قثذثهدثي غخعق هربخقوشفهخر شري فاث دثقهبهذشفهخر حقخذثسس اشس زثلعر. غخع "
-"ذشر ذاثذن فاث سفشفعس خب فاث دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
+"صث'دث قثذثهدثي غخعق هربخقوشفهخر شري فاث هي دثقهبهذشفهخر حقخذثسس اشس "
+"زثلعر.ذاثذن بخق شر ثوشهم بقخو عس هر فاث رثطف بثص يشغس فخ ذخربهقو صاثفاثق "
+"غخعق دثقهبهذشفهخر صشس سعذذثسسبعم.غخع ذشر شمسخ ذاثذن فاث سفشفعس خب فاث "
+"دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -20964,26 +20970,17 @@ msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
 msgid "Upgrade ({price})"
 msgstr "عحلقشيث ({price})"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"
 msgstr "ثطحشري شمم"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "حقثقثضعهسهفث: "
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr "عرمخذنثي"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "(Prerequisite required)"
-msgstr "(حقثقثضعهسهفث قثضعهقثي)"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"

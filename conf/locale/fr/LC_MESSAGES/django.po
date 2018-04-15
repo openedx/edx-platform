@@ -47,6 +47,7 @@
 # Marco Morales, 2014
 # Marco Morales, 2014
 # Matthieu Falce <falce.matthieu@gmail.com>, 2016
+# Mireille Cabuay, 2018
 # moocit-france <contact@moocit.fr>, 2014-2017
 # mtyaka <mtyaka@gmail.com>, 2015-2016
 # Nikolaos Maris, 2013
@@ -264,9 +265,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-01 20:42+0000\n"
-"PO-Revision-Date: 2018-03-13 13:51+0000\n"
-"Last-Translator: Isabelle Gonon <isabelle.gonon@cnam.fr>\n"
+"POT-Creation-Date: 2018-04-08 20:42+0000\n"
+"PO-Revision-Date: 2018-04-11 14:18+0000\n"
+"Last-Translator: Mireille Cabuay\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -9291,11 +9292,6 @@ msgstr ""
 "L'utilisateur {username} n'est pas inscrit au cours associé à cette équipe."
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr ""
 
@@ -9303,6 +9299,11 @@ msgstr ""
 msgid ""
 "The datetime after which users are no longer allowed to submit photos for "
 "verification."
+msgstr ""
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
@@ -11088,6 +11089,16 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -12639,7 +12650,6 @@ msgstr ""
 "{platform}"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "Réinitialiser mon mot de passe"
 
@@ -19165,34 +19175,6 @@ msgid "Reset Your {platform_name} Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr ""
 
@@ -20015,6 +19997,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Expand All"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html

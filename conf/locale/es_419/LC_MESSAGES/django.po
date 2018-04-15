@@ -20,7 +20,7 @@
 # diegobe <diegobe@iadb.org>, 2014
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # David Salazar <imdjsg@gmail.com>, 2014
-# Eduardo Zambrano <ezambrano@edx.org>, 2017
+# Eduardo Zambrano <ezambrano@edx.org>, 2017-2018
 # Elias Estay <eestay@u.uchile.cl>, 2015
 # Felix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
@@ -112,7 +112,7 @@
 # Developer EdX <mperez_ges@galileo.edu>, 2016
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # David Salazar <imdjsg@gmail.com>, 2014
-# Eduardo Zambrano <ezambrano@edx.org>, 2017
+# Eduardo Zambrano <ezambrano@edx.org>, 2017-2018
 # Elias Estay <eestay@u.uchile.cl>, 2015
 # Fabio Avellaneda <fabio_avellaneda@javeriana.edu.co>, 2015
 # Felix Antonio Valdez Noverola <felix@itesm.mx>, 2015
@@ -218,7 +218,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-01 20:42+0000\n"
+"POT-Creation-Date: 2018-04-08 20:42+0000\n"
 "PO-Revision-Date: 2018-03-23 23:51+0000\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5509,7 +5509,7 @@ msgstr "Carreras"
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid "Terms of Service & Honor Code"
-msgstr "Términos del servicio y código de honor"
+msgstr "Condiciones de servicio y código de honor"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
@@ -9901,11 +9901,6 @@ msgstr ""
 "El usuario {username} no está inscrito en el curso asociado con este equipo."
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr "Su verificación en {platform_name} ha expirado."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "Curso al que se aplica esta fecha límite."
 
@@ -9916,6 +9911,11 @@ msgid ""
 msgstr ""
 "La fecha y hora después de la cual los usuarios ya no podrán enviar fotos de"
 " verificación."
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr "Su verificación en {platform_name} ha expirado."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -11838,7 +11838,7 @@ msgstr "El país o la región donde tú vives. "
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Terms of Service and Honor Code"
-msgstr "Términos del servicio y código de honor"
+msgstr "Condiciones de servicio y código de honor"
 
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
@@ -11859,6 +11859,16 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
 "Usted debe estar de acuerdo con los {terms_of_service} de {platform_name}."
+
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -12116,7 +12126,7 @@ msgid ""
 "Thank you for joining {platform_name}. Just a couple steps before you start "
 "learning!"
 msgstr ""
-"Gracias por unirse a {platform_name}. ¡Solo un par pasos antes de comenzar a"
+"Gracias por unirte a {platform_name}. ¡Solo un par pasos antes de comenzar a"
 " aprender!"
 
 #: openedx/features/enterprise_support/utils.py
@@ -13479,7 +13489,6 @@ msgstr ""
 "{platform} "
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "Restablecer mi contraseña"
 
@@ -20721,34 +20730,6 @@ msgid "Reset Your {platform_name} Password"
 msgstr "Restablecer su contraseña de {platform_name}."
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "Error al Restablecer Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr "Debe ingresar y confirmar su nueva contraseña."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr "El texto en los dos campos de contraseña deben coincidir. "
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "Restablecer su Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr "Ingrese y confirme su nueva contraseña."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "Nueva Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "Confirmar Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Enlace de restablecimiento de contraseña inválido"
 
@@ -21622,6 +21603,10 @@ msgstr "Obtenga un certificado verificado"
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
 msgstr "Mejora({price})"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Expand All"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
 msgid "Prerequisite: "
