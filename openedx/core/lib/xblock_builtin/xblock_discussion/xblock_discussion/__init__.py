@@ -8,6 +8,7 @@ import urllib
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
 from django.utils.translation import get_language_bidi
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
 from web_fragments.fragment import Fragment
@@ -18,6 +19,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlParserMixin
+
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -36,6 +38,8 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     """
     Provides a discussion forum that is inline with other content in the courseware.
     """
+    completion_mode = XBlockCompletionMode.EXCLUDED
+
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),
