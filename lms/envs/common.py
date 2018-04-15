@@ -1275,8 +1275,6 @@ MIDDLEWARE_CLASSES = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
-
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
@@ -1297,6 +1295,9 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
+
+    # Inserts Enterprise content.
+    'openedx.features.enterprise_support.middleware.EnterpriseMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
