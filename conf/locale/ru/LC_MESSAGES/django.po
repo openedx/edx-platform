@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-01 20:42+0000\n"
+"POT-Creation-Date: 2018-04-08 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: Maksimenkova Olga <omaksimenkova@hse.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -9706,11 +9706,6 @@ msgstr ""
 "командой."
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr "Срок действия вашей верификации {platform_name} истёк."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "Курс, к которому применяется этот срок подтверждения личности"
 
@@ -9721,6 +9716,11 @@ msgid ""
 msgstr ""
 "Дата и время, после которых пользователи не смогут отправлять фото для "
 "подтверждения личности."
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr "Срок действия вашей верификации {platform_name} истёк."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -11541,6 +11541,16 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr "Вы должны принять {terms_of_service} {platform_name}"
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -13100,7 +13110,6 @@ msgid "This is the e-mail address you used to register with {platform}"
 msgstr "Адрес электронной почты, использованный при регистрации в {platform}"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "Сбросить пароль"
 
@@ -20032,34 +20041,6 @@ msgid "Reset Your {platform_name} Password"
 msgstr "Изменить свой пароль на {platform_name}"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "Ошибка при сбросе пароля"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr "Вам необходимо ввести и подтвердить новый пароль."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr "Пароли в обоих полях должны совпадать."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "Сбросить пароль"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr "Введите и подтвердите новый пароль."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "Новый пароль"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "Подтвердить пароль"
-
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Неверная ссылка для сброса пароля"
 
@@ -20921,6 +20902,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+msgid "Expand All"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
