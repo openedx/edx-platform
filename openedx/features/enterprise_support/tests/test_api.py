@@ -2,8 +2,6 @@
 Test the enterprise support APIs.
 """
 
-import unittest
-
 import ddt
 import httpretty
 import mock
@@ -15,7 +13,7 @@ from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 
 from consent.models import DataSharingConsent
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
@@ -30,14 +28,11 @@ from openedx.features.enterprise_support.api import (
     insert_enterprise_pipeline_elements,
     enterprise_enabled,
 )
+from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import get_cache_key
 from student.tests.factories import UserFactory
-
-
-FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True
 
 
 class MockEnrollment(mock.MagicMock):
@@ -51,7 +46,7 @@ class MockEnrollment(mock.MagicMock):
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     """
     Test enterprise support APIs.

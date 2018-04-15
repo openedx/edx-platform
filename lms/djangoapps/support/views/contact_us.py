@@ -33,7 +33,7 @@ class ContactUsView(View):
 
         if request.user.is_authenticated():
             context['user_enrollments'] = CourseEnrollment.enrollments_for_user_with_overviews_preload(request.user)
-            enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
+            enterprise_learner_data = enterprise_api.get_enterprise_learner_data(user=request.user)
             if enterprise_learner_data:
                 tags.append('enterprise_learner')
 

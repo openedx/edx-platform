@@ -10,6 +10,8 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import SimpleTestCase
 
+from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
+
 
 class EnterpriseServiceMockMixin(object):
     """
@@ -177,7 +179,8 @@ class EnterpriseServiceMockMixin(object):
                                 'enterprise_customer': enterprise_customer_uuid,
                                 'entitlement_id': entitlement_id
                             }
-                        ]
+                        ],
+                        'replace_sensitive_sso_username': True,
                     },
                     'user_id': 5,
                     'user': {
@@ -220,6 +223,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
     Mixin to help test the data_sharing_consent_required decorator.
     """
 
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_from_api')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
     @mock.patch('openedx.features.enterprise_support.api.reverse')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
@@ -232,6 +236,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
             mock_enterprise_enabled,
             mock_reverse,
             mock_enterprise_customer_uuid_for_request,
+            mock_enterprise_customer_from_api,
             status_code=200,
     ):
         """
@@ -247,6 +252,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
         mock_reverse.side_effect = mock_consent_reverse
         mock_enterprise_enabled.return_value = True
         mock_enterprise_customer_uuid_for_request.return_value = 'fake-uuid'
+        mock_enterprise_customer_from_api.return_value = FAKE_ENTERPRISE_CUSTOMER
         # Ensure that when consent is necessary, the user is redirected to the consent page.
         mock_consent_necessary.return_value = True
         response = client.get(url)
