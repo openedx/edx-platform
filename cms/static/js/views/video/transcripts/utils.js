@@ -1,7 +1,9 @@
-define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
+define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($, _) {
     'use strict';
     return (function() {
-        var Storage = {};
+        var Storage = {},
+            sendCheckRequest,
+            getEdxVideoIdData;
 
     /**
      * Adds some data to the Storage object. If data with existent `data_id`
@@ -318,27 +320,30 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
          * @param {Array} Data from one field
          * @param {String} Sender field name
          */
-        var _sendCheckRequest = function(locator, data, senderFieldName) {
+        sendCheckRequest = function(locator, data, senderFieldName) {
             var allFieldNames = ['edx_video_id', 'video_url'],
-                otherFieldName = _.filter(allFieldNames, function(fieldName){ return fieldName !== senderFieldName; }),
+                otherFieldName = _.filter(allFieldNames, function(fieldName) { return fieldName !== senderFieldName; }),
                 otherFieldData;
 
             if (otherFieldName.length !== 1) {
-                throw "Invalid fieldName";
+                throw 'Invalid fieldName';  // eslint-disable-line no-throw-literal
             }
+
+            // Store `data` to be used later
+            Storage.set(senderFieldName, data);
 
             otherFieldData = Storage.get(otherFieldName[0]) || [];
             return _command('check', locator, otherFieldData.concat(data));
         };
 
         /**
-         * Construct `edx_video_id` data.
+         * Construct `edxVideoId` data.
          * @function
-         * @param {String} edx_video_id
+         * @param {String} edxVideoId
          */
-        var _getEdxVideoIdData = function(edxVideoId) {
-            return [{'mode': 'edx_video_id', 'type': 'edx_video_id', 'video': edxVideoId}];
-        }
+        getEdxVideoIdData = function(edxVideoId) {
+            return [{mode: 'edx_video_id', type: 'edx_video_id', video: edxVideoId}];
+        };
 
         return {
             getField: _getField,
@@ -349,8 +354,8 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             syncCollections: _syncCollections,
             command: _command,
             getVideoList: _getVideoList,
-            sendCheckRequest: _sendCheckRequest,
-            getEdxVideoIdData: _getEdxVideoIdData,
+            sendCheckRequest: sendCheckRequest,
+            getEdxVideoIdData: getEdxVideoIdData,
             Storage: {
                 set: Storage.set,
                 get: Storage.get,

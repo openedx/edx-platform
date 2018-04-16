@@ -1,13 +1,13 @@
 define(
     [
-        'jquery', 'underscore',
+        'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
         'xmodule'
     ],
-function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
+function($, _, Backbone, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
     'use strict';
     describe('CMS.Views.Metadata.VideoList', function() {
         var videoListEntryTemplate = readFixtures(
@@ -86,6 +86,7 @@ function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
             // create mock server
             this.mockServer = createMockAjaxServer();
 
+            spyOn(Backbone, 'trigger').and.callThrough();
             spyOn(Utils, 'command').and.callThrough();
             spyOn(Utils, 'sendCheckRequest').and.callThrough();
             spyOn(abstractEditor, 'initialize').and.callThrough();
@@ -283,6 +284,47 @@ function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
                       expect(view.closeExtraVideosBar).toHaveBeenCalled();
                   })
                   .always(done);
+            });
+        });
+
+        describe('Message', function() {
+            // eslint-disable-line no-shadow
+            var assertUpdateMessage, updateMessageSpy, showServerErrorSpy,
+                requestResponse = {status: 'Success', command: 'found'};
+
+            beforeEach(function() {
+                updateMessageSpy = spyOn(VideoList.prototype, 'updateMessage').and.callThrough();
+                showServerErrorSpy = spyOn(VideoList.prototype, 'showServerError').and.callThrough();
+                createVideoListView();
+            });
+
+            assertUpdateMessage = function(done, status, resp, message) {
+                jasmine.waitUntil(function() {
+                    return updateMessageSpy.calls.count() === 1;
+                }).then(function() {
+                    expect(updateMessageSpy).toHaveBeenCalledWith(status, resp);
+                    expect(messenger.render).toHaveBeenCalled();
+                    if (status === false) {
+                        expect(showServerErrorSpy).toHaveBeenCalledWith(resp);
+                        expect(messenger.showError).toHaveBeenCalledWith(message, true);
+                    }
+                }).always(done);
+            };
+
+            it('updates message on transcripts:basicTabUpdateMessage event', function(done) {
+                Backbone.trigger('transcripts:basicTabUpdateMessage', true, requestResponse);
+                assertUpdateMessage(done, true, requestResponse);
+            });
+
+            it('updates message on transcripts:basicTabUpdateMessage event when error', function(done) {
+                Backbone.trigger('transcripts:basicTabUpdateMessage', false, requestResponse);
+                assertUpdateMessage(done, false, requestResponse, 'Error: Connection with server failed.');
+            });
+
+            it('updates message on transcripts:basicTabUpdateMessage event when JSON error', function(done) {
+                var resp = _.extend({}, {responseJSON: requestResponse});
+                Backbone.trigger('transcripts:basicTabUpdateMessage', false, resp);
+                assertUpdateMessage(done, false, resp, resp.responseJSON.status);
             });
         });
 

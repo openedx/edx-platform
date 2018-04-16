@@ -61,16 +61,13 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
             var self = this,
                 fieldName = this.model.getFieldName(),
-                component_locator = this.$el.closest('[data-locator]').data('locator'),
+                componentLocator = this.$el.closest('[data-locator]').data('locator'),
                 videoList = this.getVideoObjectsList();
 
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
-            // Store `videoList` to be used later for `check_transcript` call
-            Utils.Storage.set(fieldName, videoList);
-
             // Check current state of Timed Transcripts.
-            Utils.sendCheckRequest(component_locator, videoList, fieldName)
+            Utils.sendCheckRequest(componentLocator, videoList, fieldName)
                 .done(function(resp) {
                     var params = resp,
                         len = videoList.length,
@@ -94,7 +91,12 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
          * Updates the message with error.
          */
         showServerError: function(response) {
-            var errorMessage = response.status || gettext('Error: Connection with server failed.');
+            var errorMessage = gettext('Error: Connection with server failed.');
+            if (response.responseJSON !== undefined) {
+                errorMessage = response.responseJSON.status;
+            } else {
+                errorMessage = gettext('Error: Connection with server failed.');
+            }
             this.messenger
                 .render('not_found')
                 .showError(

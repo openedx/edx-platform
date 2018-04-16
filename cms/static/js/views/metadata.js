@@ -1,5 +1,6 @@
 define(
     [
+        'backbone',
         'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
         'js/models/uploads', 'js/views/uploads',
         'js/models/license', 'js/views/license',
@@ -7,8 +8,9 @@ define(
         'js/views/video/translations_editor',
         'js/views/video/transcripts/utils'
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
+function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
          LicenseModel, LicenseView, VideoList, VideoTranslations, TranscriptUtils) {
+    'use strict';
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
@@ -123,7 +125,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
     Metadata.VideoID = Metadata.String.extend({
         // Delay between check_transcript requests
-        requestDelay: 300,
+        requestDelay: 3,
 
         initialize: function() {
             Metadata.String.prototype.initialize.apply(this, arguments);
@@ -135,17 +137,28 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             );
         },
 
+        render: function() {
+            Metadata.String.prototype.render.apply(this, arguments);
+            TranscriptUtils.Storage.set(
+                'edx_video_id',
+                TranscriptUtils.getEdxVideoIdData(this.model.getDisplayValue())
+            );
+        },
+
         clear: function() {
-            Metadata.String.prototype.clear.apply(this);
+            this.model.setValue('');
             this.sendCheckTranscriptRequest();
+        },
+
+        getDataLocator: function() {
+            return this.$el.closest('[data-locator]').data('locator');
         },
 
         sendCheckTranscriptRequest: function() {
             var fieldName = this.model.getFieldName(),
-                locator = this.$el.closest('[data-locator]').data('locator')
+                locator = this.getDataLocator(),
                 data = TranscriptUtils.getEdxVideoIdData(this.getValueFromEditor());
 
-            TranscriptUtils.Storage.set(fieldName, data);
             TranscriptUtils.sendCheckRequest(locator, data, fieldName)
                 .done(function(response) {
                     Backbone.trigger('transcripts:basicTabUpdateMessage', true, response);
