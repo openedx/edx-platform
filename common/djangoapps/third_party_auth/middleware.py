@@ -1,6 +1,15 @@
 """Middleware classes for third_party_auth."""
 
+import urlparse
+
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from requests import HTTPError
 from social_django.middleware import SocialAuthExceptionMiddleware
+
+from student.helpers import get_next_url_for_login_page
 
 from . import pipeline
 
@@ -23,3 +32,19 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware):
             redirect_uri = pipeline.AUTH_DISPATCH_URLS[auth_entry]
 
         return redirect_uri
+
+    def process_exception(self, request, exception):
+        """Handles specific exception raised by Python Social Auth eg HTTPError."""
+
+        referer_url = request.META.get('HTTP_REFERER', '')
+        if (referer_url and isinstance(exception, HTTPError) and
+                exception.response.status_code == 502):
+            referer_url = urlparse.urlparse(referer_url).path
+            if referer_url == reverse('signin_user'):
+                messages.error(request, _('Unable to connect with the external provider, please try again'),
+                               extra_tags='social-auth')
+
+                redirect_url = get_next_url_for_login_page(request)
+                return redirect('/login?next=' + redirect_url)
+
+        return super(ExceptionMiddleware, self).process_exception(request, exception)
