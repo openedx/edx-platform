@@ -260,9 +260,6 @@ def update_account_settings(requesting_user, update, username=None, force_email_
                 subject = render_to_string('emails/email_change_subject.txt', address_context)
                 subject = ''.join(subject.splitlines())
                 message = render_to_string('emails/confirm_email_change.txt', address_context)
-                if 'old_emails' not in meta:
-                    meta['old_emails'] = []
-                meta['old_emails'].append([existing_user.email, datetime.datetime.now(UTC).isoformat()])
                 existing_user_profile.set_meta(meta)
                 existing_user_profile.save()
                 # Send it to the old email...
