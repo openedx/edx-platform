@@ -195,6 +195,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
         handleUpdateEdxVideoId: function(edxVideoId) {
             var edxVideoIdField = Utils.getField(this.collection, 'edx_video_id');
+            Utils.Storage.set('edx_video_id', Utils.getEdxVideoIdData(edxVideoId));
             edxVideoIdField.setValue(edxVideoId);
         }
 

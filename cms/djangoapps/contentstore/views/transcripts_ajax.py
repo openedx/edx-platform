@@ -310,7 +310,7 @@ def check_transcripts(request):
     transcripts_presence['status'] = 'Success'
 
     try:
-        edx_video_id = videos.get('edx_video_id', item.edx_video_id)
+        edx_video_id = videos.get('edx_video_id')
         get_transcript_from_val(edx_video_id=edx_video_id, lang=u'en')
         command = 'found'
     except NotFoundError:

@@ -135,15 +135,15 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
             );
         },
 
-        render: function() {
-            Metadata.String.prototype.render.apply(this);
+        clear: function() {
+            Metadata.String.prototype.clear.apply(this);
             this.sendCheckTranscriptRequest();
         },
 
         sendCheckTranscriptRequest: function() {
             var fieldName = this.model.getFieldName(),
                 locator = this.$el.closest('[data-locator]').data('locator')
-                data = [{'mode': 'edx_video_id', 'type': 'edx_video_id', 'video': this.getValueFromEditor()}];
+                data = TranscriptUtils.getEdxVideoIdData(this.getValueFromEditor());
 
             TranscriptUtils.Storage.set(fieldName, data);
             TranscriptUtils.sendCheckRequest(locator, data, fieldName)

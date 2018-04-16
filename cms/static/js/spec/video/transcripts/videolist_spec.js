@@ -87,6 +87,7 @@ function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
             this.mockServer = createMockAjaxServer();
 
             spyOn(Utils, 'command').and.callThrough();
+            spyOn(Utils, 'sendCheckRequest').and.callThrough();
             spyOn(abstractEditor, 'initialize').and.callThrough();
             spyOn(abstractEditor, 'render').and.callThrough();
             spyOn(console, 'error');
@@ -187,10 +188,10 @@ function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
         describe('Render', function() {
             var assertToHaveBeenRendered = function(videoList) {
                     expect(abstractEditor.render).toHaveBeenCalled();
-                    expect(Utils.command).toHaveBeenCalledWith(
-                        'check',
+                    expect(Utils.sendCheckRequest).toHaveBeenCalledWith(
                         component_locator,
-                        videoList
+                        videoList,
+                        'video_url'
                     );
 
                     expect(messenger.render).toHaveBeenCalled();
@@ -198,6 +199,7 @@ function($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
                 resetSpies = function(mockServer) {
                     abstractEditor.render.calls.reset();
                     Utils.command.calls.reset();
+                    Utils.sendCheckRequest.calls.reset();
                     messenger.render.calls.reset();
                     mockServer.requests.length = 0;
                 };

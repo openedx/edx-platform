@@ -316,7 +316,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
          * @function
          * @param {String} Video Componenet Locator
          * @param {Array} Data from one field
-         * @param {senderFieldName} Sender field name
+         * @param {String} Sender field name
          */
         var _sendCheckRequest = function(locator, data, senderFieldName) {
             var allFieldNames = ['edx_video_id', 'video_url'],
@@ -331,6 +331,15 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return _command('check', locator, otherFieldData.concat(data));
         };
 
+        /**
+         * Construct `edx_video_id` data.
+         * @function
+         * @param {String} edx_video_id
+         */
+        var _getEdxVideoIdData = function(edxVideoId) {
+            return [{'mode': 'edx_video_id', 'type': 'edx_video_id', 'video': edxVideoId}];
+        }
+
         return {
             getField: _getField,
             parseYoutubeLink: _youtubeParser,
@@ -341,6 +350,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             command: _command,
             getVideoList: _getVideoList,
             sendCheckRequest: _sendCheckRequest,
+            getEdxVideoIdData: _getEdxVideoIdData,
             Storage: {
                 set: Storage.set,
                 get: Storage.get,

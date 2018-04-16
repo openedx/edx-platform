@@ -66,19 +66,10 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
-            if (videoList.length === 0) {
-                this.messenger
-                    .render('not_found')
-                    .showError(
-                        gettext('No sources'),
-                        true // hide buttons
-                    );
-
-                return void(0);
-            }
+            // Store `videoList` to be used later for `check_transcript` call
+            Utils.Storage.set(fieldName, videoList);
 
             // Check current state of Timed Transcripts.
-            Utils.Storage.set(fieldName, videoList);
             Utils.sendCheckRequest(component_locator, videoList, fieldName)
                 .done(function(resp) {
                     var params = resp,
