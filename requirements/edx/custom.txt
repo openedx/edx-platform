@@ -3,7 +3,7 @@
 # When updating a hash of an XBlock that uses xblock-utils, please update its version hash in github.txt.
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@8837eb5d91fed05ec4758dfd9b9e7adc5c906210#egg=xblock-mentoring
 # FIXME -- use tag v1.1.0 when https://github.com/edx-solutions/xblock-image-explorer/pull/37 merged and tagged
--e git+https://github.com/edx-solutions/xblock-image-explorer.git@06b5aeb7d998b1193257e581b2648d9a82b881ed#egg=xblock-image-explorer==0.7.0
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@b7febc7a9a214cf4901c9cc864d4fdd56c4224d5#egg=xblock-image-explorer==0.8.0
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@7b054467159fd2cbe2e0adccf9a0665d36a2a197#egg=xblock-drag-and-drop-v2
 # Temporary new version for A2E course only; installs in parallel with the above version. Aim to remove this and upgrade the above ASAP.
