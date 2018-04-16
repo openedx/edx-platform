@@ -25,6 +25,7 @@
     "exports-loader": "0.6.4",
     "extract-text-webpack-plugin": "2.1.2",
     "file-loader": "1.1.6",
+    "svg-inline-loader": "0.8.0",
     "font-awesome": "4.7.0",
     "hls.js": "0.7.2",
     "imports-loader": "0.7.1",

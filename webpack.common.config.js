@@ -202,8 +202,12 @@ module.exports = {
                 )
             },
             {
-                test: /\.(woff2?|ttf|svg|eot)(\?v=\d+\.\d+\.\d+)?$/,
+                test: /\.(woff2?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
                 loader: 'file-loader'
+            },
+            {
+                test: /\.svg$/,
+                loader: 'svg-inline-loader'
             }
         ]
     },
