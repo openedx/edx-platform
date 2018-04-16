@@ -70,7 +70,7 @@ def generate_user_cert(request, course_id):
         # mark the certificate with "error" status, so it can be re-run
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
-        base_url = settings.LMS_ROOT_URL[:-3]
+        base_url = settings.LMS_ROOT_URL
         MandrillClient().send_mail(
             MandrillClient.COURSE_COMPLETION_TEMPLATE,
             student.email,
