@@ -2,6 +2,12 @@
 """Signals related to the comments service."""
 
 from django.dispatch import Signal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings
+
+from .utils import set_course_discussion_settings
 
 thread_created = Signal(providing_args=['user', 'post'])
 thread_edited = Signal(providing_args=['user', 'post'])
@@ -14,3 +20,11 @@ comment_edited = Signal(providing_args=['user', 'post'])
 comment_voted = Signal(providing_args=['user', 'post'])
 comment_deleted = Signal(providing_args=['user', 'post', 'involved_users'])
 comment_endorsed = Signal(providing_args=['user', 'post'])
+
+
+@receiver(post_save, sender=CourseCohortsSettings)
+def update_cohorted_discussions(sender, instance, **kwargs):
+    set_course_discussion_settings(
+        course_key=instance.course_id,
+        divided_discussions=instance.cohorted_discussions,
+    )

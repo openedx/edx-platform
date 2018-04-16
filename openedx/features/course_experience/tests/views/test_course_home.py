@@ -90,7 +90,6 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         """
         remove_course_updates(self.user, self.course)
         url = course_home_url(self.course)
-        # from nose.tools import set_trace; set_trace()
         response = self.client.get(url)
         self.assertNotContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
