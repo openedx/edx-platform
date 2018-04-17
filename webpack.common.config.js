@@ -51,6 +51,8 @@ module.exports = {
         LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
 
+        CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
+
         // Common
         ReactRenderer: './common/static/js/src/ReactRenderer.jsx'
     },
