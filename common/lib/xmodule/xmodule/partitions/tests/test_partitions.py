@@ -546,7 +546,6 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
 
     def setUp(self):
         super(TestGetCourseUserPartitions, self).setUp()
-        # django.conf.settings is not available when nosetests are run
         TestGetCourseUserPartitions._enable_enrollment_track_partition(True)
 
     @staticmethod

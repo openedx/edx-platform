@@ -36,7 +36,6 @@ from xmodule.contentstore.mongo import MongoContentStore
 
 from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
-from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
@@ -56,6 +55,13 @@ ASSET_COLLECTION = 'assetstore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
+
+
+def assert_not_none(actual):
+    """
+    verify that item is None
+    """
+    assert actual is not None
 
 
 class ReferenceTestXBlock(XModuleMixin):

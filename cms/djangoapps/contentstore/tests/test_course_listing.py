@@ -6,7 +6,6 @@ import random
 
 import ddt
 from ccx_keys.locator import CCXLocator
-from chrono import Timer
 from django.conf import settings
 from django.test import RequestFactory
 from mock import Mock, patch
