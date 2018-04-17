@@ -674,8 +674,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns an xml string representing this module.
         """
-        # FYI - this method is called by https://github.com/edx/edx-platform/blob/55c6387db6f169bc7b76a13ae964347e98993549/common/lib/xmodule/xmodule/xml_module.py#L444
-
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
@@ -715,25 +713,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', source)
             xml.append(ele)
 
-        cache = get_cache(EXPORTER_REQUEST_CACHE_NAME)
-        #  if cache.get(OFFLINE_EXPORT_CACHE_KEY):
-            #  pathname = name_to_pathname(self.url_name)
-            #  directory_path = u'{category}/{pathname}_encodings'.format(
-                #  category=self.category,
-                #  pathname=pathname
-            #  )
-            #  resource_fs.makedirs(directory_path, recreate=True)
-            #  for source in self.html5_sources:
-                #  # TODO: download the video content from the HTML5 location
-                #  # and add it to the output directory.
-                #  # Note: These videos may not actually be needed.
-                #  # As the videos on edx.org will be VEDA-encoded and should be
-                #  # copied over by edxval in the call to edxval_api.export_to_xml
-                #  # below.  So don't bother with this initially.
-                #  filepath = u'{}/{}'.format(directory_path, source)
-                #  with resource_fs.open(filepath, 'w') as filestream:
-                    #  filestream.write()
-
         if self.track:
             ele = etree.Element('track')
             ele.set('src', self.track)
@@ -759,6 +738,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 resource_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
 
                 download_videos_kwargs = {}
+                cache = get_cache(EXPORTER_REQUEST_CACHE_NAME)
                 if cache.get(OFFLINE_EXPORT_CACHE_KEY):
                     pathname = name_to_pathname(self.url_name)
                     directory_path = u'{category}/{pathname}_encodings'.format(
