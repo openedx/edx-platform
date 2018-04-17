@@ -161,72 +161,73 @@ class EnterpriseApiClient(object):
             LOGGER.exception(message)
             raise EnterpriseApiException(message)
 
-    def fetch_enterprise_learner_data(self, user):
+    def fetch_enterprise_learner_data(self, site, user):  # pylint: disable=unused-argument
         """
         Fetch information related to enterprise from the Enterprise Service.
 
         Example:
-            fetch_enterprise_learner_data(user)
+            fetch_enterprise_learner_data(site, user)
 
         Argument:
+            site: (Site) site instance
             user: (User) django auth user
 
         Returns:
-            dict:
-            {
-                "count": 1,
-                "num_pages": 1,
-                "current_page": 1,
-                "next": null,
-                "start": 0,
-                "previous": null
-                "results": [
-                    {
-                        "enterprise_customer": {
-                            "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                            "name": "TestShib",
-                            "catalog": 2,
-                            "active": true,
-                            "site": {
-                                "domain": "example.com",
-                                "name": "example.com"
-                            },
-                            "enable_data_sharing_consent": true,
-                            "enforce_data_sharing_consent": "at_login",
-                            "branding_configuration": {
-                                "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
-                            },
-                            "enterprise_customer_entitlements": [
-                                {
+            dict: {
+                "enterprise_api_response_for_learner": {
+                    "count": 1,
+                    "num_pages": 1,
+                    "current_page": 1,
+                    "results": [
+                        {
+                            "enterprise_customer": {
+                                "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                "name": "TestShib",
+                                "catalog": 2,
+                                "active": true,
+                                "site": {
+                                    "domain": "example.com",
+                                    "name": "example.com"
+                                },
+                                "enable_data_sharing_consent": true,
+                                "enforce_data_sharing_consent": "at_login",
+                                "branding_configuration": {
                                     "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                    "entitlement_id": 69
-                                }
-                            ],
-                            "replace_sensitive_sso_username": False,
-                        },
-                        "user_id": 5,
-                        "user": {
-                            "username": "staff",
-                            "first_name": "",
-                            "last_name": "",
-                            "email": "staff@example.com",
-                            "is_staff": true,
-                            "is_active": true,
-                            "date_joined": "2016-09-01T19:18:26.026495Z"
-                        },
-                        "data_sharing_consent_records": [
-                            {
+                                    "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
+                                },
+                                "enterprise_customer_entitlements": [
+                                    {
+                                        "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                        "entitlement_id": 69
+                                    }
+                                ]
+                            },
+                            "user_id": 5,
+                            "user": {
                                 "username": "staff",
-                                "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                "exists": true,
-                                "course_id": "course-v1:edX DemoX Demo_Course",
-                                "consent_provided": true,
-                                "consent_required": false
-                            }
-                        ]
-                    }
-                ],
+                                "first_name": "",
+                                "last_name": "",
+                                "email": "staff@example.com",
+                                "is_staff": true,
+                                "is_active": true,
+                                "date_joined": "2016-09-01T19:18:26.026495Z"
+                            },
+                            "data_sharing_consent_records": [
+                                {
+                                    "username": "staff",
+                                    "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                    "exists": true,
+                                    "course_id": "course-v1:edX DemoX Demo_Course",
+                                    "consent_provided": true,
+                                    "consent_required": false
+                                }
+                            ]
+                        }
+                    ],
+                    "next": null,
+                    "start": 0,
+                    "previous": null
+                }
             }
 
         Raises:
@@ -365,7 +366,7 @@ def enterprise_customer_uuid_for_request(request):
     if not enterprise_customer_uuid and request.user.is_authenticated():
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
-        learner_data = get_enterprise_learner_data(request.user)
+        learner_data = get_enterprise_learner_data(request.site, request.user)
         if learner_data:
             enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
 
@@ -408,7 +409,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     if request.session.get(consent_key) is False:
         return False
 
-    enterprise_learner_details = get_enterprise_learner_data(user)
+    enterprise_learner_details = get_enterprise_learner_data(request.site, user)
     if not enterprise_learner_details:
         consent_needed = False
     else:
@@ -498,14 +499,14 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     return full_url
 
 
-def get_enterprise_learner_data(user):
+def get_enterprise_learner_data(site, user):
     """
     Client API operation adapter/wrapper
     """
     if not enterprise_enabled():
         return None
 
-    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
+    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(site=site, user=user)
     if enterprise_learner_data:
         return enterprise_learner_data['results']
 
@@ -517,7 +518,7 @@ def get_enterprise_customer_for_learner(site, user):
     if not enterprise_enabled():
         return {}
 
-    enterprise_learner_data = get_enterprise_learner_data(user)
+    enterprise_learner_data = get_enterprise_learner_data(site, user)
     if enterprise_learner_data:
         return enterprise_learner_data[0]['enterprise_customer']
 
