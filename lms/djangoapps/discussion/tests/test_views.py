@@ -1659,14 +1659,10 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
 
         self.addCleanup(translation.deactivate)
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_consent_required(self, mock_enterprise_customer_for_request, mock_request):
+    def test_consent_required(self, mock_request):
         """
         Test that enterprise data sharing consent is required when enabled for the various discussion views.
         """
-        # ENT-924: Temporary solution to replace sensitive SSO usernames.
-        mock_enterprise_customer_for_request.return_value = None
-
         thread_id = 'dummy'
         course_id = unicode(self.course.id)
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)

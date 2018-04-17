@@ -2596,14 +2596,10 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
         CourseOverview.load_from_module_store(self.course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_consent_required(self, mock_enterprise_customer_for_request):
+    def test_consent_required(self):
         """
         Test that enterprise data sharing consent is required when enabled for the various courseware views.
         """
-        # ENT-924: Temporary solution to replace sensitive SSO usernames.
-        mock_enterprise_customer_for_request.return_value = None
-
         course_id = unicode(self.course.id)
         for url in (
                 reverse("courseware", kwargs=dict(course_id=course_id)),

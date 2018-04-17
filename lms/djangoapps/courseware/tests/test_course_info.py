@@ -68,16 +68,12 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
     # TODO: LEARNER-611: If this is only tested under Course Info, does this need to move?
-    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_redirection_missing_enterprise_consent(self, mock_enterprise_customer_for_request):
+    def test_redirection_missing_enterprise_consent(self):
         """
         Verify that users viewing the course info who are enrolled, but have not provided
         data sharing consent, are first redirected to a consent page, and then, once they've
         provided consent, are able to view the course info.
         """
-        # ENT-924: Temporary solution to replace sensitive SSO usernames.
-        mock_enterprise_customer_for_request.return_value = None
-
         self.setup_user()
         self.enroll(self.course)
 
