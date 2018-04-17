@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings
 
 from .utils import set_course_discussion_settings
+from .models import CourseDiscussionSettings
 
 thread_created = Signal(providing_args=['user', 'post'])
 thread_edited = Signal(providing_args=['user', 'post'])
@@ -27,4 +28,5 @@ def update_cohorted_discussions(sender, instance, **kwargs):
     set_course_discussion_settings(
         course_key=instance.course_id,
         divided_discussions=instance.cohorted_discussions,
+        division_scheme=CourseDiscussionSettings.COHORT if instance.is_cohorted else CourseDiscussionSettings.NONE,
     )
