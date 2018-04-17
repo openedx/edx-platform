@@ -20,6 +20,7 @@ from mock import Mock, patch, DEFAULT
 import six
 import webob
 from webob.multidict import MultiDict
+from nose.plugins.attrib import attr
 
 import xmodule
 from xmodule.tests import DATA_DIR
@@ -180,6 +181,7 @@ if submission[0] == '':
     """)
 
 
+@attr(shard=1)
 @ddt.ddt
 class CapaModuleTest(unittest.TestCase):
 
@@ -1996,6 +1998,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(context['problem']['name'], module.location.block_type)
 
 
+@attr(shard=1)
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
 
@@ -2792,6 +2795,7 @@ class CapaDescriptorTest(unittest.TestCase):
             self._create_descriptor(sample_invalid_xml, name="Invalid XML")
 
 
+@attr(shard=1)
 class ComplexEncoderTest(unittest.TestCase):
     def test_default(self):
         """
@@ -2803,6 +2807,7 @@ class ComplexEncoderTest(unittest.TestCase):
         self.assertEqual(expected_str, json_str[1:-1])  # ignore quotes
 
 
+@attr(shard=1)
 class TestProblemCheckTracking(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.

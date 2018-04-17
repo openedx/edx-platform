@@ -2,11 +2,13 @@
 """Test for Poll Xmodule functional logic."""
 from mock import Mock
 
+from nose.plugins.attrib import attr
 from xmodule.poll_module import PollDescriptor
 from . import LogicTest
 from .test_import import DummySystem
 
 
+@attr(shard=1)
 class PollModuleTest(LogicTest):
     """Logic tests for Poll Xmodule."""
     descriptor_class = PollDescriptor

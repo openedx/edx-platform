@@ -3,9 +3,11 @@ Tests for xmodule.x_module.ResourceTemplates
 """
 import unittest
 
+from nose.plugins.attrib import attr
 from xmodule.x_module import ResourceTemplates
 
 
+@attr(shard=1)
 class ResourceTemplatesTests(unittest.TestCase):
     """
     Tests for xmodule.x_module.ResourceTemplates

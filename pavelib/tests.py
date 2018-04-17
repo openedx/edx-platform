@@ -133,6 +133,10 @@ def test_system(options, passthrough_options):
         help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
     ),
     make_option(
+        "--eval-attr", dest="eval_attr",
+        help="Only run tests matching given attribute expression."
+    ),
+    make_option(
         '-c', '--cov-args', default='',
         help='adds as args to coverage for the test run'
     ),

@@ -9,6 +9,7 @@ from unittest import TestCase
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 from xblock.runtime import Mixologist
 from xmodule.services import ConfigurationService, SettingsService
@@ -34,6 +35,7 @@ class DummyUnexpected(object):
     pass
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestSettingsService(TestCase):
     """ Test SettingsService """
@@ -94,6 +96,7 @@ class TestSettingsService(TestCase):
         self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])
 
 
+@attr(shard=1)
 class TestConfigurationService(TestCase):
     """
     Tests for ConfigurationService

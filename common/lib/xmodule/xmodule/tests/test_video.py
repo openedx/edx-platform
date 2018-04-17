@@ -31,6 +31,7 @@ from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from nose.plugins.attrib import attr
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
@@ -117,6 +118,7 @@ class _MockValCannotCreateError(Exception):
     pass
 
 
+@attr(shard=1)
 class VideoModuleTest(LogicTest):
     """Logic tests for Video Xmodule."""
     descriptor_class = VideoDescriptor
@@ -196,6 +198,7 @@ class VideoModuleTest(LogicTest):
         )
 
 
+@attr(shard=1)
 class VideoDescriptorTestBase(unittest.TestCase):
     """
     Base class for tests for VideoDescriptor
@@ -220,6 +223,7 @@ class VideoDescriptorTestBase(unittest.TestCase):
             self.assertXmlEqual(left, right)
 
 
+@attr(shard=1)
 class TestCreateYoutubeString(VideoDescriptorTestBase):
     """
     Checks that create_youtube_string correcty extracts information from Video descriptor.
@@ -246,6 +250,7 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
         self.assertEqual(create_youtube_string(self.descriptor), expected)
 
 
+@attr(shard=1)
 class TestCreateYouTubeUrl(VideoDescriptorTestBase):
     """
     Tests for helper method `create_youtube_url`.
@@ -258,6 +263,7 @@ class TestCreateYouTubeUrl(VideoDescriptorTestBase):
         self.descriptor.create_youtube_url(u"üñîçø∂é")
 
 
+@attr(shard=1)
 @ddt.ddt
 class VideoDescriptorImportTestCase(unittest.TestCase):
     """
@@ -671,6 +677,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
 
 
+@attr(shard=1)
 class VideoExportTestCase(VideoDescriptorTestBase):
     """
     Make sure that VideoDescriptor can export itself to XML correctly.
@@ -809,6 +816,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.assertEqual(xml.get('display_name'), u'\u8fd9\u662f\u6587')
 
 
+@attr(shard=1)
 @ddt.ddt
 @patch.object(settings, 'FEATURES', create=True, new={
     'FALLBACK_TO_ENGLISH_TRANSCRIPTS': False,
@@ -921,6 +929,7 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
         self.assertDictEqual(student_view_data.get('encoded_videos'), expected_video_data)
 
 
+@attr(shard=1)
 @ddt.ddt
 @patch.object(settings, 'YOUTUBE', create=True, new={
     # YouTube JavaScript API

@@ -13,6 +13,7 @@ from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
 from xmodule.x_module import STUDENT_VIEW
+from nose.plugins.attrib import attr
 
 TODAY = now()
 DUE_DATE = TODAY + timedelta(days=7)
@@ -20,6 +21,7 @@ PAST_DUE_BEFORE_END_DATE = TODAY + timedelta(days=14)
 COURSE_END_DATE = TODAY + timedelta(days=21)
 
 
+@attr(shard=1)
 class SequenceBlockTestCase(XModuleXmlImportTest):
     """
     Base class for tests of Sequence Module.

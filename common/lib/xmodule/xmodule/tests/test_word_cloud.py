@@ -2,10 +2,12 @@
 """Test for Word cloud Xmodule functional logic."""
 
 from webob.multidict import MultiDict
+from nose.plugins.attrib import attr
 from xmodule.word_cloud_module import WordCloudDescriptor
 from . import LogicTest
 
 
+@attr(shard=1)
 class WordCloudModuleTest(LogicTest):
     """Logic tests for Word Cloud Xmodule."""
     descriptor_class = WordCloudDescriptor

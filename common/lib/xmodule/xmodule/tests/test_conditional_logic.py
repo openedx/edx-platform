@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """Test for Conditional Xmodule functional logic."""
 
+from nose.plugins.attrib import attr
+
 from xmodule.conditional_module import ConditionalDescriptor
 from . import LogicTest
 
 
+@attr(shard=1)
 class ConditionalModuleTest(LogicTest):
     """Logic tests for Conditional Xmodule."""
     descriptor_class = ConditionalDescriptor

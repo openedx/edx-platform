@@ -3,10 +3,12 @@ Tests for extended due date utilities.
 """
 import mock
 import unittest
+from nose.plugins.attrib import attr
 
 from ..util import duedate
 
 
+@attr(shard=1)
 class TestGetExtendedDueDate(unittest.TestCase):
     """
     Test `get_extended_due_date` function.
