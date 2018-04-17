@@ -313,7 +313,12 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 self.assertEqual(course1_item.data, course2_item.data)
 
             # compare meta-data
-            self.assertEqual(own_metadata(course1_item), own_metadata(course2_item))
+            course1_metadata = own_metadata(course1_item)
+            course2_metadata = own_metadata(course2_item)
+            # Omit edx_video_id as it can be different in case of extrnal video imports.
+            course1_metadata.pop('edx_video_id', None)
+            course2_metadata.pop('edx_video_id', None)
+            self.assertEqual(course1_metadata, course2_metadata)
 
             # compare children
             self.assertEqual(course1_item.has_children, course2_item.has_children)
