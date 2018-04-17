@@ -4,11 +4,13 @@ Test xblock/validation.py
 
 import unittest
 from xblock.test.tools import assert_raises
+from nose.plugins.attrib import attr
 
 from xmodule.validation import StudioValidationMessage, StudioValidation
 from xblock.validation import Validation, ValidationMessage
 
 
+@attr(shard=1)
 class StudioValidationMessageTest(unittest.TestCase):
     """
     Tests for `ValidationMessage`
@@ -68,6 +70,7 @@ class StudioValidationMessageTest(unittest.TestCase):
         )
 
 
+@attr(shard=1)
 class StudioValidationTest(unittest.TestCase):
     """
     Tests for `StudioValidation` class.

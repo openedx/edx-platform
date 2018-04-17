@@ -7,12 +7,14 @@ from lxml import etree
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from nose.plugins.attrib import attr
 
 from xmodule.videoannotation_module import VideoAnnotationModule
 
 from . import get_test_system
 
 
+@attr(shard=1)
 class VideoAnnotationModuleTestCase(unittest.TestCase):
     ''' Video Annotation Module Test Case '''
     sample_xml = '''

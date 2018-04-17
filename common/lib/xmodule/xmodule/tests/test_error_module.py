@@ -12,8 +12,10 @@ from xblock.runtime import Runtime, IdReader
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.test.tools import unabc
+from nose.plugins.attrib import attr
 
 
+@attr(shard=1)
 class SetupTestErrorModules(unittest.TestCase):
     """Common setUp for use in ErrorModule tests."""
     def setUp(self):
@@ -25,6 +27,7 @@ class SetupTestErrorModules(unittest.TestCase):
         self.error_msg = "Error"
 
 
+@attr(shard=1)
 class TestErrorModule(SetupTestErrorModules):
     """
     Tests for ErrorModule and ErrorDescriptor
@@ -58,6 +61,7 @@ class TestErrorModule(SetupTestErrorModules):
         self.assertIn(repr(descriptor), context_repr)
 
 
+@attr(shard=1)
 class TestNonStaffErrorModule(SetupTestErrorModules):
     """
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
@@ -117,6 +121,7 @@ class TestRuntime(Runtime):
     pass
 
 
+@attr(shard=1)
 class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly

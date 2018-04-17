@@ -7,6 +7,7 @@ from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from nose.plugins.attrib import attr
 
 from xmodule.html_module import CourseInfoModule, HtmlDescriptor, HtmlModule
 
@@ -27,6 +28,7 @@ def instantiate_descriptor(**field_data):
     )
 
 
+@attr(shard=1)
 @ddt.ddt
 class HtmlModuleCourseApiTestCase(unittest.TestCase):
     """
@@ -81,6 +83,7 @@ class HtmlModuleCourseApiTestCase(unittest.TestCase):
         self.assertEqual(module.student_view_data(), dict(enabled=True, html=html))
 
 
+@attr(shard=1)
 class HtmlModuleSubstitutionTestCase(unittest.TestCase):
     descriptor = Mock()
 
@@ -111,6 +114,7 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         self.assertEqual(module.get_html(), sample_xml)
 
 
+@attr(shard=1)
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     """
     Make sure that HtmlDescriptor can format data for indexing as expected.
@@ -203,6 +207,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         })
 
 
+@attr(shard=1)
 class CourseInfoModuleTestCase(unittest.TestCase):
     """
     Make sure that CourseInfoModule renders updates properly.

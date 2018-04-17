@@ -5,6 +5,7 @@ import unittest
 from mock import Mock
 from lxml import etree
 
+from nose.plugins.attrib import attr
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -13,6 +14,7 @@ from xmodule.textannotation_module import TextAnnotationModule
 from . import get_test_system
 
 
+@attr(shard=1)
 class TextAnnotationModuleTestCase(unittest.TestCase):
     ''' text Annotation Module Test Case '''
     sample_xml = '''

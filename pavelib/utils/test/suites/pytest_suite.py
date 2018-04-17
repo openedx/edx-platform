@@ -211,6 +211,7 @@ class LibTestSuite(PytestSuite):
         super(LibTestSuite, self).__init__(*args, **kwargs)
         self.append_coverage = kwargs.get('append_coverage', False)
         self.test_id = kwargs.get('test_id', self.root)
+        self.eval_attr = kwargs.get('eval_attr', None)
 
     @property
     def cmd(self):
@@ -234,6 +235,8 @@ class LibTestSuite(PytestSuite):
             cmd.append("--verbose")
         if self.disable_capture:
             cmd.append("-s")
+        if self.eval_attr:
+            cmd.append("-a '{}'".format(self.eval_attr))
         cmd.append(self.test_id)
 
         return self._under_coverage_cmd(cmd)

@@ -10,6 +10,7 @@ from webob.request import Request
 from copy import copy
 from six import text_type
 import urllib
+from nose.plugins.attrib import attr
 
 from xmodule.fields import Timedelta
 from xmodule.lti_module import LTIDescriptor
@@ -18,6 +19,7 @@ from xmodule.lti_2_util import LTIError
 from . import LogicTest
 
 
+@attr(shard=1)
 class LTIModuleTest(LogicTest):
     """Logic tests for LTI module."""
     descriptor_class = LTIDescriptor

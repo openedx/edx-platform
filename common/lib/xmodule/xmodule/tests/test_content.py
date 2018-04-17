@@ -11,6 +11,7 @@ from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator, CourseLocator
 from xmodule.static_content import _write_js, _list_descriptors
+from nose.plugins.attrib import attr
 
 SAMPLE_STRING = """
 This is a sample string with more than 1024 bytes, the default STREAM_DATA_CHUNK_SIZE
@@ -97,7 +98,7 @@ class MockImage(Mock):
     def __exit__(self, *args):
         self.close()
 
-
+@attr(shard=1)
 @ddt.ddt
 class ContentTest(unittest.TestCase):
     def test_thumbnail_none(self):

@@ -9,10 +9,12 @@ from uuid import uuid4
 from pymongo import ReadPreference
 
 from django.conf import settings
+from nose.plugins.attrib import attr
 
 from xmodule.mongo_utils import connect_to_mongodb
 
 
+@attr(shard=1)
 @ddt.ddt
 class MongoUtilsTests(TestCase):
     """

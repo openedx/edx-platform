@@ -14,6 +14,7 @@ from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
 from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
+from nose.plugins.attrib import attr
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -23,6 +24,7 @@ class SplitTestModuleFactory(xml.XmlImportFactory):
     tag = 'split_test'
 
 
+@attr(shard=1)
 class SplitTestUtilitiesTest(PartitionTestCase):
     """
     Tests for utility methods related to split_test module.
@@ -118,6 +120,7 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         self.split_test_module.system.modulestore = mocked_modulestore
 
 
+@attr(shard=1)
 @ddt.ddt
 class SplitTestModuleLMSTest(SplitTestModuleTest):
     """
@@ -178,6 +181,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         self.assertEquals(len(children), 2)
 
 
+@attr(shard=1)
 class SplitTestModuleStudioTest(SplitTestModuleTest):
     """
     Unit tests for how split test interacts with Studio.

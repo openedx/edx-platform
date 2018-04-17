@@ -58,6 +58,16 @@ case "${TEST_SUITE}" in
         ;;
 
     "commonlib-unit")
-        paver test_lib --disable_capture ${PAVER_ARGS} 2> common-tests.log
+        case "$SHARD" in
+            "all")
+                paver test_lib --disable_capture ${PAVER_ARGS} 2> common-tests.log
+                ;;
+            1)
+                paver test_lib --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.log
+                ;;
+            2|"noshard")
+                paver test_lib --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> common-tests.log
+                ;;
+        esac
         ;;
 esac

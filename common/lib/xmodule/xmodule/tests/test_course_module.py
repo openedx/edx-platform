@@ -9,6 +9,7 @@ from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 from pytz import utc
 from xblock.runtime import KvsFieldData, DictKeyValueStore
+from nose.plugins.attrib import attr
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
@@ -25,6 +26,7 @@ _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
+@attr(shard=1)
 class CourseFieldsTestCase(unittest.TestCase):
     def test_default_start_date(self):
         self.assertEqual(
@@ -93,6 +95,7 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
     return system.process_xml(start_xml)
 
 
+@attr(shard=1)
 class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
 
@@ -143,6 +146,7 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         self.assertFalse(self.future_noshow_certs.may_certify())
 
 
+@attr(shard=1)
 class CourseSummaryHasEnded(unittest.TestCase):
     """ Test for has_ended method when end date is missing timezone information. """
 
@@ -153,6 +157,7 @@ class CourseSummaryHasEnded(unittest.TestCase):
         self.assertTrue(summary.has_ended())
 
 
+@attr(shard=1)
 @ddt.ddt
 class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
@@ -258,12 +263,14 @@ class IsNewCourseTestCase(unittest.TestCase):
         assert descriptor.is_newish is True
 
 
+@attr(shard=1)
 class DiscussionTopicsTestCase(unittest.TestCase):
     def test_default_discussion_topics(self):
         d = get_dummy_course('2012-12-02T12:00')
         self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
 
 
+@attr(shard=1)
 class TeamsConfigurationTestCase(unittest.TestCase):
     """
     Tests for the configuration of teams and the helper methods for accessing them.
@@ -334,6 +341,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.assertEqual(self.course.teams_topics, topics)
 
 
+@attr(shard=1)
 class SelfPacedTestCase(unittest.TestCase):
     """Tests for self-paced courses."""
 
@@ -345,6 +353,7 @@ class SelfPacedTestCase(unittest.TestCase):
         self.assertFalse(self.course.self_paced)
 
 
+@attr(shard=1)
 class BypassHomeTestCase(unittest.TestCase):
     """Tests for setting which allows course home to be bypassed."""
     def setUp(self):
@@ -355,6 +364,7 @@ class BypassHomeTestCase(unittest.TestCase):
         self.assertFalse(self.course.bypass_home)
 
 
+@attr(shard=1)
 class CourseDescriptorTestCase(unittest.TestCase):
     """
     Tests for a select few functions from CourseDescriptor.

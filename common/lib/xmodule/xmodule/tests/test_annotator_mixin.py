@@ -4,10 +4,11 @@ This test will run for annotator_mixin.py
 
 import unittest
 from lxml import etree
+from nose.plugins.attrib import attr
 
 from xmodule.annotator_mixin import get_instructions, get_extension, html_to_text
 
-
+@attr(shard=1)
 class HelperFunctionTest(unittest.TestCase):
     """
     Tests to ensure that the following helper functions work for the annotation tool

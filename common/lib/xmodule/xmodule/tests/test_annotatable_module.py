@@ -4,6 +4,7 @@ import unittest
 
 from lxml import etree
 from mock import Mock
+from nose.plugins.attrib import attr
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -13,6 +14,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from . import get_test_system
 
 
+@attr(shard=1)
 class AnnotatableModuleTestCase(unittest.TestCase):
     sample_xml = '''
         <annotatable display_name="Iliad">

@@ -6,8 +6,10 @@ from mock import Mock
 from xmodule.modulestore.xml_importer import StaticContentImporter
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.tests import DATA_DIR
+from nose.plugins.attrib import attr
 
 
+@attr(shard=1)
 class IgnoredFilesTestCase(unittest.TestCase):
     "Tests for ignored files"
     def test_ignore_tilde_static_files(self):

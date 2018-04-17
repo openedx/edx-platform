@@ -9,6 +9,7 @@ from mock import Mock, patch
 
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
+from nose.plugins.attrib import attr
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
 from xmodule.library_tools import LibraryToolsService
@@ -67,6 +68,7 @@ class LibraryContentTest(MixedSplitTestCase):
         module.xmodule_runtime = module_system
 
 
+@attr(shard=1)
 class LibraryContentModuleTestMixin(object):
     """
     Basic unit tests for LibraryContentModule
@@ -314,6 +316,7 @@ class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, Lib
         search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
+@attr(shard=1)
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
@@ -343,6 +346,7 @@ class TestLibraryContentRender(LibraryContentTest):
         self.assertEqual("LibraryContentAuthorView", rendered.js_init_fn)  # but some js initialization should happen
 
 
+@attr(shard=1)
 class TestLibraryContentAnalytics(LibraryContentTest):
     """
     Test analytics features of LibraryContentModule

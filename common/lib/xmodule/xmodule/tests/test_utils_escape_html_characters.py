@@ -1,8 +1,10 @@
 """Tests for methods defined in util/misc.py"""
 from xmodule.util.misc import escape_html_characters
 from unittest import TestCase
+from nose.plugins.attrib import attr
 
 
+@attr(shard=1)
 class UtilHtmlEscapeTests(TestCase):
     """
     Tests for methods exposed in util/misc
