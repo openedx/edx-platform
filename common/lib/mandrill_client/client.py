@@ -7,6 +7,7 @@ log = logging.getLogger(__name__)
 
 
 class MandrillClient(object):
+    ACUMEN_DATA_TEMPLATE = 'acumen-data'
     PASSWORD_RESET_TEMPLATE = 'template-60'
     USER_ACCOUNT_ACTIVATION_TEMPLATE = 'template-61'
     ORG_ADMIN_ACTIVATION_TEMPLATE = 'org-admin-identified'
@@ -24,7 +25,7 @@ class MandrillClient(object):
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def send_mail(self, template_name, user_email, context):
+    def send_mail(self, template_name, user_email, context, attachments=[]):
         """
         calls the mandrill API for the specific template and email
 
@@ -42,7 +43,8 @@ class MandrillClient(object):
                 message={
                     'from_email': settings.NOTIFICATION_FROM_EMAIL,
                     'to': [{'email': user_email}],
-                    'global_merge_vars': global_merge_vars
+                    'global_merge_vars': global_merge_vars,
+                    'attachments': attachments,
                 },
             )
             log.info(result)

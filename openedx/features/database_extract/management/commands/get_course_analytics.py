@@ -1,3 +1,5 @@
+import base64
+import csv
 import json
 import tempfile
 
@@ -10,6 +12,8 @@ from lms.djangoapps.mailing.management.commands.mailchimp_sync_course import get
 from lms.djangoapps.onboarding.models import Organization
 from student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
+
+from common.lib.mandrill_client.client import MandrillClient
 from openedx.features.database_extract.models import TargetCourse
 
 
@@ -41,8 +45,24 @@ class Command(BaseCommand):
                 json_data.append(data)
         with tempfile.TemporaryFile() as tmp:
             # Do stuff with tmp
-            tmp.write(json.dumps(json_data))
+            fieldnames = ['student_id', 'email', 'first_name', 'last_name',
+                          'date_joined', 'bio', 'city', 'country', 'language',
+                          'english_proficiency', 'label']
+            writer = csv.DictWriter(tmp, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in json_data:
+                writer.writerow(row)
             tmp.seek(0)
-            print tmp.read()
-            tmp.seek(0, 2)
+            MandrillClient().send_mail(
+                template_name=MandrillClient.ACUMEN_DATA_TEMPLATE,
+                user_email='osama.arshad@arbisoft.com',
+                context={},
+                attachments=[
+                    {
+                        "type": "text/plain",
+                        "name": "data.csv",
+                        "content": base64.encodestring(tmp.read())
+                    }
+                ]
+            )
 
