@@ -26,7 +26,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 
-from request_cache import get_cache
+from openedx.core.djangoapps.request_cache import get_cache
 
 from xmodule.modulestore.django import modulestore, contentstore
 from xmodule.modulestore.xml_exporter import (
