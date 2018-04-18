@@ -2,6 +2,8 @@
 #
 # Test creation of aggregate completions when a user works through a course.
 
+
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import timedelta
