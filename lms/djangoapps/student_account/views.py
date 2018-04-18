@@ -9,19 +9,22 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.core.urlresolvers import resolve, reverse
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
-from django.template import loader
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 import third_party_auth
+
+from edx_ace import ace
+from edx_ace.recipient import Recipient
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
 from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
@@ -48,12 +51,14 @@ from openedx.features.enterprise_support.utils import (
     update_account_settings_context_for_enterprise,
 )
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
+from student.message_types import PasswordReset
 from student.models import UserProfile
 from student.views import register_user as old_register_view, signin_user as old_login_view
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
+
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -222,20 +227,23 @@ def password_change_request_handler(request):
             # no user associated with the email
             if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
                                                settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
-                context = {
-                    'failed': True,
-                    'email_address': email,
-                    'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
 
-                }
-                subject = loader.render_to_string('emails/password_reset_subject.txt', context)
-                subject = ''.join(subject.splitlines())
-                message = loader.render_to_string('registration/password_reset_email.html', context)
-                from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-                try:
-                    send_mail(subject, message, from_email, [email])
-                except Exception:  # pylint: disable=broad-except
-                    log.exception(u'Unable to send password reset failure email notification from "%s"', from_email)
+                site = Site.objects.get_current()
+                message_context = get_base_template_context(site)
+
+                message_context.update({
+                    'failed': True,
+                    'request': request,  # Used by google_analytics_tracking_pixel
+                    'email_address': email,
+                })
+
+                msg = PasswordReset().personalize(
+                    recipient=Recipient(username='', email_address=email),
+                    language=settings.LANGUAGE_CODE,
+                    user_context=message_context,
+                )
+
+                ace.send(msg)
         except UserAPIInternalError as err:
             log.exception('Error occured during password change for user {email}: {error}'
                           .format(email=email, error=err))

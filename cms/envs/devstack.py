@@ -27,7 +27,8 @@ for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
 
 ################################ EMAIL ########################################
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 ################################# LMS INTEGRATION #############################
 
