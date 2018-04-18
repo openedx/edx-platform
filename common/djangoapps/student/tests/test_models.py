@@ -10,15 +10,17 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
+from django.test import TestCase
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseEnrollment, PendingEmailChange
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, PendingEmailChange
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -226,3 +228,39 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
         record_was_deleted = PendingEmailChange.delete_by_user_value(self.user2, field='user')
         self.assertFalse(record_was_deleted)
         self.assertEqual(1, len(PendingEmailChange.objects.all()))
+
+
+class TestCourseEnrollmentAllowed(TestCase):
+
+    def setUp(self):
+        super(TestCourseEnrollmentAllowed, self).setUp()
+        self.email = 'learner@example.com'
+        self.course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+        self.user = UserFactory.create()
+        self.allowed_enrollment = CourseEnrollmentAllowed.objects.create(
+            email=self.email,
+            course_id=self.course_key,
+            user=self.user
+        )
+
+    def test_retiring_user_deletes_record(self):
+        is_successful = CourseEnrollmentAllowed.delete_by_user_value(
+            value=self.email,
+            field='email'
+        )
+        self.assertTrue(is_successful)
+        user_search_results = CourseEnrollmentAllowed.objects.filter(
+            email=self.email
+        )
+        self.assertFalse(user_search_results)
+
+    def test_retiring_nonexistent_user_doesnt_modify_records(self):
+        is_successful = CourseEnrollmentAllowed.delete_by_user_value(
+            value='nonexistentlearner@example.com',
+            field='email'
+        )
+        self.assertFalse(is_successful)
+        user_search_results = CourseEnrollmentAllowed.objects.filter(
+            email=self.email
+        )
+        self.assertTrue(user_search_results.exists())
