@@ -10,7 +10,11 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
   if (userInformation.enrollments) {
     courseElement = (<div>
       <label className="label-course" htmlFor="course">{gettext('Course Name')}</label>
-      <select className="form-control select-course" id="course">
+      <select className="form-control select-course" id="course" value={userInformation.course_id}>
+        <option key="select-course" value="">--------</option>
+        <option key="not-course-specific" value="Not specific to a course">
+          {gettext('Not specific to a course')}
+        </option>
         {userInformation.enrollments.map(enrollment =>
                 (<option key={enrollment.course_id} value={enrollment.course_id}>
                   {enrollment.course_name}
@@ -20,7 +24,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
     </div>);
   } else {
     courseElement = (<div>
-      <label htmlFor="course">{gettext('Course Name')}<span> {gettext('(Optional)')}</span></label>
+      <label htmlFor="course">{gettext('Course Name')}</label>
       <input type="text" className="form-control" id="course" />
     </div>);
   }
