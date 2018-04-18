@@ -417,86 +417,34 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
 class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTest):
     """ Test suite for course entitlements cards on the Student Dashboard page """
 
-    def test_unfulfilled_entitlement_card(self):
-        """ Verify that a course card appears the learner's unfulfilled entitlement."""
-        
+    def setUp(self):
 
-    def test_unfulfilled_select_session_button(self):
-        """
-        Verify that a Select Session button is present and enabled on the unfulfilled entitlement's course card.
-        """
+    def test_entitlement_session_selection(self):
+        # Verify that a course card appears for the learner's unfulfilled entitlement
+        # Verify that a Select Session button is present and enabled on the unfulfilled entitlement's course card.
+        # Verify that the 'Are you sure?' pop-up appears when the Select Session button is clicked.
+        # Verify that clicking 'OK' in the session selection pop-up removes the Select Session button from the course card and adds a View Course button and a 'Change or Leave Session' link.
+        # Verify that the the View Course button links to the course home for the proper course run.
+        # Verify that clicking the 'Change or Leave Session' link shows the course run dropdown menu.
+        # Verify that the 'Change Session' button is disabled before a new session or the leave option is selected.
+        # Verify that the 'Change Session' button is enabled once a selection is made.
+        # Verify that, when a user switches sessions, the 'View Course' button links to the new session's course home.
 
-
-    def test_select_session_popup(self):
-        """ Verify that the 'Are you sure?' pop-up appears when the Select Session button is clicked."""
-
-
-    def test_session_selected(self):
-        """
-        Verify that clicking 'OK' in the session selection pop-up removes the Select Session button
-        from the course card and adds a View Course button and a 'Change or Leave Session' link.
-        """
-
-
-    def test_view_course_link(self):
-        """ Verify that the the View Course button links to the course home for the proper course run."""
-
-
-    def test_change_or_leave_session(self):
-        """ Verify that clicking the 'Change or Leave Session' link shows the course run dropdown menu."""
-
-
-    def test_change_session_no_selection(self):
-        """ Verify that the 'Change Session' button is disabled before a new session or the leave option is selected."""
-
-
-    def test_change_session_selection_made(self):
-        """ Verify that the 'Change Session' button is enabled once a selection is made."""
-
-
-    def test_new_session_view_course(self):
-        """
-        Verify that, when a user switches sessions, the 'View Course' button links to the new session's course home.
-        """
-
-
-    def test_leave_current_session(self):
-        """
-        Verify that selecting 'Leave the current session and decide later' changes the 'Change Session'
-        button text to 'Leave Current Session'.
-        """
-
-
-    def test_leave_session_popup(self):
-        """ Verify that clicking the 'Leave Current Session' button opens the 'Are you sure?' popup."""
-
-
-    def test_remove_view_course(self):
-        """ Verify that the View Course button is removed from the course card after leaving the current session."""
+        # Verify that selecting 'Leave the current session and decide later' changes the 'Change Session' button text to 'Leave Current Session'.
+        # Verify that clicking the 'Leave Current Session' button opens the 'Are you sure?' popup.
+        # Verify that the View Course button is removed from the course card after leaving the current session.
 
 
     def test_refundable_can_unenroll(self):
-        """ Verify that the gear icon and unenroll option are available for an entitlement that is refundable."""
-
-
-    def test_entitlement_unenrollment_modal(self):
-        """
-        Verify that selecting unenroll from the gear dropdown opens an entitlement unenrollment modal
-        with the correct header for the course.
-        """
-
-
-    def test_entitlement_unenrollment_request(self):
-        """
-        Verify that selecting unenroll in the entitlement unenrollment modal triggers a DELETE request
-        to the appropriate API endpoint to revoke/refund the entitlement and redirects the user to the dashboard.
-        """
+        # Verify that the gear icon and unenroll option are available for an entitlement that is refundable.
+        # Verify that selecting unenroll from the gear dropdown opens an entitlement unenrollment modal with the correct header for the course.
+        # Verify that selecting unenroll in the entitlement unenrollment modal triggers a DELETE request to the appropriate API endpoint to revoke/refund the entitlement and redirects the user to the dashboard.
 
 
     def test_unrefundable_cannot_unenroll(self):
-        """ Verify that the gear icon is not on the course card for an entitlement that is not refundable."""
+        # Verify that the gear icon is not on the course card for an entitlement that is not refundable.
 
 
     def test_logged_out_unenroll(self):
-        """ Verify that a logged out user that selects unenroll is redirected to the login page."""
+        # Verify that a logged out user that selects unenroll is redirected to the login page.
 
