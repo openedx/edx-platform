@@ -79,7 +79,7 @@ cryptography==2.1.4
 cssselect==0.9.1
 cssutils==1.0.2
 ddt==0.8.0
-decorator==4.2.1
+decorator==4.3.0
 defusedxml==0.4.1
 dicttoxml==1.7.4
 diff-cover==0.9.8
@@ -128,7 +128,7 @@ edx-ace==0.1.6
 edx-analytics-data-api-client==0.14.4
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
-edx-completion==0.1.5
+edx-completion==0.1.6
 edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
@@ -177,7 +177,7 @@ idna==2.6
 incremental==17.5.0       # via twisted
 inflect==0.2.5
 ipaddr==2.1.11
-ipaddress==1.0.19
+ipaddress==1.0.22
 isodate==0.6.0
 isort==4.2.5
 itsdangerous==0.24
@@ -308,7 +308,7 @@ sympy==0.7.1
 testfixtures==4.5.0
 testtools==0.9.34
 text-unidecode==1.2
-tox-battery==0.5
+tox-battery==0.5.1
 tox==2.8.2
 transifex-client==0.12.1
 twisted==16.6.0           # via pa11ycrawler, scrapy
