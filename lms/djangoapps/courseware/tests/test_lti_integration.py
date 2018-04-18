@@ -46,7 +46,6 @@ class TestLTI(BaseTestXmodule):
         user_id = text_type(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = text_type(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
-        course = self.store.get_course(self.item_descriptor.course_id)
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
             context=urllib.quote(context_id),
@@ -95,8 +94,6 @@ class TestLTI(BaseTestXmodule):
             'description': self.item_descriptor.description,
             'button_text': self.item_descriptor.button_text,
             'accept_grades_past_due': self.item_descriptor.accept_grades_past_due,
-            'context_title': course.display_name_with_default,
-            'context_label': course.display_org_with_default,
         }
 
         def mocked_sign(self, *args, **kwargs):
