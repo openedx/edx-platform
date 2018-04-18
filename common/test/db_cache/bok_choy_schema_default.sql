@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1068 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1071 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1099,6 +1099,34 @@ CREATE TABLE `consent_datasharingconsent` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `consent_datasharing_enterprise_customer_id_667a1480f56052a2_uniq` (`enterprise_customer_id`,`username`,`course_id`),
   CONSTRAINT `D030ccea2714cf8f0a2e65e948ee3d2d` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `consent_datasharingconsenttextoverrides`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `consent_datasharingconsenttextoverrides` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `page_title` varchar(255) NOT NULL,
+  `left_sidebar_text` longtext,
+  `top_paragraph` longtext,
+  `agreement_text` longtext,
+  `continue_text` varchar(255) NOT NULL,
+  `abort_text` varchar(255) NOT NULL,
+  `policy_dropdown_header` varchar(255) DEFAULT NULL,
+  `policy_paragraph` longtext,
+  `confirmation_modal_header` varchar(255) NOT NULL,
+  `confirmation_modal_text` longtext NOT NULL,
+  `modal_affirm_decline_text` varchar(255) NOT NULL,
+  `modal_abort_decline_text` varchar(255) NOT NULL,
+  `declined_notification_title` longtext NOT NULL,
+  `declined_notification_message` longtext NOT NULL,
+  `published` tinyint(1) NOT NULL,
+  `enterprise_customer_id` char(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
+  CONSTRAINT `consent_datasharingc_enterprise_customer__b979dfc1_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `consent_historicaldatasharingconsent`;
@@ -2056,7 +2084,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=355 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=356 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2067,7 +2095,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=431 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=435 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2537,6 +2565,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `enforce_data_sharing_consent` varchar(25) NOT NULL,
   `enable_audit_enrollment` tinyint(1) NOT NULL,
   `enable_audit_data_reporting` tinyint(1) NOT NULL,
+  `replace_sensitive_sso_username` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `enterprise_enterprisecustomer_9365d6e7` (`site_id`),
   CONSTRAINT `enterprise_enterprise_site_id_41ce54c2601930cd_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -2706,6 +2735,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `enable_audit_enrollment` tinyint(1) NOT NULL,
   `enable_audit_data_reporting` tinyint(1) NOT NULL,
   `history_change_reason` varchar(100) DEFAULT NULL,
+  `replace_sensitive_sso_username` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_2938dabbace21ece_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_ef7c876f` (`uuid`),
@@ -2802,6 +2832,7 @@ CREATE TABLE `entitlements_courseentitlement` (
   `enrollment_course_run_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `_policy_id` int(11) DEFAULT NULL,
+  `refund_locked` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `entitlements_courseentitlement_uuid_a690dd005d0695b_uniq` (`uuid`),
   KEY `entitlements_courseentit_user_id_a8df050144d72f8_fk_auth_user_id` (`user_id`),
