@@ -11,6 +11,10 @@ class UnenrollView extends Backbone.View {
     super(Object.assign({}, defaults, options));
   }
 
+  handleTrigger(triggerElement) {
+    this.$previouslyFocusedElement = triggerElement;
+  }
+
   switchToSlideOne() {
     // Randomize survey option order
     const survey = document.querySelector('.options');
@@ -20,6 +24,16 @@ class UnenrollView extends Backbone.View {
     this.$('.inner-wrapper header').hide();
     this.$('#unenroll_form').hide();
     this.$('.slide1').removeClass('hidden');
+
+    if (window.trapFocusForAccessibleModal) {
+      window.trapFocusForAccessibleModal(
+        this.$previouslyFocusedElement,
+        window.focusableElementsString,
+        this.closeButtonSelector,
+        this.modalId,
+        this.mainPageSelector,
+      );
+    }
   }
 
   switchToSlideTwo() {
@@ -39,6 +53,16 @@ class UnenrollView extends Backbone.View {
     this.$('.slide2').removeClass('hidden');
     this.$('.reasons_survey .return_to_dashboard').attr('href', this.urls.dashboard);
     this.$('.reasons_survey .browse_courses').attr('href', this.urls.browseCourses);
+
+    if (window.trapFocusForAccessibleModal) {
+      window.trapFocusForAccessibleModal(
+        this.$previouslyFocusedElement,
+        window.focusableElementsString,
+        this.closeButtonSelector,
+        this.modalId,
+        this.mainPageSelector,
+      );
+    }
   }
 
   unenrollComplete(event, xhr) {
@@ -61,10 +85,27 @@ class UnenrollView extends Backbone.View {
     }
   }
 
+  startSubmit() {
+    this.$('.submit').prop('disabled', true);
+  }
+
   initialize(options) {
+    const view = this;
+
     this.urls = options.urls;
     this.isEdx = options.isEdx;
 
+    this.closeButtonSelector = '.unenroll-modal .close-modal';
+    this.$closeButton = $(this.closeButtonSelector);
+    this.modalId = `#${this.$el.attr('id')}`;
+    this.mainPageSelector = '#dashboard-main';
+
+    this.triggerSelector = '.action-unenroll';
+    $(this.triggerSelector).each(function attachTriggerHandler(index, element) {
+      $(element).on('click', view.handleTrigger.bind($(element)));
+    });
+
+    this.$('.submit .submit-button').on('click', this.startSubmit.bind(this));
     $('#unenroll_form').on('ajax:complete', this.unenrollComplete.bind(this));
   }
 }
