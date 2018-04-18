@@ -12,7 +12,6 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
         initialize: function() {
             // prepare data for MetadataView.Editor
-
             var metadata = this.$el.data('metadata'),
                 models = this.toModels(metadata);
 
@@ -26,6 +25,16 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Listen to edx_video_id update
             this.listenTo(Backbone, 'transcripts:basicTabUpdateEdxVideoId', this.handleUpdateEdxVideoId);
+
+            // Listen to `video_url` and `edx_video_id` updates
+            this.listenTo(Backbone, 'transcripts:basicTabFieldChanged', this.handleFieldChanged);
+
+            // Listen to modal hidden event
+            this.listenTo(Backbone, 'xblock:editorModalHidden', this.destroy);
+
+            // Now `video_url` and `edx_video_id` viwes are rendered so
+            // send a `check_transcript` request to get transctip status
+            Backbone.trigger('transcripts:basicTabFieldChanged');
         },
 
         /**
@@ -195,10 +204,32 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
         handleUpdateEdxVideoId: function(edxVideoId) {
             var edxVideoIdField = Utils.getField(this.collection, 'edx_video_id');
-            Utils.Storage.set('edx_video_id', Utils.getEdxVideoIdData(edxVideoId));
             edxVideoIdField.setValue(edxVideoId);
-        }
+        },
 
+        handleFieldChanged: function() {
+            var views = this.settingsView.views,
+                videoURLSView = views.video_url,
+                edxVideoIdView = views.edx_video_id,
+                edxVideoIdData = edxVideoIdView.getData(),
+                videoURLsData = videoURLSView.getVideoObjectsList(),
+                data = videoURLsData.concat(edxVideoIdData),
+                locator = this.$el.closest('[data-locator]').data('locator');
+
+            Utils.command('check', locator, data)
+                .done(function(response) {
+                    videoURLSView.updateOnCheckTranscriptSuccess(videoURLsData, response);
+                })
+                .fail(function(response) {
+                    videoURLSView.showServerError(response);
+                });
+        },
+
+        destroy: function() {
+            this.stopListening();
+            this.undelegateEvents();
+            this.$el.empty();
+        }
     });
 
     return Editor;

@@ -14,6 +14,8 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
+        // Store rendered view references
+        views: {},
 
         // Model is CMS.Models.MetadataCollection,
         initialize: function() {
@@ -45,10 +47,10 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
                     }
 
                     if (_.isFunction(Metadata[type])) {
-                        new Metadata[type](data);
+                        self.views[data.model.getFieldName()] = new Metadata[type](data);
                     } else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.
-                        new Metadata.String(data);
+                        self.views[data.model.getFieldName()] = new Metadata.String(data);
                     }
                 });
         },
@@ -125,7 +127,7 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
 
     Metadata.VideoID = Metadata.String.extend({
         // Delay between check_transcript requests
-        requestDelay: 3,
+        requestDelay: 300,
 
         initialize: function() {
             Metadata.String.prototype.initialize.apply(this, arguments);
@@ -133,39 +135,21 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
             this.$el.on(
                 'input',
                 'input',
-                _.debounce(_.bind(this.sendCheckTranscriptRequest, this), this.requestDelay)
-            );
-        },
-
-        render: function() {
-            Metadata.String.prototype.render.apply(this, arguments);
-            TranscriptUtils.Storage.set(
-                'edx_video_id',
-                TranscriptUtils.getEdxVideoIdData(this.model.getDisplayValue())
+                _.debounce(_.bind(this.inputChange, this), this.requestDelay)
             );
         },
 
         clear: function() {
             this.model.setValue('');
-            this.sendCheckTranscriptRequest();
+            Backbone.trigger('transcripts:basicTabFieldChanged', this.model.getFieldName());
         },
 
-        getDataLocator: function() {
-            return this.$el.closest('[data-locator]').data('locator');
+        getData: function() {
+            return [{mode: 'edx_video_id', type: 'edx_video_id', video: this.getValueFromEditor()}];
         },
 
-        sendCheckTranscriptRequest: function() {
-            var fieldName = this.model.getFieldName(),
-                locator = this.getDataLocator(),
-                data = TranscriptUtils.getEdxVideoIdData(this.getValueFromEditor());
-
-            TranscriptUtils.sendCheckRequest(locator, data, fieldName)
-                .done(function(response) {
-                    Backbone.trigger('transcripts:basicTabUpdateMessage', true, response);
-                })
-                .fail(function(response) {
-                    Backbone.trigger('transcripts:basicTabUpdateMessage', false, response);
-                });
+        inputChange: function() {
+            Backbone.trigger('transcripts:basicTabFieldChanged', this.model.getFieldName());
         }
     });
 

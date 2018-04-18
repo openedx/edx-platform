@@ -49,9 +49,6 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
             this.component_locator = this.$el.closest('[data-locator]')
                                                             .data('locator');
-
-            // Listen to message update
-            this.listenTo(Backbone, 'transcripts:basicTabUpdateMessage', this.updateMessage);
         },
 
         render: function() {
@@ -67,24 +64,24 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
             // Check current state of Timed Transcripts.
-            Utils.sendCheckRequest(componentLocator, videoList, fieldName)
-                .done(function(resp) {
-                    var params = resp,
-                        len = videoList.length,
-                        mode = (len === 1) ? videoList[0].mode : false;
+            Backbone.trigger('transcripts:basicTabFieldChanged', fieldName);
+        },
 
-                    // If there are more than 1 video or just html5 source is
-                    // passed, video sources box should expand
-                    if (len > 1 || mode === 'html5') {
-                        self.openExtraVideosBar();
-                    } else {
-                        self.closeExtraVideosBar();
-                    }
+        updateOnCheckTranscriptSuccess: function(videoList, response) {
+            var params = response,
+                len = videoList.length,
+                mode = (len === 1) ? videoList[0].mode : false;
 
-                    self.messenger.render(resp.command, params);
-                    self.checkIsUniqVideoTypes();
-                })
-                .fail(this.showServerError);
+            // If there are more than 1 video or just html5 source is
+            // passed, video sources box should expand
+            if (len > 1 || mode === 'html5') {
+                this.openExtraVideosBar();
+            } else {
+                this.closeExtraVideosBar();
+            }
+
+            this.messenger.render(response.command, params);
+            this.checkIsUniqVideoTypes();
         },
 
         /**
@@ -103,17 +100,6 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                     errorMessage,
                     true // hide buttons
                 );
-        },
-
-        /**
-         * Updates the message to show the current state of transcripts.
-         */
-        updateMessage: function(status, response) {
-            if (status) {
-                this.messenger.render(response.command, response);
-            } else {
-                this.showServerError(response);
-            }
         },
 
         /**

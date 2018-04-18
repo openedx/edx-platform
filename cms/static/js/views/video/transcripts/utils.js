@@ -313,38 +313,6 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($, _) {
             };
         }());
 
-        /**
-         * Combine data from two fields and send `check_transcript` request.
-         * @function
-         * @param {String} Video Componenet Locator
-         * @param {Array} Data from one field
-         * @param {String} Sender field name
-         */
-        sendCheckRequest = function(locator, data, senderFieldName) {
-            var allFieldNames = ['edx_video_id', 'video_url'],
-                otherFieldName = _.filter(allFieldNames, function(fieldName) { return fieldName !== senderFieldName; }),
-                otherFieldData;
-
-            if (otherFieldName.length !== 1) {
-                throw 'Invalid fieldName';  // eslint-disable-line no-throw-literal
-            }
-
-            // Store `data` to be used later
-            Storage.set(senderFieldName, data);
-
-            otherFieldData = Storage.get(otherFieldName[0]) || [];
-            return _command('check', locator, otherFieldData.concat(data));
-        };
-
-        /**
-         * Construct `edxVideoId` data.
-         * @function
-         * @param {String} edxVideoId
-         */
-        getEdxVideoIdData = function(edxVideoId) {
-            return [{mode: 'edx_video_id', type: 'edx_video_id', video: edxVideoId}];
-        };
-
         return {
             getField: _getField,
             parseYoutubeLink: _youtubeParser,
@@ -354,8 +322,6 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($, _) {
             syncCollections: _syncCollections,
             command: _command,
             getVideoList: _getVideoList,
-            sendCheckRequest: sendCheckRequest,
-            getEdxVideoIdData: getEdxVideoIdData,
             Storage: {
                 set: Storage.set,
                 get: Storage.get,
