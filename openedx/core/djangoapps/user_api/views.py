@@ -775,13 +775,12 @@ class RegistrationView(APIView):
             # Translators: This is a legal document users must agree to
             # in order to register a new account.
             terms_label = _(u"Terms of Service and Honor Code")
-            terms_link = marketing_link("HONOR")
-            terms_text = _(u"Click here to read the Terms and Conditions.")
+            terms_link = "https://philanthropyu.org/terms-of-use/"
+            terms_text = _(u"Terms of Use")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"Terms and Agreement: By using this Site, you agree to be bound by,"
-                  u" and to comply with, these Terms and Conditions.")
+        label = _(u"Check here if you agree to be bound by, and to comply with, our ")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
