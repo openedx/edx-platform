@@ -30,6 +30,7 @@ import json
 import re
 from lxml import etree
 
+from xblock.fields import XBlockMixin
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.xml import XMLModuleStore, LibraryXMLModuleStore, ImportSystem
 from xblock.runtime import KvsFieldData, DictKeyValueStore
@@ -48,13 +49,33 @@ from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
-from xmodule.modulestore.tests.utils import LocationMixin
 from xmodule.util.misc import escape_invalid_characters
 
 
 log = logging.getLogger(__name__)
 
 DEFAULT_STATIC_CONTENT_SUBDIR = 'static'
+
+
+class LocationMixin(XBlockMixin):
+    """
+    Adds a `location` property to an :class:`XBlock` so it is more compatible
+    with old-style :class:`XModule` API. This is a simplified version of
+    :class:`XModuleMixin`.
+    """
+    @property
+    def location(self):
+        """ Get the UsageKey of this block. """
+        return self.scope_ids.usage_id
+
+    @location.setter
+    def location(self, value):
+        """ Set the UsageKey of this block. """
+        assert isinstance(value, UsageKey)
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
 
 
 class StaticContentImporter:
