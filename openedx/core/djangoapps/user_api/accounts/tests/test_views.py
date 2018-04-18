@@ -11,6 +11,7 @@ from copy import deepcopy
 import ddt
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.testcases import TransactionTestCase
@@ -20,6 +21,7 @@ from nose.plugins.attrib import attr
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
@@ -27,7 +29,7 @@ from openedx.core.djangoapps.user_api.models import UserPreference, UserOrgTag
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import PendingEmailChange, UserProfile, get_retired_username_by_username
+from student.models import PendingEmailChange, UserProfile, get_retired_username_by_username, get_retired_email_by_email
 from student.tests.factories import (
     TEST_PASSWORD,
     ContentTypeFactory,
@@ -1012,3 +1014,77 @@ class TestAccountRetireMailings(TestCase):
             )
         finally:
             USER_RETIRE_MAILINGS.disconnect(mock_handler)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestDeactivateLogout(TestCase):
+    """
+    Tests the account deactivation/logout endpoint.
+    """
+    def setUp(self):
+        super(TestDeactivateLogout, self).setUp()
+        self.test_user = UserFactory()
+        self.test_superuser = SuperuserFactory()
+        self.test_service_user = UserFactory()
+
+        UserSocialAuth.objects.create(
+            user=self.test_user,
+            provider='some_provider_name',
+            uid='xyz@gmail.com'
+        )
+        UserSocialAuth.objects.create(
+            user=self.test_user,
+            provider='some_other_provider_name',
+            uid='xyz@gmail.com'
+        )
+
+        self.url = reverse('deactivate_logout')
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = JwtBuilder(user).build_token([])
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + token
+        }
+        return headers
+
+    def build_post(self, username):
+        return {'user': username}
+
+    def test_superuser_deactivates_user(self):
+        """
+        Verify a superuser calling the deactivation endpoint logs out a user and deletes all their SSO tokens.
+        """
+        headers = self.build_jwt_headers(self.test_superuser)
+        response = self.client.post(self.url, self.build_post(self.test_user.username), **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        updated_user = User.objects.get(id=self.test_user.id)
+        self.assertEqual(get_retired_email_by_email(self.test_user.email), updated_user.email)
+        self.assertFalse(updated_user.has_usable_password())
+        self.assertEqual(list(UserSocialAuth.objects.filter(user=self.test_user)), [])
+
+    def test_unauthorized_rejection(self):
+        """
+        Verify unauthorized users cannot deactivate other users.
+        """
+        headers = self.build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_user.username), **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_nonexistent_user(self):
+        """
+        Verify that trying to deactivate a nonexistent user returns a 404.
+        """
+        headers = self.build_jwt_headers(self.test_superuser)
+        response = self.client.post(self.url, self.build_post("made_up_username"), **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_user_not_specified(self):
+        """
+        Verify that not specifying a user to the deactivation endpoint results in a 404.
+        """
+        headers = self.build_jwt_headers(self.test_superuser)
+        response = self.client.post(self.url, self.build_post(""), **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
