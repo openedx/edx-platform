@@ -22,9 +22,9 @@
 
 <!-- TEST RED THEME MARKER: Do not remove this comment, it is used by the tests to tell if this theme was used -->
 
-{# Note {beacon_src} is not a template variable that is evaluated by the Django template engine. It is evaluated by #}
-{# Sailthru when the email is sent. Other email providers would need to replace this variable in the HTML as well. #}
-<img src="{beacon_src}" alt="" role="presentation" aria-hidden="true" />
+{% for image_src in channel.tracker_image_sources %}
+    <img src="{image_src}" alt="" role="presentation" aria-hidden="true" />
+{% endfor %}
 
 {% google_analytics_tracking_pixel %}
 
@@ -159,17 +159,13 @@
                     <tr>
                         <!-- Actions -->
                         <td style="padding-bottom: 20px;">
-                            {# Note that these variables are evaluated by Sailthru, not the Django template engine #}
-                            <p>
-                                <a href="{view_url}" style="color: #960909">
-                                    <font color="#960909"><b>{% trans "View on Web" %}</b></font>
-                                </a>
-                            </p>
-                            <p>
-                                <a href="{optout_confirm_url}" style="color: #960909">
-                                    <font color="#960909"><b>{% trans "Unsubscribe from this list" %}</b></font>
-                                </a>
-                            </p>
+                            {% for action_link_url, action_link_text in channel.action_links %}
+                                <p>
+                                    <a href="{{ action_link_url }}" style="color: #960909">
+                                        <font color="#960909"><b>{{ action_link_text }}</b></font>
+                                    </a>
+                                </p>
+                            {% endfor %}
                         </td>
                     </tr>
                     <tr>

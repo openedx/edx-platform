@@ -7,8 +7,8 @@ import attr
 import ddt
 import pytz
 from django.conf import settings
-from edx_ace.channel import ChannelType
-from edx_ace.test_utils import StubPolicy, patch_channels, patch_policies
+from edx_ace.channel import ChannelMap, ChannelType
+from edx_ace.test_utils import StubPolicy, patch_policies
 from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import Mock, patch
@@ -383,11 +383,16 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             )
 
         patch_policies(self, [StubPolicy([ChannelType.PUSH])])
+
         mock_channel = Mock(
-            name='test_channel',
-            channel_type=ChannelType.EMAIL
+            channel_type=ChannelType.EMAIL,
+            action_links=[],
+            tracker_image_sources=[],
         )
-        patch_channels(self, [mock_channel])
+
+        channel_map = ChannelMap([
+            ['sailthru', mock_channel],
+        ])
 
         sent_messages = []
         with self.settings(TEMPLATES=self._get_template_overrides()):
@@ -411,8 +416,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
             with self.assertNumQueries(NUM_QUERIES_PER_MESSAGE_DELIVERY):
                 with patch('analytics.track') as mock_analytics_track:
-                    self.deliver_task(*sent_messages[0])
-                    self.assertEqual(mock_analytics_track.call_count, 1)
+                    with patch('edx_ace.channel.channels', return_value=channel_map):
+                        self.deliver_task(*sent_messages[0])
+                        self.assertEqual(mock_analytics_track.call_count, 1)
 
             self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
