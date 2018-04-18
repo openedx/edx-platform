@@ -3,6 +3,7 @@
 Test site_configuration middleware.
 """
 import ddt
+import unittest
 from mock import patch
 
 from django.conf import settings
@@ -21,7 +22,6 @@ from microsite_configuration.tests.tests import (
     MICROSITE_BACKENDS,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
@@ -29,7 +29,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 # pylint: disable=no-member, protected-access
 @ddt.ddt
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
-@skip_unless_lms
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class SessionCookieDomainMicrositeOverrideTests(DatabaseMicrositeTestCase):
     """
     Tests regarding the session cookie management in the middlware for Microsites
@@ -127,3 +127,53 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         """
         response = self.client.get('/', HTTP_HOST=self.site.domain)
         self.assertIn(self.site.domain, str(response.cookies['sessionid']))
+
+class LoginRequiredMiddlewareTests(TestCase):
+
+    def setUp(self):
+        super(LoginRequiredMiddlewareTests, self).setUp()
+
+        self.user = UserFactory.create()
+        self.user.set_password('password')
+        self.user.save()
+        self.open_site = SiteFactory.create(
+            domain='testserver.fake.open',
+            name='testserver.fake.open'
+        )
+        self.open_site_configuration = SiteConfigurationFactory.create(
+            site=self.open_site,
+            values={}
+        )
+
+        self.restricted_site = SiteFactory.create(
+            domain='testserver.fake.restricted',
+            name='testserver.fake.restricted'
+        )
+        self.restricted_site_configuration = SiteConfigurationFactory.create(
+            site=self.restricted_site,
+            values={
+                "RESTRICT_SITE_TO_LOGGED_IN_USERS": True,
+                "LOGIN_EXEMPT_URLS": r'^about'
+            }
+        )
+        self.client = Client()
+
+    def test_anonymous_user_can_access_open_site(self):
+        response = self.client.get('/courses', HTTP_HOST=self.open_site.domain)
+        self.assertEqual(response.status_code, 200, 'Response: ' + str(response.status_code) + ' ' + str(response))
+
+    def test_anonymous_user_cannot_access_restricted_site(self):
+        response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_user_can_access_both_sites(self):
+        self.client.login(username=self.user.username, password="password")
+        o_response = self.client.get('/courses', HTTP_HOST=self.open_site.domain)
+        r_response = self.client.get('/courses', HTTP_HOST=self.restricted_site.domain)
+        self.assertEqual(o_response.status_code, 200)
+        self.assertEqual(r_response.status_code, 200)
+
+    def test_anonymous_user_can_access_login_exempt_urls_for_restricted_site(self):
+        response = self.client.get('/about', HTTP_HOST=self.restricted_site.domain)
+        self.assertEqual(response.status_code, 200)
+

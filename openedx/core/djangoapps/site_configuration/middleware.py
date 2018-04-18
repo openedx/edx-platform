@@ -3,8 +3,10 @@ This file contains Django middleware related to the site_configuration app.
 """
 
 from django.conf import settings
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from re import compile
 
 
 class SessionCookieDomainOverrideMiddleware(object):
@@ -54,3 +56,54 @@ class SessionCookieDomainOverrideMiddleware(object):
             response.set_cookie = _set_cookie_wrapper
 
         return response
+
+class LoginRequiredMiddleware:
+    """
+    Middleware that requires a user to be authenticated to view any page other
+    than LOGIN_URL. Exemptions to this requirement can optionally be specified
+    in settings via a list of regular expressions in LOGIN_EXEMPT_URLS (which
+    you can copy from any urls.py).
+    """
+
+    def __init__(self):
+        self.LOGIN_URL = settings.LOGIN_URL or '/login/'
+
+        # Needed for user to be able to login at all
+        self.DEFAULT_LOGIN_EXEMPT_URLS = [
+            r'^user_api/v1/account/.*$',
+            r'^auth/.*$',
+            r'^register.*$',
+            r'^create_account.*$',
+            r'^admin.*$'
+        ]
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+
+        '''
+        If the site is configured to restrict not logged in users to the LOGIN_EXEMPT_URLS
+        from accessing pages, wrap the next view with the django login_required middleware
+        '''
+
+        if request.user.is_authenticated():
+            return None
+
+        RESTRICT_SITE_TO_LOGGED_IN_USERS = configuration_helpers.get_value(
+            'RESTRICT_SITE_TO_LOGGED_IN_USERS',
+            settings.FEATURES.get('RESTRICT_SITE_TO_LOGGED_IN_USERS', False)
+        )
+
+        if RESTRICT_SITE_TO_LOGGED_IN_USERS:
+            LOGIN_EXEMPT_URLS = configuration_helpers.get_value(
+                'LOGIN_EXEMPT_URLS',
+                settings.FEATURES.get('LOGIN_EXEMPT_URLS', None)
+            )
+
+            EXEMPT_URLS = [compile(self.LOGIN_URL.lstrip('/'))]
+
+            if LOGIN_EXEMPT_URLS:
+                if type(LOGIN_EXEMPT_URLS) is str or type(LOGIN_EXEMPT_URLS) is unicode:
+                    LOGIN_EXEMPT_URLS = [LOGIN_EXEMPT_URLS]
+                EXEMPT_URLS += [compile(expr) for expr in LOGIN_EXEMPT_URLS + self.DEFAULT_LOGIN_EXEMPT_URLS]
+            path = request.path_info.lstrip('/')
+            if not any(m.match(path) for m in EXEMPT_URLS):
+                return login_required(view_func)(request, view_args, view_kwargs)
