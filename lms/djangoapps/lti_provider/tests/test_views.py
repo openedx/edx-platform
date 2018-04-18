@@ -28,6 +28,8 @@ LTI_DEFAULT_PARAMS = {
 }
 
 LTI_OPTIONAL_PARAMS = {
+    'context_title': u'context title',
+    'context_label': u'context label',
     'lis_result_sourcedid': u'result sourcedid',
     'lis_outcome_service_url': u'outcome service URL',
     'tool_consumer_instance_guid': u'consumer instance guid'
@@ -94,6 +96,21 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         request = build_launch_request()
         views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
+
+    @patch('lti_provider.views.render_courseware')
+    @patch('lti_provider.views.store_outcome_parameters')
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_valid_launch_with_optional_params(self, _authenticate, store_params, _render):
+        """
+        Verifies that the LTI launch succeeds when passed a valid request.
+        """
+        request = build_launch_request(extra_post_data=LTI_OPTIONAL_PARAMS)
+        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
+        store_params.assert_called_with(
+            dict(ALL_PARAMS.items() + LTI_OPTIONAL_PARAMS.items()),
+            request.user,
+            self.consumer
+        )
 
     @patch('lti_provider.views.render_courseware')
     @patch('lti_provider.views.store_outcome_parameters')
