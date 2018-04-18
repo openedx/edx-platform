@@ -2,6 +2,7 @@
 Utility functions for transcripts.
 ++++++++++++++++++++++++++++++++++
 """
+from functools import wraps
 from django.conf import settings
 import os
 import copy
@@ -47,6 +48,26 @@ class GetTranscriptsFromYouTubeException(Exception):  # pylint: disable=missing-
 
 class TranscriptsRequestValidationException(Exception):  # pylint: disable=missing-docstring
     pass
+
+
+def exception_decorator(func):
+    """
+    Generate NotFoundError for TranscriptsGenerationException, UnicodeDecodeError.
+
+    Args:
+    `func`: Input function
+
+    Returns:
+    'wrapper': Decorated function
+    """
+    @wraps(func)
+    def wrapper(*args, **kwds):
+        try:
+            return func(*args, **kwds)
+        except (TranscriptsGenerationException, UnicodeDecodeError) as ex:
+            log.exception(text_type(ex))
+            raise NotFoundError
+    return wrapper
 
 
 def generate_subs(speed, source_speed, source_subs):
@@ -855,6 +876,7 @@ class VideoTranscriptsMixin(object):
         }
 
 
+@exception_decorator
 def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SRT):
     """
     Get video transcript from edx-val.
@@ -909,6 +931,7 @@ def get_transcript_for_video(video_location, subs_id, file_name, language):
     return input_format, base_name, content
 
 
+@exception_decorator
 def get_transcript_from_contentstore(video, language, output_format, transcripts_info, youtube_id=None):
     """
     Get video transcript from content store.
@@ -954,7 +977,6 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     language_prefix = '{}_'.format(language) if language else ''
     transcript_name = u'{}{}.{}'.format(language_prefix, base_name, output_format)
     transcript_content = Transcript.convert(transcript_content, input_format=input_format, output_format=output_format)
-
     if not transcript_content.strip():
         raise NotFoundError('No transcript content')
 
