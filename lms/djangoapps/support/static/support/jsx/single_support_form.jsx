@@ -41,9 +41,11 @@ class RenderForm extends React.Component {
           body: $('#message').val(),
         },
         tags: this.props.context.tags,
-      };
+      },
+      errors = [];
 
     let course;
+    this.clearErrors();
 
     data.requester = {
       email: $userInfo.data('email'),
@@ -54,13 +56,16 @@ class RenderForm extends React.Component {
     if (!course) {
       course = $course.val();
     }
-
+    if (!course) {
+      $('#course').closest('.form-group').addClass('has-error');
+      errors.push(gettext('Select a course or select "Not specific to a course" for your support request.'));
+    }
     data.custom_fields = [{
       id: this.props.context.customFields.course_id,
       value: course,
     }];
 
-    if (this.validateData(data)) {
+    if (this.validateData(data, errors)) {
       request.open('POST', url, true);
       request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
       request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
@@ -81,8 +86,12 @@ class RenderForm extends React.Component {
     }
   }
 
-  validateData(data) {
-    const errors = [];
+  clearErrors() {
+    this.setErrorState([]);
+    $('.form-group').removeClass('has-error');
+  }
+
+  validateData(data, errors) {
     if (!data.subject) {
       errors.push(gettext('Enter a subject for your support request.'));
       $('#subject').closest('.form-group').addClass('has-error');
