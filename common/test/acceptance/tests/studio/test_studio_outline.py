@@ -116,7 +116,6 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
             expected_ordering
         )
 
-    @skip("Fails in Firefox 45 but passes in Chrome")
     def test_drop_unit_in_collapsed_subsection(self):
         """
         Drag vertical "1.1.2" from subsection "1.1" into collapsed subsection "1.2" which already
