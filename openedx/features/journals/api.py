@@ -7,6 +7,7 @@ from urlparse import urlsplit, urlunsplit
 import six
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
@@ -19,6 +20,8 @@ from slumber.exceptions import HttpClientError, HttpServerError
 LOGGER = logging.getLogger("edx.journals")
 JOURNALS_CACHE_TIMEOUT = 3600  # Value is in seconds
 JOURNALS_API_PATH = '/journal/api/v1/'
+JOURNAL_WORKER_USERNAME = 'journals_worker'
+User = get_user_model()
 
 
 class DiscoveryApiClient(object):
@@ -68,17 +71,61 @@ class JournalsApiClient(object):
     """
     Class for interacting with the Journals Service
     """
-    def __init__(self, user):
+    def __init__(self):
         """
         Initialize an authenticated Enterprise service API client by using the
         provided user.
         """
-        self.user = user
-        jwt = JwtBuilder(user).build_token([])
+        self.user = self.get_journals_worker()
+        jwt = JwtBuilder(self.user).build_token(['email', 'profile'], 16000)
         self.client = EdxRestApiClient(
             configuration_helpers.get_value('JOURNALS_API_URL', settings.JOURNALS_API_URL),
             jwt=jwt
         )
+
+    def get_journals_worker(self):
+        """ Return journals worker """
+        return User.objects.get(username=JOURNAL_WORKER_USERNAME)
+
+
+def fetch_journal_access(site, user):
+    """
+    Retrieve journal access record for given user.
+    Retrieve if from the cache if present, otherwise send GET request to the journal access api
+        and store it in the cache
+
+    Args:
+        site (Site)
+        user (username | str): user to retrieve access records for
+
+    Returns:
+        list of dicts: list of journal access dicts
+
+    Raises:
+        ConnectionError: raised if lms is unable to connect to the journals service.
+        SlumberBaseException: raised if API response contains http error status like 4xx, 5xx etc...
+        Timeout: raised if API is talking to long to respond
+    """
+    # TODO: WL-1560: (see jira for more info)
+
+    # api_resourse = 'journal_access'
+    # cache_key = get_cache_key(
+    #     site_domain=site.domain,
+    #     resourse=api_resourse,
+    #     user=user
+    # )
+    #
+    # journal_access_records = cache.get(cache_key)
+    # if not journal_access_records:
+    #     journal_access_records = JournalsApiClient().client.journalaccess.get(user=user)
+    #     cache.set(cache_key, journal_access_records, JOURNALS_CACHE_TIMEOUT)
+
+    journal_access_records = JournalsApiClient().client.journalaccess.get(
+        user=user,
+        get_latest=True
+    )
+
+    return journal_access_records
 
 
 def get_cache_key(**kwargs):
