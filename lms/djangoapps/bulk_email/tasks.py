@@ -124,6 +124,7 @@ def _get_course_email_context(course):
     }
     return email_context
 
+
 def perform_delegate_email_batches(entry_id, course_id, task_input, action_name):
     """
     Delegates emails by querying for the list of recipients who should
