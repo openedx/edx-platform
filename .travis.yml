@@ -25,6 +25,7 @@ branches:
   - oxa/release.fic
   - oxa/dev.fic_msa
   - oxa/dev.fic
+  - oxa/ms.fic
   - oxa/ci
 
 
