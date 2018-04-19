@@ -19,6 +19,10 @@ from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
+from openedx.core.djangoapps.password_policy.compliance import (
+    NonCompliantPasswordException,
+    NonCompliantPasswordWarning
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.tests.util import expected_redirect_url
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
@@ -431,6 +435,51 @@ class LoginTest(CacheIsolationTestCase):
         response_content = json.loads(response.content)
         self.assertIsNone(response_content["redirect_url"])
         self._assert_response(response, success=True)
+
+    @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
+    def test_check_password_policy_compliance(self):
+        """
+        Tests _enforce_password_policy_compliance succeeds when no exception is thrown
+        """
+        with patch('student.views.login.password_policy_compliance.enforce_compliance_on_login') as mock_check_password_policy_compliance:
+            mock_check_password_policy_compliance.return_value = HttpResponse()
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password',
+            )
+            response_content = json.loads(response.content)
+        self.assertTrue(response_content.get('success'))
+
+    @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
+    def test_check_password_policy_compliance_exception(self):
+        """
+        Tests _enforce_password_policy_compliance fails with an exception thrown
+        """
+        with patch('student.views.login.password_policy_compliance.enforce_compliance_on_login') as \
+                mock_enforce_compliance_on_login:
+            mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordException()
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password'
+            )
+            response_content = json.loads(response.content)
+        self.assertFalse(response_content.get('success'))
+
+    @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
+    def test_check_password_policy_compliance_warning(self):
+        """
+        Tests _enforce_password_policy_compliance succeeds with a warning thrown
+        """
+        with patch('student.views.login.password_policy_compliance.enforce_compliance_on_login') as \
+                mock_enforce_compliance_on_login:
+            mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordWarning('Test warning')
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password'
+            )
+            response_content = json.loads(response.content)
+            self.assertIn('Test warning', self.client.session['_messages'])
+        self.assertTrue(response_content.get('success'))
 
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG', extra_post_params=None):
         """

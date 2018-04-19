@@ -149,7 +149,7 @@ def password_instructions():
                          min_length).format(num=min_length, requirements=' & '.join(reqs))
 
 
-def validate_password(password, user=None, username=None):
+def validate_password(password, user=None, username=None, password_reset=True):
     """
     Checks user-provided password against our current site policy.
 
@@ -159,6 +159,8 @@ def validate_password(password, user=None, username=None):
         password: The user-provided password as a string
         user: A User model object, if available. Required to check against security policy.
         username: The user-provided username, if available. Taken from 'user' if not provided.
+        password_reset: Whether to run validators that only make sense in a password reset
+         context (like PasswordHistory).
     """
     if not isinstance(password, text_type):
         try:
@@ -168,7 +170,7 @@ def validate_password(password, user=None, username=None):
 
     username = username or (user and user.username)
 
-    if user:
+    if user and password_reset:
         _validate_password_security(password, user)
 
     _validate_password_dictionary(password)

@@ -10,12 +10,18 @@ import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.external_auth.views
 import openedx.core.djangoapps.lang_pref.views
+from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
+from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 
 from ratelimitbackend import admin
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
 admin.site.site_title = admin.site.site_header
+
+if password_policy_compliance.should_enforce_compliance_on_login():
+    admin.site.login_form = PasswordPolicyAwareAdminAuthForm
+
 
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
