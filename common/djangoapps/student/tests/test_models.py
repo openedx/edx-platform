@@ -18,7 +18,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, PendingEmailChange
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -197,3 +197,32 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         ScheduleFactory(enrollment=enrollment)
         self.assertIsNotNone(enrollment.schedule)
         self.assertIsNone(enrollment.upgrade_deadline)
+
+
+class PendingEmailChangeTests(SharedModuleStoreTestCase):
+    """
+    Tests the deletion of PendingEmailChange records.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(PendingEmailChangeTests, cls).setUpClass()
+        cls.course = CourseFactory()
+        cls.user = UserFactory()
+        cls.user2 = UserFactory()
+
+    def setUp(self):
+        self.email_change, _ = PendingEmailChange.objects.get_or_create(
+            user=self.user,
+            new_email='new@example.com',
+            activation_key='a' * 32
+        )
+
+    def test_delete_by_user_removes_pending_email_change(self):
+        record_was_deleted = PendingEmailChange.delete_by_user_value(self.user, field='user')
+        self.assertTrue(record_was_deleted)
+        self.assertEqual(0, len(PendingEmailChange.objects.all()))
+
+    def test_delete_by_user_no_effect_for_user_with_no_email_change(self):
+        record_was_deleted = PendingEmailChange.delete_by_user_value(self.user2, field='user')
+        self.assertFalse(record_was_deleted)
+        self.assertEqual(1, len(PendingEmailChange.objects.all()))
