@@ -35,6 +35,7 @@ from openedx.core.djangoapps.course_groups import views as course_groups_views
 from openedx.core.djangoapps.debug import views as openedx_debug_views
 from openedx.core.djangoapps.external_auth import views as external_auth_views
 from openedx.core.djangoapps.lang_pref import views as lang_pref_views
+from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -54,6 +55,10 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
     admin.site.site_header = _('LMS Administration')
     admin.site.site_title = admin.site.site_header
+
+    if password_policy_compliance.should_enforce_compliance_on_login():
+        from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
+        admin.site.login_form = PasswordPolicyAwareAdminAuthForm
 
 
 urlpatterns = [
