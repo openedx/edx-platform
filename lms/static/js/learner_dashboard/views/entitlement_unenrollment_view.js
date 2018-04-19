@@ -22,11 +22,15 @@ class EntitlementUnenrollmentView extends Backbone.View {
     this.triggerSelector = '.js-entitlement-action-unenroll';
     this.mainPageSelector = '#dashboard-main';
     this.genericErrorMsg = gettext('Your unenrollment request could not be processed. Please try again later.');
+    this.modalId = `#${this.$el.attr('id')}`;
 
     this.dashboardPath = options.dashboardPath;
     this.signInPath = options.signInPath;
+    this.browseCourses = options.browseCourses;
+    this.isEdx = options.isEdx;
 
     this.$submitButton = $(this.submitButtonSelector);
+    this.$closeButton = $(this.closeButtonSelector);
     this.$headerText = $(this.headerTextSelector);
     this.$errorText = $(this.errorTextSelector);
 
@@ -37,6 +41,7 @@ class EntitlementUnenrollmentView extends Backbone.View {
 
       $trigger.on('click', view.handleTrigger.bind(view));
 
+      // From accessibility_tools.js
       if (window.accessible_modal) {
         window.accessible_modal(
           `#${$trigger.attr('id')}`,
@@ -53,6 +58,8 @@ class EntitlementUnenrollmentView extends Backbone.View {
     const courseName = $trigger.data('courseName');
     const courseNumber = $trigger.data('courseNumber');
     const apiEndpoint = $trigger.data('entitlementApiEndpoint');
+
+    this.$previouslyFocusedElement = $trigger;
 
     this.resetModal();
     this.setHeaderText(courseName, courseNumber);
@@ -113,12 +120,62 @@ class EntitlementUnenrollmentView extends Backbone.View {
     this.$submitButton.data('entitlementApiEndpoint', apiEndpoint);
   }
 
+  switchToSlideOne() {
+    // Randomize survey option order
+    const survey = document.querySelector('.options');
+    for (let i = survey.children.length - 1; i >= 0; i -= 1) {
+      survey.appendChild(survey.children[Math.trunc(Math.random() * i)]);
+    }
+    this.$('.entitlement-unenrollment-modal-inner-wrapper header').addClass('hidden');
+    this.$('.entitlement-unenrollment-modal-submit-wrapper').addClass('hidden');
+    this.$('.slide1').removeClass('hidden');
+
+    // From accessibility_tools.js
+    window.trapFocusForAccessibleModal(
+      this.$previouslyFocusedElement,
+      window.focusableElementsString,
+      this.closeButtonSelector,
+      this.modalId,
+      this.mainPageSelector,
+    );
+  }
+
+  switchToSlideTwo() {
+    let reason = this.$(".reasons_survey input[name='reason']:checked").attr('val');
+    if (reason === 'Other') {
+      reason = this.$('.other_text').val();
+    }
+    if (reason) {
+      window.analytics.track('entitlement_unenrollment_reason.selected', {
+        category: 'user-engagement',
+        label: reason,
+        displayName: 'v1',
+      });
+    }
+    this.$('.slide1').addClass('hidden');
+    this.$('.slide2').removeClass('hidden');
+
+    // From accessibility_tools.js
+    window.trapFocusForAccessibleModal(
+      this.$previouslyFocusedElement,
+      window.focusableElementsString,
+      this.closeButtonSelector,
+      this.modalId,
+      this.mainPageSelector,
+    );
+  }
+
   onComplete(xhr) {
     const status = xhr.status;
     const message = xhr.responseJSON && xhr.responseJSON.detail;
 
     if (status === 204) {
-      EntitlementUnenrollmentView.redirectTo(this.dashboardPath);
+      if (this.isEdx) {
+        this.switchToSlideOne();
+        this.$('.reasons_survey:first .submit-reasons').click(this.switchToSlideTwo.bind(this));
+      } else {
+        EntitlementUnenrollmentView.redirectTo(this.dashboardPath);
+      }
     } else if (status === 401 && message === 'Authentication credentials were not provided.') {
       EntitlementUnenrollmentView.redirectTo(`${this.signInPath}?next=${encodeURIComponent(this.dashboardPath)}`);
     } else {
