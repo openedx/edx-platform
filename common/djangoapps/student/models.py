@@ -64,6 +64,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -676,7 +677,10 @@ class PendingNameChange(models.Model):
     rationale = models.CharField(blank=True, max_length=1024)
 
 
-class PendingEmailChange(models.Model):
+class PendingEmailChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's email address.
+    """
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
