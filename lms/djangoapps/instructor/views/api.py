@@ -664,6 +664,14 @@ def students_update_enrollment(request, course_id):
             language = get_user_email_language(user)
 
         try:
+            # Log the process
+            log.info(
+                u'Starting [%s] process for student[%s] in course[%s] by course staff[%s]',
+                action,
+                user.username,
+                course_id,
+                request.user.username
+            )
             # Use django.core.validators.validate_email to check email address
             # validity (obviously, cannot check if email actually /exists/,
             # simply that it is plausibly valid)
