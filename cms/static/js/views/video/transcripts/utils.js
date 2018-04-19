@@ -1,9 +1,7 @@
-define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($, _) {
+define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
     'use strict';
     return (function() {
-        var Storage = {},
-            sendCheckRequest,
-            getEdxVideoIdData;
+        var Storage = {};
 
     /**
      * Adds some data to the Storage object. If data with existent `data_id`

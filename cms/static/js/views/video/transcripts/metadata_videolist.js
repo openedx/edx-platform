@@ -56,15 +56,10 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             AbstractEditor.prototype.render
                 .apply(this, arguments);
 
-            var self = this,
-                fieldName = this.model.getFieldName(),
-                componentLocator = this.$el.closest('[data-locator]').data('locator'),
-                videoList = this.getVideoObjectsList();
-
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
             // Check current state of Timed Transcripts.
-            Backbone.trigger('transcripts:basicTabFieldChanged', fieldName);
+            Backbone.trigger('transcripts:basicTabFieldChanged');
         },
 
         updateOnCheckTranscriptSuccess: function(videoList, response) {

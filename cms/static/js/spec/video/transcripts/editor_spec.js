@@ -51,7 +51,7 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                 object: testData,
                 string: JSON.stringify(testData)
             },
-            transcripts, $container;
+            transcripts, $container, waitForEvent;
 
         var waitsForDisplayName = function(collection) {
             return jasmine.waitUntil(function() {
@@ -76,13 +76,70 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
             Utils.Storage.remove('sub');
         });
 
-        describe('Test initialization', function() {
+        describe('Events', function() {
             beforeEach(function() {
+                spyOn(Backbone, 'trigger').and.callThrough();
                 spyOn(MetadataView, 'Editor');
+                spyOn(Editor.prototype, 'handleFieldChanged');
+                spyOn(Editor.prototype, 'destroy').and.callThrough();
 
                 transcripts = new Editor({
                     el: $container
                 });
+
+                // reset the manual call to `handleFieldChanged` we made in the `editor.js::initialize`
+                Editor.prototype.handleFieldChanged.calls.reset();
+            });
+
+            waitForEvent = function(eventName) {
+                var triggerCallArgs;
+                return jasmine.waitUntil(function() {
+                    triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
+                    return Backbone.trigger.calls.count() === 1 && triggerCallArgs[0] === eventName;
+                });
+            };
+
+            afterEach(function() {
+                Backbone.trigger.calls.reset();
+                MetadataView.Editor.calls.reset();
+                Editor.prototype.destroy.calls.reset();
+                Editor.prototype.handleFieldChanged.calls.reset();
+            });
+
+            it('handles transcripts:basicTabFieldChanged', function(done) {
+                var event = 'transcripts:basicTabFieldChanged';
+
+                Backbone.trigger(event);
+                waitForEvent(event)
+                    .then(function() {
+                        expect(Editor.prototype.handleFieldChanged).toHaveBeenCalled();
+                    }).always(done);
+            });
+
+            it('handles xblock:editorModalHidden', function(done) {
+                var event = 'xblock:editorModalHidden';
+
+                Backbone.trigger(event);
+                waitForEvent(event)
+                    .then(function() {
+                        expect(Editor.prototype.destroy).toHaveBeenCalled();
+                    }).always(done);
+            });
+        });
+
+        describe('Test initialization', function() {
+            beforeEach(function() {
+                spyOn(MetadataView, 'Editor');
+                spyOn(Editor.prototype, 'handleFieldChanged');
+
+                transcripts = new Editor({
+                    el: $container
+                });
+            });
+
+            afterEach(function() {
+                MetadataView.Editor.calls.reset();
+                Editor.prototype.handleFieldChanged.calls.reset();
             });
 
             $.each(metadataDict, function(index, val) {
@@ -159,6 +216,7 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
 
             beforeEach(function() {
                 spyOn(MetadataView, 'Editor');
+                spyOn(Editor.prototype, 'handleFieldChanged');
 
                 transcripts = new Editor({
                     el: $container
@@ -180,6 +238,11 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                         'getModifiedMetadataValues'
                     ]
                 );
+            });
+
+            afterEach(function() {
+                MetadataView.Editor.calls.reset();
+                Editor.prototype.handleFieldChanged.calls.reset();
             });
 
             describe('Test Advanced to Basic synchronization', function() {

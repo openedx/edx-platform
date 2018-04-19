@@ -5,11 +5,10 @@ define(
         'js/models/uploads', 'js/views/uploads',
         'js/models/license', 'js/views/license',
         'js/views/video/transcripts/metadata_videolist',
-        'js/views/video/translations_editor',
-        'js/views/video/transcripts/utils'
+        'js/views/video/translations_editor'
     ],
 function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-         LicenseModel, LicenseView, VideoList, VideoTranslations, TranscriptUtils) {
+         LicenseModel, LicenseView, VideoList, VideoTranslations) {
     'use strict';
     var Metadata = {};
 
@@ -141,7 +140,7 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
 
         clear: function() {
             this.model.setValue('');
-            Backbone.trigger('transcripts:basicTabFieldChanged', this.model.getFieldName());
+            this.inputChange();
         },
 
         getData: function() {
@@ -149,7 +148,7 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
         },
 
         inputChange: function() {
-            Backbone.trigger('transcripts:basicTabFieldChanged', this.model.getFieldName());
+            Backbone.trigger('transcripts:basicTabFieldChanged');
         }
     });
 

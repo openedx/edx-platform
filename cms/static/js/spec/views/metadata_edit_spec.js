@@ -274,111 +274,46 @@ function(_, MetadataModel, MetadataCollection, MetadataView, main, Utils, AjaxHe
           });
       });
 
-      describe("MetadataView.VideoID", function() {
-        var waitsForResponse, assertToHaveBeenRendered, responseData, mockServer;
+     describe("MetadataView.VideoID", function() {
+        var waitForMock;
 
-        responseData = {
-            command: 'found',
-            status: 'Success',
-            subs: 'video_id'
-        };
-
-        waitsForResponse = function(mockServer) {
+        waitForMock = function(mock) {
             return jasmine.waitUntil(function() {
-                var requests = mockServer.requests,
-                    len = requests.length;
-
-                return len && requests[0].readyState === 4;
+                return mock.calls.count() === 1;
             });
         };
-
-        assertToHaveBeenRendered = function(componentLocator, eventStatus, videoIdData) {
-            var triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
-            expect(triggerCallArgs[0]).toEqual("transcripts:basicTabUpdateMessage");
-            expect(triggerCallArgs[1]).toEqual(eventStatus);
-            if (eventStatus) {
-                expect(triggerCallArgs[2]).toEqual(responseData);
-            } else {
-                expect(triggerCallArgs[2].responseJSON).toEqual(responseData);
-            }
-            expect(Utils.sendCheckRequest).toHaveBeenCalledWith(
-                componentLocator,
-                videoIdData,
-                'edx_video_id'
-            );
-        }
-
-        mockServer = function(status) {
-            var mockServer = AjaxHelpers.server([
-                status,
-                {'Content-Type': 'application/json'},
-                JSON.stringify(responseData)
-            ]);
-            mockServer.autoRespond = true;
-            return mockServer;
-        }
 
         beforeEach(function() {
             const model = new MetadataModel(videoIDEntry);
             this.view = new MetadataView.VideoID({model});
-
             spyOn(Backbone, 'trigger');
-            spyOn(Utils, 'sendCheckRequest').and.callThrough();
-            spyOn(this.view, 'getDataLocator').and.returnValue("component_locator");
         });
 
-        afterEach(function() {
-            Utils.sendCheckRequest.calls.reset();
-        });
-
-        it("sends ajax and trigger event on input change", function(done) {
-            var data,
-                server = mockServer(200);
+        it("triggers correct event on input change", function(done) {
             // change value and trigger input event
             this.view.$el.find('input').val("1234-5678-90").trigger('input');
-            data = Utils.getEdxVideoIdData(this.view.getValueFromEditor());
-            waitsForResponse(server)
+            waitForMock(Backbone.trigger)
                 .then(function() {
-                    assertToHaveBeenRendered(
-                        "component_locator",
-                        true,
-                        data
-                    )
+                    expect(Backbone.trigger).toHaveBeenCalledWith('transcripts:basicTabFieldChanged');
                 })
                 .always(done);
         });
 
-        it("sends ajax and trigger event on clear", function(done) {
-            var data,
-                server = mockServer(200);
+        it("triggers correct event on clear", function(done) {
             this.view.clear();
-            data = Utils.getEdxVideoIdData(this.view.getValueFromEditor());
-            waitsForResponse(server)
+            waitForMock(Backbone.trigger)
                 .then(function() {
-                    assertToHaveBeenRendered(
-                        "component_locator",
-                        true,
-                        data
-                    )
+                    expect(Backbone.trigger).toHaveBeenCalledWith('transcripts:basicTabFieldChanged');
                 })
                 .always(done);
         });
 
-        it("triggers correct event ajax request failure", function(done) {
-            var data,
-                server = mockServer(400);
-            // change value and trigger input event
-            this.view.$el.find('input').val("1234-5678-90").trigger('input');
-            data = Utils.getEdxVideoIdData(this.view.getValueFromEditor());
-            waitsForResponse(server)
-                .then(function() {
-                    assertToHaveBeenRendered(
-                        "component_locator",
-                        false,
-                        data
-                    )
-                })
-                .always(done);
+        it("constructs correct data", function() {
+            expect(
+                this.view.getData()
+            ).toEqual(
+                [{mode: 'edx_video_id', type: 'edx_video_id', video: this.view.getValueFromEditor()}]
+            );
         });
       });
 

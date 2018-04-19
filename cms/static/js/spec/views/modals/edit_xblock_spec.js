@@ -1,6 +1,7 @@
-define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_helpers/edit_helpers',
-    'js/views/modals/edit_xblock', 'js/models/xblock_info'],
-    function($, _, AjaxHelpers, EditHelpers, EditXBlockModal, XBlockInfo) {
+define(['jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'js/spec_helpers/edit_helpers', 'js/views/modals/edit_xblock', 'js/models/xblock_info'],
+    function($, _, Backbone, AjaxHelpers, EditHelpers, EditXBlockModal, XBlockInfo) {
+        'use strict';
         describe('EditXBlockModal', function() {
             var model, modal, showModal;
 
@@ -30,6 +31,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
                 beforeEach(function() {
                     EditHelpers.installMockXBlock();
+                    spyOn(Backbone, 'trigger').and.callThrough();
                 });
 
                 afterEach(function() {
@@ -74,6 +76,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     modal.editorView.notifyRuntime('save', {state: 'end'});
                     expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeTruthy();
+                    expect(Backbone.trigger).toHaveBeenCalledWith('xblock:editorModalHidden');
                 });
 
                 it('hides itself and does not refresh after cancel notification', function() {
@@ -86,6 +89,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     modal.editorView.notifyRuntime('cancel');
                     expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeFalsy();
+                    expect(Backbone.trigger).toHaveBeenCalledWith('xblock:editorModalHidden');
                 });
 
                 describe('Custom Buttons', function() {
