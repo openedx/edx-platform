@@ -1,31 +1,34 @@
-from factory.fuzzy import FuzzyInteger
+import json
+from random import randint
+from uuid import uuid4
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.base import FixtureError, StudioApiFixture
+from common.test.acceptance.fixtures.catalog import CatalogIntegrationMixin
 
 
-class CourseEntitlementFixture(object):
+class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
     """
     Fixture for ensuring that a course entitlement exists.
     """
 
-    def __init__(self, course_uuid, mode, expired_at=None, enrollment_course_run=None):
+    def __init__(self, user, mode='verified', expired_at=None, enrollment_course_run=None):
         """
         Configure the course entitlement fixture to create an entitlement with
 
-        `course_uuid`, `mode`, `run` (all unicode).
+        `mode` `run` (both unicode).
 
         `expired_at` is a datetime object indicating the date on which the course entitlement became expired.
             The default is for the entitlement to be unexpired, which is generally what we want for testing
             so students can use the entitlement.
         """
         self._entitlement_dict = {
-            'user': self.user,
-            'course_uuid': course_uuid,
+            'user': user,
+            'course_uuid': str(uuid4()),
             'expired_at': expired_at,
             'mode': mode,
             'enrollment_course_run': enrollment_course_run,
-            'order_number': FuzzyInteger()
+            'order_number': randint(0, 999)
         }
 
     def __str__(self):
@@ -52,7 +55,7 @@ class CourseEntitlementFixture(object):
         # with a 200 and an error message, which we ignore.
         response = self.session.post(
             LMS_BASE_URL + '/api/entitlements/v1/entitlements/',
-            data=self._encode_post_dict(self._course_dict),
+            data=json.dumps(self._entitlement_dict),
             headers=self.headers
         )
 

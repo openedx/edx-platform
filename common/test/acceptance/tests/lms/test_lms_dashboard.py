@@ -4,9 +4,11 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
 
+from mock import patch
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.entitlement import CourseEntitlementFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
@@ -414,13 +416,38 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
-class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTest):
+class LmsDashboardCourseEntitlementTest(UniqueCourseTest):
     """ Test suite for course entitlements cards on the Student Dashboard page """
 
     def setUp(self):
+        super(LmsDashboardCourseEntitlementTest, self).setUp()
 
-    def test_entitlement_session_selection(self):
+        # Load page objects for use by the tests
+        self.dashboard_page = DashboardPage(self.browser)
+
+        # Create the test user, authenticate, then create their entitlement
+        self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        self.email = "{user}@example.com".format(user=self.username)
+
+        AutoAuthPage(
+            self.browser,
+            username=self.username,
+            email=self.email,
+        ).visit()
+
+        self.entitlement_fixture = CourseEntitlementFixture(self.username, self.course_id)
+        self.entitlement_fixture.install()
+
+        self.mock_sessions = []
+
+        # Navigate the authenticated, enrolled user to the dashboard page and get testing!
+        self.dashboard_page.visit()
+
+    @patch('openedx.core.lib.edx_api_utils.get_edx_api_data')
+    def test_entitlement_session_selection(self, mock_get_sessions):
+        mock_get_sessions.return_value = self.mock_sessions
         # Verify that a course card appears for the learner's unfulfilled entitlement
+        assert True
         # Verify that a Select Session button is present and enabled on the unfulfilled entitlement's course card.
         # Verify that the 'Are you sure?' pop-up appears when the Select Session button is clicked.
         # Verify that clicking 'OK' in the session selection pop-up removes the Select Session button from the course card and adds a View Course button and a 'Change or Leave Session' link.
@@ -439,12 +466,15 @@ class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTest):
         # Verify that the gear icon and unenroll option are available for an entitlement that is refundable.
         # Verify that selecting unenroll from the gear dropdown opens an entitlement unenrollment modal with the correct header for the course.
         # Verify that selecting unenroll in the entitlement unenrollment modal triggers a DELETE request to the appropriate API endpoint to revoke/refund the entitlement and redirects the user to the dashboard.
+        assert True
 
 
     def test_unrefundable_cannot_unenroll(self):
         # Verify that the gear icon is not on the course card for an entitlement that is not refundable.
+        assert True
 
 
     def test_logged_out_unenroll(self):
         # Verify that a logged out user that selects unenroll is redirected to the login page.
+        assert True
 
