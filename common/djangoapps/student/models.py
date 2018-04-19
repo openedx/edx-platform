@@ -145,7 +145,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
 
-    if user.is_anonymous():
+    if user.is_anonymous:
         return None
 
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
@@ -1226,7 +1226,7 @@ class CourseEnrollment(models.Model):
         """
         assert user
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return None
         try:
             return cls.objects.get(
@@ -1643,7 +1643,7 @@ class CourseEnrollment(models.Model):
         """
         assert user
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return None
 
         cache_key = cls.enrollment_status_hash_cache_key(user)
@@ -1966,7 +1966,7 @@ class CourseEnrollment(models.Model):
         """
         assert user
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return CourseEnrollmentState(None, None)
         enrollment_state = cls._get_enrollment_in_request_cache(user, course_key)
         if not enrollment_state:
