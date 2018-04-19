@@ -291,6 +291,7 @@ simplejson==3.13.2
 singledispatch==3.4.0.3
 six==1.11.0
 slumber==0.7.1
+snakefood==1.4
 snowballstemmer==1.2.1    # via sphinx
 social-auth-app-django==1.2.0
 social-auth-core==1.4.0

@@ -10,6 +10,7 @@
 #   * verify that the dependency has a license compatible with AGPLv3
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
+#   * add an appropriate pattern to scripts/dependencies/testing.py
 
 -r base.txt               # Core edx-platform production dependencies
 -r coverage.txt           # Utilities for calculating test coverage
