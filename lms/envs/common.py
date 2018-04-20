@@ -3415,6 +3415,42 @@ derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
 RETIRED_USER_SALTS = ['abc', '123']
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 
+# These states are the default, but are designed to be overridden in configuration.
+RETIREMENT_STATES = [
+    'PENDING',
+
+    'LOCKING_ACCOUNT',
+    'LOCKING_COMPLETE',
+
+    'RETIRING_CREDENTIALS',
+    'CREDENTIALS_COMPLETE',
+
+    'RETIRING_ECOM',
+    'ECOM_COMPLETE',
+
+    'RETIRING_FORUMS',
+    'FORUMS_COMPLETE',
+
+    'RETIRING_EMAIL_LISTS',
+    'EMAIL_LISTS_COMPLETE',
+
+    'RETIRING_ENROLLMENTS',
+    'ENROLLMENTS_COMPLETE',
+
+    'RETIRING_NOTES',
+    'NOTES_COMPLETE',
+
+    'NOTIFYING_PARTNERS',
+    'PARTNERS_NOTIFIED',
+
+    'RETIRING_LMS',
+    'LMS_COMPLETE',
+
+    'ERRORED',
+    'ABORTED',
+    'COMPLETE',
+]
+
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
     'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
