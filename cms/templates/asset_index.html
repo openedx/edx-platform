@@ -13,8 +13,10 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
-    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/assets.min.css')}" />
+    % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/assets.min.css')}" />
+    % endif
 </%block>
 
 <%block name="content">
