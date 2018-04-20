@@ -217,9 +217,6 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
 
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8008'
-CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8008'
-
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True

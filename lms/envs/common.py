@@ -2254,9 +2254,6 @@ INSTALLED_APPS = [
 
     'sorl.thumbnail',
 
-    # Credentials support
-    'openedx.core.djangoapps.credentials',
-
     # edx-milestones service
     'milestones',
 
