@@ -1179,6 +1179,19 @@ def results_callback(request):
         log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
+        email_template_context['reason'] = reason
+        email_template_context['reverify_url'] = reverse("verify_student_reverify")
+        email_template_context['faq_url'] = configuration_helpers.get_value(
+            'ID_VERIFICATION_SUPPORT_LINK',
+            settings.SUPPORT_SITE_LINK
+        )
+        context['email_template_context'] = email_template_context
+        context['subject'] = _("Your {platform_name} Verification Has Been Denied").format(
+            platform_name=settings.PLATFORM_NAME
+        )
+        context['message'] = 'emails/failed_verification_email.txt'
+        send_verification_status_email(context)
+
     elif result == "SYSTEM FAIL":
         log.debug("System failure for %s -- resetting to must_retry", receipt_id)
         attempt.system_error(json.dumps(reason), error_code=error_code)
