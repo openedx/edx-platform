@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1068 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1077 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1099,6 +1099,34 @@ CREATE TABLE `consent_datasharingconsent` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `consent_datasharing_enterprise_customer_id_667a1480f56052a2_uniq` (`enterprise_customer_id`,`username`,`course_id`),
   CONSTRAINT `D030ccea2714cf8f0a2e65e948ee3d2d` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `consent_datasharingconsenttextoverrides`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `consent_datasharingconsenttextoverrides` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `page_title` varchar(255) NOT NULL,
+  `left_sidebar_text` longtext,
+  `top_paragraph` longtext,
+  `agreement_text` longtext,
+  `continue_text` varchar(255) NOT NULL,
+  `abort_text` varchar(255) NOT NULL,
+  `policy_dropdown_header` varchar(255) DEFAULT NULL,
+  `policy_paragraph` longtext,
+  `confirmation_modal_header` varchar(255) NOT NULL,
+  `confirmation_modal_text` longtext NOT NULL,
+  `modal_affirm_decline_text` varchar(255) NOT NULL,
+  `modal_abort_decline_text` varchar(255) NOT NULL,
+  `declined_notification_title` longtext NOT NULL,
+  `declined_notification_message` longtext NOT NULL,
+  `published` tinyint(1) NOT NULL,
+  `enterprise_customer_id` char(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
+  CONSTRAINT `consent_datasharingc_enterprise_customer__b979dfc1_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `consent_historicaldatasharingconsent`;
@@ -2056,7 +2084,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=355 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=358 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2067,7 +2095,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=431 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=436 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2537,6 +2565,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `enforce_data_sharing_consent` varchar(25) NOT NULL,
   `enable_audit_enrollment` tinyint(1) NOT NULL,
   `enable_audit_data_reporting` tinyint(1) NOT NULL,
+  `replace_sensitive_sso_username` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
   KEY `enterprise_enterprisecustomer_9365d6e7` (`site_id`),
   CONSTRAINT `enterprise_enterprise_site_id_41ce54c2601930cd_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -2706,6 +2735,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `enable_audit_enrollment` tinyint(1) NOT NULL,
   `enable_audit_data_reporting` tinyint(1) NOT NULL,
   `history_change_reason` varchar(100) DEFAULT NULL,
+  `replace_sensitive_sso_username` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_2938dabbace21ece_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_ef7c876f` (`uuid`),
@@ -2802,6 +2832,7 @@ CREATE TABLE `entitlements_courseentitlement` (
   `enrollment_course_run_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `_policy_id` int(11) DEFAULT NULL,
+  `refund_locked` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `entitlements_courseentitlement_uuid_a690dd005d0695b_uniq` (`uuid`),
   KEY `entitlements_courseentit_user_id_a8df050144d72f8_fk_auth_user_id` (`user_id`),
@@ -5341,6 +5372,21 @@ CREATE TABLE `track_trackinglog` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `user_api_retirementstate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_api_retirementstate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `state_name` varchar(30) NOT NULL,
+  `state_execution_order` smallint(6) NOT NULL,
+  `is_dead_end_state` tinyint(1) NOT NULL,
+  `required` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `state_name` (`state_name`),
+  UNIQUE KEY `state_execution_order` (`state_execution_order`),
+  KEY `user_api_retirementstate_is_dead_end_state_62eaf9b7` (`is_dead_end_state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_api_usercoursetag`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -5387,6 +5433,36 @@ CREATE TABLE `user_api_userpreference` (
   UNIQUE KEY `user_api_userpreference_user_id_4e4942d73f760072_uniq` (`user_id`,`key`),
   KEY `user_api_userpreference_3c6e0b8a` (`key`),
   CONSTRAINT `user_api_userpreference_user_id_68f8a34b_fk` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `user_api_userretirementstatus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_api_userretirementstatus` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `original_username` varchar(150) NOT NULL,
+  `original_email` varchar(254) NOT NULL,
+  `original_name` varchar(255) NOT NULL,
+  `retired_username` varchar(150) NOT NULL,
+  `retired_email` varchar(254) NOT NULL,
+  `responses` longtext NOT NULL,
+  `current_state_id` int(11) NOT NULL,
+  `last_state_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `user_api_userretirem_current_state_id_e37bb094_fk_user_api_` (`current_state_id`),
+  KEY `user_api_userretirem_last_state_id_359e74cd_fk_user_api_` (`last_state_id`),
+  KEY `user_api_userretirementstatus_original_username_fa5d4a21` (`original_username`),
+  KEY `user_api_userretirementstatus_original_email_a7203bff` (`original_email`),
+  KEY `user_api_userretirementstatus_original_name_17c2846b` (`original_name`),
+  KEY `user_api_userretirementstatus_retired_username_52067a53` (`retired_username`),
+  KEY `user_api_userretirementstatus_retired_email_ee7c1579` (`retired_email`),
+  CONSTRAINT `user_api_userretirem_current_state_id_e37bb094_fk_user_api_` FOREIGN KEY (`current_state_id`) REFERENCES `user_api_retirementstate` (`id`),
+  CONSTRAINT `user_api_userretirem_last_state_id_359e74cd_fk_user_api_` FOREIGN KEY (`last_state_id`) REFERENCES `user_api_retirementstate` (`id`),
+  CONSTRAINT `user_api_userretirementstatus_user_id_aca4dc7b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_tasks_usertaskartifact`;
