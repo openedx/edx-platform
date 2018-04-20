@@ -2091,7 +2091,7 @@ class ManualEnrollmentAudit(models.Model):
         return manual_enrollment
 
 
-class CourseEnrollmentAllowed(models.Model):
+class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
     The user may or may not (yet) exist.  Enrollment by users listed in this table is allowed

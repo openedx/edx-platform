@@ -17,7 +17,7 @@ class DeprecatedModelMixin(object):
 class DeletableByUserValue(object):
     """
     This mixin allows inheriting models to delete instances of the model
-    associated with some user.
+    associated with some specified user.
     """
 
     @classmethod
