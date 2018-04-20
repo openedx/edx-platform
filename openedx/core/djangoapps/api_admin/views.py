@@ -178,7 +178,7 @@ class CatalogListView(CatalogApiMixin, View):
         if not form.is_valid():
             return render_to_response(self.template, self.get_context_data(client, username, form), status=400)
 
-        attrs = form.instance.attributes
+        attrs = form.cleaned_data
         catalog = client.catalogs.post(attrs)
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
