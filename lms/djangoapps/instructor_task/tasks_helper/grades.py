@@ -582,43 +582,64 @@ class ProblemResponses(object):
                 yield result
 
     @classmethod
-    def _build_student_data(cls, user_id, course_id, problem_location):
+    def _build_student_data(cls, user_id, course_key, usage_key_str):
         """
         Generate a list of problem responses for all problem under the
         ``problem_location`` root.
 
         Arguments:
             user_id (int): The user id for the user generating the report
-            course_id (CourseKey): The ``CourseKey`` for the course whose report
+            course_key (CourseKey): The ``CourseKey`` for the course whose report
                 is being generated
-            problem_location (str): The generated report will include this
+            usage_key_str (str): The generated report will include this
                 block and it child blocks.
 
         Returns:
               List[Dict]: Returns a list of dictionaries containing the student
                 data which will be included in the final csv.
         """
-        problem_key = UsageKey.from_string(problem_location).map_into_course(course_id)
+        usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
         user = get_user_model().objects.get(pk=user_id)
-        course_blocks = get_course_blocks(user, problem_key)
+        course_blocks = get_course_blocks(user, usage_key)
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
-        for title, path, block_key in cls._build_problem_list(course_blocks, problem_key):
-            # Chapter and sequential blocks are filtered out since they include state
-            # which isn't useful for this report.
-            if block_key.block_type in ('sequential', 'chapter'):
-                continue
-            responses = list_problem_responses(course_id, block_key, max_count)
-            student_data += responses
-            for response in responses:
-                response['title'] = title
-                response['location'] = ' > '.join(path)
-                response['block_key'] = str(block_key)
-            if max_count is not None:
-                max_count -= len(responses)
-                if max_count <= 0:
-                    break
+
+        store = modulestore()
+        user_state_client = DjangoXBlockUserStateClient()
+
+        with store.bulk_operations(course_key):
+            for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
+                # Chapter and sequential blocks are filtered out since they include state
+                # which isn't useful for this report.
+                if block_key.block_type in ('sequential', 'chapter'):
+                    continue
+
+                block = store.get_item(block_key)
+
+                # Blocks can implement the generate_report_data method to provide their own
+                # human-readable formatting for user state.
+                if hasattr(block, 'generate_report_data'):
+                    user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                    responses = [
+                        {'username': username, 'state': state}
+                        for username, state in
+                        block.generate_report_data(user_state_iterator, max_count)
+                    ]
+                else:
+                    responses = list_problem_responses(course_key, block_key, max_count)
+
+                student_data += responses
+                for response in responses:
+                    response['title'] = title
+                    # A human-readable location for the current block
+                    response['location'] = ' > '.join(path)
+                    # A machine-friendly location for the current block
+                    response['block_key'] = str(block_key)
+                if max_count is not None:
+                    max_count -= len(responses)
+                    if max_count <= 0:
+                        break
 
         return student_data
 
@@ -639,8 +660,8 @@ class ProblemResponses(object):
         # Compute result table and format it
         student_data = cls._build_student_data(
             user_id=task_input.get('user_id'),
-            course_id=course_id,
-            problem_location=problem_location
+            course_key=course_id,
+            usage_key_str=problem_location
         )
 
         features = ['username', 'title', 'location', 'block_key', 'state']
