@@ -8,6 +8,7 @@ from django.db.models.signals import post_delete, post_save, pre_delete, pre_sav
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
@@ -121,7 +122,7 @@ class UserCourseTag(models.Model):
         unique_together = ("user", "course_id", "key")
 
 
-class UserOrgTag(TimeStampedModel):
+class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=model-missing-unicode
     """
     Per-Organization user tags.
 
