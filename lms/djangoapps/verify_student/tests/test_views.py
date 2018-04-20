@@ -1812,6 +1812,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'"Invalid photo"')
         self.assertEquals(response.content, 'OK!')
+        self.assertEqual(len(mail.outbox), 1)
 
     @mock.patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
