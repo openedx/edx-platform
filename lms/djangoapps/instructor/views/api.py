@@ -648,7 +648,13 @@ def students_update_enrollment(request, course_id):
     if email_students:
         course = get_course_by_id(course_id)
         email_params = get_email_params(course, auto_enroll, secure=request.is_secure())
-
+    # log the process
+    log.info(
+        u'Starting [%s] process for students[%s] in course[%s] by course staff.',
+        action,
+        identifiers,
+        course_id,
+    )
     results = []
     for identifier in identifiers:
         # First try to get a user object from the identifer
@@ -664,13 +670,6 @@ def students_update_enrollment(request, course_id):
             language = get_user_email_language(user)
 
         try:
-            # Log the process
-            log.info(
-                u'Starting [%s] process for student[%s] in course[%s] by course staff.',
-                action,
-                user.username,
-                course_id,
-            )
             # Use django.core.validators.validate_email to check email address
             # validity (obviously, cannot check if email actually /exists/,
             # simply that it is plausibly valid)
