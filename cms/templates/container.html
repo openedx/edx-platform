@@ -35,8 +35,10 @@ from openedx.core.djangolib.markup import HTML, Text
 </script>
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 % if ENABLE_IN_CONTEXT_IMAGE_SELECTION.is_enabled(xblock_locator.course_key):
-  <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
-  <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/editImageModal.min.css')}" />
+    % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/editImageModal.min.css')}" />
+    % endif
 % endif
 </%block>
 
