@@ -139,7 +139,7 @@ def email_marketing_register_user(sender, user, registration,
         return
 
     # ignore anonymous users
-    if user.is_anonymous():
+    if user.is_anonymous:
         return
 
     # perform update asynchronously
@@ -165,7 +165,7 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
     """
 
     # ignore anonymous users
-    if user.is_anonymous():
+    if user.is_anonymous:
         return
 
     # ignore anything but User, Profile or UserPreference tables
