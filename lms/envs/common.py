@@ -2223,9 +2223,6 @@ INSTALLED_APPS = [
     # Coursegraph
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
-    # Old course structure API
-    'course_structure_api',
-
     # Mailchimp Syncing
     'mailing',
 
