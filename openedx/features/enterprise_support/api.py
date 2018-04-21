@@ -161,12 +161,12 @@ class EnterpriseApiClient(object):
             LOGGER.exception(message)
             raise EnterpriseApiException(message)
 
-    def fetch_enterprise_learner_data(self, site, user):  # pylint: disable=unused-argument
+    def fetch_enterprise_learner_data(self, user):
         """
         Fetch information related to enterprise from the Enterprise Service.
 
         Example:
-            fetch_enterprise_learner_data(site, user)
+            fetch_enterprise_learner_data(user)
 
         Argument:
             site: (Site) site instance
@@ -269,17 +269,12 @@ class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClie
         Fetch enterprise customer with enterprise service user and cache the
         API response`.
         """
-        cache_key = get_cache_key(
-            resource='enterprise-customer',
-            resource_id=uuid,
-            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
-        )
-        enterprise_customer = cache.get(cache_key)
+        enterprise_customer = enterprise_customer_from_cache(uuid=uuid)
         if not enterprise_customer:
             endpoint = getattr(self.client, 'enterprise-customer')
             enterprise_customer = endpoint(uuid).get()
             if enterprise_customer:
-                cache.set(cache_key, enterprise_customer, settings.ENTERPRISE_API_CACHE_TIMEOUT)
+                cache_enterprise(enterprise_customer)
 
         return enterprise_customer
 
@@ -328,14 +323,79 @@ def enterprise_enabled():
     return 'enterprise' in settings.INSTALLED_APPS and settings.FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION', False)
 
 
+def enterprise_is_enabled(otherwise=None):
+    """Decorator which requires that the Enterprise feature be enabled before the function can run."""
+    def decorator(func):
+        """Decorator for ensuring the Enterprise feature is enabled."""
+        def wrapper(*args, **kwargs):
+            if enterprise_enabled():
+                return func(*args, **kwargs)
+            return otherwise
+        return wrapper
+    return decorator
+
+
+@enterprise_is_enabled()
+def get_enterprise_customer_cache_key(uuid, username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME):
+    """The cache key used to get cached Enterprise Customer data."""
+    return get_cache_key(
+        resource='enterprise-customer',
+        resource_id=uuid,
+        username=username,
+    )
+
+
+@enterprise_is_enabled()
+def cache_enterprise(enterprise_customer):
+    """Cache this customer's data."""
+    cache_key = get_enterprise_customer_cache_key(enterprise_customer['uuid'])
+    cache.set(cache_key, enterprise_customer, settings.ENTERPRISE_API_CACHE_TIMEOUT)
+
+
+@enterprise_is_enabled()
+def enterprise_customer_from_cache(request=None, uuid=None):
+    """Check all available caches for Enterprise Customer data."""
+    enterprise_customer = None
+
+    # Check if it's cached in the general cache storage.
+    if uuid:
+        cache_key = get_enterprise_customer_cache_key(uuid)
+        enterprise_customer = cache.get(cache_key)
+
+    # Check if it's cached in the session.
+    if not enterprise_customer and request and request.user.is_authenticated():
+        enterprise_customer = request.session.get('enterprise_customer')
+
+    return enterprise_customer
+
+
+@enterprise_is_enabled()
+def enterprise_customer_from_api(request):
+    """Use an API to get Enterprise Customer data from request context clues."""
+    enterprise_customer = None
+    enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
+    if enterprise_customer_uuid:
+        # If we were able to obtain an EnterpriseCustomer UUID, go ahead
+        # and use it to attempt to retrieve EnterpriseCustomer details
+        # from the EnterpriseCustomer API.
+        enterprise_api_client = (
+            EnterpriseApiClient(user=request.user)
+            if request.user.is_authenticated()
+            else EnterpriseApiServiceClient()
+        )
+
+        try:
+            enterprise_customer = enterprise_api_client.get_enterprise_customer(enterprise_customer_uuid)
+        except HttpNotFoundError:
+            enterprise_customer = None
+    return enterprise_customer
+
+
+@enterprise_is_enabled()
 def enterprise_customer_uuid_for_request(request):
     """
     Check all the context clues of the request to gather a particular EnterpriseCustomer's UUID.
     """
-    if not enterprise_enabled():
-        return None
-
-    enterprise_customer_uuid = None
     sso_provider_id = request.GET.get('tpa_hint')
     running_pipeline = get_partial_pipeline(request)
     if running_pipeline:
@@ -355,7 +415,7 @@ def enterprise_customer_uuid_for_request(request):
                 enterprise_customer_identity_provider__provider_id=sso_provider_id
             ).uuid
         except EnterpriseCustomer.DoesNotExist:
-            pass
+            enterprise_customer_uuid = None
     else:
         # Check if we got an Enterprise UUID passed directly as either a query
         # parameter, or as a value in the Enterprise cookie.
@@ -366,50 +426,37 @@ def enterprise_customer_uuid_for_request(request):
     if not enterprise_customer_uuid and request.user.is_authenticated():
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
-        learner_data = get_enterprise_learner_data(request.site, request.user)
+        learner_data = get_enterprise_learner_data(request.user)
         if learner_data:
             enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
 
     return enterprise_customer_uuid
 
 
+@enterprise_is_enabled()
 def enterprise_customer_for_request(request):
     """
     Check all the context clues of the request to determine if
     the request being made is tied to a particular EnterpriseCustomer.
     """
-    enterprise_customer = None
-    enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
-    if enterprise_customer_uuid:
-        # If we were able to obtain an EnterpriseCustomer UUID, go ahead
-        # and use it to attempt to retrieve EnterpriseCustomer details
-        # from the EnterpriseCustomer API.
-        enterprise_api_client = EnterpriseApiServiceClient()
-        if request.user.is_authenticated():
-            enterprise_api_client = EnterpriseApiClient(user=request.user)
-
-        try:
-            enterprise_customer = enterprise_api_client.get_enterprise_customer(enterprise_customer_uuid)
-        except HttpNotFoundError:
-            enterprise_customer = None
-
-    return enterprise_customer
+    if 'enterprise_customer' in request.session:
+        return enterprise_customer_from_cache(request=request)
+    else:
+        return enterprise_customer_from_api(request)
 
 
+@enterprise_is_enabled(otherwise=False)
 def consent_needed_for_course(request, user, course_id, enrollment_exists=False):
     """
     Wrap the enterprise app check to determine if the user needs to grant
     data sharing permissions before accessing a course.
     """
-    if not enterprise_enabled():
-        return False
-
     consent_key = ('data_sharing_consent_needed', course_id)
 
     if request.session.get(consent_key) is False:
         return False
 
-    enterprise_learner_details = get_enterprise_learner_data(request.site, user)
+    enterprise_learner_details = get_enterprise_learner_data(user)
     if not enterprise_learner_details:
         consent_needed = False
     else:
@@ -431,15 +478,13 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     return consent_needed
 
 
+@enterprise_is_enabled(otherwise=set())
 def get_consent_required_courses(user, course_ids):
     """
     Returns a set of course_ids that require consent
     Note that this function makes use of the Enterprise models directly instead of using the API calls
     """
     result = set()
-    if not enterprise_enabled():
-        return result
-
     enterprise_learner = EnterpriseCustomerUser.objects.filter(user_id=user.id).first()
     if not enterprise_learner or not enterprise_learner.enterprise_customer:
         return result
@@ -456,6 +501,7 @@ def get_consent_required_courses(user, course_ids):
     return result
 
 
+@enterprise_is_enabled(otherwise='')
 def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False):
     """
     Build a URL to redirect the user to the Enterprise app to provide data sharing
@@ -468,9 +514,6 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     * return_to: url name label for the page to return to after consent is granted.
                  If None, return to request.path instead.
     """
-    if not enterprise_enabled():
-        return ''
-
     user = user or request.user
 
     if not consent_needed_for_course(request, user, course_id, enrollment_exists=enrollment_exists):
@@ -499,29 +542,24 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     return full_url
 
 
-def get_enterprise_learner_data(site, user):
+@enterprise_is_enabled()
+def get_enterprise_learner_data(user):
     """
     Client API operation adapter/wrapper
     """
-    if not enterprise_enabled():
-        return None
-
-    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(site=site, user=user)
+    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
     if enterprise_learner_data:
         return enterprise_learner_data['results']
 
 
+@enterprise_is_enabled(otherwise={})
 def get_enterprise_customer_for_learner(site, user):
     """
     Return enterprise customer to whom given learner belongs.
     """
-    if not enterprise_enabled():
-        return {}
-
-    enterprise_learner_data = get_enterprise_learner_data(site, user)
+    enterprise_learner_data = get_enterprise_learner_data(user)
     if enterprise_learner_data:
         return enterprise_learner_data[0]['enterprise_customer']
-
     return {}
 
 
@@ -544,6 +582,7 @@ def get_consent_notification_data(enterprise_customer):
     return title_template, message_template
 
 
+@enterprise_is_enabled(otherwise='')
 def get_dashboard_consent_notification(request, user, course_enrollments):
     """
     If relevant to the request at hand, create a banner on the dashboard indicating consent failed.
@@ -556,9 +595,6 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
     Returns:
         str: Either an empty string, or a string containing the HTML code for the notification banner.
     """
-    if not enterprise_enabled():
-        return ''
-
     enrollment = None
     consent_needed = False
     course_id = request.GET.get(CONSENT_FAILED_PARAMETER)
@@ -612,14 +648,12 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
     return ''
 
 
+@enterprise_is_enabled()
 def insert_enterprise_pipeline_elements(pipeline):
     """
     If the enterprise app is enabled, insert additional elements into the
     pipeline related to enterprise.
     """
-    if not enterprise_enabled():
-        return
-
     additional_elements = (
         'enterprise.tpa_pipeline.handle_enterprise_logistration',
     )

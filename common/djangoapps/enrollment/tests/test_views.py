@@ -33,6 +33,7 @@ from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.core.lib.token_utils import JwtBuilder
+from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
@@ -932,7 +933,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
                        FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
-    def test_enterprise_course_enrollment_with_ec_uuid(self):
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_from_api')
+    def test_enterprise_course_enrollment_with_ec_uuid(self, mock_enterprise_customer_from_api):
         """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
         UserFactory.create(
             username='enterprise_worker',
@@ -949,6 +951,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             'course_id': unicode(self.course.id),
             'ec_uuid': 'this-is-a-real-uuid'
         }
+        mock_enterprise_customer_from_api.return_value = FAKE_ENTERPRISE_CUSTOMER
         self.mock_enterprise_course_enrollment_post_api()
         self.mock_consent_missing(**consent_kwargs)
         self.mock_consent_post(**consent_kwargs)

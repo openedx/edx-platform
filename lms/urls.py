@@ -143,7 +143,7 @@ urlpatterns = [
 
 # TODO: This needs to move to a separate urls.py once the student_account and
 # student views below find a home together
-if settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION']:
+if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += [
         url(r'^login$', student_account_views.login_and_registration_form,
@@ -158,12 +158,12 @@ else:
         url(r'^register$', student_views.register_user, name='register_user'),
     ]
 
-if settings.FEATURES['ENABLE_MOBILE_REST_API']:
+if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     ]
 
-if settings.FEATURES['ENABLE_OPENBADGES']:
+if settings.FEATURES.get('ENABLE_OPENBADGES'):
     urlpatterns += [
         url(r'^api/badges/v1/', include('badges.api.urls', app_name='badges', namespace='badges_api')),
     ]
@@ -174,7 +174,7 @@ urlpatterns += [
 
 
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
-if settings.FEATURES['ENABLE_SYSADMIN_DASHBOARD']:
+if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
     urlpatterns += [
         url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
     ]
@@ -675,7 +675,7 @@ urlpatterns += [
     ),
 ]
 
-if settings.FEATURES['ENABLE_TEAMS']:
+if settings.FEATURES.get('ENABLE_TEAMS'):
     # Teams endpoints
     urlpatterns += [
         url(
@@ -831,7 +831,7 @@ if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
             external_auth_views.course_specific_register, name='course-specific-register'),
     ]
 
-if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATURES['ENABLE_BULK_ENROLLMENT_VIEW']):
+if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATURES.get('ENABLE_BULK_ENROLLMENT_VIEW')):
     urlpatterns += [
         url(r'^api/bulk_enroll/v1/', include('bulk_enroll.urls')),
     ]
@@ -994,7 +994,7 @@ urlpatterns += [
 ]
 
 # Custom courses on edX (CCX) URLs
-if settings.FEATURES['CUSTOM_COURSES_EDX']:
+if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
     urlpatterns += [
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
             include('ccx.urls')),
