@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-15 20:36+0000\n"
-"PO-Revision-Date: 2018-04-15 20:36:08.772903\n"
+"POT-Creation-Date: 2018-04-22 20:36+0000\n"
+"PO-Revision-Date: 2018-04-22 20:36:16.392376\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2646,6 +2646,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -10961,6 +10962,15 @@ msgstr ""
 "Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
 
+#: lms/djangoapps/verify_student/utils.py
+#, python-brace-format
+msgid ""
+"Could not send verification status email having subject: {subject} and email"
+" of user: {email}"
+msgstr ""
+"Çöüld nöt sénd vérïfïçätïön stätüs émäïl hävïng süßjéçt: {subject} änd émäïl"
+" öf üsér: {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "Ìntrö Ⱡ'σяєм ιρѕ#"
@@ -11045,6 +11055,20 @@ msgid "{platform_name} ID Verification Photos Received"
 msgstr ""
 "{platform_name} ÌD Vérïfïçätïön Phötös Réçéïvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
 " ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr ""
+"Ýöür {platform_name} ÌD Vérïfïçätïön Àpprövéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr ""
+"Ýöür {platform_name} Vérïfïçätïön Häs Béén Dénïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -11428,6 +11452,7 @@ msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
@@ -11443,6 +11468,7 @@ msgstr "Wïkï Prévïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr "wïndöw öpén Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -13469,6 +13495,13 @@ msgstr "Sét göäl tö: {goal_text} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid "Enrollment in {course_title} was not complete."
+msgstr ""
+"Énröllmént ïn {course_title} wäs nöt çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
@@ -13476,13 +13509,6 @@ msgstr ""
 "Ìf ýöü hävé çönçérns äßöüt shärïng ýöür dätä, pléäsé çöntäçt ýöür "
 "ädmïnïsträtör ät {enterprise_customer_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє#"
-
-#: openedx/features/enterprise_support/api.py
-#, python-brace-format
-msgid "Enrollment in {course_name} was not complete."
-msgstr ""
-"Énröllmént ïn {course_name} wäs nöt çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -14858,6 +14884,7 @@ msgstr "Sävé Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "Ûnénröll Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -19380,6 +19407,7 @@ msgstr ""
 "Thé {provider_name} äççöünt ýöü séléçtéd ïs älréädý lïnkéd tö änöthér "
 "{platform_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
@@ -19387,69 +19415,83 @@ msgstr ""
 "Wé'ré sörrý tö séé ýöü gö! Pléäsé shäré ýöür mäïn réäsön för ünénröllïng. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
 msgstr ""
 "Ì jüst wäntéd tö ßröwsé thé mätérïäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
 msgstr ""
 "Thïs wön't hélp mé réäçh mý göäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
 msgstr "Ì dön't hävé thé tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
 msgstr ""
 "Ì dön't hävé thé äçädémïç ör längüägé préréqüïsïtés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
 msgstr "Ì dön't hävé énöügh süppört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
 msgstr ""
 "Ì äm nöt häppý wïth thé qüälïtý öf thé çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
 msgstr ""
 "Thé çöürsé mätérïäl wäs töö härd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too easy"
 msgstr ""
 "Thé çöürsé mätérïäl wäs töö éäsý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Something was broken"
 msgstr "Söméthïng wäs ßrökén Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
 msgstr "Öthér Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
 msgstr ""
 "Thänk ýöü för shärïng ýöür réäsöns för ünénröllïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
 msgstr "Ýöü äré ünénrölléd fröm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr "Rétürn Tö Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "Bröwsé Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -20077,6 +20119,37 @@ msgid "You have been enrolled in {course_name}"
 msgstr ""
 "Ýöü hävé ßéén énrölléd ïn {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#: lms/templates/emails/failed_verification_email.txt
+msgid ""
+"Sorry! The photos you submitted for ID verification were not accepted, for "
+"the following reason(s):"
+msgstr ""
+"Sörrý! Thé phötös ýöü süßmïttéd för ÌD vérïfïçätïön wéré nöt äççéptéd, för "
+"thé föllöwïng réäsön(s): Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo(s) of you: {reason}"
+msgstr "Thé phötö(s) öf ýöü: {reason} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Resubmit Verification: {reverify_url}"
+msgstr ""
+"Résüßmït Vérïfïçätïön: {reverify_url} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "Thank you,"
+msgstr "Thänk ýöü, Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "The {platform_name} team"
+msgstr "Thé {platform_name} téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -20086,16 +20159,12 @@ msgstr ""
 "çrédït ör déßït çärd stätémént ündér thé çömpäný nämé {merchant_name}. Ⱡ'#"
 
 #: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Thänk ýöü, Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr ""
 "Ýöür ördér nümßér ïs: {order_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr "Hï {full_name}, Ⱡ'σяєм ιρѕυм #"
 
@@ -20119,11 +20188,6 @@ msgstr ""
 "∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
 "∂σłσя ιη яєρяєнєη∂єяιт ι#"
-
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} team"
-msgstr "Thé {platform_name} téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -20399,6 +20463,19 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "Thänks, Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "Congratulations! Your ID verification process was successful."
+msgstr ""
+"Çöngrätülätïöns! Ýöür ÌD vérïfïçätïön pröçéss wäs süççéssfül. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/emails/successfull_verification_email.txt
+msgid ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr ""
+"Ýöür vérïfïçätïön ïs éfféçtïvé för öné ýéär. Ìt wïll éxpïré ön {expiry_date}"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
