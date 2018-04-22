@@ -198,7 +198,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-08 20:42+0000\n"
+"POT-Creation-Date: 2018-04-15 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: ali fakih <mr.fakih@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -214,7 +214,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -367,7 +367,7 @@ msgstr "التعليم المهني"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "اسم العرض"
@@ -1695,6 +1695,10 @@ msgstr[4] ""
 msgstr[5] ""
 
 #: common/djangoapps/util/password_policy_validators.py
+msgid "Invalid password."
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Enter a password with at least {requirements}."
 msgstr ""
@@ -2301,7 +2305,7 @@ msgstr "بيانات ’XML‘ للملاحظات التوضيحية"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
 msgstr ""
 
@@ -6360,13 +6364,13 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "sign in"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr ""
@@ -9722,8 +9726,9 @@ msgid "Image data is not valid."
 msgstr "بيانات الصورة غير صالحة."
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Verification photos received"
-msgstr "استُلمت الصور الخاصّة بعملية التحقّق  "
+#, python-brace-format
+msgid "{platform_name} ID Verification Photos Received"
+msgstr ""
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -11609,15 +11614,15 @@ msgid ""
 "A license defines how the contents of this block can be shared and reused."
 msgstr "تحدِّد الإجازة كيف يمكن مشاركة محتويات هذه الكتلة وإعادة استخدامها."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
 msgstr "الفئة"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Week 1"
 msgstr "الأسبوع 1"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -11625,11 +11630,11 @@ msgstr ""
 "هو اسم فئة النقاشات. يظهر هذا الاسم على الجانب الأيسر من منتدى النقاشات "
 "الخاص بالمساق."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Subcategory"
 msgstr "فئة فرعية"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -11637,7 +11642,7 @@ msgstr ""
 "اسم الفئة الفرعية في النقاشات. يظهر هذا الاسم في الجانب الأيسر من منتدى "
 "النقاشات الخاص بالمساق."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #, python-brace-format
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
@@ -15782,8 +15787,7 @@ msgstr "{span_start}القسم الحالي{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr "تاريخ الاستحقاق {date}"
 
@@ -15792,8 +15796,7 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} مستحق في {{date}}"
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "جرى تقييم هذا المحتوى"
 
@@ -16033,7 +16036,6 @@ msgstr ""
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "تابع المساق"
 
@@ -17512,11 +17514,11 @@ msgstr "شكرًا لك على تقديم صورك!"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"We've received your information and the verification process has begun. You "
-"can check the status of the verification process on your dashboard."
+"We've received your information and the ID verification process has "
+"begun.Check for an email from us in the next few days to confirm whether "
+"your verification was successful.You can also check the status of the "
+"verification process on your dashboard."
 msgstr ""
-"لقد استلمنا معلوماتك وقد بدأت عملية التحقق. يمكنك متابعة سير عملية التحقق "
-"على لوحة معلوماتك."
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -20830,25 +20832,16 @@ msgstr ""
 msgid "Upgrade ({price})"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "(Prerequisite required)"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
