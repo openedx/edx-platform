@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-15 20:36+0000\n"
-"PO-Revision-Date: 2018-04-15 20:36:08.772903\n"
+"POT-Creation-Date: 2018-04-22 20:36+0000\n"
+"PO-Revision-Date: 2018-04-22 20:36:16.392376\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2326,6 +2326,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -9496,6 +9497,15 @@ msgstr ""
 msgid "Your {platform_name} verification has expired."
 msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
 
+#: lms/djangoapps/verify_student/utils.py
+#, python-brace-format
+msgid ""
+"Could not send verification status email having subject: {subject} and email"
+" of user: {email}"
+msgstr ""
+"ذخعمي رخف سثري دثقهبهذشفهخر سفشفعس ثوشهم اشدهرل سعزتثذف: {subject} شري ثوشهم"
+" خب عسثق: {email}"
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "هرفقخ"
@@ -9569,6 +9579,16 @@ msgstr "هوشلث يشفش هس رخف دشمهي."
 #, python-brace-format
 msgid "{platform_name} ID Verification Photos Received"
 msgstr "{platform_name} هي دثقهبهذشفهخر حاخفخس قثذثهدثي"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr "غخعق {platform_name} هي دثقهبهذشفهخر شححقخدثي"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس زثثر يثرهثي"
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -9920,6 +9940,7 @@ msgstr "حقثدهثص"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "ذمخسث"
 
@@ -9935,6 +9956,7 @@ msgstr "صهنه حقثدهثص"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr "صهريخص خحثر"
 
@@ -11691,17 +11713,17 @@ msgstr "سثف لخشم فخ: {goal_text}"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid "Enrollment in {course_title} was not complete."
+msgstr "ثرقخمموثرف هر {course_title} صشس رخف ذخوحمثفث."
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
 msgstr ""
 "هب غخع اشدث ذخرذثقرس شزخعف ساشقهرل غخعق يشفش, حمثشسث ذخرفشذف غخعق "
 "شيوهرهسفقشفخق شف {enterprise_customer_name}."
-
-#: openedx/features/enterprise_support/api.py
-#, python-brace-format
-msgid "Enrollment in {course_name} was not complete."
-msgstr "ثرقخمموثرف هر {course_name} صشس رخف ذخوحمثفث."
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -12946,6 +12968,7 @@ msgstr "سشدث سثففهرلس"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "عرثرقخمم"
 
@@ -16955,64 +16978,79 @@ msgstr ""
 "فاث {provider_name} شذذخعرف غخع سثمثذفثي هس شمقثشيغ مهرنثي فخ شرخفاثق "
 "{platform_name} شذذخعرف."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
 msgstr ""
 "صث'قث سخققغ فخ سثث غخع لخ! حمثشسث ساشقث غخعق وشهر قثشسخر بخق عرثرقخممهرل."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
 msgstr "ه تعسف صشرفثي فخ زقخصسث فاث وشفثقهشم"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
 msgstr "فاهس صخر'ف اثمح وث قثشذا وغ لخشمس"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
 msgstr "ه يخر'ف اشدث فاث فهوث"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
 msgstr "ه يخر'ف اشدث فاث شذشيثوهذ خق مشرلعشلث حقثقثضعهسهفثس"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
 msgstr "ه يخر'ف اشدث ثرخعلا سعححخقف"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
 msgstr "ه شو رخف اشححغ صهفا فاث ضعشمهفغ خب فاث ذخرفثرف"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
 msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ اشقي"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too easy"
 msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ ثشسغ"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Something was broken"
 msgstr "سخوثفاهرل صشس زقخنثر"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
 msgstr "خفاثق"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
 msgstr "فاشرن غخع بخق ساشقهرل غخعق قثشسخرس بخق عرثرقخممهرل."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
 msgstr "غخع شقث عرثرقخممثي بقخو"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr "قثفعقر فخ يشسازخشقي"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "زقخصسث ذخعقسثس"
@@ -17562,6 +17600,36 @@ msgstr "فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف بقخو 
 msgid "You have been enrolled in {course_name}"
 msgstr "غخع اشدث زثثر ثرقخممثي هر {course_name}"
 
+#: lms/templates/emails/failed_verification_email.txt
+msgid ""
+"Sorry! The photos you submitted for ID verification were not accepted, for "
+"the following reason(s):"
+msgstr ""
+"سخققغ! فاث حاخفخس غخع سعزوهففثي بخق هي دثقهبهذشفهخر صثقث رخف شذذثحفثي, بخق "
+"فاث بخممخصهرل قثشسخر(س):"
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo(s) of you: {reason}"
+msgstr "فاث حاخفخ(س) خب غخع: {reason}"
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Resubmit Verification: {reverify_url}"
+msgstr "قثسعزوهف دثقهبهذشفهخر: {reverify_url}"
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "Thank you,"
+msgstr "فاشرن غخع,"
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "The {platform_name} team"
+msgstr "فاث {platform_name} فثشو"
+
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -17571,15 +17639,11 @@ msgstr ""
 "ذقثيهف خق يثزهف ذشقي سفشفثوثرف عريثق فاث ذخوحشرغ رشوث {merchant_name}."
 
 #: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "فاشرن غخع,"
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "غخعق خقيثق رعوزثق هس: {order_number}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr "اه {full_name},"
 
@@ -17598,11 +17662,6 @@ msgstr ""
 "زثلعر.ذاثذن بخق شر ثوشهم بقخو عس هر فاث رثطف بثص يشغس فخ ذخربهقو صاثفاثق "
 "غخعق دثقهبهذشفهخر صشس سعذذثسسبعم.غخع ذشر شمسخ ذاثذن فاث سفشفعس خب فاث "
 "دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
-
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} team"
-msgstr "فاث {platform_name} فثشو"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -17827,6 +17886,16 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "فاشرنس,"
+
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "Congratulations! Your ID verification process was successful."
+msgstr "ذخرلقشفعمشفهخرس! غخعق هي دثقهبهذشفهخر حقخذثسس صشس سعذذثسسبعم."
+
+#: lms/templates/emails/successfull_verification_email.txt
+msgid ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr ""
+"غخعق دثقهبهذشفهخر هس ثببثذفهدث بخق خرث غثشق. هف صهمم ثطحهقث خر {expiry_date}"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
