@@ -89,6 +89,18 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
 
         self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 0)
 
+    def test_retire_user_org_tags_only_deletes_user(self):
+        """Create org specific user tags and confirm all properties are set """
+        user = UserFactory.create()
+        other_user = UserFactory.create()
+        course = CourseFactory.create()
+        UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
+        UserOrgTagFactory.create(user=other_user, org=course.id.org, key="testkey", value="foobar")
+        # Delete the tags by user value. Ensure the other user's row is still present.
+        UserOrgTag.delete_by_user_value(user.id, "user_id")
+
+        self.assertEqual(len(UserOrgTag.objects.filter(user_id=other_user.id)), 1)
+
     def test_get_value(self):
         """Verifies the behavior of get_value."""
 
