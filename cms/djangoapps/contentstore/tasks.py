@@ -91,7 +91,6 @@ def enqueue_async_migrate_transcripts_tasks(
 
     Arguments:
         course_keys: Command line course ids as list of CourseKey objects,
-        all_courses: Run the command for all courses. Default is False,
         force_update: Overwrite file in S3. Default is False,
         commit: Update S3 or dry-run the command to see which transcripts will be affected. Default is False.
     """
