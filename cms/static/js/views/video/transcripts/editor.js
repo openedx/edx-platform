@@ -23,6 +23,8 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
                 el: this.$el,
                 collection: this.collection
             });
+
+            Utils.Storage.set('transcripts', this.$el.data('transcripts'));
         },
 
         /**
@@ -176,6 +178,8 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             var getField = Utils.getField,
                 subsValue = Utils.Storage.get('sub'),
                 subs = getField(metadataCollection, 'sub'),
+                transcriptData = Utils.Storage.get('transcripts'),
+                transcripts = getField(metadataCollection, 'transcripts'),
                 html5Sources, youtube, videoUrlValue, result;
 
             // if metadataCollection is not passed, just exit.
@@ -241,6 +245,17 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Synchronize other fields that has the same `field_name` property.
             Utils.syncCollections(this.collection, metadataCollection);
+
+            // Update transcripts data
+            if(transcriptData) {
+                var transcriptsModel = metadataCollection.findWhere({
+                    field_name: 'transcripts'
+                });
+                transcriptsModel.setValue(transcriptData.value)
+
+                // Remove to avoid overwrite
+                Utils.Storage.remove('transcripts');
+            }
         }
 
     });
