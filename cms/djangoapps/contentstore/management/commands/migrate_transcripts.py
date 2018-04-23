@@ -27,7 +27,6 @@ class Command(BaseCommand):
         $ ./manage.py cms migrate_transcripts --course-id 'Course1' --course-id 'Course2' --commit
         $ ./manage.py cms migrate_transcripts --from-settings
     """
-    args = '<course_id course_id ...>'
     help = 'Migrates transcripts to S3 for one or more courses.'
 
     def add_arguments(self, parser):
