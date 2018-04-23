@@ -4,10 +4,12 @@ Unit test module covering utils module
 
 import ddt
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.learner_dashboard import utils
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestUtils(TestCase):
     """

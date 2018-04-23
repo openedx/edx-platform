@@ -2,10 +2,12 @@
 
 from django.test import TestCase
 from nose.tools import raises
+from nose.plugins.attrib import attr
 
 from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
 
 
+@attr(shard=4)
 class TestAnalyticsCSVS(TestCase):
     """ Test analytics rendering of csv files."""
 
@@ -37,6 +39,7 @@ class TestAnalyticsCSVS(TestCase):
         self.assertEqual(res.content.strip(), '')
 
 
+@attr(shard=4)
 class TestAnalyticsFormatDictlist(TestCase):
     """ Test format_dictlist method """
 
@@ -81,6 +84,7 @@ class TestAnalyticsFormatDictlist(TestCase):
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
 
+@attr(shard=4)
 class TestAnalyticsFormatInstances(TestCase):
     """ test format_instances method """
     class TestDataClass(object):

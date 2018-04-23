@@ -82,7 +82,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
-@attr(shard=1)
+@attr(shard=5)
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -193,7 +193,7 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=2)
+@attr(shard=5)
 @ddt.ddt
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
@@ -235,7 +235,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=2)
+@attr(shard=5)
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
@@ -950,7 +950,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertContains(response, test)
 
 
-@attr(shard=2)
+@attr(shard=5)
 # Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,
 # but for some unknown reason that patch doesn't seem to be applied.
 @patch('openedx.core.djangoapps.catalog.utils.cache')
@@ -992,7 +992,7 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=1)
+@attr(shard=5)
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
@@ -1085,6 +1085,7 @@ class TestProgressDueDate(BaseDueDateTests):
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
+@attr(shard=5)
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
@@ -1124,7 +1125,7 @@ class TestAccordionDueDate(BaseDueDateTests):
         super(TestAccordionDueDate, self).test_format_none()
 
 
-@attr(shard=1)
+@attr(shard=5)
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -1166,7 +1167,7 @@ class StartDateTests(ModuleStoreTestCase):
 
 
 # pylint: disable=protected-access, no-member
-@attr(shard=1)
+@attr(shard=5)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
     Base class for progress page tests.
@@ -1224,6 +1225,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
 
 
 # pylint: disable=protected-access, no-member
+@attr(shard=5)
 @ddt.ddt
 class ProgressPageTests(ProgressPageBaseTests):
     """
@@ -1781,6 +1783,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
 
 # pylint: disable=protected-access, no-member
+@attr(shard=5)
 @ddt.ddt
 class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
     """
@@ -2059,7 +2062,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         self.assert_progress_page_show_grades(resp, show_correctness, due_date, graded, show_grades, 1, 1, .5)
 
 
-@attr(shard=1)
+@attr(shard=5)
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
     Tests for the ensure_valid_course_key decorator.
@@ -2085,7 +2088,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         self.assertFalse(mocked_view.called)
 
 
-@attr(shard=1)
+@attr(shard=5)
 class GenerateUserCertTests(ModuleStoreTestCase):
     """
     Tests for the view function Generated User Certs
@@ -2249,7 +2252,7 @@ class ViewCheckerBlock(XBlock):
         return result
 
 
-@attr(shard=1)
+@attr(shard=5)
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """
@@ -2348,6 +2351,7 @@ class TestIndexView(ModuleStoreTestCase):
             assert response.status_code == 200
 
 
+@attr(shard=5)
 @ddt.ddt
 class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
     """
@@ -2414,6 +2418,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         self._assert_correct_position(resp, expected_position)
 
 
+@attr(shard=5)
 class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test the index view for a course with gated content
@@ -2466,6 +2471,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn("Content Locked", response.content)
 
 
+@attr(shard=5)
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the courseware.render_xblock endpoint.
@@ -2508,6 +2514,7 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
         return options
 
 
+@attr(shard=5)
 class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     """
     Ensure that courseware index requests do not trigger student state writes.
@@ -2587,7 +2594,7 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=1)
+@attr(shard=5)
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
@@ -2617,6 +2624,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
             self.verify_consent_required(self.client, url)
 
 
+@attr(shard=5)
 @ddt.ddt
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """

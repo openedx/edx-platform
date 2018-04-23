@@ -64,6 +64,7 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         self.store.update_item(block, 1)
 
 
+@attr(shard=5)
 class XBlockValidationTest(LmsXBlockMixinTestCase):
     """
     Unit tests for XBlock validation
@@ -273,6 +274,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         )
 
 
+@attr(shard=5)
 class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
     Tests for OpenAssessmentBlock mixin.
@@ -295,7 +297,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         self.assertTrue(self.open_assessment.has_score)
 
 
-@attr(shard=3)
+@attr(shard=5)
 @ddt.ddt
 class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
@@ -388,7 +390,7 @@ def ddt_named(parent, child):
     return args
 
 
-@attr(shard=3)
+@attr(shard=5)
 @ddt.ddt
 class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     """

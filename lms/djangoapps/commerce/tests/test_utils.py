@@ -11,6 +11,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 from waffle.testutils import override_switch
+from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -33,6 +34,7 @@ def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):
     )
 
 
+@attr(shard=4)
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
     @patch('openedx.core.lib.log_utils.log')
@@ -46,6 +48,7 @@ class AuditLogTests(TestCase):
         self.assertTrue(mock_log.info.called_with(message))
 
 
+@attr(shard=4)
 @ddt.ddt
 class EcommerceServiceTests(TestCase):
     """Tests for the EcommerceService helper class."""
@@ -143,6 +146,7 @@ class EcommerceServiceTests(TestCase):
         self.assertEqual(url, expected_url)
 
 
+@attr(shard=4)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class RefundUtilMethodTests(ModuleStoreTestCase):
     def setUp(self):

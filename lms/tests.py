@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from mock import patch
 from six import text_type
+from nose.plugins.attrib import attr
 
 from edxmako import LOOKUP, add_lookup
 from microsite_configuration import microsite
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 log = logging.getLogger(__name__)
 
 
+@attr(shard=5)
 class LmsModuleTests(TestCase):
     """
     Tests for lms module itself.
@@ -29,6 +31,7 @@ class LmsModuleTests(TestCase):
             self.assertIsNotNone(mimetype)
 
 
+@attr(shard=5)
 class TemplateLookupTests(TestCase):
     """
     Tests for TemplateLookup.
@@ -47,6 +50,7 @@ class TemplateLookupTests(TestCase):
         self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 
 
+@attr(shard=5)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_FEEDBACK_SUBMISSION': True})
 class HelpModalTests(ModuleStoreTestCase):
     """Tests for the help modal"""

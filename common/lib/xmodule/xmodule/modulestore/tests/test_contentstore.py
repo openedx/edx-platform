@@ -6,6 +6,7 @@ from uuid import uuid4
 import unittest
 import mimetypes
 from tempfile import mkdtemp
+from nose.plugins.attrib import attr
 import path
 import shutil
 
@@ -25,6 +26,7 @@ PORT = MONGO_PORT_NUM
 DB = 'test_mongo_%s' % uuid4().hex[:5]
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestContentstore(unittest.TestCase):
     """

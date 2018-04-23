@@ -52,7 +52,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         return response
 
 
-@attr(shard=3)
+@attr(shard=9)
 class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseListView.
@@ -101,6 +101,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
         self.verify_response()
 
 
+@attr(shard=9)
 class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreTestCase):
     """
     Test responses returned from CourseListView (with tests that modify the
@@ -162,6 +163,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             )
 
 
+@attr(shard=9)
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseDetailView.
@@ -229,6 +231,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         self.assertEquals(response.status_code, 400)
 
 
+@attr(shard=9)
 @override_settings(ELASTIC_FIELD_MAPPINGS={
     'start_date': {'type': 'date'},
     'enrollment_start': {'type': 'date'},

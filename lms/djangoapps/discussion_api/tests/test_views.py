@@ -124,6 +124,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         self.test_basic()
 
 
+@attr(shard=8)
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
@@ -158,6 +159,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -230,6 +232,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         pass
 
 
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -384,7 +387,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -725,6 +728,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.assertEqual({}, response_thread['users'])
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'thread_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -789,7 +793,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response_data, expected_response_data)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'thread_edited')
@@ -947,6 +951,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         )
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'thread_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -982,7 +987,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1357,6 +1362,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             self.assertNotIn(response_comment['endorsed_by'], response_users)
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'comment_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1399,6 +1405,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'comment_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1487,6 +1494,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 403)
 
 
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1606,6 +1614,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.assertEqual(response.status_code, 400)
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
@@ -1657,6 +1666,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.assertEqual(expected_profile_data, response_users[self.user.username])
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):

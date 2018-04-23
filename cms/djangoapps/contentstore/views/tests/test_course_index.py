@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
+from nose.plugins.attrib import attr
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
@@ -38,6 +39,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
 
 
+@attr(shard=1)
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
@@ -310,6 +312,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertIn('display_course_number: ""', response.content)
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestCourseIndexArchived(CourseTestCase):
     """
@@ -421,6 +424,7 @@ class TestCourseIndexArchived(CourseTestCase):
                                                    sql_queries=sql_queries)
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
@@ -629,6 +633,7 @@ class TestCourseOutline(CourseTestCase):
         )
 
 
+@attr(shard=1)
 class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.

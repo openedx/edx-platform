@@ -20,6 +20,7 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock
 from unittest.case import SkipTest, TestCase
+from nose.plugins.attrib import attr
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -254,6 +255,7 @@ class ContainerModuleFactory(LeafModuleFactory):
         return ContainerModuleRuntimeFactory(depth=self.depth)  # pylint: disable=no-member
 
 
+@attr(shard=1)
 @ddt.ddt
 class XBlockWrapperTestMixin(object):
     """
@@ -317,6 +319,7 @@ class XBlockWrapperTestMixin(object):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 
+@attr(shard=1)
 class TestStudentView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that student_view and XModule.get_html produce the same results.
@@ -340,6 +343,7 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
         )
 
 
+@attr(shard=1)
 class TestStudioView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that studio_view and XModuleDescriptor.get_html produce the same results
@@ -363,6 +367,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         self.assertEqual(html, rendered_content)
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestXModuleHandler(TestCase):
     """
@@ -404,6 +409,7 @@ class TestXModuleHandler(TestCase):
         self.assertEqual(response.body, '{"test_key": "test_value"}')
 
 
+@attr(shard=1)
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
     """
     This tests that XModuleDescriptor.export_course_to_xml and add_xml_to_node produce the same results.

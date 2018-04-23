@@ -9,12 +9,14 @@ import ddt
 
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestLibraries(MixedSplitTestCase):
     """

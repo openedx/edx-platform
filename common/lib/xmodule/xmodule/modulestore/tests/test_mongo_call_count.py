@@ -5,7 +5,8 @@ when using the Split modulestore.
 
 from tempfile import mkdtemp
 from shutil import rmtree
-from unittest import skip
+from unittest import TestCase, skip
+from nose.plugins.attrib import attr
 import ddt
 from django.test import TestCase
 
@@ -22,6 +23,7 @@ MIXED_OLD_MONGO_MODULESTORE_BUILDER = MixedModulestoreBuilder([('draft', MongoMo
 MIXED_SPLIT_MODULESTORE_BUILDER = MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())])
 
 
+@attr(shard=2)
 @ddt.ddt
 @skip("Fix call counts below - sometimes the counts are off by 1.")
 class CountMongoCallsXMLRoundtrip(TestCase):
@@ -82,6 +84,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
                     )
 
 
+@attr(shard=2)
 @ddt.ddt
 class CountMongoCallsCourseTraversal(TestCase):
     """

@@ -12,6 +12,7 @@ import ddt
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 import six
+from nose.plugins.attrib import attr
 
 from . import get_test_system
 from .helpers import StubUserService
@@ -101,6 +102,7 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         self.default_context = {"bookmarked": False, "username": self.username}
 
 
+@attr(shard=1)
 @ddt.ddt
 class VerticalBlockTestCase(BaseVerticalBlockTest):
     """

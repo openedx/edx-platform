@@ -3,6 +3,7 @@ Unit tests for course_goals.api methods.
 """
 import mock
 
+from nose.plugins.attrib import attr
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -18,6 +19,7 @@ EVENT_NAME_ADDED = 'edx.course.goal.added'
 EVENT_NAME_UPDATED = 'edx.course.goal.updated'
 
 
+@attr(shard=4)
 class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
     """
     Testing the Course Goals API.

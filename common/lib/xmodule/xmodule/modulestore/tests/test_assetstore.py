@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 import pytz
 import unittest
 
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.assetstore import AssetMetadata
@@ -58,6 +59,7 @@ class AssetStoreTestData(object):
     )
 
 
+@attr(shard=1)
 class TestSortedAssetList(unittest.TestCase):
     """
     Tests the SortedAssetList class.
@@ -83,6 +85,7 @@ class TestSortedAssetList(unittest.TestCase):
         )
 
 
+@attr(shard=1)
 @attr('mongo')
 @ddt.ddt
 class TestMongoAssetMetadataStorage(TestCase):

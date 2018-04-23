@@ -5,6 +5,7 @@ from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
@@ -14,6 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 @ddt
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
 @override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend')
@@ -68,6 +70,7 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
 @ddt
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
 @override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend')
+@attr(shard=4)
 class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on the number of courses completed.
@@ -124,6 +127,7 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
         self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
 
 
+@attr(shard=4)
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
 @override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend')
 class CourseGroupBadgeTest(ModuleStoreTestCase):

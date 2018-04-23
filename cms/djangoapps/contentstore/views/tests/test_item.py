@@ -22,6 +22,7 @@ from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
+from nose.plugins.attrib import attr
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
@@ -122,6 +123,7 @@ class ItemTest(CourseTestCase):
         return self.response_usage_key(resp)
 
 
+@attr(shard=1)
 @ddt.ddt
 class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
@@ -466,6 +468,7 @@ class GetItemTest(ItemTest):
                 self.assertEqual(_get_module_info(xblock), response)
 
 
+@attr(shard=1)
 @ddt.ddt
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
@@ -481,6 +484,7 @@ class DeleteItem(ItemTest):
         self.assertEqual(resp.status_code, 204)
 
 
+@attr(shard=1)
 class TestCreateItem(ItemTest):
     """
     Test the create_item handler thoroughly
@@ -656,6 +660,7 @@ class DuplicateHelper(object):
         return self.response_usage_key(resp)
 
 
+@attr(shard=1)
 class TestDuplicateItem(ItemTest, DuplicateHelper):
     """
     Test the duplicate method.
@@ -761,6 +766,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestMoveItem(ItemTest):
     """
@@ -1313,6 +1319,7 @@ class TestMoveItem(ItemTest):
             )
 
 
+@attr(shard=1)
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
     Test the duplicate method for blocks with asides.
@@ -1375,6 +1382,7 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
         self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key, check_asides=True)
 
 
+@attr(shard=1)
 class TestEditItemSetup(ItemTest):
     """
     Setup for xblock update tests.
@@ -1405,6 +1413,7 @@ class TestEditItemSetup(ItemTest):
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
 
+@attr(shard=1)
 class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
@@ -1844,6 +1853,7 @@ class TestEditItem(TestEditItemSetup):
         self.assertIn("Incorrect RelativeTime value", parsed["error"])  # See xmodule/fields.py
 
 
+@attr(shard=1)
 class TestEditItemSplitMongo(TestEditItemSetup):
     """
     Tests for EditItem running on top of the SplitMongoModuleStore.
@@ -1865,6 +1875,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
             self.assertEqual(len(PyQuery(content['html'])('.xblock-{}'.format(STUDIO_VIEW))), 1)
 
 
+@attr(shard=1)
 class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
@@ -2088,6 +2099,7 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(group_id_to_child, split_test.group_id_to_child)
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestComponentHandler(TestCase):
     def setUp(self):
@@ -2146,6 +2158,7 @@ class TestComponentHandler(TestCase):
                           status_code)
 
 
+@attr(shard=1)
 class TestComponentTemplates(CourseTestCase):
     """
     Unit tests for the generation of the component templates for a course.
@@ -2380,6 +2393,7 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(support_level, templates[0]['support_level'])
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestXBlockInfo(ItemTest):
     """
@@ -2727,6 +2741,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
 
 
+@attr(shard=1)
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """
     Unit tests for XBlock Info for XBlocks in a content library
@@ -2776,6 +2791,7 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         self.assertIsNone(xblock_info.get('graders', None))
 
 
+@attr(shard=1)
 class TestLibraryXBlockCreation(ItemTest):
     """
     Tests the adding of XBlocks to Library
@@ -2811,6 +2827,7 @@ class TestLibraryXBlockCreation(ItemTest):
         self.assertFalse(lib.children)
 
 
+@attr(shard=1)
 @ddt.ddt
 class TestXBlockPublishingInfo(ItemTest):
     """

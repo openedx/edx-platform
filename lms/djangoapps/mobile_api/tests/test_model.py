@@ -6,10 +6,12 @@ from datetime import datetime
 import ddt
 from django.test import TestCase
 from pytz import UTC
+from nose.plugins.attrib import attr
 
 from mobile_api.models import AppVersionConfig, MobileApiConfig
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestAppVersionConfigModel(TestCase):
     """
@@ -84,6 +86,7 @@ class TestAppVersionConfigModel(TestCase):
         self.assertEqual(last_supported_date, AppVersionConfig.last_supported_date(platform, version))
 
 
+@attr(shard=4)
 class TestMobileApiConfig(TestCase):
     """
     Tests MobileAPIConfig

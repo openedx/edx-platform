@@ -5,6 +5,7 @@ Tests for BlockNavigationTransformer.
 from unittest import TestCase
 
 import ddt
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
@@ -16,6 +17,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
 
 
+@attr(shard=4)
 @ddt.ddt
 class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
@@ -66,6 +68,7 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
             )
 
 
+@attr(shard=4)
 class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
     """
     Uses SampleCourseFactory and Modulestore to test the Navigation transformer,

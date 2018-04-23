@@ -8,12 +8,14 @@ import mock
 from django.core.cache import caches
 from django.http import HttpRequest, HttpResponse
 from pytz import UTC
+from nose.plugins.attrib import attr
 
 from mobile_api.middleware import AppVersionUpgrade
 from mobile_api.models import AppVersionConfig
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     """

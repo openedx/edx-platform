@@ -3,9 +3,11 @@ This test will run for annotator_token.py
 """
 import unittest
 
+from nose.plugins.attrib import attr
+
 from xmodule.annotator_token import retrieve_token
 
-
+@attr(shard=1)
 class TokenRetriever(unittest.TestCase):
     """
     Tests to make sure that when passed in a username and secret token, that it will be encoded correctly

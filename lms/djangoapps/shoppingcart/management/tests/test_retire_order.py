@@ -3,6 +3,7 @@
 from tempfile import NamedTemporaryFile
 
 from django.core.management import call_command
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
@@ -11,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 class TestRetireOrder(ModuleStoreTestCase):
     """Test the retire_order command"""
     def setUp(self):

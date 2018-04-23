@@ -6,10 +6,12 @@ Tests for BlockCountsTransformer.
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
+from nose.plugins.attrib import attr
 
 from ..block_counts import BlockCountsTransformer
 
 
+@attr(shard=4)
 class TestBlockCountsTransformer(ModuleStoreTestCase):
     """
     Test behavior of BlockCountsTransformer

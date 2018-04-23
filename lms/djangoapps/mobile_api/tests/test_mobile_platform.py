@@ -3,10 +3,12 @@ Tests for Platform against Mobile App Request
 """
 import ddt
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from mobile_api.mobile_platform import MobilePlatform
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestMobilePlatform(TestCase):
     """

@@ -1,6 +1,7 @@
 """
 Tests for CourseData utility class.
 """
+from nose.plugins.attrib import attr
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from mock import patch
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -12,6 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..course_data import CourseData
 
 
+@attr(shard=4)
 class CourseDataTest(ModuleStoreTestCase):
     """
     Simple tests to ensure CourseData works as advertised.

@@ -10,6 +10,7 @@ from django.test import TestCase
 from fs.osfs import OSFS
 from lxml import etree
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 
 from pytz import UTC
 from six import text_type
@@ -61,6 +62,7 @@ class DummySystem(ImportSystem):
         raise Exception("Shouldn't be called")
 
 
+@attr(shard=1)
 class BaseCourseTestCase(TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
     @staticmethod
@@ -90,6 +92,7 @@ class GenericXBlock(XBlock):
     field2 = Integer(scope=Scope.user_state)
 
 
+@attr(shard=1)
 @ddt.ddt
 class PureXBlockImportTest(BaseCourseTestCase):
     """
@@ -121,6 +124,7 @@ class PureXBlockImportTest(BaseCourseTestCase):
         self.assertFalse(mock_location.called)
 
 
+@attr(shard=1)
 class ImportTestCase(BaseCourseTestCase):
     date = Date()
 

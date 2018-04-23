@@ -1,9 +1,11 @@
 """ Commerce API v1 serializer tests. """
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from ..serializers import serializers, validate_course_id
 
 
+@attr(shard=4)
 class CourseValidatorTests(TestCase):
     """ Tests for Course Validator method. """
 

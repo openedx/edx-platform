@@ -11,7 +11,7 @@ from ..services import BookmarksService
 from .test_models import BookmarksTestsBase
 
 
-@attr(shard=2)
+@attr(shard=9)
 @skip_unless_lms
 @pytest.mark.django111_expected_failure
 class BookmarksServiceTests(BookmarksTestsBase):

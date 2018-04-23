@@ -8,6 +8,7 @@ import ddt
 import pytz
 from django.test import TestCase
 from mock import MagicMock, patch
+from nose.plugins.attrib import attr
 
 from submissions.models import score_reset, score_set
 from util.date_utils import to_timestamp
@@ -79,6 +80,7 @@ PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS = {
 }
 
 
+@attr(shard=4)
 @ddt.ddt
 class ScoreChangedSignalRelayTest(TestCase):
     """

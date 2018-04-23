@@ -9,12 +9,14 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.editing_module import TabsEditingDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from nose.plugins.attrib import attr
 
 from xmodule.tests import get_test_descriptor_system
 
 log = logging.getLogger(__name__)
 
 
+@attr(shard=1)
 class TabsEditingDescriptorTestCase(unittest.TestCase):
     """ Testing TabsEditingDescriptor"""
 

@@ -4,8 +4,10 @@ Extremely basic tests for the cert_whitelist command
 import pytest
 
 from django.core.management import call_command
+from nose.plugins.attrib import attr
 
 
+@attr(shard=4)
 def test_cert_whitelist_help(capsys):
     """
     Basic test to see if the command will parse and get args

@@ -14,6 +14,7 @@ import mock
 from django.core.urlresolvers import reverse
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
+from nose.plugins.attrib import attr
 
 from course_api.blocks.tests.helpers import deserialize_usage_key
 from courseware.module_render import get_module_for_descriptor_internal
@@ -25,6 +26,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestDiscussionXBlock(XModuleRenderingTestBase):
     """
@@ -79,6 +81,7 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
             patcher.stop()
 
 
+@attr(shard=4)
 class TestGetDjangoUser(TestDiscussionXBlock):
     """
     Tests for the django_user property.
@@ -116,6 +119,7 @@ class TestGetDjangoUser(TestDiscussionXBlock):
         self.assertEqual(self.block.django_user, None)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestViews(TestDiscussionXBlock):
     """
@@ -202,6 +206,7 @@ class TestViews(TestDiscussionXBlock):
         self.assertEqual(fragment.js_init_fn, 'DiscussionInlineBlock')
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestTemplates(TestDiscussionXBlock):
     """
@@ -247,6 +252,7 @@ class TestTemplates(TestDiscussionXBlock):
         self.assertIn('data-read-only="{read_only}"'.format(read_only=read_only), fragment.content)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestXBlockInCourse(SharedModuleStoreTestCase):
     """
@@ -371,6 +377,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             self.assertEqual(block_data['student_view_data'], {"topic_id": self.discussion_id})
 
 
+@attr(shard=4)
 class TestXBlockQueryLoad(SharedModuleStoreTestCase):
     """
     Test the number of queries executed when rendering the XBlock.

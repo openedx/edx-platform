@@ -44,20 +44,40 @@ case "${TEST_SUITE}" in
             "all")
                 paver test_system -s lms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.log
                 ;;
-            [1-3])
+            [1-9])
                 paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.${SHARD}.log
                 ;;
-            4|"noshard")
-                paver test_system -s lms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.4.log
+            10|"noshard")
+                paver test_system -s lms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.10.log
                 ;;
         esac
         ;;
 
     "cms-unit")
-        paver test_system -s cms --disable_capture ${PAVER_ARGS} 2> cms-tests.log
+        case "$SHARD" in
+            "all")
+                paver test_system -s cms --disable_capture ${PAVER_ARGS} 2> cms-tests.log
+                ;;
+            1)
+                paver test_system -s cms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> cms-tests.${SHARD}.log
+                ;;
+            2|"noshard")
+                paver test_system -s cms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> cms-tests.2.log
+                ;;
+        esac
         ;;
 
     "commonlib-unit")
-        paver test_lib --disable_capture ${PAVER_ARGS} 2> common-tests.log
+        case "$SHARD" in
+            "all")
+                paver test_lib --disable_capture ${PAVER_ARGS} 2> common-tests.log
+                ;;
+            [1-2])
+                paver test_lib -l common/lib/xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.${SHARD}.log
+                ;;
+            3|"noshard")
+                paver test_lib --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> common-tests.3.log
+                ;;
+        esac
         ;;
 esac

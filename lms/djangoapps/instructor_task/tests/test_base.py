@@ -17,6 +17,7 @@ from mock import Mock, patch
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
@@ -299,6 +300,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         return resp
 
 
+@attr(shard=4)
 class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.

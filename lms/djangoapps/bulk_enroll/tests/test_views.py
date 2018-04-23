@@ -9,6 +9,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
+from nose.plugins.attrib import attr
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
@@ -25,6 +26,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 @override_settings(ENABLE_BULK_ENROLLMENT_VIEW=True)
 @ddt.ddt
 class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCase):

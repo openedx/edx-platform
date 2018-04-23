@@ -23,6 +23,7 @@ from edxval.api import (
     create_or_update_video_transcript
 )
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 
 from contentstore.models import VideoUploadConfig
 from contentstore.tests.utils import CourseTestCase
@@ -59,6 +60,7 @@ def override_switch(switch, active):
     return decorate
 
 
+@attr(shard=1)
 class VideoUploadTestBase(object):
     """
     Test cases for the video upload feature
@@ -168,6 +170,7 @@ class VideoUploadTestBase(object):
         )
 
 
+@attr(shard=1)
 class VideoUploadTestMixin(VideoUploadTestBase):
     """
     Test cases for the video upload feature
@@ -206,6 +209,7 @@ class VideoUploadTestMixin(VideoUploadTestBase):
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
 
+@attr(shard=1)
 @ddt.ddt
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
@@ -651,6 +655,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         )
 
 
+@attr(shard=1)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={'BUCKET': 'test_bucket', 'ROOT_PATH': 'test_root'})
@@ -956,6 +961,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 self.verify_image_upload_reponse(self.course.id, edx_video_id, response)
 
 
+@attr(shard=1)
 @ddt.ddt
 @patch(
     'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
@@ -1273,6 +1279,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 )
 
 
+@attr(shard=1)
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):

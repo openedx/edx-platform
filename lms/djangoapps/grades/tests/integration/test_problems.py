@@ -3,6 +3,7 @@ import itertools
 
 import ddt
 import pytz
+from nose.plugins.attrib import attr
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -20,6 +21,7 @@ from ...subsection_grade_factory import SubsectionGradeFactory
 from ..utils import answer_problem, mock_get_submissions_score
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
@@ -92,6 +94,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         self.assertEqual(score.all_total.possible, possible_per_block * block_count)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     """
@@ -200,6 +203,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         self.assertEqual(score.graded_total.possible, expected_possible)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestWeightedProblems(SharedModuleStoreTestCase):
     """

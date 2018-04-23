@@ -4,10 +4,12 @@ Tests for Django template context processors.
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.mobile_api.context_processor import is_from_mobile_app
 
 
+@attr(shard=4)
 class MobileContextProcessorTests(TestCase):
     """
     Tests for the configuration context processor.

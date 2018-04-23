@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
 from rest_framework.test import APITestCase
+from nose.plugins.attrib import attr
 
 from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
@@ -17,6 +18,7 @@ from student.tests.factories import UserFactory
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
+@attr(shard=4)
 class ExperimentDataViewSetTests(APITestCase):
 
     def assert_data_created_for_user(self, user, method='post', status=201):
@@ -312,6 +314,7 @@ class ExperimentCrossDomainTests(APITestCase):
         )
 
 
+@attr(shard=4)
 class ExperimentKeyValueViewSetTests(APITestCase):
     def test_permissions(self):
         """ Staff access is required for write operations. """

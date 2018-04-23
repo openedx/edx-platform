@@ -1,12 +1,14 @@
 """ Tests for models. """
 import ddt
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 
 from ..models import Course
 
 
+@attr(shard=4)
 @ddt.ddt
 class CourseTests(TestCase):
     """ Tests for Course model. """

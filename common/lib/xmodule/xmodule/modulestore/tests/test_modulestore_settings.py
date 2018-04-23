@@ -3,6 +3,7 @@ Tests for testing the modulestore settings migration code.
 """
 import copy
 import ddt
+from nose.plugins.attrib import attr
 
 from openedx.core.lib.tempdir import mkdtemp_clean
 
@@ -14,6 +15,7 @@ from xmodule.modulestore.modulestore_settings import (
 )
 
 
+@attr(shard=2)
 @ddt.ddt
 class ModuleStoreSettingsMigration(TestCase):
     """

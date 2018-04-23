@@ -8,6 +8,7 @@ from urlparse import urlunparse
 
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.locator import CourseLocator
+from nose.plugins.attrib import attr
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from .helpers import deserialize_usage_key
 
 
+@attr(shard=4)
 class TestBlocksView(SharedModuleStoreTestCase):
     """
     Test class for BlocksView
@@ -246,6 +248,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
+@attr(shard=4)
 class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-tests
     """
     Test class for BlocksInCourseView

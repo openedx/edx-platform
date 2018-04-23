@@ -13,8 +13,10 @@ from xmodule import graders
 from xmodule.graders import (
     AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
 )
+from nose.plugins.attrib import attr
 
 
+@attr(shard=1)
 class GradesheetTest(unittest.TestCase):
     """
     Tests the aggregate_scores method
@@ -76,6 +78,7 @@ class GradesheetTest(unittest.TestCase):
         )
 
 
+@attr(shard=1)
 @ddt.ddt
 class GraderTest(unittest.TestCase):
     """
@@ -325,6 +328,7 @@ class GraderTest(unittest.TestCase):
         self.assertIn(expected_error_message, text_type(error.exception))
 
 
+@attr(shard=1)
 @ddt.ddt
 class ShowCorrectnessTest(unittest.TestCase):
     """

@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import User
 from django.test.client import Client
+from nose.plugins.attrib import attr
 
 from survey.models import SurveyForm
 from survey.utils import is_survey_required_for_course, is_survey_required_and_unanswered
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 class SurveyModelsTests(ModuleStoreTestCase):
     """
     All tests for the utils.py file

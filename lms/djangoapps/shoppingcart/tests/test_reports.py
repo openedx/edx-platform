@@ -11,6 +11,7 @@ import pytz
 from django.conf import settings
 from mock import patch
 from six import text_type
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from shoppingcart.models import (
@@ -27,6 +28,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 class ReportTypeTests(ModuleStoreTestCase):
     """
     Tests for the models used to generate certificate status reports
@@ -160,6 +162,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())
 
 
+@attr(shard=4)
 class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     """
     Tests for the models used to generate itemized purchase reports

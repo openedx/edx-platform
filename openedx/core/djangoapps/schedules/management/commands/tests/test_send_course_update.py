@@ -5,6 +5,7 @@ Tests for send_course_update management command.
 import ddt
 from mock import patch, _is_started
 from unittest import skipUnless
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 
@@ -25,6 +26,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@attr(shard=6)
 @ddt.ddt
 @skip_unless_lms
 @skipUnless(

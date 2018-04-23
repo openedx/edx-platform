@@ -6,6 +6,7 @@ import os.path
 from django.test import TestCase
 from glob import glob
 from mock import patch, Mock
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import ModuleStoreEnum
@@ -28,6 +29,7 @@ def glob_tildes_at_end(path):
     return no_tildes + with_tildes
 
 
+@attr(shard=2)
 class TestXMLModuleStore(TestCase):
     """
     Test around the XML modulestore
