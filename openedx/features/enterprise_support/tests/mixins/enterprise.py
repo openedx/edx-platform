@@ -223,6 +223,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
     Mixin to help test the data_sharing_consent_required decorator.
     """
 
+    @mock.patch('openedx.features.enterprise_support.utils.get_enterprise_learner_generic_name')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_from_api')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
     @mock.patch('openedx.features.enterprise_support.api.reverse')
@@ -237,6 +238,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
             mock_reverse,
             mock_enterprise_customer_uuid_for_request,
             mock_enterprise_customer_from_api,
+            mock_get_enterprise_learner_generic_name,
             status_code=200,
     ):
         """
@@ -248,6 +250,9 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
             if args[0] == 'grant_data_sharing_permissions':
                 return '/enterprise/grant_data_sharing_permissions'
             return reverse(*args, **kwargs)
+
+        # ENT-924: Temporary solution to replace sensitive SSO usernames.
+        mock_get_enterprise_learner_generic_name.return_value = ''
 
         mock_reverse.side_effect = mock_consent_reverse
         mock_enterprise_enabled.return_value = True
