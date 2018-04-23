@@ -122,7 +122,7 @@ class UserCourseTag(models.Model):
         unique_together = ("user", "course_id", "key")
 
 
-class UserOrgTag(DeletableByUserValue, TimeStampedModel):
+class UserOrgTag(TimeStampedModel, DeletableByUserValue):
     """
     Per-Organization user tags.
 
