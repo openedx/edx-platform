@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
@@ -22,6 +23,7 @@ FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
+@attr(shard=4)
 class CertificateSupportTestCase(ModuleStoreTestCase):
     """
     Base class for tests of the certificate support views.
@@ -86,6 +88,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Couldn't log in as support staff")
 
 
+@attr(shard=4)
 @ddt.ddt
 class CertificateSearchTests(CertificateSupportTestCase):
     """
@@ -221,6 +224,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         return self.client.get(url)
 
 
+@attr(shard=4)
 @ddt.ddt
 class CertificateRegenerateTests(CertificateSupportTestCase):
     """
@@ -403,6 +407,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         )
 
 
+@attr(shard=4)
 @ddt.ddt
 class CertificateGenerateTests(CertificateSupportTestCase):
     """

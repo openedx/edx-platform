@@ -6,11 +6,13 @@ import mock
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 from branding.api import get_footer, get_home_url, get_logo_url
 from edxmako.shortcuts import marketing_link
 
 
+@attr(shard=4)
 class TestHeader(TestCase):
     """Test API end-point for retrieving the header. """
 
@@ -39,6 +41,7 @@ class TestHeader(TestCase):
         self.assertEqual(marketing_link('ROOT'), expected_url)
 
 
+@attr(shard=4)
 class TestFooter(TestCase):
     maxDiff = None
     """Test retrieving the footer. """

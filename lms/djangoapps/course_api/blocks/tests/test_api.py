@@ -8,6 +8,7 @@ import ddt
 import django
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
 import course_blocks.api as course_blocks_api
 
@@ -22,6 +23,7 @@ from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo
 from ..api import get_blocks
 
 
+@attr(shard=4)
 class TestGetBlocks(SharedModuleStoreTestCase):
     """
     Tests for the get_blocks function
@@ -108,6 +110,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
             self.assertEqual(block['type'], 'problem')
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     """
@@ -139,6 +142,7 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
                 get_blocks(self.request, course.location, self.user)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
@@ -191,6 +195,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             )
 
 
+@attr(shard=4)
 @ddt.ddt
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(course_blocks_api.INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER, ))
 class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase):

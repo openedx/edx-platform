@@ -7,6 +7,7 @@ from itertools import chain, izip_longest
 
 import pytz
 from ccx_keys.locator import CCXLocator
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from student.tests.factories import AdminFactory, UserFactory
@@ -14,6 +15,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@attr(shard=4)
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
     """tests for a modulestore wrapped by CCXModulestoreWrapper
     """

@@ -4,8 +4,10 @@ Extremely basic tests for the fix_ungraded_certs command
 import pytest
 
 from django.core.management import call_command
+from nose.plugins.attrib import attr
 
 
+@attr(shard=4)
 def test_fix_ungraded_certs_help(capsys):
     """
     Basic test to see if the command will parse and get args

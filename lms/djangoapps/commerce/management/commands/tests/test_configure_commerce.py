@@ -3,10 +3,12 @@ Tests for management command for enabling commerce configuration.
 """
 from django.core.management import call_command
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from ....models import CommerceConfiguration
 
 
+@attr(shard=4)
 class TestCommerceConfigurationCommand(TestCase):
     """
     Test django management command for enabling commerce configuration.

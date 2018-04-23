@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.test import APITestCase
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -20,6 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 USER_PASSWORD = 'test'
 
 
+@attr(shard=4)
 class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test for the Certificates REST APIs

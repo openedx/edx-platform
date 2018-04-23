@@ -4,6 +4,7 @@ and disabling for instructor-paced courses.
 """
 import ddt
 import mock
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -22,6 +23,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     """
     Tests for enabling/disabling self-generated certificates according to course-pacing.
@@ -49,6 +51,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
 
 
+@attr(shard=4)
 class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
     Tests for whitelisted student auto-certificate generation
@@ -128,6 +131,7 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 )
 
 
+@attr(shard=4)
 class PassingGradeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on passing grade receipt
@@ -217,6 +221,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_not_called()
 
 
+@attr(shard=4)
 class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner verification
@@ -287,6 +292,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 )
 
 
+@attr(shard=4)
 @ddt.ddt
 class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
