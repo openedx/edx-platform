@@ -32,5 +32,9 @@ class DeletableByUserValue(object):
         Returns False otherwise.
         """
         filter_kwargs = {field: value}
-        num_deleted_records, _ = cls.objects.filter(**filter_kwargs).delete()
-        return num_deleted_records > 0
+        records_to_delete = cls.objects.filter(**filter_kwargs)
+        if records_to_delete.exists():
+            num_deleted_records, _ = records_to_delete._raw_delete(records_to_delete.db)
+            return num_deleted_records > 0
+        else:
+            return False
