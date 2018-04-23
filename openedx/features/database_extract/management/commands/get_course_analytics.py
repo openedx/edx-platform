@@ -2,7 +2,9 @@ import base64
 import csv
 import json
 import tempfile
+import requests
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
@@ -14,7 +16,8 @@ from lms.djangoapps.mailing.management.commands.mailchimp_sync_course import get
 from lms.djangoapps.onboarding.models import Organization
 from student.models import CourseEnrollment, AnonymousUserId, anonymous_id_for_user
 from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.features.database_extract.models import TargetCourse
 from submissions.models import StudentItem, Submission, Score
 from submissions.api import _get_or_create_student_item
@@ -31,9 +34,54 @@ class Command(BaseCommand):
         data = []
 
         for target_course in target_courses:
-            user_profiles = get_enrolled_students(target_course.course_id)
+            print target_course
+            course_data = {
+                'course_structure': {},
+                'team_data': [],
+                'user_data': {
+                    'demographic_data': {},
+                    'performance_data': [],
+                }
+            }
+            course_key = CourseKey.from_string(target_course.course_id)
 
+            course_structure = CourseStructure.objects.get(course_id=course_key)
+            course_teams = CourseTeam.objects.filter(course_id=course_key)
+
+            course_data['course_structure'] = {
+                'created': course_structure.created.__str__(),
+                'modified': course_structure.modified.__str__(),
+                'course_id': course_structure.course_id.to_deprecated_string(),
+                'structure_json': course_structure.structure_json,
+                'discussion_id_map_json': course_structure.discussion_id_map_json,
+            }
+
+            for team in course_teams:
+                team_data = {
+                    'team_id': course_team.team_id,
+                    'discussion_topic_id': course_team.discussion_topic_id,
+                    'name': course_team.name,
+                    'course_id': course_team.course_id.to_deprecated_string(),
+                    'topic_id': course_team.topic_id,
+                    'date_created': course_team.date_created.__str__(),
+                    'description': course_team.description,
+                    'country': course_team.country,
+                    'language': course_team.language,
+                    'last_activity_at': course_team.last_activity_at.__str__(),
+                    'team_size': course_team.team_size,
+                }
+                course_data['team_data'].push(team_data)
+
+            user_profiles = get_enrolled_students(target_course.course_id)
             for profile in user_profiles:
+                data_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/data'
+                headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
+                response = requests.post(data_endpoint,
+                                         data={'_uid': 1, 'username': profile.user.username},
+                                         headers=headers)
+
+                user_community_data = json.loads(response._content)['payload']
+
                 demo_data = {
                     'student_id': profile.user.id,
                     'email': profile.user.email,
@@ -47,11 +95,13 @@ class Command(BaseCommand):
                     'english_proficiency': profile.user.extended_profile.english_proficiency,
                     'label': profile.user.extended_profile.organization.label if
                     profile.user.extended_profile.organization else '',
+                    'reputation': user_community_data['reputation'],
+                    'postcount': user_community_data['postcount'],
                 }
 
                 anon_user_id = AnonymousUserId.objects.get(
                     user=profile.user,
-                    course_id=CourseKey.from_string(target_course.course_id)
+                    course_id=course_key
                 )
 
                 perf_data = {
@@ -144,10 +194,10 @@ class Command(BaseCommand):
                     }
 
                 }
-                data.append({
-                    'demo_data': demo_data,
-                    'perf_data': perf_data,
-                })
+                course_data['user_data']['demographic_data'] = demo_data
+                course_data['user_data']['performance_data'] = perf_data
+
+            data.append(course_data)
 
         with tempfile.TemporaryFile() as tmp:
             MandrillClient().send_mail(
