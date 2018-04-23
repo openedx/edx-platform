@@ -23,6 +23,7 @@ import lms.lib.comment_client as cc
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger(__name__)
@@ -30,6 +31,30 @@ log = logging.getLogger(__name__)
 
 DEFAULT_LANGUAGE = 'en'
 ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
+
+
+@task(base=LoggedTask)
+def update_discussions_map(context):
+    course_key = CourseKey.from_string(context['course_id'])
+    discussions_id_map = {}
+
+    with modulestore().bulk_operations(course_key):
+        course = modulestore().get_course(course_key, depth=None)
+        blocks_stack = [course]
+        while blocks_stack:
+            curr_block = blocks_stack.pop()
+            children = curr_block.get_children() if curr_block.has_children else []
+            if (
+                curr_block.category == 'discussion' and
+                hasattr(curr_block, 'discussion_id') and
+                curr_block.discussion_id
+            ):
+                discussions_id_map[curr_block.discussion_id] = unicode(curr_block.scope_ids.usage_id)
+
+            # Add this blocks children to the stack so that we can traverse them as well.
+            blocks_stack.extend(children)
+
+    # TODO Store discussions_id_map for later retrieval
 
 
 class ResponseNotification(MessageType):
