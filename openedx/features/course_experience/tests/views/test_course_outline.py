@@ -384,6 +384,27 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         self.assertContains(response, 'Resume Course', count=resume_count)
         return response
 
+    def test_course_home_completion(self):
+        """
+        Test that completed blocks appear checked on course home page
+        """
+        self.override_waffle_switch(True)
+
+        course = self.course
+        vertical = course.children[0].children[0].children[0]
+
+        response = self.client.get(course_home_url(course))
+        content = pq(response.content)
+        self.assertEqual(len(content('.fa-check')), 0)
+
+        self.complete_sequential(self.course, vertical)
+
+        response = self.client.get(course_home_url(course))
+        content = pq(response.content)
+
+        # vertical and its parent should be checked
+        self.assertEqual(len(content('.fa-check')), 2)
+
     def test_start_course(self):
         """
         Tests that the start course button appears when the course has never been accessed.
