@@ -5,6 +5,7 @@ import datetime
 import pytz
 from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from courseware.access import has_access
 from courseware.tests.factories import BetaTesterFactory
@@ -15,6 +16,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@attr(shard=4)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.self_paced_overrides.SelfPacedDateOverrideProvider'],

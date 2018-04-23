@@ -5,6 +5,7 @@ from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from xblock.core import XBlock
 from xblock.completable import CompletableXBlockMixin, XBlockCompletionMode
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
@@ -37,6 +38,7 @@ class StubCompletableXBlock(XBlock, CompletableXBlockMixin):
     pass
 
 
+@attr(shard=4)
 class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, CompletionWaffleTestMixin, ModuleStoreTestCase):
     """
     Tests behaviour of BlockCompletionTransformer

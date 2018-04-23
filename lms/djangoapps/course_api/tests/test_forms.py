@@ -8,6 +8,7 @@ from urllib import urlencode
 import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
+from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.tests.factories import UserFactory
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..forms import CourseDetailGetForm, CourseListGetForm
 
 
+@attr(shard=4)
 class UsernameTestMixin(object):
     """
     Tests the username Form field.
@@ -32,6 +34,7 @@ class UsernameTestMixin(object):
         self.assert_valid(self.cleaned_data)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
     """
@@ -98,6 +101,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.assert_valid(self.cleaned_data)
 
 
+@attr(shard=4)
 class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseDetailGetForm

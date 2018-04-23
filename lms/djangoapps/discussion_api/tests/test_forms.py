@@ -8,11 +8,13 @@ from urllib import urlencode
 import ddt
 from django.http import QueryDict
 from opaque_keys.edx.locator import CourseLocator
+from nose.plugins.attrib import attr
 
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 
 
+@attr(shard=4)
 class PaginationTestMixin(object):
     """A mixin for testing forms with pagination fields"""
     def test_missing_page(self):
@@ -36,6 +38,7 @@ class PaginationTestMixin(object):
         self.assert_field_value("page_size", 100)
 
 
+@attr(shard=4)
 @ddt.ddt
 class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for ThreadListGetForm"""
@@ -162,6 +165,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         )
 
 
+@attr(shard=4)
 @ddt.ddt
 class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for CommentListGetForm"""

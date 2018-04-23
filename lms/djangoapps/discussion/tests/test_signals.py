@@ -1,12 +1,14 @@
 from django.test import TestCase
 import mock
 
+from nose.plugins.attrib import attr
 from django_comment_common import signals
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 
+@attr(shard=4)
 class SendMessageHandlerTestCase(TestCase):
     def setUp(self):
         self.sender = mock.Mock()

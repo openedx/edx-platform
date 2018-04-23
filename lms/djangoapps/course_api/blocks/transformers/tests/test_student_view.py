@@ -2,6 +2,7 @@
 Tests for StudentViewTransformer.
 """
 import ddt
+from nose.plugins.attrib import attr
 
 # pylint: disable=protected-access
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
@@ -11,6 +12,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from ..student_view import StudentViewTransformer
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestStudentViewTransformer(ModuleStoreTestCase):
     """
