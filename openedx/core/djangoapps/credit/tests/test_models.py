@@ -8,7 +8,19 @@ from django.test import TestCase
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement, CreditRequirementStatus
+from student.models import get_retired_username_by_username
+
+
+def add_credit_course(course_key):
+    """ Add the course as a credit
+
+    Returns:
+        CreditCourse object
+    """
+    credit_course = CreditCourse(course_key=course_key, enabled=True)
+    credit_course.save()
+    return credit_course
 
 
 @attr(shard=2)
@@ -31,7 +43,7 @@ class CreditEligibilityModelTests(TestCase):
             self.assertFalse(CreditCourse.is_credit_course(self.course_key))
 
     def test_get_course_requirements(self):
-        credit_course = self.add_credit_course()
+        credit_course = add_credit_course(self.course_key)
         requirement = {
             "namespace": "grade",
             "name": "grade",
@@ -47,7 +59,7 @@ class CreditEligibilityModelTests(TestCase):
         self.assertEqual(len(requirements), 1)
 
     def test_add_course_requirement_namespace(self):
-        credit_course = self.add_credit_course()
+        credit_course = add_credit_course(self.course_key)
         requirement = {
             "namespace": "grade",
             "name": "grade",
@@ -76,12 +88,69 @@ class CreditEligibilityModelTests(TestCase):
         requirements = CreditRequirement.get_course_requirements(self.course_key, namespace="grade")
         self.assertEqual(len(requirements), 1)
 
-    def add_credit_course(self):
-        """ Add the course as a credit
 
-        Returns:
-            CreditCourse object
+class CreditRequirementStatusTests(TestCase):
+    """
+    Tests for credit requirement status models.
+    """
+
+    def setUp(self):
+        super(CreditRequirementStatusTests, self).setUp()
+        self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
+        self.old_username = "username"
+        self.retired_username = get_retired_username_by_username(self.old_username)
+        self.credit_course = add_credit_course(self.course_key)
+
+    def add_course_requirements(self):
         """
-        credit_course = CreditCourse(course_key=self.course_key, enabled=True)
-        credit_course.save()
-        return credit_course
+        Add requirements to course.
+        """
+        requirements = (
+            {
+                "namespace": "grade",
+                "name": "grade",
+                "display_name": "Grade",
+                "criteria": {
+                    "min_grade": 0.8
+                }
+            },
+            {
+                "namespace": "new_grade",
+                "name": "new_grade",
+                "display_name": "new_grade",
+                "criteria": {
+                    "min_grade": 0.8
+                },
+            }
+        )
+
+        for i, requirement in enumerate(requirements):
+            credit_requirement, _ = CreditRequirement.add_or_update_course_requirement(
+                self.credit_course,
+                requirement,
+                i
+            )
+            CreditRequirementStatus.add_or_update_requirement_status(
+                self.old_username,
+                credit_requirement,
+                "satisfied",
+                {
+                    "final_grade": 0.95
+                }
+            )
+
+    def test_retire_user(self):
+        self.add_course_requirements()
+
+        retirement_succeeded = CreditRequirementStatus.retire_user(self.old_username)
+        self.assertTrue(retirement_succeeded)
+
+        old_username_records_exist = CreditRequirementStatus.objects.filter(username=self.old_username).exists()
+        self.assertFalse(old_username_records_exist)
+
+        new_username_records_exist = CreditRequirementStatus.objects.filter(username=self.retired_username).exists()
+        self.assertTrue(new_username_records_exist)
+
+    def test_retire_user_with_data(self):
+        retirement_succeeded = CreditRequirementStatus.retire_user(self.retired_username)
+        self.assertFalse(retirement_succeeded)
