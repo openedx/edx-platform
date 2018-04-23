@@ -239,7 +239,7 @@ class CourseCohort(models.Model):
         return course_cohort
 
 
-class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
+class UnregisteredLearnerCohortAssignments(models.Model, DeletableByUserValue):
     """
     Tracks the assignment of an unregistered learner to a course's cohort.
     """
