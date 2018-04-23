@@ -191,7 +191,7 @@ class TestReviewXBlock(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(course, verify=True)
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt.ddt
 class TestReviewFunctions(TestReviewXBlock):
     """

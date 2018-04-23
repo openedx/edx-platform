@@ -177,6 +177,8 @@ def mock_render_template(*args, **kwargs):
 
 
 class ModelsTest(unittest.TestCase):
+    shard = 1
+
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
@@ -185,6 +187,7 @@ class ModelsTest(unittest.TestCase):
 
 class LogicTest(unittest.TestCase):
     """Base class for testing xmodule logic."""
+    shard = 1
     descriptor_class = None
     raw_field_data = {}
 
@@ -400,6 +403,7 @@ class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
     """
+    shard = 1
 
     def setUp(self):
         super(CourseComparisonTest, self).setUp()

@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 
 class BaseTestMixin(ModuleStoreTestCase):
+    shard = 6
     profile = None
     ENABLED_SIGNALS = ['course_published']
 
@@ -31,6 +32,8 @@ class BaseTestMixin(ModuleStoreTestCase):
 
 
 class IDTokenTest(BaseTestMixin, IDTokenTestCase):
+    shard = 6
+
     def setUp(self):
         super(IDTokenTest, self).setUp()
 
@@ -144,6 +147,8 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):
+    shard = 6
+
     def setUp(self):
         super(UserInfoTest, self).setUp()
         # create another course in the DB that only global staff have access to

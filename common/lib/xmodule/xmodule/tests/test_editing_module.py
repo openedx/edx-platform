@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class TabsEditingDescriptorTestCase(unittest.TestCase):
     """ Testing TabsEditingDescriptor"""
+    shard = 1
 
     def setUp(self):
         super(TabsEditingDescriptorTestCase, self).setUp()

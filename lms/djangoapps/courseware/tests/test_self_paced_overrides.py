@@ -23,6 +23,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
     Tests for self-paced due date overrides.
     """
+    shard = 4
 
     def setUp(self):
         self.reset_setting_cache_variables()

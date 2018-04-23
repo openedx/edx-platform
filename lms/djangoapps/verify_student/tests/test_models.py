@@ -129,6 +129,7 @@ class TestVerification(TestCase):
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
 class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
+    shard = 4
 
     def setUp(self):
         super(TestPhotoVerification, self).setUp()
@@ -390,6 +391,7 @@ class VerificationDeadlineTest(CacheIsolationTestCase):
     """
     Tests for the VerificationDeadline model.
     """
+    shard = 4
 
     ENABLED_CACHES = ['default']
 

@@ -303,6 +303,8 @@ class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.
     """
+    shard = 4
+
     def setUp(self):
 
         def clean_up_tmpdir():

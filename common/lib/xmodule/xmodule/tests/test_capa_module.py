@@ -182,6 +182,7 @@ if submission[0] == '':
 
 @ddt.ddt
 class CapaModuleTest(unittest.TestCase):
+    shard = 1
 
     def setUp(self):
         super(CapaModuleTest, self).setUp()
@@ -2002,6 +2003,7 @@ class CapaModuleTest(unittest.TestCase):
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
+    shard = 1
 
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
@@ -2797,6 +2799,8 @@ class CapaDescriptorTest(unittest.TestCase):
 
 
 class ComplexEncoderTest(unittest.TestCase):
+    shard = 1
+
     def test_default(self):
         """
         Check that complex numbers can be encoded into JSON.
@@ -2811,6 +2815,7 @@ class TestProblemCheckTracking(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.
     """
+    shard = 1
 
     def setUp(self):
         super(TestProblemCheckTracking, self).setUp()

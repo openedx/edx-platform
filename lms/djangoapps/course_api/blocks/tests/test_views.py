@@ -21,6 +21,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
     """
     Test class for BlocksView
     """
+    shard = 4
     requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field', 'due']
     BLOCK_TYPES_WITH_STUDENT_VIEW_DATA = ['video', 'discussion', 'html']
 
@@ -250,6 +251,8 @@ class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-t
     """
     Test class for BlocksInCourseView
     """
+    shard = 4
+
     def setUp(self):
         super(TestBlocksInCourseView, self).setUp()
         self.url = reverse('blocks_in_course')

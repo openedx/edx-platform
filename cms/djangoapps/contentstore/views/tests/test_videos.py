@@ -63,6 +63,8 @@ class VideoUploadTestBase(object):
     """
     Test cases for the video upload feature
     """
+    shard = 1
+
     def get_url_for_course_key(self, course_key, kwargs=None):
         """Return video handler URL for the given course"""
         return reverse_course_url(self.VIEW_NAME, course_key, kwargs)
@@ -172,6 +174,8 @@ class VideoUploadTestMixin(VideoUploadTestBase):
     """
     Test cases for the video upload feature
     """
+    shard = 1
+
     def test_anon_user(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -211,6 +215,7 @@ class VideoUploadTestMixin(VideoUploadTestBase):
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     """Test cases for the main video upload endpoint"""
+    shard = 1
 
     VIEW_NAME = 'videos_handler'
 
@@ -658,6 +663,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
     """
     Tests for video image.
     """
+    shard = 1
 
     VIEW_NAME = "video_images_handler"
 
@@ -966,6 +972,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     """
     Tests for video transcripts preferences.
     """
+    shard = 1
 
     VIEW_NAME = 'transcript_preferences_handler'
 
@@ -1277,6 +1284,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
     """Test cases for the CSV download endpoint for video uploads"""
+    shard = 1
 
     VIEW_NAME = "video_encodings_download"
 

@@ -30,6 +30,7 @@ class TestContentstore(unittest.TestCase):
     """
     Test the methods in contentstore.mongo using deprecated and non-deprecated keys
     """
+    shard = 2
 
     # don't use these 2 class vars as they restore behavior once the tests are done
     asset_deprecated = None

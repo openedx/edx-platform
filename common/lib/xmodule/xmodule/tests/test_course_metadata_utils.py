@@ -37,6 +37,7 @@ class CourseMetadataUtilsTestCase(TestCase):
     """
     Tests for course_metadata_utils.
     """
+    shard = 1
 
     def setUp(self):
         """

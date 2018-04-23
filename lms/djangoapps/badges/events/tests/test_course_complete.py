@@ -13,6 +13,8 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     Tests for the course completion helper functions.
     """
+    shard = 4
+
     def setUp(self, **kwargs):
         super(CourseCompleteTestCase, self).setUp()
         # Need key to be deterministic to test slugs.

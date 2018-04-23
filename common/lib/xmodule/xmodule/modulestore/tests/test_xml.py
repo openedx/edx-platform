@@ -32,6 +32,8 @@ class TestXMLModuleStore(TestCase):
     """
     Test around the XML modulestore
     """
+    shard = 2
+
     @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during

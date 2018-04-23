@@ -21,6 +21,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
     """
     Tests for credit requirement display on the progress page.
     """
+    shard = 4
 
     USERNAME = "bob"
     PASSWORD = "test"

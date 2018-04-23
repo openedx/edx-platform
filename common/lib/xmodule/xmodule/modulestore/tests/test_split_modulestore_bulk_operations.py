@@ -14,6 +14,8 @@ from opaque_keys.edx.locator import CourseLocator
 
 
 class TestBulkWriteMixin(unittest.TestCase):
+    shard = 2
+
     def setUp(self):
         super(TestBulkWriteMixin, self).setUp()
         self.bulk = SplitBulkWriteMixin()
@@ -54,6 +56,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     """
     Tests of the bulk write mixin when bulk operations aren't active.
     """
+    shard = 2
+
     @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
     def test_no_bulk_read_structure(self, version_guid):
         # Reading a structure when no bulk operation is active should just call
@@ -296,6 +300,8 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     """
     Tests of BulkWriteMixin methods for finding many structures or indexes
     """
+    shard = 2
+
     def test_no_bulk_find_matching_course_indexes(self):
         branch = Mock(name='branch')
         search_targets = MagicMock(name='search_targets')
@@ -572,6 +578,8 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
     Tests of the bulk write mixin when bulk write operations are open
     """
+    shard = 2
+
     def setUp(self):
         super(TestBulkWriteMixinOpen, self).setUp()
         self.bulk._begin_bulk_operation(self.course_key)

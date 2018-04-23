@@ -19,6 +19,7 @@ class ModuleStoreSettingsMigration(TestCase):
     """
     Tests for the migration code for the module store settings
     """
+    shard = 2
 
     OLD_CONFIG = {
         "default": {

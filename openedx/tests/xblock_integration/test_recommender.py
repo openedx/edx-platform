@@ -196,7 +196,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestRecommenderCreateFromEmpty(TestRecommender):
     """
     Check whether we can add resources to an empty database correctly
@@ -223,7 +223,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
                 self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestRecommenderResourceBase(TestRecommender):
     """Base helper class for tests with resources."""
     def setUp(self):
@@ -256,7 +256,7 @@ class TestRecommenderResourceBase(TestRecommender):
         return resource
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestRecommenderWithResources(TestRecommenderResourceBase):
     """
     Check whether we can add/edit/flag/export resources correctly
@@ -421,7 +421,7 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt
 class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
     """
@@ -535,7 +535,7 @@ class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
         self.check_event_response_by_key('handle_vote', resource, 'newVotes', test_case['new_votes'])
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt
 class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
     """
@@ -630,7 +630,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
         self.check_event_response_by_http_status(test_case['handler'], resource, test_case['status'])
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt
 class TestRecommenderFileUploading(TestRecommender):
     """

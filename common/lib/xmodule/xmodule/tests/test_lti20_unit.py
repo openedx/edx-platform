@@ -13,6 +13,7 @@ from . import LogicTest
 
 class LTI20RESTResultServiceTest(LogicTest):
     """Logic tests for LTI module. LTI2.0 REST ResultService"""
+    shard = 1
     descriptor_class = LTIDescriptor
 
     def setUp(self):

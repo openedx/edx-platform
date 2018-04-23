@@ -26,6 +26,8 @@ class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page
     """
+    shard = 4
+
     def setUp(self):
         super(RefundTests, self).setUp()
 

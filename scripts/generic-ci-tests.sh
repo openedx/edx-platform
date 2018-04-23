@@ -144,23 +144,7 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit")
-        case "$SHARD" in
-            "all"|[1-4]|"noshard")
-                $TOX bash scripts/unit-tests.sh
-                ;;
-            *)
-                # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
-                # backwards compatibility feature. If a new shard (e.g., shard n) is introduced in the build
-                # system, but the tests are called with the old code, then builds will not fail because the
-                # code is out of date. Instead, there will be an instantly-passing shard.
-                mkdir -p reports/lms
-                emptyxunit "lms/nosetests"
-                ;;
-        esac
-        ;;
-
-    "cms-unit"|"commonlib-unit")
+    "lms-unit"|"cms-unit"|"commonlib-unit")
         $TOX bash scripts/unit-tests.sh
         ;;
 

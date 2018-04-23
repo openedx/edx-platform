@@ -16,6 +16,7 @@ class CourseDataTest(ModuleStoreTestCase):
     """
     Simple tests to ensure CourseData works as advertised.
     """
+    shard = 4
 
     def setUp(self):
         super(CourseDataTest, self).setUp()

@@ -52,6 +52,7 @@ class BlockMock(Mock):
 
 class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
+    shard = 4
 
     def setUp(self):
         super(TestHandlerUrl, self).setUp()
@@ -117,6 +118,7 @@ class TestHandlerUrl(TestCase):
 
 class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
+    shard = 4
 
     def setUp(self):
         super(TestUserServiceAPI, self).setUp()
@@ -167,6 +169,7 @@ class TestUserServiceAPI(TestCase):
 @ddt
 class TestBadgingService(ModuleStoreTestCase):
     """Test the badging service interface"""
+    shard = 4
 
     def setUp(self):
         super(TestBadgingService, self).setUp()
@@ -232,6 +235,7 @@ class TestBadgingService(ModuleStoreTestCase):
 
 class TestI18nService(ModuleStoreTestCase):
     """ Test ModuleI18nService """
+    shard = 4
 
     def setUp(self):
         """ Setting up tests """

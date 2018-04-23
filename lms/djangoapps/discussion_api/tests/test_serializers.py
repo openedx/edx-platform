@@ -31,8 +31,12 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=6)
 @ddt.ddt
 class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
+    """
+    Test Mixin for Serializer tests
+    """
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
@@ -132,7 +136,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         self.assertEqual(serialized["voted"], True)
 
 
-@attr(shard=3)
+@attr(shard=6)
 @ddt.ddt
 class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer serialization."""
@@ -234,6 +238,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.assertNotIn("response_count", serialized)
 
 
+@attr(shard=6)
 @ddt.ddt
 class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for CommentSerializer."""
@@ -393,6 +398,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         self.assertEqual(serialized["children"][1]["children"][0]["parent_id"], "test_child_2")
 
 
+@attr(shard=6)
 @ddt.ddt
 class ThreadSerializerDeserializationTest(
         ForumsEnableMixin,
@@ -602,6 +608,7 @@ class ThreadSerializerDeserializationTest(
         )
 
 
+@attr(shard=6)
 @ddt.ddt
 class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""

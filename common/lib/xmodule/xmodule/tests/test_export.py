@@ -62,6 +62,7 @@ class RoundTripTestCase(unittest.TestCase):
     And we compare original import with second import (after export).
     Thus we make sure that export and import work properly.
     """
+    shard = 1
 
     def setUp(self):
         super(RoundTripTestCase, self).setUp()
@@ -152,6 +153,8 @@ class TestEdxJsonEncoder(unittest.TestCase):
     """
     Tests for xml_exporter.EdxJSONEncoder
     """
+    shard = 1
+
     def setUp(self):
         super(TestEdxJsonEncoder, self).setUp()
 

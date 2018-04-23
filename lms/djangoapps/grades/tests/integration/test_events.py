@@ -24,6 +24,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
     Tests integration between the eventing in various layers
     of the grading infrastructure.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
