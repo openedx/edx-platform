@@ -26,6 +26,7 @@ from openedx.core.lib.api.authentication import (
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
     User,
+    UserProfile,
     get_retired_email_by_email,
     get_potentially_retired_user_by_username_and_hash,
     get_potentially_retired_user_by_username
@@ -476,3 +477,96 @@ class AccountRetirementView(ViewSet):
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AccountRetireFinalView(APIView):
+    """
+    Part of the retirement API, accepts POSTs to perform final actions to retire a user
+    once all other retirement tasks are complete.
+    """
+    authentication_classes = (JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+
+
+    def post(self, request, username):
+        """
+        POST /api/user/v1/accounts/{username}/retire/
+
+        Allows an administrative user to take the following actions
+        on behalf of an LMS user:
+        - Clear these auth_user fields:
+            - first_name
+            - last_name
+            - country
+            - date_of_birth
+        - Clear all PII from auth_userprofile, including:
+            - language
+            - location
+            - gender
+            - mailing_address
+            - year_of_birth
+            - level_of_education
+            - goals
+            - country
+            - city
+            - bio
+        - Remove user profile picture from S3, if one exists.
+            - openedx/core/djangoapps/profile_images/views.py
+        - Disable any/all OAuth tokens? (PLAT-2076)
+        - Delete enterprise data records, including:
+            - enterprise_pendingenterprisecustomeruser
+            - enterprise_pendingenrollment (cascade delete of above)
+            - enterprise_enterprisecustomeruser
+            - sap_success_factors_sapsuccessfactorslearnerdatatransmission3ce5
+        - Delete course entitlements, including:
+            - entitlements_courseentitlement
+            - entitlements_courseentitlementsupportdetail
+        - Delete country cache items.
+        - Set auth_user's is_active field to False.
+        - Retire (hash) auth_user username field.
+        """
+        user_model = get_user_model()
+        retired_username = request.data['retired_username']
+        original_email = request.data['email']
+
+        try:
+            user = get_potentially_retired_user_by_username_and_hash(username, retired_username)
+            user_profile = UserProfile.objects.get(user=user)
+
+            with transaction.atomic():
+                # Clear the relevant auth_user fields.
+                user.first_name = ""
+                user.last_name = ""
+                user.country = ""
+                user.date_of_birth = None
+                user.is_staff = False
+                user.is_superuser = False
+                user.is_active = False
+                user.save()
+
+                # Clear the relevant fields from auth_userprofile.
+                user_profile.name = ""
+                user_profile.language = ""
+                user_profile.location = ""
+                user_profile.gender = None
+                user_profile.mailing_address = None
+                user_profile.year_of_birth = None
+                user_profile.level_of_education = None
+                user_profile.goals = None
+                user_profile.country = None
+                user_profile.city = None
+                user_profile.bio = None
+                user_profile.save()
+
+
+
+        except user_model.DoesNotExist, UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # This signal allows lms' email_marketing and other 3rd party email
+        # providers to unsubscribe the user as well
+        USER_RETIRE_MAILINGS.send(sender=self.__class__, user=user)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -80,6 +80,11 @@ urlpatterns = [
         name='deactivate_logout'
     ),
     url(
+        r'^v1/accounts/retire/$',
+        AccountRetireFinalView.as_view(),
+        name='accounts_retire_final'
+    ),
+    url(
         r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),
         IDVerificationStatusView.as_view(),
         name='verification_status'
