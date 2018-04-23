@@ -169,14 +169,11 @@ def get_cached_discussion_key(course_id, discussion_id):
     map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
     raises a DiscussionIdMapIsNotCached exception.
     """
-    try:
-        mapping = CourseStructure.objects.get(course_id=course_id).discussion_id_map
-        if not mapping:
-            raise DiscussionIdMapIsNotCached()
-
-        return mapping.get(discussion_id)
-    except CourseStructure.DoesNotExist:
+    discussion_settings = get_course_discussion_settings(course_id)
+    if discussion_settings.discussions_id_map is None:
         raise DiscussionIdMapIsNotCached()
+
+    return discussion_settings.discussions_id_map.get(discussion_id)
 
 
 def get_cached_discussion_id_map(course, discussion_ids, user):
