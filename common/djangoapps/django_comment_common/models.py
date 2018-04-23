@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_noop
+from jsonfield.fields import JSONField
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
@@ -179,6 +180,11 @@ class CourseDiscussionSettings(models.Model):
         max_length=255,
         db_index=True,
         help_text="Which course are these settings associated with?",
+    )
+    discussions_id_map = JSONField(
+        null=True,
+        blank=True,
+        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
     always_divide_inline_discussions = models.BooleanField(default=False)
     _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
