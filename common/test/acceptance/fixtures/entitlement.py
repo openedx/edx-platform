@@ -1,4 +1,5 @@
 import json
+import datetime
 from random import randint
 from uuid import uuid4
 
@@ -22,6 +23,10 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
             The default is for the entitlement to be unexpired, which is generally what we want for testing
             so students can use the entitlement.
         """
+        now = datetime.datetime.now()
+        tomorrow = now + datetime.timedelta(days=1)
+        yesterday = now - datetime.timedelta(days=1)
+
         self._entitlement_dict = {
             'user': user,
             'course_uuid': str(uuid4()),
@@ -30,6 +35,45 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
             'enrollment_course_run': enrollment_course_run,
             'order_number': randint(0, 999)
         }
+
+        self.sessions_list = [
+            {
+                "key": "course-v1:edX+TestX+Test_Course_1",
+                "title": "Test Course",
+                "seats": [
+                    {
+                        "type": mode,
+                        "upgrade_deadline": tomorrow,
+                    }
+                ],
+                "start": yesterday,
+                "end": tomorrow,
+                "enrollment_start": yesterday,
+                "enrollment_end": tomorrow,
+                "type": mode,
+                "status": "published",
+                "availability": "Current",
+                "hidden": False
+            },
+            {
+                "key": "course-v1:edX+TestX+Test_Course_2",
+                "title": "Test Course",
+                "seats": [
+                    {
+                        "type": mode,
+                        "upgrade_deadline": tomorrow,
+                    }
+                ],
+                "start": yesterday,
+                "end": tomorrow,
+                "enrollment_start": yesterday,
+                "enrollment_end": tomorrow,
+                "type": mode,
+                "status": "published",
+                "availability": "Current",
+                "hidden": False
+            }
+        ]
 
     def __str__(self):
         """

@@ -416,7 +416,8 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
-class LmsDashboardCourseEntitlementTest(UniqueCourseTest):
+@patch('openedx.core.lib.edx_api_utils.get_edx_api_data')
+class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTestMultiple):
     """ Test suite for course entitlements cards on the Student Dashboard page """
 
     def setUp(self):
@@ -435,17 +436,16 @@ class LmsDashboardCourseEntitlementTest(UniqueCourseTest):
             email=self.email,
         ).visit()
 
-        self.entitlement_fixture = CourseEntitlementFixture(self.username, self.course_id)
-        self.entitlement_fixture.install()
-
-        self.mock_sessions = []
+        self.refundable_entitlement = CourseEntitlementFixture(self.username)
+        self.refundable_entitlement.install()
+        self.unrefundable_entitlement = CourseEntitlementFixture(self.username, expired_at=datetime.datetime.now())
+        self.refundable_entitlement.install()
 
         # Navigate the authenticated, enrolled user to the dashboard page and get testing!
         self.dashboard_page.visit()
 
-    @patch('openedx.core.lib.edx_api_utils.get_edx_api_data')
     def test_entitlement_session_selection(self, mock_get_sessions):
-        mock_get_sessions.return_value = self.mock_sessions
+        mock_get_sessions.return_value = self.refundable_entitlement.sessions_list
         # Verify that a course card appears for the learner's unfulfilled entitlement
         assert True
         # Verify that a Select Session button is present and enabled on the unfulfilled entitlement's course card.
@@ -462,19 +462,22 @@ class LmsDashboardCourseEntitlementTest(UniqueCourseTest):
         # Verify that the View Course button is removed from the course card after leaving the current session.
 
 
-    def test_refundable_can_unenroll(self):
+    def test_refundable_can_unenroll(self, mock_get_sessions):
+        mock_get_sessions.return_value = self.refundable_entitlement.sessions_list
         # Verify that the gear icon and unenroll option are available for an entitlement that is refundable.
         # Verify that selecting unenroll from the gear dropdown opens an entitlement unenrollment modal with the correct header for the course.
         # Verify that selecting unenroll in the entitlement unenrollment modal triggers a DELETE request to the appropriate API endpoint to revoke/refund the entitlement and redirects the user to the dashboard.
         assert True
 
 
-    def test_unrefundable_cannot_unenroll(self):
+    def test_unrefundable_cannot_unenroll(self, mock_get_sessions):
+        mock_get_sessions.return_value = self.unrefundable_entitlement.sessions_list
         # Verify that the gear icon is not on the course card for an entitlement that is not refundable.
         assert True
 
 
-    def test_logged_out_unenroll(self):
+    def test_logged_out_unenroll(self, mock_get_sessions):
+        mock_get_sessions.return_value = []
         # Verify that a logged out user that selects unenroll is redirected to the login page.
         assert True
 
