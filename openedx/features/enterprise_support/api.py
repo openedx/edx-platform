@@ -169,65 +169,64 @@ class EnterpriseApiClient(object):
             fetch_enterprise_learner_data(user)
 
         Argument:
-            site: (Site) site instance
             user: (User) django auth user
 
         Returns:
-            dict: {
-                "enterprise_api_response_for_learner": {
-                    "count": 1,
-                    "num_pages": 1,
-                    "current_page": 1,
-                    "results": [
-                        {
-                            "enterprise_customer": {
-                                "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                "name": "TestShib",
-                                "catalog": 2,
-                                "active": true,
-                                "site": {
-                                    "domain": "example.com",
-                                    "name": "example.com"
-                                },
-                                "enable_data_sharing_consent": true,
-                                "enforce_data_sharing_consent": "at_login",
-                                "branding_configuration": {
-                                    "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                    "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
-                                },
-                                "enterprise_customer_entitlements": [
-                                    {
-                                        "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                        "entitlement_id": 69
-                                    }
-                                ]
+            dict:
+            {
+                "count": 1,
+                "num_pages": 1,
+                "current_page": 1,
+                "next": null,
+                "start": 0,
+                "previous": null
+                "results": [
+                    {
+                        "enterprise_customer": {
+                            "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                            "name": "TestShib",
+                            "catalog": 2,
+                            "active": true,
+                            "site": {
+                                "domain": "example.com",
+                                "name": "example.com"
                             },
-                            "user_id": 5,
-                            "user": {
-                                "username": "staff",
-                                "first_name": "",
-                                "last_name": "",
-                                "email": "staff@example.com",
-                                "is_staff": true,
-                                "is_active": true,
-                                "date_joined": "2016-09-01T19:18:26.026495Z"
+                            "enable_data_sharing_consent": true,
+                            "enforce_data_sharing_consent": "at_login",
+                            "branding_configuration": {
+                                "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
                             },
-                            "data_sharing_consent_records": [
+                            "enterprise_customer_entitlements": [
                                 {
-                                    "username": "staff",
-                                    "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                    "exists": true,
-                                    "course_id": "course-v1:edX DemoX Demo_Course",
-                                    "consent_provided": true,
-                                    "consent_required": false
+                                    "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                    "entitlement_id": 69
                                 }
-                            ]
-                        }
-                    ],
-                    "next": null,
-                    "start": 0,
-                    "previous": null
-                }
+                            ],
+                            "replace_sensitive_sso_username": False,
+                        },
+                        "user_id": 5,
+                        "user": {
+                            "username": "staff",
+                            "first_name": "",
+                            "last_name": "",
+                            "email": "staff@example.com",
+                            "is_staff": true,
+                            "is_active": true,
+                            "date_joined": "2016-09-01T19:18:26.026495Z"
+                        },
+                        "data_sharing_consent_records": [
+                            {
+                                "username": "staff",
+                                "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                "exists": true,
+                                "course_id": "course-v1:edX DemoX Demo_Course",
+                                "consent_provided": true,
+                                "consent_required": false
+                            }
+                        ]
+                    }
+                ],
             }
 
         Raises:

@@ -2,19 +2,21 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 
-## This template should not use the target student's details when masquerading, see TNL-4895
-<%
-self.real_user = getattr(user, 'real_user', user)
-username = self.real_user.username
-profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
-%>
-
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
 %>
+
+<%
+## This template should not use the target student's details when masquerading, see TNL-4895
+self.real_user = getattr(user, 'real_user', user)
+username = get_enterprise_learner_generic_name(request) or self.real_user.username
+profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
+%>
+
 % if uses_bootstrap:
     <div class="nav-item nav-item-hidden-collapsed container">
         <div class="nav align-items-center">
