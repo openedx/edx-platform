@@ -1,7 +1,0 @@
-# DON'T JUST ADD NEW DEPENDENCIES!!!
-#
-# If you open a pull request that adds a new dependency, you should notify:
-#   * @edx/ospr - to check licensing
-#   * @edx/devops - to check system requirements
-
-# Empty file left here until all the places that expect it have been updated.
