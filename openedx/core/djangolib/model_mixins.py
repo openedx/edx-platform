@@ -34,7 +34,7 @@ class DeletableByUserValue(object):
         filter_kwargs = {field: value}
         records_to_delete = cls.objects.filter(**filter_kwargs)
         if records_to_delete.exists():
-            num_of_records, _ = records_to_delete.delete()
-            return num_of_records > 0
+            records_to_delete.delete()
+            return True
         else:
             return False
