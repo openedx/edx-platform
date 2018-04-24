@@ -139,11 +139,18 @@ def set_course_discussion_settings(course_key, **kwargs):
         divided_discussions (list): List of discussion ids.
         division_scheme (str): `CourseDiscussionSettings.NONE`, `CourseDiscussionSettings.COHORT`,
             or `CourseDiscussionSettings.ENROLLMENT_TRACK`
+        discussions_id_map (dict): Dict containing discussion IDs as keys and the associated discussion
+            XBlock usage keys as values.
 
     Returns:
         A CourseDiscussionSettings object.
     """
-    fields = {'division_scheme': basestring, 'always_divide_inline_discussions': bool, 'divided_discussions': list}
+    fields = {
+        'division_scheme': basestring,
+        'always_divide_inline_discussions': bool,
+        'divided_discussions': list,
+        'discussions_id_map': dict,
+    }
     course_discussion_settings = get_course_discussion_settings(course_key)
     for field, field_type in fields.items():
         if field in kwargs:

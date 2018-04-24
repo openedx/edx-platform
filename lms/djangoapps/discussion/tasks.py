@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from celery_utils.logged_task import LoggedTask
+from django_comment_common.utils import set_course_discussion_settings
 from edx_ace import ace
 from edx_ace.utils import date
 from edx_ace.message import MessageType
@@ -54,7 +55,8 @@ def update_discussions_map(context):
             # Add this blocks children to the stack so that we can traverse them as well.
             blocks_stack.extend(children)
 
-    # TODO Store discussions_id_map for later retrieval
+    # Store discussions_id_map for later retrieval
+    set_course_discussion_settings(course_key, {'discussions_id_map': discussions_id_map})
 
 
 class ResponseNotification(MessageType):
