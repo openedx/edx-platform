@@ -56,19 +56,20 @@
         % endif
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
+          <ul class="courses-listing journal-list">
+            %for journal in journals:
+            <li class="courses-listing-item">
+              <%include file="../journal.html" args="journal=journal, journals_root_url=journals_root_url" />
+            </li>
+          %endfor
+          </ul>
+
           <ul class="courses-listing">
             %for course in courses:
             <li class="courses-listing-item">
               <%include file="../course.html" args="course=course" />
             </li>
             %endfor
-          </ul>
-          <ul class="courses-listing">
-            %for journal in journals:
-            <li class="courses-listing-item">
-              <%include file="../journal.html" args="journal=journal, journals_root_url=journals_root_url" />
-            </li>
-          %endfor
           </ul>
         </div>
 
