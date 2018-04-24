@@ -4,6 +4,7 @@ Tests for custom Teams Serializers.
 """
 from django.core.paginator import Paginator
 from django.test.client import RequestFactory
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer, MembershipSerializer, TopicSerializer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
@@ -29,6 +30,7 @@ class SerializerTestCase(SharedModuleStoreTestCase):
         )
 
 
+@attr(shard=4)
 class MembershipSerializerTestCase(SerializerTestCase):
     """
     Tests for the membership serializer.
@@ -66,6 +68,7 @@ class MembershipSerializerTestCase(SerializerTestCase):
         self.assertNotIn('membership', data['team'])
 
 
+@attr(shard=4)
 class TopicSerializerTestCase(SerializerTestCase):
     """
     Tests for the `TopicSerializer`, which should serialize team count data for
@@ -115,6 +118,7 @@ class TopicSerializerTestCase(SerializerTestCase):
             )
 
 
+@attr(shard=4)
 class BaseTopicSerializerTestCase(SerializerTestCase):
     """
     Base class for testing the two paginated topic serializers.
@@ -169,6 +173,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         self.assert_serializer_output([], num_teams_per_topic=0, num_queries=0)
 
 
+@attr(shard=4)
 class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
     """
     Tests for the `BulkTeamCountTopicSerializer`, which should serialize team_count

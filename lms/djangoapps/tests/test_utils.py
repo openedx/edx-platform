@@ -7,8 +7,10 @@ import ddt
 
 from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from nose.plugins.attrib import attr
 
 
+@attr(shard=4)
 @ddt.ddt
 class UtilsTests(TestCase):
     @ddt.data(

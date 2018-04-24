@@ -9,11 +9,13 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
+from nose.plugins.attrib import attr
 
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 from survey.models import SurveyAnswer, SurveyForm
 
 
+@attr(shard=4)
 @ddt.ddt
 class SurveyModelsTests(TestCase):
     """

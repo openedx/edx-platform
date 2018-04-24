@@ -17,6 +17,7 @@ from nose.tools import (  # pylint: disable=no-name-in-module
 )
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
+from nose.plugins.attrib import attr
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import (
@@ -95,6 +96,7 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
     raise requests.exceptions.ConnectionError
 
 
+@attr(shard=4)
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
@@ -319,6 +321,7 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
             self.assertEqual(fourth_result, first_result)
 
 
+@attr(shard=4)
 class VerificationDeadlineTest(CacheIsolationTestCase):
     """
     Tests for the VerificationDeadline model.

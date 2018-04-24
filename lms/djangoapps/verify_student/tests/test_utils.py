@@ -10,6 +10,7 @@ import pytz
 from mock import patch
 from pytest import mark
 from django.conf import settings
+from nose.plugins.attrib import attr
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.utils import verification_for_datetime
 from student.tests.factories import UserFactory
@@ -19,6 +20,7 @@ FAKE_SETTINGS = {
 }
 
 
+@attr(shard=4)
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @mark.django_db
 class TestVerifyStudentUtils(unittest.TestCase):

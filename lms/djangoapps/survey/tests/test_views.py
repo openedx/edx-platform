@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from django.core.urlresolvers import reverse
 from django.test.client import Client
+from nose.plugins.attrib import attr
 
 from student.tests.factories import UserFactory
 from survey.models import SurveyAnswer, SurveyForm
@@ -14,6 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 class SurveyViewsTests(ModuleStoreTestCase):
     """
     All tests for the views.py file
