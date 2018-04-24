@@ -121,6 +121,38 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     return response
 
 
+def delete_all_notes_for_user(user, user_id):
+    """
+    helper method to delete all notes for a user_id, as part of GDPR compliance
+
+    :param user_id: The user object associated with the deleted notes
+    :return: response (requests) object
+
+    Raises:
+        RequestException - when notes api is not found/misconfigured.
+    """
+    # TODO:PLAT-2001 add to master LMS endpoint.
+    url = get_internal_endpoint()
+    headers = {
+        "x-annotator-auth-token": get_edxnotes_id_token(user),
+    }
+    data = {
+        "user_id": user_id
+    }
+    try:
+        response = requests.delete(
+            url=url,
+            headers=headers,
+            data=data,
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
+        )
+    except RequestException:
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(headers))
+        raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
+
+    return response
+
+
 def preprocess_collection(user, course, collection):
     """
     Prepare `collection(notes_list)` provided by edx-notes-api
