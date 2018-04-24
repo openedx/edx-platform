@@ -203,8 +203,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 143),
-        (ModuleStoreEnum.Type.split, 4, 143),
+        (ModuleStoreEnum.Type.mongo, 10, 146),
+        (ModuleStoreEnum.Type.split, 4, 146),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1424,17 +1424,21 @@ class ProgressPageTests(ProgressPageBaseTests):
                 resp = self._get_progress_page()
                 self.assertContains(resp, u"Download Your Certificate")
 
-    @ddt.data(True, False)
-    def test_progress_queries_paced_courses(self, self_paced):
+    @ddt.data(
+        (True, 37),
+        (False, 36)
+    )
+    @ddt.unpack
+    def test_progress_queries_paced_courses(self, self_paced, query_count):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(34 if self_paced else 33, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 40, 27),
-        (True, 33, 23)
+        (False, 43, 27),
+        (True, 36, 23)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
