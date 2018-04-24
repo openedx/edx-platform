@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
@@ -21,7 +22,10 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from .. import cohorts
-from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup
+from ..models import (
+    CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup,
+    UnregisteredLearnerCohortAssignments
+)
 from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
@@ -267,7 +271,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[])
-        cohort2 = CohortFactory(course_id=course.id, name="RandomCohort", users=[])
+        CohortFactory(course_id=course.id, name="RandomCohort", users=[])
         config_course_cohorts(course, is_cohorted=True)
 
         # Add email address to the cohort
@@ -873,3 +877,47 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             CourseUserGroupPartitionGroup.objects.get(
                 course_user_group_id=self.first_cohort.id
             )
+
+
+class TestUnregisteredLearnerCohortAssignments(TestCase):
+    """
+    Tests the UnregisteredLearnerCohortAssignment.retire_user method.
+    """
+
+    def setUp(self):
+        super(TestUnregisteredLearnerCohortAssignments, self).setUp()
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.cohort = CourseUserGroup.objects.create(
+            name="TestCohort",
+            course_id=self.course_key,
+            group_type=CourseUserGroup.COHORT
+        )
+        self.cohort_assignment = UnregisteredLearnerCohortAssignments.objects.create(
+            course_user_group=self.cohort,
+            course_id=self.course_key,
+            email='learner@example.com'
+        )
+
+    def test_retired_user_has_deleted_record(self):
+        was_retired = UnregisteredLearnerCohortAssignments.delete_by_user_value(
+            value='learner@example.com',
+            field='email'
+        )
+
+        self.assertTrue(was_retired)
+
+        search_retired_user_results = \
+            UnregisteredLearnerCohortAssignments.objects.filter(
+                email=self.cohort_assignment.email
+            )
+        self.assertFalse(search_retired_user_results)
+
+    def test_retired_user_with_no_cohort_returns_false(self):
+        known_learner_email = self.cohort_assignment.email
+        was_retired = UnregisteredLearnerCohortAssignments.delete_by_user_value(
+            value='nonexistantlearner@example.com',
+            field='email'
+        )
+
+        self.assertFalse(was_retired)
+        self.assertEqual(self.cohort_assignment.email, known_learner_email)
