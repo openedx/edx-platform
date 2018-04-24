@@ -2,6 +2,8 @@
 Custom Django Model mixins.
 """
 
+import logging
+log = logging.getLogger(__name__)
 
 class DeprecatedModelMixin(object):
     """
@@ -32,5 +34,6 @@ class DeletableByUserValue(object):
         Returns False otherwise.
         """
         filter_kwargs = {field: value}
+        log.WARNING("LOOK: %s", str(cls.__mro__))
         num_deleted_records, _ = cls.objects.filter(**filter_kwargs).delete()
         return num_deleted_records > 0
