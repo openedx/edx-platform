@@ -677,7 +677,7 @@ class PendingNameChange(models.Model):
     rationale = models.CharField(blank=True, max_length=1024)
 
 
-class PendingEmailChange(DeletableByUserValue, models.Model):
+class PendingEmailChange(models.Model, DeletableByUserValue):
     """
     This model keeps track of pending requested changes to a user's email address.
     """

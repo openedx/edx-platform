@@ -32,5 +32,8 @@ class DeletableByUserValue(object):
         Returns False otherwise.
         """
         filter_kwargs = {field: value}
-        num_deleted_records, _ = cls.objects.filter(**filter_kwargs).delete()
+        num_deleted_records = 0
+        for instance in cls.objects.filter(**filter_kwargs):
+            instance.delete()
+            num_deleted_records += 1
         return num_deleted_records > 0
