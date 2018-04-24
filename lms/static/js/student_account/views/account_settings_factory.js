@@ -22,17 +22,17 @@
             contactEmail,
             allowEmailChange,
             socialPlatforms,
-
             syncLearnerProfileData,
             enterpriseName,
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
-            extendedProfileFields
+            extendedProfileFields,
+            enableGDPRFlag
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
                 showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField,
-                emailFieldView, socialFields, platformData,
+                emailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
                 fullNameFieldData, emailFieldData, countryFieldData, additionalFields, fieldItem;
 
@@ -290,6 +290,18 @@
                 );
             }
             aboutSectionsData.push(socialFields);
+
+            // Add account deletion fields
+            if (enableGDPRFlag) {
+                accountDeletionFields = {
+                    title: gettext('Delete My Account'),
+                    fields: [],
+                    // Used so content can be rendered external to Backbone
+                    domHookId: 'account-deletion-container'
+                };
+                aboutSectionsData.push(accountDeletionFields);
+            }
+
 
             // set TimeZoneField to listen to CountryField
             getUserField = function(list, search) {

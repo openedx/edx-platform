@@ -535,6 +535,98 @@
       }
     }
 
+    .account-deletion-details {
+      .btn-outline-primary {
+        @extend %ui-clear-button;
+
+        // set styles
+        @extend %btn-pl-default-base;
+
+        @include font-size(18);
+
+        border: 1px solid $blue;
+        color: $blue;
+        padding: 11px 14px;
+        line-height: normal;
+        margin: 20px 0;
+      }
+
+      .paragon__modal-open {
+        overflow-y: scroll;
+        color: $dark-gray;
+
+        .paragon__modal-title {
+          font-weight: $font-semibold;
+        }
+
+        .paragon__modal-body {
+          line-height: 1.5;
+
+          .alert-title {
+            line-height: 1.5;
+          }
+        }
+
+        .paragon__alert-warning {
+          color: $dark-gray;
+        }
+
+        .next-steps {
+          margin-bottom: 10px;
+          font-weight: $font-semibold;
+        }
+
+        .confirm-password-input {
+          width: 50%;
+        }
+
+        .paragon__btn:not(.cancel-btn) {
+          @extend %btn-primary-blue;
+        }
+      }
+
+      .modal-alert {
+        display: flex;
+
+        .icon-wrapper {
+          padding-right: 15px;
+        }
+
+        .alert-content {
+          .alert-title {
+            color: $dark-gray;
+            margin-bottom: 10px;
+            font: {
+              size: 1rem;
+              weight: $font-semibold;
+            }
+          }
+
+          a {
+            color: $blue-u1;
+          }
+        }
+      }
+
+      .delete-confirmation-wrapper {
+        .paragon__modal-footer {
+          .paragon__btn-outline-primary {
+            @extend %ui-clear-button;
+
+            // set styles
+            @extend %btn-pl-default-base;
+
+            @include margin-left(25px);
+
+            border-color: $blue;
+            color: $blue;
+            padding: 11px 14px;
+            line-height: normal;
+          }
+        }
+      }
+    }
+
     &:last-child {
       border-bottom: none;
     }
