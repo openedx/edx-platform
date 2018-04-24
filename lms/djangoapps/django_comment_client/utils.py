@@ -157,26 +157,32 @@ def get_discussion_id_map_entry(xblock):
     )
 
 
-class DiscussionIdMapIsNotCached(Exception):
-    """Thrown when the discussion id map is not cached for this course, but an attempt was made to access it."""
-    pass
-
+@request_cached
+def get_cached_discussion_key_map(course_id):
+    """
+    Returns a map for the given course with discussion IDs as the keys
+    and the associated discussion xblock usage keys as the values.
+    """
+    discussion_key_map = {}
+    discussion_xblocks = modulestore().get_items(
+        course_id,
+        qualifiers={
+            'category': 'discussion'
+        },
+        include_orphans=False,
+    )
+    for discussion_xblock in discussion_xblocks:
+        discussion_id = getattr(discussion_xblock, 'discussion_id', None)
+        if discussion_id:
+            discussion_key_map[discussion_id] = discussion_xblock
+    return discussion_key_map
 
 @request_cached
-def get_cached_discussion_key(course_id, discussion_id):
+def get_cached_discussion_xblock(course_id, discussion_id):
     """
-    Returns the usage key of the discussion xblock associated with discussion_id if it is cached. If the discussion id
-    map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
-    raises a DiscussionIdMapIsNotCached exception.
+    Returns the usage key of the discussion xblock associated with discussion_id.
     """
-    try:
-        mapping = CourseStructure.objects.get(course_id=course_id).discussion_id_map
-        if not mapping:
-            raise DiscussionIdMapIsNotCached()
-
-        return mapping.get(discussion_id)
-    except CourseStructure.DoesNotExist:
-        raise DiscussionIdMapIsNotCached()
+    return get_cached_discussion_key_map(course_id).get(discussion_id)
 
 
 def get_cached_discussion_id_map(course, discussion_ids, user):
@@ -192,19 +198,15 @@ def get_cached_discussion_id_map_by_course_id(course_id, discussion_ids, user): 
     Returns a dict mapping discussion_ids to respective discussion xblock metadata if it is cached and visible to the
     user. If not, returns the result of get_discussion_id_map
     """
-    try:
-        entries = []
-        for discussion_id in discussion_ids:
-            key = get_cached_discussion_key(course_id, discussion_id)
-            if not key:
-                continue
-            xblock = modulestore().get_item(key)
-            if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course_id)):
-                continue
-            entries.append(get_discussion_id_map_entry(xblock))
-        return dict(entries)
-    except DiscussionIdMapIsNotCached:
-        return get_discussion_id_map_by_course_id(course_id, user)
+    entries = []
+    for discussion_id in discussion_ids:
+        xblock = get_cached_discussion_xblock(course_id, discussion_id)
+        if not xblock:
+            continue
+        if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course_id)):
+            continue
+        entries.append(get_discussion_id_map_entry(xblock))
+    return dict(entries)
 
 
 def get_discussion_id_map(course, user):
@@ -429,15 +431,11 @@ def discussion_category_id_access(course, user, discussion_id, xblock=None):
     """
     if discussion_id in course.top_level_discussion_topic_ids:
         return True
-    try:
+    if not xblock:
+        xblock = get_cached_discussion_xblock(course.id, discussion_id)
         if not xblock:
-            key = get_cached_discussion_key(course.id, discussion_id)
-            if not key:
-                return False
-            xblock = modulestore().get_item(key)
-        return has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)
-    except DiscussionIdMapIsNotCached:
-        return discussion_id in get_discussion_categories_ids(course, user)
+            return False
+    return has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)
 
 
 def get_discussion_categories_ids(course, user, include_all=False):
