@@ -5,6 +5,7 @@ This is meant to simplify the process of sending user preferences (espec. time_z
 to the templates without having to append every view file.
 
 """
+from lms.djangoapps.onboarding.constants import ACTIVATION_ERROR
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 import request_cache
@@ -44,3 +45,14 @@ def user_timezone_locale_prefs(request):
 
         cached_value.update(user_prefs)
     return cached_value
+
+
+def get_alert_messages(request):
+    alert_messages = []
+    if not request.is_ajax():
+        if request.user.is_authenticated() and not request.user.is_active and '/activate/' not in request.path:
+            alert_messages.append({
+                "type": "activation",
+                "alert": ACTIVATION_ERROR
+            })
+    return {"alert_messages": alert_messages}
