@@ -262,6 +262,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             discussion_target='Beta Testing',
             visible_to_staff_only=True
         )
+        request_cache.clear_cache(name=None)
         self.bad_discussion = ItemFactory.create(
             parent_location=self.course.location,
             category='discussion',

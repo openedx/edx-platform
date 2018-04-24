@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import json
 import math
 
-from crum import CurrentRequestUserMiddleware
 import ddt
 from django.contrib.sites.models import Site
 import mock
@@ -22,8 +21,6 @@ from lms.djangoapps.discussion.tasks import _should_send_message, _track_notific
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
-from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
