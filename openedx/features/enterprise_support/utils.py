@@ -95,7 +95,11 @@ def get_enterprise_sidebar_context(enterprise_customer):
         end_bold=HTML('</b>'),
         line_break=HTML('<br/>'),
         enterprise_name=enterprise_customer['name'],
-        platform_name=platform_name
+        platform_name=platform_name,
+        privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+            pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+        ),
+        privacy_policy_link_end=HTML("</a>"),
     )
 
     platform_welcome_template = configuration_helpers.get_value(
