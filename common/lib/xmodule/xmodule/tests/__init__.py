@@ -16,6 +16,7 @@ import traceback
 import unittest
 
 from contextlib import contextmanager, nested
+from django.test import TestCase
 from functools import wraps
 from mock import Mock
 from path import Path as path
@@ -255,7 +256,7 @@ class _BulkAssertionManager(object):
             raise BulkAssertionError(self._assertion_errors)
 
 
-class BulkAssertionTest(unittest.TestCase):
+class BulkAssertionTest(TestCase):
     """
     This context manager provides a _BulkAssertionManager to assert with,
     and then calls `raise_assertion_errors` at the end of the block to validate all
