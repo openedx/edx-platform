@@ -33,6 +33,7 @@ from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 from lms.djangoapps.verify_student.ssencrypt import (
     encrypt_and_encode,
@@ -235,7 +236,7 @@ class SSOVerification(IDVerificationAttempt):
 models.signals.post_save.connect(post_save_id_verification, sender=SSOVerification)
 
 
-class PhotoVerification(IDVerificationAttempt):
+class PhotoVerification(IDVerificationAttempt, DeletableByUserValue):
     """
     Each PhotoVerification represents a Student's attempt to establish
     their identity by uploading a photo of themselves and a picture ID. An

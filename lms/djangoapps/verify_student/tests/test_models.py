@@ -330,6 +330,27 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
             self.assertIsNotNone(fourth_result)
             self.assertEqual(fourth_result, first_result)
 
+    def test_retire_user(self):
+        user = UserFactory.create()
+        user.profile.name = u"Enrique"
+
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.mark_ready()
+        attempt.status = "submitted"
+        attempt.photo_id_image_url = "https://example.com/test/image/img.jpg"
+        attempt.face_image_url = "https://example.com/test/face/img.jpg"
+        attempt.approve()
+
+        # Before Delete
+        assert_equals(attempt.name, user.profile.name)
+        assert_equals(attempt.photo_id_image_url, 'https://example.com/test/image/img.jpg')
+        assert_equals(attempt.face_image_url, 'https://example.com/test/face/img.jpg')
+
+        # Attempt
+        self.assertTrue(SoftwareSecurePhotoVerification.delete_by_user_value(user, "user"))
+        # Reattempt
+        self.assertFalse(SoftwareSecurePhotoVerification.delete_by_user_value(user, "user"))
+
 
 class SSOVerificationTest(TestVerification):
     """
