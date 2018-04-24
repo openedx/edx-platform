@@ -4,7 +4,7 @@ define(
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/file_uploader',
         'xmodule', 'jquery.form'
     ],
-function($, _, Backbone, Utils, FileUploader) {
+function($, _, Backbone, TranscriptUtils, FileUploader) {
     'use strict';
 
     describe('Transcripts.FileUploader', function() {
@@ -95,6 +95,12 @@ function($, _, Backbone, Utils, FileUploader) {
         });
 
         describe('Upload', function() {
+            var videoId = '123-456-789-0';
+
+            beforeEach(function() {
+                TranscriptUtils.Storage.set('edx_video_id', videoId);
+            });
+
             it('File is not chosen', function() {
                 spyOn($.fn, 'ajaxSubmit');
                 view.upload();
@@ -109,6 +115,9 @@ function($, _, Backbone, Utils, FileUploader) {
                 view.upload();
 
                 expect(view.$form.ajaxSubmit).toHaveBeenCalled();
+                expect(view.$form.ajaxSubmit).toHaveBeenCalledWith(jasmine.objectContaining({
+                    data: {'edx_video_id': videoId}
+                }));
             });
         });
 

@@ -43,7 +43,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                 .apply(this, arguments);
 
             this.$el.on(
-                'input', 'input',
+                'input', '.videolist-settings-item input',
                 _.debounce(_.bind(this.inputHandler, this), this.inputDelay)
             );
 

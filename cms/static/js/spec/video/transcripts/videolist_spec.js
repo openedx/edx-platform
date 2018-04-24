@@ -99,6 +99,7 @@ function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, A
             // create mock server
             this.mockServer = createMockAjaxServer();
 
+            spyOn($.fn, 'on').and.callThrough();
             spyOn(Backbone, 'trigger').and.callThrough();
             spyOn(Utils, 'command').and.callThrough();
             spyOn(abstractEditor, 'initialize').and.callThrough();
@@ -215,14 +216,17 @@ function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, A
 
 
         it('Initialize', function(done) {
-            var view = createVideoListView(this.mockServer);
+            var view = createVideoListView(this.mockServer), callArgs;
             waitsForResponse(this.mockServer)
-              .then(function() {
-                  expect(abstractEditor.initialize).toHaveBeenCalled();
-                  expect(MessageManager.prototype.initialize).toHaveBeenCalled();
-                  expect(view.component_locator).toBe(component_locator);
-                  expect(view.$el).toHandle('input');
-              }).always(done);
+                .then(function() {
+                    expect(abstractEditor.initialize).toHaveBeenCalled();
+                    expect(MessageManager.prototype.initialize).toHaveBeenCalled();
+                    expect(view.component_locator).toBe(component_locator);
+                    expect(view.$el).toHandle('input');
+                    callArgs = view.$el.on.calls.mostRecent().args;
+                    expect(callArgs[0]).toEqual('input');
+                    expect(callArgs[1]).toEqual('.videolist-settings-item input');
+                }).always(done);
         });
 
         describe('Render', function() {
