@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from pytz import UTC
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import i4xEncoder
 from six import text_type
 
@@ -20,7 +20,6 @@ from django_comment_client.permissions import check_permissions_by_view, get_tea
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
 from django_comment_common.utils import get_course_discussion_settings
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.djangoapps.request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
@@ -131,10 +130,10 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylin
     return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
 
 
-def get_accessible_discussion_xblocks_by_course_id(course_id, user, include_all=False):  # pylint: disable=invalid-name
+def get_accessible_discussion_xblocks_by_course_id(course_id, user=None, include_all=False):  # pylint: disable=invalid-name
     """
-    Return a list of all valid discussion xblocks in this course that
-    are accessible to the given user.
+    Return a list of all valid discussion xblocks in this course.
+    Checks for the given user's access if include_all is False.
     """
     all_xblocks = modulestore().get_items(course_id, qualifiers={'category': 'discussion'}, include_orphans=False)
 
@@ -169,14 +168,15 @@ def get_cached_discussion_key(course_id, discussion_id):
     map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
     raises a DiscussionIdMapIsNotCached exception.
     """
-    try:
-        mapping = CourseStructure.objects.get(course_id=course_id).discussion_id_map
-        if not mapping:
-            raise DiscussionIdMapIsNotCached()
-
-        return mapping.get(discussion_id)
-    except CourseStructure.DoesNotExist:
+    discussion_settings = get_course_discussion_settings(course_id)
+    if discussion_settings.discussions_id_map is None:
         raise DiscussionIdMapIsNotCached()
+
+    discussion_usage_id_string = discussion_settings.discussions_id_map.get(discussion_id)
+    if discussion_usage_id_string:
+        return UsageKey.from_string(discussion_usage_id_string).map_into_course(course_id)
+    else:
+        return None
 
 
 def get_cached_discussion_id_map(course, discussion_ids, user):
