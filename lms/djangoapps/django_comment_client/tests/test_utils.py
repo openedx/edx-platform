@@ -34,11 +34,10 @@ from django_comment_common.utils import (
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
+import openedx.core.djangoapps.request_cache as request_cache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -219,7 +218,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
         # The above call is request cached, so we need to clear it for this test.
-        RequestCache.clear_request_cache()
+        request_cache.clear_cache(name=None)
         # Add an orphan discussion xblock to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
         self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
@@ -279,14 +278,16 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         usage_key = utils.get_cached_discussion_key(self.course.id, 'bogus_id')
         self.assertIsNone(usage_key)
 
-    def test_cache_raises_exception_if_course_structure_not_cached(self):
-        CourseStructure.objects.all().delete()
+    def test_cache_raises_exception_if_course_settings_not_cached(self):
+        request_cache.clear_cache(name=None)
+        CourseDiscussionSettings.objects.all().delete()
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
             utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
 
     def test_cache_raises_exception_if_discussion_id_not_cached(self):
-        cache = CourseStructure.objects.get(course_id=self.course.id)
-        cache.discussion_id_map_json = None
+        request_cache.clear_cache(name=None)
+        cache = CourseDiscussionSettings.objects.get(course_id=self.course.id)
+        cache.discussions_id_map = None
         cache.save()
 
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
@@ -314,7 +315,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         self.verify_discussion_metadata()
 
     def test_get_discussion_id_map_without_cache(self):
-        CourseStructure.objects.all().delete()
+        CourseDiscussionSettings.objects.all().delete()
         self.verify_discussion_metadata()
 
     def test_get_missing_discussion_id_map_from_cache(self):
@@ -1781,7 +1782,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
             'can_vote': True,
             'can_report': True
         })
-        RequestCache.clear_request_cache()
+        request_cache.clear_cache(name=None)
 
         set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
         content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
