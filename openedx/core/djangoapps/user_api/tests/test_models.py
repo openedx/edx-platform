@@ -85,7 +85,8 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         UserOrgTagFactory.create(user=user, org=course.id.org + "x", key="testkey", value="foobar")
         self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 2)
         # Delete the tags by user value. Ensure the rows no longer exist.
-        UserOrgTag.delete_by_user_value(user.id, "user_id")
+        deleted = UserOrgTag.delete_by_user_value(user.id, "user_id")
+        self.assertIsNotNone(deleted)
 
         self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 0)
 
@@ -97,8 +98,8 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
         UserOrgTagFactory.create(user=other_user, org=course.id.org, key="testkey", value="foobar")
         # Delete the tags by user value. Ensure the other user's row is still present.
-        UserOrgTag.delete_by_user_value(user.id, "user_id")
-
+        deleted = UserOrgTag.delete_by_user_value(user.id, "user_id")
+        self.assertIsNotNone(deleted)
         self.assertEqual(len(UserOrgTag.objects.filter(user_id=other_user.id)), 1)
 
     def test_get_value(self):
