@@ -15,44 +15,38 @@
 -r base.txt               # Core edx-platform production dependencies
 -r coverage.txt           # Utilities for calculating test coverage
 
-beautifulsoup4==4.1.3     # Library for extracting data from HTML and XML files
-before_after==0.1.3       # Syntactic sugar for mock, only used in one test case, not Python 3 compatible
+beautifulsoup4            # Library for extracting data from HTML and XML files
+before_after              # Syntactic sugar for mock, only used in one test case, not Python 3 compatible
 bok-choy                  # Framework for browser automation tests, based on selenium
-cssselect==0.9.1          # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
-ddt==0.8.0                # Run a test case multiple times with different input; used in many, many of our tests
+cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
+ddt                       # Run a test case multiple times with different input; used in many, many of our tests
 edx-i18n-tools            # Commands for developers and translators to extract, compile and validate translations
-edx-lint==0.5.4           # pylint extensions for Open edX repositories
+edx-lint                  # pylint extensions for Open edX repositories
 factory_boy==2.8.1        # Library for creating test fixtures, used in many tests
-freezegun==0.3.8          # Allows tests to mock the output of assorted datetime module functions
+freezegun                 # Allows tests to mock the output of assorted datetime module functions
 httpretty                 # Library for mocking HTTP requests, used in many tests
-isort==4.2.5              # For checking and fixing the order of imports
+isort                     # For checking and fixing the order of imports
 moto==0.3.1               # Lets tests mock AWS access via the boto library
 nose                      # Former test runner, we're still using some utility functions from it
 pa11ycrawler              # Python crawler (using Scrapy) that uses Pa11y to check accessibility of pages as it crawls
-pep8==1.5.7               # Checker for compliance with the Python style guide (PEP 8)
+pycodestyle               # Checker for compliance with the Python style guide (PEP 8)
 polib                     # Library for manipulating gettext translation files, used to test paver i18n commands
-pylint-django==0.7.2      # via edx-lint
-pyquery==1.2.9            # jQuery-like API for retrieving fragments of HTML and XML files in tests
+pyquery                   # jQuery-like API for retrieving fragments of HTML and XML files in tests
 pysqlite                  # DB-API 2.0 interface for SQLite 3.x (used as the relational database for most tests)
-pytest==3.1.3             # Testing framework
+pytest                    # Testing framework
 pytest-attrib             # Select tests based on attributes
-pytest-catchlog           # pytest plugin to catch log messages; merged into pytest 3.3.0
 pytest-cov                # pytest plugin for measuring code coverage
 pytest-django==3.1.2      # Django support for pytest
-pytest-randomly==1.2.1    # pytest plugin to randomly order tests
-pytest-xdist==1.20.0      # Parallel execution of tests on multiple CPU cores or hosts
-python-subunit==0.0.16    # via lettuce
-radon==1.3.2              # Calculates cyclomatic complexity of Python code (code quality utility)
+pytest-randomly           # pytest plugin to randomly order tests
+pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
+radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
 selenium                  # Browser automation library, used for acceptance tests
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering
-splinter==0.5.4           # Browser driver used by lettuce
-sure==1.2.3               # via lettuce
-testfixtures==4.5.0       # Provides a LogCapture utility used by several tests
-testtools==0.9.34         # via python-subunit
-tox==2.8.2                # virtualenv management for tests
+splinter                  # Browser driver used by lettuce
+testfixtures              # Provides a LogCapture utility used by several tests
+tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
-transifex-client==0.12.1  # Command-line interface for the Transifex localization service
-xmltodict==0.4.1          # via moto
+transifex-client          # Command-line interface for the Transifex localization service
 
 # Deprecated acceptance testing framework
 -e git+https://github.com/edx/lettuce.git@31b0dfd865766243e9b563ec65fae9122edf7975#egg=lettuce==0.2.23+edx.1

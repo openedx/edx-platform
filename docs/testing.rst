@@ -693,7 +693,7 @@ To view test coverage:
 Python Code Style Quality
 -------------------------
 
-To view Python code style quality (including pep8 and pylint violations) run this command::
+To view Python code style quality (including PEP 8 and pylint violations) run this command::
 
     paver run_quality
 

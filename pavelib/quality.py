@@ -1,7 +1,7 @@
 # coding=utf-8
 
 """
-Check code quality using pep8, pylint, and diff_quality.
+Check code quality using pycodestyle, pylint, and diff_quality.
 """
 import json
 import os
@@ -206,8 +206,8 @@ def _count_pylint_violations(report_file):
 
 def _get_pep8_violations(clean=True):
     """
-    Runs pep8. Returns a tuple of (number_of_violations, violations_string)
-    where violations_string is a string of all pep8 violations found, separated
+    Runs pycodestyle. Returns a tuple of (number_of_violations, violations_string)
+    where violations_string is a string of all PEP 8 violations found, separated
     by new lines.
     """
     report_dir = (Env.REPORT_DIR / 'pep8')
@@ -220,16 +220,16 @@ def _get_pep8_violations(clean=True):
     Env.METRICS_DIR.makedirs_p()
 
     if not report.exists():
-        sh('pep8 . | tee {} -a'.format(report))
+        sh('pycodestyle . | tee {} -a'.format(report))
 
     violations_list = _pep8_violations(report)
 
-    return (len(violations_list), violations_list)
+    return len(violations_list), violations_list
 
 
 def _pep8_violations(report_file):
     """
-    Returns the list of all pep8 violations in the given report_file.
+    Returns the list of all PEP 8 violations in the given report_file.
     """
     with open(report_file) as f:
         return f.readlines()
@@ -243,14 +243,14 @@ def _pep8_violations(report_file):
 @timed
 def run_pep8(options):  # pylint: disable=unused-argument
     """
-    Run pep8 on system code.
+    Run pycodestyle on system code.
     Fail the task if any violations are found.
     """
     (count, violations_list) = _get_pep8_violations()
     violations_list = ''.join(violations_list)
 
     # Print number of violations to log
-    violations_count_str = "Number of pep8 violations: {count}".format(count=count)
+    violations_count_str = "Number of PEP 8 violations: {count}".format(count=count)
     print violations_count_str
     print violations_list
 
@@ -261,7 +261,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
     # Fail if any violations are found
     if count:
-        failure_string = "FAILURE: Too many pep8 violations. " + violations_count_str
+        failure_string = "FAILURE: Too many PEP 8 violations. " + violations_count_str
         failure_string += "\n\nViolations:\n{violations_list}".format(violations_list=violations_list)
         raise BuildFailure(failure_string)
 

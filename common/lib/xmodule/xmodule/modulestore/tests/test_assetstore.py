@@ -4,6 +4,7 @@ too.
 """
 from datetime import datetime, timedelta
 import ddt
+from django.test import TestCase
 from nose.plugins.attrib import attr
 import pytz
 import unittest
@@ -84,7 +85,7 @@ class TestSortedAssetList(unittest.TestCase):
 
 @attr('mongo')
 @ddt.ddt
-class TestMongoAssetMetadataStorage(unittest.TestCase):
+class TestMongoAssetMetadataStorage(TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
