@@ -1,3 +1,0 @@
-# Placeholder for code which hasn't yet been updated to no longer use this file.
-# The requirements which were here have been moved to shared.in and base.in,
-# and are now incorporated into base.txt

@@ -1,4 +1,0 @@
-# Placeholder for code which hasn't yet been updated to no longer use this file.
-# The requirements which were here have been moved to base.in, and are now
-# incorporated into the appropriate full requirements files (base.txt,
-# testing.txt, etc.)
