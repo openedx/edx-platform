@@ -5,12 +5,14 @@ import pytz
 from celery.states import FAILURE
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, InstructorTask
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskTestCase
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
     """

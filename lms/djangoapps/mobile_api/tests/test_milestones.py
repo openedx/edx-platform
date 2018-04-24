@@ -3,6 +3,7 @@ Milestone related tests for the mobile_api
 """
 from django.conf import settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from courseware.access_response import MilestoneAccessError
 from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
@@ -11,6 +12,7 @@ from util.milestones_helpers import add_prerequisite_course, fulfill_course_mile
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@attr(shard=4)
 class MobileAPIMilestonesMixin(object):
     """
     Tests the Mobile API decorators for milestones.

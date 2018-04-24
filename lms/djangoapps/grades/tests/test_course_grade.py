@@ -2,6 +2,7 @@ import ddt
 from django.conf import settings
 from mock import patch
 
+from nose.plugins.attrib import attr
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -16,6 +17,7 @@ from .base import GradeTestBase
 from .utils import answer_problem
 
 
+@attr(shard=4)
 @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
 @ddt.ddt
 class ZeroGradeTest(GradeTestBase):
@@ -53,6 +55,7 @@ class ZeroGradeTest(GradeTestBase):
                         self.assertEqual({}, section.problem_scores)
 
 
+@attr(shard=4)
 class TestScoreForModule(SharedModuleStoreTestCase):
     """
     Test the method that calculates the score for a given block based on the

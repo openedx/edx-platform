@@ -4,10 +4,12 @@ Tests for the rss_proxy views
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 
 from rss_proxy.models import WhitelistedRssUrl
 
 
+@attr(shard=4)
 class RssProxyViewTests(TestCase):
     """ Tests for the rss_proxy views """
 

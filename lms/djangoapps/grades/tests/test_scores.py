@@ -9,6 +9,7 @@ import ddt
 from django.test import TestCase
 from django.utils.timezone import now
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from nose.plugins.attrib import attr
 
 import lms.djangoapps.grades.scores as scores
 from lms.djangoapps.grades.models import BlockRecord
@@ -48,6 +49,7 @@ def expected_result_repr(self):
     return '<ExpectedResult {}>'.format(' '.join(attributes))
 
 
+@attr(shard=4)
 class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
@@ -72,6 +74,7 @@ class TestScoredBlockTypes(TestCase):
             self.assertTrue(scores.possibly_scored(usage_key))
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestGetScore(TestCase):
     """
@@ -224,6 +227,7 @@ class TestGetScore(TestCase):
         self.assertEquals(score, expected_score)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestWeightedScore(TestCase):
     """
@@ -264,6 +268,7 @@ class TestWeightedScore(TestCase):
             scores.weighted_score(raw_earned=1, raw_possible=None, weight=1)
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestInternalGetGraded(TestCase):
     """
@@ -303,6 +308,7 @@ class TestInternalGetGraded(TestCase):
         )
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestInternalGetScoreFromBlock(TestCase):
     """

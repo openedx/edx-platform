@@ -2,6 +2,7 @@
 Unit tests for gating.signals module
 """
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 
 from gating.signals import evaluate_subsection_gated_milestones
 from student.tests.factories import UserFactory
@@ -10,6 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr(shard=4)
 class TestHandleScoreChanged(ModuleStoreTestCase):
     """
     Test case for handle_score_changed django signal handler

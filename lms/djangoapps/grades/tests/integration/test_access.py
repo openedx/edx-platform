@@ -3,6 +3,7 @@ Test grading with access changes.
 """
 # pylint: disable=protected-access
 
+from nose.plugins.attrib import attr
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from ...subsection_grade_factory import SubsectionGradeFactory
 
 
+@attr(shard=4)
 class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
     """
     Tests integration between grading and block access.

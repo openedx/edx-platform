@@ -8,6 +8,7 @@ import ddt
 from django.conf import settings
 from mock import MagicMock, patch
 from pytz import utc
+from nose.plugins.attrib import attr
 
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.management.commands import recalculate_subsection_grades
@@ -19,6 +20,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 DATE_FORMAT = "%Y-%m-%d %H:%M"
 
 
+@attr(shard=4)
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTestCase):

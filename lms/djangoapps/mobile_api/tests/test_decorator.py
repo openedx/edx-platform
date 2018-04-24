@@ -5,10 +5,12 @@ Tests for mobile API utilities.
 
 import ddt
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from ..decorators import mobile_course_access, mobile_view
 
 
+@attr(shard=4)
 @ddt.ddt
 class TestMobileAPIDecorators(TestCase):
     """

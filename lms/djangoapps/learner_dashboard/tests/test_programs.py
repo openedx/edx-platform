@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import override_settings
+from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -24,6 +25,7 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCour
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
+@attr(shard=4)
 @skip_unless_lms
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
@@ -170,6 +172,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             self.assertEqual(actual_program['detail_url'], expected_url)
 
 
+@attr(shard=4)
 @skip_unless_lms
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):

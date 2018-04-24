@@ -2,6 +2,7 @@ import urllib
 
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
+from nose.plugins.attrib import attr
 
 from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
@@ -9,6 +10,7 @@ from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 
 
+@attr(shard=4)
 class ExperimentDataViewSetTests(APITestCase):
     def assert_data_created_for_user(self, user, method='post', status=201):
         url = reverse('api_experiments:v0:data-list')
@@ -210,6 +212,7 @@ class ExperimentDataViewSetTests(APITestCase):
         ExperimentData.objects.get(user=other_user, **kwargs)
 
 
+@attr(shard=4)
 class ExperimentKeyValueViewSetTests(APITestCase):
     def test_permissions(self):
         """ Staff access is required for write operations. """

@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-from nose.plugins.attrib import attr
+@attr(shard=4)
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
 @ddt.ddt
 class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):

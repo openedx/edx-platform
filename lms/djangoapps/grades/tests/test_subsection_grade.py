@@ -3,8 +3,10 @@ from ..subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade
 from .utils import mock_get_score
 from .base import GradeTestBase
 from ddt import data, ddt, unpack
+from nose.plugins.attrib import attr
 
 
+@attr(shard=4)
 @ddt
 class SubsectionGradeTest(GradeTestBase):
 

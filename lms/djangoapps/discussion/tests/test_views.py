@@ -11,6 +11,7 @@ from django.utils import translation
 from mock import ANY, Mock, call, patch
 from nose.tools import assert_true
 from six import text_type
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

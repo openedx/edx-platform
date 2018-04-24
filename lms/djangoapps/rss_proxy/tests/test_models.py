@@ -2,10 +2,12 @@
 Tests for the rss_proxy models
 """
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from rss_proxy.models import WhitelistedRssUrl
 
 
+@attr(shard=4)
 class WhitelistedRssUrlTests(TestCase):
     """ Tests for the rss_proxy.WhitelistedRssUrl model """
 

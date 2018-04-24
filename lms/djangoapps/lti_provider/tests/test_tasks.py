@@ -6,6 +6,7 @@ import ddt
 from django.test import TestCase
 from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from nose.plugins.attrib import attr
 
 import lti_provider.tasks as tasks
 from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
@@ -66,6 +67,7 @@ class BaseOutcomeTest(TestCase):
         return mock
 
 
+@attr(shard=4)
 @ddt.ddt
 class SendLeafOutcomeTest(BaseOutcomeTest):
     """
@@ -86,6 +88,7 @@ class SendLeafOutcomeTest(BaseOutcomeTest):
         self.send_score_update_mock.assert_called_once_with(self.assignment, expected)
 
 
+@attr(shard=4)
 @ddt.ddt
 class SendCompositeOutcomeTest(BaseOutcomeTest):
     """

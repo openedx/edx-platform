@@ -3,12 +3,14 @@
 from django.test import TestCase
 from nose.tools import raises
 from opaque_keys.edx.locator import CourseLocator
+from nose.plugins.attrib import attr
 
 from instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 
 
+@attr(shard=4)
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
@@ -72,6 +74,7 @@ class TestAnalyticsDistributions(TestCase):
         self.assertEqual(distribution.data['hs'], len(course_enrollments) - 1)
 
 
+@attr(shard=4)
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 

@@ -12,6 +12,7 @@ from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
+from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
@@ -22,6 +23,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
+@attr(shard=4)
 @ddt.ddt
 class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
     """
@@ -304,6 +306,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.assertEqual(resp.data, [expected_data])  # pylint: disable=no-member
 
 
+@attr(shard=4)
 @ddt.ddt
 class GradingPolicyTestMixin(object):
     """
@@ -443,6 +446,7 @@ class GradingPolicyTestMixin(object):
         self.assert_get_for_course(course_id=unicode(course.id))
 
 
+@attr(shard=4)
 class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseGradingPolicy view.
@@ -494,6 +498,7 @@ class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase
         self.assertListEqual(response.data, expected)
 
 
+@attr(shard=4)
 class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseGradingPolicy view when fields are missing.
