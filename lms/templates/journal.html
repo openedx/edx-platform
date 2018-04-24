@@ -7,28 +7,33 @@ from six import text_type
 from urlparse import urljoin
 %>
 <%page args="journal, journals_root_url" expression_filter="h"/>
-<article class="course" id="${journal.get('slug')}" role="region" aria-label="${journal.get('title')}">
-  <a href="${urljoin(journals_root_url, journal.get('slug'))}">
-    <header class="course-image">
+<article class="journal" id="${journal.get('slug')}" role="region" aria-label="${journal.get('title')}">
+  <a class="journals-listing-item" href="${urljoin(journals_root_url, journal.get('slug'))}">
+    <header class="journal-image">
       <div class="cover-image">
         <img src="${journal.get('card_image_url')}" alt="${journal.get('title')}" />
         <div class="learn-more" aria-hidden="true">${_("LEARN MORE")}</div>
       </div>
     </header>
-    <div class="course-info" aria-hidden="true">
-      <h2 class="course-name">
-        <span class="course-organization">${journal.get('organization')}</span>
-        <span class="course-title">${journal.get('title')}</span>
-      </h2>
-      <%
-      if journal.get('access_length') is not None:
-          access_length_string = '{} months'.format(int(journal.get('access_length')/30))
-      else:
-          access_length_string = _("unlimited")
-      %>
-
-      <div class="course-date" aria-hidden="true">${_("Access Length")}: ${access_length_string}</div>
+    <div class="banner">
+      ${_("Journal")}
     </div>
+
+    <div class="journal-info" aria-hidden="true">
+        <span class="journal-org">${journal.get('organization')}</span>
+        <h3 class="journal-title">${journal.get('title')}</h3>
+    </div>
+
+    <span class="journal-footer">
+        <%
+        if journal.get('access_length') is not None:
+          access_length_string = '{} months'.format(int(journal.get('access_length')/30))
+        else:
+          access_length_string = _("unlimited")
+        %>
+        <div class="course-date" aria-hidden="true">${_("Access Length")}: ${access_length_string}</div>
+    </span>
+
     <div class="sr">
       <ul>
         <li>${journal.get('organization')}</li>
