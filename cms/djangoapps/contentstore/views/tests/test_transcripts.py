@@ -195,13 +195,16 @@ class TestUploadTranscripts(BaseTranscripts):
         self.bad_name_srt_file.close()
         self.bom_srt_file.close()
 
-    def upload_transcript(self, locator, transcript_file):
+    def upload_transcript(self, locator, transcript_file, edx_video_id=None):
         """
         Uploads a transcript for a video
         """
         payload = {}
         if locator:
             payload.update({'locator': locator})
+
+        if edx_video_id is not None:
+            payload.update({'edx_video_id': edx_video_id})
 
         if transcript_file:
             payload.update({'transcript-file': transcript_file})
@@ -233,7 +236,7 @@ class TestUploadTranscripts(BaseTranscripts):
 
         # Upload a transcript
         transcript_file = self.bom_srt_file if include_bom else self.good_srt_file
-        response = self.upload_transcript(self.video_usage_key, transcript_file)
+        response = self.upload_transcript(self.video_usage_key, transcript_file, '')
 
         # Verify the response
         self.assert_response(response, expected_status_code=200, expected_message='Success')
@@ -258,7 +261,7 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         Test that transcript upload validation fails if the video locator is missing
         """
-        response = self.upload_transcript(locator=None, transcript_file=self.good_srt_file)
+        response = self.upload_transcript(locator=None, transcript_file=self.good_srt_file, edx_video_id='')
         self.assert_response(
             response,
             expected_status_code=400,
@@ -269,7 +272,7 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         Test that transcript upload validation fails if transcript file is missing
         """
-        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=None)
+        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=None, edx_video_id='')
         self.assert_response(
             response,
             expected_status_code=400,
@@ -280,7 +283,11 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         Test that transcript upload validation fails if transcript format is not SRT
         """
-        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.bad_name_srt_file)
+        response = self.upload_transcript(
+            locator=self.video_usage_key,
+            transcript_file=self.bad_name_srt_file,
+            edx_video_id=''
+        )
         self.assert_response(
             response,
             expected_status_code=400,
@@ -292,7 +299,11 @@ class TestUploadTranscripts(BaseTranscripts):
         Test that transcript upload validation fails in case of bad transcript content.
         """
         # Request to upload transcript for the video
-        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.bad_data_srt_file)
+        response = self.upload_transcript(
+            locator=self.video_usage_key,
+            transcript_file=self.bad_data_srt_file,
+            edx_video_id=''
+        )
         self.assert_response(
             response,
             expected_status_code=400,
@@ -306,7 +317,7 @@ class TestUploadTranscripts(BaseTranscripts):
         # non_video module setup - i.e. an item whose category is not 'video'.
         usage_key = self.create_non_video_module()
         # Request to upload transcript for the item
-        response = self.upload_transcript(locator=usage_key, transcript_file=self.good_srt_file)
+        response = self.upload_transcript(locator=usage_key, transcript_file=self.good_srt_file, edx_video_id='')
         self.assert_response(
             response,
             expected_status_code=400,
@@ -318,12 +329,46 @@ class TestUploadTranscripts(BaseTranscripts):
         Test that transcript upload validation fails in case of invalid item's locator.
         """
         # Request to upload transcript for the item
-        response = self.upload_transcript(locator='non_existent_locator', transcript_file=self.good_srt_file)
+        response = self.upload_transcript(
+            locator='non_existent_locator',
+            transcript_file=self.good_srt_file,
+            edx_video_id=''
+        )
         self.assert_response(
             response,
             expected_status_code=400,
             expected_message=u'Cannot find item by locator.'
         )
+
+    def test_transcript_upload_without_edx_video_id(self):
+        """
+        Test that transcript upload validation fails if the `edx_video_id` is missing
+        """
+        response = self.upload_transcript(locator=self.video_usage_key, transcript_file=self.good_srt_file)
+        self.assert_response(
+            response,
+            expected_status_code=400,
+            expected_message=u'Video ID is required.'
+        )
+
+    def test_transcript_upload_with_non_existant_edx_video_id(self):
+        """
+        Test that transcript upload works as expected if `edx_video_id` set on
+        video descriptor is different from `edx_video_id` received in POST request.
+        """
+        non_existant_edx_video_id = '1111-2222-3333-4444'
+
+        # Upload with non-existant `edx_video_id`
+        response = self.upload_transcript(
+            locator=self.video_usage_key,
+            transcript_file=self.good_srt_file,
+            edx_video_id=non_existant_edx_video_id
+        )
+        # Verify the response
+        self.assert_response(response, expected_status_code=400, expected_message='Invalid Video ID')
+
+        # Verify transcript does not exist for non-existant `edx_video_id`
+        self.assertIsNone(get_video_transcript_content(non_existant_edx_video_id, language_code=u'en'))
 
 
 @ddt.ddt
