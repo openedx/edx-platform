@@ -13,9 +13,10 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files import File
+from django.core.files.storage import FileSystemStorage
 from django.core.servers.basehttp import FileWrapper
 from django.db import transaction
-from django.http import Http404, HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseNotFound, StreamingHttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
@@ -274,8 +275,9 @@ def send_tarball(tarball, size):
     """
     Renders a tarball to response, for use when sending a tar.gz file to the user.
     """
-    wrapper = FileWrapper(tarball)
-    response = HttpResponse(wrapper, content_type='application/x-tgz')
+    chunk_size = 4096
+    wrapper = FileWrapper(tarball, chunk_size)
+    response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
     response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
     response['Content-Length'] = size
     return response
@@ -370,7 +372,11 @@ def export_status_handler(request, course_key_string):
     elif task_status.state == UserTaskStatus.SUCCEEDED:
         status = 3
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
-        if hasattr(artifact.file.storage, 'bucket'):
+        if isinstance(artifact.file.storage, FileSystemStorage):
+            # local file, serve from the authorization wrapper view
+            output_url = reverse_course_url('export_output_handler', course_key)
+        elif hasattr(artifact.file.storage, 'bucket'):
+            # file is being served from S3
             filename = os.path.basename(artifact.file.name).encode('utf-8')
             disposition = 'attachment; filename="{}"'.format(filename)
             output_url = artifact.file.storage.url(artifact.file.name, response_headers={
@@ -379,8 +385,8 @@ def export_status_handler(request, course_key_string):
                 'response-content-type': 'application/x-tgz'
             })
         else:
-            # local file, serve from the authorization wrapper view
-            output_url = reverse_course_url('export_output_handler', course_key)
+            # file is being served using some other storage like SWIFT
+            output_url = artifact.file.storage.url(artifact.file.name)
 
     elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
         status = max(-(task_status.completed_steps + 1), -2)
