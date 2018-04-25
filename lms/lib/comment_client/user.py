@@ -103,7 +103,7 @@ class User(models.Model):
             raise utils.CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
         params = {'course_id': text_type(self.course_id)}
-        params = utils.merge_dict(params, query_params)
+        params.update(query_params)
         response = utils.perform_request(
             'get',
             url,
@@ -119,7 +119,7 @@ class User(models.Model):
             raise utils.CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': text_type(self.course_id)}
-        params = utils.merge_dict(params, query_params)
+        params.update(query_params)
         response = utils.perform_request(
             'get',
             url,
