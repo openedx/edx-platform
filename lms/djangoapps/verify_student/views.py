@@ -1226,7 +1226,7 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        verification_status = IDVerificationService.user_status(request.user)
+        status, __ = IDVerificationService.user_status(request.user)
 
         expiration_datetime = IDVerificationService.get_expiration_datetime(request.user)
         can_reverify = False
@@ -1243,7 +1243,7 @@ class ReverifyView(View):
         # A photo verification is marked as 'pending' if its status is either
         # 'submitted' or 'must_retry'.
 
-        if verification_status['status'] in ["none", "must_reverify", "expired", "pending"] or can_reverify:
+        if status in ["none", "must_reverify", "expired", "pending"] or can_reverify:
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
@@ -1252,6 +1252,6 @@ class ReverifyView(View):
             return render_to_response("verify_student/reverify.html", context)
         else:
             context = {
-                "status": verification_status['status']
+                "status": status
             }
             return render_to_response("verify_student/reverify_not_allowed.html", context)

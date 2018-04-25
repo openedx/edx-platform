@@ -7,25 +7,12 @@ from django.db import migrations
 
 
 def populate_id_verification_aggregate(apps, schema_editor):
-    ContentType = apps.get_model('contenttypes', 'ContentType')
-    IDVerificationAggregate = apps.get_model('verify_student', 'IDVerificationAggregate')
-    SoftwareSecurePhotoVerification = apps.get_model('verify_student', 'SoftwareSecurePhotoVerification')
-    SSOVerification = apps.get_model('verify_student', 'SSOVerification')
-
-    software_secure_verifications = SoftwareSecurePhotoVerification.objects.all()
-    sso_verifications = SSOVerification.objects.all()
-    for verification in chain(software_secure_verifications, sso_verifications):
-        content_type = ContentType.objects.get_for_model(verification)
-        IDVerificationAggregate.objects.create(
-            status=verification.status,
-            user=verification.user,
-            name=verification.name,
-            created_at=verification.created_at,
-            updated_at=verification.updated_at,
-            content_type=content_type,
-            object_id=verification.id,
-        )
-
+    """
+    The code from this migration was removed because it caused a spike in database errors
+    when it was run in the edX production environment. More details can be found here:
+    https://openedx.atlassian.net/browse/ENT-969
+    """
+    pass
 
 class Migration(migrations.Migration):
 
