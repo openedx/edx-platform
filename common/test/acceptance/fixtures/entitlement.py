@@ -121,3 +121,12 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
                 "Could not create course entitlement {0}.  Status was {1}\nResponse content was: {2}".format(
                     self._entitlement_dict, response.status_code, response.content))
 
+    def expire_course_entitlement(self):
+        """
+        Set the expired_at attribute of the course entitlement described in the fixture.
+        """
+        self.session.patch(
+            LMS_BASE_URL + '/api/entitlements/v1/entitlements/{uuid}/'.format(self.entitlement_uuid),
+            data=json.dumps({'expired_at': datetime.datetime.now()}),
+            headers=self.headers
+        )

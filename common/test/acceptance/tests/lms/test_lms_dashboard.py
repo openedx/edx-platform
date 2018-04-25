@@ -416,7 +416,7 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
-@patch('openedx.core.djangoapps.catalog.utils.get_edx_api_data')
+@patch('entitlements.api.v1.views.get_course_runs_for_course')
 class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTestMultiple):
     """ Test suite for course entitlements cards on the Student Dashboard page """
 
@@ -436,16 +436,14 @@ class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTestMultiple):
             email=self.email,
         ).visit()
 
-        self.refundable_entitlement = CourseEntitlementFixture(self.username)
-        self.refundable_entitlement.install()
-        self.unrefundable_entitlement = CourseEntitlementFixture(self.username, expired_at=datetime.datetime.now())
-        self.refundable_entitlement.install()
+        self.entitlement = CourseEntitlementFixture(self.username)
+        self.entitlement.install()
 
         # Navigate the authenticated, enrolled user to the dashboard page and get testing!
         self.dashboard_page.visit()
 
     def test_entitlement_session_selection(self, mock_get_sessions):
-        mock_get_sessions.return_value = self.refundable_entitlement.sessions_list
+        mock_get_sessions.return_value = self.entitlement.sessions_list
         # Verify that a course card appears for the learner's unfulfilled entitlement
         assert True
         # Verify that a Select Session button is present and enabled on the unfulfilled entitlement's course card.
@@ -468,7 +466,7 @@ class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTestMultiple):
 
 
     def test_refundable_can_unenroll(self, mock_get_sessions):
-        mock_get_sessions.return_value = self.refundable_entitlement.sessions_list
+        mock_get_sessions.return_value = self.entitlement.sessions_list
         # Verify that the gear icon and unenroll option are available for an entitlement that is refundable.
 
         # Verify that selecting unenroll from the gear dropdown opens an entitlement unenrollment modal with the correct
@@ -480,7 +478,8 @@ class LmsDashboardCourseEntitlementTest(BaseLmsDashboardTestMultiple):
 
 
     def test_unrefundable_cannot_unenroll(self, mock_get_sessions):
-        mock_get_sessions.return_value = self.unrefundable_entitlement.sessions_list
+        mock_get_sessions.return_value = self.entitlement.sessions_list
+        self.entitlement.expire_course_entitlement()
         # Verify that the gear icon is not on the course card for an entitlement that is not refundable.
         assert True
 

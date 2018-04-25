@@ -246,3 +246,44 @@ class DashboardPage(PageObject):
             'Language selector element is available'
         )
         return self.q(css='#settings-language-value')
+
+    def get_session_action_button(self, course_id, action_text):
+        """ Get session action button for entitlement to given course and assert it contains the given text."""
+        session_action_button = self.q(css='.action-controls .enroll-btn-initial')
+        assert session_action_button.text == action_text
+        return session_action_button
+
+    def get_session_action_popup_text(self):
+        """ Get session action verification modal. """
+        return self.q(css='.course-entitlement-selection-container .verification-modal .popover-title')
+
+    def click_session_selection_verification(self, verification_modal):
+        """ Select ok in the session selection verificiation modal."""
+        verification_modal.find('.action-items .enroll-btn.final-confirmation-btn').click()
+
+    def get_view_course_button(self, course_id):
+        """ Get 'View Course' button for entitlement to given course."""
+        return self.q(css='.course-actions .enter-course')
+
+    def get_update_session_selection_link(self, course_id):
+        """ Get 'Change or Leave Session' link for entitlement to given course."""
+        return self.q(css='.course-info .change-session.btn-link')
+
+    def get_session_dropdown(self, course_id):
+        """ Get course run dropdown menu from entitlement card for given course."""
+        return self.q(css='.course-entitlement-selection-container .action-controls .session-select')
+
+    def select_session(self, session_dropdown, session_number):
+        """ Select given session number form given dropdown menu."""
+        session_dropdown.nth(session_number).click()
+
+    def get_entitlement_actions_element(self, course_id):
+        """ Get entitlement actions element from entitlement card for given course."""
+        return self.q(css='.course-actions .entitlement-actions-wrapper')
+
+    def entitlement_unenroll(self, entitlement_actions_element):
+        """ Verify that unenroll is the first option in the given entitlement actions object, and select it."""
+        entitlement_actions_element.find('.entitlement-action.entitlement-action-more').click()
+        unenroll_option = entitlement_actions_element.find('.entitlement_actions_dropdown li.actions-item').first.find('.entitlement-action.action-unenroll')
+        assert unenroll_option
+        unenroll_option.click()
