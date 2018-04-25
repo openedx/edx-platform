@@ -926,80 +926,6 @@ class TestAccountDeactivation(TestCase):
         )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-class TestDeactivateLogout(TestCase):
-    """
-    Tests the account deactivation/logout endpoint.
-    """
-    def setUp(self):
-        super(TestDeactivateLogout, self).setUp()
-        self.test_user = UserFactory()
-        self.test_superuser = SuperuserFactory()
-        self.test_service_user = UserFactory()
-
-        UserSocialAuth.objects.create(
-            user=self.test_user,
-            provider='some_provider_name',
-            uid='xyz@gmail.com'
-        )
-        UserSocialAuth.objects.create(
-            user=self.test_user,
-            provider='some_other_provider_name',
-            uid='xyz@gmail.com'
-        )
-
-        self.url = reverse('deactivate_logout')
-
-    def build_jwt_headers(self, user):
-        """
-        Helper function for creating headers for the JWT authentication.
-        """
-        token = JwtBuilder(user).build_token([])
-        headers = {
-            'HTTP_AUTHORIZATION': 'JWT ' + token
-        }
-        return headers
-
-    def build_post(self, username):
-        return {'username': username}
-
-    def test_superuser_deactivates_user(self):
-        """
-        Verify a superuser calling the deactivation endpoint logs out a user and deletes all their SSO tokens.
-        """
-        headers = self.build_jwt_headers(self.test_superuser)
-        response = self.client.post(self.url, self.build_post(self.test_user.username), **headers)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        updated_user = User.objects.get(id=self.test_user.id)
-        self.assertEqual(get_retired_email_by_email(self.test_user.email), updated_user.email)
-        self.assertFalse(updated_user.has_usable_password())
-        self.assertEqual(list(UserSocialAuth.objects.filter(user=self.test_user)), [])
-
-    def test_unauthorized_rejection(self):
-        """
-        Verify unauthorized users cannot deactivate other users.
-        """
-        headers = self.build_jwt_headers(self.test_user)
-        response = self.client.post(self.url, self.build_post(self.test_user.username), **headers)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_nonexistent_user(self):
-        """
-        Verify that trying to deactivate a nonexistent user returns a 404.
-        """
-        headers = self.build_jwt_headers(self.test_superuser)
-        response = self.client.post(self.url, self.build_post("made_up_username"), **headers)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_user_not_specified(self):
-        """
-        Verify that not specifying a user to the deactivation endpoint results in a 404.
-        """
-        headers = self.build_jwt_headers(self.test_superuser)
-        response = self.client.post(self.url, self.build_post(""), **headers)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-
 class RetirementTestCase(TestCase):
     """
     Test case with a helper methods for retirement
@@ -1127,6 +1053,74 @@ class RetirementTestCase(TestCase):
 
     def _get_dead_end_states(self):
         return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestDeactivateLogout(RetirementTestCase):
+    """
+    Tests the account deactivation/logout endpoint.
+    """
+    def setUp(self):
+        super(TestDeactivateLogout, self).setUp()
+        self.test_password = 'password'
+        self.test_user = UserFactory(password=self.test_password)
+        UserSocialAuth.objects.create(
+            user=self.test_user,
+            provider='some_provider_name',
+            uid='xyz@gmail.com'
+        )
+        UserSocialAuth.objects.create(
+            user=self.test_user,
+            provider='some_other_provider_name',
+            uid='xyz@gmail.com'
+        )
+
+        self.url = reverse('deactivate_logout')
+
+    def build_post(self, password):
+        return {'password': password}
+
+    def test_user_can_deactivate_self(self):
+        """
+        Verify a user calling the deactivation endpoint logs out the user, deletes all their SSO tokens,
+        and creates a user retirement row.
+        """
+        self.client.login(username=self.test_user.username, password=self.test_password)
+        headers = self.build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # make sure the user model is as expected
+        updated_user = User.objects.get(id=self.test_user.id)
+        self.assertEqual(get_retired_email_by_email(self.test_user.email), updated_user.email)
+        self.assertFalse(updated_user.has_usable_password())
+        self.assertEqual(list(UserSocialAuth.objects.filter(user=self.test_user)), [])
+        self.assertEqual(len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)), 1)
+        # make sure the user cannot log in
+        self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
+
+    def test_password_mismatch(self):
+        """
+        Verify that the user submitting a mismatched password results in
+        a rejection.
+        """
+        self.client.login(username=self.test_user.username, password=self.test_password)
+        headers = self.build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_password + "xxxx"), **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_called_twice(self):
+        """
+        Verify a user calling the deactivation endpoint a second time results in a "forbidden"
+        error, as the user will be logged out.
+        """
+        self.client.login(username=self.test_user.username, password=self.test_password)
+        headers = self.build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.client.login(username=self.test_user.username, password=self.test_password)
+        headers = self.build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
