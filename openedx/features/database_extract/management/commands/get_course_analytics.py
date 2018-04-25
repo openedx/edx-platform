@@ -17,10 +17,19 @@ from lms.djangoapps.onboarding.models import Organization
 from student.models import CourseEnrollment, AnonymousUserId, anonymous_id_for_user
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
+from openassessment.data import OraAggregateData
+from openassessment.fileupload import api as ora_file_upload_api
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.features.database_extract.models import TargetCourse
 from submissions.models import StudentItem, Submission, Score
 from submissions.api import _get_or_create_student_item
+
+
+def get_file_url(answer):
+    try:
+        return ora_file_upload_api.get_download_url(answer.file_key)
+    except:
+        return ""
 
 
 class Command(BaseCommand):
@@ -34,7 +43,6 @@ class Command(BaseCommand):
         data = []
 
         for target_course in target_courses:
-            print target_course
             course_data = {
                 'course_structure': {},
                 'team_data': [],
@@ -74,6 +82,7 @@ class Command(BaseCommand):
 
             user_profiles = get_enrolled_students(target_course.course_id)
             for profile in user_profiles:
+                # get the user profie data from NodeBB API
                 data_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/data'
                 headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
                 response = requests.post(data_endpoint,
@@ -179,9 +188,12 @@ class Command(BaseCommand):
                             'submitted_at': submission.submitted_at.__str__(),
                             'created_at': submission.created_at.__str__(),
                             'answer': submission.answer,
+                            'file_url': get_file_url(submission.answer),
                             'student_item_id': submission.student_item_id,
                             'status': submission.status,
-                        } for submission in Submission.objects.filter(student_item__student_id=anon_user_id.anonymous_user_id)],
+                        } for submission in Submission.objects.filter(
+                            student_item__student_id=anon_user_id.anonymous_user_id
+                        )],
 
                         'scores': [{
                             'points_earned': score.points_earned,
