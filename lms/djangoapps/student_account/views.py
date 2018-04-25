@@ -23,6 +23,7 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
 from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
@@ -526,6 +527,7 @@ def account_settings_context(request):
         # it will be broken if exception raised
         user_orders = []
 
+    dark_lang_config = DarkLangConfig.current()
     context = {
         'auth': {},
         'duplicate_provider': None,
@@ -537,6 +539,8 @@ def account_settings_context(request):
                 'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # pylint: disable=translation-of-non-string
             }, 'language': {
                 'options': released_languages(),
+            }, 'beta_language': {
+                'options': dark_lang_config.beta_languages_list if dark_lang_config.enable_beta_languages else [],
             }, 'level_of_education': {
                 'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],  # pylint: disable=translation-of-non-string
             }, 'password': {

@@ -69,10 +69,22 @@ class DarkLangMiddleware(object):
             language_options.append(settings.LANGUAGE_CODE)
         return language_options
 
+    @property
+    def beta_langs(self):
+        """
+        Current list of released languages
+        """
+        language_options = DarkLangConfig.current().beta_languages_list
+        if settings.LANGUAGE_CODE not in language_options:
+            language_options.append(settings.LANGUAGE_CODE)
+        return language_options
+
     def process_request(self, request):
         """
         Prevent user from requesting un-released languages except by using the preview-lang query string.
         """
+        # import pdb;
+        # pdb.set_trace()
         if not DarkLangConfig.current().enabled:
             return
 
@@ -82,11 +94,18 @@ class DarkLangMiddleware(object):
     def _fuzzy_match(self, lang_code):
         """Returns a fuzzy match for lang_code"""
         match = None
-        if lang_code in self.released_langs:
+        dark_lang_config = DarkLangConfig.current()
+
+        if dark_lang_config.enable_beta_languages:
+            langs = self.released_langs + self.beta_langs
+        else:
+            langs = self.released_langs
+
+        if lang_code in langs:
             match = lang_code
         else:
             lang_prefix = lang_code.partition('-')[0]
-            for released_lang in self.released_langs:
+            for released_lang in langs:
                 released_prefix = released_lang.partition('-')[0]
                 if lang_prefix == released_prefix:
                     match = released_lang
@@ -97,6 +116,7 @@ class DarkLangMiddleware(object):
         Remove any language that is not either in ``self.released_langs`` or
         a territory of one of those languages.
         """
+        # import pdb; pdb.set_trace()
         accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
         if accept is None or accept == '*':
             return
@@ -116,6 +136,8 @@ class DarkLangMiddleware(object):
         """
         Check the user's dark language setting in the session and apply it
         """
+        # import pdb;
+        # pdb.set_trace()
         auth_user = request.user.is_authenticated()
         preview_lang = None
         if auth_user:
