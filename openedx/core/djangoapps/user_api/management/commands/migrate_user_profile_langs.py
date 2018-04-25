@@ -57,8 +57,10 @@ class Command(BaseCommand):
 
         # Make sure we're changing to a code that actually exists. Presumably it's safe to move away from a code that
         # doesn't.
+        dark_lang_config = DarkLangConfig.current()
         langs = [lang_code[0] for lang_code in settings.LANGUAGES]
-        langs += DarkLangConfig.current().released_languages_list
+        langs += dark_lang_config.released_languages_list
+        langs += dark_lang_config.beta_languages_list if dark_lang_config.enable_beta_languages else []
 
         if new_lang_code not in langs:
             raise CommandError('{} is not a configured language code in settings.LANGUAGES '
