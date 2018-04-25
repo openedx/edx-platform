@@ -17,27 +17,6 @@ from student.tests.factories import UserFactory
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
-def cross_domain_config(func):
-    """Decorator for configuring a cross-domain request. """
-    feature_flag_decorator = patch.dict(settings.FEATURES, {
-        'ENABLE_CORS_HEADERS': True,
-        'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True
-    })
-    settings_decorator = override_settings(
-        CORS_ORIGIN_WHITELIST=['ecommerce.edx.org'],
-        CSRF_COOKIE_NAME="prod-edx-csrftoken",
-        CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",
-        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=".edx.org"
-    )
-    is_secure_decorator = patch.object(WSGIRequest, 'is_secure', return_value=True)
-
-    return feature_flag_decorator(
-        settings_decorator(
-            is_secure_decorator(func)
-        )
-    )
-
-
 class ExperimentDataViewSetTests(APITestCase):
 
     def assert_data_created_for_user(self, user, method='post', status=201):
@@ -240,17 +219,39 @@ class ExperimentDataViewSetTests(APITestCase):
         ExperimentData.objects.get(user=other_user, **kwargs)
 
 
+def cross_domain_config(func):
+    """Decorator for configuring a cross-domain request. """
+    feature_flag_decorator = patch.dict(settings.FEATURES, {
+        'ENABLE_CORS_HEADERS': True,
+        'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True
+    })
+    settings_decorator = override_settings(
+        CORS_ORIGIN_WHITELIST=['ecommerce.edx.org'],
+        CSRF_COOKIE_NAME="prod-edx-csrftoken",
+        CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=".edx.org"
+    )
+    is_secure_decorator = patch.object(WSGIRequest, 'is_secure', return_value=True)
+
+    return feature_flag_decorator(
+        settings_decorator(
+            is_secure_decorator(func)
+        )
+    )
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ExperimentCrossDomainTests(APITestCase):
+    """Tests for handling cross-domain requests"""
 
     def setUp(self):
         super(ExperimentCrossDomainTests, self).setUp()
         self.client = self.client_class(enforce_csrf_checks=True)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @cross_domain_config
     def test_cross_domain_create(self, *args):  # pylint: disable=unused-argument
         user = UserFactory()
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # pylint: disable=protected-access
         csrf_cookie = self._get_csrf_cookie()
         data = {
             'experiment_id': 1,
@@ -263,11 +264,10 @@ class ExperimentCrossDomainTests(APITestCase):
         # passing the CSRF checks (including the referer check).
         self.assertEqual(resp.status_code, 201)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @cross_domain_config
     def test_cross_domain_invalid_csrf_header(self, *args):  # pylint: disable=unused-argument
         user = UserFactory()
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # pylint: disable=protected-access
         self._get_csrf_cookie()
         data = {
             'experiment_id': 1,
@@ -277,11 +277,10 @@ class ExperimentCrossDomainTests(APITestCase):
         resp = self._cross_domain_post('invalid_csrf_token', data)
         self.assertEqual(resp.status_code, 403)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @cross_domain_config
     def test_cross_domain_not_in_whitelist(self, *args):  # pylint: disable=unused-argument
         user = UserFactory()
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # pylint: disable=protected-access
         csrf_cookie = self._get_csrf_cookie()
         data = {
             'experiment_id': 1,
@@ -296,8 +295,8 @@ class ExperimentCrossDomainTests(APITestCase):
         url = reverse('courseenrollments')
         resp = self.client.get(url, HTTP_REFERER=CROSS_DOMAIN_REFERER)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(settings.CSRF_COOKIE_NAME, resp.cookies)  # pylint: disable=no-member
-        return resp.cookies[settings.CSRF_COOKIE_NAME].value  # pylint: disable=no-member
+        self.assertIn(settings.CSRF_COOKIE_NAME, resp.cookies)
+        return resp.cookies[settings.CSRF_COOKIE_NAME].value
 
     def _cross_domain_post(self, csrf_token, data, referer=CROSS_DOMAIN_REFERER):
         """Perform a cross-domain POST request. """
