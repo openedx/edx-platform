@@ -63,7 +63,7 @@ case "${TEST_SUITE}" in
                 paver test_lib --disable_capture ${PAVER_ARGS} 2> common-tests.log
                 ;;
             1)
-                paver test_lib --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.log
+                paver test_lib -l common/lib/xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.log
                 ;;
             2|"noshard")
                 paver test_lib --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> common-tests.log
