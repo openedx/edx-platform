@@ -561,9 +561,6 @@ JWT_AUTH.update({
 
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
-CREDENTIALS_INTERNAL_SERVICE_URL = 'https://credentials-internal.example.com'
-CREDENTIALS_PUBLIC_SERVICE_URL = 'https://credentials.example.com'
-
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
