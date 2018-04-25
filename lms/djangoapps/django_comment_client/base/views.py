@@ -27,7 +27,7 @@ from django_comment_client.utils import (
     discussion_category_id_access,
     get_ability,
     get_annotated_content_info,
-    get_cached_discussion_id_map,
+    get_discussion_id_map,
     get_group_id_for_comments_service,
     get_user_group_ids,
     is_comment_too_deep,
@@ -72,7 +72,7 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
         data.update(team_id=team.team_id)
 
     if id_map is None:
-        id_map = get_cached_discussion_id_map(course, [commentable_id], user)
+        id_map = get_discussion_id_map(course, user)
     if commentable_id in id_map:
         data['category_name'] = id_map[commentable_id]["title"]
         data['category_id'] = commentable_id
