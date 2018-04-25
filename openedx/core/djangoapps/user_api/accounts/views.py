@@ -27,6 +27,8 @@ from six import text_type
 from social_django.models import UserSocialAuth
 
 from entitlements.models import CourseEntitlement
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -36,6 +38,8 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    CourseEnrollmentAllowed,
+    PendingEmailChange,
     User,
     UserProfile,
     get_potentially_retired_user_by_username,
@@ -594,16 +598,31 @@ class AccountRetirementView(ViewSet):
             user = retirement_status.user
             retired_username = retirement_status.retired_username or get_retired_username_by_username(username)
             retired_email = retirement_status.retired_email or get_retired_email_by_email(user.email)
+            original_email = retirement_status.original_email
 
+            # Retire core user/profile information
             self.clear_pii_from_userprofile(user)
             self.delete_users_profile_images(user)
             self.delete_users_country_cache(user)
+
+            # Retire data from Enterprise models
             self.retire_users_data_sharing_consent(username, retired_username)
             self.retire_sapsf_data_transmission(user)
             self.retire_user_from_pending_enterprise_customer_user(user, retired_email)
             self.retire_entitlement_support_detail(user)
+
+            # Retire misc. models that may contain PII of this user
+            SoftwareSecurePhotoVerification.retire_user(user.id)
+            PendingEmailChange.delete_by_user_value(user, field='user')
+            UserOrgTag.delete_by_user_value(user, field='user')
+
+            # Retire any objects linked to the user via their original email
+            CourseEnrollmentAllowed.delete_by_user_value(original_email, field='email')
+            UnregisteredLearnerCohortAssignments.delete_by_user_value(original_email, field='email')
+
             # TODO: Password Reset links - https://openedx.atlassian.net/browse/PLAT-2104
             # TODO: Delete OAuth2 records - https://openedx.atlassian.net/browse/EDUCATOR-2703
+
             user.first_name = ''
             user.last_name = ''
             user.is_active = False
