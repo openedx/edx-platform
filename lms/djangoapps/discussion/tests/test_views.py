@@ -44,6 +44,7 @@ from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -404,15 +405,15 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 6, 4, 16, 4),
-        (ModuleStoreEnum.Type.mongo, False, 50, 6, 4, 16, 4),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 16, 4),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 16, 4),
         # split mongo: 3 queries, regardless of thread response size.
         (ModuleStoreEnum.Type.split, False, 1, 3, 3, 16, 4),
         (ModuleStoreEnum.Type.split, False, 50, 3, 3, 16, 4),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 6, 4, 16, 4),
-        (ModuleStoreEnum.Type.mongo, True, 50, 6, 4, 16, 4),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 16, 4),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 16, 4),
         # split mongo: 3 queries, regardless of thread response size.
         (ModuleStoreEnum.Type.split, True, 1, 3, 3, 16, 4),
         (ModuleStoreEnum.Type.split, True, 50, 3, 3, 16, 4),
@@ -1854,6 +1855,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         expected_response = self.get_expected_response()
         self.assertEqual(response, expected_response)
 
+        RequestCache.clear_request_cache()
         now = datetime.now()
         # inline discussion
         ItemFactory.create(

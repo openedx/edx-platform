@@ -132,7 +132,6 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(CoursewareContextTestCase, self).setUp()
-
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
             parent_location=self.course.location,
@@ -219,6 +218,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         # Assert that there is only one discussion xblock in the course at the moment.
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
+        # The above call is request cached, so we need to clear it for this test.
+        RequestCache.clear_request_cache()
         # Add an orphan discussion xblock to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
         self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
