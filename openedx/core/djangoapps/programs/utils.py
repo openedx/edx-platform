@@ -605,15 +605,20 @@ class ProgramDataExtender(object):
         if skus:
             try:
                 api_user = self.user
+                is_anonymous = False
                 if not self.user.is_authenticated():
                     user = get_user_model()
                     service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
                     api_user = service_user
+                    is_anonymous = True
 
                 api = ecommerce_api_client(api_user)
 
                 # Make an API call to calculate the discounted price
-                discount_data = api.baskets.calculate.get(sku=skus)
+                if is_anonymous:
+                    discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
+                else:
+                    discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
 
                 program_discounted_price = discount_data['total_incl_tax']
                 program_full_price = discount_data['total_incl_tax_excl_discounts']
