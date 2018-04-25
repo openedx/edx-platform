@@ -38,6 +38,7 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -1785,6 +1786,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
             'can_vote': True,
             'can_report': True
         })
+        RequestCache.clear_request_cache()
 
         set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
         content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
