@@ -48,13 +48,23 @@ case "${TEST_SUITE}" in
                 paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.${SHARD}.log
                 ;;
             6|"noshard")
-                paver test_system -s lms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.4.log
+                paver test_system -s lms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.6.log
                 ;;
         esac
         ;;
 
     "cms-unit")
-        paver test_system -s cms --disable_capture ${PAVER_ARGS} 2> cms-tests.log
+        case "$SHARD" in
+            "all")
+                paver test_system -s cms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> cms-tests.log
+                ;;
+            1)
+                paver test_system -s cms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} ${PARALLEL} 2> cms-tests.${SHARD}.log
+                ;;
+            2|"noshard")
+                paver test_system -s cms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> cms-tests.2.log
+                ;;
+        esac
         ;;
 
     "commonlib-unit")

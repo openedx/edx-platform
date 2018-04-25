@@ -28,6 +28,7 @@ from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from path import Path as path
 from six import text_type
 from waffle.testutils import override_switch
+from nose.plugins.attrib import attr
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from contentstore.utils import delete_course, reverse_course_url, reverse_url
@@ -88,6 +89,7 @@ class ContentStoreTestCase(CourseTestCase):
     """
 
 
+@attr(shard=1)
 class ImportRequiredTestCases(ContentStoreTestCase):
     """
     Tests which legitimately need to import a course
@@ -604,6 +606,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         )
 
 
+@attr(shard=1)
 @ddt.ddt
 class MiscCourseTests(ContentStoreTestCase):
     """
@@ -1152,6 +1155,7 @@ class MiscCourseTests(ContentStoreTestCase):
             self.assertEqual(resp.status_code, 200)
 
 
+@attr(shard=1)
 @ddt.ddt
 class ContentStoreTest(ContentStoreTestCase):
     """
@@ -1803,6 +1807,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEquals(response.status_code, 404)
 
 
+@attr(shard=1)
 class MetadataSaveTestCase(ContentStoreTestCase):
     """Test that metadata is correctly cached and decached."""
 
@@ -1862,6 +1867,7 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         pass
 
 
+@attr(shard=1)
 class RerunCourseTest(ContentStoreTestCase):
     """
     Tests for Rerunning a course via the view handler
@@ -2104,6 +2110,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEquals(destination_course.wiki_slug, destination_wiki_slug)
 
 
+@attr(shard=1)
 class ContentLicenseTest(ContentStoreTestCase):
     """
     Tests around content licenses
@@ -2142,6 +2149,7 @@ class ContentLicenseTest(ContentStoreTestCase):
         self.assertEqual(videos[0].license, "all-rights-reserved")
 
 
+@attr(shard=1)
 class EntryPageTestCase(TestCase):
     """
     Tests entry pages that aren't specific to a course.
@@ -2174,6 +2182,7 @@ class EntryPageTestCase(TestCase):
         self._test_page('/accessibility')
 
 
+@attr(shard=1)
 class SigninPageTestCase(TestCase):
     """
     Tests that the CSRF token is directly included in the signin form. This is
