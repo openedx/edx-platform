@@ -592,15 +592,14 @@ def get_user_group_ids(course_id, content, user=None):
     content_user_group_id = None
     user_group_id = None
     if course_id is not None:
-        course_discussion_settings = get_course_discussion_settings(course_id)
         if content.get('username'):
             try:
                 content_user = get_user_by_username_or_email(content.get('username'))
-                content_user_group_id = get_group_id_for_user(content_user, course_discussion_settings)
+                content_user_group_id = get_group_id_for_user_from_cache(content_user, course_id)
             except User.DoesNotExist:
                 content_user_group_id = None
 
-        user_group_id = get_group_id_for_user(user, course_discussion_settings) if user else None
+        user_group_id = get_group_id_for_user_from_cache(user, course_id) if user else None
     return user_group_id, content_user_group_id
 
 
@@ -819,12 +818,21 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
             _verify_group_exists(group_id, course_discussion_settings)
         else:
             # regular users always query with their own id.
-            group_id = get_group_id_for_user(request.user, course_discussion_settings)
+            group_id = get_group_id_for_user_from_cache(request.user, course_key)
         return group_id
     else:
         # Never pass a group_id to the comments service for a non-divided
         # commentable
         return None
+
+
+@request_cached
+def get_group_id_for_user_from_cache(user, course_id):
+    """
+    Caches the results of get_group_id_for_user, but serializes the course_id
+    instead of the course_discussions_settings object as cache keys.
+    """
+    return get_group_id_for_user(user, get_course_discussion_settings(course_id))
 
 
 def get_group_id_for_user(user, course_discussion_settings):
