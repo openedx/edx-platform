@@ -131,6 +131,7 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylin
     return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
 
 
+@request_cached
 def get_accessible_discussion_xblocks_by_course_id(course_id, user, include_all=False):  # pylint: disable=invalid-name
     """
     Return a list of all valid discussion xblocks in this course that
@@ -198,7 +199,7 @@ def get_cached_discussion_id_map_by_course_id(course_id, discussion_ids, user): 
             key = get_cached_discussion_key(course_id, discussion_id)
             if not key:
                 continue
-            xblock = modulestore().get_item(key)
+            xblock = _get_item_from_modulestore(key)
             if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course_id)):
                 continue
             entries.append(get_discussion_id_map_entry(xblock))
@@ -222,6 +223,11 @@ def get_discussion_id_map_by_course_id(course_id, user):  # pylint: disable=inva
     """
     xblocks = get_accessible_discussion_xblocks_by_course_id(course_id, user)
     return dict(map(get_discussion_id_map_entry, xblocks))
+
+
+@request_cached
+def _get_item_from_modulestore(key):
+    return modulestore().get_item(key)
 
 
 def _filter_unstarted_categories(category_map, course):
@@ -434,7 +440,7 @@ def discussion_category_id_access(course, user, discussion_id, xblock=None):
             key = get_cached_discussion_key(course.id, discussion_id)
             if not key:
                 return False
-            xblock = modulestore().get_item(key)
+            xblock = _get_item_from_modulestore(key)
         return has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)
     except DiscussionIdMapIsNotCached:
         return discussion_id in get_discussion_categories_ids(course, user)
