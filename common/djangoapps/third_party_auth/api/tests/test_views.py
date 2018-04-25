@@ -2,11 +2,15 @@
 """
 Tests for the Third Party Auth REST API
 """
+import json
 import unittest
 
 import ddt
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
+from django.test.utils import override_settings
 from mock import patch
 from provider.constants import CONFIDENTIAL
 from provider.oauth2.models import Client, AccessToken
@@ -30,6 +34,7 @@ ALICE_USERNAME = "alice"
 CARL_USERNAME = "carl"
 STAFF_USERNAME = "staff"
 ADMIN_USERNAME = "admin"
+NONEXISTENT_USERNAME = "nobody"
 # These users will be created and linked to third party accounts:
 LINKED_USERS = (ALICE_USERNAME, STAFF_USERNAME, ADMIN_USERNAME)
 PASSWORD = "edx"
@@ -79,6 +84,58 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             )
         # Create another user not linked to any providers:
         UserFactory.create(username=CARL_USERNAME, password=PASSWORD)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class ProviderViewAPITests(TpaAPITestCase):
+    """
+    Test that the provider endpoint returns the appropriate data
+    """
+    @ddt.data(*LINKED_USERS)
+    def test_linked_users(self, username):
+        for identifier_type in (u'username', u'email'):
+            identifier = getattr(User.objects.get(username=username), identifier_type)
+            url = reverse(
+                u'third_party_auth_providers_api',
+                kwargs={u'identifier': identifier},
+            )
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.content)
+            self.assertEqual(
+                data,
+                {
+                    u"identifier": identifier,
+                    u"identifier_type": identifier_type,
+                    u"providers": [
+                        {
+                            u'backend_name': u'google-oauth2',
+                            u'name': u'Google',
+                            u'provider_id': u'oa2-google-oauth2'
+                        }, {
+                            u'backend_name': u'tpa-saml',
+                            u'name': u'TestShib',
+                            u'provider_id': u'saml-testshib'
+                        },
+                    ],
+                },
+            )
+
+    @ddt.data(CARL_USERNAME, NONEXISTENT_USERNAME)
+    def test_unlinked_users(self, username):
+        url = reverse(u'third_party_auth_providers_api', kwargs={u'identifier': username})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(
+            data,
+            {
+                u'identifier': username,
+                u'identifier_type': u'username',
+                u'providers': [],
+            },
+        )
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -141,7 +198,7 @@ class UserViewAPITests(TpaAPITestCase):
         (None, ALICE_USERNAME, 403),
     )
     @ddt.unpack
-    def test_list_connected_providers__withapi_key(self, api_key, target_user, expect_result):
+    def test_list_connected_providers_with_api_key(self, api_key, target_user, expect_result):
         url = reverse('third_party_auth_users_api', kwargs={'username': target_user})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=api_key)
         self.assertEqual(response.status_code, expect_result)
