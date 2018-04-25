@@ -80,7 +80,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery
                 var uploadAjaxData = _.extend({}, this.uploadData);
                 // don't show the generic error notification; we're in a modal,
                 // and we're better off modifying it instead.
-                uploadAjaxData['notifyOnError'] = false;
+                uploadAjaxData.notifyOnError = false;
 
                 if (e && e.preventDefault) { e.preventDefault(); }
                 this.model.set('uploading', true);

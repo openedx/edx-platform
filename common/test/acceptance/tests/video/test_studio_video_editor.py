@@ -3,12 +3,14 @@
 """
 Acceptance tests for CMS Video Editor.
 """
+import ddt
 from nose.plugins.attrib import attr
-
+from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
 @attr(shard=6)
+@ddt.ddt
 class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class
@@ -263,6 +265,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.assertEqual(self.video.translations(), ['zh', 'uk'])
         self.video.remove_translation('uk')
+        confirm_prompt(self.video)
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
         unicode_text = "好 各位同学".decode('utf-8')
@@ -271,6 +274,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.assertEqual(self.video.translations(), ['zh'])
         self.video.remove_translation('zh')
+        confirm_prompt(self.video)
         self.save_unit_settings()
         self.assertFalse(self.video.is_captions_visible())
 
@@ -292,8 +296,27 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('uk_transcripts.srt', 'uk')
         self.assertEqual(self.video.translations(), ['uk'])
         self.video.remove_translation('uk')
+        confirm_prompt(self.video)
         self.save_unit_settings()
         self.assertFalse(self.video.is_captions_visible())
+
+    def test_translations_entry_remove_works(self):
+        """
+        Scenario: Translations entry removal works correctly when transcript is not uploaded
+        Given I have created a Video component
+        And I edit the component
+        And I open tab "Advanced"
+        And I click on "+ Add" button for "Transcript Languages" field
+        Then I click on "Remove" button
+        And I see newly created entry is removed
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.open_advanced_tab()
+        self.video.click_button("translation_add")
+        self.assertEqual(self.video.translations_count(), 1)
+        self.video.remove_translation("")
+        self.assertEqual(self.video.translations_count(), 0)
 
     def test_cannot_upload_sjson_translation(self):
         """
@@ -394,6 +417,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('chinese_transcripts.srt', 'zh')
         self.assertEqual(self.video.translations(), ['zh'])
         self.video.remove_translation('zh')
+        confirm_prompt(self.video)
         self.video.upload_translation('uk_transcripts.srt', 'zh')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
