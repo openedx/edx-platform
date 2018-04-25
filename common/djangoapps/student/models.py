@@ -23,6 +23,7 @@ from urllib import urlencode
 
 import analytics
 from config_models.models import ConfigurationModel
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
@@ -216,15 +217,33 @@ def is_username_retired(username):
 
 def get_retired_username_by_username(username):
     """
-    Returns a "retired username" hashed using the newest configured salt
+    If a UserRetirementStatus object with an original_username matching the given username exists,
+    returns that UserRetirementStatus.retired_username value.  Otherwise, returns a "retired username"
+    hashed using the newest configured salt.
     """
+    UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
+    try:
+        status = UserRetirementStatus.objects.filter(original_username=username).order_by('-modified').first()
+        if status:
+            return status.retired_username
+    except UserRetirementStatus.DoesNotExist:
+        pass
     return user_util.get_retired_username(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
 
 
 def get_retired_email_by_email(email):
     """
-    Returns a "retired email" hashed using the newest configured salt
+    If a UserRetirementStatus object with an original_email matching the given email exists,
+    returns that UserRetirementStatus.retired_email value.  Otherwise, returns a "retired email"
+    hashed using the newest configured salt.
     """
+    UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
+    try:
+        status = UserRetirementStatus.objects.filter(original_email=email).order_by('-modified').first()
+        if status:
+            return status.retired_email
+    except UserRetirementStatus.DoesNotExist:
+        pass
     return user_util.get_retired_email(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
