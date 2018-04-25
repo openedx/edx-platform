@@ -83,8 +83,6 @@ class DarkLangMiddleware(object):
         """
         Prevent user from requesting un-released languages except by using the preview-lang query string.
         """
-        # import pdb;
-        # pdb.set_trace()
         if not DarkLangConfig.current().enabled:
             return
 
@@ -116,7 +114,6 @@ class DarkLangMiddleware(object):
         Remove any language that is not either in ``self.released_langs`` or
         a territory of one of those languages.
         """
-        # import pdb; pdb.set_trace()
         accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
         if accept is None or accept == '*':
             return
@@ -136,8 +133,6 @@ class DarkLangMiddleware(object):
         """
         Check the user's dark language setting in the session and apply it
         """
-        # import pdb;
-        # pdb.set_trace()
         auth_user = request.user.is_authenticated()
         preview_lang = None
         if auth_user:
