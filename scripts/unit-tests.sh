@@ -44,10 +44,10 @@ case "${TEST_SUITE}" in
             "all")
                 paver test_system -s lms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.log
                 ;;
-            [1-4])
+            [1-5])
                 paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.${SHARD}.log
                 ;;
-            5|"noshard")
+            6|"noshard")
                 paver test_system -s lms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.4.log
                 ;;
         esac

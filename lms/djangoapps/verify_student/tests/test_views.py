@@ -1101,6 +1101,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertNotEqual(httpretty.last_request().headers, {})
 
 
+@attr(shard=2)
 class CheckoutTestMixin(object):
     """
     Mixin implementing test methods that should behave identically regardless
