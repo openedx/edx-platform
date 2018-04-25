@@ -28,4 +28,3 @@ def get_lms_link_for_about_page(course_key):
         about_base_url=about_base,
         course_key=course_key.to_deprecated_string()
     )
-
