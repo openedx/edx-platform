@@ -5,6 +5,7 @@ consist primarily of authentication, request validation, and serialization.
 """
 import logging
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.authentication import JwtAuthentication
@@ -23,6 +24,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
@@ -313,14 +315,14 @@ class UnenrollmentView(APIView):
         **Example Requests**
 
             POST /api/enrollment/v1/enrollment {
-                "user": "username12345"
+                "username": "username12345"
             }
 
             **POST Parameters**
 
               A POST request must include the following parameter.
 
-              * user: The username of the user being unenrolled.
+              * username: The username of the user being unenrolled.
               This will never match the username from the request,
               since the request is issued as a privileged service user.
 
@@ -342,31 +344,23 @@ class UnenrollmentView(APIView):
         """
         Unenrolls the specified user from all courses.
         """
-        # Get the User from the request.
-        username = request.data.get('user', None)
-        if not username:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND,
-                data={
-                    'message': u'The user was not specified.'
-                }
-            )
+        username = None
+        user_model = get_user_model()
+
         try:
-            # make sure the specified user exists
-            User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND,
-                data={
-                    'message': u'The user "{}" does not exist.'.format(username)
-                }
-            )
-        try:
+            # Get the username from the request and check that it exists
+            username = request.data['username']
+            user_model.objects.get(username=username)
+
             enrollments = api.get_enrollments(username)
             active_enrollments = [enrollment for enrollment in enrollments if enrollment['is_active']]
             if len(active_enrollments) < 1:
                 return Response(status=status.HTTP_200_OK)
             return Response(api.unenroll_user_from_all_courses(username))
+        except KeyError:
+            return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
+        except user_model.DoesNotExist:
+            return Response(u'The user "{}" does not exist.'.format(username), status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

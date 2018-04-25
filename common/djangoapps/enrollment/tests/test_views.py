@@ -1283,10 +1283,18 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
     def test_deactivate_enrollments_no_username(self):
         self._assert_active()
+        response = self._submit_unenroll(self.superuser, None)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = json.loads(response.content)
+        self.assertEqual(data, u"Username not specified.")
+        self._assert_active()
+
+    def test_deactivate_enrollments_empty_username(self):
+        self._assert_active()
         response = self._submit_unenroll(self.superuser, "")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = json.loads(response.content)
-        self.assertEqual(data['message'], 'The user was not specified.')
+        self.assertEqual(data, u'The user "" does not exist.')
         self._assert_active()
 
     def test_deactivate_enrollments_invalid_username(self):
@@ -1294,7 +1302,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         response = self._submit_unenroll(self.superuser, "a made up username")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = json.loads(response.content)
-        self.assertEqual(data['message'], 'The user "a made up username" does not exist.')
+        self.assertEqual(data, u'The user "a made up username" does not exist.')
         self._assert_active()
 
     def test_deactivate_enrollments_called_twice(self):
@@ -1318,7 +1326,10 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
             self.assertFalse(is_active)
 
     def _submit_unenroll(self, submitting_user, unenrolling_username):
-        data = {'user': unenrolling_username}
+        data = {}
+        if unenrolling_username is not None:
+            data['username'] = unenrolling_username
+
         url = reverse('unenrollment')
         headers = self.build_jwt_headers(submitting_user)
         return self.client.post(url, json.dumps(data), content_type='application/json', **headers)

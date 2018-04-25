@@ -33,7 +33,7 @@ from discussion_api.forms import CommentGetForm, CommentListGetForm, ThreadListG
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
-from student.models import get_potentially_retired_user_by_username_and_hash
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from xmodule.modulestore.django import modulestore
 
 
@@ -543,23 +543,22 @@ class RetireUserView(APIView):
     authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
-    def post(self, request, username):
+    def post(self, request):
         """
         Implements the retirement endpoint.
         """
-        user_model = get_user_model()
-        retired_username = request.data['retired_username']
+        username = request.data['username']
 
         try:
-            user = get_potentially_retired_user_by_username_and_hash(username, retired_username)
-            cc_user = comment_client.User.from_django_user(user)
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            cc_user = comment_client.User.from_django_user(retirement.user)
 
             # We can't count on the LMS username being un-retired at this point,
             # so we pass the old username as a parameter to describe which
             # user to retire. This will either succeed or throw an error which
             # should be good to raise from here.
             cc_user.retire(username)
-        except user_model.DoesNotExist:
+        except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
