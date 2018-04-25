@@ -859,7 +859,7 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
     """
     Get video transcript from edx-val.
     Arguments:
-        edx_video_id (unicode): course identifier
+        edx_video_id (unicode): video identifier
         lang (unicode): transcript language
         output_format (unicode): transcript output format
     Returns:
@@ -923,6 +923,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     Returns:
         tuple containing content, filename, mimetype
     """
+    input_format, base_name, transcript_content = None, None, None
     if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
         raise NotFoundError('Invalid transcript format `{output_format}`'.format(output_format=output_format))
 
@@ -930,24 +931,24 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     transcripts = dict(other_languages)
 
     # this is sent in case of a translation dispatch and we need to use it as our subs_id.
-    if youtube_id:
-        transcripts['en'] = youtube_id
-    elif sub:
-        transcripts['en'] = sub
-    elif video.youtube_id_1_0:
-        transcripts['en'] = video.youtube_id_1_0
-    elif language == u'en':
-        raise NotFoundError('No transcript for `en` language')
+    possible_sub_ids = [youtube_id, sub, video.youtube_id_1_0] + get_html5_ids(video.html5_sources)
+    for sub_id in possible_sub_ids:
+        try:
+            transcripts[u'en'] = sub_id
+            input_format, base_name, transcript_content = get_transcript_for_video(
+                video.location,
+                subs_id=sub_id,
+                file_name=transcripts[language],
+                language=language
+            )
+            break
+        except (KeyError, NotFoundError):
+            continue
 
-    try:
-        input_format, base_name, transcript_content = get_transcript_for_video(
-            video.location,
-            subs_id=transcripts.get('en'),
-            file_name=transcripts[language],
-            language=language
-        )
-    except KeyError:
-        raise NotFoundError
+    if transcript_content is None:
+        raise NotFoundError('No transcript for `{lang}` language'.format(
+            lang=language
+        ))
 
     # add language prefix to transcript file only if language is not None
     language_prefix = '{}_'.format(language) if language else ''

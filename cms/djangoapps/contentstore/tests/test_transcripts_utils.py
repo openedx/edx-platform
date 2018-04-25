@@ -744,7 +744,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             edx_video_id=u'1234-5678-90'
         )
 
-    def create_transcript(self, subs_id, language=u'en', filename='video.srt'):
+    def create_transcript(self, subs_id, language=u'en', filename='video.srt', youtube_id_1_0='', html5_sources=None):
         """
         create transcript.
         """
@@ -752,21 +752,26 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         if language != u'en':
             transcripts = {language: filename}
 
+        html5_sources = html5_sources or []
         self.video = ItemFactory.create(
             category='video',
             parent_location=self.vertical.location,
             sub=subs_id,
+            youtube_id_1_0=youtube_id_1_0,
             transcripts=transcripts,
-            edx_video_id=u'1234-5678-90'
+            edx_video_id=u'1234-5678-90',
+            html5_sources=html5_sources
         )
 
-        if subs_id:
-            transcripts_utils.save_subs_to_store(
-                self.subs_sjson,
-                subs_id,
-                self.video,
-                language=language,
-            )
+        possible_subs = [subs_id, youtube_id_1_0] + transcripts_utils.get_html5_ids(html5_sources)
+        for possible_sub in possible_subs:
+            if possible_sub:
+                transcripts_utils.save_subs_to_store(
+                    self.subs_sjson,
+                    possible_sub,
+                    self.video,
+                    language=language,
+                )
 
     def create_srt_file(self, content):
         """
@@ -812,31 +817,69 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             )
 
     @ddt.data(
+        # video.sub transcript
         {
             'language': u'en',
             'subs_id': 'video_101',
-            'filename': 'en_video_101.srt',
+            'youtube_id_1_0': '',
+            'html5_sources': [],
+            'expected_filename': 'en_video_101.srt',
         },
+        # if video.sub is present, rest will be skipped.
+        {
+            'language': u'en',
+            'subs_id': 'video_101',
+            'youtube_id_1_0': 'test_yt_id',
+            'html5_sources': ['www.abc.com/foo.mp4'],
+            'expected_filename': 'en_video_101.srt',
+        },
+        # video.youtube_id_1_0 transcript
+        {
+            'language': u'en',
+            'subs_id': '',
+            'youtube_id_1_0': 'test_yt_id',
+            'html5_sources': [],
+            'expected_filename': 'en_test_yt_id.srt',
+        },
+        # video.html5_sources transcript
+        {
+            'language': u'en',
+            'subs_id': '',
+            'youtube_id_1_0': '',
+            'html5_sources': ['www.abc.com/foo.mp4'],
+            'expected_filename': 'en_foo.srt',
+        },
+        # non-english transcript
         {
             'language': u'ur',
             'subs_id': '',
-            'filename': 'ur_video_101.srt',
+            'youtube_id_1_0': '',
+            'html5_sources': [],
+            'expected_filename': 'ur_video_101.srt',
         },
     )
     @ddt.unpack
-    def test_get_transcript_from_content_store(self, language, subs_id, filename):
+    def test_get_transcript_from_contentstore(
+        self,
+        language,
+        subs_id,
+        youtube_id_1_0,
+        html5_sources,
+        expected_filename
+    ):
         """
         Verify that `get_transcript` function returns correct data when transcript is in content store.
         """
-        self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, filename)
-        self.create_transcript(subs_id, language, filename)
-        content, filename, mimetype = transcripts_utils.get_transcript(
+        base_filename = 'video_101.srt'
+        self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, base_filename)
+        self.create_transcript(subs_id, language, base_filename, youtube_id_1_0, html5_sources)
+        content, file_name, mimetype = transcripts_utils.get_transcript(
             self.video,
             language
         )
 
         self.assertEqual(content, self.subs[language])
-        self.assertEqual(filename, filename)
+        self.assertEqual(file_name, expected_filename)
         self.assertEqual(mimetype, self.srt_mime_type)
 
     def test_get_transcript_from_content_store_for_ur(self):
