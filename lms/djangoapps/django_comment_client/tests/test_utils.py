@@ -65,12 +65,6 @@ class DictionaryTestCase(TestCase):
         expected = {'cats': 'meow', 'dogs': 'woof'}
         self.assertEqual(utils.strip_blank(d), expected)
 
-    def test_merge_dict(self):
-        d1 = {'cats': 'meow', 'dogs': 'woof'}
-        d2 = {'lions': 'roar', 'ducks': 'quack'}
-        expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
-        self.assertEqual(utils.merge_dict(d1, d2), expected)
-
 
 @attr(shard=1)
 @pytest.mark.django111_expected_failure

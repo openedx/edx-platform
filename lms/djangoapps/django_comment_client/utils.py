@@ -60,13 +60,6 @@ def strip_blank(dic):
 # TODO should we be checking if d1 and d2 have the same keys with different values?
 
 
-def merge_dict(dic1, dic2):
-    """
-    Combines the keys from the two provided dictionaries
-    """
-    return dict(dic1.items() + dic2.items())
-
-
 def get_role_ids(course_id):
     """
     Returns a dictionary having role names as keys and a list of users as values
@@ -648,7 +641,9 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     def infogetter(thread):
         return get_annotated_content_infos(course_id, thread, user, user_info)
 
-    metadata = reduce(merge_dict, map(infogetter, threads), {})
+    metadata = {}
+    for thread in threads:
+        metadata.update(infogetter(thread))
     return metadata
 
 
@@ -685,7 +680,8 @@ def extend_content(content):
         'roles': roles,
         'updated': content['created_at'] != content['updated_at'],
     }
-    return merge_dict(content, content_info)
+    content.update(content_info)
+    return content
 
 
 def add_courseware_context(content_list, course, user, id_map=None):
