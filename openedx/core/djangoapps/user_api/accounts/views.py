@@ -5,39 +5,83 @@ For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
 import datetime
+import logging
+from functools import wraps
 
 import pytz
-from django.contrib.auth import get_user_model, authenticate, logout
+from consent.models import DataSharingConsent
+from django.contrib.auth import authenticate, get_user_model, logout
+from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from rest_framework import permissions
-from rest_framework import status
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
+from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
+from rest_framework import permissions, status
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 from social_django.models import UserSocialAuth
+
+from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.profile_images.images import remove_profile_images
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
+)
+from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    Registration,
     User,
+    UserProfile,
+    get_potentially_retired_user_by_username,
     get_retired_email_by_email,
-    get_potentially_retired_user_by_username_and_hash,
-    get_potentially_retired_user_by_username
+    get_retired_username_by_username,
+    is_username_retired
 )
 from student.views.login import AuthFailedError, LoginFailures
 
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser,
-    OAuth2AuthenticationAllowInactiveUser,
-)
-from openedx.core.lib.api.parsers import MergePatchParser
+from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
+from ..models import RetirementState, RetirementStateError, UserOrgTag, UserRetirementStatus
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanRetireUser
 from .serializers import UserRetirementStatusSerializer
 from .signals import USER_RETIRE_MAILINGS
-from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
-from ..models import UserOrgTag, RetirementState, RetirementStateError, UserRetirementStatus
+
+log = logging.getLogger(__name__)
+
+USER_PROFILE_PII = {
+    'name': '',
+    'meta': '',
+    'location': '',
+    'year_of_birth': None,
+    'gender': None,
+    'mailing_address': None,
+    'city': None,
+    'country': None,
+    'bio': None,
+}
+
+
+def request_requires_username(function):
+    """
+    Requires that a ``username`` key containing a truthy value exists in
+    the ``request.data`` attribute of the decorated function.
+    """
+    @wraps(function)
+    def wrapper(self, request):  # pylint: disable=missing-docstring
+        username = request.data.get('username', None)
+        if not username:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={'message': text_type('The user was not specified.')}
+            )
+        return function(self, request)
+    return wrapper
 
 
 class AccountViewSet(ViewSet):
@@ -423,18 +467,18 @@ def _set_unusable_password(user):
     user.save()
 
 
-class AccountRetirementView(ViewSet):
+class AccountRetirementStatusView(ViewSet):
     """
     Provides API endpoints for managing the user retirement process.
     """
     authentication_classes = (JwtAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, CanRetireUser, )
-    parser_classes = (MergePatchParser, )
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (MergePatchParser,)
     serializer_class = UserRetirementStatusSerializer
 
     def retirement_queue(self, request):
         """
-        GET /api/user/v1/accounts/accounts_to_retire/
+        GET /api/user/v1/accounts/retirement_queue/
         {'cool_off_days': 7, 'states': ['PENDING', 'COMPLETE']}
 
         Returns the list of RetirementStatus users in the given states that were
@@ -489,6 +533,7 @@ class AccountRetirementView(ViewSet):
         except (UserRetirementStatus.DoesNotExist, User.DoesNotExist):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @request_requires_username
     def partial_update(self, request):
         """
         PATCH /api/user/v1/accounts/update_retirement_status/
@@ -517,3 +562,116 @@ class AccountRetirementView(ViewSet):
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AccountRetirementView(ViewSet):
+    """
+    Provides API endpoint for retiring a user.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+
+    @request_requires_username
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/retire/
+
+        {
+            'username': 'user_to_retire'
+        }
+
+        Retires the user with the given username.  This includes
+        retiring this username, the associates email address, and
+        any other PII associated with this user.
+        """
+        username = request.data['username']
+        if is_username_retired(username):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = UserRetirementStatus.get_retirement_for_retirement_action(username).user
+
+            with transaction.atomic():
+                self.clear_pii_from_userprofile(user)
+                Registration.objects.filter(user=user).delete()
+                self.delete_users_profile_images(user)
+                self.delete_users_country_cache(user)
+                self.retire_users_data_sharing_consent(username)
+                self.retire_sapsf_data_transmission(user)
+                self.retire_user_from_pending_enterprise_customer_user(user)
+                self.retire_entitlement_support_detail(user)
+                # TODO: Password Reset links - https://openedx.atlassian.net/browse/PLAT-2104
+                # TODO: Delete OAuth2 records - https://openedx.atlassian.net/browse/EDUCATOR-2703
+                user.first_name = ''
+                user.last_name = ''
+                user.is_active = False
+                user.username = get_retired_username_by_username(user.username)
+                user.save()
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def clear_pii_from_userprofile(user):
+        """
+        For the given user, sets all of the user's profile fields to some retired value.
+        This also deletes all ``SocialLink`` objects associated with this user's profile.
+        """
+        for model_field, value_to_assign in USER_PROFILE_PII.iteritems():
+            setattr(user.profile, model_field, value_to_assign)
+
+        user.profile.save()
+        user.profile.social_links.all().delete()
+
+    @staticmethod
+    def delete_users_profile_images(user):
+        set_has_profile_image(user.username, False)
+        names_of_profile_images = get_profile_image_names(user.username)
+        remove_profile_images(names_of_profile_images)
+
+    @staticmethod
+    def delete_users_country_cache(user):
+        cache_key = UserProfile.country_cache_key_name(user.id)
+        cache.delete(cache_key)
+
+    @staticmethod
+    def retire_users_data_sharing_consent(username):
+        DataSharingConsent.objects.filter(
+            username=username
+        ).update(
+            username=get_retired_username_by_username(username)
+        )
+
+    @staticmethod
+    def retire_sapsf_data_transmission(user):
+        for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
+            for enrollment in EnterpriseCourseEnrollment.objects.filter(
+                enterprise_customer_user=ent_user
+            ):
+                audits = SapSuccessFactorsLearnerDataTransmissionAudit.objects.filter(
+                    enterprise_course_enrollment_id=enrollment.id
+                )
+                audits.update(sapsf_user_id='')
+
+    @staticmethod
+    def retire_user_from_pending_enterprise_customer_user(user):
+        PendingEnterpriseCustomerUser.objects.filter(
+            user_email=user.email
+        ).update(
+            user_email=get_retired_email_by_email(user.email)
+        )
+
+    @staticmethod
+    def retire_entitlement_support_detail(user):
+        """
+        Updates all CourseEntitleSupportDetail records for the given
+        user to have an empty ``comments`` field.
+        """
+        for entitlement in CourseEntitlement.objects.filter(user_id=user.id):
+            entitlement.courseentitlementsupportdetail_set.all().update(comments='')

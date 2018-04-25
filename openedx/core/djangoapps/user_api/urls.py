@@ -9,6 +9,7 @@ from ..profile_images.views import ProfileImageView
 from .accounts.views import (
     AccountDeactivationView,
     AccountRetireMailingsView,
+    AccountRetirementStatusView,
     AccountRetirementView,
     AccountViewSet,
     DeactivateLogoutView
@@ -30,16 +31,20 @@ ACCOUNT_DETAIL = AccountViewSet.as_view({
     'patch': 'partial_update',
 })
 
-RETIREMENT_QUEUE = AccountRetirementView.as_view({
+RETIREMENT_QUEUE = AccountRetirementStatusView.as_view({
     'get': 'retirement_queue'
 })
 
-RETIREMENT_RETRIEVE = AccountRetirementView.as_view({
+RETIREMENT_RETRIEVE = AccountRetirementStatusView.as_view({
     'get': 'retrieve'
 })
 
-RETIREMENT_UPDATE = AccountRetirementView.as_view({
+RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
     'patch': 'partial_update',
+})
+
+RETIREMENT_POST = AccountRetirementView.as_view({
+    'post': 'post',
 })
 
 
@@ -93,6 +98,11 @@ urlpatterns = [
         r'^v1/accounts/retirement_queue/$',
         RETIREMENT_QUEUE,
         name='accounts_retirement_queue'
+    ),
+    url(
+        r'^v1/accounts/retire/$',
+        RETIREMENT_POST,
+        name='accounts_retire'
     ),
     url(
         r'^v1/accounts/update_retirement_status/$',
