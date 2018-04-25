@@ -8,6 +8,7 @@ class TargetCourse(models.Model):
     @course_id: (string) id of the course
     """
     course_id = models.CharField(max_length=255)
+    emails = models.TextField()
 
     def __unicode__(self):
         return '{}'.format(self.course_id)

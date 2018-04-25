@@ -35,14 +35,12 @@ def get_file_url(answer):
 class Command(BaseCommand):
     help = 'Generates the analytics data for each course_id in targetcourse table'
 
-    def add_arguments(self, parser):
-        parser.add_argument('email', type=str)
-
     def handle(self, **options):
         target_courses = TargetCourse.objects.all()
         data = []
 
         for target_course in target_courses:
+            emails = map(unicode.strip, target_course.emails.split(','))
             course_data = {
                 'course_structure': {},
                 'team_data': [],
@@ -211,16 +209,17 @@ class Command(BaseCommand):
 
             data.append(course_data)
 
-        with tempfile.TemporaryFile() as tmp:
-            MandrillClient().send_mail(
-                template_name=MandrillClient.ACUMEN_DATA_TEMPLATE,
-                user_email=options['email'],
-                context={},
-                attachments=[
-                    {
-                        "type": "text/plain",
-                        "name": "data.json",
-                        "content": base64.encodestring(json.dumps(data))
-                    }
-                ]
-            )
+            with tempfile.TemporaryFile() as tmp:
+                for email in emails:
+                    MandrillClient().send_mail(
+                        template_name=MandrillClient.ACUMEN_DATA_TEMPLATE,
+                        user_email=email,
+                        context={},
+                        attachments=[
+                            {
+                                "type": "text/plain",
+                                "name": "data.json",
+                                "content": base64.encodestring(json.dumps(data))
+                            }
+                        ]
+                    )
