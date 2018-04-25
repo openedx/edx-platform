@@ -1245,6 +1245,9 @@ OPTIONAL_APPS = (
     # Enterprise App (http://github.com/edx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
+    ('integrated_channels.integrated_channel', None),
+    ('integrated_channels.degreed', None),
+    ('integrated_channels.sap_success_factors', None),
 )
 
 
