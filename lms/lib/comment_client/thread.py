@@ -50,10 +50,14 @@ class Thread(models.Model):
         # either the 'search' or 'get_all' actions below.  Both already use
         # with_responses=False internally in the comment service, so no additional
         # optimization is required.
-        default_params = {'page': 1,
-                          'per_page': 20,
-                          'course_id': query_params['course_id']}
-        params = utils.merge_dict(default_params, utils.strip_blank(utils.strip_none(query_params)))
+        params = {
+            'page': 1,
+            'per_page': 20,
+            'course_id': query_params['course_id'],
+        }
+        params.update(
+            utils.strip_blank(utils.strip_none(query_params))
+        )
 
         if query_params.get('text'):
             url = cls.url(action='search')

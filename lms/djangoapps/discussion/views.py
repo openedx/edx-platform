@@ -39,7 +39,6 @@ from django_comment_client.utils import (
     get_group_id_for_user,
     get_group_names_by_id,
     is_commentable_divided,
-    merge_dict,
     strip_none
 )
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
@@ -129,8 +128,8 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     #is user a moderator
     #did the user request a group
 
-    query_params = merge_dict(
-        default_query_params,
+    query_params = default_query_params.copy()
+    query_params.update(
         strip_none(
             extract(
                 request.GET,
@@ -581,14 +580,12 @@ def followed_threads(request, course_key, user_id):
     try:
         profiled_user = cc.User(id=user_id, course_id=course_key)
 
-        default_query_params = {
+        query_params = {
             'page': 1,
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
             'sort_key': 'date',
         }
-
-        query_params = merge_dict(
-            default_query_params,
+        query_params.update(
             strip_none(
                 extract(
                     request.GET,
