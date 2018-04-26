@@ -13,6 +13,7 @@ from django.test.utils import override_settings
 from pytz import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from milestones.models import MilestoneRelationshipType
@@ -37,6 +38,7 @@ def get_url(course_id, handler_name='settings_handler'):
     return reverse_course_url(handler_name, course_id)
 
 
+@attr(shard=1)
 class CourseSettingsEncoderTest(CourseTestCase):
     """
     Tests for CourseSettingsEncoder.
@@ -82,6 +84,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
 
+@attr(shard=1)
 @ddt.ddt
 class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
@@ -430,6 +433,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Video Thumbnail Image")
 
 
+@attr(shard=1)
 @ddt.ddt
 class CourseGradingTest(CourseTestCase):
     """
@@ -764,6 +768,7 @@ class CourseGradingTest(CourseTestCase):
         return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
 
 
+@attr(shard=1)
 @ddt.ddt
 class CourseMetadataEditingTest(CourseTestCase):
     """
@@ -1154,6 +1159,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@attr(shard=1)
 class CourseGraderUpdatesTest(CourseTestCase):
     """
     Test getting, deleting, adding, & updating graders
@@ -1218,6 +1224,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
         self.assertEqual(len(self.starting_graders) + 1, len(current_graders))
 
 
+@attr(shard=1)
 class CourseEnrollmentEndFieldTest(CourseTestCase):
     """
     Base class to test the enrollment end fields in the course settings details view in Studio
