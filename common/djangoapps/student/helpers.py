@@ -116,14 +116,10 @@ def check_verify_status_by_course(user, course_enrollments):
     verifications = IDVerificationService.verifications_for_user(user)
 
     # Check whether the user has an active or pending verification attempt
-    # To avoid another database hit, we re-use the queryset we have already retrieved.
-    has_active_or_pending = IDVerificationService.user_has_valid_or_pending(
-        user, queryset=verifications
-    )
+    has_active_or_pending = IDVerificationService.user_has_valid_or_pending(user)
 
     # Retrieve expiration_datetime of most recent approved verification
-    # To avoid another database hit, we re-use the queryset we have already retrieved.
-    expiration_datetime = IDVerificationService.get_expiration_datetime(user, verifications)
+    expiration_datetime = IDVerificationService.get_expiration_datetime(user, ['approved'])
     verification_expiring_soon = is_verification_expiring_soon(expiration_datetime)
 
     # Retrieve verification deadlines for the enrolled courses
@@ -154,9 +150,12 @@ def check_verify_status_by_course(user, course_enrollments):
 
             # By default, don't show any status related to verification
             status = None
+            should_display = True
 
             # Check whether the user was approved or is awaiting approval
             if relevant_verification is not None:
+                should_display = relevant_verification.should_display_status_to_user()
+
                 if relevant_verification.status == "approved":
                     if verification_expiring_soon:
                         status = VERIFY_STATUS_NEED_TO_REVERIFY
@@ -214,7 +213,8 @@ def check_verify_status_by_course(user, course_enrollments):
 
                 status_by_course[enrollment.course_id] = {
                     'status': status,
-                    'days_until_deadline': days_until_deadline
+                    'days_until_deadline': days_until_deadline,
+                    'should_display': should_display,
                 }
 
     if recent_verification_datetime:
