@@ -959,3 +959,43 @@ class TestGetTranscript(SharedModuleStoreTestCase):
 
         exception_message = text_type(no_en_transcript_exception.exception)
         self.assertEqual(exception_message, 'No transcript for `en` language')
+
+    @ddt.data(
+        transcripts_utils.TranscriptsGenerationException,
+        UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
+    )
+    @patch('xmodule.video_module.transcripts_utils.Transcript')
+    def test_get_transcript_val_exceptions(self, exception_to_raise, mock_Transcript):
+        """
+        Verify that `get_transcript_from_val` function raises `NotFoundError` when specified exceptions raised.
+        """
+        mock_Transcript.convert.side_effect = exception_to_raise
+        transcripts_info = self.video.get_transcripts_info()
+        lang = self.video.get_default_transcript_language(transcripts_info)
+        edx_video_id = transcripts_utils.clean_video_id(self.video.edx_video_id)
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.get_transcript_from_val(
+                edx_video_id,
+                lang=lang,
+                output_format=transcripts_utils.Transcript.SRT
+            )
+
+    @ddt.data(
+        transcripts_utils.TranscriptsGenerationException,
+        UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
+    )
+    @patch('xmodule.video_module.transcripts_utils.Transcript')
+    def test_get_transcript_content_store_exceptions(self, exception_to_raise, mock_Transcript):
+        """
+        Verify that `get_transcript_from_contentstore` function raises `NotFoundError` when specified exceptions raised.
+        """
+        mock_Transcript.asset.side_effect = exception_to_raise
+        transcripts_info = self.video.get_transcripts_info()
+        lang = self.video.get_default_transcript_language(transcripts_info)
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.get_transcript_from_contentstore(
+                self.video,
+                language=lang,
+                output_format=transcripts_utils.Transcript.SRT,
+                transcripts_info=transcripts_info
+            )
