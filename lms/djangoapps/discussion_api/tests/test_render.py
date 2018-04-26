@@ -14,7 +14,7 @@ def _add_p_tags(raw_body):
     return "<p>{raw_body}</p>".format(raw_body=raw_body)
 
 
-@attr(shard=4)
+@attr(shard=8)
 @ddt.ddt
 class RenderBodyTest(TestCase):
     """Tests for render_body"""

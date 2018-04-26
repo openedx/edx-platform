@@ -26,7 +26,7 @@ def mock_signal_receiver(signal):
     signal.disconnect(receiver)
 
 
-@attr(shard=4)
+@attr(shard=7)
 class TestSendCCXCoursePublished(ModuleStoreTestCase):
     """
     Unit tests for the send ccx course published task

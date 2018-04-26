@@ -10,7 +10,7 @@ from discussion_api.pagination import DiscussionAPIPagination
 from discussion_api.tests.utils import make_paginated_api_response
 
 
-@attr(shard=4)
+@attr(shard=8)
 class PaginationSerializerTest(TestCase):
     """Tests for PaginationSerializer"""
     def do_case(self, objects, page_num, num_pages, expected):
