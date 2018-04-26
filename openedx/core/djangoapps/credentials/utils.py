@@ -9,6 +9,19 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
 
+def get_credentials_records_url(program_uuid=None):
+    """
+    Returns a URL for a given records page (or general records list if given no UUID).
+    May return None if this feature is disabled.
+    """
+    base_url = CredentialsApiConfig.current().public_records_url
+    if base_url is None:
+        return None
+    if program_uuid:
+        return base_url + 'programs/{}/'.format(program_uuid)
+    return base_url
+
+
 def get_credentials_api_client(user):
     """ Returns an authenticated Credentials API client. """
 

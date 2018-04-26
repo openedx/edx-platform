@@ -112,6 +112,7 @@ class ProgramDetailsView extends Backbone.View {
       model: this.programModel,
       courseModel: this.courseData,
       certificateCollection: this.certificateCollection,
+      programRecordUrl: this.options.urls.program_record_url,
     });
   }
 

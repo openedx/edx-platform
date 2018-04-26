@@ -4,8 +4,10 @@
 import datetime
 import ddt
 import mock
+from waffle.testutils import override_switch
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from course_modes.models import CourseMode
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,6 +22,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
+@override_switch('student_records', True)
 class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student profile view. """
 
@@ -109,6 +112,11 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         for attribute in self.CONTEXT_DATA:
             self.assertIn(attribute, response.content)
+
+    def test_records_link(self):
+        profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+        response = self.client.get(path=profile_path)
+        self.assertContains(response, '<a href="{}/records/">'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
 
     def test_undefined_profile_page(self):
         """
