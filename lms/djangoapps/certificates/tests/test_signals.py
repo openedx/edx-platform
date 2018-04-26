@@ -256,12 +256,17 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
+                expected_verification_status = {
+                    'status': 'approved',
+                    'error': '',
+                    'should_display': True,
+                }
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
                         'student': unicode(self.user_one.id),
                         'course_key': unicode(self.course_one.id),
-                        'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
+                        'expected_verification_status': unicode(expected_verification_status),
                     }
                 )
 
@@ -277,12 +282,17 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
+                expected_verification_status = {
+                    'status': 'approved',
+                    'error': '',
+                    'should_display': True,
+                }
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
                         'student': unicode(self.user_two.id),
                         'course_key': unicode(self.course_two.id),
-                        'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
+                        'expected_verification_status': unicode(expected_verification_status),
                     }
                 )
 
