@@ -2620,6 +2620,10 @@ FINANCIAL_REPORTS = {
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
 
+#### Grading policy change-related settings #####
+# Rate limit for regrading tasks that a grading policy change can kick off
+POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
+
 #### PASSWORD POLICY SETTINGS #####
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = None
