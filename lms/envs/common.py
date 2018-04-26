@@ -2231,7 +2231,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.student_dashboard',
 
     # Data extraction App
-    'openedx.features.database_extract',
+    'openedx.features.data_extract',
 )
 
 ######################### CSRF #########################################

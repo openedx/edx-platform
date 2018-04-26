@@ -11,10 +11,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='TargetCourse',
+            name='CourseDataExtraction',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', models.TextField(max_length=255)),
+                ('course_id', models.CharField(max_length=255)),
+                ('emails', models.TextField()),
             ],
         ),
     ]

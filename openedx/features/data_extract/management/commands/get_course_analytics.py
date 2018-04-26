@@ -20,7 +20,7 @@ from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
 from openassessment.data import OraAggregateData
 from openassessment.fileupload import api as ora_file_upload_api
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from openedx.features.database_extract.models import TargetCourse
+from openedx.features.data_extract.models import CourseDataExtraction
 from submissions.models import StudentItem, Submission, Score
 from submissions.api import _get_or_create_student_item
 
@@ -33,10 +33,10 @@ def get_file_url(answer):
 
 
 class Command(BaseCommand):
-    help = 'Generates the analytics data for each course_id in targetcourse table'
+    help = 'Generates the analytics data for each course_id in coursedataextraction table'
 
     def handle(self, **options):
-        target_courses = TargetCourse.objects.all()
+        target_courses = CourseDataExtraction.objects.all()
 
         for target_course in target_courses:
             emails = map(unicode.strip, target_course.emails.split(','))

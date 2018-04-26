@@ -79,10 +79,6 @@ urlpatterns = (
 
     url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
 
-    # Data extraction URLs
-
-    url(r'^data/', include('openedx.features.database_extract.urls')),
-
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
