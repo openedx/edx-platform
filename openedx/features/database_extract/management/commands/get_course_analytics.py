@@ -37,7 +37,6 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         target_courses = TargetCourse.objects.all()
-        data = []
 
         for target_course in target_courses:
             emails = map(unicode.strip, target_course.emails.split(','))
@@ -207,8 +206,6 @@ class Command(BaseCommand):
                 course_data['user_data']['demographic_data'] = demo_data
                 course_data['user_data']['performance_data'] = perf_data
 
-            data.append(course_data)
-
             with tempfile.TemporaryFile() as tmp:
                 for email in emails:
                     MandrillClient().send_mail(
@@ -219,7 +216,7 @@ class Command(BaseCommand):
                             {
                                 "type": "text/plain",
                                 "name": "data.json",
-                                "content": base64.encodestring(json.dumps(data))
+                                "content": base64.encodestring(json.dumps(course_data))
                             }
                         ]
                     )
