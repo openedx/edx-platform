@@ -2232,6 +2232,9 @@ INSTALLED_APPS = (
 
     # student_dashboard App
     'lms.djangoapps.student_dashboard',
+
+    # Data extraction App
+    'openedx.features.data_extract',
 )
 
 ######################### CSRF #########################################
@@ -2695,6 +2698,7 @@ OPTIONAL_APPS = (
     'enterprise',
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
+
 )
 
 for app_name in OPTIONAL_APPS:
