@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import CourseDataExtraction
+from openedx.features.data_extract.models import CourseDataExtraction
 
 admin.site.register(CourseDataExtraction)
 

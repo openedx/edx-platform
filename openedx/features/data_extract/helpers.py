@@ -8,7 +8,7 @@ from courseware.models import StudentModule
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.onboarding.models import Organization
 from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
-from student.models import CourseEnrollment, AnonymousUserId, anonymous_id_for_user
+from student.models import AnonymousUserId
 from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
 from openassessment.fileupload import api as ora_file_upload_api
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
@@ -18,7 +18,9 @@ from submissions.models import StudentItem, Submission, Score
 def get_file_url(answer):
     try:
         return ora_file_upload_api.get_download_url(answer.file_key)
-    except:
+    except AttributeError:
+        return ""
+    else:
         return ""
 
 
@@ -52,7 +54,6 @@ def get_teams_data(course_key):
     for team in course_teams:
         team_data.push({
             'team_id': course_team.team_id,
-            'discussion_topic_id': course_team.discussion_topic_id,
             'name': course_team.name,
             'course_id': course_team.course_id.to_deprecated_string(),
             'topic_id': course_team.topic_id,
@@ -100,7 +101,7 @@ def get_user_demographic_data(profile):
     }
 
 
-def get_user_progress_data(course_key, profile):
+def get_user_progress_data(course_key, profile, anonymous_user_id):
     """
     Returns all the data regarding the progress the user has made in a course
 
@@ -108,10 +109,6 @@ def get_user_progress_data(course_key, profile):
     course_key (CourseKey): CourseKey object for specified course
     profile (UserProfile): UserProfile object for the learner
     """
-    anon_user_id = AnonymousUserId.objects.get(
-        user=profile.user,
-        course_id=course_key
-    )
 
     return {
         'team_memberships': [{
@@ -180,7 +177,7 @@ def get_user_progress_data(course_key, profile):
                 'course_id': item.course_id,
                 'item_id': item.item_id,
                 'item_type': item.item_type,
-            } for item in StudentItem.objects.filter(student_id=anon_user_id.anonymous_user_id)],
+            } for item in StudentItem.objects.filter(student_id=anonymous_user_id)],
 
             'submissions': [{
                 'uuid': submission.uuid,
@@ -192,7 +189,7 @@ def get_user_progress_data(course_key, profile):
                 'student_item_id': submission.student_item_id,
                 'status': submission.status,
             } for submission in Submission.objects.filter(
-                student_item__student_id=anon_user_id.anonymous_user_id
+                student_item__student_id=anonymous_user_id
             )],
 
             'student_scores': [{
@@ -202,6 +199,6 @@ def get_user_progress_data(course_key, profile):
                 'reset': score.reset,
                 'student_item_id': score.student_item_id,
                 'submission_id': score.submission_id,
-            } for score in Score.objects.filter(student_item__student_id=anon_user_id.anonymous_user_id)],
+            } for score in Score.objects.filter(student_item__student_id=anonymous_user_id)],
         }
     }

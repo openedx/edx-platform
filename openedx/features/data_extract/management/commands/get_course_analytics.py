@@ -17,6 +17,7 @@ from openedx.features.data_extract.helpers import (
     get_user_demographic_data,
     get_user_progress_data,
 )
+from student.models import AnonymousUserId
 
 
 class Command(BaseCommand):
@@ -36,12 +37,15 @@ class Command(BaseCommand):
             }
 
             user_profiles = get_enrolled_students(target_course.course_id)
+            anon_user_ids = dict(list(map(lambda x: (x.user.username, x.anonymous_user_id,),
+                                          AnonymousUserId.objects.filter(course_id=course_key))))
+
             for profile in user_profiles:
-                demo_data = get_user_demographic_data(profile)
-                progress_data = get_user_progress_data(course_key, profile)
+                demographic_data = get_user_demographic_data(profile)
+                progress_data = get_user_progress_data(course_key, profile, anon_user_ids[profile.user.username])
 
                 course_data['user_data'].append({
-                    'demographic_data': demo_data,
+                    'demographic_data': demographic_data,
                     'progress_data': progress_data,
                 })
 
