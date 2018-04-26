@@ -91,7 +91,7 @@ def fail_on_pylint(*args):
 
 def fail_on_npm_install(*args):
     """
-    For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+    For our tests, we need the call for diff-quality running pycodestyle reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.
     """
     if "npm install" in args[0]:
@@ -102,7 +102,7 @@ def fail_on_npm_install(*args):
 
 def unexpected_fail_on_npm_install(*args):
     """
-    For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+    For our tests, we need the call for diff-quality running pycodestyle reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.
     """
     if "npm install" in args[0]:

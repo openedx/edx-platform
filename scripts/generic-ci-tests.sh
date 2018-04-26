@@ -13,7 +13,7 @@ set -e
 #   `TEST_SUITE` defines which kind of test to run.
 #   Possible values are:
 #
-#       - "quality": Run the quality (pep8/pylint) checks
+#       - "quality": Run the quality (pycodestyle/pylint) checks
 #       - "lms-unit": Run the LMS Python unit tests
 #       - "cms-unit": Run the CMS Python unit tests
 #       - "js-unit": Run the JavaScript tests
@@ -122,7 +122,7 @@ case "$TEST_SUITE" in
             4)
                 echo "Finding fixme's and storing report..."
                 run_paver_quality find_fixme || { EXIT=1; }
-                echo "Finding pep8 violations and storing report..."
+                echo "Finding pycodestyle violations and storing report..."
                 run_paver_quality run_pep8 || { EXIT=1; }
                 echo "Finding ESLint violations and storing report..."
                 run_paver_quality run_eslint -l $ESLINT_THRESHOLD || { EXIT=1; }

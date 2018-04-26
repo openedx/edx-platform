@@ -5,8 +5,9 @@ when using the Split modulestore.
 
 from tempfile import mkdtemp
 from shutil import rmtree
-from unittest import TestCase, skip
+from unittest import skip
 import ddt
+from django.test import TestCase
 
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml

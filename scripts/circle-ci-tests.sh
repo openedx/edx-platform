@@ -51,7 +51,7 @@ else
             echo "Finding fixme's and storing report..."
             paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
 
-            echo "Finding pep8 violations and storing report..."
+            echo "Finding PEP 8 violations and storing report..."
             paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
             echo "Finding pylint violations and storing in report..."
