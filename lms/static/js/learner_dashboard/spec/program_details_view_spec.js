@@ -468,6 +468,7 @@ describe('Program Details Header View', () => {
       program_listing_url: '/dashboard/programs/',
       commerce_api_url: '/api/commerce/v0/baskets/',
       track_selection_url: '/course_modes/choose/',
+      program_record_url: 'http://credentials.example.com/records/programs/UUID',
     },
     userPreferences: {
       'pref-lang': 'en',

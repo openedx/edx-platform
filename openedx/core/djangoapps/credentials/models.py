@@ -2,6 +2,7 @@
 Models for credentials support for the LMS and Studio.
 """
 
+import waffle
 from urlparse import urljoin
 
 from config_models.models import ConfigurationModel
@@ -76,6 +77,17 @@ class CredentialsApiConfig(ConfigurationModel):
         """
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/api/{}/'.format(API_VERSION))
+
+    @property
+    def public_records_url(self):
+        """
+        Publicly-accessible Records URL root.
+        """
+        # Temporarily disable this feature while we work on it
+        if not waffle.switch_is_active('student_records'):
+            return None
+        root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
+        return urljoin(root, '/records/')
 
     @property
     def is_learner_issuance_enabled(self):
