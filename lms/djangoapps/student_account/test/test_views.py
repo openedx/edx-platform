@@ -291,7 +291,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
 
 
-@attr(shard=3)
+@attr(shard=7)
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """

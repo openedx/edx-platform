@@ -10,6 +10,7 @@ from edx_ace import Message
 from edx_ace.utils.date import serialize
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks
@@ -26,6 +27,7 @@ from student.tests.factories import UserFactory
 LOG = logging.getLogger(__name__)
 
 
+@attr(shard=6)
 @ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
