@@ -19,7 +19,14 @@ var optimizedConfig = Merge.smart(commonConfig, {
         new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
             minimize: true
         }),
-        new webpack.optimize.UglifyJsPlugin()
+        new webpack.optimize.UglifyJsPlugin(),
+        new webpack.optimize.CommonsChunkPlugin({
+            // If the value below changes, update the render_bundle call in
+            // common/djangoapps/pipeline_mako/templates/static_content.html
+            name: 'commons',
+            filename: 'commons.[chunkhash].js',
+            minChunks: 3
+        })
     ]
 });
 
@@ -39,8 +46,17 @@ var optimizedConfig = Merge.smart(commonConfig, {
 var requireCompatConfig = Merge.smart(optimizedConfig, {
     output: {
         filename: '[name].js'
-    }
-})
+    },
+    plugins: [
+        new webpack.optimize.CommonsChunkPlugin({
+            // If the value below changes, update the render_bundle call in
+            // common/djangoapps/pipeline_mako/templates/static_content.html
+            name: 'commons',
+            filename: 'commons.js',
+            minChunks: 3
+        })
+    ]
+});
 
 // Step 2: Remove the plugin entries that generate the webpack-stats.json files
 // that Django needs to look up resources. We never want to accidentally
