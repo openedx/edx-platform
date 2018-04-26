@@ -5,10 +5,10 @@ from uuid import uuid4
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.base import FixtureError, StudioApiFixture
-from common.test.acceptance.fixtures.catalog import CatalogIntegrationMixin
+from common.test.acceptance.fixtures.catalog import CatalogFixture
 
 
-class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
+class CourseEntitlementFixture(StudioApiFixture):
     """
     Fixture for ensuring that a course entitlement exists.
     """
@@ -23,9 +23,7 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
             The default is for the entitlement to be unexpired, which is generally what we want for testing
             so students can use the entitlement.
         """
-        now = datetime.datetime.now()
-        tomorrow = now + datetime.timedelta(days=1)
-        yesterday = now - datetime.timedelta(days=1)
+        self.catalog_fixture = CatalogFixture()
 
         self._entitlement_dict = {
             'user': user,
@@ -36,7 +34,61 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
             'order_number': randint(0, 999)
         }
 
-        self.sessions_list = [
+    def __str__(self):
+        """
+        String representation of the course entitlement fixture, useful for debugging.
+        """
+        return "<CourseEntitlementFixture: course_uuid='{course_uuid}', mode='{mode}'>".format(**self._entitlement_dict)
+
+    def install(self):
+        """
+        Create the course entitlement.
+        This is NOT an idempotent method; if the entitlement already exists, this will
+        raise a `FixtureError`.  You should use unique course identifiers to avoid
+        conflicts between tests.
+        """
+        self._create_course_entitlement()
+        self._install_course_runs()
+        return self
+
+    def _create_course_entitlement(self):
+        """
+        Create the course entitlement described in the fixture.
+        """
+        # If the course entitlement already exists, this will respond
+        # with a 200 and an error message, which we ignore.
+        response = self.session.post(
+            LMS_BASE_URL + '/api/entitlements/v1/entitlements/',
+            data=json.dumps(self._entitlement_dict),
+            headers=self.headers
+        )
+
+        try:
+            err = response.json().get('ErrMsg')
+        except ValueError:
+            raise FixtureError(
+                "Could not parse response from course entitlement request as JSON: '{0}'".format(
+                    response.content))
+
+        # This will occur if the course identifier is not unique
+        if err is not None:
+            raise FixtureError("Could not create course entitlement {0}.  Error message: '{1}'".format(self, err))
+
+        if response.ok:
+            self.entitlement_uuid = response.json()['uuid']
+        else:
+            raise FixtureError(
+                "Could not create course entitlement {0}.  Status was {1}\nResponse content was: {2}".format(
+                    self._entitlement_dict, response.status_code, response.content))
+
+    def _install_course_runs(self):
+        now = datetime.datetime.now()
+        tomorrow = str(now + datetime.timedelta(days=1))
+        yesterday = str(now - datetime.timedelta(days=1))
+
+        mode = self._entitlement_dict['mode']
+
+        sessions_list = [
             {
                 "key": "course-v1:edX+TestX+Test_Course_1",
                 "title": "Test Course",
@@ -75,51 +127,7 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
             }
         ]
 
-    def __str__(self):
-        """
-        String representation of the course entitlement fixture, useful for debugging.
-        """
-        return "<CourseEntitlementFixture: course_uuid='{course_uuid}', mode='{mode}'>".format(**self._entitlement_dict)
-
-    def install(self):
-        """
-        Create the course entitlement.
-        This is NOT an idempotent method; if the entitlement already exists, this will
-        raise a `FixtureError`.  You should use unique course identifiers to avoid
-        conflicts between tests.
-        """
-        self._create_course_entitlement()
-        return self
-
-    def _create_course_entitlement(self):
-        """
-        Create the course entitlement described in the fixture.
-        """
-        # If the course entitlement already exists, this will respond
-        # with a 200 and an error message, which we ignore.
-        response = self.session.post(
-            LMS_BASE_URL + '/api/entitlements/v1/entitlements/',
-            data=json.dumps(self._entitlement_dict),
-            headers=self.headers
-        )
-
-        try:
-            err = response.json().get('ErrMsg')
-        except ValueError:
-            raise FixtureError(
-                "Could not parse response from course entitlement request as JSON: '{0}'".format(
-                    response.content))
-
-        # This will occur if the course identifier is not unique
-        if err is not None:
-            raise FixtureError("Could not create course entitlement {0}.  Error message: '{1}'".format(self, err))
-
-        if response.ok:
-            self.entitlement_uuid = response.json()['uuid']
-        else:
-            raise FixtureError(
-                "Could not create course entitlement {0}.  Status was {1}\nResponse content was: {2}".format(
-                    self._entitlement_dict, response.status_code, response.content))
+        self.catalog_fixture.install_course_runs(self._entitlement_dict['course_uuid'], sessions_list)
 
     def expire_course_entitlement(self):
         """
@@ -127,6 +135,6 @@ class CourseEntitlementFixture(StudioApiFixture, CatalogIntegrationMixin):
         """
         self.session.patch(
             LMS_BASE_URL + '/api/entitlements/v1/entitlements/{uuid}/'.format(self.entitlement_uuid),
-            data=json.dumps({'expired_at': datetime.datetime.now()}),
+            data=json.dumps({'expired_at': str(datetime.datetime.now())}),
             headers=self.headers
         )

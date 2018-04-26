@@ -52,6 +52,19 @@ class CatalogFixture(object):
             data={'catalog.programs_types': json.dumps(program_types)},
         )
 
+    def install_course_runs(self, course_uuid, course_runs):
+        """
+        Stub the discovery service's courses API endpoint.
+
+        Arguments:
+            course_uuid (UUID): API endpoint for this course will be stubbed.
+            course_runs (list): A list of course_runs. Course endpoint will be stubbed using data from this list.
+        """
+        key = 'catalog.courses.{uuid}'.format(uuid=course_uuid)
+        requests.put(
+            '{}/set_config'.format(CATALOG_STUB_URL),
+            data={key: json.dumps({'course_runs': course_runs})},
+        )
 
 class CatalogIntegrationMixin(object):
     """Mixin providing a method used to configure the catalog integration."""

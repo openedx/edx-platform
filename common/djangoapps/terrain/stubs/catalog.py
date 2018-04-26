@@ -15,6 +15,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
             r'/api/v1/programs/$': self.program_list,
             r'/api/v1/programs/([0-9a-f-]+)/$': self.program_detail,
             r'/api/v1/program_types/$': self.program_types,
+            r'/api/v1/courses/([0-9a-f-]+)/$': self.course_detail,
         }
 
         if self.match_pattern(pattern_handlers):
@@ -47,6 +48,10 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
         program_types = self.server.config.get('catalog.programs_types', [])
         self.send_json_response(program_types)
 
+    def course_detail(self, course_uuid):
+        """ Stub the catalog's course detail endpoint."""
+        course = self.server.config.get('catalog.courses.' + course_uuid, {})
+        self.send_json_response(course)
 
 class StubCatalogService(StubHttpService):
     HANDLER_CLASS = StubCatalogServiceHandler
