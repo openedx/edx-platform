@@ -5,7 +5,7 @@ Tests of pipeline_mako/templates/static_content.html
 import unittest
 
 from edxmako.shortcuts import render_to_string
-@attr(shard=7)
+from nose.plugins.attrib import attr
 
 
 @attr(shard=7)
