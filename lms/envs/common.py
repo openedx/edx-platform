@@ -563,6 +563,9 @@ TEMPLATES = [
                 # Timezone processor (sends language and time_zone preference)
                 'courseware.context_processor.user_timezone_locale_prefs',
 
+                # Alert message processor
+                'philu_overrides.context_processor.get_global_alert_messages',
+
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.footer_context_processor',
 
