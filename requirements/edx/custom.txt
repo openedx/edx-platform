@@ -20,7 +20,7 @@
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.10#egg=xblock-scorm==2.0.10
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.2#egg=xblock-diagnostic-feedback==0.2.2
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.6#egg=xblock-group-project-v2==0.4.6
--e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1#egg=xblock-virtualreality==0.1
+-e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
 git+https://github.com/edx-solutions/api-integration.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@ziafazal/ginkgo-fixes
