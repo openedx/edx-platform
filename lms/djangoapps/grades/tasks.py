@@ -72,7 +72,8 @@ def compute_all_grades_for_course(**kwargs):
     base=LoggedPersistOnFailureTask,
     default_retry_delay=RETRY_DELAY_SECONDS,
     max_retries=1,
-    time_limit=COURSE_GRADE_TIMEOUT_SECONDS
+    time_limit=COURSE_GRADE_TIMEOUT_SECONDS,
+    rate_limit=settings.POLICY_CHANGE_TASK_RATE_LIMIT,
 )
 def compute_grades_for_course_v2(self, **kwargs):
     """
