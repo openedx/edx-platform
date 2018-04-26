@@ -1,8 +1,9 @@
-import * as cookie from 'jquery.cookie';
-import * as utility from 'utility';
-import * as ViewUtils from 'common/js/components/utils/view_utils';
 
 'use strict';
+
+import cookie from 'jquery.cookie';
+import utility from 'utility';
+import ViewUtils from 'common/js/components/utils/view_utils';
 
 export default function LoginFactory(homepageURL) {
     function postJSON(url, data, callback) {
@@ -16,23 +17,23 @@ export default function LoginFactory(homepageURL) {
     }
 
     // Clear the login error message when credentials are edited
-    $('input#email').on('input', function() {
+    $('input#email').on('input', function () {
         $('#login_error').removeClass('is-shown');
     });
 
-    $('input#password').on('input', function() {
+    $('input#password').on('input', function () {
         $('#login_error').removeClass('is-shown');
     });
 
-    $('form#login_form').submit(function(event) {
+    $('form#login_form').submit(function (event) {
         event.preventDefault();
         var $submitButton = $('#submit'),
             deferred = new $.Deferred(),
             promise = deferred.promise();
-        ViewUtils.disableElementWhileRunning($submitButton, function() { return promise; });
+        ViewUtils.disableElementWhileRunning($submitButton, function () { return promise; });
         var submit_data = $('#login_form').serialize();
 
-        postJSON('/login_post', submit_data, function(json) {
+        postJSON('/login_post', submit_data, function (json) {
             if (json.success) {
                 var next = /next=([^&]*)/g.exec(decodeURIComponent(window.location.search));
                 if (next && next.length > 1 && !isExternal(next[1])) {
@@ -59,4 +60,4 @@ export default function LoginFactory(homepageURL) {
     });
 };
 
-export {LoginFactory}
+export { LoginFactory }

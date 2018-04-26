@@ -309,6 +309,7 @@ define(['sinon', 'js/utils/drag_and_drop', 'common/js/components/views/feedback_
                 });
                 afterEach(function() {
                     this.clock.restore();
+                    jasmine.stealth.clearSpies();
                 });
                 it('should send an update on reorder from one parent to another', function() {
                     var requests, request, savingOptions;

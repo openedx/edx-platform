@@ -76,7 +76,7 @@ function($, date, TriggerChangeEventOnEnter) {
     var setDate = function(datepickerInput, timepickerInput, datetime) {
         // given a pair of inputs (datepicker and timepicker) and the date as an
         // ISO-formatted date string.
-        datetime = date.parse(datetime);
+        datetime = Date.parse(datetime);
         if (datetime) {
             $(datepickerInput).datepicker('setDate', datetime);
             if (timepickerInput.length > 0) {

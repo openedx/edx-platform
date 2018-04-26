@@ -62,24 +62,24 @@ webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
     libraryFiles: [
-        {pattern: 'common/js/vendor/**/*.js'},
-        {pattern: 'edx-pattern-library/js/**/*.js'},
-        {pattern: 'edx-ui-toolkit/js/**/*.js'},
-        {pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/src/**/*.js'}
+        { pattern: 'common/js/vendor/**/*.js' },
+        { pattern: 'edx-pattern-library/js/**/*.js' },
+        { pattern: 'edx-ui-toolkit/js/**/*.js' },
+        { pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js' },
+        { pattern: 'xmodule_js/common_static/js/**/!(*spec).js' },
+        { pattern: 'xmodule_js/src/**/*.js' }
     ],
 
     sourceFiles: [
-        {pattern: 'common/js/!(spec_helpers)/**/!(*spec).js'}
+        { pattern: 'common/js/!(spec_helpers)/**/!(*spec).js' }
     ],
 
     specFiles: [
-        {pattern: 'common/js/spec_helpers/**/*.js'}
+        { pattern: 'common/js/spec_helpers/**/*.js' }
     ],
 
     fixtureFiles: [
-        {pattern: 'common/templates/**/*.underscore'}
+        { pattern: 'common/templates/**/*.underscore' }
     ]
 };
 
@@ -154,8 +154,8 @@ function coverageSettings(config) {
         subdir: '.',
         includeAllSources: true,
         reporters: [
-            {type: 'cobertura', file: path.file},
-            {type: 'text-summary'}
+            { type: 'cobertura', file: path.file },
+            { type: 'text-summary' }
         ]
     };
 }
@@ -200,7 +200,7 @@ function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
         normalizedFile,
         filesForCoverage = {};
 
-    files.forEach(function(file) {
+    files.forEach(function (file) {
         if (!file.ignoreCoverage) {
             normalizedFile = normalizeFn(appRoot, file.pattern);
             if (preprocessors && preprocessors.hasOwnProperty(normalizedFile)) {
@@ -222,8 +222,8 @@ function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
  * @return {Object}
  */
 function setDefaults(files) {
-    return files.map(function(f) {
-        var file = _.isObject(f) ? f : {pattern: f};
+    return files.map(function (f) {
+        var file = _.isObject(f) ? f : { pattern: f };
         if (!file.included && !file.webpack) {
             f.included = false;
         }
@@ -232,7 +232,7 @@ function setDefaults(files) {
 }
 
 function getBaseConfig(config, useRequireJs) {
-    var getFrameworkFiles = function() {
+    var getFrameworkFiles = function () {
         var files = [
             'common/static/common/js/vendor/jquery.js',
             'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
@@ -263,8 +263,8 @@ function getBaseConfig(config, useRequireJs) {
     // which isn't a karma plugin. Though a karma framework for jasmine-jquery is available
     // but it's not actively maintained. In future we also wanna add jQuery at the top when
     // we upgrade to jQuery 2
-    var initFrameworks = function(files) {
-        getFrameworkFiles().reverse().forEach(function(f) {
+    var initFrameworks = function (files) {
+        getFrameworkFiles().reverse().forEach(function (f) {
             files.unshift({
                 pattern: path.join(appRoot, f),
                 included: true,
@@ -423,7 +423,7 @@ function configure(config, options) {
         baseConfig = getBaseConfig(config, useRequireJs);
 
     if (options.includeCommonFiles) {
-        _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function(collectionName) {
+        _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function (collectionName) {
             options[collectionName] = _.flatten([commonFiles[collectionName], options[collectionName]]);
         });
     }
@@ -431,16 +431,16 @@ function configure(config, options) {
     var files = _.flatten(
         _.map(
             ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
-            function(collectionName) { return options[collectionName] || []; }
+            function (collectionName) { return options[collectionName] || []; }
         )
     );
 
     files.unshift(
-        {pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true}
+        { pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true }
     );
 
     if (useRequireJs) {
-        files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
+        files.unshift({ pattern: 'common/js/utils/require-serial.js', included: true });
     }
 
     // Karma sets included=true by default.
@@ -450,7 +450,7 @@ function configure(config, options) {
     var filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
-            function(collectionName) { return options[collectionName]; }
+            function (collectionName) { return options[collectionName]; }
         )
     );
 

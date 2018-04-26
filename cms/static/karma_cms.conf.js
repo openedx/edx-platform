@@ -33,13 +33,22 @@ var options = {
 
     fixtureFiles: [
         {pattern: '../templates/js/**/*.underscore'},
-        {pattern: 'templates/**/*.underscore'}
+        {pattern: 'templates/**/*.underscore'},
     ],
 
     runFiles: [
-        {pattern: 'cms/js/spec/main.js', included: true}
-    ]
+        {pattern: 'cms/js/spec/main.js', included: true},
+        {pattern: 'jasmine.cms.conf.js', included: true}
+    ],
+
+    preprocessors: {}
 };
+
+(options.sourceFiles.concat(options.specFiles))
+    .filter(function(file) { return file.webpack; })
+    .forEach(function(file) {
+        options.preprocessors[file.pattern] = ['webpack'];
+    });
 
 module.exports = function(config) {
     configModule.configure(config, options);

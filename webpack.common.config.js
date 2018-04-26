@@ -101,6 +101,7 @@ module.exports = {
             'window.jQuery': 'jquery',
             Popper: 'popper.js', // used by bootstrap
             CodeMirror: 'codemirror',
+            'edx.HtmlUtils': 'edx-ui-toolkit/js/utils/html-utils',
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
@@ -321,6 +322,7 @@ module.exports = {
             'cms/djangoapps/pipeline_js/js',
             'cms/static',
             'cms/static/cms/js',
+            'cms/templates/js',
             'lms/static',
             'common/lib/xmodule',
             'common/lib/xmodule/xmodule/js/src',
@@ -357,5 +359,9 @@ module.exports = {
 
     watchOptions: {
         poll: true
+    },
+
+    node: {
+        fs: 'empty'
     }
 };
