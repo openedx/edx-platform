@@ -52,6 +52,7 @@ describe('Program Progress View', () => {
     model: programModel,
     courseModel: courseData,
     certificateCollection,
+    programRecordUrl: '/foo/bar'
   });
 
   beforeEach(() => {
@@ -92,6 +93,13 @@ describe('Program Progress View', () => {
     expect($certLink.attr('href')).toEqual(programCert.url);
     expect($certLink.find('.program-cert').attr('alt')).toEqual(altText);
     expect(view.$('.certificate-heading')).toHaveText('Your XSeries Certificate');
+  });
+
+  it('should render the program record link', () => {
+    view = initView();
+
+    expect(view.$('.program-record-link button')).toBeInDOM();
+    expect(view.$('.program-record-link').attr('href')).toEqual('/foo/bar');
   });
 
   it('should render the course certificate list', () => {
