@@ -14,7 +14,7 @@ from .accounts.views import (
     DeactivateLogoutView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import IDVerificationStatusView
+from .verification_api.views import PhotoVerificationStatusView
 from .validation.views import RegistrationValidationView
 
 ME = AccountViewSet.as_view({
@@ -81,7 +81,7 @@ urlpatterns = [
     ),
     url(
         r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),
-        IDVerificationStatusView.as_view(),
+        PhotoVerificationStatusView.as_view(),
         name='verification_status'
     ),
     url(
