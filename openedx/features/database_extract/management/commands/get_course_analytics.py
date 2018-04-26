@@ -43,10 +43,7 @@ class Command(BaseCommand):
             course_data = {
                 'course_structure': {},
                 'team_data': [],
-                'user_data': {
-                    'demographic_data': {},
-                    'performance_data': [],
-                }
+                'user_data': []
             }
             course_key = CourseKey.from_string(target_course.course_id)
 
@@ -201,10 +198,11 @@ class Command(BaseCommand):
                             'submission_id': score.submission_id,
                         } for score in Score.objects.filter(student_item__student_id=anon_user_id.anonymous_user_id)],
                     }
-
                 }
-                course_data['user_data']['demographic_data'] = demo_data
-                course_data['user_data']['performance_data'] = perf_data
+                course_data['user_data'].append({
+                    'demographic_data': demo_data,
+                    'performance_data': perf_data,
+                })
 
             with tempfile.TemporaryFile() as tmp:
                 for email in emails:
