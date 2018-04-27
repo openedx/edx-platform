@@ -3,12 +3,13 @@
 define([
     'domReady',
     'jquery',
+    'underscore',
     'underscore.string',
     'backbone',
     'gettext',
     '../../common/js/components/views/feedback_notification',
     'jquery.cookie'
-], function(domReady, $, str, Backbone, gettext, NotificationView) {
+], function(domReady, $, _, str, Backbone, gettext, NotificationView) {
     'use strict';
 
     var main, sendJSON;
@@ -78,6 +79,7 @@ define([
             if (window.onTouchBasedDevice()) {
                 return $('body').addClass('touch-based-device');
             }
+            return null;
         });
     };
     main();

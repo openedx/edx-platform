@@ -14,14 +14,16 @@ var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
     /descriptors\/js/,
     /modules\/js/,
-    /common\/lib\/xmodule\/xmodule\/js\/src\//,
+    /common\/lib\/xmodule\/xmodule\/js\/src\//
 ];
 
 var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
 var defineCallFooter = /\}\)\.call\(this, ((define|require)( \|\| RequireJS\.(define|require))?(, )?)+?\);/;
 var defineDirectFooter = /\}\(((window\.)?(RequireJS\.)?(requirejs|define|require|jQuery)(, )?)+\)\);/;
 var defineFancyFooter = /\}\).call\(\s*this(\s|.)*define(\s|.)*\);/;
-var defineFooter = new RegExp('(' + defineCallFooter.source + ')|(' + defineDirectFooter.source + ')|(' + defineFancyFooter.source + ')', 'm');
+var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
+                             + defineDirectFooter.source + ')|('
+                             + defineFancyFooter.source + ')', 'm');
 
 module.exports = {
     context: __dirname,
@@ -335,7 +337,7 @@ module.exports = {
             'common/static/js/vendor/jQuery-File-Upload/js/',
             'common/static/js/vendor/tinymce/js/tinymce',
             'node_modules',
-            'common/static/xmodule',
+            'common/static/xmodule'
         ]
     },
 
@@ -354,7 +356,7 @@ module.exports = {
         underscore: '_',
         URI: 'URI',
         XModule: 'XModule',
-        XBlockToXModuleShim: 'XBlockToXModuleShim',
+        XBlockToXModuleShim: 'XBlockToXModuleShim'
     },
 
     watchOptions: {

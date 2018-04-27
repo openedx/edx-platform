@@ -33,7 +33,7 @@ var options = {
 
     fixtureFiles: [
         {pattern: '../templates/js/**/*.underscore'},
-        {pattern: 'templates/**/*.underscore'},
+        {pattern: 'templates/**/*.underscore'}
     ],
 
     runFiles: [

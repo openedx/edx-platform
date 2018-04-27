@@ -23,7 +23,7 @@
                     window.Video(el);
                 });
 
-                return;
+                return null;
             }
 
             // If normal call to `window.Video` constructor, store the element for later initializing.
@@ -128,14 +128,15 @@
                         initialize(innerState, element);
                     };
                 };
+                var onSequenceChange;
 
-                new VideoAccessibleMenu(el, {
+                VideoAccessibleMenu(el, {
                     storage: storage,
                     saveStateUrl: state.metadata.saveStateUrl
                 });
 
                 if (bumperMetadata) {
-                    new VideoPoster(el, {
+                    VideoPoster(el, {
                         poster: el.data('poster'),
                         onClick: _.once(function() {
                             var mainVideoPlayer = player(state);
@@ -162,7 +163,7 @@
                 }
 
                 el.data('video-player-state', state);
-                var onSequenceChange = function onSequenceChange() {
+                onSequenceChange = function() {
                     if (state && state.videoPlayer) {
                         state.videoPlayer.destroy();
                     }

@@ -1,9 +1,9 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+define(['underscore', 'jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
-    function($, NotificationView, Prompt, AjaxHelpers) {
+    function(_, $, NotificationView, Prompt, AjaxHelpers) {
         'use strict';
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
@@ -41,11 +41,11 @@ define(['jquery', 'common/js/components/views/feedback_notification', 'common/js
             return createFeedbackSpy(NotificationView, type || 'Mini');
         };
 
-        verifyNotificationShowing = function(notificationSpy, text) {
+        verifyNotificationShowing = function() {
             verifyFeedbackShowing.apply(this, arguments);
         };
 
-        verifyNotificationHidden = function(notificationSpy) {
+        verifyNotificationHidden = function() {
             verifyFeedbackHidden.apply(this, arguments);
         };
 
@@ -62,11 +62,11 @@ define(['jquery', 'common/js/components/views/feedback_notification', 'common/js
             }
         };
 
-        verifyPromptShowing = function(promptSpy, text) {
+        verifyPromptShowing = function() {
             verifyFeedbackShowing.apply(this, arguments);
         };
 
-        verifyPromptHidden = function(promptSpy) {
+        verifyPromptHidden = function() {
             verifyFeedbackHidden.apply(this, arguments);
         };
 

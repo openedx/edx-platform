@@ -29,11 +29,9 @@
              */
             toggleExpandCollapse = function(target, collapsedClass) {
                 // Support the old 'collapsed' option until fully switched over to is-collapsed
-                if (!collapsedClass) {
-                    collapsedClass = 'collapsed';
-                }
+                var collapsed = collapsedClass || 'collapsed';
                 target.closest('.expand-collapse').toggleClass('expand collapse');
-                target.closest('.is-collapsible, .window').toggleClass(collapsedClass);
+                target.closest('.is-collapsible, .window').toggleClass(collapsed);
                 target.closest('.is-collapsible').children('article').slideToggle();
             };
 
@@ -239,20 +237,20 @@
             };
 
             // Ensure that sum length of key field values <= ${MAX_SUM_KEY_LENGTH} chars.
-            validateTotalKeyLength = function(key_field_selectors) {
+            validateTotalKeyLength = function(keyFieldSelectors) {
                 var totalLength = _.reduce(
-                    key_field_selectors,
+                    keyFieldSelectors,
                     function(sum, ele) { return sum + $(ele).val().length; },
                     0
                 );
                 return totalLength <= MAX_SUM_KEY_LENGTH;
             };
 
-            checkTotalKeyLengthViolations = function(selectors, classes, key_field_selectors, message_tpl) {
-                if (!validateTotalKeyLength(key_field_selectors)) {
+            checkTotalKeyLengthViolations = function(selectors, classes, keyFieldSelectors, messageTpl) {
+                if (!validateTotalKeyLength(keyFieldSelectors)) {
                     $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
                     $(selectors.errorMessage).html(
-                        '<p>' + _.template(message_tpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
+                        '<p>' + _.template(messageTpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
                     );
                     $(selectors.save).addClass(classes.disabled);
                 } else {

@@ -4,6 +4,7 @@
 (function(requirejs, requireSerial) {
     'use strict';
 
+    var i, specHelpers, testFiles;
     if (window) {
         define('add-a11y-deps',
             [
@@ -19,8 +20,6 @@
                 window.edx.StringUtils = StringUtils;
             });
     }
-
-    var i, specHelpers, testFiles;
 
     requirejs.config({
         baseUrl: '/base/',
