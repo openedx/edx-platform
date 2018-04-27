@@ -397,7 +397,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 @attr(shard=1)
 class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Test the handle_xblock_callback function
+    Test the XblockCallbackView function
     """
     @classmethod
     def setUpClass(cls):

@@ -22,11 +22,10 @@ from courseware.entrance_exams import (
     user_has_passed_entrance_exam
 )
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from courseware.module_render import get_module, toc_for_course
 from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.core.urlresolvers import reverse
-from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from nose.plugins.attrib import attr
