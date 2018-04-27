@@ -12,7 +12,7 @@ set -e
 source scripts/jenkins-common.sh
 
 # Get the diff coverage and html reports for unit tests
-paver coverage -b $TARGET_BRANCH
+paver coverage -b origin/estute/TE-2427-reshard-lms4
 
 # Test for the CodeCov API token
 if [ -z $CODE_COV_TOKEN ]; then
