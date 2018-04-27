@@ -93,5 +93,5 @@ def send_course_notification_email(course, template_name, context, to_list=None)
 
 def get_course_link(course_id):
     course_link = reverse("about_course", args=[course_id])
-    base_url = settings.LMS_ROOT_URL[:-3]
+    base_url = settings.LMS_ROOT_URL
     return base_url + course_link

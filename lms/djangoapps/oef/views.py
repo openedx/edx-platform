@@ -5,11 +5,12 @@ from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from rest_framework import status
+import logging
 
 from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
 from lms.djangoapps.onboarding.models import Organization
-
+log = logging.getLogger("edx.oef")
 
 @login_required
 def oef_dashboard(request):
@@ -90,8 +91,11 @@ def fetch_survey(request):
 
     """
     survey_info = get_user_survey_status(request.user)
+    user_extended_profile = request.user.extended_profile
     if not survey_info['survey']:
-        return redirect(reverse('oef_dashboard'))
+        last_finished_survey = OrganizationOefScore.objects.filter(org=user_extended_profile.organization).exclude(
+            finish_date__isnull=True).last()
+        return redirect('/oef/%s' % last_finished_survey.id)
 
     uos = get_user_survey(request.user, survey_info['survey'])
     survey = OefSurvey.objects.filter(is_enabled=True).latest('created')
@@ -122,6 +126,7 @@ def save_answer(request):
 
     if data['is_complete']:
         uos.finish_date = datetime.date.today()
+        log.info(datetime.datetime.now())
     uos.save()
 
     return JsonResponse({
