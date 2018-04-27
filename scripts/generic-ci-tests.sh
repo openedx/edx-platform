@@ -146,7 +146,7 @@ case "$TEST_SUITE" in
 
     "lms-unit")
         case "$SHARD" in
-            "all"|[1-9]|"noshard")
+            "all"|[1-9]|10|"noshard")
                 $TOX bash scripts/unit-tests.sh
                 ;;
             *)
