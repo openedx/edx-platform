@@ -27,6 +27,8 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload
         templateName: 'metadata-translations-entry',
         templateItemName: 'metadata-translations-item',
 
+        validFileFormats: ['srt'],
+
         initialize: function() {
             var templateName = _.result(this, 'templateItemName'),
                 tpl = document.getElementById(templateName).text,
@@ -38,11 +40,12 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload
 
             this.templateItem = _.template(tpl);
 
-            // Initialize language map. Keys in this map represent language codes present on
-            // server. Values will change if user changes the language from a dropdown.
-            // For example: Initially map will look like {'ar': 'ar', 'zh': 'zh'} and corresponding
-            // dropdowns will show language names `Arabic` and `Chinese`. If user changes `Chinese`
-            // to `Russian` then map will become {'ar': 'ar', 'zh': 'ru'}
+            // Initialize language map. This maps original language to the newly selected language.
+            // Keys in this map represent language codes present on server, they don't change when
+            // user selects a language while values represent currently selected language.
+            // Initially, the map will look like {'ar': 'ar', 'zh': 'zh'} i.e {'original_lang': 'original_lang'}
+            // and corresponding dropdowns will show language names Arabic and Chinese. If user changes
+            // Chinese to Russian then map will become {'ar': 'ar', 'zh': 'ru'} i.e {'original_lang': 'new_lang'}
             _.each(this.model.getDisplayValue(), function(value, lang) {
                 languageMap[lang] = lang;
             });
@@ -216,7 +219,7 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload
 
             fileUploadModel = new FileUpload({
                 title: gettext('Upload translation'),
-                fileFormats: ['srt']
+                fileFormats: this.validFileFormats
             });
 
             videoUploadDialog = new VideoUploadDialog({
