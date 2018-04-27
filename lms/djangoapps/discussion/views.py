@@ -35,16 +35,18 @@ from django_comment_client.utils import (
     available_division_schemes,
     course_discussion_division_enabled,
     extract,
+    get_ability2,
     get_group_id_for_comments_service,
     get_group_id_for_user,
     get_group_names_by_id,
     is_commentable_divided,
     strip_none
 )
+from django_comment_common.models import CourseDiscussionSettings, all_permissions_for_user_in_course
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.monitoring_utils import function_trace
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, get_user_by_username_or_email
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
@@ -191,6 +193,7 @@ def inline_discussion(request, course_key, discussion_id):
     Renders JSON for DiscussionModules
     """
 
+    from nose.tools import set_trace; set_trace()
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
@@ -200,20 +203,66 @@ def inline_discussion(request, course_key, discussion_id):
     except ValueError:
         return HttpResponseServerError("Invalid group_id")
 
-    with function_trace("get_metadata_for_threads"):
-        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+    # TODO: move all of this into utils.get_metadata_for_threads
+    flattened_threads = []
+    def __flatten(thread):
+        """Turn our tree of threads into a list"""
+        flattened_threads.append(thread)
+        children = thread.get('children', []).append(
+            thread.get('endorsed_responses', [])
+        ).append(
+            thread.get('non_endorsed_responses', [])
+        )
+        for thread in children:
+            __flatten(thread)
+    for thread in threads:
+        __flatten(thread)
+
+    flat_uinfo = {
+        'up': set(user_info['upvoted_ids']),
+        'down': set(user_info['downvoted_ids']),
+        'sub': set(user_info['subscribed_thread_ids']),
+    }
+    user_perms = all_permissions_for_user_in_course(request.user, course_key)
+    course_discussion_settings = get_course_discussion_settings(course_key)
+    course_is_divided = course_discussion_settings.division_scheme is CourseDiscussionSettings.NONE
+    content_usernames = {thread['username'] for thread in threads}
+    content_user_group_ids = {
+        name: get_group_id_for_user(
+            get_user_by_username_or_email(name),
+            course_discussion_settings
+        ) for name in content_usernames
+    }
+    user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
+    annotated_content_info = {
+        thread['id']: {
+            'voted': 'up' if thread['id'] in flat_uinfo['up'] else 'down' if thread['id'] in flat_uinfo['down'] else '',
+            'subscribed': thread['id'] in flat_uinfo['sub'],
+            'ability': get_ability2(
+                thread,
+                request.user,
+                user_perms,
+                course_is_divided,
+                user_group_id,
+                content_user_group_ids[thread['username']]
+            ),
+        } for thread in flattened_threads
+    }
+    # ennd TODO
+
+    #with function_trace("get_metadata_for_threads"):
+        #annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
     with function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
-    course_discussion_settings = get_course_discussion_settings(course.id)
 
     return utils.JsonResponse({
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id),
         'discussion_data': threads,
         'user_info': user_info,
-        'user_group_id': get_group_id_for_user(request.user, course_discussion_settings),
+        'user_group_id': user_group_id,
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],
