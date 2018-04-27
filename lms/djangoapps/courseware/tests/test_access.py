@@ -729,7 +729,7 @@ class UserRoleTestCase(TestCase):
         )
 
 
-@attr(shard=3)
+@attr(shard=5)
 @ddt.ddt
 class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     """

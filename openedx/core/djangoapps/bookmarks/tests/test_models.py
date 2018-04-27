@@ -225,7 +225,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarkModelTests(BookmarksTestsBase):
@@ -417,7 +417,7 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """
