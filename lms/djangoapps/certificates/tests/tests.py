@@ -90,7 +90,9 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         {'allow_certificate': True, 'whitelisted': True, 'grade': None, 'output': ['Y', 'Y', 'honor']},
         {'allow_certificate': True, 'whitelisted': False, 'grade': 0.9, 'output': ['Y', 'Y', 'honor']},
         {'allow_certificate': False, 'whitelisted': True, 'grade': 0.8, 'output': ['N', 'Y', 'honor']},
-        {'allow_certificate': False, 'whitelisted': None, 'grade': 0.8, 'output': ['N', 'Y', 'honor']}
+        {'allow_certificate': False, 'whitelisted': None, 'grade': 0.8, 'output': ['N', 'Y', 'honor']},
+        {'allow_certificate': True, 'whitelisted': None, 'grade': None, 'output': ['Y', 'Y', 'honor']},
+        {'allow_certificate': False, 'whitelisted': True, 'grade': None, 'output': ['N', 'Y', 'honor']}
     )
     def test_certificate_info_for_user_when_grade_changes(self, allow_certificate, whitelisted, grade, output):
         """
