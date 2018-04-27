@@ -41,6 +41,7 @@ from django_comment_client.utils import (
     is_commentable_divided,
     strip_none
 )
+from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.monitoring_utils import function_trace
@@ -204,10 +205,20 @@ def inline_discussion(request, course_key, discussion_id):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
-    threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+    course_discussion_settings = get_course_discussion_settings(course.id)
+    group_names_by_id = get_group_names_by_id(course_discussion_settings)
+    course_is_divided = course_discussion_settings.division_scheme is not CourseDiscussionSettings.NONE
+    threads = [
+        utils.prepare_content(
+            thread,
+            course_key,
+            is_staff,
+            course_is_divided,
+            group_names_by_id
+        ) for thread in threads
+    ]
     with function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
-    course_discussion_settings = get_course_discussion_settings(course.id)
 
     return utils.JsonResponse({
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id),
