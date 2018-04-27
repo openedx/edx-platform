@@ -1,0 +1,54 @@
+Inline discussion queries (on a heavily CCX'd course) are bad, why?
+
+What does this query do?
+  -get course and user_info
+  -get threads and query_params
+    - why is *body* included at this point? save that ish for last maybe?
+  -get annotated_content_info
+  -get is_staff
+  -call prepare_content on each thread
+  -modify threads again with add_courseware_context
+  -get course_discussion_settings
+  -serialize and return
+
+Why does this query suck so hard?
+  -probably related to CCX
+  -traces seem to indicate *serialization* of mongo queries, not necessarily the queries themselves
+
+How can we fix it?
+  -let's try grabbing all the info we need *once*, and holding that in memory
+
+-------------
+(Pdb) course
+CourseDescriptorWithMixins(CombinedSystem(None, <xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem object at 0x7fb59aff12d0>), InheritingFieldData(<xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS object at 0x7fb5e3530690>), ScopeIds(user_id=None, block_type=u'course', def_id=BlockUsageLocator(CourseLocator(u'edX', u'DemoX', u'Demo_Course', None, None), u'course', u'course'),
+usage_id=BlockUsageLocator(CourseLocator(u'edX', u'DemoX', u'Demo_Course', None, None), u'course', u'course')))
+(Pdb) user_info
+{'username': u'honor', u'follower_ids': [], u'default_sort_key': u'activity', u'downvoted_ids': [], u'subscribed_thread_ids': [u'5ae3385a632d75008f000002', u'5ae33863632d75008f000004'], u'upvoted_ids': [], 'external_id': u'6', 'id': u'6', u'subscribed_user_ids': [], u'subscribed_commentable_ids': []}
+(Pdb) threads
+[{u'anonymous_to_peers': False, u'unread_comments_count': 0, u'updated_at': u'2018-04-27T14:49:07Z', u'course_id': u'course-v1:edX+DemoX+Demo_Course', u'id': u'5ae33863632d75008f000004', u'abuse_flaggers': [], u'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, u'user_id': u'6', u'title': u'test thread 3', u'commentable_id': u'edx_demo_embedded_discussion', u'pinned': False, u'closed': False, u'at_position_list': [], u'type': u'thread', u'body':
+u'asdasdasd', u'tags': [], u'read': True, u'anonymous': False, u'last_activity_at': u'2018-04-27T14:49:07Z', u'created_at': u'2018-04-27T14:49:07Z', u'thread_type': u'discussion', u'username': u'honor', u'comments_count': 0, u'context': u'course', u'group_id': None, u'endorsed': False}, {u'anonymous_to_peers': False, u'unread_comments_count': 0, u'updated_at': u'2018-04-27T14:48:58Z', u'course_id': u'course-v1:edX+DemoX+Demo_Course', u'id': u'5ae3385a632d75008f000002',
+u'abuse_flaggers': [], u'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, u'user_id': u'6', u'title': u'test thread 2', u'commentable_id': u'edx_demo_embedded_discussion', u'pinned': False, u'closed': False, u'at_position_list': [], u'type': u'thread', u'body': u'asdasdasd', u'tags': [], u'read': True, u'anonymous': False, u'last_activity_at': u'2018-04-27T14:48:58Z', u'created_at': u'2018-04-27T14:48:58Z', u'thread_type': u'discussion', u'username':
+u'honor', u'comments_count': 0, u'context': u'course', u'group_id': None, u'endorsed': False}, {u'anonymous_to_peers': False, u'unread_comments_count': 0, u'updated_at': u'2018-04-27T14:48:49Z', u'course_id': u'course-v1:edX+DemoX+Demo_Course', u'id': u'5ae33851632d75008f000000', u'abuse_flaggers': [], u'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, u'user_id': u'6', u'title': u'test thread 1', u'commentable_id': u'edx_demo_embedded_discussion', u'pinned': False,
+u'closed': False, u'at_position_list': [], u'type': u'thread', u'body': u'askdjhaskd', u'tags': [], u'read': True, u'anonymous': False, u'last_activity_at': u'2018-04-27T14:48:49Z', u'created_at': u'2018-04-27T14:48:49Z', u'thread_type': u'discussion', u'username': u'honor', u'comments_count': 0, u'context': u'course', u'group_id': None, u'endorsed': False}]
+(Pdb) query_params
+{'num_pages': 1, 'user_id': 6, 'sort_key': u'activity', 'text': '', 'commentable_id': u'edx_demo_embedded_discussion', 'corrected_text': None, 'context': 'course', 'course_id': u'course-v1:edX+DemoX+Demo_Course', 'per_page': 20, 'group_id': None, 'page': 1}
+(Pdb) annotated_content_info
+{'5ae33851632d75008f000000': {'voted': '', 'subscribed': False, 'ability': {'can_reply': True, 'can_openclose': False, 'can_report': False, 'editable': True, 'can_delete': True, 'can_vote': False}}, '5ae3385a632d75008f000002': {'voted': '', 'subscribed': True, 'ability': {'can_reply': True, 'can_openclose': False, 'can_report': False, 'editable': True, 'can_delete': True, 'can_vote': False}}, '5ae33863632d75008f000004': {'voted': '', 'subscribed': True, 'ability': {'can_reply': True,
+'can_openclose': False, 'can_report': False, 'editable': True, 'can_delete': True, 'can_vote': False}}}
+(Pdb) is_staff
+False
+(Pdb) threads <after prepare_content>
+[{'anonymous_to_peers': False, 'unread_comments_count': 0, 'updated_at': u'2018-04-27T14:49:07Z', 'course_id': u'course-v1:edX+DemoX+Demo_Course', 'id': u'5ae33863632d75008f000004', 'pinned': False, 'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, 'user_id': u'6', 'title': u'test thread 3', 'commentable_id': u'edx_demo_embedded_discussion', 'abuse_flaggers': [], 'closed': False, 'at_position_list': [], 'type': u'thread', 'body': u'asdasdasd',
+'read': True, 'anonymous': False, 'last_activity_at': u'2018-04-27T14:49:07Z', 'created_at': u'2018-04-27T14:49:07Z', 'thread_type': u'discussion', 'username': u'honor', 'comments_count': 0, 'context': u'course', 'endorsed': False}, {'anonymous_to_peers': False, 'unread_comments_count': 0, 'updated_at': u'2018-04-27T14:48:58Z', 'course_id': u'course-v1:edX+DemoX+Demo_Course', 'id': u'5ae3385a632d75008f000002', 'pinned': False, 'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count':
+0}, 'user_id': u'6', 'title': u'test thread 2', 'commentable_id': u'edx_demo_embedded_discussion', 'abuse_flaggers': [], 'closed': False, 'at_position_list': [], 'type': u'thread', 'body': u'asdasdasd', 'read': True, 'anonymous': False, 'last_activity_at': u'2018-04-27T14:48:58Z', 'created_at': u'2018-04-27T14:48:58Z', 'thread_type': u'discussion', 'username': u'honor', 'comments_count': 0, 'context': u'course', 'endorsed': False}, {'anonymous_to_peers': False, 'unread_comments_count':
+0, 'updated_at': u'2018-04-27T14:48:49Z', 'course_id': u'course-v1:edX+DemoX+Demo_Course', 'id': u'5ae33851632d75008f000000', 'pinned': False, 'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, 'user_id': u'6', 'title': u'test thread 1', 'commentable_id': u'edx_demo_embedded_discussion', 'abuse_flaggers': [], 'closed': False, 'at_position_list': [], 'type': u'thread', 'body': u'askdjhaskd', 'read': True, 'anonymous': False, 'last_activity_at':
+u'2018-04-27T14:48:49Z', 'created_at': u'2018-04-27T14:48:49Z', 'thread_type': u'discussion', 'username': u'honor', 'comments_count': 0, 'context': u'course', 'endorsed': False}]
+(Pdb) threads <after add_courseware_context>
+[{'anonymous_to_peers': False, 'unread_comments_count': 0, 'updated_at': u'2018-04-27T14:49:07Z', 'course_id': u'course-v1:edX+DemoX+Demo_Course', 'courseware_url': u'/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d', 'id': u'5ae33863632d75008f000004', 'pinned': False, 'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, 'user_id': u'6', 'title': u'test thread 3', 'commentable_id':
+u'edx_demo_embedded_discussion', 'abuse_flaggers': [], 'closed': False, 'at_position_list': [], 'type': u'thread', 'body': u'asdasdasd', 'read': True, 'anonymous': False, 'last_activity_at': u'2018-04-27T14:49:07Z', 'created_at': u'2018-04-27T14:49:07Z', 'courseware_title': u'Interesting Courses / Discussion Forums', 'thread_type': u'discussion', 'username': u'honor', 'comments_count': 0, 'context': u'course', 'endorsed': False}, {'anonymous_to_peers': False, 'unread_comments_count':
+0, 'updated_at': u'2018-04-27T14:48:58Z', 'course_id': u'course-v1:edX+DemoX+Demo_Course', 'courseware_url': u'/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d', 'id': u'5ae3385a632d75008f000002', 'pinned': False, 'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, 'user_id': u'6', 'title': u'test thread 2', 'commentable_id': u'edx_demo_embedded_discussion', 'abuse_flaggers': [], 'closed': False,
+'at_position_list': [], 'type': u'thread', 'body': u'asdasdasd', 'read': True, 'anonymous': False, 'last_activity_at': u'2018-04-27T14:48:58Z', 'created_at': u'2018-04-27T14:48:58Z', 'courseware_title': u'Interesting Courses / Discussion Forums', 'thread_type': u'discussion', 'username': u'honor', 'comments_count': 0, 'context': u'course', 'endorsed': False}, {'anonymous_to_peers': False, 'unread_comments_count': 0, 'updated_at': u'2018-04-27T14:48:49Z', 'course_id':
+u'course-v1:edX+DemoX+Demo_Course', 'courseware_url': u'/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d', 'id': u'5ae33851632d75008f000000', 'pinned': False, 'votes': {u'count': 0, u'down_count': 0, u'point': 0, u'up_count': 0}, 'user_id': u'6', 'title': u'test thread 1', 'commentable_id': u'edx_demo_embedded_discussion', 'abuse_flaggers': [], 'closed': False, 'at_position_list': [], 'type':
+u'thread', 'body': u'askdjhaskd', 'read': True, 'anonymous': False, 'last_activity_at': u'2018-04-27T14:48:49Z', 'created_at': u'2018-04-27T14:48:49Z', 'courseware_title': u'Interesting Courses / Discussion Forums', 'thread_type': u'discussion', 'username': u'honor', 'comments_count': 0, 'context': u'course', 'endorsed': False}]
+(Pdb) course_discussion_settings
+<CourseDiscussionSettings: CourseDiscussionSettings object>

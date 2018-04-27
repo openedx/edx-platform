@@ -16,7 +16,7 @@ from six import text_type
 from courseware import courses
 from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
+from django_comment_client.permissions import check_permissions_by_view, check_permissions_by_view2, get_team, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
 from django_comment_common.utils import get_course_discussion_settings
@@ -535,6 +535,58 @@ class QueryCountDebugMiddleware(object):
         return response
 
 
+def get_ability2(content, user, user_perms, course_is_divided, user_group_id, content_user_group_id):
+    """
+    Return a dictionary of forums-oriented actions and the user's permission to perform them
+
+    I'm aware this violates DRY; I'm attempting to optimize one particular function and will refactor if able later.
+    """
+    return {
+        'editable': check_permissions_by_view2(
+            user,
+            content,
+            "update_thread" if content['type'] == 'thread' else "update_comment",
+            user_perms,
+            course_is_divided,
+            user_group_id,
+            content_user_group_id
+        ),
+        'can_reply': check_permissions_by_view2(user, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment", user_perms, course_is_divided),
+        'can_delete': check_permissions_by_view2(
+            user,
+            content,
+            "delete_thread" if content['type'] == 'thread' else "delete_comment",
+            user_perms,
+            course_is_divided,
+            user_group_id,
+            content_user_group_id
+        ),
+        'can_openclose': check_permissions_by_view2(
+            user,
+            content,
+            "openclose_thread" if content['type'] == 'thread' else False,
+            user_perms,
+            course_is_divided,
+            user_group_id,
+            content_user_group_id
+        ),
+        'can_vote': not is_content_authored_by(content, user) and check_permissions_by_view2(
+            user,
+            content,
+            "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment",
+            user_perms,
+            course_is_divided
+        ),
+        'can_report': not is_content_authored_by(content, user) and (check_permissions_by_view2(
+            user,
+            content,
+            "flag_abuse_for_thread" if content['type'] == 'thread' else "flag_abuse_for_comment",
+            user_perms,
+            course_is_divided,
+        ) or GlobalStaff().has_user(user))
+    }
+
+
 def get_ability(course_id, content, user):
     """
     Return a dictionary of forums-oriented actions and the user's permission to perform them
@@ -981,6 +1033,7 @@ def get_group_name(group_id, course_discussion_settings):
 
     Returns: learner-facing name of the Group, or None if no such group exists
     """
+    # TODO: found it
     group_names_by_id = get_group_names_by_id(course_discussion_settings)
     return group_names_by_id[group_id] if group_id in group_names_by_id else None
 

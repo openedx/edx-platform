@@ -142,6 +142,40 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
     return test(user, permissions, operator="or")
 
 
+def _check_conditions_permissions2(user, permissions, content, user_perms, course_is_divided, user_group_id=None, content_user_group=None):
+    """
+    Accepts a list of permissions and proceed if any of the permission is valid.
+    Note that ["can_view", "can_edit"] will proceed if the user has either
+    "can_view" or "can_edit" permission. To use AND operator in between, wrap them in
+    a list.
+    """
+
+    def test(user, per, operator="or"):
+        if isinstance(per, basestring):
+            if per in CONDITIONS:
+                # I didn't optimize this method at all
+                return _check_condition(user, per, content)
+            if 'group_' in per:
+                # If a course does not have divided discussions
+                # or a course has divided discussions, but the current user's content group does not equal
+                # the content group of the commenter/poster,
+                # then the current user does not have group edit permissions.
+                if (not course_is_divided
+                        or user_group_id is None
+                        or content_user_group is None
+                        or user_group_id != content_user_group):
+                        return False
+            return per in user_perms
+        elif isinstance(per, list) and operator in ["and", "or"]:
+            results = [test(user, x, operator="and") for x in per]
+            if operator == "or":
+                return True in results
+            elif operator == "and":
+                return False not in results
+
+    return test(user, permissions, operator="or")
+
+
 # Note: 'edit_content' is being used as a generic way of telling if someone is a privileged user
 # (forum Moderator/Admin/TA), because there is a desire that team membership does not impact privileged users.
 VIEW_PERMISSIONS = {
@@ -185,3 +219,14 @@ def check_permissions_by_view(user, course_id, content, name, group_id=None, con
     except KeyError:
         logging.warning("Permission for view named %s does not exist in permissions.py", name)
     return _check_conditions_permissions(user, p, course_id, content, group_id, content_user_group)
+
+
+def check_permissions_by_view2(user, content, name, user_perms, course_is_divided, group_id=None, content_user_group=None):
+    # I'm aware this violates DRY; I'm attempting to optimize one particular function and will refactor if able later.
+    assert isinstance(course_id, CourseKey)
+    p = None
+    try:
+        p = VIEW_PERMISSIONS[name]
+    except KeyError:
+        logging.warning("Permission for view named %s does not exist in permissions.py", name)
+    return _check_conditions_permissions2(user, p, content, user_perms, course_is_divided, group_id, content_user_group)
