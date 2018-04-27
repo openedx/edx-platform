@@ -5,6 +5,7 @@ Test the partitions and partitions service
 
 from unittest import TestCase
 from mock import Mock
+from nose.plugins.attrib import attr
 
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
@@ -17,6 +18,7 @@ from xmodule.partitions.partitions_service import (
 )
 
 
+@attr(shard=2)
 class TestGroup(TestCase):
     """Test constructing groups"""
     def test_construct(self):
@@ -117,6 +119,7 @@ class MockEnrollmentTrackUserPartitionScheme(MockUserPartitionScheme):
         return UserPartition(id, name, description, groups, self, parameters, active)
 
 
+@attr(shard=2)
 class PartitionTestCase(TestCase):
     """Base class for test cases that require partitions"""
     TEST_ID = 0
@@ -172,6 +175,7 @@ class PartitionTestCase(TestCase):
         UserPartition.scheme_extensions = None
 
 
+@attr(shard=2)
 class TestUserPartition(PartitionTestCase):
     """Test constructing UserPartitions"""
 
@@ -450,6 +454,7 @@ class PartitionServiceBaseClass(PartitionTestCase):
         )
 
 
+@attr(shard=2)
 class TestPartitionService(PartitionServiceBaseClass):
     """
     Test getting a user's group out of a partition
@@ -539,6 +544,7 @@ class TestPartitionService(PartitionServiceBaseClass):
         self.assertEqual(group2, groups[1])
 
 
+@attr(shard=2)
 class TestGetCourseUserPartitions(PartitionServiceBaseClass):
     """
     Test the helper method get_all_partitions_for_course.

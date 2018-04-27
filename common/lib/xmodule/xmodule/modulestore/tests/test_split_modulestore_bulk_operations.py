@@ -7,12 +7,14 @@ import ddt
 import unittest
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
+from nose.plugins.attrib import attr
 from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 
 from opaque_keys.edx.locator import CourseLocator
 
 
+@attr(shard=2)
 class TestBulkWriteMixin(unittest.TestCase):
     def setUp(self):
         super(TestBulkWriteMixin, self).setUp()
@@ -49,6 +51,7 @@ class TestBulkWriteMixinPreviousTransaction(TestBulkWriteMixin):
         self.clear_cache.reset_mock()
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     """
@@ -291,6 +294,7 @@ class TestBulkWriteMixinClosedAfterPrevTransaction(TestBulkWriteMixinClosed, Tes
     pass
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     """
@@ -567,6 +571,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         self.assertItemsEqual(active_match + db_match, results)
 
 
+@attr(shard=2)
 @ddt.ddt
 class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
@@ -728,6 +733,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.conn.get_course_index.assert_called_once_with(self.course_key, ignore_case=False)
 
 
+@attr(shard=2)
 class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):
     """
     Test that operations on with an open transaction aren't affected by a previously executed transaction

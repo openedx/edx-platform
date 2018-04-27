@@ -1,10 +1,12 @@
 """ Test the behavior of split_mongo/MongoConnection """
 import unittest
 from mock import patch
+from nose.plugins.attrib import attr
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.exceptions import HeartbeatFailure
 
 
+@attr(shard=2)
 class TestHeartbeatFailureException(unittest.TestCase):
     """ Test that a heartbeat failure is thrown at the appropriate times """
     @patch('pymongo.MongoClient')
