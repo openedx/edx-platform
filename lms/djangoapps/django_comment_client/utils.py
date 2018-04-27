@@ -712,7 +712,7 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False, discussion_division_enabled=None):
+def prepare_content(content, course_key, is_staff=False, discussion_division_enabled=None, group_names_by_id=None):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -775,7 +775,13 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
             children = [
-                prepare_content(child, course_key, is_staff, discussion_division_enabled=discussion_division_enabled)
+                prepare_content(
+                    child,
+                    course_key,
+                    is_staff,
+                    discussion_division_enabled=discussion_division_enabled,
+                    group_names_by_id=group_names_by_id
+                )
                 for child in content[child_content_key]
             ]
             content[child_content_key] = children
@@ -784,7 +790,10 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
             course_discussion_settings = get_course_discussion_settings(course_key)
-            content['group_name'] = get_group_name(content.get('group_id'), course_discussion_settings)
+            if group_names_by_id:
+                content['group_name'] = group_names_by_id.get(content.get('group_id'))
+            else:
+                content['group_name'] = get_group_name(content.get('group_id'), course_discussion_settings)
             content['is_commentable_divided'] = is_commentable_divided(
                 course_key, content['commentable_id'], course_discussion_settings
             )
