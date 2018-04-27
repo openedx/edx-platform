@@ -52,7 +52,7 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
-@attrshard=9)
+@attr(shard=9)
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
     Tests for /api/mobile/v0.5/my_user_info
