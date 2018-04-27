@@ -805,7 +805,6 @@ OPTIMIZELY_PROJECT_ID = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
-VIRTUAL_UNIVERSITIES = []
 
 ############# XBlock Configuration ##########
 
