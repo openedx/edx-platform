@@ -10,7 +10,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
   if (userInformation.enrollments) {
     courseElement = (<div>
       <label className="label-course" htmlFor="course">{gettext('Course Name')}</label>
-      <select className="form-control select-course" id="course" value={userInformation.course_id}>
+      <select className="form-control select-course" id="course" defaultValue={userInformation.course_id}>
         <option key="select-course" value="">--------</option>
         <option key="not-course-specific" value="Not specific to a course">
           {gettext('Not specific to a course')}
@@ -74,12 +74,12 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
       </div>
     </div>
 
-    {/*TODO file uploading will be done after initial release*/}
-    {/*<FileUpload*/}
-      {/*setErrorState={setErrorState}*/}
-      {/*zendeskApiHost={zendeskApiHost}*/}
-      {/*accessToken={accessToken}*/}
-    {/*/>*/}
+    {/* TODO file uploading will be done after initial release */}
+    {/* <FileUpload */}
+      {/* setErrorState={setErrorState} */}
+      {/* zendeskApiHost={zendeskApiHost} */}
+      {/* accessToken={accessToken} */}
+    {/* /> */}
 
     <div className="row">
       <div className="col-sm-12">
