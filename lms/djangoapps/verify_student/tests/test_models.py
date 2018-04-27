@@ -319,25 +319,49 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
             self.assertEqual(fourth_result, first_result)
 
     def test_retire_user(self):
+        """
+        Retire user with record(s) in table
+        """
         user = UserFactory.create()
         user.profile.name = u"Enrique"
-
         attempt = SoftwareSecurePhotoVerification(user=user)
+
+        # Populate Record
         attempt.mark_ready()
         attempt.status = "submitted"
         attempt.photo_id_image_url = "https://example.com/test/image/img.jpg"
         attempt.face_image_url = "https://example.com/test/face/img.jpg"
+        attempt.photo_id_key = 'there_was_an_attempt'
         attempt.approve()
 
-        # Before Delete
+        # Validate data before retirement
         assert_equals(attempt.name, user.profile.name)
         assert_equals(attempt.photo_id_image_url, 'https://example.com/test/image/img.jpg')
         assert_equals(attempt.face_image_url, 'https://example.com/test/face/img.jpg')
+        assert_equals(attempt.photo_id_key, 'there_was_an_attempt')
 
-        # Attempt
-        self.assertTrue(SoftwareSecurePhotoVerification.delete_by_user_value(user, "user"))
-        # Reattempt
-        self.assertFalse(SoftwareSecurePhotoVerification.delete_by_user_value(user, "user"))
+        # Retire User
+        attempt_again = SoftwareSecurePhotoVerification(user=user)
+        self.assertTrue(attempt_again.retire_user(user_id=user.id))
+
+        # Validate data after retirement
+        self.assertEqual(attempt_again.name, '')
+        self.assertEqual(attempt_again.face_image_url, '')
+        self.assertEqual(attempt_again.photo_id_image_url, '')
+        self.assertEqual(attempt_again.photo_id_key, '')
+
+    def test_retire_nonuser(self):
+        """
+        Attempt to Retire User with no records in table
+        """
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+
+        # User with no records in table
+        self.assertFalse(attempt.retire_user(user_id=user.id))
+
+        # No user
+        self.assertFalse(attempt.retire_user(user_id=47))
 
 
 class VerificationDeadlineTest(CacheIsolationTestCase):
