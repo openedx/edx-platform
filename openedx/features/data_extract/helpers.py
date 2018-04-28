@@ -16,12 +16,9 @@ from submissions.models import StudentItem, Submission, Score
 
 
 def get_file_url(answer):
-    try:
-        return ora_file_upload_api.get_download_url(answer.file_key)
-    except AttributeError:
-        return ""
-    else:
-        return ""
+    if answer.get('file_key'):
+        return ora_file_upload_api.get_download_url(answer['file_key'])
+    return None
 
 
 def get_course_structure(course_key):
