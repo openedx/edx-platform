@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-22 20:36+0000\n"
-"PO-Revision-Date: 2018-04-22 20:36:16.392376\n"
+"POT-Creation-Date: 2018-04-29 20:36+0000\n"
+"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1092,6 +1092,12 @@ msgstr ""
 msgid "Delete the selected configuration"
 msgstr ""
 "Délété thé séléçtéd çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
+msgstr ""
+"Ûnäßlé tö çönnéçt wïth thé éxtérnäl prövïdér, pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -11189,20 +11195,22 @@ msgstr "Wélçömé tö {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
-"{start_bold}{enterprise_name}{end_bold} häs pärtnéréd wïth "
-"{start_bold}{platform_name}{end_bold} tö  öffér ýöü älwäýs äväïläßlé, hïgh-"
-"qüälïtý léärnïng prögräms tö hélp ýöü ädvänçé ýöür knöwlédgé änd ýöür "
-"çäréér. {line_break}Pléäsé çöntïnüé wïth régïsträtïön, ör lög ïn ïf ýöü äré "
-"än éxïstïng üsér, änd préss çöntïnüé tö stärt léärnïng. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"Ýöü hävé léft thé {start_bold}{enterprise_name}{end_bold} wéßsïté änd äré "
+"nöw ön thé {platform_name} sïté. {enterprise_name} häs pärtnéréd wïth "
+"{platform_name} tö öffér ýöü hïgh-qüälïtý, älwäýs äväïläßlé léärnïng "
+"prögräms tö hélp ýöü ädvänçé ýöür knöwlédgé änd çäréér. {line_break}Pléäsé "
+"nöté thät {platform_name} häs ä dïfférént {privacy_policy_link_start}Prïväçý"
+" Pölïçý{privacy_policy_link_end} fröm {enterprise_name}. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
 "łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ #"
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυα#"
 
 #: lms/templates/emails/password_reset_subject.txt
 #, python-format
@@ -12186,6 +12194,10 @@ msgid "A cohort with the same name already exists."
 msgstr ""
 "À çöhört wïth thé sämé nämé älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr "Çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-22 20:36+0000\n"
-"PO-Revision-Date: 2018-04-22 20:36:16.392376\n"
+"POT-Creation-Date: 2018-04-29 20:36+0000\n"
+"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -942,6 +942,10 @@ msgstr "يثمثفثي فاث سثمثذفثي ذخربهلعقشفهخر(س)."
 #: common/djangoapps/third_party_auth/admin.py
 msgid "Delete the selected configuration"
 msgstr "يثمثفث فاث سثمثذفثي ذخربهلعقشفهخر"
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
+msgstr "عرشزمث فخ ذخررثذف صهفا فاث ثطفثقرشم حقخدهيثق, حمثشسث فقغ شلشهر"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -9705,17 +9709,19 @@ msgstr "صثمذخوث فخ {platform_name}."
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
-"{start_bold}{enterprise_name}{end_bold} اشس حشقفرثقثي صهفا "
-"{start_bold}{platform_name}{end_bold} فخ  خببثق غخع شمصشغس شدشهمشزمث, اهلا-"
-"ضعشمهفغ مثشقرهرل حقخلقشوس فخ اثمح غخع شيدشرذث غخعق نرخصمثيلث شري غخعق "
-"ذشقثثق. {line_break}حمثشسث ذخرفهرعث صهفا قثلهسفقشفهخر, خق مخل هر هب غخع شقث "
-"شر ثطهسفهرل عسثق, شري حقثسس ذخرفهرعث فخ سفشقف مثشقرهرل."
+"غخع اشدث مثبف فاث {start_bold}{enterprise_name}{end_bold} صثزسهفث شري شقث "
+"رخص خر فاث {platform_name} سهفث. {enterprise_name} اشس حشقفرثقثي صهفا "
+"{platform_name} فخ خببثق غخع اهلا-ضعشمهفغ, شمصشغس شدشهمشزمث مثشقرهرل "
+"حقخلقشوس فخ اثمح غخع شيدشرذث غخعق نرخصمثيلث شري ذشقثثق. {line_break}حمثشسث "
+"رخفث فاشف {platform_name} اشس ش يهببثقثرف {privacy_policy_link_start}حقهدشذغ"
+" حخمهذغ{privacy_policy_link_end} بقخو {enterprise_name}."
 
 #: lms/templates/emails/password_reset_subject.txt
 #, python-format
@@ -10616,6 +10622,10 @@ msgstr ""
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
 msgstr "ش ذخاخقف صهفا فاث سشوث رشوث شمقثشيغ ثطهسفس."
+
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr "ذقثيثرفهشمس"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
