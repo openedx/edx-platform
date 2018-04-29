@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-22 20:35+0000\n"
-"PO-Revision-Date: 2018-04-22 20:36:15.838842\n"
+"POT-Creation-Date: 2018-04-29 20:36+0000\n"
+"PO-Revision-Date: 2018-04-29 20:36:21.128556\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4572,6 +4572,10 @@ msgid "Enter your "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Delete My Account"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
 msgstr ""
@@ -7746,6 +7750,10 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "View Program Record"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore

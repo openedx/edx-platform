@@ -218,7 +218,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-15 20:42+0000\n"
+"POT-Creation-Date: 2018-04-22 20:42+0000\n"
 "PO-Revision-Date: 2018-03-23 23:51+0000\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2556,6 +2556,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -9921,6 +9922,13 @@ msgstr ""
 msgid "Your {platform_name} verification has expired."
 msgstr "Su verificación en {platform_name} ha expirado."
 
+#: lms/djangoapps/verify_student/utils.py
+#, python-brace-format
+msgid ""
+"Could not send verification status email having subject: {subject} and email"
+" of user: {email}"
+msgstr ""
+
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "Introducción"
@@ -9995,6 +10003,16 @@ msgstr "Los datos de imagen no es válida."
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "{platform_name} ID Verification Photos Received"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
 msgstr ""
 
 #: lms/envs/common.py
@@ -10336,6 +10354,7 @@ msgstr "Vista previa"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "Cerrar"
 
@@ -10351,6 +10370,7 @@ msgstr "Vista previa de la Wiki"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr "ventana abierta"
 
@@ -12113,17 +12133,17 @@ msgstr "Establece el objetivo de: {goal_text}"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid "Enrollment in {course_title} was not complete."
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
 msgstr ""
 "Si tiene dudas acerca de compartir sus datos, contacte a su administrador de"
 " {enterprise_customer_name}."
-
-#: openedx/features/enterprise_support/api.py
-#, python-brace-format
-msgid "Enrollment in {course_name} was not complete."
-msgstr "La inscripción en {course_name} no se completó."
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -13379,6 +13399,7 @@ msgstr "Guardar ajustes"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "Cancelar la inscripción"
 
@@ -17476,6 +17497,7 @@ msgstr ""
 "La cuenta de {provider_name} seleccionada ya está vinculada con otra cuenta "
 "de {platform_name}. "
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
@@ -17483,58 +17505,72 @@ msgstr ""
 "¡Lamentamos que te vayas! Por favor comparte la principal razón por la que "
 "cancelas la inscripción."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
 msgstr "Solo quería explorar el material."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
 msgstr "Esto no ayudara a alcanzar mis metas"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
 msgstr "No tengo el tiempo"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
 msgstr "No cumplo con los requisitos académicos o de lenguaje"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
 msgstr "No tengo suficiente soporte"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
 msgstr "No estoy conforme con la calidad del contenido"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
 msgstr "El material del curso fue muy difícil"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too easy"
 msgstr "El material del curso fue muy fácil"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Something was broken"
 msgstr "Algo estaba roto"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
 msgstr "Otro"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
 msgstr "Gracias por compartir las razones de tu cancelación de inscripción."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
 msgstr "Has anulado la inscripción de"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr "Volver al panel principal"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "Explora los cursos"
@@ -18104,6 +18140,34 @@ msgstr "Este correo fue enviado automáticamente por {site_name} a {full_name}"
 msgid "You have been enrolled in {course_name}"
 msgstr "Usted ha sido inscrito en el curso {course_name}"
 
+#: lms/templates/emails/failed_verification_email.txt
+msgid ""
+"Sorry! The photos you submitted for ID verification were not accepted, for "
+"the following reason(s):"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo(s) of you: {reason}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Resubmit Verification: {reverify_url}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "Thank you,"
+msgstr "Gracias."
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "The {platform_name} team"
+msgstr "El equipo de {platform_name}"
+
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -18113,15 +18177,11 @@ msgstr ""
 "tarjeta de crédito o débito a nombre de la empresa  {merchant_name}."
 
 #: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Gracias."
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "Su número de orden es: {order_number}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr "Hola {full_name},"
 
@@ -18136,11 +18196,6 @@ msgid ""
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
 msgstr ""
-
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} team"
-msgstr "El equipo de {platform_name}"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -18370,6 +18425,15 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "Gracias,"
+
+#: lms/templates/emails/successfull_verification_email.txt
+msgid "Congratulations! Your ID verification process was successful."
+msgstr ""
+
+#: lms/templates/emails/successfull_verification_email.txt
+msgid ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
