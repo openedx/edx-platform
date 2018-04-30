@@ -91,7 +91,7 @@ def get_user_demographic_data(profile):
         'country': profile.country.__str__(),
         'language': profile.language,
         'english_proficiency': profile.user.extended_profile.english_proficiency,
-        'label': profile.user.extended_profile.organization.label if
+        'organization_label': profile.user.extended_profile.organization.label if
         profile.user.extended_profile.organization else '',
         'reputation': user_community_data['reputation'],
         'postcount': user_community_data['postcount'],
