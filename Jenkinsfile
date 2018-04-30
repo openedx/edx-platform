@@ -3,7 +3,6 @@ pipeline {
     agent { label "coverage-worker" }
 
     options {
-        ansiColor('gnome-terminal')
         timestamps()
         timeout(75)
     }
@@ -18,14 +17,16 @@ pipeline {
                         TEST_SUITE = 'lms-unit'
                     }
                     steps {
-                        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                                url: 'git@github.com:edx/edx-platform.git']]]
-                            sh "bash scripts/all-tests.sh"
-                            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
                         }
                     }
                     post {
@@ -42,14 +43,16 @@ pipeline {
                         TEST_SUITE = 'lms-unit'
                     }
                     steps{
-                        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                                url: 'git@github.com:edx/edx-platform.git']]]
-                            sh "bash scripts/all-tests.sh"
-                            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
                         }
                     }
                     post {
@@ -66,14 +69,16 @@ pipeline {
                         TEST_SUITE = 'lms-unit'
                     }
                     steps {
-                        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                                url: 'git@github.com:edx/edx-platform.git']]]
-                            sh "bash scripts/all-tests.sh"
-                            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
                         }
                     }
                     post {
@@ -90,14 +95,16 @@ pipeline {
                         TEST_SUITE = 'lms-unit'
                     }
                     steps {
-                        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                                url: 'git@github.com:edx/edx-platform.git']]]
-                            sh "bash scripts/all-tests.sh"
-                            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
                         }
                     }
                     post {
@@ -114,14 +121,16 @@ pipeline {
                         TEST_SUITE = 'cms-unit'
                     }
                     steps {
-                        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                                url: 'git@github.com:edx/edx-platform.git']]]
-                            sh "bash scripts/all-tests.sh"
-                            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
                         }
                     }
                     post {
@@ -138,14 +147,16 @@ pipeline {
                         TEST_SUITE = 'commonlib-unit'
                     }
                     steps {
-                        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                                url: 'git@github.com:edx/edx-platform.git']]]
-                            sh "bash scripts/all-tests.sh"
-                            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
                         }
                     }
                     post {
@@ -165,19 +176,21 @@ pipeline {
                 SUBSET_JOB = "null" // Keep this variable until we can remove the $SUBSET_JOB path from .coveragerc
             }
             steps {
-                sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                        doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                        userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                        refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                        url: 'git@github.com:edx/edx-platform.git']]]
-                    unstash 'lms-unit_1_reports'
-                    unstash 'lms-unit_2_reports'
-                    unstash 'lms-unit_3_reports'
-                    unstash 'lms-unit_4_reports'
-                    unstash 'cms-unit_1_reports'
-                    unstash 'commonlib-unit_1_reports'
-                    sh "./scripts/jenkins-report.sh"
+                ansiColor('gnome-terminal') {
+                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                            doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                            userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                            refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                            url: 'git@github.com:edx/edx-platform.git']]]
+                        unstash 'lms-unit_1_reports'
+                        unstash 'lms-unit_2_reports'
+                        unstash 'lms-unit_3_reports'
+                        unstash 'lms-unit_4_reports'
+                        unstash 'cms-unit_1_reports'
+                        unstash 'commonlib-unit_1_reports'
+                        sh "./scripts/jenkins-report.sh"
+                    }
                 }
             }
             post {
