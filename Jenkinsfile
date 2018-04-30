@@ -114,7 +114,163 @@ pipeline {
                         }
                     }
                 }
-                stage('cms_unit') {
+                stage('lms_unit_5') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 5
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('lms_unit_6') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 6
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('lms_unit_7') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 7
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('lms_unit_8') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 8
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('lms_unit_9') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 9
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('lms_unit_10') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 10
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('cms_unit_1') {
                     agent { label "jenkins-worker" }
                     environment {
                         SHARD = 1
@@ -140,10 +296,88 @@ pipeline {
                         }
                     }
                 }
-                stage('commonlib_unit') {
+                stage('cms_unit_2') {
                     agent { label "jenkins-worker" }
                     environment {
                         SHARD = 1
+                        TEST_SUITE = 'cms-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('commonlib_unit_1') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 1
+                        TEST_SUITE = 'commonlib-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('commonlib_unit_2') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 2
+                        TEST_SUITE = 'commonlib-unit'
+                    }
+                    steps {
+                        ansiColor('gnome-terminal') {
+                            sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                                checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                    refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                                    url: 'git@github.com:edx/edx-platform.git']]]
+                                sh "bash scripts/all-tests.sh"
+                                stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}_${SHARD}_reports"
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+                            junit '**/nosetests.xml'
+                        }
+                    }
+                }
+                stage('commonlib_unit_3') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 3
                         TEST_SUITE = 'commonlib-unit'
                     }
                     steps {
@@ -187,8 +421,17 @@ pipeline {
                         unstash 'lms-unit_2_reports'
                         unstash 'lms-unit_3_reports'
                         unstash 'lms-unit_4_reports'
+                        unstash 'lms-unit_5_reports'
+                        unstash 'lms-unit_6_reports'
+                        unstash 'lms-unit_7_reports'
+                        unstash 'lms-unit_8_reports'
+                        unstash 'lms-unit_9_reports'
+                        unstash 'lms-unit_10_reports'
                         unstash 'cms-unit_1_reports'
+                        unstash 'cms-unit_2_reports'
                         unstash 'commonlib-unit_1_reports'
+                        unstash 'commonlib-unit_2_reports'
+                        unstash 'commonlib-unit_3_reports'
                         sh "./scripts/jenkins-report.sh"
                     }
                 }
