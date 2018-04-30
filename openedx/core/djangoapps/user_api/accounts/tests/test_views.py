@@ -28,6 +28,7 @@ from integrated_channels.sap_success_factors.models import (
 )
 import mock
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 import pytest
 import pytz
 from rest_framework import status
@@ -37,6 +38,10 @@ from social_django.models import UserSocialAuth
 
 from entitlements.models import CourseEntitlementSupportDetail
 from entitlements.tests.factories import CourseEntitlementFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import CreditRequirementStatus
+from openedx.core.djangoapps.credit.tests.factories import CreditRequirementStatusFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
@@ -45,6 +50,7 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import (
+    CourseEnrollmentAllowed,
     PendingEmailChange,
     Registration,
     SocialLink,
@@ -55,13 +61,18 @@ from student.models import (
 from student.tests.factories import (
     TEST_PASSWORD,
     ContentTypeFactory,
+    CourseEnrollmentAllowedFactory,
+    PendingEmailChangeFactory,
     PermissionFactory,
     RegistrationFactory,
     SuperuserFactory,
     UserFactory
 )
+from survey.tests.factories import SurveyAnswerFactory
+
 from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY
 from ..views import AccountRetirementView, USER_PROFILE_PII
+from ...tests.factories import UserOrgTagFactory
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=pytz.UTC)
 
@@ -1087,6 +1098,7 @@ class TestDeactivateLogout(RetirementTestCase):
         super(TestDeactivateLogout, self).setUp()
         self.test_password = 'password'
         self.test_user = UserFactory(password=self.test_password)
+        self.original_email = self.test_user.email
         UserSocialAuth.objects.create(
             user=self.test_user,
             provider='some_provider_name',
@@ -1096,6 +1108,20 @@ class TestDeactivateLogout(RetirementTestCase):
             user=self.test_user,
             provider='some_other_provider_name',
             uid='xyz@gmail.com'
+        )
+
+        CourseEnrollmentAllowedFactory.create(email=self.original_email)
+
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.cohort = CourseUserGroup.objects.create(
+            name="TestCohort",
+            course_id=self.course_key,
+            group_type=CourseUserGroup.COHORT
+        )
+        self.cohort_assignment = UnregisteredLearnerCohortAssignments.objects.create(
+            course_user_group=self.cohort,
+            course_id=self.course_key,
+            email=self.original_email
         )
 
         self.url = reverse('deactivate_logout')
@@ -1117,6 +1143,8 @@ class TestDeactivateLogout(RetirementTestCase):
         self.assertEqual(get_retired_email_by_email(self.test_user.email), updated_user.email)
         self.assertFalse(updated_user.has_usable_password())
         self.assertEqual(list(UserSocialAuth.objects.filter(user=self.test_user)), [])
+        self.assertFalse(CourseEnrollmentAllowed.objects.filter(email=self.original_email).exists())
+        self.assertFalse(UnregisteredLearnerCohortAssignments.objects.filter(email=self.original_email).exists())
         self.assertEqual(len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)), 1)
         # make sure the user cannot log in
         self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
@@ -1661,6 +1689,17 @@ class TestAccountRetirementPost(RetirementTestCase):
             comments='A comment containing potential PII.'
         )
 
+        # Misc. setup
+        self.photo_verification = SoftwareSecurePhotoVerificationFactory.create(user=self.test_user)
+        PendingEmailChangeFactory.create(user=self.test_user)
+        UserOrgTagFactory.create(user=self.test_user, key='foo', value='bar')
+        UserOrgTagFactory.create(user=self.test_user, key='cat', value='dog')
+        self.credit_requirement_status = CreditRequirementStatusFactory.create(
+            username=self.original_username,
+            reason={'something': 'that might have PII in it'},
+        )
+        self.survey_answer = SurveyAnswerFactory.create(user=self.test_user, field_value='foo')
+
         # setup for doing POST from test client
         self.headers = self.build_jwt_headers(self.test_superuser)
         self.headers['content_type'] = "application/merge-patch+json"
@@ -1758,6 +1797,12 @@ class TestAccountRetirementPost(RetirementTestCase):
         self._pending_enterprise_customer_user_assertions()
         self._entitlement_support_detail_assertions()
 
+        self._photo_verification_assertions()
+        self.assertFalse(PendingEmailChange.objects.filter(user=self.test_user).exists())
+        self.assertFalse(UserOrgTag.objects.filter(user=self.test_user).exists())
+        self._credit_requirement_status_assertions()
+        self._survey_answer_assertions()
+
     def test_deletes_pii_from_user_profile(self):
         for model_field, value_to_assign in USER_PROFILE_PII.iteritems():
             if value_to_assign == '':
@@ -1853,3 +1898,27 @@ class TestAccountRetirementPost(RetirementTestCase):
         """
         self.entitlement_support_detail.refresh_from_db()
         self.assertEqual('', self.entitlement_support_detail.comments)
+
+    def _photo_verification_assertions(self):
+        """
+        Helper method for asserting that ``SoftwareSecurePhotoVerification`` objects are retired.
+        """
+        self.photo_verification.refresh_from_db()
+        self.assertEqual(self.test_user, self.photo_verification.user)
+        for field in ('name', 'face_image_url', 'photo_id_image_url', 'photo_id_key'):
+            self.assertEqual('', getattr(self.photo_verification, field))
+
+    def _credit_requirement_status_assertions(self):
+        """
+        Helper method for asserting that ``CreditRequirementStatus`` objects are retired.
+        """
+        self.credit_requirement_status.refresh_from_db()
+        self.assertEqual({}, self.credit_requirement_status.reason)
+        self.assertEqual(self.retired_username, self.credit_requirement_status.username)
+
+    def _survey_answer_assertions(self):
+        """
+        Helper method for asserting that ``SurveyAnswer`` objects are retired.
+        """
+        self.survey_answer.refresh_from_db()
+        self.assertEqual('', self.survey_answer.field_value)

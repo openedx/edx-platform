@@ -32,6 +32,9 @@ from six import text_type
 from social_django.models import UserSocialAuth
 import pytz
 
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import CreditRequirementStatus
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -41,6 +44,8 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    CourseEnrollmentAllowed,
+    PendingEmailChange,
     Registration,
     User,
     UserProfile,
@@ -50,6 +55,7 @@ from student.models import (
     is_username_retired,
 )
 from student.views.login import AuthFailedError, LoginFailures
+from survey.models import SurveyAnswer
 
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import (
@@ -411,14 +417,17 @@ class DeactivateLogoutView(APIView):
             with transaction.atomic():
                 # 1. Unlink LMS social auth accounts
                 UserSocialAuth.objects.filter(user_id=request.user.id).delete()
-                # 2. Change LMS password & email
+                # 2. Retire any objects linked to the user via their email
+                CourseEnrollmentAllowed.delete_by_user_value(request.user.email, field='email')
+                UnregisteredLearnerCohortAssignments.delete_by_user_value(request.user.email, field='email')
+                # 3. Change LMS password & email
                 request.user.email = get_retired_email_by_email(request.user.email)
                 request.user.save()
                 _set_unusable_password(request.user)
-                # 3. Unlink social accounts & change password on each IDA, still to be implemented
-                # 4. Add user to retirement queue
+                # 4. Unlink social accounts & change password on each IDA, still to be implemented
+                # 5. Add user to retirement queue
                 UserRetirementStatus.create_retirement(request.user)
-                # 5. Log the user out
+                # 6. Log the user out
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except KeyError:
@@ -600,16 +609,29 @@ class AccountRetirementView(ViewSet):
             user = user_model.objects.get(username=username)
 
             with transaction.atomic():
+                # Retire core user/profile information
                 self.clear_pii_from_userprofile(user)
                 Registration.objects.filter(user=user).delete()
                 self.delete_users_profile_images(user)
                 self.delete_users_country_cache(user)
+
+                # Retire data from Enterprise models
                 self.retire_users_data_sharing_consent(username)
                 self.retire_sapsf_data_transmission(user)
                 self.retire_user_from_pending_enterprise_customer_user(user)
                 self.retire_entitlement_support_detail(user)
+
+                # Retire misc. models that may contain PII of this user
+                SoftwareSecurePhotoVerification.retire_user(user.id)
+                PendingEmailChange.delete_by_user_value(user, field='user')
+                UserOrgTag.delete_by_user_value(user, field='user')
+                CreditRequirementStatus.retire_user(username)
+                SurveyAnswer.retire_user(user.id)
+
                 # TODO: Password Reset links - https://openedx.atlassian.net/browse/PLAT-2104
                 # TODO: Delete OAuth2 records - https://openedx.atlassian.net/browse/EDUCATOR-2703
+
+                # Finally, retire the the main auth_user record
                 user.first_name = ''
                 user.last_name = ''
                 user.is_active = False
