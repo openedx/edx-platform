@@ -276,7 +276,6 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
 
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
     @ddt.data(
@@ -354,10 +353,6 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertItemsEqual(json.loads(response.body), result)
 
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
         """
@@ -511,7 +506,6 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
@@ -543,21 +537,6 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.text, expected_content)
         for attribute, value in expected_headers.iteritems():
             self.assertEqual(response.headers[attribute], value)
-
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
-    def test_download_fallback_transcript_feature_disabled(self):
-        """
-        Verify val transcript if its feature is disabled.
-        """
-        # Make request to XModule transcript handler
-        request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
-        # Assert the actual response
-        self.assertEqual(response.status_code, 404)
 
 
 @attr(shard=1)
@@ -798,7 +777,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             store.update_item(self.course, self.user.id)
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
     @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript(self, mock_get_video_transcript_data):
@@ -831,10 +809,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         for attribute, value in expected_headers.iteritems():
             self.assertEqual(response.headers[attribute], value)
 
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
     @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
     @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript_feature_disabled(self):

@@ -23,9 +23,6 @@ from xmodule.video_module.transcripts_utils import (
     Transcript,
     get_transcript,
 )
-from xmodule.video_module.transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
 
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary

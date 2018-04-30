@@ -11,7 +11,8 @@ define(
                         duration: 42,
                         created: '2014-11-25T23:13:05',
                         edx_video_id: 'dummy_id',
-                        status: 'uploading'
+                        status: 'uploading',
+                        transcripts: []
                     };
                     var collection = new Backbone.Collection(
                         _.map(
@@ -26,6 +27,9 @@ define(
                     var view = new PreviousVideoUploadListView({
                         collection: collection,
                         videoHandlerUrl: videoHandlerUrl,
+                        transcriptAvailableLanguages: [],
+                        videoSupportedFileFormats: [],
+                        videoTranscriptSettings: {},
                         videoImageSettings: {}
                     });
                     return view.render().$el;
