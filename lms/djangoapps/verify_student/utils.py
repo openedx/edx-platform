@@ -95,3 +95,30 @@ def send_verification_status_email(context):
                 subject=context['subject'],
                 email=context['email']
             ))
+
+
+def most_recent_verification(photo_id_verifications, sso_id_verifications, most_recent_key):
+    """
+    Return the most recent verification given querysets for both photo and sso verifications.
+
+    Arguments:
+            photo_id_verifications: Queryset containing photo verifications
+            sso_id_verifications: Queryset containing sso verifications
+            most_recent_key: Either 'updated_at' or 'created_at'
+
+    Returns:
+        The most recent verification.
+    """
+    photo_id_verification = photo_id_verifications and photo_id_verifications.first()
+    sso_id_verification = sso_id_verifications and sso_id_verifications.first()
+
+    if not photo_id_verification and not sso_id_verification:
+        return None
+    elif photo_id_verification and not sso_id_verification:
+        return photo_id_verification
+    elif sso_id_verification and not photo_id_verification:
+        return sso_id_verification
+    elif getattr(photo_id_verification, most_recent_key) > getattr(sso_id_verification, most_recent_key):
+        return photo_id_verification
+    else:
+        return sso_id_verification

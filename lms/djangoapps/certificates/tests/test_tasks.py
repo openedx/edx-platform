@@ -45,13 +45,22 @@ class GenerateUserCertificateTest(TestCase):
         course_key = 'course-v1:edX+CS101+2017_T2'
         student = UserFactory()
 
+        expected_verification_status = {
+            'status': 'approved',
+            'error': '',
+            'should_display': True,
+        }
+
         kwargs = {
             'student': student.id,
             'course_key': course_key,
-            'expected_verification_status': 'approved'
+            'expected_verification_status': expected_verification_status,
         }
 
-        user_status_mock.side_effect = [('pending', ''), ('approved', '')]
+        user_status_mock.side_effect = [
+            {'status': 'pending', 'error': '', 'should_display': True},
+            {'status': 'approved', 'error': '', 'should_display': True}
+        ]
 
         generate_certificate.apply_async(kwargs=kwargs).get()
 

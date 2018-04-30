@@ -92,7 +92,7 @@ def checkout_receipt(request):
         'page_title': page_title,
         'is_payment_complete': is_payment_complete,
         'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
-        'verified': IDVerificationService.verification_valid_or_pending(request.user).exists(),
+        'verified': IDVerificationService.user_has_valid_or_pending(request.user),
         'error_summary': error_summary,
         'error_text': error_text,
         'for_help_text': for_help_text,

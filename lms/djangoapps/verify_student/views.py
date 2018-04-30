@@ -646,11 +646,13 @@ class PayAndVerifyView(View):
         Returns:
             datetime object in string format
         """
-        photo_verifications = IDVerificationService.verification_valid_or_pending(user)
+        expiration_datetime = IDVerificationService.get_expiration_datetime(
+            user, ['submitted', 'approved', 'must_retry']
+        )
         # return 'expiration_datetime' of latest photo verification if found,
         # otherwise implicitly return ''
-        if photo_verifications:
-            return photo_verifications[0].expiration_datetime.strftime(date_format)
+        if expiration_datetime:
+            return expiration_datetime.strftime(date_format)
 
         return ''
 
@@ -1226,9 +1228,9 @@ class ReverifyView(View):
         Most of the work is done client-side by composing the same
         Backbone views used in the initial verification flow.
         """
-        status, __ = IDVerificationService.user_status(request.user)
+        verification_status = IDVerificationService.user_status(request.user)
 
-        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user)
+        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
         can_reverify = False
         if expiration_datetime:
             if is_verification_expiring_soon(expiration_datetime):
@@ -1243,7 +1245,7 @@ class ReverifyView(View):
         # A photo verification is marked as 'pending' if its status is either
         # 'submitted' or 'must_retry'.
 
-        if status in ["none", "must_reverify", "expired", "pending"] or can_reverify:
+        if verification_status['status'] in ["none", "must_reverify", "expired", "pending"] or can_reverify:
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
@@ -1252,6 +1254,6 @@ class ReverifyView(View):
             return render_to_response("verify_student/reverify.html", context)
         else:
             context = {
-                "status": status
+                "status": verification_status['status']
             }
             return render_to_response("verify_student/reverify_not_allowed.html", context)

@@ -5,23 +5,38 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveAPIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.user_api.serializers import SoftwareSecurePhotoVerificationSerializer
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.utils import most_recent_verification
+from openedx.core.djangoapps.user_api.serializers import (
+    SoftwareSecurePhotoVerificationSerializer, SSOVerificationSerializer,
+)
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 
-class PhotoVerificationStatusView(RetrieveAPIView):
-    """ PhotoVerificationStatus detail endpoint. """
+class IDVerificationStatusView(RetrieveAPIView):
+    """ IDVerificationStatus detail endpoint. """
     authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsStaffOrOwner,)
-    serializer_class = SoftwareSecurePhotoVerificationSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        Overrides default get_serializer in order to choose the correct serializer for the instance.
+        """
+        instance = args[0]
+        kwargs['context'] = self.get_serializer_context()
+        if isinstance(instance, SoftwareSecurePhotoVerification):
+            return SoftwareSecurePhotoVerificationSerializer(*args, **kwargs)
+        else:
+            return SSOVerificationSerializer(*args, **kwargs)
 
     def get_object(self):
         username = self.kwargs['username']
-        verifications = SoftwareSecurePhotoVerification.objects.filter(user__username=username).order_by('-updated_at')
+        photo_verifications = SoftwareSecurePhotoVerification.objects.filter(
+            user__username=username).order_by('-updated_at')
+        sso_verifications = SSOVerification.objects.filter(user__username=username).order_by('-updated_at')
 
-        if len(verifications) > 0:
-            verification = verifications[0]
+        if photo_verifications or sso_verifications:
+            verification = most_recent_verification(photo_verifications, sso_verifications, 'updated_at')
             self.check_object_permissions(self.request, verification)
             return verification
 
