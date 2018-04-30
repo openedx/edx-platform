@@ -22,5 +22,13 @@
             "name": "studio.enable_policy_page",
             "active": true
         }
+    },
+    {
+        "pk": 2,
+        "model": "waffle.switch",
+        "fields": {
+            "name": "completion.enable_completion_tracking",
+            "active": true
+        }
     }
 ]
