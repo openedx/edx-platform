@@ -1257,7 +1257,7 @@ class TestAccountRetirementList(RetirementTestCase):
             except AttributeError:
                 states_to_request = states_to_request
 
-        data = {'cool_off_days': cool_off_days, 'states': ','.join(states_to_request)}
+        data = {'cool_off_days': cool_off_days, 'states': states_to_request}
         response = self.client.get(self.url, data, **self.headers)
         self.assertEqual(response.status_code, expected_status)
         response_data = response.json()
@@ -1284,6 +1284,18 @@ class TestAccountRetirementList(RetirementTestCase):
         for state in self._get_dead_end_states():
             self._create_retirement(state)
         self.assert_status_and_user_list([], states_to_request=self._get_non_dead_end_states())
+
+    def test_users_retrieved_in_multiple_states(self):
+        """
+        Verify that if multiple states are requested, learners in each state are returned.
+        """
+        multiple_states = ['PENDING', 'FORUMS_COMPLETE']
+        for state in multiple_states:
+            self._create_retirement(RetirementState.objects.get(state_name=state))
+        data = {'cool_off_days': 0, 'states': multiple_states}
+        response = self.client.get(self.url, data, **self.headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()), 2)
 
     def test_users_exist(self):
         """
