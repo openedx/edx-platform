@@ -2,6 +2,7 @@
   "name": "edx",
   "version": "0.1.0",
   "dependencies": {
+    "@arizzitano/graphql-dashboard": "0.0.1",
     "@edx/cookie-policy-banner": "1.1.6",
     "@edx/edx-bootstrap": "0.4.3",
     "@edx/paragon": "2.6.4",
