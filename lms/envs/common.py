@@ -563,6 +563,9 @@ TEMPLATES = [
                 # Timezone processor (sends language and time_zone preference)
                 'courseware.context_processor.user_timezone_locale_prefs',
 
+                # Alert message processor
+                'philu_overrides.context_processor.get_global_alert_messages',
+
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.footer_context_processor',
 
@@ -2229,6 +2232,9 @@ INSTALLED_APPS = (
 
     # student_dashboard App
     'lms.djangoapps.student_dashboard',
+
+    # Data extraction App
+    'openedx.features.data_extract',
 )
 
 ######################### CSRF #########################################
@@ -2692,6 +2698,7 @@ OPTIONAL_APPS = (
     'enterprise',
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
+
 )
 
 for app_name in OPTIONAL_APPS:
