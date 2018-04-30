@@ -442,10 +442,12 @@ class AccountRetirementView(ViewSet):
         """
         try:
             cool_off_days = int(request.GET['cool_off_days'])
-            states = request.GET['states'].split(',')
-
             if cool_off_days < 0:
                 raise RetirementStateError('Invalid argument for cool_off_days, must be greater than 0.')
+
+            states = request.GET.getlist('states')
+            if not states:
+                raise RetirementStateError('Param "states" required with at least one state.')
 
             state_objs = RetirementState.objects.filter(state_name__in=states)
             if state_objs.count() != len(states):
