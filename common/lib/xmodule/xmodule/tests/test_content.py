@@ -98,6 +98,7 @@ class MockImage(Mock):
     def __exit__(self, *args):
         self.close()
 
+
 @attr(shard=1)
 @ddt.ddt
 class ContentTest(unittest.TestCase):

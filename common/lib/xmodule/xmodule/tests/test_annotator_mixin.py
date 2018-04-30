@@ -8,6 +8,7 @@ from nose.plugins.attrib import attr
 
 from xmodule.annotator_mixin import get_instructions, get_extension, html_to_text
 
+
 @attr(shard=1)
 class HelperFunctionTest(unittest.TestCase):
     """

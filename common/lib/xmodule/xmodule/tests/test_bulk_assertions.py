@@ -46,6 +46,7 @@ CONTEXT_FAILING_ASSERTIONS = (
     ('assertRaisesRegexp', KeyError, "2", {}.__getitem__, '1'),
 )
 
+
 @attr(shard=1)
 @ddt.ddt
 class TestBulkAssertionTestCase(BulkAssertionTest):

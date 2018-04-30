@@ -7,6 +7,7 @@ from nose.plugins.attrib import attr
 
 from xmodule.annotator_token import retrieve_token
 
+
 @attr(shard=1)
 class TokenRetriever(unittest.TestCase):
     """
