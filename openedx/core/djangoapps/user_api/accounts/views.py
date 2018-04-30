@@ -13,6 +13,7 @@ from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -21,7 +22,6 @@ from social_django.models import UserSocialAuth
 from student.models import (
     User,
     get_retired_email_by_email,
-    get_potentially_retired_user_by_username_and_hash,
     get_potentially_retired_user_by_username
 )
 from student.views.login import AuthFailedError, LoginFailures
@@ -335,12 +335,12 @@ class DeactivateLogoutView(APIView):
     -  Log the user out
     - Create a row in the retirement table for that user
     """
-    authentication_classes = (JwtAuthentication, )
+    authentication_classes = (SessionAuthentication, JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
 
     def post(self, request):
         """
-        POST /api/user/v1/accounts/deactivate_logout
+        POST /api/user/v1/accounts/deactivate_logout/
 
         Marks the user as having no password set for deactivation purposes,
         and logs the user out.
