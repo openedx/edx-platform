@@ -3,6 +3,7 @@ pipeline {
     agent { label "coverage-worker" }
 
     options {
+        ansiColor('gnome-terminal')
         timestamps()
         timeout(75)
     }
