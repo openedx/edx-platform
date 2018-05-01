@@ -172,19 +172,17 @@
                         }, 1000);
                         break;
                     case MSAMigrationStatus.REGISTER_NEW_USER:
-                        var msg = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
+                        /*var msg = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
                             _.sprintf(
                                 gettext('This email is not registered with %(platformName)s.' +
                                         ' Please try a different email or '),
                                 {platformName: this.platformName}
                             ),
-                            HtmlUtils.HTML(
-                                '<a href="/register" class="form-toggle btn-neutral btn-register" data-type="register">',  // eslint-disable-line max-len
-                                gettext('register'),
-                                '</a>'
-                            ),
+                            HtmlUtils.HTML('<a href="/register" class="form-toggle btn-neutral btn-register" data-type="register">'),
+                            gettext('register'),
+                            HtmlUtils.HTML('</a>'),
                             gettext(' before signing in.')
-                        );
+                        );*/
 
                         this.errors = ['<li>' + msg + '</li>'];
                         this.clearPasswordResetSuccess();
