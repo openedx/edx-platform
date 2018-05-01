@@ -23,6 +23,8 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
     def setUp(self):
         super(TestCachePrograms, self).setUp()
 
+        httpretty.httpretty.reset()
+
         self.catalog_integration = self.create_catalog_integration()
         self.site_domain = 'testsite.com'
         self.set_up_site(
