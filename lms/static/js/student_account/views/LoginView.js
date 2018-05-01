@@ -172,7 +172,7 @@
                         }, 1000);
                         break;
                     case MSAMigrationStatus.REGISTER_NEW_USER:
-                        /*var msg = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
+                        var msg = HtmlUtils.joinHtml(  // eslint-disable-line vars-on-top
                             _.sprintf(
                                 gettext('This email is not registered with %(platformName)s.' +
                                         ' Please try a different email or '),
@@ -182,7 +182,7 @@
                             gettext('register'),
                             HtmlUtils.HTML('</a>'),
                             gettext(' before signing in.')
-                        );*/
+                        );
 
                         this.errors = ['<li>' + msg + '</li>'];
                         this.clearPasswordResetSuccess();
