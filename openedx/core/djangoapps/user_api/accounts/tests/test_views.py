@@ -50,6 +50,7 @@ from openedx.core.lib.token_utils import JwtBuilder
 from student.models import (
     CourseEnrollmentAllowed,
     PendingEmailChange,
+    Registration,
     SocialLink,
     UserProfile,
     get_retired_username_by_username,
@@ -1104,6 +1105,8 @@ class TestDeactivateLogout(RetirementTestCase):
             uid='xyz@gmail.com'
         )
 
+        Registration().register(self.test_user)
+
         self.url = reverse('deactivate_logout')
 
     def build_post(self, password):
@@ -1123,6 +1126,7 @@ class TestDeactivateLogout(RetirementTestCase):
         self.assertEqual(get_retired_email_by_email(self.test_user.email), updated_user.email)
         self.assertFalse(updated_user.has_usable_password())
         self.assertEqual(list(UserSocialAuth.objects.filter(user=self.test_user)), [])
+        self.assertEqual(list(Registration.objects.filter(user=self.test_user)), [])
         self.assertEqual(len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)), 1)
         # make sure the user cannot log in
         self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
