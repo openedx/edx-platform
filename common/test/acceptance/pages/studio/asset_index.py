@@ -250,18 +250,21 @@ class AssetIndexPageStudioFrontend(CoursePage):
         Arguments:
             file_names (list): file name(s) we want to upload.
         """
-
-        # Make file input field visible.
         file_input_css = 'input[type=file]'
-        self.browser.execute_script('$("{}").css("display","block");'.format(file_input_css))
 
         for file_name in file_names:
+            # Make file input field visible.
+            self.browser.execute_script('$("{}").css("display","block");'.format(file_input_css))
+            self.wait_for_element_visibility(file_input_css, "Input is visible")
+            #Send file to upload
             self.q(css=file_input_css).results[0].send_keys(
                 UPLOAD_FILE_DIR + file_name)
             self.q(css=file_input_css).results[0].clear()
+            # Wait for status alert and close
+            self.wait_for_element_visibility(
+                '.alert', 'Upload status alert is visible.')
+            self.q(css='.close').first.click()
 
-        self.wait_for_element_visibility(
-            '.alert', 'Upload status alert is visible.')
         self.wait_for_ajax()
         self.wait_for_files_upload(len(file_names))
 
