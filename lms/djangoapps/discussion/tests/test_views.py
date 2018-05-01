@@ -1140,16 +1140,6 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             request, text_type(self.course.id), self.discussion1.discussion_id
         )
 
-    def verify_response(self, response):
-        """Verifies that the response contains the appropriate courseware_url and courseware_title"""
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
-        expected_courseware_title = 'Chapter / Discussion1'
-        self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
-
-    def test_courseware_data(self, mock_request):
-        self.verify_response(self.send_request(mock_request))
-
     def test_context(self, mock_request):
         team = CourseTeamFactory(
             name='Team Name',
@@ -1162,7 +1152,6 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         response = self.send_request(mock_request)
         self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
-        self.verify_response(response)
 
 
 @patch('requests.request', autospec=True)
