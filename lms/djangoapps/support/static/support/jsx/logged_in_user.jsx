@@ -3,6 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 import FileUpload from './file_upload';
 
 function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitForm }) {
@@ -36,7 +38,12 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
         data-username={userInformation.username}
         data-email={userInformation.email}
       >
-        <p>{gettext(`What can we help you with, ${userInformation.username}?`)}</p>
+        <p>
+          {StringUtils.interpolate(
+            gettext('What can we help you with, {username}?'),
+            { username: userInformation.username },
+          )}
+        </p>
       </div>
     </div>
 

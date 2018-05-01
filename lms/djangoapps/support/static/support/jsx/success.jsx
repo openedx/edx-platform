@@ -4,6 +4,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 function Success({ platformName, homepageUrl, dashboardUrl, isLoggedIn }) {
   let btnText,
     btnUrl;
@@ -11,7 +13,10 @@ function Success({ platformName, homepageUrl, dashboardUrl, isLoggedIn }) {
     btnText = gettext('Go to my Dashboard');
     btnUrl = dashboardUrl;
   } else {
-    btnText = gettext(`Go to ${platformName} Home`);
+    btnText = StringUtils.interpolate(
+      gettext('Go to {platform} Home'),
+      { platform: platformName },
+    );
     btnUrl = homepageUrl;
   }
   return (<div className="contact-us-wrapper">

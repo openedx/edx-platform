@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 import ShowErrors from './errors_list';
 import LoggedInUser from './logged_in_user';
 import LoggedOutUser from './logged_out_user';
@@ -161,7 +163,12 @@ class RenderForm extends React.Component {
             <a
               href={this.props.context.marketingUrl}
               className="btn btn-secondary help-button"
-            >{gettext(`Search the ${this.props.context.platformName} Help Center`)}</a>
+            >
+              {StringUtils.interpolate(
+                gettext('Search the {platform} Help Center'),
+                { platform: this.props.context.platformName },
+              )}
+            </a>
           </div>
         </div>
 

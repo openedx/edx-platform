@@ -26,7 +26,7 @@ git+https://github.com/mitodl/edx-sga.git@6b2f7aa2a18206023c8407e2c46f86d4b4c3ac
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.7#egg=lti_consumer-xblock==1.1.7
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 -e .
-git+https://github.com/edx/edx-ora2.git@2.1.15#egg=ora2==2.1.15
+git+https://github.com/edx/edx-ora2.git@2.1.16#egg=ora2==2.1.16
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
@@ -116,7 +116,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-drf-extensions==1.2.5
 edx-enterprise==0.67.7
-edx-i18n-tools==0.4.4
+edx-i18n-tools==0.4.5
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
