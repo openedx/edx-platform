@@ -6,7 +6,6 @@ from uuid import uuid4
 import unittest
 import mimetypes
 from tempfile import mkdtemp
-from nose.plugins.attrib import attr
 import path
 import shutil
 
@@ -26,12 +25,12 @@ PORT = MONGO_PORT_NUM
 DB = 'test_mongo_%s' % uuid4().hex[:5]
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestContentstore(unittest.TestCase):
     """
     Test the methods in contentstore.mongo using deprecated and non-deprecated keys
     """
+    shard = 2
 
     # don't use these 2 class vars as they restore behavior once the tests are done
     asset_deprecated = None

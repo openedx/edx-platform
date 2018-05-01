@@ -2,14 +2,13 @@
 
 from unittest import TestCase
 from mock import Mock
-from nose.plugins.attrib import attr
 
 from xmodule.mako_module import MakoModuleDescriptor
 
 
-@attr(shard=1)
 class MakoModuleTest(TestCase):
     """ Test MakoModuleDescriptor """
+    shard = 1
 
     def test_render_template_check(self):
         mock_system = Mock()

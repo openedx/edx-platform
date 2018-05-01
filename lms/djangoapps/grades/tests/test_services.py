@@ -11,7 +11,6 @@ from mock import patch, call
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from nose.plugins.attrib import attr
 
 from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
@@ -25,12 +24,13 @@ class MockWaffleFlag(object):
         return self.state
 
 
-@attr(shard=4)
 @ddt.ddt
 class GradesServiceTests(ModuleStoreTestCase):
     """
     Tests for the Grades service
     """
+    shard = 4
+
     def setUp(self):
         super(GradesServiceTests, self).setUp()
         self.service = GradesService()

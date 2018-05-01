@@ -3,7 +3,6 @@ Integration tests of the payment flow, including course mode selection.
 """
 
 from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
 
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
@@ -12,11 +11,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=4)
 class TestProfEdVerification(ModuleStoreTestCase):
     """
     Integration test for professional ed verification, including course mode selection.
     """
+    shard = 4
 
     # Choose an uncommon number for the price so we can search for it on the page
     MIN_PRICE = 1438

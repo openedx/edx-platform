@@ -2,18 +2,18 @@
 Test that inherited fields work correctly when parsing XML
 """
 from nose.tools import assert_equals, assert_in  # pylint: disable=no-name-in-module
-from nose.plugins.attrib import attr
 
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory, XmlImportFactory
 
 
-@attr(shard=2)
 class TestInheritedFieldParsing(XModuleXmlImportTest):
     """
     Test that inherited fields work correctly when parsing XML
 
     """
+    shard = 2
+
     def test_null_string(self):
         # Test that the string inherited fields are passed through 'deserialize_field',
         # which converts the string "null" to the python value None

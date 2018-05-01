@@ -4,7 +4,6 @@ and disabling for instructor-paced courses.
 """
 import ddt
 import mock
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -23,11 +22,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=4)
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     """
     Tests for enabling/disabling self-generated certificates according to course-pacing.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -51,11 +50,11 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
 
 
-@attr(shard=4)
 class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
     Tests for whitelisted student auto-certificate generation
     """
+    shard = 4
     def setUp(self):
         super(WhitelistGeneratedCertificatesTest, self).setUp()
         self.course = CourseFactory.create(self_paced=True)
@@ -131,11 +130,12 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 )
 
 
-@attr(shard=4)
 class PassingGradeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on passing grade receipt
     """
+    shard = 4
+
     def setUp(self):
         super(PassingGradeCertsTest, self).setUp()
         self.course = CourseFactory.create(
@@ -221,11 +221,12 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_not_called()
 
 
-@attr(shard=4)
 class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner verification
     """
+    shard = 4
+
     def setUp(self):
         super(LearnerTrackChangeCertsTest, self).setUp()
         self.course_one = CourseFactory.create(self_paced=True)
@@ -292,12 +293,12 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 )
 
 
-@attr(shard=4)
 @ddt.ddt
 class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task.
     """
+    shard = 4
 
     def setUp(self):
         super(CertificateGenerationTaskTest, self).setUp()

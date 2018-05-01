@@ -9,7 +9,6 @@ from unittest import TestCase
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from xblock.runtime import Mixologist
 from xmodule.services import ConfigurationService, SettingsService
@@ -35,10 +34,10 @@ class DummyUnexpected(object):
     pass
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestSettingsService(TestCase):
     """ Test SettingsService """
+    shard = 1
 
     xblock_setting_key1 = 'dummy_block'
     xblock_setting_key2 = 'other_dummy_block'
@@ -96,11 +95,12 @@ class TestSettingsService(TestCase):
         self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])
 
 
-@attr(shard=1)
 class TestConfigurationService(TestCase):
     """
     Tests for ConfigurationService
     """
+    shard = 1
+
     def test_given_unexpected_class_throws_value_error(self):
         """
         Test that instantiating ConfigurationService raises exception on passing

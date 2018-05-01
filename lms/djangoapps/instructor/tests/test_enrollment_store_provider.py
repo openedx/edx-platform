@@ -3,7 +3,6 @@ Exercises tests on the base_store_provider file
 """
 
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.instructor.enrollment_report import AbstractEnrollmentReportProvider
 from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
@@ -34,11 +33,11 @@ class BadImplementationAbstractEnrollmentReportProvider(AbstractEnrollmentReport
         super(BadImplementationAbstractEnrollmentReportProvider, self).get_payment_info(user, course_id)
 
 
-@attr(shard=4)
 class TestBaseNotificationDataProvider(TestCase):
     """
     Cover the EnrollmentReportProvider class
     """
+    shard = 4
 
     def test_cannot_create_instance(self):
         """

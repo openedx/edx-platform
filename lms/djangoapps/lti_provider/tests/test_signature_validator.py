@@ -6,7 +6,6 @@ import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch
-from nose.plugins.attrib import attr
 
 from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
@@ -23,12 +22,12 @@ def get_lti_consumer():
     )
 
 
-@attr(shard=4)
 @ddt.ddt
 class ClientKeyValidatorTest(TestCase):
     """
     Tests for the check_client_key method in the SignatureValidator class.
     """
+    shard = 4
 
     def setUp(self):
         super(ClientKeyValidatorTest, self).setUp()
@@ -54,12 +53,12 @@ class ClientKeyValidatorTest(TestCase):
         self.assertFalse(SignatureValidator(self.lti_consumer).check_client_key(key))
 
 
-@attr(shard=4)
 @ddt.ddt
 class NonceValidatorTest(TestCase):
     """
     Tests for the check_nonce method in the SignatureValidator class.
     """
+    shard = 4
 
     def setUp(self):
         super(NonceValidatorTest, self).setUp()
@@ -85,13 +84,14 @@ class NonceValidatorTest(TestCase):
         self.assertFalse(SignatureValidator(self.lti_consumer).check_nonce(nonce))
 
 
-@attr(shard=4)
 class SignatureValidatorTest(TestCase):
     """
     Tests for the custom SignatureValidator class that uses the oauthlib library
     to check message signatures. Note that these tests mock out the library
     itself, since we assume it to be correct.
     """
+    shard = 4
+
     def setUp(self):
         super(SignatureValidatorTest, self).setUp()
         self.lti_consumer = get_lti_consumer()

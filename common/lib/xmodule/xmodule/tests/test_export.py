@@ -15,7 +15,6 @@ from path import Path as path
 from six import text_type
 from tempfile import mkdtemp
 from textwrap import dedent
-from nose.plugins.attrib import attr
 
 from xblock.core import XBlock
 from xblock.fields import String, Scope, Integer
@@ -55,7 +54,6 @@ class PureXBlock(XBlock):
     field2 = Integer(scope=Scope.user_state)
 
 
-@attr(shard=1)
 @ddt.ddt
 class RoundTripTestCase(unittest.TestCase):
     """
@@ -64,6 +62,7 @@ class RoundTripTestCase(unittest.TestCase):
     And we compare original import with second import (after export).
     Thus we make sure that export and import work properly.
     """
+    shard = 1
 
     def setUp(self):
         super(RoundTripTestCase, self).setUp()
@@ -150,11 +149,11 @@ class RoundTripTestCase(unittest.TestCase):
             ))
 
 
-@attr(shard=1)
 class TestEdxJsonEncoder(unittest.TestCase):
     """
     Tests for xml_exporter.EdxJSONEncoder
     """
+    shard = 1
     def setUp(self):
         super(TestEdxJsonEncoder, self).setUp()
 

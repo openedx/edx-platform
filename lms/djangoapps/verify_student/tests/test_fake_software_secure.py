@@ -4,7 +4,6 @@ Tests for the fake software secure response.
 
 from django.test import TestCase
 from mock import patch
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from student.tests.factories import UserFactory
@@ -28,12 +27,13 @@ class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
         self.client.login(username="test", password="test")
 
 
-@attr(shard=4)
 class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
     """
     Test the fake software secure response when feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE' is not enabled.
     """
+    shard = 4
+
     def setUp(self):
         super(SoftwareSecureFakeViewDisabledTest, self).setUp(enable_software_secure_fake=False)
 
@@ -49,12 +49,13 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=4)
 class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
     """
     Test the fake software secure response when feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE' is enabled.
     """
+    shard = 4
+
     def setUp(self):
         super(SoftwareSecureFakeViewEnabledTest, self).setUp(enable_software_secure_fake=True)
 

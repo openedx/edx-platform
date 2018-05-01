@@ -7,7 +7,6 @@ from mock import patch
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 from xmodule.x_module import AUTHOR_VIEW
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -15,7 +14,6 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
-@attr(shard=1)
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
@@ -26,6 +24,8 @@ class TestLibraryRoot(MixedSplitTestCase):
     """
     Basic unit tests for LibraryRoot (library_root_xblock.py)
     """
+    shard = 1
+
     def test_library_author_view(self):
         """
         Test that LibraryRoot.author_view can run and includes content from its

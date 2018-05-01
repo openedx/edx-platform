@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
@@ -23,11 +22,11 @@ FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
-@attr(shard=4)
 class CertificateSupportTestCase(ModuleStoreTestCase):
     """
     Base class for tests of the certificate support views.
     """
+    shard = 4
 
     SUPPORT_USERNAME = "support"
     SUPPORT_EMAIL = "support@example.com"
@@ -88,12 +87,13 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Couldn't log in as support staff")
 
 
-@attr(shard=4)
 @ddt.ddt
 class CertificateSearchTests(CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
+    shard = 4
+
     def setUp(self):
         """
         Create a course
@@ -224,12 +224,12 @@ class CertificateSearchTests(CertificateSupportTestCase):
         return self.client.get(url)
 
 
-@attr(shard=4)
 @ddt.ddt
 class CertificateRegenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate regeneration end-point used by the support team.
     """
+    shard = 4
 
     def setUp(self):
         """
@@ -407,12 +407,12 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         )
 
 
-@attr(shard=4)
 @ddt.ddt
 class CertificateGenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate generation end-point used by the support team.
     """
+    shard = 4
 
     def setUp(self):
         """

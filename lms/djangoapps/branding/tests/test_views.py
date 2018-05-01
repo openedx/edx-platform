@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -20,10 +19,10 @@ from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_t
 from student.tests.factories import UserFactory
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestFooter(TestCase):
     """Test API end-point for retrieving the footer. """
+    shard = 4
 
     def setUp(self):
         """Clear the configuration cache. """
@@ -283,9 +282,9 @@ class TestFooter(TestCase):
             self.assertIn('<option value="{}">'.format(language.code), content)
 
 
-@attr(shard=4)
 class TestIndex(SiteMixin, TestCase):
     """ Test the index view """
+    shard = 4
 
     def setUp(self):
         """ Set up a user """

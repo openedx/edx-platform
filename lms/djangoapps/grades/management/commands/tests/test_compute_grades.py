@@ -11,7 +11,6 @@ import six
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
 from mock import ANY, patch
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
@@ -27,12 +26,12 @@ def _sorted_by_batch(calls):
     return sorted(calls, key=lambda x: (x[1]['kwargs']['course_key'], x[1]['kwargs']['offset']))
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestComputeGrades(SharedModuleStoreTestCase):
     """
     Tests compute_grades management command.
     """
+    shard = 4
     num_users = 3
     num_courses = 5
 

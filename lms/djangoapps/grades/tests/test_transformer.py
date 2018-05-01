@@ -8,7 +8,6 @@ from copy import deepcopy
 
 import ddt
 import pytz
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
@@ -22,12 +21,12 @@ from xmodule.modulestore.tests.factories import check_mongo_calls
 from ..transformer import GradesTransformer
 
 
-@attr(shard=4)
 @ddt.ddt
 class GradesTransformerTestCase(CourseStructureTestCase):
     """
     Verify behavior of the GradesTransformer
     """
+    shard = 4
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
@@ -394,12 +393,12 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         )
 
 
-@attr(shard=4)
 @ddt.ddt
 class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):
     """
     Test mongo usage in GradesTransformer.
     """
+    shard = 4
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 

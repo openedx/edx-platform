@@ -4,7 +4,6 @@ Dashboard with Shopping Cart History tests with configuration overrides.
 """
 from django.core.urlresolvers import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -14,12 +13,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=4)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
     """
     Test for dashboard order history site configuration overrides.
     """
+    shard = 4
+
     def setUp(self):
         super(TestOrderHistoryOnSiteDashboard, self).setUp()
 

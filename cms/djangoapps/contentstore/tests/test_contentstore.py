@@ -28,7 +28,6 @@ from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from path import Path as path
 from six import text_type
 from waffle.testutils import override_switch
-from nose.plugins.attrib import attr
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from contentstore.utils import delete_course, reverse_course_url, reverse_url
@@ -89,11 +88,11 @@ class ContentStoreTestCase(CourseTestCase):
     """
 
 
-@attr(shard=1)
 class ImportRequiredTestCases(ContentStoreTestCase):
     """
     Tests which legitimately need to import a course
     """
+    shard = 1
     def test_no_static_link_rewrites_on_import(self):
         course_items = import_course_from_xml(
             self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True
@@ -606,12 +605,12 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class MiscCourseTests(ContentStoreTestCase):
     """
     Tests that rely on the toy courses.
     """
+    shard = 1
     def setUp(self):
         super(MiscCourseTests, self).setUp()
         # save locs not items b/c the items won't have the subsequently created children in them until refetched
@@ -1155,12 +1154,12 @@ class MiscCourseTests(ContentStoreTestCase):
             self.assertEqual(resp.status_code, 200)
 
 
-@attr(shard=1)
 @ddt.ddt
 class ContentStoreTest(ContentStoreTestCase):
     """
     Tests for the CMS ContentStore application.
     """
+    shard = 1
     duplicate_course_error = ("There is already a course defined with the same organization and course number. "
                               "Please change either organization or course number to be unique.")
 
@@ -1807,9 +1806,9 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEquals(response.status_code, 404)
 
 
-@attr(shard=1)
 class MetadataSaveTestCase(ContentStoreTestCase):
     """Test that metadata is correctly cached and decached."""
+    shard = 1
 
     def setUp(self):
         super(MetadataSaveTestCase, self).setUp()
@@ -1867,11 +1866,11 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         pass
 
 
-@attr(shard=1)
 class RerunCourseTest(ContentStoreTestCase):
     """
     Tests for Rerunning a course via the view handler
     """
+    shard = 1
     def setUp(self):
         super(RerunCourseTest, self).setUp()
         self.destination_course_data = {
@@ -2110,11 +2109,11 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEquals(destination_course.wiki_slug, destination_wiki_slug)
 
 
-@attr(shard=1)
 class ContentLicenseTest(ContentStoreTestCase):
     """
     Tests around content licenses
     """
+    shard = 1
     def test_course_license_export(self):
         content_store = contentstore()
         root_dir = path(mkdtemp_clean())
@@ -2149,11 +2148,11 @@ class ContentLicenseTest(ContentStoreTestCase):
         self.assertEqual(videos[0].license, "all-rights-reserved")
 
 
-@attr(shard=1)
 class EntryPageTestCase(TestCase):
     """
     Tests entry pages that aren't specific to a course.
     """
+    shard = 1
     def setUp(self):
         super(EntryPageTestCase, self).setUp()
         self.client = AjaxEnabledTestClient()
@@ -2182,13 +2181,13 @@ class EntryPageTestCase(TestCase):
         self._test_page('/accessibility')
 
 
-@attr(shard=1)
 class SigninPageTestCase(TestCase):
     """
     Tests that the CSRF token is directly included in the signin form. This is
     important to make sure that the script is functional independently of any
     other script.
     """
+    shard = 1
 
     def test_csrf_token_is_present_in_form(self):
         # Expected html:

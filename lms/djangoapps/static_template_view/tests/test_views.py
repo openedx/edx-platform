@@ -4,14 +4,13 @@ Tests for static templates
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 
-@attr(shard=4)
 class MarketingSiteViewTests(TestCase):
     """ Tests for the marketing site views """
+    shard = 4
 
     def _test_view(self, view_name, mimetype):
         """

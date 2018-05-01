@@ -5,7 +5,6 @@ from unittest import skipUnless
 
 import ddt
 from django.conf import settings
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_recurring_nudge as nudge
@@ -18,7 +17,6 @@ from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolationTestCase
 
 
-@attr(shard=6)
 @ddt.ddt
 @skip_unless_lms
 @skipUnless(
@@ -26,6 +24,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolation
     "Can't test schedules if the app isn't installed",
 )
 class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, CacheIsolationTestCase):
+    shard = 6
     __test__ = True
 
     # pylint: disable=protected-access

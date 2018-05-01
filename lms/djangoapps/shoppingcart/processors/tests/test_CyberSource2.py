@@ -6,7 +6,6 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from mock import patch
-from nose.plugins.attrib import attr
 
 from shoppingcart.models import Order, OrderItem
 from shoppingcart.processors.CyberSource2 import (
@@ -24,7 +23,6 @@ from shoppingcart.processors.exceptions import (
 from student.tests.factories import UserFactory
 
 
-@attr(shard=4)
 @ddt.ddt
 class CyberSource2Test(TestCase):
     """
@@ -36,6 +34,7 @@ class CyberSource2Test(TestCase):
     to be configured a certain way.
 
     """
+    shard = 4
 
     COST = "10.00"
     CALLBACK_URL = "/test_callback_url"

@@ -7,15 +7,14 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from branding.api import get_footer, get_home_url, get_logo_url
 from edxmako.shortcuts import marketing_link
 
 
-@attr(shard=4)
 class TestHeader(TestCase):
     """Test API end-point for retrieving the header. """
+    shard = 4
 
     def test_cdn_urls_for_logo(self):
         # Ordinarily, we'd use `override_settings()` to override STATIC_URL,
@@ -42,8 +41,8 @@ class TestHeader(TestCase):
         self.assertEqual(marketing_link('ROOT'), expected_url)
 
 
-@attr(shard=4)
 class TestFooter(TestCase):
+    shard = 4
     maxDiff = None
     """Test retrieving the footer. """
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})

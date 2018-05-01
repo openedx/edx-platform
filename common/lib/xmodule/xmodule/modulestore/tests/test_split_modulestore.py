@@ -14,7 +14,6 @@ import ddt
 from contracts import contract
 from nose.plugins.attrib import attr
 from django.core.cache import caches, InvalidCacheBackendError
-from nose.plugins.attrib import attr
 
 from openedx.core.lib import tempdir
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict

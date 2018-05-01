@@ -6,7 +6,6 @@ Test lti_provider management commands.
 from django.test import TestCase
 from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from nose.plugins.attrib import attr
 
 from lti_provider.management.commands import resend_lti_scores
 from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
@@ -16,11 +15,11 @@ from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 
-@attr(shard=4)
 class CommandArgsTestCase(TestCase):
     """
     Test management command parses arguments properly.
     """
+    shard = 4
 
     def _get_arg_parser(self):
         """
@@ -43,11 +42,11 @@ class CommandArgsTestCase(TestCase):
         self.assertEqual(args.course_keys, [])
 
 
-@attr(shard=4)
 class CommandExecutionTestCase(SharedModuleStoreTestCase):
     """
     Test `manage.py resend_lti_scores` command.
     """
+    shard = 4
 
     @classmethod
     def setUpClass(cls):

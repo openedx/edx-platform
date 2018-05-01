@@ -4,17 +4,16 @@ import unittest
 import urllib2
 
 from nose.plugins.skip import SkipTest
-from nose.plugins.attrib import attr
 
 from django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
 
 
-@attr(shard=4)
 class MockCommentServiceServerTest(unittest.TestCase):
     '''
     A mock version of the Comment Service server that listens on a local
     port and responds with pre-defined grade messages.
     '''
+    shard = 4
 
     def setUp(self):
         super(MockCommentServiceServerTest, self).setUp()

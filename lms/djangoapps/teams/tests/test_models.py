@@ -9,7 +9,6 @@ import ddt
 import pytz
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
-from nose.plugins.attrib import attr
 
 from django_comment_common.signals import (
     comment_created,
@@ -33,10 +32,10 @@ COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
 
 
-@attr(shard=4)
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
     """Tests for the TeamMembership model."""
+    shard = 4
 
     def setUp(self):
         """
@@ -116,10 +115,10 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=4)
 @ddt.ddt
 class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
     """Tests for handling of team-related signals."""
+    shard = 4
 
     SIGNALS = {
         'thread_created': thread_created,

@@ -5,7 +5,6 @@ Tests for ContentLibraryTransformer.
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory
-from nose.plugins.attrib import attr
 
 from ...api import get_course_blocks
 from ..library_content import ContentLibraryTransformer
@@ -23,11 +22,11 @@ class MockedModule(object):
         self.state = state
 
 
-@attr(shard=4)
 class ContentLibraryTransformerTestCase(CourseStructureTestCase):
     """
     ContentLibraryTransformer Test
     """
+    shard = 4
     TRANSFORMER_CLASS_TO_TEST = ContentLibraryTransformer
 
     def setUp(self):

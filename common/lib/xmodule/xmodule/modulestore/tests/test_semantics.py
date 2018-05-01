@@ -7,7 +7,6 @@ import itertools
 from collections import namedtuple
 from xmodule.course_module import CourseSummary
 from mock import patch
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore.tests.utils import (
     PureModulestoreTestCase, MongoModulestoreBuilder,
@@ -38,13 +37,13 @@ class AsideTest(XBlockAside):
     content = String(default="content", scope=Scope.content)
 
 
-@attr(shard=2)
 @ddt.ddt
 class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     """
     Verify the behavior of Direct Only items
     blocks intended to store snippets of course content.
     """
+    shard = 2
 
     __test__ = False
 
@@ -412,12 +411,12 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
             self.assertBlockDoesntExist(child_usage_key)
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
+    shard = 2
     MODULESTORE = SPLIT_MODULESTORE_SETUP
     __test__ = True
 
@@ -448,10 +447,10 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
                                    self.ASIDE_DATA_FIELD.field_name, self.ASIDE_DATA_FIELD.updated)
 
 
-@attr(shard=2)
 class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the MongoModulestore
     """
+    shard = 2
     MODULESTORE = MongoModulestoreBuilder()
     __test__ = True

@@ -14,7 +14,6 @@ from lazy.lazy import lazy
 from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
-from nose.plugins.attrib import attr
 
 from contentstore.courseware_index import (
     CourseAboutSearchIndexer,
@@ -182,11 +181,11 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
             store.update_item(item, ModuleStoreEnum.UserID.test)
 
 
-@attr(shard=1)
 @pytest.mark.django_db
 @ddt.ddt
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
+    shard = 1
 
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
@@ -603,11 +602,11 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_delete_course_from_search_index_after_course_deletion)
 
 
-@attr(shard=1)
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')
 @ddt.ddt
 class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     """ Tests to excerise deleting items from a course """
+    shard = 1
 
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
@@ -684,7 +683,6 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_large_course_deletion)
 
 
-@attr(shard=1)
 class TestTaskExecution(SharedModuleStoreTestCase):
     """
     Set of tests to ensure that the task code will do the right thing when
@@ -692,6 +690,7 @@ class TestTaskExecution(SharedModuleStoreTestCase):
     being present, which allows us to ensure that when the listener is
     executed, it is done as expected.
     """
+    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -783,10 +782,10 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         self.assertEqual(response["total"], 2)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
+    shard = 1
 
     # libraries work only with split, so do library indexer
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.split, )
@@ -956,11 +955,12 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_exception)
 
 
-@attr(shard=1)
 class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     """
     Tests indexing of content groups on course modules using mongo modulestore.
     """
+    shard = 1
+
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
 

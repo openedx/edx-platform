@@ -7,7 +7,6 @@ import ddt
 from django.http import Http404, QueryDict
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
@@ -18,12 +17,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..forms import BlockListGetForm
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """
+    shard = 4
+
     FORM_CLASS = BlockListGetForm
 
     @classmethod

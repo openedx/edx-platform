@@ -9,13 +9,11 @@ from django.conf import settings
 from django.test import TestCase
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 
 
-@attr(shard=4)
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class PersistentGradesFeatureFlagTests(TestCase):
@@ -23,6 +21,8 @@ class PersistentGradesFeatureFlagTests(TestCase):
     Tests the behavior of the feature flags for persistent grading.
     These are set via Django admin settings.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentGradesFeatureFlagTests, self).setUp()
         self.course_id_1 = CourseLocator(org="edx", course="course", run="run")

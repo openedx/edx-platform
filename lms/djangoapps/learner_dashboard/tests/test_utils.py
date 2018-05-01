@@ -4,17 +4,17 @@ Unit test module covering utils module
 
 import ddt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.learner_dashboard import utils
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestUtils(TestCase):
     """
     The test case class covering the all the utils functions
     """
+    shard = 4
+
     @ddt.data('path1/', '/path1/path2/', '/', '')
     def test_strip_course_id(self, path):
         """

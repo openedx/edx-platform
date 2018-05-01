@@ -1,17 +1,17 @@
 """ Tests for models. """
 import ddt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 
 from ..models import Course
 
 
-@attr(shard=4)
 @ddt.ddt
 class CourseTests(TestCase):
     """ Tests for Course model. """
+    shard = 4
+
     def setUp(self):
         super(CourseTests, self).setUp()
         self.course = Course('a/b/c', [])

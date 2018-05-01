@@ -1,7 +1,6 @@
 """
 Unit Tests for the Certificate service
 """
-from nose.plugins.attrib import attr
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.services import CertificateService
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -10,11 +9,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=4)
 class CertificateServiceTests(ModuleStoreTestCase):
     """
     Tests for the Certificate service
     """
+    shard = 4
     def setUp(self):
         super(CertificateServiceTests, self).setUp()
         self.service = CertificateService()

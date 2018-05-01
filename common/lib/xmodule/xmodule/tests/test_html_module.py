@@ -7,7 +7,6 @@ from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from nose.plugins.attrib import attr
 
 from xmodule.html_module import CourseInfoModule, HtmlDescriptor, HtmlModule
 
@@ -28,12 +27,12 @@ def instantiate_descriptor(**field_data):
     )
 
 
-@attr(shard=1)
 @ddt.ddt
 class HtmlModuleCourseApiTestCase(unittest.TestCase):
     """
     Test the HTML XModule's student_view_data method.
     """
+    shard = 1
 
     @ddt.data(
         dict(),
@@ -83,9 +82,9 @@ class HtmlModuleCourseApiTestCase(unittest.TestCase):
         self.assertEqual(module.student_view_data(), dict(enabled=True, html=html))
 
 
-@attr(shard=1)
 class HtmlModuleSubstitutionTestCase(unittest.TestCase):
     descriptor = Mock()
+    shard = 1
 
     def test_substitution_works(self):
         sample_xml = '''%%USER_ID%%'''
@@ -114,11 +113,11 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         self.assertEqual(module.get_html(), sample_xml)
 
 
-@attr(shard=1)
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     """
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """
+    shard = 1
 
     def test_index_dictionary_simple_html_module(self):
         sample_xml = '''
@@ -207,11 +206,11 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         })
 
 
-@attr(shard=1)
 class CourseInfoModuleTestCase(unittest.TestCase):
     """
     Make sure that CourseInfoModule renders updates properly.
     """
+    shard = 1
     def test_updates_render(self):
         """
         Tests that a course info module will render its updates, even if they are malformed.

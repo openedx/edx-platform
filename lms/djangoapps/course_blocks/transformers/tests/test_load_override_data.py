@@ -10,7 +10,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.course_blocks.transformers.load_override_data import REQUESTED_FIELDS, OverrideDataTransformer
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
@@ -26,12 +25,13 @@ expected_overrides = {
 }
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestOverrideDataTransformer(ModuleStoreTestCase):
     """
     Test proper behavior for OverrideDataTransformer
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestOverrideDataTransformer, cls).setUpClass()

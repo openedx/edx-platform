@@ -7,7 +7,6 @@ from io import BytesIO
 
 from django.conf import settings
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from shoppingcart.pdf import PDFInvoice
 from shoppingcart.utils import parse_pages
@@ -37,11 +36,12 @@ PDF_RECEIPT_TERMS_AND_CONDITIONS = "Enrollments:\nEnrollments must be completed 
     "policies, including terms and conditions of use."
 
 
-@attr(shard=4)
 class TestPdfFile(unittest.TestCase):
     """
     Unit test cases for pdf file generation
     """
+    shard = 4
+
     def setUp(self):
         super(TestPdfFile, self).setUp()
 

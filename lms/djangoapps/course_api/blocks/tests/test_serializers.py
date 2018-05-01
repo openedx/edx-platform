@@ -10,18 +10,18 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
-from nose.plugins.attrib import attr
 
 from ..serializers import BlockDictSerializer, BlockSerializer
 from ..transformers.blocks_api import BlocksAPITransformer
 from .helpers import deserialize_usage_key
 
 
-@attr(shard=4)
 class TestBlockSerializerBase(SharedModuleStoreTestCase):
     """
     Base class for testing BlockSerializer and BlockDictSerializer
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestBlockSerializerBase, cls).setUpClass()
@@ -149,11 +149,12 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             self.assertFalse(serialized_block['visible_to_staff_only'])
 
 
-@attr(shard=4)
 class TestBlockSerializer(TestBlockSerializerBase):
     """
     Tests the BlockSerializer class, which returns a list of blocks.
     """
+    shard = 4
+
 
     def create_serializer(self, context=None):
         """
@@ -191,11 +192,12 @@ class TestBlockSerializer(TestBlockSerializerBase):
         self.assertEquals(len(serializer.data), 29)
 
 
-@attr(shard=4)
 class TestBlockDictSerializer(TestBlockSerializerBase):
     """
     Tests the BlockDictSerializer class, which returns a dict of blocks key-ed by its block_key.
     """
+    shard = 4
+
 
     def create_serializer(self, context=None):
         """

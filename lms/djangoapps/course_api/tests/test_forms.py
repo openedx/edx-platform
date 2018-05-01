@@ -8,7 +8,6 @@ from urllib import urlencode
 import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.tests.factories import UserFactory
@@ -18,11 +17,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..forms import CourseDetailGetForm, CourseListGetForm
 
 
-@attr(shard=4)
 class UsernameTestMixin(object):
     """
     Tests the username Form field.
     """
+    shard = 4
+
     def test_no_user_param_anonymous_access(self):
         self.set_up_data(AnonymousUser())
         self.form_data.pop('username')
@@ -34,12 +34,12 @@ class UsernameTestMixin(object):
         self.assert_valid(self.cleaned_data)
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseListGetForm
     """
+    shard = 4
     FORM_CLASS = CourseListGetForm
 
     @classmethod
@@ -101,11 +101,11 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.assert_valid(self.cleaned_data)
 
 
-@attr(shard=4)
 class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseDetailGetForm
     """
+    shard = 4
     FORM_CLASS = CourseDetailGetForm
 
     @classmethod

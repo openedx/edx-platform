@@ -11,7 +11,6 @@ from django.utils import translation
 from mock import ANY, Mock, call, patch
 from nose.tools import assert_true
 from six import text_type
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -68,8 +67,8 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 # pylint: disable=missing-docstring
 
 
-@attr(shard=4)
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
+    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -275,9 +274,9 @@ class PartialDictMatcher(object):
         ])
 
 
-@attr(shard=4)
 @patch('requests.request', autospec=True)
 class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+    shard = 4
 
     CREATE_USER = False
 
@@ -389,7 +388,6 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=4)
 @ddt.ddt
 @patch('requests.request', autospec=True)
 class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
@@ -397,6 +395,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     Ensures the number of modulestore queries and number of sql queries are
     independent of the number of responses retrieved for a given discussion thread.
     """
+    shard = 4
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     def setUp(self):
@@ -475,9 +474,10 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     call_single_thread()
 
 
-@attr(shard=4)
 @patch('requests.request', autospec=True)
 class SingleCohortedThreadTestCase(CohortedTestCase):
+    shard = 4
+
     def _create_mock_cohorted_thread(self, mock_request):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
@@ -539,9 +539,10 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         self.assertRegexpMatches(html, r'"group_name": "student_cohort"')
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class SingleThreadAccessTestCase(CohortedTestCase):
+    shard = 4
+
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
@@ -627,9 +628,9 @@ class SingleThreadAccessTestCase(CohortedTestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
+    shard = 4
     cs_endpoint = "/threads/dummy_thread_id"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
@@ -675,9 +676,9 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
         )
 
 
-@attr(shard=4)
 @patch('requests.request', autospec=True)
 class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):
+    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -786,9 +787,10 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+    shard = 4
+
     def setUp(self):
         super(InlineDiscussionContextTestCase, self).setUp()
         self.course = CourseFactory.create()
@@ -823,13 +825,13 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionGroupIdTestCase(
         CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
+    shard = 4
     cs_endpoint = "/threads"
 
     def setUp(self):
@@ -875,9 +877,9 @@ class InlineDiscussionGroupIdTestCase(
         )
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
+    shard = 4
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
@@ -922,9 +924,9 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         )
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
+    shard = 4
     cs_endpoint = "/active_threads"
 
     def call_view_for_profiled_user(
@@ -1084,9 +1086,9 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         verify_group_id_not_present(profiled_user=self.moderator, pass_group_id=False)
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
+    shard = 4
     cs_endpoint = "/subscribed_threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
@@ -1122,9 +1124,10 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
-@attr(shard=4)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+    shard = 4
+
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
 
@@ -1179,9 +1182,9 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         self.verify_response(response)
 
 
-@attr(shard=4)
 @patch('requests.request', autospec=True)
 class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+    shard = 4
 
     TEST_THREAD_TEXT = 'userprofile-test-text'
     TEST_THREAD_ID = 'userprofile-test-thread-id'
@@ -1309,9 +1312,9 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 405)
 
 
-@attr(shard=4)
 @patch('requests.request', autospec=True)
 class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+    shard = 4
 
     CREATE_USER = False
 
@@ -1377,8 +1380,8 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-@attr(shard=4)
 class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
+    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1411,8 +1414,9 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@attr(shard=4)
 class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
@@ -1443,10 +1447,11 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@attr(shard=4)
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+    shard = 4
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ForumDiscussionXSSTestCase, self).setUp()
@@ -1499,8 +1504,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotIn(malicious_code, resp.content)
 
 
-@attr(shard=4)
 class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
+    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1536,8 +1541,8 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@attr(shard=4)
 class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
+    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1570,8 +1575,8 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         self.assertEqual(response_data["content"]["body"], text)
 
 
-@attr(shard=4)
 class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
+    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1603,8 +1608,8 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@attr(shard=4)
 class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
+    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -1636,12 +1641,12 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@attr(shard=4)
 class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled
     in the course
     """
+    shard = 4
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1659,12 +1664,12 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             views.forum_form_discussion(request, course_id=text_type(self.course.id))
 
 
-@attr(shard=4)
 @patch('requests.request', autospec=True)
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
     """
+    shard = 4
     CREATE_USER = False
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1706,8 +1711,8 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
             self.verify_consent_required(self.client, url)
 
 
-@attr(shard=4)
 class DividedDiscussionsTestCase(CohortViewsTestCase):
+    shard = 4
 
     def create_divided_discussions(self):
         """
@@ -1744,11 +1749,11 @@ class DividedDiscussionsTestCase(CohortViewsTestCase):
         return divided_inline_discussions, divided_course_wide_discussions
 
 
-@attr(shard=4)
 class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
     """
     Tests the `divide_discussion_topics` view.
     """
+    shard = 4
 
     def test_non_staff(self):
         """
@@ -1800,11 +1805,12 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
         self.assertEqual(response, expected_response)
 
 
-@attr(shard=4)
 class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
     """
     Tests the course_discussion_settings_handler
     """
+    shard = 4
+
     def get_expected_response(self):
         """
         Returns the static response dict.
@@ -1959,11 +1965,11 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         self.assertEqual(response, expected_response)
 
 
-@attr(shard=4)
 class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
     """
     Tests the `_get_discussion_default_topic_id` helper.
     """
+    shard = 4
 
     def test_no_default_topic(self):
         discussion_topics = {
@@ -1992,11 +1998,11 @@ class DefaultTopicIdGetterTestCase(ModuleStoreTestCase):
         self.assertEqual(expected_id, result)
 
 
-@attr(shard=4)
 class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
     """
     Forum thread views are expected to launch analytics events. Test these here.
     """
+    shard = 4
 
     CATEGORY_ID = 'i4x-edx-discussion-id'
     CATEGORY_NAME = 'Discussion 1'

@@ -17,7 +17,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from student.signals import REFUND_ORDER
@@ -32,13 +31,13 @@ ZENDESK_USER = 'test@example.com'
 ZENDESK_API_KEY = 'abc123'
 
 
-@attr(shard=4)
 @ddt.ddt
 @override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY)
 class TestRefundSignal(TestCase):
     """
     Exercises logic triggered by the REFUND_ORDER signal.
     """
+    shard = 4
 
     def setUp(self):
         super(TestRefundSignal, self).setUp()

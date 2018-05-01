@@ -11,7 +11,6 @@ import mock
 from django.conf import settings
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
-from nose.plugins.attrib import attr
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
@@ -103,11 +102,11 @@ class HelperMethods(object):
 
 
 # pylint: disable=no-member
-@attr(shard=1)
 class CertificatesBaseTestCase(object):
     """
     Mixin with base test cases for the certificates.
     """
+    shard = 1
 
     def _remove_ids(self, content):
         """
@@ -193,7 +192,6 @@ class CertificatesBaseTestCase(object):
         self.assertIn('must have name of the certificate', context.exception)
 
 
-@attr(shard=1)
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(
@@ -202,6 +200,8 @@ class CertificatesListHandlerTestCase(
     """
     Test cases for certificates_list_handler.
     """
+    shard = 1
+
     def setUp(self):
         """
         Set up CertificatesListHandlerTestCase.
@@ -420,7 +420,6 @@ class CertificatesListHandlerTestCase(
             self.assertNotEqual(new_certificate.get('id'), prev_certificate.get('id'))
 
 
-@attr(shard=1)
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesDetailHandlerTestCase(
@@ -429,6 +428,7 @@ class CertificatesDetailHandlerTestCase(
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
+    shard = 1
 
     _id = 0
 

@@ -5,7 +5,6 @@ Test grading events across apps.
 
 from mock import call as mock_call, patch
 
-from nose.plugins.attrib import attr
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
@@ -20,12 +19,12 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from ... import events
 
 
-@attr(shard=4)
 class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
     """
     Tests integration between the eventing in various layers
     of the grading infrastructure.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod

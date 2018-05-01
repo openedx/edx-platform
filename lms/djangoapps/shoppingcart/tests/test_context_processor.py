@@ -4,7 +4,6 @@ Unit tests for shoppingcart context_processor
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from course_modes.tests.factories import CourseModeFactory
 from shoppingcart.context_processor import user_has_cart_context_processor
@@ -14,11 +13,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=4)
 class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
     """
     Unit test for shoppingcart context_processor
     """
+    shard = 4
     def setUp(self):
         super(UserCartContextProcessorUnitTest, self).setUp()
 

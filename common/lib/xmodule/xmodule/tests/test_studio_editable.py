@@ -4,14 +4,13 @@ Tests for StudioEditableModule.
 
 from xmodule.tests.test_vertical import BaseVerticalBlockTest
 from xmodule.x_module import AUTHOR_VIEW
-from nose.plugins.attrib import attr
 
 
-@attr(shard=1)
 class StudioEditableModuleTestCase(BaseVerticalBlockTest):
     """
     Class containing StudioEditableModule tests.
     """
+    shard = 1
     def test_render_reorderable_children(self):
         """
         Test the behavior of render_reorderable_children.

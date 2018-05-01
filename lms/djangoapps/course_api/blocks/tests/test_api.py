@@ -8,7 +8,6 @@ import ddt
 import django
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 import course_blocks.api as course_blocks_api
 
@@ -23,11 +22,12 @@ from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo
 from ..api import get_blocks
 
 
-@attr(shard=4)
 class TestGetBlocks(SharedModuleStoreTestCase):
     """
     Tests for the get_blocks function
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestGetBlocks, cls).setUpClass()
@@ -110,12 +110,13 @@ class TestGetBlocks(SharedModuleStoreTestCase):
             self.assertEqual(block['type'], 'problem')
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     """
     Base for the get_blocks tests.
     """
+    shard = 4
+
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -142,12 +143,13 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
                 get_blocks(self.request, course.location, self.user)
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
     Tests query counts for the get_blocks function.
     """
+    shard = 4
+
     @ddt.data(
         *product(
             (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
@@ -195,13 +197,14 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             )
 
 
-@attr(shard=4)
 @ddt.ddt
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(course_blocks_api.INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER, ))
 class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase):
     """
     Tests query counts for the get_blocks function when IndividualStudentOverrideProvider is set.
     """
+    shard = 4
+
     @ddt.data(
         *product(
             (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),

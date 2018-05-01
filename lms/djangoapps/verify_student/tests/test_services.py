@@ -8,7 +8,6 @@ from datetime import timedelta
 import ddt
 from django.conf import settings
 from mock import patch
-from nose.plugins.attrib import attr
 from nose.tools import (
     assert_equals,
     assert_false,
@@ -28,13 +27,13 @@ FAKE_SETTINGS = {
 }
 
 
-@attr(shard=4)
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt
 class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
     """
     Tests for IDVerificationService.
     """
+    shard = 4
 
     def test_active_for_user(self):
         """

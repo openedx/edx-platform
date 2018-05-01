@@ -7,7 +7,6 @@ import json
 from celery.states import FAILURE, PENDING, REVOKED, SUCCESS
 from django.http import QueryDict
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.instructor_task.models import PROGRESS
 from lms.djangoapps.instructor_task.tests.test_base import (
@@ -18,11 +17,11 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 from lms.djangoapps.instructor_task.views import get_task_completion_info, instructor_task_status
 
 
-@attr(shard=4)
 class InstructorTaskReportTest(InstructorTaskTestCase):
     """
     Tests view methods that involve the reporting of status for background tasks.
     """
+    shard = 4
 
     def _get_instructor_task_status(self, task_id):
         """Returns status corresponding to task_id via api method."""

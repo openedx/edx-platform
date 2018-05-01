@@ -4,7 +4,6 @@ Tests for custom Teams Serializers.
 """
 from django.core.paginator import Paginator
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer, MembershipSerializer, TopicSerializer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
@@ -30,11 +29,11 @@ class SerializerTestCase(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=4)
 class MembershipSerializerTestCase(SerializerTestCase):
     """
     Tests for the membership serializer.
     """
+    shard = 4
 
     def setUp(self):
         super(MembershipSerializerTestCase, self).setUp()
@@ -68,12 +67,13 @@ class MembershipSerializerTestCase(SerializerTestCase):
         self.assertNotIn('membership', data['team'])
 
 
-@attr(shard=4)
 class TopicSerializerTestCase(SerializerTestCase):
     """
     Tests for the `TopicSerializer`, which should serialize team count data for
     a single topic.
     """
+    shard = 4
+
     def test_topic_with_no_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
@@ -118,11 +118,12 @@ class TopicSerializerTestCase(SerializerTestCase):
             )
 
 
-@attr(shard=4)
 class BaseTopicSerializerTestCase(SerializerTestCase):
     """
     Base class for testing the two paginated topic serializers.
     """
+    shard = 4
+
     __test__ = False
     PAGE_SIZE = 5
     # Extending test classes should specify their serializer class.
@@ -173,12 +174,12 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         self.assert_serializer_output([], num_teams_per_topic=0, num_queries=0)
 
 
-@attr(shard=4)
 class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
     """
     Tests for the `BulkTeamCountTopicSerializer`, which should serialize team_count
     data for many topics with constant time SQL queries.
     """
+    shard = 4
     __test__ = True
     serializer = BulkTeamCountTopicSerializer
 

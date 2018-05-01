@@ -5,7 +5,6 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
 from six import text_type
-from nose.plugins.attrib import attr
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -141,12 +140,12 @@ class ConditionalFactory(object):
                 'child_module': child_descriptor}
 
 
-@attr(shard=1)
 class ConditionalModuleBasicTest(unittest.TestCase):
     """
     Make sure that conditional module works, using mocks for
     other modules.
     """
+    shard = 1
 
     def setUp(self):
         super(ConditionalModuleBasicTest, self).setUp()
@@ -215,11 +214,12 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         self.assertIn(None, cond_module.required_modules)
 
 
-@attr(shard=1)
 class ConditionalModuleXmlTest(unittest.TestCase):
     """
     Make sure ConditionalModule works, by loading data in from an XML-defined course.
     """
+    shard = 1
+
     @staticmethod
     def get_system(load_error_modules=True):
         '''Get a dummy system'''
@@ -378,11 +378,11 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.assertDictEqual(modules['cond_module'].xml_attributes, expected_xml_attributes)
 
 
-@attr(shard=1)
 class ConditionalModuleStudioTest(XModuleXmlImportTest):
     """
     Unit tests for how conditional test interacts with Studio.
     """
+    shard = 1
 
     def setUp(self):
         super(ConditionalModuleStudioTest, self).setUp()

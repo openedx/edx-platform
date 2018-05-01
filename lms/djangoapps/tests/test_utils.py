@@ -7,12 +7,11 @@ import ddt
 
 from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from nose.plugins.attrib import attr
 
 
-@attr(shard=4)
 @ddt.ddt
 class UtilsTests(TestCase):
+    shard = 4
     @ddt.data(
         ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],
         ['course-v1:edX+DemoX+Demo_Course', CourseKey.from_string('course-v1:edX+DemoX+Demo_Course'), CourseKey],

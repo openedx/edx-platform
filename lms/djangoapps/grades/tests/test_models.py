@@ -15,7 +15,6 @@ from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.grades.models import (
     BLOCK_RECORD_LIST_VERSION,
@@ -29,11 +28,12 @@ from lms.djangoapps.grades.models import (
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 
-@attr(shard=4)
 class BlockRecordListTestCase(TestCase):
     """
     Verify the behavior of BlockRecordList, particularly around edge cases
     """
+    shard = 4
+
     def setUp(self):
         super(BlockRecordListTestCase, self).setUp()
         self.course_key = CourseLocator(
@@ -85,12 +85,13 @@ class GradesModelTestCase(TestCase):
         self.record_b = BlockRecord(locator=self.locator_b, weight=1, raw_possible=10, graded=True)
 
 
-@attr(shard=4)
 @ddt.ddt
 class BlockRecordTest(GradesModelTestCase):
     """
     Test the BlockRecord model.
     """
+    shard = 4
+
     def test_creation(self):
         """
         Tests creation of a BlockRecord.
@@ -125,11 +126,12 @@ class BlockRecordTest(GradesModelTestCase):
         self.assertEqual(expected, record._asdict())
 
 
-@attr(shard=4)
 class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
+    shard = 4
+
     def _create_block_record_list(self, blocks):
         """
         Creates and returns a BlockRecordList for the given blocks.
@@ -192,12 +194,13 @@ class VisibleBlocksTest(GradesModelTestCase):
             visible_blocks.blocks = expected_blocks
 
 
-@attr(shard=4)
 @ddt.ddt
 class PersistentSubsectionGradeTest(GradesModelTestCase):
     """
     Test the PersistentSubsectionGrade model.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentSubsectionGradeTest, self).setUp()
         self.usage_key = BlockUsageLocator(
@@ -324,12 +327,13 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         )
 
 
-@attr(shard=4)
 @ddt.ddt
 class PersistentCourseGradesTest(GradesModelTestCase):
     """
     Tests the PersistentCourseGrade model.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentCourseGradesTest, self).setUp()
         self.params = {

@@ -2,15 +2,15 @@ import ddt
 from django.test import TestCase
 from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates.tasks import generate_certificate
 from student.tests.factories import UserFactory
 
 
-@attr(shard=4)
 @ddt.ddt
 class GenerateUserCertificateTest(TestCase):
+    shard = 4
+
     @patch('lms.djangoapps.certificates.tasks.generate_user_certificates')
     @patch('lms.djangoapps.certificates.tasks.User.objects.get')
     def test_generate_user_certs(self, user_get_mock, generate_user_certs_mock):

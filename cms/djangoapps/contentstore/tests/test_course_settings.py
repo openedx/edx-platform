@@ -13,7 +13,6 @@ from django.test.utils import override_settings
 from pytz import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from milestones.models import MilestoneRelationshipType
@@ -38,11 +37,12 @@ def get_url(course_id, handler_name='settings_handler'):
     return reverse_course_url(handler_name, course_id)
 
 
-@attr(shard=1)
 class CourseSettingsEncoderTest(CourseTestCase):
     """
     Tests for CourseSettingsEncoder.
     """
+    shard = 1
+
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
@@ -84,12 +84,13 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
 
-@attr(shard=1)
 @ddt.ddt
 class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
+    shard = 1
+
     def alter_field(self, url, details, field, val):
         """
         Change the one field to the given value and then invoke the update post to see if it worked.
@@ -433,12 +434,13 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Video Thumbnail Image")
 
 
-@attr(shard=1)
 @ddt.ddt
 class CourseGradingTest(CourseTestCase):
     """
     Tests for the course settings grading page.
     """
+    shard = 1
+
     def test_initial_grader(self):
         test_grader = CourseGradingModel(self.course)
         self.assertIsNotNone(test_grader.graders)
@@ -768,12 +770,13 @@ class CourseGradingTest(CourseTestCase):
         return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
 
 
-@attr(shard=1)
 @ddt.ddt
 class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
     """
+    shard = 1
+
     def setUp(self):
         CourseTestCase.setUp(self)
         self.fullcourse = CourseFactory.create()
@@ -1159,11 +1162,12 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=1)
 class CourseGraderUpdatesTest(CourseTestCase):
     """
     Test getting, deleting, adding, & updating graders
     """
+    shard = 1
+
     def setUp(self):
         """Compute the url to use in tests"""
         super(CourseGraderUpdatesTest, self).setUp()
@@ -1224,12 +1228,13 @@ class CourseGraderUpdatesTest(CourseTestCase):
         self.assertEqual(len(self.starting_graders) + 1, len(current_graders))
 
 
-@attr(shard=1)
 class CourseEnrollmentEndFieldTest(CourseTestCase):
     """
     Base class to test the enrollment end fields in the course settings details view in Studio
     when using marketing site flag and global vs non-global staff to access the page.
     """
+    shard = 1
+
     NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX partner manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
     NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"

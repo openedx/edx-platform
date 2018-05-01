@@ -7,7 +7,6 @@ from xblock.fields import Scope, String
 from unittest import TestCase
 from xmodule.modulestore.tests.utils import XmlModulestoreBuilder
 from mock import patch
-from nose.plugins.attrib import attr
 
 
 class AsideTestType(XBlockAside):
@@ -25,11 +24,11 @@ class AsideTestType(XBlockAside):
         return Fragment(self.FRAG_CONTENT)
 
 
-@attr(shard=1)
 class TestAsidesXmlStore(TestCase):
     """
     Test Asides sourced from xml store
     """
+    shard = 1
     @patch('xmodule.modulestore.xml.ImportSystem.applicable_aside_types', lambda self, block: ['test_aside'])
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     def test_xml_aside(self):

@@ -5,7 +5,6 @@ from collections import namedtuple
 from datetime import timedelta, datetime
 from unittest import TestCase
 
-from nose.plugins.attrib import attr
 from pytz import utc
 from xmodule.block_metadata_utils import (
     url_name_for_block,
@@ -34,11 +33,11 @@ _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
-@attr(shard=1)
 class CourseMetadataUtilsTestCase(TestCase):
     """
     Tests for course_metadata_utils.
     """
+    shard = 1
 
     def setUp(self):
         """

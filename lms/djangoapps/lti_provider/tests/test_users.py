@@ -9,18 +9,17 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser
 from student.tests.factories import UserFactory
 
 
-@attr(shard=4)
 class UserManagementHelperTest(TestCase):
     """
     Tests for the helper functions in users.py
     """
+    shard = 4
 
     def setUp(self):
         super(UserManagementHelperTest, self).setUp()
@@ -73,13 +72,14 @@ class UserManagementHelperTest(TestCase):
                 )
 
 
-@attr(shard=4)
 @patch('lti_provider.users.switch_user', autospec=True)
 @patch('lti_provider.users.create_lti_user', autospec=True)
 class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py
     """
+    shard = 4
+
     def setUp(self):
         super(AuthenticateLtiUserTest, self).setUp()
         self.lti_consumer = LtiConsumer(
@@ -142,11 +142,11 @@ class AuthenticateLtiUserTest(TestCase):
         switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
 
 
-@attr(shard=4)
 class CreateLtiUserTest(TestCase):
     """
     Tests for the create_lti_user function in users.py
     """
+    shard = 4
 
     def setUp(self):
         super(CreateLtiUserTest, self).setUp()
@@ -180,11 +180,11 @@ class CreateLtiUserTest(TestCase):
         self.assertEqual(user.email, 'new_edx_id@lti.example.com')
 
 
-@attr(shard=4)
 class LtiBackendTest(TestCase):
     """
     Tests for the authentication backend that authenticates LTI users.
     """
+    shard = 4
 
     def setUp(self):
         super(LtiBackendTest, self).setUp()

@@ -6,7 +6,6 @@ import unittest
 from mock import Mock
 from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_in, assert_not_in  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from nose.plugins.attrib import attr
 
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
@@ -62,11 +61,11 @@ class TestFields(object):
     list_field = List(scope=Scope.settings, default=[])
 
 
-@attr(shard=1)
 class InheritingFieldDataTest(unittest.TestCase):
     """
     Tests of InheritingFieldData.
     """
+    shard = 1
 
     class TestableInheritingXBlock(XmlDescriptor):
         """
@@ -229,8 +228,9 @@ class InheritingFieldDataTest(unittest.TestCase):
         self.assertEqual(child.inherited, "child's default")
 
 
-@attr(shard=1)
 class EditableMetadataFieldsTest(unittest.TestCase):
+    shard = 1
+
     def test_display_name_field(self):
         editable_fields = self.get_xml_editable_fields(DictFieldData({}))
         # Tests that the xblock fields (currently tags and name) get filtered out.
@@ -371,9 +371,9 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         self.assertEqual(explicitly_set, test_field['explicitly_set'])
 
 
-@attr(shard=1)
 class TestSerialize(unittest.TestCase):
     """ Tests the serialize, method, which is not dependent on type. """
+    shard = 1 
     def test_serialize(self):
         assert_equals('null', serialize_field(None))
         assert_equals('-2', serialize_field(-2))
@@ -392,8 +392,9 @@ class TestSerialize(unittest.TestCase):
                       serialize_field("1 day 12 hours 59 minutes 59 seconds"))
 
 
-@attr(shard=1)
 class TestDeserialize(unittest.TestCase):
+    shard = 1
+
     def assertDeserializeEqual(self, expected, arg):
         """
         Asserts the result of deserialize_field.
@@ -414,10 +415,10 @@ class TestDeserialize(unittest.TestCase):
         self.assertDeserializeEqual(None, 'null')
 
 
-@attr(shard=1)
 class TestDeserializeInteger(TestDeserialize):
     """ Tests deserialize as related to Integer type. """
 
+    shard = 1
     field_type = Integer
 
     def test_deserialize(self):
@@ -440,9 +441,9 @@ class TestDeserializeInteger(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeFloat(TestDeserialize):
     """ Tests deserialize as related to Float type. """
+    shard = 1
 
     field_type = Float
 
@@ -464,9 +465,9 @@ class TestDeserializeFloat(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeBoolean(TestDeserialize):
     """ Tests deserialize as related to Boolean type. """
+    shard = 1
 
     field_type = Boolean
 
@@ -490,9 +491,9 @@ class TestDeserializeBoolean(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeString(TestDeserialize):
     """ Tests deserialize as related to String type. """
+    shard = 1
 
     field_type = String
 
@@ -509,9 +510,9 @@ class TestDeserializeString(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeAny(TestDeserialize):
     """ Tests deserialize as related to Any type. """
+    shard = 1
 
     field_type = Any
 
@@ -526,9 +527,9 @@ class TestDeserializeAny(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeList(TestDeserialize):
     """ Tests deserialize as related to List type. """
+    shard = 1
 
     field_type = List
 
@@ -544,9 +545,9 @@ class TestDeserializeList(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeDate(TestDeserialize):
     """ Tests deserialize as related to Date type. """
+    shard = 1
 
     field_type = Date
 
@@ -556,9 +557,9 @@ class TestDeserializeDate(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeTimedelta(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
+    shard = 1
 
     field_type = Timedelta
 
@@ -574,9 +575,9 @@ class TestDeserializeTimedelta(TestDeserialize):
         self.assertDeserializeNonString()
 
 
-@attr(shard=1)
 class TestDeserializeRelativeTime(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
+    shard = 1
 
     field_type = RelativeTime
 
@@ -597,8 +598,8 @@ class TestDeserializeRelativeTime(TestDeserialize):
         self.assertDeserializeEqual('10:20:30', '"10:20:30"')
 
 
-@attr(shard=1)
 class TestXmlAttributes(XModuleXmlImportTest):
+    shard = 1
 
     def test_unknown_attribute(self):
         assert_false(hasattr(CourseDescriptor, 'unknown_attr'))

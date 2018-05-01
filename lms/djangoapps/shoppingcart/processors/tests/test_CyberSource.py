@@ -7,7 +7,6 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from shoppingcart.models import Order, OrderItem
 from shoppingcart.processors.CyberSource import (
@@ -62,12 +61,12 @@ def fake_site(name, default=None):  # pylint: disable=unused-argument
         return None
 
 
-@attr(shard=4)
 @override_settings(
     CC_PROCESSOR_NAME=TEST_CC_PROCESSOR_NAME,
     CC_PROCESSOR=TEST_CC_PROCESSOR
 )
 class CyberSourceTests(TestCase):
+    shard = 4
 
     def test_override_settings(self):
         self.assertEqual(settings.CC_PROCESSOR['CyberSource']['MERCHANT_ID'], 'edx_test')

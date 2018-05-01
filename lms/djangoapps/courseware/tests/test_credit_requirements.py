@@ -6,7 +6,6 @@ import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.credit import api as credit_api
@@ -16,13 +15,13 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=4)
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
 @ddt.ddt
 class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
     """
     Tests for credit requirement display on the progress page.
     """
+    shard = 4
 
     USERNAME = "bob"
     PASSWORD = "test"

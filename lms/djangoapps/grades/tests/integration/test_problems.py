@@ -3,7 +3,6 @@ import itertools
 
 import ddt
 import pytz
-from nose.plugins.attrib import attr
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -21,12 +20,12 @@ from ...subsection_grade_factory import SubsectionGradeFactory
 from ..utils import answer_problem, mock_get_submissions_score
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
     Test grading of different problem types.
     """
+    shard = 4
 
     SCORED_BLOCK_COUNT = 7
     ACTUAL_TOTAL_POSSIBLE = 17.0

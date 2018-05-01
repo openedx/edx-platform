@@ -13,7 +13,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.test import override_settings
 from waffle.testutils import override_switch
-from nose.plugins.attrib import attr
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
@@ -27,12 +26,12 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCour
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
-@attr(shard=4)
 @skip_unless_lms
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
+    shard = 4
     maxDiff = None
     password = 'test'
     url = reverse_lazy('program_listing_view')
@@ -174,12 +173,12 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             self.assertEqual(actual_program['detail_url'], expected_url)
 
 
-@attr(shard=4)
 @skip_unless_lms
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 @override_switch('student_records', True)
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
+    shard = 4
     program_uuid = str(uuid4())
     password = 'test'
     url = reverse_lazy('program_details_view', kwargs={'program_uuid': program_uuid})

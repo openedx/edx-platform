@@ -2,7 +2,6 @@ import ddt
 from django.conf import settings
 from mock import patch
 
-from nose.plugins.attrib import attr
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -17,7 +16,6 @@ from .base import GradeTestBase
 from .utils import answer_problem
 
 
-@attr(shard=4)
 @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
 @ddt.ddt
 class ZeroGradeTest(GradeTestBase):
@@ -25,6 +23,8 @@ class ZeroGradeTest(GradeTestBase):
     Tests ZeroCourseGrade (and, implicitly, ZeroSubsectionGrade)
     functionality.
     """
+    shard = 4
+
     @ddt.data(True, False)
     def test_zero(self, assume_zero_enabled):
         """
@@ -55,7 +55,6 @@ class ZeroGradeTest(GradeTestBase):
                         self.assertEqual({}, section.problem_scores)
 
 
-@attr(shard=4)
 class TestScoreForModule(SharedModuleStoreTestCase):
     """
     Test the method that calculates the score for a given block based on the
@@ -71,6 +70,8 @@ class TestScoreForModule(SharedModuleStoreTestCase):
                    (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
 
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestScoreForModule, cls).setUpClass()

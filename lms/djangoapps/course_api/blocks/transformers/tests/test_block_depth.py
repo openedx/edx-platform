@@ -7,7 +7,6 @@ Tests for BlockDepthTransformer.
 from unittest import TestCase
 
 import ddt
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
 from openedx.core.djangoapps.content.block_structure.tests.helpers import ChildrenMapTestMixin
@@ -15,12 +14,13 @@ from openedx.core.djangoapps.content.block_structure.tests.helpers import Childr
 from ..block_depth import BlockDepthTransformer
 
 
-@attr(shard=4)
 @ddt.ddt
 class BlockDepthTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
     Test behavior of BlockDepthTransformer
     """
+    shard = 4
+
     @ddt.data(
         (0, [], [], []),
         (0, ChildrenMapTestMixin.SIMPLE_CHILDREN_MAP, [[], [], [], [], []], [1, 2, 3, 4]),

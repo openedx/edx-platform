@@ -10,18 +10,17 @@ from django.conf import settings
 from django.test import SimpleTestCase, TestCase, override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from nose.plugins.attrib import attr
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor_task.tests.test_base import TestReportMixin
 
 
-@attr(shard=4)
 class ReportStoreTestMixin(object):
     """
     Mixin for report store tests.
     """
+    shard = 4
     def setUp(self):
         super(ReportStoreTestMixin, self).setUp()
         self.course_id = CourseLocator(org="testx", course="coursex", run="runx")
@@ -116,12 +115,12 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
             return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-@attr(shard=4)
 class TestS3ReportStorage(MockS3Mixin, TestCase):
     """
     Test the S3ReportStorage to make sure that configuration overrides from settings.FINANCIAL_REPORTS
     are used instead of default ones.
     """
+    shard = 4
     def test_financial_report_overrides(self):
         """
         Test that CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url. instead of domain defined via

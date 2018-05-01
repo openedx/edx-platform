@@ -6,7 +6,6 @@ Unit tests for the Mongo modulestore
 # pylint: disable=bad-continuation
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
-from nose.plugins.attrib import attr
 from django.test import TestCase
 # pylint: enable=E0611
 from path import Path as path
@@ -75,11 +74,11 @@ class ReferenceTestXBlock(XModuleMixin):
     reference_dict = ReferenceValueDict(scope=Scope.settings)
 
 
-@attr(shard=2)
 class TestMongoModuleStoreBase(TestCase):
     '''
     Basic setup for all tests
     '''
+    shard = 2
     # Explicitly list the courses to load (don't want the big one)
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
@@ -181,9 +180,9 @@ class TestMongoModuleStoreBase(TestCase):
         self.dummy_user = ModuleStoreEnum.UserID.test
 
 
-@attr(shard=2)
 class TestMongoModuleStore(TestMongoModuleStoreBase):
     '''Module store tests'''
+    shard = 2
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -749,11 +748,11 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         self.assertEqual(root_block_key.block_id, "2015")
 
 
-@attr(shard=2)
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     '''
     Tests a situation where no asset_collection is specified.
     '''
+    shard = 2
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -782,11 +781,11 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
 
 
-@attr(shard=2)
 class TestMongoKeyValueStore(TestCase):
     """
     Tests for MongoKeyValueStore.
     """
+    shard = 2
 
     def setUp(self):
         super(TestMongoKeyValueStore, self).setUp()

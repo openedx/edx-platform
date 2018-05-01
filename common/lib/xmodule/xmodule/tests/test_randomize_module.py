@@ -8,7 +8,6 @@ from pytz import UTC
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.fields import ScopeIds
 from xmodule.randomize_module import RandomizeModule
-from nose.plugins.attrib import attr
 
 from .test_course_module import DummySystem as DummyImportSystem
 
@@ -22,9 +21,9 @@ _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
-@attr(shard=1)
 class RandomizeModuleTestCase(unittest.TestCase):
     """Make sure the randomize module works"""
+    shard = 1
 
     def setUp(self):
         """

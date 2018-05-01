@@ -7,7 +7,6 @@ from django.core.management import CommandError, call_command
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from search.search_engine_base import SearchEngine
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -17,12 +16,12 @@ from ....tests.factories import CourseTeamFactory
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 
 
-@attr(shard=4)
 @ddt.ddt
 class ReindexCourseTeamTest(SharedModuleStoreTestCase):
     """
     Tests for the ReindexCourseTeam command
     """
+    shard = 4
 
     def setUp(self):
         """

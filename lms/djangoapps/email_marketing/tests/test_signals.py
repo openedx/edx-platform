@@ -14,7 +14,6 @@ from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
 from testfixtures import LogCapture
-from nose.plugins.attrib import attr
 
 from email_marketing.models import EmailMarketingConfiguration
 from email_marketing.signals import (
@@ -65,12 +64,12 @@ def update_email_marketing_config(enabled=True, key='badkey', secret='badsecret'
     )
 
 
-@attr(shard=4)
 @ddt.ddt
 class EmailMarketingTests(TestCase):
     """
     Tests for the EmailMarketing signals and tasks classes.
     """
+    shard = 4
 
     def setUp(self):
         update_email_marketing_config(enabled=False)
@@ -655,11 +654,11 @@ class MockSailthruError(object):
         return self.code
 
 
-@attr(shard=4)
 class SailthruTests(TestCase):
     """
     Tests for the Sailthru tasks class.
     """
+    shard = 4
 
     def setUp(self):
         super(SailthruTests, self).setUp()

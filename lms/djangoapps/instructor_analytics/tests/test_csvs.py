@@ -2,14 +2,13 @@
 
 from django.test import TestCase
 from nose.tools import raises
-from nose.plugins.attrib import attr
 
 from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
 
 
-@attr(shard=4)
 class TestAnalyticsCSVS(TestCase):
     """ Test analytics rendering of csv files."""
+    shard = 4
 
     def test_create_csv_response_nodata(self):
         header = ['Name', 'Email']
@@ -39,9 +38,9 @@ class TestAnalyticsCSVS(TestCase):
         self.assertEqual(res.content.strip(), '')
 
 
-@attr(shard=4)
 class TestAnalyticsFormatDictlist(TestCase):
     """ Test format_dictlist method """
+    shard = 4
 
     def test_format_dictlist(self):
         dictlist = [
@@ -84,9 +83,10 @@ class TestAnalyticsFormatDictlist(TestCase):
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
 
-@attr(shard=4)
 class TestAnalyticsFormatInstances(TestCase):
     """ test format_instances method """
+    shard = 4
+
     class TestDataClass(object):
         """ Test class to generate objects for format_instances """
         def __init__(self):

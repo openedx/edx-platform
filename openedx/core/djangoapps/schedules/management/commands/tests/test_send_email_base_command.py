@@ -5,19 +5,19 @@ import ddt
 import pytz
 from django.conf import settings
 from mock import patch, DEFAULT, Mock
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 
-@attr(shard=6)
 @ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestSendEmailBaseCommand(CacheIsolationTestCase):
+    shard = 6
+
     def setUp(self):
         self.command = SendEmailBaseCommand()
         self.site = SiteFactory()

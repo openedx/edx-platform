@@ -1,18 +1,18 @@
 """
 Tests for the LMS/lib utils
 """
-from nose.plugins.attrib import attr
 from lms.lib import utils
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=4)
 class LmsUtilsTest(ModuleStoreTestCase):
     """
     Tests for the LMS utility functions
     """
+    shard = 4
+
     def setUp(self):
         """
         Setup a dummy course content.

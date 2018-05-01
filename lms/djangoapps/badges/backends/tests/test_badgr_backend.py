@@ -8,7 +8,6 @@ from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
 from lazy.lazy import lazy
 from mock import Mock, call, patch
-from nose.plugins.attrib import attr
 
 from badges.backends.badgr import BadgrBackend
 from badges.models import BadgeAssertion
@@ -30,13 +29,14 @@ EXAMPLE_SLUG = '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a
 
 
 # pylint: disable=protected-access
-@attr(shard=4)
 @ddt.ddt
 @override_settings(**BADGR_SETTINGS)
 class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests the BadgeHandler object
     """
+    shard = 4
+
     def setUp(self):
         """
         Create a course and user to test with.

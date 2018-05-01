@@ -4,19 +4,18 @@ Currently it is only used for content libraries.
 However for these tests, we make sure it also works when copying from course to course.
 """
 import ddt
-from nose.plugins.attrib import attr
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSplitCopyTemplate(MixedSplitTestCase):
     """
     Test for split's copy_from_template method.
     """
+    shard = 2
     @ddt.data(
         LibraryFactory,
         CourseFactory,

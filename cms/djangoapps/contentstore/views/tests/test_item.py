@@ -22,7 +22,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
-from nose.plugins.attrib import attr
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
@@ -123,10 +122,10 @@ class ItemTest(CourseTestCase):
         return self.response_usage_key(resp)
 
 
-@attr(shard=1)
 @ddt.ddt
 class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
+    shard = 1
 
     def _get_preview(self, usage_key, data=None):
         """ Makes a request to xblock preview handler """
@@ -468,10 +467,11 @@ class GetItemTest(ItemTest):
                 self.assertEqual(_get_module_info(xblock), response)
 
 
-@attr(shard=1)
 @ddt.ddt
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
+    shard = 1
+
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_delete_static_page(self, store):
         course = CourseFactory.create(default_store=store)
@@ -484,11 +484,12 @@ class DeleteItem(ItemTest):
         self.assertEqual(resp.status_code, 204)
 
 
-@attr(shard=1)
 class TestCreateItem(ItemTest):
     """
     Test the create_item handler thoroughly
     """
+    shard = 1
+
     def test_create_nicely(self):
         """
         Try the straightforward use cases
@@ -660,11 +661,12 @@ class DuplicateHelper(object):
         return self.response_usage_key(resp)
 
 
-@attr(shard=1)
 class TestDuplicateItem(ItemTest, DuplicateHelper):
     """
     Test the duplicate method.
     """
+    shard = 1
+
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
         super(TestDuplicateItem, self).setUp()
@@ -766,12 +768,13 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestMoveItem(ItemTest):
     """
     Tests for move item.
     """
+    shard = 1
+
     def setUp(self):
         """
         Creates the test course structure to build course outline tree.
@@ -1319,11 +1322,12 @@ class TestMoveItem(ItemTest):
             )
 
 
-@attr(shard=1)
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
     Test the duplicate method for blocks with asides.
     """
+    shard = 1
+
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
@@ -1382,11 +1386,12 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
         self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key, check_asides=True)
 
 
-@attr(shard=1)
 class TestEditItemSetup(ItemTest):
     """
     Setup for xblock update tests.
     """
+    shard = 1
+
     def setUp(self):
         """ Creates the test course structure and a couple problems to 'edit'. """
         super(TestEditItemSetup, self).setUp()
@@ -1413,11 +1418,12 @@ class TestEditItemSetup(ItemTest):
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
 
-@attr(shard=1)
 class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
     """
+    shard = 1
+
     def test_delete_field(self):
         """
         Sending null in for a field 'deletes' it
@@ -1853,11 +1859,11 @@ class TestEditItem(TestEditItemSetup):
         self.assertIn("Incorrect RelativeTime value", parsed["error"])  # See xmodule/fields.py
 
 
-@attr(shard=1)
 class TestEditItemSplitMongo(TestEditItemSetup):
     """
     Tests for EditItem running on top of the SplitMongoModuleStore.
     """
+    shard = 1
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_editing_view_wrappers(self):
@@ -1875,11 +1881,11 @@ class TestEditItemSplitMongo(TestEditItemSetup):
             self.assertEqual(len(PyQuery(content['html'])('.xblock-{}'.format(STUDIO_VIEW))), 1)
 
 
-@attr(shard=1)
 class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
     """
+    shard = 1
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
         self.user = UserFactory()
@@ -2099,9 +2105,10 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(group_id_to_child, split_test.group_id_to_child)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestComponentHandler(TestCase):
+    shard = 1
+
     def setUp(self):
         super(TestComponentHandler, self).setUp()
 
@@ -2158,11 +2165,11 @@ class TestComponentHandler(TestCase):
                           status_code)
 
 
-@attr(shard=1)
 class TestComponentTemplates(CourseTestCase):
     """
     Unit tests for the generation of the component templates for a course.
     """
+    shard = 1
 
     def setUp(self):
         super(TestComponentTemplates, self).setUp()
@@ -2393,12 +2400,13 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(support_level, templates[0]['support_level'])
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestXBlockInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
+    shard = 1
+
     def setUp(self):
         super(TestXBlockInfo, self).setUp()
         user_id = self.user.id
@@ -2741,11 +2749,12 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
 
 
-@attr(shard=1)
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """
     Unit tests for XBlock Info for XBlocks in a content library
     """
+    shard = 1
+
     def setUp(self):
         super(TestLibraryXBlockInfo, self).setUp()
         user_id = self.user.id
@@ -2791,11 +2800,12 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         self.assertIsNone(xblock_info.get('graders', None))
 
 
-@attr(shard=1)
 class TestLibraryXBlockCreation(ItemTest):
     """
     Tests the adding of XBlocks to Library
     """
+    shard = 1
+
     def test_add_xblock(self):
         """
         Verify we can add an XBlock to a Library.
@@ -2827,12 +2837,12 @@ class TestLibraryXBlockCreation(ItemTest):
         self.assertFalse(lib.children)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
+    shard = 1
     FIRST_SUBSECTION_PATH = [0]
     FIRST_UNIT_PATH = [0, 0]
     SECOND_UNIT_PATH = [0, 1]

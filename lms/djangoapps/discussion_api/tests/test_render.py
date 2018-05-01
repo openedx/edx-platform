@@ -4,7 +4,6 @@ Tests for content rendering
 from unittest import TestCase
 
 import ddt
-from nose.plugins.attrib import attr
 
 from discussion_api.render import render_body
 
@@ -14,10 +13,11 @@ def _add_p_tags(raw_body):
     return "<p>{raw_body}</p>".format(raw_body=raw_body)
 
 
-@attr(shard=8)
 @ddt.ddt
 class RenderBodyTest(TestCase):
     """Tests for render_body"""
+    shard = 8
+
     def test_empty(self):
         self.assertEqual(render_body(""), "")
 

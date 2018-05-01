@@ -9,7 +9,6 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -19,11 +18,12 @@ from ..api import course_detail, list_courses
 from .mixins import CourseApiFactoryMixin
 
 
-@attr(shard=4)
 class CourseApiTestMixin(CourseApiFactoryMixin):
     """
     Establish basic functionality for Course API tests
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(CourseApiTestMixin, cls).setUpClass()
@@ -54,11 +54,12 @@ class CourseDetailTestMixin(CourseApiTestMixin):
             return course_detail(request, target_user.username, course_key)
 
 
-@attr(shard=4)
 class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
     """
     Test course_detail api function
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestGetCourseDetail, cls).setUpClass()
@@ -89,11 +90,12 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
             self._make_api_call(self.staff_user, self.honor_user, self.hidden_course.id)
 
 
-@attr(shard=4)
 class CourseListTestMixin(CourseApiTestMixin):
     """
     Common behavior for list_courses tests
     """
+    shard = 4
+
     def _make_api_call(self, requesting_user, specified_user, org=None, filter_=None):
         """
         Call the list_courses api endpoint to get information about
@@ -112,11 +114,11 @@ class CourseListTestMixin(CourseApiTestMixin):
         self.verify_course(courses[0])
 
 
-@attr(shard=4)
 class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
     """
     Test the behavior of the `list_courses` api function.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
@@ -154,12 +156,12 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
             self._make_api_call(anonuser, self.staff_user)
 
 
-@attr(shard=4)
 class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase):
     """
     Test the behavior of the `list_courses` api function (with tests that
     modify the courseware).
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -213,12 +215,12 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
             )
 
 
-@attr(shard=4)
 class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
     """
     Tests of course_list api function that require alternative configurations
     of created courses.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod

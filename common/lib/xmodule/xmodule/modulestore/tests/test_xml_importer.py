@@ -21,7 +21,6 @@ from uuid import uuid4
 from path import Path as path
 import unittest
 import importlib
-from nose.plugins.attrib import attr
 
 
 class ModuleStoreNoSettings(unittest.TestCase):
@@ -123,11 +122,11 @@ class StubXBlock(XModuleMixin, InheritanceMixin):
     )
 
 
-@attr(shard=2)
 class RemapNamespaceTest(ModuleStoreNoSettings):
     """
     Test that remapping the namespace from import to the actual course location.
     """
+    shard = 2
 
     def setUp(self):
         """
@@ -272,11 +271,11 @@ class StubXBlockWithMutableFields(StubXBlock):
     )
 
 
-@attr(shard=2)
 class UpdateLocationTest(ModuleStoreNoSettings):
     """
     Test that updating location preserves "is_set_on" status on fields
     """
+    shard = 2
     CONTENT_FIELDS = ['test_content_field', 'test_mutable_content_field']
     SETTINGS_FIELDS = ['test_settings_field', 'test_mutable_settings_field']
     CHILDREN_FIELDS = ['children']
@@ -343,8 +342,9 @@ class UpdateLocationTest(ModuleStoreNoSettings):
             self.assertTrue(new_version.fields[field].is_set_on(new_version))
 
 
-@attr(shard=2)
 class StaticContentImporterTest(unittest.TestCase):
+    shard = 2
+
     def setUp(self):
         self.course_data_path = path('/path')
         self.mocked_content_store = mock.Mock()

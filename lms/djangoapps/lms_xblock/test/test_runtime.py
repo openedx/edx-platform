@@ -12,7 +12,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import ScopeIds
-from nose.plugins.attrib import attr
 
 from badges.tests.factories import BadgeClassFactory
 from badges.tests.test_models import get_image
@@ -51,9 +50,9 @@ class BlockMock(Mock):
         return BlockUsageLocator(course_key, block_type='mock_type', block_id="mock_id")
 
 
-@attr(shard=4)
 class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
+    shard = 4
 
     def setUp(self):
         super(TestHandlerUrl, self).setUp()
@@ -117,9 +116,9 @@ class TestHandlerUrl(TestCase):
         self.assertIsNone(parsed_fq_url.hostname)
 
 
-@attr(shard=4)
 class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
+    shard = 4
 
     def setUp(self):
         super(TestUserServiceAPI, self).setUp()
@@ -167,10 +166,10 @@ class TestUserServiceAPI(TestCase):
             self.runtime.service(self.mock_block, 'user_tags').get_tag('fake_scope', self.key)
 
 
-@attr(shard=4)
 @ddt
 class TestBadgingService(ModuleStoreTestCase):
     """Test the badging service interface"""
+    shard = 4
 
     def setUp(self):
         super(TestBadgingService, self).setUp()
@@ -234,9 +233,9 @@ class TestBadgingService(ModuleStoreTestCase):
         self.assertEqual(badge_class.image.path, premade_badge_class.image.path)
 
 
-@attr(shard=4)
 class TestI18nService(ModuleStoreTestCase):
     """ Test ModuleI18nService """
+    shard = 4
 
     def setUp(self):
         """ Setting up tests """

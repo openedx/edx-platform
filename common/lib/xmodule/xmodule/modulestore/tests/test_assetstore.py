@@ -9,7 +9,6 @@ from nose.plugins.attrib import attr
 import pytz
 import unittest
 
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.assetstore import AssetMetadata
@@ -59,11 +58,11 @@ class AssetStoreTestData(object):
     )
 
 
-@attr(shard=1)
 class TestSortedAssetList(unittest.TestCase):
     """
     Tests the SortedAssetList class.
     """
+    shard = 1
     def setUp(self):
         super(TestSortedAssetList, self).setUp()
         asset_list = [dict(zip(AssetStoreTestData.asset_fields, asset)) for asset in AssetStoreTestData.all_asset_data]
@@ -85,13 +84,14 @@ class TestSortedAssetList(unittest.TestCase):
         )
 
 
-@attr(shard=1)
 @attr('mongo')
 @ddt.ddt
 class TestMongoAssetMetadataStorage(TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
+    shard = 1
+
     def setUp(self):
         super(TestMongoAssetMetadataStorage, self).setUp()
         self.addTypeEqualityFunc(datetime, self._compare_datetimes)

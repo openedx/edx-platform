@@ -5,7 +5,6 @@ import contextlib
 
 import mock
 from ccx_keys.locator import CCXLocator
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -26,11 +25,11 @@ def mock_signal_receiver(signal):
     signal.disconnect(receiver)
 
 
-@attr(shard=7)
 class TestSendCCXCoursePublished(ModuleStoreTestCase):
     """
     Unit tests for the send ccx course published task
     """
+    shard = 7
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     ENABLED_SIGNALS = ['course_published']

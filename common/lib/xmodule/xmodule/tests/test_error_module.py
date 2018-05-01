@@ -12,12 +12,12 @@ from xblock.runtime import Runtime, IdReader
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.test.tools import unabc
-from nose.plugins.attrib import attr
 
 
-@attr(shard=1)
 class SetupTestErrorModules(unittest.TestCase):
     """Common setUp for use in ErrorModule tests."""
+    shard = 1
+
     def setUp(self):
         super(SetupTestErrorModules, self).setUp()
         self.system = get_test_system()
@@ -27,11 +27,12 @@ class SetupTestErrorModules(unittest.TestCase):
         self.error_msg = "Error"
 
 
-@attr(shard=1)
 class TestErrorModule(SetupTestErrorModules):
     """
     Tests for ErrorModule and ErrorDescriptor
     """
+    shard = 1
+
     def test_error_module_xml_rendering(self):
         descriptor = ErrorDescriptor.from_xml(
             self.valid_xml,
@@ -61,11 +62,12 @@ class TestErrorModule(SetupTestErrorModules):
         self.assertIn(repr(descriptor), context_repr)
 
 
-@attr(shard=1)
 class TestNonStaffErrorModule(SetupTestErrorModules):
     """
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
     """
+    shard = 1
+
     def test_non_staff_error_module_create(self):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
@@ -121,11 +123,12 @@ class TestRuntime(Runtime):
     pass
 
 
-@attr(shard=1)
 class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly
     """
+    shard = 1
+
     def setUp(self):
         # pylint: disable=abstract-class-instantiated
         super(TestErrorModuleConstruction, self).setUp()

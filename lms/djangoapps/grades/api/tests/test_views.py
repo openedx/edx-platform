@@ -12,7 +12,6 @@ from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
-from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
@@ -23,7 +22,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
-@attr(shard=4)
 @ddt.ddt
 class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
     """
@@ -65,6 +63,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         }
     }
     """
+    shard = 4
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
@@ -306,12 +305,12 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.assertEqual(resp.data, [expected_data])  # pylint: disable=no-member
 
 
-@attr(shard=4)
 @ddt.ddt
 class GradingPolicyTestMixin(object):
     """
     Mixin class for Grading Policy tests
     """
+    shard = 4
     view_name = None
 
     def setUp(self):
@@ -446,11 +445,11 @@ class GradingPolicyTestMixin(object):
         self.assert_get_for_course(course_id=unicode(course.id))
 
 
-@attr(shard=4)
 class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseGradingPolicy view.
     """
+    shard = 4
     view_name = 'grades_api:course_grading_policy'
 
     raw_grader = [
@@ -498,11 +497,11 @@ class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase
         self.assertListEqual(response.data, expected)
 
 
-@attr(shard=4)
 class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModuleStoreTestCase):
     """
     Tests for CourseGradingPolicy view when fields are missing.
     """
+    shard = 4
     view_name = 'grades_api:course_grading_policy'
 
     # Raw grader with missing keys

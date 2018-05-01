@@ -4,14 +4,13 @@ import datetime
 import unittest
 
 from pytz import UTC
-from nose.plugins.attrib import attr
 
 from xmodule.fields import Date, Timedelta, RelativeTime
 from xmodule.timeinfo import TimeInfo
 
 
-@attr(shard=1)
 class DateTest(unittest.TestCase):
+    shard = 1
     date = Date()
 
     def compare_dates(self, dt1, dt2, expected_delta):
@@ -123,8 +122,8 @@ class DateTest(unittest.TestCase):
             DateTest.date.to_json('2012-12-31T23:00:01-01:00')
 
 
-@attr(shard=1)
 class TimedeltaTest(unittest.TestCase):
+    shard = 1
     delta = Timedelta()
 
     def test_from_json(self):
@@ -158,8 +157,9 @@ class TimedeltaTest(unittest.TestCase):
         )
 
 
-@attr(shard=1)
 class TimeInfoTest(unittest.TestCase):
+    shard = 1
+
     def test_time_info(self):
         due_date = datetime.datetime(2000, 4, 14, 10, tzinfo=UTC)
         grace_pd_string = '1 day 12 hours 59 minutes 59 seconds'
@@ -170,8 +170,8 @@ class TimeInfoTest(unittest.TestCase):
         )
 
 
-@attr(shard=1)
 class RelativeTimeTest(unittest.TestCase):
+    shard = 1
 
     delta = RelativeTime()
 

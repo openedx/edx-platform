@@ -4,17 +4,16 @@ Test xblock/validation.py
 
 import unittest
 from xblock.test.tools import assert_raises
-from nose.plugins.attrib import attr
 
 from xmodule.validation import StudioValidationMessage, StudioValidation
 from xblock.validation import Validation, ValidationMessage
 
 
-@attr(shard=1)
 class StudioValidationMessageTest(unittest.TestCase):
     """
     Tests for `ValidationMessage`
     """
+    shard = 1
 
     def test_bad_parameters(self):
         """
@@ -70,11 +69,12 @@ class StudioValidationMessageTest(unittest.TestCase):
         )
 
 
-@attr(shard=1)
 class StudioValidationTest(unittest.TestCase):
     """
     Tests for `StudioValidation` class.
     """
+    shard = 1
+
     def test_copy(self):
         validation = Validation("id")
         validation.add(ValidationMessage(ValidationMessage.ERROR, u"Error message"))

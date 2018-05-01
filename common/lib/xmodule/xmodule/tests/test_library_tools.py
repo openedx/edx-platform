@@ -2,17 +2,16 @@
 Tests for library tools service.
 """
 from mock import patch
-from nose.plugins.attrib import attr
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
-@attr(shard=1)
 class LibraryToolsServiceTest(MixedSplitTestCase):
     """
     Tests for library service.
     """
+    shard = 1
 
     def setUp(self):
         super(LibraryToolsServiceTest, self).setUp()

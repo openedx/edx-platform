@@ -12,7 +12,6 @@ import textwrap
 import datetime
 
 from mock import Mock
-from nose.plugins.attrib import attr
 
 import xmodule
 from xmodule.capa_module import CapaModule
@@ -121,11 +120,11 @@ class CapaFactoryWithDelay(object):
         return module
 
 
-@attr(shard=1)
 class XModuleQuizAttemptsDelayTest(unittest.TestCase):
     """
     Class to test delay between quiz attempts.
     """
+    shard = 1
 
     def create_and_check(self,
                          num_attempts=None,

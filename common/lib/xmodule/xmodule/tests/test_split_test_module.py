@@ -14,7 +14,6 @@ from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
 from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
-from nose.plugins.attrib import attr
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -24,11 +23,12 @@ class SplitTestModuleFactory(xml.XmlImportFactory):
     tag = 'split_test'
 
 
-@attr(shard=1)
 class SplitTestUtilitiesTest(PartitionTestCase):
     """
     Tests for utility methods related to split_test module.
     """
+    shard = 1
+
     def test_split_user_partitions(self):
         """
         Tests the get_split_user_partitions helper method.
@@ -120,12 +120,12 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         self.split_test_module.system.modulestore = mocked_modulestore
 
 
-@attr(shard=1)
 @ddt.ddt
 class SplitTestModuleLMSTest(SplitTestModuleTest):
     """
     Test the split test module
     """
+    shard = 1
 
     @ddt.data((0, 'split_test_cond0'), (1, 'split_test_cond1'))
     @ddt.unpack
@@ -181,11 +181,11 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         self.assertEquals(len(children), 2)
 
 
-@attr(shard=1)
 class SplitTestModuleStudioTest(SplitTestModuleTest):
     """
     Unit tests for how split test interacts with Studio.
     """
+    shard = 1
 
     @patch('xmodule.split_test_module.SplitTestDescriptor.group_configuration_url', return_value='http://example.com')
     def test_render_author_view(self, group_configuration_url):

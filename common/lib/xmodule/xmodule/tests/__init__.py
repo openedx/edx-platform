@@ -21,7 +21,6 @@ from functools import wraps
 from mock import Mock
 from path import Path as path
 from six import text_type
-from nose.plugins.attrib import attr
 
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
@@ -177,17 +176,18 @@ def mock_render_template(*args, **kwargs):
     return pprint.pformat((args, kwargs)).decode()
 
 
-@attr(shard=1)
 class ModelsTest(unittest.TestCase):
+    shard = 1
+
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 
 
-@attr(shard=1)
 class LogicTest(unittest.TestCase):
     """Base class for testing xmodule logic."""
+    shard = 1
     descriptor_class = None
     raw_field_data = {}
 
@@ -399,11 +399,11 @@ class LazyFormat(object):
         return unicode(self)[index]
 
 
-@attr(shard=1)
 class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
     """
+    shard = 1
 
     def setUp(self):
         super(CourseComparisonTest, self).setUp()

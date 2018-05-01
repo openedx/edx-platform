@@ -8,7 +8,6 @@ import ddt
 import pytz
 from django.test import TestCase
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 
 from submissions.models import score_reset, score_set
 from util.date_utils import to_timestamp
@@ -80,7 +79,6 @@ PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS = {
 }
 
 
-@attr(shard=4)
 @ddt.ddt
 class ScoreChangedSignalRelayTest(TestCase):
     """
@@ -92,6 +90,7 @@ class ScoreChangedSignalRelayTest(TestCase):
     This ensures that listeners in the LMS only have to handle one type
     of signal for all scoring events regardless of their origin.
     """
+    shard = 4
     SIGNALS = {
         'score_set': score_set,
         'score_reset': score_reset,

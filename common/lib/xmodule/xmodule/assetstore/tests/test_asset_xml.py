@@ -6,18 +6,18 @@ import unittest
 from path import Path as path
 from lxml import etree
 from contracts import ContractNotRespected
-from nose.plugins.attrib import attr
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.tests.test_assetstore import AssetStoreTestData
 
 
-@attr(shard=1)
 class TestAssetXml(unittest.TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
+    shard = 1
+
     def setUp(self):
         super(TestAssetXml, self).setUp()
 

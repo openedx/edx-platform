@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import json
 import math
 
-from nose.plugins.attrib import attr
 from crum import CurrentRequestUserMiddleware
 import ddt
 from django.contrib.sites.models import Site
@@ -68,9 +67,10 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
     return mock_request
 
 
-@attr(shard=4)
 @ddt.ddt
 class TaskTestCase(ModuleStoreTestCase):
+    shard = 4
+
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):

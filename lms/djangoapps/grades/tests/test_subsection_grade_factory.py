@@ -3,7 +3,6 @@ from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from django.conf import settings
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
-from nose.plugins.attrib import attr
 
 from ..models import PersistentSubsectionGrade
 from ..subsection_grade_factory import ZeroSubsectionGrade
@@ -11,7 +10,6 @@ from .base import GradeTestBase
 from .utils import mock_get_score
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
     """
@@ -21,6 +19,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
     persistent grades are functioning as expected, and that the flag to
     enable saving subsection grades blocks/enables that feature as expected.
     """
+    shard = 4
 
     def assert_grade(self, grade, expected_earned, expected_possible):
         """

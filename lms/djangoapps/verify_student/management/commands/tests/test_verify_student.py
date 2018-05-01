@@ -9,7 +9,6 @@ from django.core.management import call_command
 from django.test import TestCase
 from mock import patch
 from nose.tools import assert_equals
-from nose.plugins.attrib import attr
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -21,7 +20,6 @@ from lms.djangoapps.verify_student.tests.test_models import (
 from student.tests.factories import UserFactory
 
 
-@attr(shard=4)
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
@@ -29,6 +27,7 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
+    shard = 4
 
     def setUp(self):
         super(TestVerifyStudentCommand, self).setUp()

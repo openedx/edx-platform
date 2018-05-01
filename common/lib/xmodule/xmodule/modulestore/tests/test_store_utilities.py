@@ -4,14 +4,12 @@ Tests for store_utilities.py
 import unittest
 from mock import Mock
 import ddt
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore.store_utilities import (
     get_draft_subtree_roots, draft_node_constructor
 )
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestUtils(unittest.TestCase):
     """
@@ -51,6 +49,7 @@ class TestUtils(unittest.TestCase):
                 /        \
             child_3    child_4
     """
+    shard = 2
 
     ONLY_ROOTS = [
         draft_node_constructor(Mock(), 'url1', 'vertical'),

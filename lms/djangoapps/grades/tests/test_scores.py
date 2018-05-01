@@ -9,7 +9,6 @@ import ddt
 from django.test import TestCase
 from django.utils.timezone import now
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from nose.plugins.attrib import attr
 
 import lms.djangoapps.grades.scores as scores
 from lms.djangoapps.grades.models import BlockRecord
@@ -49,11 +48,11 @@ def expected_result_repr(self):
     return '<ExpectedResult {}>'.format(' '.join(attributes))
 
 
-@attr(shard=4)
 class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
     """
+    shard = 4
     possibly_scored_block_types = {
         'course', 'chapter', 'sequential', 'vertical',
         'library_content', 'split_test', 'conditional', 'library', 'randomize',
@@ -74,12 +73,12 @@ class TestScoredBlockTypes(TestCase):
             self.assertTrue(scores.possibly_scored(usage_key))
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestGetScore(TestCase):
     """
     Tests for get_score
     """
+    shard = 4
     display_name = 'test_name'
     location = 'test_location'
 
@@ -227,12 +226,13 @@ class TestGetScore(TestCase):
         self.assertEquals(score, expected_score)
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestWeightedScore(TestCase):
     """
     Tests the helper method: weighted_score
     """
+    shard = 4
+
     @ddt.data(
         (0, 0, 1),
         (5, 0, 0),
@@ -268,12 +268,13 @@ class TestWeightedScore(TestCase):
             scores.weighted_score(raw_earned=1, raw_possible=None, weight=1)
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestInternalGetGraded(TestCase):
     """
     Tests the internal helper method: _get_explicit_graded
     """
+    shard = 4
+
     def _create_block(self, explicit_graded_value):
         """
         Creates and returns a minimal BlockData object with the give value
@@ -308,12 +309,13 @@ class TestInternalGetGraded(TestCase):
         )
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
+    shard = 4
+
     def _create_block(self, raw_possible):
         """
         Creates and returns a minimal BlockData object with the give value

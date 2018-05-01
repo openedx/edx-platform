@@ -14,7 +14,6 @@ import django
 from django.conf import settings
 from django.db.utils import IntegrityError
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
@@ -131,13 +130,13 @@ def _recalc_persistent_expected_query_counts():
         return 24
 
 
-@attr(shard=4)
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
     """
     Ensures that the recalculate subsection grade task functions as expected when run.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
@@ -428,12 +427,12 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.assertFalse(mock_retry.called)
 
 
-@attr(shard=4)
 @ddt.ddt
 class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
     """
     Test compute_grades_for_course_v2 task.
     """
+    shard = 4
 
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 

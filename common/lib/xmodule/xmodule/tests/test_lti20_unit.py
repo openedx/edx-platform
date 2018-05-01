@@ -3,7 +3,6 @@
 import datetime
 import textwrap
 
-from nose.plugins.attrib import attr
 from pytz import UTC
 from mock import Mock
 from xmodule.lti_module import LTIDescriptor
@@ -12,9 +11,9 @@ from xmodule.lti_2_util import LTIError
 from . import LogicTest
 
 
-@attr(shard=1)
 class LTI20RESTResultServiceTest(LogicTest):
     """Logic tests for LTI module. LTI2.0 REST ResultService"""
+    shard = 1
     descriptor_class = LTIDescriptor
 
     def setUp(self):

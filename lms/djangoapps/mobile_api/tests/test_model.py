@@ -6,17 +6,17 @@ from datetime import datetime
 import ddt
 from django.test import TestCase
 from pytz import UTC
-from nose.plugins.attrib import attr
 
 from mobile_api.models import AppVersionConfig, MobileApiConfig
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestAppVersionConfigModel(TestCase):
     """
     Tests for app version configuration model
     """
+    shard = 4
+
     def set_app_version_config(self):
         """ Creates configuration data for platform versions """
         AppVersionConfig(platform="ios", version="1.1.1", expire_at=None, enabled=True).save()
@@ -86,11 +86,11 @@ class TestAppVersionConfigModel(TestCase):
         self.assertEqual(last_supported_date, AppVersionConfig.last_supported_date(platform, version))
 
 
-@attr(shard=4)
 class TestMobileApiConfig(TestCase):
     """
     Tests MobileAPIConfig
     """
+    shard = 4
 
     def test_video_profile_list(self):
         """Check that video_profiles config is returned in order as a list"""

@@ -5,7 +5,6 @@ defined in edx_user_state_client.
 
 from collections import defaultdict
 from unittest import skip
-from nose.plugins.attrib import attr
 
 from django.test import TestCase
 from edx_user_state_client.tests import UserStateClientTestBase
@@ -15,12 +14,12 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@attr(shard=4)
 class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     """
     Tests of the DjangoUserStateClient backend.
     It reuses all tests from :class:`~UserStateClientTestBase`.
     """
+    shard = 4
     __test__ = True
     # Tell Django to clean out all databases, not just default
     multi_db = True
