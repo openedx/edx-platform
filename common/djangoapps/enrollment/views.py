@@ -5,26 +5,22 @@ consist primarily of authentication, request validation, and serialization.
 """
 import logging
 
+from course_modes.models import CourseMode
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from rest_framework import status, permissions
-from rest_framework.response import Response
-from rest_framework.throttling import UserRateThrottle
-from rest_framework.views import APIView
-from six import text_type
-
-from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
+from enrollment import REDUCE_RATE_LIMIT_FOR_STAFF_FOR_ENROLLMENT_API, \
+    USE_UNIVERSAL_RATE_LIMIT_FOR_ENROLLMENT_API
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
-from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
@@ -35,10 +31,15 @@ from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.api import (
     ConsentApiServiceClient,
-    EnterpriseApiServiceClient,
     EnterpriseApiException,
+    EnterpriseApiServiceClient,
     enterprise_enabled
 )
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
+from six import text_type
 from student.auth import user_has_role
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
@@ -77,13 +78,30 @@ class ApiKeyPermissionMixIn(object):
 
 class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     """Limit the number of requests users can make to the enrollment API."""
-    # The staff Throttle rate is currently being adjusted to meet the needs of the eCommerce API calls.
-    # This should be reviewed for performance and we should determine the optimum throttle for the needs of this API.
-    # https://openedx.atlassian.net/wiki/spaces/LEARNER/pages/645923004/eCommerce+Guild
+    # TODO: After confirming that reducing the throttle is successful, remove
+    # and clean up waffles. The rate limit has been increased over the course
+    # of a few months to account for unnecessary calls from the ecommerce
+    # service. These calls are no longer made and the plan is to set the
+    # rate limit back to its original state. LEARNER-5148
+
+    # Current rate limit
     THROTTLE_RATES = {
         'user': '40/minute',
-        'staff': '2000/minute',  # Decided on by looking at number of API calls to the Enrollment API from Staff users
+        'staff': '2000/minute',
     }
+
+    # Less aggressive reduction in throttle limit. This should not be necessary
+    if REDUCE_RATE_LIMIT_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
+        THROTTLE_RATES = {
+            'user': '40/minute',
+            'staff': '400/minute',
+        }
+
+    # Original rate Limit before rate limit increases.
+    if USE_UNIVERSAL_RATE_LIMIT_FOR_ENROLLMENT_API.is_enabled():
+        THROTTLE_RATES = {
+            'user': '40/minute',
+        }
 
     def allow_request(self, request, view):
         # Use a special scope for staff to allow for a separate throttle rate
