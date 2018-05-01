@@ -671,7 +671,7 @@ class Registration(models.Model):
             analytics.identify(*identity_args)
 
 
-class PendingNameChange(models.Model):
+class PendingNameChange(DeletableByUserValue, models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_name = models.CharField(blank=True, max_length=255)
     rationale = models.CharField(blank=True, max_length=1024)
