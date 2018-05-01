@@ -747,7 +747,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             ### Copy videos from the course tarball into the local video storage backend ###
             LOGGER.info(u'Starting to copy videos from course tarball')
             video_store = LocalVideoStorage()
-            top_olx_video_dir = os.path.join(course_dir, 'course', 'video')
+            top_olx_video_dir = os.path.join(data_root, dirpath, 'video')
             # list of paths to video subdirs, one element per edx course video
             course_video_dirs = filter(os.path.isdir, [
                 os.path.join(top_olx_video_dir, f)
