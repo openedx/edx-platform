@@ -20,7 +20,12 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, PendingEmailChange
+from student.models import (
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    PendingEmailChange,
+    PendingNameChange
+)
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -201,6 +206,35 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertIsNone(enrollment.upgrade_deadline)
 
 
+class PendingNameChangeTests(SharedModuleStoreTestCase):
+    """
+    Tests the deletion of PendingNameChange records
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(PendingNameChangeTests, cls).setUpClass()
+        cls.user = UserFactory()
+        cls.user2 = UserFactory()
+
+    def setUp(self):
+        self.name_change, _ = PendingNameChange.objects.get_or_create(
+            user=self.user,
+            new_name='New Name PII',
+            rationale='for testing!'
+        )
+        self.assertEqual(1, len(PendingNameChange.objects.all()))
+
+    def test_delete_by_user_removes_pending_name_change(self):
+        record_was_deleted = PendingNameChange.delete_by_user_value(self.user, field='user')
+        self.assertTrue(record_was_deleted)
+        self.assertEqual(0, len(PendingNameChange.objects.all()))
+
+    def test_delete_by_user_no_effect_for_user_with_no_name_change(self):
+        record_was_deleted = PendingNameChange.delete_by_user_value(self.user2, field='user')
+        self.assertFalse(record_was_deleted)
+        self.assertEqual(1, len(PendingNameChange.objects.all()))
+
+
 class PendingEmailChangeTests(SharedModuleStoreTestCase):
     """
     Tests the deletion of PendingEmailChange records.
@@ -208,7 +242,6 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(PendingEmailChangeTests, cls).setUpClass()
-        cls.course = CourseFactory()
         cls.user = UserFactory()
         cls.user2 = UserFactory()
 
