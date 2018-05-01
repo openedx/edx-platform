@@ -217,8 +217,6 @@ def inline_discussion(request, course_key, discussion_id):
             group_names_by_id
         ) for thread in threads
     ]
-    with function_trace("add_courseware_context"):
-        add_courseware_context(threads, course, request.user)
 
     return utils.JsonResponse({
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id),
