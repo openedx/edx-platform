@@ -203,3 +203,20 @@ class TestPasswordHistory(TestCase):
         student = self._user_factory_with_history()
 
         self.assertFalse(PasswordHistory.is_password_reset_too_soon(student))
+
+    def test_retirement(self):
+        """
+        Verify that the user's password history contains no actual
+        passwords after retirement is called.
+        """
+        user = self._user_factory_with_history()
+
+        # create multiple rows in the password history table
+        self._change_password(user, "different")
+        self._change_password(user, "differentagain")
+        for row in PasswordHistory.objects.filter(user_id=user.id):
+            self.assertFalse(row.password == "")
+
+        PasswordHistory.retire_user(user.id)
+        for row in PasswordHistory.objects.filter(user_id=user.id):
+            self.assertEqual(row.password, "")
