@@ -29,7 +29,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import IntegrityError, models
+from django.db import IntegrityError, models, transaction
 from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -899,6 +899,20 @@ class PasswordHistory(models.Model):
                 return False
 
         return True
+
+    @classmethod
+    def retire_user(cls, user_id):
+        """
+        Updates the password in all rows corresponding to a user
+        to an empty string as part of removing PII for user retirement.
+        """
+        changed_password = False
+        with transaction.atomic():
+            for row, _ in cls.objects.filter(user_id=user_id):
+                changed_password = True
+                row.password = ""
+
+        return changed_password
 
 
 class LoginFailures(models.Model):
