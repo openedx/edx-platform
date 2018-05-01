@@ -1,5 +1,7 @@
 /* globals gettext */
 
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
+
 export class CourseGoals {  // eslint-disable-line import/prefer-default-export
 
   constructor(options) {
@@ -19,7 +21,10 @@ export class CourseGoals {  // eslint-disable-line import/prefer-default-export
           $('.section-goals').slideDown();
           $('.section-goals .goal .text').text(data.goal_text);
           $('.section-goals select').val(data.goal_key);
-          const successMsg = gettext(`Thank you for setting your course goal to ${data.goal_text.toLowerCase()}!`);
+          const successMsg = HtmlUtils.interpolateHtml(
+            gettext('Thank you for setting your course goal to {goal}!'),
+            { goal: data.goal_text.toLowerCase() },
+          );
           if (!data.is_unsure) {
             // xss-lint: disable=javascript-jquery-html
             $('.message-content').html(`<div class="success-message">${successMsg}</div>`);
