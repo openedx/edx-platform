@@ -11,12 +11,10 @@ urlpatterns = patterns(
         'ccx.views.create_ccx', name='create_ccx'),
     url(r'^save_ccx$',
         'ccx.views.save_ccx', name='save_ccx'),
-    url(r'^ccx_invite$',
-        'ccx.views.ccx_invite', name='ccx_invite'),
     url(r'^ccx_schedule$',
         'ccx.views.ccx_schedule', name='ccx_schedule'),
-    url(r'^ccx_manage_student$',
-        'ccx.views.ccx_student_management', name='ccx_manage_student'),
+    url(r'^ccx-manage-students$',
+        'ccx.views.ccx_students_management', name='ccx-manage-students'),
 
     # Grade book
     url(r'^ccx_gradebook$',
