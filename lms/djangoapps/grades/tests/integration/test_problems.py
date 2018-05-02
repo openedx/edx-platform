@@ -93,13 +93,13 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         self.assertEqual(score.all_total.possible, possible_per_block * block_count)
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     """
     Test that changing the metadata on a block has the desired effect on the
     persisted score.
     """
+    shard = 4
     default_problem_metadata = {
         u'graded': True,
         u'weight': 2.5,
@@ -202,12 +202,12 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         self.assertEqual(score.graded_total.possible, expected_possible)
 
 
-@attr(shard=4)
 @ddt.ddt
 class TestWeightedProblems(SharedModuleStoreTestCase):
     """
     Test scores and grades with various problem weight values.
     """
+    shard = 4
     @classmethod
     def setUpClass(cls):
         super(TestWeightedProblems, cls).setUpClass()
