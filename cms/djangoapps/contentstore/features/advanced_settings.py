@@ -17,11 +17,11 @@ DEPRECATED_SETTINGS = ["CSS Class for Course Reruns", "Hide Progress Tab", "XQA 
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
 
-    world.wait_for_js_to_load()
-    world.wait_for_js_variable_truthy('window.studioNavMenuActive')
+    world.wait_for_js_to_load()  # pylint: disable=no-member
+    world.wait_for_js_variable_truthy('window.studioNavMenuActive')  # pylint: disable=no-member
 
     for _ in range(5):
-        world.click_course_settings()
+        world.click_course_settings()  # pylint: disable=no-member
 
         # The click handlers are set up so that if you click <body>
         # the menu disappears.  This means that if we're even a *little*
@@ -32,7 +32,7 @@ def i_select_advanced_settings(step):
         # link with no JavaScript involved.
         link_css = 'li.nav-course-settings-advanced a'
         try:
-            world.wait_for_visible(link_css)
+            world.wait_for_visible(link_css)  # pylint: disable=no-member
             break
         except AssertionError:
             continue
