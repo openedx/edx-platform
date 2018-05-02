@@ -12,7 +12,8 @@ from .accounts.views import (
     AccountRetirementStatusView,
     AccountRetirementView,
     AccountViewSet,
-    DeactivateLogoutView
+    DeactivateLogoutView,
+    LMSAccountRetirementView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
@@ -44,6 +45,10 @@ RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
 })
 
 RETIREMENT_POST = AccountRetirementView.as_view({
+    'post': 'post',
+})
+
+RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
     'post': 'post',
 })
 
@@ -103,6 +108,11 @@ urlpatterns = [
         r'^v1/accounts/retire/$',
         RETIREMENT_POST,
         name='accounts_retire'
+    ),
+    url(
+        r'^v1/accounts/retire_LMS/$',
+        RETIREMENT_LMS_POST,
+        name='accounts_retire_LMS'
     ),
     url(
         r'^v1/accounts/update_retirement_status/$',

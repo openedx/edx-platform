@@ -9,6 +9,7 @@ import logging
 from functools import wraps
 
 import pytz
+from course_wiki.models import ArticleRevision
 from consent.models import DataSharingConsent
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.core.cache import cache
@@ -35,6 +36,8 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    PasswordHistory,
+    PendingNameChange,
     Registration,
     User,
     UserProfile,
@@ -562,6 +565,83 @@ class AccountRetirementStatusView(ViewSet):
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LMSAccountRetirementView(ViewSet):
+    """
+    Provides an API endpoint for retiring a user in the LMS.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+
+    @request_requires_username
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/retire_LMS/
+
+        {
+            'username': 'user_to_retire'
+        }
+
+        Retires the user with the given username within LMS.
+        This includes:
+
+        """
+
+        username = request.data['username']
+        if is_username_retired(username):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = UserRetirementStatus.get_retirement_for_retirement_action(username).user
+
+            with transaction.atomic():
+                self.clear_pii_from_userprofile(user)
+
+                # EDUCATOR-2702
+
+                # EDUCATOR-2701
+                # https://github.com/edx/django-wiki/pull/34/files
+                ArticleRevision.retire_user(user)
+
+                # EDUCATOR-2695
+                # https://github.com/edx/edx-platform/pull/18100/files
+                PendingNameChange.delete_by_user_value(user, field='user')
+
+                # EDUCATOR-2690
+                # https://github.com/edx/edx-platform/commit/41b1f03c78d2c9ad7975f3b7eb28c2ca20884122
+                PasswordHistory.retire_user(user.id)
+
+                # EDUCATOR-2689
+                # In progress: Sandy
+
+                # EDUCATOR-2660
+                # Backlog
+
+                # EDUCATOR-2659
+                # Backlog
+
+                # EDUCATOR-2658
+                # Backlog
+
+                # EDUCATOR-2648
+                # Backlog
+
+                # EDUCATOR-2681
+                # Backlog
+
+                # EDUCATOR-2703
+                # In progress: https://github.com/edx/edx-platform/pull/18012/files
+
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AccountRetirementView(ViewSet):
