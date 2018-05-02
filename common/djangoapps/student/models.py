@@ -906,13 +906,7 @@ class PasswordHistory(models.Model):
         Updates the password in all rows corresponding to a user
         to an empty string as part of removing PII for user retirement.
         """
-        changed_password = False
-        with transaction.atomic():
-            for row, _ in cls.objects.filter(user_id=user_id):
-                changed_password = True
-                row.password = ""
-
-        return changed_password
+        return cls.objects.filter(user_id=user_id).update(password="")
 
 
 class LoginFailures(models.Model):
