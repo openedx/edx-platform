@@ -170,7 +170,7 @@ class Order(models.Model):
         If a item_type is passed in, then we check to see if the cart has at least one of
         those types of OrderItems
         """
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return False
         cart = cls.get_cart_for_user(user)
 

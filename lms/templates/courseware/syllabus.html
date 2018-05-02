@@ -18,7 +18,7 @@ from courseware.courses import get_course_syllabus_section
   <div class="syllabus_wrapper">
     <div class="syllabus">
         <h1>${_("Syllabus")}</h1>
-        % if user.is_authenticated():
+        % if user.is_authenticated:
         ${get_course_syllabus_section(course, 'syllabus')}
         % else:
         ${get_course_syllabus_section(course, 'guest_syllabus')}

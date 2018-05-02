@@ -201,7 +201,7 @@ def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=in
     return (
         _is_prerequisites_disabled()
         or _has_staff_access_to_descriptor(user, course, course.id)
-        or user.is_anonymous()
+        or user.is_anonymous
         or _has_fulfilled_prerequisites(user, [course.id])
     )
 
@@ -250,7 +250,7 @@ def _can_enroll_courselike(user, courselike):
 
     # If using a registration method to restrict enrollment (e.g., Shibboleth)
     if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and enrollment_domain:
-        if user is not None and user.is_authenticated() and \
+        if user is not None and user.is_authenticated and \
                 ExternalAuthMap.objects.filter(user=user, external_domain=enrollment_domain):
             debug("Allow: external_auth of " + enrollment_domain)
             reg_method_ok = True
@@ -263,7 +263,7 @@ def _can_enroll_courselike(user, courselike):
     # they may enroll, except if the CEA has already been used by a different user.
     # Note that as dictated by the legacy database schema, the filter call includes
     # a `course_id` kwarg which requires a CourseKey.
-    if user is not None and user.is_authenticated():
+    if user is not None and user.is_authenticated:
         cea = CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key).first()
         if cea and cea.valid_for_user(user):
             return ACCESS_GRANTED
@@ -667,7 +667,7 @@ def _has_access_to_course(user, access_level, course_key):
 
     access_level = string, either "staff" or "instructor"
     """
-    if user is None or (not user.is_authenticated()):
+    if user is None or (not user.is_authenticated):
         debug("Deny: no user or anon user")
         return ACCESS_DENIED
 

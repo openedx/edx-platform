@@ -24,7 +24,7 @@ def signup(request):
     Display the signup form.
     """
     csrf_token = csrf(request)['csrf_token']
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect('/course/')
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to course to login to process their certificate if SSL is enabled
@@ -68,7 +68,7 @@ def login_page(request):
 
 def howitworks(request):
     "Proxy view"
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect('/home/')
     else:
         return render_to_response('howitworks.html', {})

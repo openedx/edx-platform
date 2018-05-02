@@ -752,7 +752,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     try:
         # TODO authorization
         #may raise exceptions.PermissionDenied
-        #if request.user.is_anonymous():
+        #if request.user.is_anonymous:
         #    msg = _('Sorry, anonymous users cannot upload files')
         #    raise exceptions.PermissionDenied(msg)
 

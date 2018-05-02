@@ -255,7 +255,7 @@ class StaticContentServer(object):
         if not self.is_content_locked(content):
             return True
 
-        if not hasattr(request, "user") or not request.user.is_authenticated():
+        if not hasattr(request, "user") or not request.user.is_authenticated:
             return False
 
         if not request.user.is_staff:

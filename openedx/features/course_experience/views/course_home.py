@@ -116,7 +116,7 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Unenrolled users who are not course or global staff are given only a subset.
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         user_access = {
-            'is_anonymous': request.user.is_anonymous(),
+            'is_anonymous': request.user.is_anonymous,
             'is_enrolled': enrollment is not None,
             'is_staff': has_access(request.user, 'staff', course_key),
         }

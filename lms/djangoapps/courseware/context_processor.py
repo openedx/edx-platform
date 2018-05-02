@@ -31,7 +31,7 @@ def user_timezone_locale_prefs(request):
             'user_timezone': None,
             'user_language': None,
         }
-        if hasattr(request, 'user') and request.user.is_authenticated():
+        if hasattr(request, 'user') and request.user.is_authenticated:
             try:
                 user_preferences = get_user_preferences(request.user)
             except (UserNotFound, UserAPIInternalError):

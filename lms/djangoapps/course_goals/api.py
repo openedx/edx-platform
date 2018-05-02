@@ -41,7 +41,7 @@ def get_course_goal(user, course_key):
 
     If the user is anonymous or a course goal does not exist, returns None.
     """
-    if user.is_anonymous():
+    if user.is_anonymous:
         return None
 
     course_goals = models.CourseGoal.objects.filter(user=user, course_key=course_key)

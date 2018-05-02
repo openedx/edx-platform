@@ -29,7 +29,7 @@ def user_can_skip_entrance_exam(user, course):
     """
     if not course_has_entrance_exam(course):
         return True
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
     if has_access(user, 'staff', course):
         return True
@@ -47,7 +47,7 @@ def user_has_passed_entrance_exam(user, course):
     """
     if not course_has_entrance_exam(course):
         return True
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
     return get_entrance_exam_content(user, course) is None
 

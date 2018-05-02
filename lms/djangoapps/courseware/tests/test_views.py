@@ -512,9 +512,9 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     def test_user_groups(self):
-        # depreciated function
+        # deprecated function
         mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
+        type(mock_user).is_authenticated = PropertyMock(return_value=False)
         self.assertEqual(views.user_groups(mock_user), [])
 
     def test_get_redirect_url(self):

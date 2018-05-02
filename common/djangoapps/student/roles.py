@@ -124,7 +124,7 @@ class GlobalStaff(AccessRole):
 
     def add_users(self, *users):
         for user in users:
-            if user.is_authenticated() and user.is_active:
+            if user.is_authenticated and user.is_active:
                 user.is_staff = True
                 user.save()
 
@@ -167,7 +167,7 @@ class RoleBase(AccessRole):
         Return:
             bool identifying if user has that particular role or not
         """
-        if check_user_activation and not (user.is_authenticated() and user.is_active):
+        if check_user_activation and not (user.is_authenticated and user.is_active):
             return False
 
         # pylint: disable=protected-access
@@ -186,7 +186,7 @@ class RoleBase(AccessRole):
         # legit get updated.
         from student.models import CourseAccessRole
         for user in users:
-            if user.is_authenticated() and user.is_active and not self.has_user(user):
+            if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
                 entry.save()
                 if hasattr(user, '_roles'):
@@ -372,7 +372,7 @@ class UserBasedRole(object):
         """
         Return whether the role's user has the configured role access to the passed course
         """
-        if not (self.user.is_authenticated() and self.user.is_active):
+        if not (self.user.is_authenticated and self.user.is_active):
             return False
 
         # pylint: disable=protected-access
@@ -385,7 +385,7 @@ class UserBasedRole(object):
         """
         Grant this object's user the object's role for the supplied courses
         """
-        if self.user.is_authenticated() and self.user.is_active:
+        if self.user.is_authenticated and self.user.is_active:
             for course_key in course_keys:
                 entry = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
                 entry.save()
