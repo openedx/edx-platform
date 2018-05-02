@@ -9,7 +9,7 @@ import logging
 from functools import wraps
 
 import pytz
-from course_wiki.models import ArticleRevision
+from course_wiki.models import ArticleRevision, RevisionPluginRevision
 from consent.models import DataSharingConsent
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.core.cache import cache
@@ -597,9 +597,9 @@ class LMSAccountRetirementView(ViewSet):
             user = UserRetirementStatus.get_retirement_for_retirement_action(username).user
 
             with transaction.atomic():
-                self.clear_pii_from_userprofile(user)
-
                 # EDUCATOR-2702
+                # https://github.com/edx/django-wiki/pull/35/files
+                RevisionPluginRevision.retire_user(user)
 
                 # EDUCATOR-2701
                 # https://github.com/edx/django-wiki/pull/34/files
@@ -614,7 +614,7 @@ class LMSAccountRetirementView(ViewSet):
                 PasswordHistory.retire_user(user.id)
 
                 # EDUCATOR-2689
-                # In progress: Sandy
+                # In progress: no PR
 
                 # EDUCATOR-2660
                 # Backlog
