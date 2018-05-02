@@ -70,6 +70,7 @@ def cmd_log(cmd, cwd):
 def export_to_git(course_id, repo, user='', rdir=None):
     """Export a course to git."""
     # pylint: disable=too-many-statements
+    log.info("Starting git export (course id: %s)", course_id)
 
     if not GIT_REPO_EXPORT_DIR:
         raise GitExportError(GitExportError.NO_EXPORT_DIR)
@@ -181,3 +182,5 @@ def export_to_git(course_id, repo, user='', rdir=None):
     except subprocess.CalledProcessError as ex:
         log.exception('Error running git push command: %r', ex.output)
         raise GitExportError(GitExportError.CANNOT_PUSH)
+
+    log.info("Finished git export (course id: %s)", course_id)

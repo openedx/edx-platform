@@ -4,10 +4,10 @@ from datetime import datetime
 from functools import wraps
 import logging
 
+from django.conf import settings
 from django.core.cache import cache
 from django.dispatch import receiver
 from pytz import UTC
-
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
@@ -61,8 +61,15 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     if CoursewareSearchIndexer.indexing_is_enabled():
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
         from contentstore.tasks import update_search_index
-
         update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat())
+
+    # If the Git auto-export is enabled, push the course changes to Git
+    if settings.FEATURES.get('ENABLE_EXPORT_GIT') and settings.FEATURES.get('ENABLE_GIT_AUTO_EXPORT'):
+        from contentstore.tasks import async_export_to_git
+        log.info(
+            'Course published with auto-export enabled. Starting export... (course id: %s)', course_key
+        )
+        async_export_to_git.delay(unicode(course_key))
 
 
 @receiver(SignalHandler.library_updated)

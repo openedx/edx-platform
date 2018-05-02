@@ -9,6 +9,7 @@ from uuid import uuid4
 
 import ddt
 import pytest
+import mock
 from django.conf import settings
 from lazy.lazy import lazy
 from mock import patch
@@ -758,6 +759,27 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
+        # Note that this test will only succeed if celery is working in inline mode
+        response = searcher.search(
+            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
+            field_dictionary={"course": unicode(self.course.id)}
+        )
+        self.assertEqual(response["total"], 3)
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {
+        'ENABLE_EXPORT_GIT': True,
+        'ENABLE_GIT_AUTO_EXPORT': True,
+    })
+    def test_task_indexing_course_with_export_git(self):
+        """
+        Making sure that the receiver correctly fires off the task when invoked by signal
+        and git export called.
+        """
+        searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
+        with mock.patch('contentstore.tasks.async_export_to_git.delay') as mocked_export_to_git:
+            listen_for_course_publish(self, self.course.id)
+
+        mocked_export_to_git.assert_called_with(unicode(self.course.id))
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(
             doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
