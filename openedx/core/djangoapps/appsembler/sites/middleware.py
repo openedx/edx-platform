@@ -3,6 +3,33 @@ from django.core.cache import cache
 from django.contrib.redirects.models import Redirect
 from django.shortcuts import redirect
 
+from .models import AlternativeDomain
+
+import logging
+log = logging.getLogger(__name__)
+
+
+class CustomDomainsRedirectMiddleware(object):
+
+    def process_request(self, request):
+
+        hostname = request.get_host()
+        if hostname.endswith(settings.SITE_NAME):
+            cache_key = '{prefix}-{site}'.format(prefix=settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX, site=hostname)
+            custom_domain = cache.get(cache_key)
+            if custom_domain is None:
+                try:
+                    alternative_domain = AlternativeDomain.objects.select_related('site').get(domain=hostname)
+                    custom_domain = alternative_domain.site.domain
+                except AlternativeDomain.DoesNotExist:
+                    custom_domain = ""
+                cache.set(cache_key, custom_domain, settings.CUSTOM_DOMAINS_REDIRECT_CACHE_TIMEOUT)
+
+            if custom_domain:
+                return redirect("https://" + custom_domain)
+
+            return
+
 
 class RedirectMiddleware(object):
     """

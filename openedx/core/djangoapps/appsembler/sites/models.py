@@ -2,6 +2,8 @@
 from django.conf import settings
 from django.core.cache import caches
 from django.db import models
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
 from django.core.exceptions import ImproperlyConfigured
@@ -99,6 +101,19 @@ class AlternativeDomain(models.Model):
         """
         return settings.LMS_BASE in self.domain
 
+
+@receiver(post_save, sender=AlternativeDomain)
+def delete_alternative_domain_cache(sender, instance, **kwargs):
+    if instance.site.domain.endswith(settings.SITE_NAME):
+        cache_key_site = instance.site.domain
+    else:
+        cache_key_site = instance.domain
+
+    cache_key = '{prefix}-{site}'.format(
+        prefix=settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX,
+        site=cache_key_site
+    )
+    cache.delete(cache_key)
 
 django.contrib.sites.models.clear_site_cache = patched_clear_site_cache
 SiteManager.clear_cache = patched_clear_cache
