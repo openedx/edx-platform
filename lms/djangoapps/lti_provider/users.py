@@ -35,7 +35,7 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         # This is the first time that the user has been here. Create an account.
         lti_user = create_lti_user(lti_user_id, lti_consumer)
 
-    if not (request.user.is_authenticated() and
+    if not (request.user.is_authenticated and
             request.user == lti_user.edx_user):
         # The user is not authenticated, or is logged in as somebody else.
         # Switch them to the LTI user

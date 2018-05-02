@@ -93,7 +93,7 @@ from xmodule.tabs import CourseTabList
           <div class="feedback-form-error" aria-live="polite">
               <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
           </div>
-    % if not user.is_authenticated():
+    % if not user.is_authenticated:
           <label data-field="name" for="feedback_form_name">${_('Name')}*</label>
           <input name="name" type="text" id="feedback_form_name" required>
           <label data-field="email" for="feedback_form_email">${_('E-mail')}*</label>
@@ -241,7 +241,7 @@ $(document).ready(function() {
             return option;
         };
 
-    % if user.is_authenticated():
+    % if user.is_authenticated:
         userAuthenticated = true;
     % endif
 

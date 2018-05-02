@@ -137,7 +137,7 @@ def permission_blacked_out(course, role_names, permission_name):
 
 def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=invalid-name
     """Returns all the permissions the user has in the given course."""
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return {}
 
     course = modulestore().get_course(course_id)

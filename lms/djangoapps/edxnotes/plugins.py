@@ -30,7 +30,7 @@ class EdxNotesTab(EnrolledTab):
         if not settings.FEATURES.get("ENABLE_EDXNOTES") or is_harvard_notes_enabled(course):
             return False
 
-        if user and not user.is_authenticated():
+        if user and not user.is_authenticated:
             return False
 
         return course.edxnotes

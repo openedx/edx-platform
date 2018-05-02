@@ -185,7 +185,7 @@ def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
     """
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return []
 
     # TODO: Rewrite in Django
@@ -335,7 +335,7 @@ def course_info(request, course_id):
         # LEARNER-1697: Transition banner messages to new Course Home (DONE)
         # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
         user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
-        show_enroll_banner = request.user.is_authenticated() and not user_is_enrolled
+        show_enroll_banner = request.user.is_authenticated and not user_is_enrolled
 
         # If the user is not enrolled but this is a course that does not support
         # direct enrollment then redirect them to the dashboard.
@@ -358,7 +358,7 @@ def course_info(request, course_id):
         # Construct the dates fragment
         dates_fragment = None
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             # TODO: LEARNER-611: Remove enable_course_home_improvements
             if SelfPacedConfiguration.current().enable_course_home_improvements:
                 # Shared code with the new Course Home (DONE)
@@ -520,7 +520,7 @@ class CourseTabView(EdxFragmentView):
         """
         Register messages to be shown to the user if they have limited access.
         """
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             PageLevelMessages.register_warning_message(
                 request,
                 Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
@@ -677,7 +677,7 @@ def registered_for_course(course, user):
     """
     if user is None:
         return False
-    if user.is_authenticated():
+    if user.is_authenticated:
         return CourseEnrollment.is_enrolled(user, course.id)
     else:
         return False
@@ -785,7 +785,7 @@ def course_about(request, course_id):
 
         _is_shopping_cart_enabled = is_shopping_cart_enabled()
         if _is_shopping_cart_enabled:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 cart = shoppingcart.models.Order.get_cart_for_user(request.user)
                 in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
                     shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
@@ -1360,7 +1360,7 @@ def generate_user_cert(request, course_id):
 
     """
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
             _('You must be signed in to {platform_name} to create a certificate.').format(

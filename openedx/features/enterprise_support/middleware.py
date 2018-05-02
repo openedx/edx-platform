@@ -25,5 +25,5 @@ class EnterpriseMiddleware(object):
         """
         Fill the request with Enterprise-related content.
         """
-        if 'enterprise_customer' not in request.session and request.user.is_authenticated():
+        if 'enterprise_customer' not in request.session and request.user.is_authenticated:
             request.session['enterprise_customer'] = api.enterprise_customer_for_request(request)

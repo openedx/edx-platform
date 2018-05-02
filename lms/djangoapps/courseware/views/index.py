@@ -97,7 +97,7 @@ class CoursewareIndex(View):
         """
         self.course_key = CourseKey.from_string(course_id)
 
-        if not (request.user.is_authenticated() or self.enable_anonymous_courseware_access):
+        if not (request.user.is_authenticated or self.enable_anonymous_courseware_access):
             return redirect_to_login(request.get_full_path())
 
         self.original_chapter_url_name = chapter
@@ -156,7 +156,7 @@ class CoursewareIndex(View):
                 self._save_positions()
                 self._prefetch_and_bind_section()
 
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             qs = urllib.urlencode({
                 'course_id': self.course_key,
                 'enrollment_action': 'enroll',
@@ -218,7 +218,7 @@ class CoursewareIndex(View):
         """
         redeemed_registration_codes = []
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             self.real_user = User.objects.prefetch_related("groups").get(id=self.real_user.id)
             redeemed_registration_codes = CourseRegistrationCode.objects.filter(
                 course_id=self.course_key,
@@ -255,7 +255,7 @@ class CoursewareIndex(View):
         """
         language_preference = settings.LANGUAGE_CODE
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             language_preference = get_user_preference(self.real_user, LANGUAGE_KEY)
 
         return language_preference
@@ -484,12 +484,12 @@ class CoursewareIndex(View):
 
         # NOTE (CCB): Pull the position from the URL for un-authenticated users. Otherwise, pull the saved
         # state from the data store.
-        position = None if self.request.user.is_authenticated() else self.position
+        position = None if self.request.user.is_authenticated else self.position
         section_context = {
             'activate_block_id': self.request.GET.get('activate_block_id'),
             'requested_child': self.request.GET.get("child"),
             'progress_url': reverse('progress', kwargs={'course_id': unicode(self.course_key)}),
-            'user_authenticated': self.request.user.is_authenticated(),
+            'user_authenticated': self.request.user.is_authenticated,
             'position': position,
         }
         if previous_of_active_section:

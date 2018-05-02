@@ -31,7 +31,7 @@ class ContactUsView(View):
             current_site_name = current_site_name.replace(".", "_")
             tags.append("site_name_{site}".format(site=current_site_name))
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             context['course_id'] = request.session.get('course_id', '')
             context['user_enrollments'] = CourseEnrollment.enrollments_for_user_with_overviews_preload(request.user)
             enterprise_learner_data = enterprise_api.get_enterprise_learner_data(user=request.user)

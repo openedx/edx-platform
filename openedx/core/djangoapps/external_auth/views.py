@@ -401,7 +401,7 @@ def ssl_login_shortcut(func):
             return func(*args, **kwargs)
         request = args[0]
 
-        if request.user and request.user.is_authenticated():  # don't re-authenticate
+        if request.user and request.user.is_authenticated:  # don't re-authenticate
             return func(*args, **kwargs)
 
         cert = ssl_get_cert_from_request(request)
@@ -484,7 +484,7 @@ def cas_login(request, next_page=None, required=False):
 
     ret = django_cas_login(request, next_page, required)
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         user = request.user
         UserProfile.objects.get_or_create(
             user=user,

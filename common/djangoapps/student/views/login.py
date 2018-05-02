@@ -514,7 +514,7 @@ def signin_user(request):
         return external_auth_response
     # Determine the URL to redirect to following login:
     redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect(redirect_to)
 
     third_party_auth_error = None

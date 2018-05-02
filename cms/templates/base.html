@@ -110,7 +110,7 @@ from openedx.core.release import RELEASE_LINE
         </div>
       </main>
 
-      % if user.is_authenticated():
+      % if user.is_authenticated:
         <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
       % endif
       <%include file="widgets/footer.html" />
@@ -142,7 +142,7 @@ from openedx.core.release import RELEASE_LINE
         }
       </script>
     % endif
-    % if user.is_authenticated():
+    % if user.is_authenticated:
       <%static:invoke_page_bundle page_name='js/sock'/>
     % endif
     <%block name='page_bundle'>

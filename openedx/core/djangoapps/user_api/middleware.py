@@ -35,7 +35,7 @@ class UserTagsEventContextMiddleware(object):
         if course_id:
             context['course_id'] = course_id
 
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 context['course_user_tags'] = dict(
                     UserCourseTag.objects.filter(
                         user=request.user.pk,

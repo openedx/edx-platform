@@ -48,7 +48,7 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     template_name = 'course_experience/mobile/course-dates-fragment.html'
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             raise Http404
 
         return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)

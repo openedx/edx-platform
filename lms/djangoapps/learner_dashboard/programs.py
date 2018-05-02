@@ -39,7 +39,7 @@ class ProgramsFragmentView(EdxFragmentView):
             mobile_only = False
 
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
-        if not programs_config.enabled or not user.is_authenticated():
+        if not programs_config.enabled or not user.is_authenticated:
             raise Http404
 
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
@@ -76,7 +76,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     def render_to_fragment(self, request, program_uuid, **kwargs):
         """View details about a specific program."""
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
-        if not programs_config.enabled or not request.user.is_authenticated():
+        if not programs_config.enabled or not request.user.is_authenticated:
             raise Http404
 
         meter = ProgramProgressMeter(request.site, request.user, uuid=program_uuid)
