@@ -5,9 +5,9 @@
 # FIXME -- use tag v1.1.0 when https://github.com/edx-solutions/xblock-image-explorer/pull/37 merged and tagged
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@b7febc7a9a214cf4901c9cc864d4fdd56c4224d5#egg=xblock-image-explorer==0.8.0
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@7b054467159fd2cbe2e0adccf9a0665d36a2a197#egg=xblock-drag-and-drop-v2
-# Temporary new version for A2E course only; installs in parallel with the above version. Aim to remove this and upgrade the above ASAP.
--e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@c98fd76eabbf9e2be85dad519acf1f8918960d03#egg=xblock-drag-and-drop-v2-new
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@9e017517060ad1c8e6935c24962de1d233a9d3a4#egg=xblock-drag-and-drop-v2
+# This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
+-e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.15#egg=xblock-ooyala==2.0.15
 -e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
