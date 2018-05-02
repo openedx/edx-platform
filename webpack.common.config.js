@@ -104,6 +104,7 @@ module.exports = {
             Popper: 'popper.js', // used by bootstrap
             CodeMirror: 'codemirror',
             'edx.HtmlUtils': 'edx-ui-toolkit/js/utils/html-utils',
+            AjaxPrefix: 'ajax_prefix'
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
