@@ -13,7 +13,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     data-user-create-comment="${json_dumps(can_create_comment)}"
     data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
     data-read-only="${'false' if can_create_thread else 'true'}">
-    % if not user.is_authenticated():
+    % if not user.is_authenticated:
         <div class="page-banner">
             <div class="alert alert-warning" role="alert">
                 <span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>
@@ -32,7 +32,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     </div>
     <button class="discussion-show btn"
         data-discussion-id="${discussion_id}"
-        ${"disabled=disabled" if not user.is_authenticated() else ""}>
+        ${"disabled=disabled" if not user.is_authenticated else ""}>
         <span class="button-text">${_("Show Discussion")}</span>
     </button>
 

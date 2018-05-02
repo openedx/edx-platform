@@ -215,7 +215,7 @@ def get_required_content(course_key, user):
     if settings.FEATURES.get('MILESTONES_APP'):
         course_run_id = unicode(course_key)
 
-        if user.is_authenticated():
+        if user.is_authenticated:
             # Get all of the outstanding milestones for this course, for this user
             try:
 

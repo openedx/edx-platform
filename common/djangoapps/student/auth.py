@@ -164,7 +164,7 @@ def _check_caller_authority(caller, role):
     :param caller: a user
     :param role: an AccessRole
     """
-    if not (caller.is_authenticated() and caller.is_active):
+    if not (caller.is_authenticated and caller.is_active):
         raise PermissionDenied
     # superuser
     if GlobalStaff().has_user(caller):

@@ -173,7 +173,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
 
         login_msg = ''
 
-        if not self.django_user.is_authenticated():
+        if not self.django_user.is_authenticated:
             qs = urllib.urlencode({
                 'course_id': self.course_key,
                 'enrollment_action': 'enroll',

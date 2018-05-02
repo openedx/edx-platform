@@ -60,7 +60,7 @@ def get_bookmarks(user, course_key=None, fields=None, serialized=True):
     Returns:
          List of dicts if serialized is True else queryset.
     """
-    if user.is_authenticated():
+    if user.is_authenticated:
         bookmarks_queryset = Bookmark.objects.filter(user=user)
 
         if course_key:

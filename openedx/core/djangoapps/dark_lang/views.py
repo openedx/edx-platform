@@ -80,7 +80,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         """
         if not DarkLangConfig.current().enabled:
             return False
-        return user and not user.is_anonymous()
+        return user and not user.is_anonymous
 
     def _set_preview_language(self, request):
         """

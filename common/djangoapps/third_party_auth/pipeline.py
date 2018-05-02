@@ -626,7 +626,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
     to the next pipeline step.
 
     """
-    if not is_api(auth_entry) and user is not None and user.is_authenticated():
+    if not is_api(auth_entry) and user is not None and user.is_authenticated:
         request = strategy.request if strategy else None
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:

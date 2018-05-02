@@ -265,7 +265,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         else:
             user = User.objects.get(username=username)
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             # Anonymous users cannot be persisted to the database, so let's just use
             # what we have.
             return

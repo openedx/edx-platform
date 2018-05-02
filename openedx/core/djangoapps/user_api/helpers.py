@@ -482,7 +482,7 @@ def shim_student_view(view_func, check_logged_in=False):
         # the request through authentication middleware.
         is_authenticated = (
             getattr(request, 'user', None) is not None
-            and request.user.is_authenticated()
+            and request.user.is_authenticated
         )
         if check_logged_in and not is_authenticated:
             # If we get a 403 status code from the student view

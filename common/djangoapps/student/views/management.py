@@ -203,7 +203,7 @@ def register_user(request, extra_context=None):
     """
     # Determine the URL to redirect to following login:
     redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect(redirect_to)
 
     external_auth_response = external_auth_register(request)
@@ -352,7 +352,7 @@ def change_enrollment(request, check_access=True):
     user = request.user
 
     # Ensure the user is authenticated
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return HttpResponseForbidden()
 
     # Ensure we received a course_id
@@ -1020,7 +1020,7 @@ def activate_account(request, key):
             # Success message for logged in users.
             message = _('{html_start}Success{html_end} You have activated your account.')
 
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 # Success message for logged out users
                 message = _(
                     '{html_start}Success! You have activated your account.{html_end}'
@@ -1054,7 +1054,7 @@ def activate_account_studio(request, key):
             {'csrf': csrf(request)['csrf_token']}
         )
     else:
-        user_logged_in = request.user.is_authenticated()
+        user_logged_in = request.user.is_authenticated
         already_active = True
         if not registration.user.is_active:
             if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):

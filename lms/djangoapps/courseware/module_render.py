@@ -582,7 +582,7 @@ def get_module_system_for_user(
         Returns:
             nothing (but the side effect is that module is re-bound to real_user)
         """
-        if user.is_authenticated():
+        if user.is_authenticated:
             err_msg = ("rebind_noauth_module_to_user can only be called from a module bound to "
                        "an anonymous user")
             log.error(err_msg)
@@ -943,10 +943,10 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
-    if request.method != 'GET' and not request.user.is_authenticated():
+    if request.method != 'GET' and not request.user.is_authenticated:
         return HttpResponseForbidden()
 
-    request.user.known = request.user.is_authenticated()
+    request.user.known = request.user.is_authenticated
 
     try:
         course_key = CourseKey.from_string(course_id)
@@ -1119,7 +1119,7 @@ def xblock_view(request, course_id, usage_id, view_name):
                  " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     try:

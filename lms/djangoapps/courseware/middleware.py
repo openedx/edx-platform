@@ -27,7 +27,7 @@ class CacheCourseIdMiddleware(object):
         """
         Add a course_id to user request session.
         """
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             match = COURSE_REGEX.match(request.build_absolute_uri())
             course_id = None
             if match:

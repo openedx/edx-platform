@@ -136,6 +136,6 @@ from django.core.urlresolvers import reverse
   </section>
 </section>
 
-%if user.is_authenticated():
+%if user.is_authenticated:
 <%include file="../signup_modal.html" />
 %endif

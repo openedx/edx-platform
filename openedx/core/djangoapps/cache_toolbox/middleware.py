@@ -9,7 +9,7 @@ avoid querying the database for a ``User`` instance in each request.
 Whilst the built-in ``AuthenticationMiddleware`` mechanism will only obtain the
 ``User`` instance when it is required, the vast majority of sites will do so on
 every page to render "Logged in as 'X'" text as well to evaluate the result of
-``user.is_authenticated()`` and ``user.is_superuser`` to provide conditional
+``user.is_authenticated`` and ``user.is_superuser`` to provide conditional
 functionality.
 
 This middleware eliminates the cost of retrieving this ``User`` instance by

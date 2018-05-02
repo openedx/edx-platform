@@ -106,7 +106,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     def allow_request(self, request, view):
         # Use a special scope for staff to allow for a separate throttle rate
         user = request.user
-        if user.is_authenticated() and (user.is_staff or user.is_superuser):
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
             self.scope = 'staff'
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)

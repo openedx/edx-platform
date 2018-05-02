@@ -190,7 +190,7 @@
         <nav class="user-language-selector" aria-label="${_('Language preference')}">
           <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
               <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-              % if user.is_authenticated():
+              % if user.is_authenticated:
               <input title="preference api" type="hidden" id="preference-api-url" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
               % else:
               <input title="session update url" type="hidden" id="update-session-url" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
@@ -210,7 +210,7 @@
         </nav>
       % endif
       % endif
-      % if user.is_authenticated():
+      % if user.is_authenticated:
       <nav class="nav-account nav-is-signedin nav-dd ui-right" aria-label="${_('Account')}">
         <h2 class="sr-only">${_("Account Navigation")}</h2>
         <ol>

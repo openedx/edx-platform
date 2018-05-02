@@ -238,7 +238,7 @@ class EnterpriseApiClient(object):
                 a response. This exception is raised for both connection timeout and read timeout.
 
         """
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return None
 
         api_resource_name = 'enterprise-learner'
@@ -362,7 +362,7 @@ def enterprise_customer_from_cache(request=None, uuid=None):
         enterprise_customer = cache.get(cache_key)
 
     # Check if it's cached in the session.
-    if not enterprise_customer and request and request.user.is_authenticated():
+    if not enterprise_customer and request and request.user.is_authenticated:
         enterprise_customer = request.session.get('enterprise_customer')
 
     return enterprise_customer
@@ -379,7 +379,7 @@ def enterprise_customer_from_api(request):
         # from the EnterpriseCustomer API.
         enterprise_api_client = (
             EnterpriseApiClient(user=request.user)
-            if request.user.is_authenticated()
+            if request.user.is_authenticated
             else EnterpriseApiServiceClient()
         )
 
@@ -422,7 +422,7 @@ def enterprise_customer_uuid_for_request(request):
             settings.ENTERPRISE_CUSTOMER_COOKIE_NAME
         )
 
-    if not enterprise_customer_uuid and request.user.is_authenticated():
+    if not enterprise_customer_uuid and request.user.is_authenticated:
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
         learner_data = get_enterprise_learner_data(request.user)

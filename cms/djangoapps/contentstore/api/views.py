@@ -35,7 +35,7 @@ class CourseImportExportViewMixin(DeveloperErrorViewMixin):
         Ensures that the user is authenticated (e.g. not an AnonymousUser)
         """
         super(CourseImportExportViewMixin, self).perform_authentication(request)
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             raise AuthenticationFailed
 
 
