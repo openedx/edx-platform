@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import MagicMock, patch
+from mock import MagicMock, patch, PropertyMock
 
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser
@@ -124,7 +124,7 @@ class AuthenticateLtiUserTest(TestCase):
     def test_authentication_with_unauthenticated_user(self, create_user, switch_user):
         lti_user = self.create_lti_user_model()
         self.request.user = lti_user.edx_user
-        with patch('django.contrib.auth.models.User.is_authenticated') as mock_is_auth:
+        with patch('django.contrib.auth.models.User.is_authenticated', new_callable=PropertyMock) as mock_is_auth:
             mock_is_auth.return_value = False
             users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
             self.assertFalse(create_user.called)

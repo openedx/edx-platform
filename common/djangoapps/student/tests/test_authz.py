@@ -113,7 +113,10 @@ class CreatorGroupTest(TestCase):
 
     def test_add_user_to_group_requires_authenticated(self):
         with self.assertRaises(PermissionDenied):
-            with mock.patch('django.contrib.auth.models.User.is_authenticated') as mock_is_auth:
+            with mock.patch(
+                'django.contrib.auth.models.User.is_authenticated',
+                new_callable=mock.PropertyMock
+            ) as mock_is_auth:
                 mock_is_auth.return_value = False
                 add_users(self.admin, CourseCreatorRole(), self.user)
 
@@ -129,7 +132,10 @@ class CreatorGroupTest(TestCase):
 
     def test_remove_user_from_group_requires_authenticated(self):
         with self.assertRaises(PermissionDenied):
-            with mock.patch('django.contrib.auth.models.User.is_authenticated') as mock_is_auth:
+            with mock.patch(
+                'django.contrib.auth.models.User.is_authenticated',
+                new_callable=mock.PropertyMock
+            ) as mock_is_auth:
                 mock_is_auth.return_value = False
                 remove_users(self.admin, CourseCreatorRole(), self.user)
 
