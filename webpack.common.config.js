@@ -42,6 +42,8 @@ module.exports = {
         UnenrollmentFactory: './lms/static/js/learner_dashboard/unenrollment_factory.js',
         ViewedEvent: './lms/static/completion/js/ViewedEvent.js',
 
+        DashboardV2: './lms/static/js/dashboard-v2/index.jsx',
+
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
         CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
@@ -152,7 +154,8 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 include: [
-                    /paragon/
+                    /paragon/,
+                    /graphql-dashboard/
                 ],
                 use: 'babel-loader'
             },

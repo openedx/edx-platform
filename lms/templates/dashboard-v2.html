@@ -1,8 +1,16 @@
 <%page expression_filter="h"/>
 <%inherit file="main-v2.html" />
+<%! from openedx.core.djangolib.js_utils import dump_js_escaped_json %>
 
+<%namespace name='static' file='static_content.html'/>
 <%block name="pagetitle">Dashboard</%block>
-
 <div>
-    <h1>hello world</h1>
+    ${static.renderReact(
+        component="DashboardV2",
+        id="dashboard-v2",
+        props={
+            'apiUri': api_uri,
+            'username': user.username
+        }
+    )}
 </div>
