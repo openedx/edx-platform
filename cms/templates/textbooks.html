@@ -27,10 +27,12 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 </script>
 </%block>
 
-<%block name="page_bundle">
-  <%static:invoke_page_bundle page_name="js/pages/textbooks" class_name="TextbooksFactory">
-     ${textbooks | n, dump_js_escaped_json}
-  </%static:invoke_page_bundle>
+<%block name="requirejs">
+    require(["js/factories/textbooks"], function (TextbooksFactory) {
+        TextbooksFactory(
+            ${textbooks | n, dump_js_escaped_json}
+        );
+    });
 </%block>
 
 <%block name="content">
