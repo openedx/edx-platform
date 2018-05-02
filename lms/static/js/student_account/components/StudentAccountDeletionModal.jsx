@@ -3,9 +3,10 @@
 import React from 'react';
 import 'whatwg-fetch';
 import PropTypes from 'prop-types';
-import Cookies from 'js-cookie';
 import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
+import { deactivate } from '../AccountsClient';
 
 class StudentAccountDeletionConfirmationModal extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.deleteAccount = this.deleteAccount.bind(this);
     this.handlePasswordInputChange = this.handlePasswordInputChange.bind(this);
     this.passwordFieldValidation = this.passwordFieldValidation.bind(this);
+    this.handleConfirmationModalClose = this.handleConfirmationModalClose.bind(this);
     this.state = {
       password: '',
       passwordSubmitted: false,
@@ -25,37 +27,27 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     };
   }
 
-  addUserToDeletionQueue() {
-    // TODO: Add API call to add user to account deletion queue
+  handleConfirmationModalClose() {
+    this.props.onClose();
 
-    this.setState({
-      accountQueuedForDeletion: true,
-      responseError: false,
-      passwordSubmitted: false,
-      validationMessage: '',
-      validationErrorDetails: '',
-    });
+    window.location.href = 'https://www.edx.org';
   }
 
   deleteAccount() {
-    const { password } = this.state;
-
-    this.setState({ passwordSubmitted: true });
-
-    fetch('/accounts/verify_password', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': Cookies.get('csrftoken'),
-      },
-      body: JSON.stringify({ password }),
-    }).then((response) => {
-      if (response.ok) {
-        return this.addUserToDeletionQueue();
-      }
-      return this.failedSubmission(response);
-    }).catch(error => this.failedSubmission(error));
+    return this.setState(
+      { passwordSubmitted: true },
+      () => (
+        deactivate(this.state.password)
+          .then(() => this.setState({
+            accountQueuedForDeletion: true,
+            responseError: false,
+            passwordSubmitted: false,
+            validationMessage: '',
+            validationErrorDetails: '',
+          }))
+          .catch(error => this.failedSubmission(error))
+        ),
+      );
   }
 
   failedSubmission(error) {
@@ -182,15 +174,13 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
   }
 
   renderSuccessModal() {
-    const { onClose } = this.props;
-
     return (
       <div className="delete-success-wrapper">
         <Modal
           title={gettext('We\'re sorry to see you go! Your account will be deleted shortly.')}
           renderHeaderCloseButton={false}
           body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.')}
-          onClose={onClose}
+          onClose={this.handleConfirmationModalClose}
           aria-live="polite"
           open
         />
