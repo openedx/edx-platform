@@ -24,6 +24,8 @@ from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     PendingEmailChange,
+    ManualEnrollmentAudit,
+    ALLOWEDTOENROLL_TO_ENROLLED,
     PendingNameChange
 )
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -297,3 +299,52 @@ class TestCourseEnrollmentAllowed(TestCase):
             email=self.email
         )
         self.assertTrue(user_search_results.exists())
+
+
+class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
+    """
+    Tests for the ManualEnrollmentAudit model.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestManualEnrollmentAudit, cls).setUpClass()
+        cls.course = CourseFactory()
+        cls.other_course = CourseFactory()
+        cls.user = UserFactory()
+        cls.instructor = UserFactory(username='staff', is_staff=True)
+
+    def test_retirement(self):
+        """
+        Tests that calling the retirement method for a specific enrollment retires
+        the enrolled_email and reason columns of each row associated with that
+        enrollment.
+        """
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        other_enrollment = CourseEnrollment.enroll(self.user, self.other_course.id)
+        ManualEnrollmentAudit.create_manual_enrollment_audit(
+            self.instructor, self.user.email, ALLOWEDTOENROLL_TO_ENROLLED,
+            'manually enrolling unenrolled user', enrollment
+        )
+        ManualEnrollmentAudit.create_manual_enrollment_audit(
+            self.instructor, self.user.email, ALLOWEDTOENROLL_TO_ENROLLED,
+            'manually enrolling unenrolled user again', enrollment
+        )
+        ManualEnrollmentAudit.create_manual_enrollment_audit(
+            self.instructor, self.user.email, ALLOWEDTOENROLL_TO_ENROLLED,
+            'manually enrolling unenrolled user', other_enrollment
+        )
+        ManualEnrollmentAudit.create_manual_enrollment_audit(
+            self.instructor, self.user.email, ALLOWEDTOENROLL_TO_ENROLLED,
+            'manually enrolling unenrolled user again', other_enrollment
+        )
+        self.assertTrue(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists())
+        # retire the ManualEnrollmentAudit objects associated with the above enrollments
+        enrollments = CourseEnrollment.objects.filter(user=self.user)
+        ManualEnrollmentAudit.retire_manual_enrollments(enrollments=enrollments, retired_email="xxx")
+        self.assertTrue(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists())
+        self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
+            enrolled_email="xxx"
+        ))
+        self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
+            reason=""
+        ))

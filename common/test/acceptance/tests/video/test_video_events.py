@@ -2,6 +2,7 @@
 
 import datetime
 import json
+from unittest import skip
 
 import ddt
 from nose.plugins.attrib import attr
@@ -231,6 +232,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         }
         self.course_fixture.add_advanced_settings(additional_data)
 
+    @skip("student: 5/2/18: flaky test")
     @ddt.data(
         ('edx.video.bumper.skipped', watch_video_and_skip),
         ('edx.video.bumper.dismissed', watch_video_and_dismiss),
