@@ -594,15 +594,18 @@ class LMSAccountRetirementView(ViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
+            ## Is this still necessary?
             user = UserRetirementStatus.get_retirement_for_retirement_action(username).user
 
             with transaction.atomic():
                 # EDUCATOR-2702
                 # https://github.com/edx/django-wiki/pull/35/files
+                # Not sure I'm calling functions in the wiki correctly
                 RevisionPluginRevision.retire_user(user)
 
                 # EDUCATOR-2701
                 # https://github.com/edx/django-wiki/pull/34/files
+                # Not sure I'm calling functions in the wiki correctly
                 ArticleRevision.retire_user(user)
 
                 # EDUCATOR-2695
