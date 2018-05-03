@@ -1142,7 +1142,7 @@ class HLSVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.video.click_player_button('play')
-        self.assertEqual(self.video.state, 'playing')
+        self.assertIn(self.video.state, ['buffering', 'playing'])
         self.video.click_player_button('pause')
         self.assertEqual(self.video.state, 'pause')
 
@@ -1231,6 +1231,7 @@ class HLSVideoTest(VideoBaseTest):
         Given the course has a Video component with "HLS" video only
         And I have defined a transcript for the video
         Then I see the correct text in the captions for transcript
+        Then I play, pause and seek to 0:00
         Then I click on a caption line
         And video position should be updated accordingly
         Then I change video position
@@ -1242,6 +1243,12 @@ class HLSVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.assertIn("Hi, edX welcomes you0.", self.video.captions_text)
+
+        # This is required to load the video
+        self.video.click_player_button('play')
+        # Below 2 steps are required to test the caption line click scenario
+        self.video.click_player_button('pause')
+        self.video.seek('0:00')
 
         for line_no in range(5):
             self.video.click_transcript_line(line_no=line_no)

@@ -20,8 +20,12 @@
             function Player(el, config) {
                 var self = this;
 
+                this.config = config;
+
                 // do common initialization independent of player type
                 this.init(el, config);
+
+                _.bindAll(this, 'playVideo', 'onReady');
 
                 // If we have only HLS sources and browser doesn't support HLS then show error message.
                 if (config.HLSOnlySources && !config.canPlayHLS) {
@@ -29,13 +33,26 @@
                     return;
                 }
 
+                this.config.state.el.on('initialize', _.once(function() {
+                    console.log('[HLS Video]: HLS Player initialized');
+                    self.showPlayButton();
+                }));
+
                 // Safari has native support to play HLS videos
                 if (config.browserIsSafari) {
                     this.videoEl.attr('src', config.videoSources[0]);
                 } else {
-                    this.hls = new HLS();
+                    this.hls = new HLS({autoStartLoad: false});
                     this.hls.loadSource(config.videoSources[0]);
                     this.hls.attachMedia(this.video);
+
+                    this.showLoadingOnce = _.once(function() {
+                        HTML5Video.Player.prototype.updatePlayerLoadingState.apply(self, ['show']);
+                    });
+
+                    this.hideLoadingOnce = _.once(function() {
+                        HTML5Video.Player.prototype.updatePlayerLoadingState.apply(self, ['hide']);
+                    });
 
                     this.hls.on(HLS.Events.ERROR, this.onError.bind(this));
 
@@ -49,6 +66,7 @@
                                 };
                             })
                         );
+                        self.config.onReadyHLS();
                     });
                     this.hls.on(HLS.Events.LEVEL_SWITCHED, function(event, data) {
                         var level = self.hls.levels[data.level];
@@ -59,12 +77,23 @@
                                 resolution: level.width + 'x' + level.height
                             }
                         );
+                        self.hideLoadingOnce();
                     });
                 }
             }
 
             Player.prototype = Object.create(HTML5Video.Player.prototype);
             Player.prototype.constructor = Player;
+
+            Player.prototype.playVideo = function() {
+                this.hls.startLoad();
+                this.video.play();
+                this.showLoadingOnce();
+            };
+
+            Player.prototype.onReady = function() {
+                this.config.events.onReady(null);
+            };
 
             /**
              * Handler for HLS video errors. This only takes care of fatal erros, non-fatal errors
