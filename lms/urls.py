@@ -679,6 +679,16 @@ urlpatterns += [
     ),
 ]
 
+if settings.FEATURES.get('ENABLE_JOURNAL_INTEGRATION'):
+    urlpatterns += [
+        url(
+            r'^bundles/{}/about'.format(
+                r'(?P<bundle_uuid>[0-9a-f-]+)',
+            ),
+            include('openedx.features.journals.urls')
+        ),
+    ]
+
 if settings.FEATURES.get('ENABLE_TEAMS'):
     # Teams endpoints
     urlpatterns += [
