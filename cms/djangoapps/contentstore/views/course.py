@@ -911,6 +911,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, async=True):
 
     # Clear the fields that must be reset for the rerun
     fields['advertised_start'] = None
+    fields['video_upload_pipeline'] = {}
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [unicode(source_course_key), unicode(destination_course_key), user.id, json_fields]
