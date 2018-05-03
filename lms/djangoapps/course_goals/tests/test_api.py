@@ -22,6 +22,8 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
     """
     Testing the Course Goals API.
     """
+    shard = 4
+
     def setUp(self):
         # Create a course with a verified track
         super(TestCourseGoalsAPI, self).setUp()

@@ -63,7 +63,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         return response
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 @pytest.mark.django111_expected_failure
@@ -369,7 +369,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 @pytest.mark.django111_expected_failure

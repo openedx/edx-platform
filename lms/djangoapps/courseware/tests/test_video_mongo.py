@@ -67,7 +67,7 @@ I am overwatch.
 TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -132,7 +132,7 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -214,7 +214,7 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
@@ -990,7 +990,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         self.assertIn("\'poster\': \'null\'", context)
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestVideoCDNRewriting(BaseTestXmodule):
     """
     Tests for Video CDN.
@@ -1047,7 +1047,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
         self.assertIsNone(rewrite_video_url("", ""))
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
@@ -1206,7 +1206,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestEditorSavedMethod(BaseTestXmodule):
     """
@@ -1523,7 +1523,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.assertDictEqual(student_view_response['transcripts'], {self.TEST_LANGUAGE: self.transcript_url})
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """

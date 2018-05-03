@@ -203,7 +203,7 @@ class TestVideoAPIMixin(object):
         return sub_block_a, sub_block_b
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, MilestonesTestCaseMixin):
     """
     Tests /api/mobile/v0.5/video_outlines/courses/{course_id} with no course set
@@ -413,7 +413,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         )
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                            TestVideoAPIMixin, MilestonesTestCaseMixin):
@@ -944,7 +944,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         self.assertItemsEqual(course_outline[0]['summary']['transcripts'].keys(), expected_transcripts)
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                             TestVideoAPIMixin, MilestonesTestCaseMixin):
     """

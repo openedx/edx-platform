@@ -21,6 +21,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
     """
     Tests integration between grading and block access.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod

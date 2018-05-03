@@ -78,6 +78,7 @@ class TestMongoModuleStoreBase(TestCase):
     '''
     Basic setup for all tests
     '''
+    shard = 2
     # Explicitly list the courses to load (don't want the big one)
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
@@ -181,6 +182,7 @@ class TestMongoModuleStoreBase(TestCase):
 
 class TestMongoModuleStore(TestMongoModuleStoreBase):
     '''Module store tests'''
+    shard = 2
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -750,6 +752,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     '''
     Tests a situation where no asset_collection is specified.
     '''
+    shard = 2
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -782,6 +785,7 @@ class TestMongoKeyValueStore(TestCase):
     """
     Tests for MongoKeyValueStore.
     """
+    shard = 2
 
     def setUp(self):
         super(TestMongoKeyValueStore, self).setUp()

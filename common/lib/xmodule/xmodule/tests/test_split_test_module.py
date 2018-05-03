@@ -27,6 +27,8 @@ class SplitTestUtilitiesTest(PartitionTestCase):
     """
     Tests for utility methods related to split_test module.
     """
+    shard = 1
+
     def test_split_user_partitions(self):
         """
         Tests the get_split_user_partitions helper method.
@@ -123,6 +125,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     """
     Test the split test module
     """
+    shard = 1
 
     @ddt.data((0, 'split_test_cond0'), (1, 'split_test_cond1'))
     @ddt.unpack
@@ -182,6 +185,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
     """
     Unit tests for how split test interacts with Studio.
     """
+    shard = 1
 
     @patch('xmodule.split_test_module.SplitTestDescriptor.group_configuration_url', return_value='http://example.com')
     def test_render_author_view(self, group_configuration_url):

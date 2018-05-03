@@ -26,6 +26,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     """
     Verify behavior of the GradesTransformer
     """
+    shard = 4
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
@@ -397,6 +398,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
     """
     Test mongo usage in GradesTransformer.
     """
+    shard = 4
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 

@@ -11,6 +11,8 @@ from discussion_api.tests.utils import make_paginated_api_response
 
 class PaginationSerializerTest(TestCase):
     """Tests for PaginationSerializer"""
+    shard = 8
+
     def do_case(self, objects, page_num, num_pages, expected):
         """
         Make a dummy request, and assert that get_paginated_data with the given

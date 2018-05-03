@@ -24,6 +24,8 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     """
     Base class for tests of Sequence Module.
     """
+    shard = 1
+
     def setUp(self):
         super(SequenceBlockTestCase, self).setUp()
 

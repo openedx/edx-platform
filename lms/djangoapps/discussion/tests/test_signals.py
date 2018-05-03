@@ -8,6 +8,8 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 
 class SendMessageHandlerTestCase(TestCase):
+    shard = 4
+
     def setUp(self):
         self.sender = mock.Mock()
         self.user = mock.Mock()

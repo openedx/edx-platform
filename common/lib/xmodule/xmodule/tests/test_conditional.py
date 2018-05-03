@@ -145,6 +145,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     Make sure that conditional module works, using mocks for
     other modules.
     """
+    shard = 1
 
     def setUp(self):
         super(ConditionalModuleBasicTest, self).setUp()
@@ -217,6 +218,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
     """
     Make sure ConditionalModule works, by loading data in from an XML-defined course.
     """
+    shard = 1
+
     @staticmethod
     def get_system(load_error_modules=True):
         '''Get a dummy system'''
@@ -379,6 +382,7 @@ class ConditionalModuleStudioTest(XModuleXmlImportTest):
     """
     Unit tests for how conditional test interacts with Studio.
     """
+    shard = 1
 
     def setUp(self):
         super(ConditionalModuleStudioTest, self).setUp()

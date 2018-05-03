@@ -7,6 +7,7 @@ from . import LogicTest
 
 class ConditionalModuleTest(LogicTest):
     """Logic tests for Conditional Xmodule."""
+    shard = 1
     descriptor_class = ConditionalDescriptor
 
     def test_ajax_request(self):

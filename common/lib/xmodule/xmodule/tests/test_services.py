@@ -37,6 +37,7 @@ class DummyUnexpected(object):
 @ddt.ddt
 class TestSettingsService(TestCase):
     """ Test SettingsService """
+    shard = 1
 
     xblock_setting_key1 = 'dummy_block'
     xblock_setting_key2 = 'other_dummy_block'
@@ -98,6 +99,8 @@ class TestConfigurationService(TestCase):
     """
     Tests for ConfigurationService
     """
+    shard = 1
+
     def test_given_unexpected_class_throws_value_error(self):
         """
         Test that instantiating ConfigurationService raises exception on passing

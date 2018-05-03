@@ -8,6 +8,7 @@ from xmodule.mako_module import MakoModuleDescriptor
 
 class MakoModuleTest(TestCase):
     """ Test MakoModuleDescriptor """
+    shard = 1
 
     def test_render_template_check(self):
         mock_system = Mock()

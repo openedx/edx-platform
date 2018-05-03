@@ -22,7 +22,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
     """Verify that get_ccx_from_ccx_locator functions properly"""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE

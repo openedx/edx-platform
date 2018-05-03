@@ -19,6 +19,8 @@ class SurveyModelsTests(TestCase):
     """
     All tests for the Survey models.py file
     """
+    shard = 4
+
     def setUp(self):
         """
         Set up the test data used in the specific tests

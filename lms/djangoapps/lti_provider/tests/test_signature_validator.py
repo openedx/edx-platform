@@ -27,6 +27,7 @@ class ClientKeyValidatorTest(TestCase):
     """
     Tests for the check_client_key method in the SignatureValidator class.
     """
+    shard = 4
 
     def setUp(self):
         super(ClientKeyValidatorTest, self).setUp()
@@ -57,6 +58,7 @@ class NonceValidatorTest(TestCase):
     """
     Tests for the check_nonce method in the SignatureValidator class.
     """
+    shard = 4
 
     def setUp(self):
         super(NonceValidatorTest, self).setUp()
@@ -88,6 +90,8 @@ class SignatureValidatorTest(TestCase):
     to check message signatures. Note that these tests mock out the library
     itself, since we assume it to be correct.
     """
+    shard = 4
+
     def setUp(self):
         super(SignatureValidatorTest, self).setUp()
         self.lti_consumer = get_lti_consumer()

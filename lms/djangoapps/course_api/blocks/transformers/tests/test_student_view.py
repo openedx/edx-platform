@@ -16,6 +16,8 @@ class TestStudentViewTransformer(ModuleStoreTestCase):
     """
     Test proper behavior for StudentViewTransformer
     """
+    shard = 4
+
     def setUp(self):
         super(TestStudentViewTransformer, self).setUp()
         self.course_key = ToyCourseFactory.create().id

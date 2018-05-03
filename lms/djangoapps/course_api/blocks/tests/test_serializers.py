@@ -20,6 +20,8 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
     """
     Base class for testing BlockSerializer and BlockDictSerializer
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestBlockSerializerBase, cls).setUpClass()
@@ -151,6 +153,7 @@ class TestBlockSerializer(TestBlockSerializerBase):
     """
     Tests the BlockSerializer class, which returns a list of blocks.
     """
+    shard = 4
 
     def create_serializer(self, context=None):
         """
@@ -192,6 +195,7 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
     """
     Tests the BlockDictSerializer class, which returns a dict of blocks key-ed by its block_key.
     """
+    shard = 4
 
     def create_serializer(self, context=None):
         """

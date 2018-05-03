@@ -15,6 +15,8 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
     """
     Test for split's copy_from_template method.
     """
+    shard = 2
+
     @ddt.data(
         LibraryFactory,
         CourseFactory,

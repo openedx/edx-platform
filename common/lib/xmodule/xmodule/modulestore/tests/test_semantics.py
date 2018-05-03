@@ -43,6 +43,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     Verify the behavior of Direct Only items
     blocks intended to store snippets of course content.
     """
+    shard = 1
 
     __test__ = False
 
@@ -415,6 +416,7 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
+    shard = 1
     MODULESTORE = SPLIT_MODULESTORE_SETUP
     __test__ = True
 
@@ -449,5 +451,6 @@ class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the MongoModulestore
     """
+    shard = 1
     MODULESTORE = MongoModulestoreBuilder()
     __test__ = True

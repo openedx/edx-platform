@@ -9,6 +9,8 @@ from student.tests.factories import UserFactory
 
 @ddt.ddt
 class GenerateUserCertificateTest(TestCase):
+    shard = 4
+
     @patch('lms.djangoapps.certificates.tasks.generate_user_certificates')
     @patch('lms.djangoapps.certificates.tasks.User.objects.get')
     def test_generate_user_certs(self, user_get_mock, generate_user_certs_mock):

@@ -40,6 +40,8 @@ class TestPdfFile(unittest.TestCase):
     """
     Unit test cases for pdf file generation
     """
+    shard = 4
+
     def setUp(self):
         super(TestPdfFile, self).setUp()
 

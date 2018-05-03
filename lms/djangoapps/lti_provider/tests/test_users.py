@@ -19,6 +19,7 @@ class UserManagementHelperTest(TestCase):
     """
     Tests for the helper functions in users.py
     """
+    shard = 4
 
     def setUp(self):
         super(UserManagementHelperTest, self).setUp()
@@ -77,6 +78,8 @@ class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py
     """
+    shard = 4
+
     def setUp(self):
         super(AuthenticateLtiUserTest, self).setUp()
         self.lti_consumer = LtiConsumer(
@@ -143,6 +146,7 @@ class CreateLtiUserTest(TestCase):
     """
     Tests for the create_lti_user function in users.py
     """
+    shard = 4
 
     def setUp(self):
         super(CreateLtiUserTest, self).setUp()
@@ -180,6 +184,7 @@ class LtiBackendTest(TestCase):
     """
     Tests for the authentication backend that authenticates LTI users.
     """
+    shard = 4
 
     def setUp(self):
         super(LtiBackendTest, self).setUp()

@@ -11,6 +11,7 @@ class TestGetExtendedDueDate(unittest.TestCase):
     """
     Test `get_extended_due_date` function.
     """
+    shard = 1
 
     def call_fut(self, node):
         """

@@ -24,6 +24,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test for the Certificates REST APIs
     """
+    shard = 4
     now = timezone.now()
 
     @classmethod

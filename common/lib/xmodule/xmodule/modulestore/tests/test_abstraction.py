@@ -10,6 +10,7 @@ class AbstractionTest(TestCase):
     """
     Tests that the ModuleStore objects are properly abstracted
     """
+    shard = 1
 
     def test_cant_instantiate_abstract_class(self):
         self.assertRaises(TypeError, ModuleStoreRead)  # Cannot be instantiated due to explicit abstraction

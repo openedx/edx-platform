@@ -22,6 +22,7 @@ from student.tests.factories import UserFactory
 @ddt.ddt
 class TestFooter(TestCase):
     """Test API end-point for retrieving the footer. """
+    shard = 4
 
     def setUp(self):
         """Clear the configuration cache. """
@@ -283,6 +284,7 @@ class TestFooter(TestCase):
 
 class TestIndex(SiteMixin, TestCase):
     """ Test the index view """
+    shard = 4
 
     def setUp(self):
         """ Set up a user """

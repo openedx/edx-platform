@@ -37,7 +37,7 @@ from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
-@attr(shard=3)
+@attr(shard=7)
 @mock.patch.dict(
     'django.conf.settings.FEATURES',
     {

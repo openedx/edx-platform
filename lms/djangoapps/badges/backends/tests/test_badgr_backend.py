@@ -35,6 +35,8 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
     """
     Tests the BadgeHandler object
     """
+    shard = 4
+
     def setUp(self):
         """
         Create a course and user to test with.

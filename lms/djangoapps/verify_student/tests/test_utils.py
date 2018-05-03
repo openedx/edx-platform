@@ -27,6 +27,7 @@ class TestVerifyStudentUtils(unittest.TestCase):
     """
     Tests for utility functions in verify_student.
     """
+    shard = 4
 
     def test_verification_for_datetime(self):
         user = UserFactory.create()

@@ -106,6 +106,8 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
     """
     Tests for the VerticalBlock.
     """
+    shard = 1
+
     def assert_bookmark_info_in(self, content):
         """
         Assert content has all the bookmark info.

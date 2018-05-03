@@ -8,6 +8,7 @@ from . import LogicTest
 
 class WordCloudModuleTest(LogicTest):
     """Logic tests for Word Cloud Xmodule."""
+    shard = 1
     descriptor_class = WordCloudDescriptor
     raw_field_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},

@@ -37,7 +37,7 @@ from .. import errors
 from .serializers import CourseEnrollmentSerializer
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>...
@@ -52,7 +52,7 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
     Tests for /api/mobile/v0.5/my_user_info
@@ -68,7 +68,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.assertIn(self.username, response['location'])
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
@@ -304,7 +304,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             self.assertEqual(entry['course']['org'], 'edX')
 
 
-@attr(shard=2)
+@attr(shard=9)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
@@ -339,7 +339,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -359,7 +359,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -463,7 +463,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=2)
+@attr(shard=9)
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):

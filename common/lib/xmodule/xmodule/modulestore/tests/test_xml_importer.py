@@ -126,6 +126,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     """
     Test that remapping the namespace from import to the actual course location.
     """
+    shard = 2
 
     def setUp(self):
         """
@@ -274,6 +275,7 @@ class UpdateLocationTest(ModuleStoreNoSettings):
     """
     Test that updating location preserves "is_set_on" status on fields
     """
+    shard = 2
     CONTENT_FIELDS = ['test_content_field', 'test_mutable_content_field']
     SETTINGS_FIELDS = ['test_settings_field', 'test_mutable_settings_field']
     CHILDREN_FIELDS = ['children']
@@ -341,6 +343,8 @@ class UpdateLocationTest(ModuleStoreNoSettings):
 
 
 class StaticContentImporterTest(unittest.TestCase):
+    shard = 2
+
     def setUp(self):
         self.course_data_path = path('/path')
         self.mocked_content_store = mock.Mock()

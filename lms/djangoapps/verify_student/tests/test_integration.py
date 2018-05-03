@@ -15,6 +15,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
     """
     Integration test for professional ed verification, including course mode selection.
     """
+    shard = 4
 
     # Choose an uncommon number for the price so we can search for it on the page
     MIN_PRICE = 1438

@@ -69,6 +69,8 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
 
 @ddt.ddt
 class TaskTestCase(ModuleStoreTestCase):
+    shard = 4
+
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
