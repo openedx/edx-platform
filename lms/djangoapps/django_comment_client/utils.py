@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
@@ -131,11 +131,43 @@ def get_accessible_discussion_xblocks_by_course_id(course_id, user, include_all=
     are accessible to the given user.
     """
     all_xblocks = modulestore().get_items(course_id, qualifiers={'category': 'discussion'}, include_orphans=False)
+    if not all_xblocks:
+        return []
 
+    prefetched_group_data = prefetch_group_data(user, all_xblocks[0], course_id)
     return [
         xblock for xblock in all_xblocks
-        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course_id))
+        if (
+            has_required_keys(xblock) and (
+                include_all or
+                has_access(user, 'load', xblock, course_id, prefetched_group_data=prefetched_group_data)
+            )
+        )
     ]
+
+
+def prefetch_group_data(user, sample_block, course_id):
+    """
+    Return a dict containing:
+      - id of every partition in the course, mapped to:
+        - all of their corresponding group_ids
+        - the group_id appropriate for user
+    """
+    all_partitions = sample_block.runtime.service(sample_block, 'partitions').course_partitions
+    if not user:
+        user = AnonymousUser()
+
+    def _group_id_or_none(partition, course_id, user):
+        """If an appropriate group for this user exists, return its id. Else return None."""
+        group = partition.scheme.get_group_for_user(course_id, user, partition)
+        return group.id if group else None
+
+    return {
+        partition.id: {
+            'all_group_ids': [group.id for group in partition.groups],
+            'user_group_id': _group_id_or_none(partition, course_id, user),
+        } for partition in all_partitions if partition.active
+    }
 
 
 def get_discussion_id_map_entry(xblock):

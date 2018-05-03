@@ -95,7 +95,7 @@ def has_ccx_coach_role(user, course_key):
     return False
 
 
-def has_access(user, action, obj, course_key=None):
+def has_access(user, action, obj, course_key=None, prefetched_group_data=None):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
     switching based on various settings.
@@ -150,7 +150,7 @@ def has_access(user, action, obj, course_key=None):
 
     # NOTE: any descriptor access checkers need to go above this
     if isinstance(obj, XBlock):
-        return _has_access_descriptor(user, action, obj, course_key)
+        return _has_access_descriptor(user, action, obj, course_key, prefetched_group_data)
 
     if isinstance(obj, CourseKey):
         return _has_access_course_key(user, action, obj)
@@ -399,7 +399,21 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
-def _has_group_access(descriptor, user, course_key):
+def _partition_and_user_groups_prefetch(prefetched_group_data, merged_access):
+    """Compute the needed partition_groups and user_groups structures using prefetched data."""
+    partition_groups = {
+        partition_id: set(group_ids).intersection(
+            set(prefetched_group_data.get(partition_id, {}).get('all_group_ids', []))
+        ) for partition_id, group_ids in merged_access.iteritems()
+    }
+    user_groups = {
+        partition_id: prefetched_group_data.get(partition_id, {}).get('user_group_id')
+        for partition_id in merged_access.iterkeys()
+    }
+    return partition_groups, user_groups
+
+
+def _has_group_access(descriptor, user, course_key, prefetched_group_data):
     """
     This function returns a boolean indicating whether or not `user` has
     sufficient group memberships to "load" a block (the `descriptor`)
@@ -417,60 +431,63 @@ def _has_group_access(descriptor, user, course_key):
         log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
         return ACCESS_DENIED
 
-    # resolve the partition IDs in group_access to actual
-    # partition objects, skipping those which contain empty group directives.
-    # If a referenced partition could not be found, it will be denied
-    # If the partition is found but is no longer active (meaning it's been disabled)
-    # then skip the access check for that partition.
-    partitions = []
-    for partition_id, group_ids in merged_access.items():
-        try:
-            partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
-            if partition.active:
-                if group_ids is not None:
-                    partitions.append(partition)
-            else:
-                log.debug(
-                    "Skipping partition with ID %s in course %s because it is no longer active",
-                    partition.id, course_key
-                )
-        except NoSuchUserPartitionError:
-            log.warning("Error looking up user partition, access will be denied.", exc_info=True)
-            return ACCESS_DENIED
-
-    # next resolve the group IDs specified within each partition
-    partition_groups = []
-    try:
-        for partition in partitions:
-            groups = [
-                partition.get_group(group_id)
-                for group_id in merged_access[partition.id]
-            ]
-            if groups:
-                partition_groups.append((partition, groups))
-    except NoSuchUserPartitionGroupError:
-        log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
-        return ACCESS_DENIED
-
-    # look up the user's group for each partition
+    partition_groups = {}
     user_groups = {}
-    for partition, groups in partition_groups:
-        user_groups[partition.id] = partition.scheme.get_group_for_user(
-            course_key,
-            user,
-            partition,
-        )
+    if prefetched_group_data:
+        # Use prefetched data, if possible. See EDUCATOR-2618 for context.
+        partition_groups, user_groups = _partition_and_user_groups_prefetch(prefetched_group_data, merged_access)
+    else:
+        # resolve the partition IDs in group_access to actual
+        # partition objects, skipping those which contain empty group directives.
+        # If a referenced partition could not be found, it will be denied
+        # If the partition is found but is no longer active (meaning it's been disabled)
+        # then skip the access check for that partition.
+        partitions = []
+        for partition_id, group_ids in merged_access.iteritems():
+            try:
+                partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
+                if partition.active:
+                    if group_ids is not None:
+                        partitions.append(partition)
+                else:
+                    log.debug(
+                        "Skipping partition with ID %s in course %s because it is no longer active",
+                        partition.id, course_key
+                    )
+            except NoSuchUserPartitionError:
+                log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+                return ACCESS_DENIED
+
+        # next resolve the group IDs specified within each partition
+        try:
+            for partition in partitions:
+                groups = [
+                    partition.get_group(group_id)
+                    for group_id in merged_access[partition.id]
+                ]
+                if groups:
+                    partition_groups[partition.id] = [group.id for group in groups]
+                    # look up the user's group for each partition
+                    user_group = partition.scheme.get_group_for_user(
+                        course_key,
+                        user,
+                        partition,
+                    )
+                    user_groups[partition.id] = user_group.id if user_group else None
+        except NoSuchUserPartitionGroupError:
+            log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
+            return ACCESS_DENIED
 
     # finally: check that the user has a satisfactory group assignment
     # for each partition.
-    if not all(user_groups.get(partition.id) in groups for partition, groups in partition_groups):
+    if not all(user_groups.get(partition_id) in group_ids for partition_id, group_ids in partition_groups.iteritems()):
         return ACCESS_DENIED
 
     # all checks passed.
     return ACCESS_GRANTED
 
 
-def _has_access_descriptor(user, action, descriptor, course_key=None):
+def _has_access_descriptor(user, action, descriptor, course_key=None, prefetched_group_data=None):
     """
     Check if user has access to this descriptor.
 
@@ -493,7 +510,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
         # before this method is that _has_staff_access_to_descriptor short-circuits and returns True
         # for staff users in preview mode.
-        if not _has_group_access(descriptor, user, course_key):
+        if not _has_group_access(descriptor, user, course_key, prefetched_group_data):
             return ACCESS_DENIED
 
         # If the user has staff access, they can load the module and checks below are not needed.
