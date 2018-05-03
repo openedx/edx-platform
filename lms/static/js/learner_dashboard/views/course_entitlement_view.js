@@ -134,7 +134,7 @@ class CourseEntitlementView extends Backbone.View {
     3) Hide the 'View Course' button to the course card.
     */
     const successIconEl = '<span class="fa fa-check" aria-hidden="true"></span>';
-    const eventPage = this.$parentEl ? 'course-dashboard' : 'program-details';
+    const eventPage = this.$parentEl ? 'program-details' : 'course-dashboard';
     const eventAction = prevSession ? 'switch' : 'new';
 
     // Emit analytics event to track user leaving current session
@@ -178,7 +178,7 @@ class CourseEntitlementView extends Backbone.View {
     4) Remove the link from the course card image and title.
     */
     // Emit analytics event to track user leaving current session
-    const eventPage = this.$parentEl ? 'course-dashboard' : 'program-details';
+    const eventPage = this.$parentEl ? 'program-details' : 'course-dashboard';
     this.trackSessionChange(eventPage, 'leave', prevSession);
 
     // With a containing backbone view, we can simply re-render the parent card
