@@ -176,10 +176,19 @@ from openedx.core.djangolib.markup import HTML, Text
           <div id="edit-image-modal">
             <%static:studiofrontend entry="editImageModal">
               {
-                "lang": "${language_code | n, js_escaped_string}",
+                "course": {
+                    "id": "${context_course.id | n, js_escaped_string}",
+                    "name": "${context_course.display_name_with_default | n, js_escaped_string}",
+                    "url_name": "${context_course.location.name | n, js_escaped_string}",
+                    "org": "${context_course.location.org | n, js_escaped_string}",
+                    "num": "${context_course.location.course | n, js_escaped_string}",
+                    "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
+                    "revision": "${context_course.location.revision | n, js_escaped_string}"
+                },
                 "help_tokens": {
                     "image_accessibility": "${get_online_help_info('image_accessibility')['doc_url'] | n, js_escaped_string}"
-                }
+                },
+                "lang": "${language_code | n, js_escaped_string}"
               }
             </%static:studiofrontend>
           </div>
