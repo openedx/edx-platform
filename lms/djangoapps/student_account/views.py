@@ -468,7 +468,8 @@ def account_settings(request):
         GET /account/settings
 
     """
-    return render_to_response('student_account/account_settings.html', account_settings_context(request))
+    context = account_settings_context(request)
+    return render_to_response('student_account/account_settings.html', context)
 
 
 @login_required

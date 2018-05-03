@@ -22,5 +22,13 @@
             "name": "studio.enable_policy_page",
             "active": true
         }
+    },
+    {
+        "pk": 3,
+        "model": "waffle.flag",
+        "fields": {
+            "name": "course_experience.gdpr",
+            "everyone": false
+        }
     }
 ]
