@@ -682,6 +682,21 @@ class CreditRequest(TimeStampedModel):
         get_latest_by = 'created'
 
     @classmethod
+    def retire_user(cls, original_username, retired_username):
+        """
+        Obfuscates CreditRecord instances associated with `original_username`.
+        Empties the records' `parameters` field and replaces username with its
+        anonymized value, `retired_username`.
+        """
+        num_updated_credit_requests = cls.objects.filter(
+            username=original_username
+        ).update(
+            username=retired_username,
+            parameters={},
+        )
+        return num_updated_credit_requests > 0
+
+    @classmethod
     def credit_requests_for_user(cls, username):
         """
         Retrieve all credit requests for a user.
