@@ -140,7 +140,7 @@ Note -
     paver -h
 
 Connecting to Browser
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 If you want to see the browser being automated for JavaScript or bok-choy tests,
 you can connect to the container running it via VNC.
