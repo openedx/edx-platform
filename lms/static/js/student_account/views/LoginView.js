@@ -179,10 +179,10 @@
                                 {platformName: this.platformName}
                             ),
                             HtmlUtils.HTML(
-                                '<a href="/register" class="form-toggle btn-neutral btn-register" data-type="register">',  // eslint-disable-line max-len
-                                gettext('register'),
-                                '</a>'
+                                '<a href="/register" class="form-toggle btn-neutral btn-register" data-type="register">'
                             ),
+                            gettext('register'),
+                            HtmlUtils.HTML('</a>'),
                             gettext(' before signing in.')
                         );
 
