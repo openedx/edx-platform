@@ -1,9 +1,14 @@
-define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
+define(["underscore", "sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
         "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/modal_helpers"],
-    (sinon, FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) =>
+    (_, sinon, FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) =>
 
         describe("UploadDialog", function() {
-            const tpl = readFixtures("upload-dialog.underscore");
+            const tpl = readFixtures("upload-dialog.underscore"),
+                uploadData = {
+                    edx_video_id: '123-456-789-0',
+                    language_code: 'en',
+                    new_language_code: 'ur'
+                };
 
             beforeEach(function() {
                 let dialogResponse;
@@ -27,7 +32,8 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     url:  CMS.URL.UPLOAD_ASSET,
                     onSuccess: response => {
                         return test.dialogResponse.push(response.response);
-                    }
+                    },
+                    uploadData: uploadData
                 });
                 spyOn(view, 'remove').and.callThrough();
 
@@ -37,6 +43,7 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                 const jqMockFileInput = jasmine.createSpyObj('jqMockFileInput', ['get', 'replaceWith']);
                 jqMockFileInput.get.and.returnValue(mockFileInput);
                 const originalView$ = view.$;
+                spyOn($.fn, 'ajaxSubmit').and.callThrough();
                 spyOn(view, "$").and.callFake(function(selector) {
                     if (selector === "input[type=file]") {
                         return jqMockFileInput;
@@ -126,6 +133,9 @@ define(["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
                     view.upload();
                     expect(this.model.get("uploading")).toBeTruthy();
                     AjaxHelpers.expectRequest(requests, "POST", "/upload");
+                    expect($.fn.ajaxSubmit.calls.mostRecent().args[0].data).toEqual(
+                        _.extend({}, uploadData, {notifyOnError: false})
+                    );
                     AjaxHelpers.respondWithJson(requests, { response: "dummy_response"});
                     expect(this.model.get("uploading")).toBeFalsy();
                     expect(this.model.get("finished")).toBeTruthy();

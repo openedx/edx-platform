@@ -5,7 +5,7 @@
  */
 define(["underscore", "js/models/metadata", "js/collections/metadata", "js/views/metadata", "cms/js/main",
         "js/views/video/transcripts/utils", 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
-function(_, MetadataModel, MetadataCollection, MetadataView, main, Utils, AjaxHelpers) {
+function(_, MetadataModel, MetadataCollection, MetadataView, main, TranscriptUtils, AjaxHelpers) {
   const verifyInputType = function(input, expectedType) {
       // Some browsers (e.g. FireFox) do not support the "number"
       // input type.  We can accept a "text" input instead
@@ -285,8 +285,10 @@ function(_, MetadataModel, MetadataCollection, MetadataView, main, Utils, AjaxHe
 
         beforeEach(function() {
             const model = new MetadataModel(videoIDEntry);
+            spyOn(TranscriptUtils.Storage, 'set');
             this.view = new MetadataView.VideoID({model});
             spyOn(Backbone, 'trigger');
+            expect(TranscriptUtils.Storage.set).toHaveBeenCalledWith('edx_video_id', this.view.getValueFromEditor());
         });
 
         it("triggers correct event on input change", function(done) {

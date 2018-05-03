@@ -4,11 +4,12 @@ define(
         'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
         'js/models/uploads', 'js/views/uploads',
         'js/models/license', 'js/views/license',
+        'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist',
         'js/views/video/translations_editor'
     ],
 function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-         LicenseModel, LicenseView, VideoList, VideoTranslations) {
+         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations) {
     'use strict';
     var Metadata = {};
 
@@ -138,6 +139,11 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
             );
         },
 
+        render: function() {
+            Metadata.String.prototype.render.apply(this, arguments);
+            TranscriptUtils.Storage.set('edx_video_id', this.getValueFromEditor());
+        },
+
         clear: function() {
             this.model.setValue('');
             this.inputChange();
@@ -148,6 +154,7 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
         },
 
         inputChange: function() {
+            TranscriptUtils.Storage.set('edx_video_id', this.getValueFromEditor());
             Backbone.trigger('transcripts:basicTabFieldChanged');
         }
     });
