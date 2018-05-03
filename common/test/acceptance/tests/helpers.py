@@ -746,7 +746,7 @@ class AcceptanceTest(WebAppTest):
                 os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1'),
                 os.environ.get('BOK_CHOY_LMS_PORT', 8003),
             ))
-        except:
+        except:  # pylint: disable=bare-except
             self.browser.get('http://{}:{}'.format(
                 os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1'),
                 os.environ.get('BOK_CHOY_CMS_PORT', 8031),

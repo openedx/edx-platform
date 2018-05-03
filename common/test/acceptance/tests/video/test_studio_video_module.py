@@ -143,7 +143,11 @@ class CMSVideoBaseTest(UniqueCourseTest):
             xblock_index: number starting from 1 (0th entry is the unit page itself)
         """
         self.unit_page.xblocks[xblock_index].edit()
-        EmptyPromise(lambda: self.video.q(css='div.basic_metadata_edit').visible, "Wait for the basic editor to be open", timeout=5).fulfill()
+        EmptyPromise(
+            lambda: self.video.q(css='div.basic_metadata_edit').visible,
+            "Wait for the basic editor to be open",
+            timeout=5
+        ).fulfill()
 
     def open_advanced_tab(self):
         """
