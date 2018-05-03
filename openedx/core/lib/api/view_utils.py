@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import clone_request
 from rest_framework.response import Response
 from six import text_type
-
+from edx_rest_framework_extensions.permissions import JWTRestrictedApplicationPermission
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
@@ -103,6 +103,8 @@ def view_auth_classes(is_user=False, is_authenticated=True):
             func_or_class.permission_classes += (IsAuthenticated,)
         if is_user:
             func_or_class.permission_classes += (IsUserInUrl,)
+        # always check access by restricted OAuth2 applications
+        func_or_class.permission_classes += (JWTRestrictedApplicationPermission, )
         return func_or_class
     return _decorator
 

@@ -79,7 +79,7 @@ class RestrictedApplicationAdmin(ModelAdmin):
     """
     ModelAdmin for the Restricted Application
     """
-    list_display = [u'application']
+    list_display = [u'application', u'_org_associations']
 
 
 site.register(RestrictedApplication, RestrictedApplicationAdmin)

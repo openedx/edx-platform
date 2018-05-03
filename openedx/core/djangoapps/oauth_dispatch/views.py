@@ -22,7 +22,7 @@ from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
-
+from .models import RestrictedApplication
 from . import adapters
 from .dot_overrides import views as dot_overrides_views
 
@@ -85,6 +85,37 @@ class _DispatchingView(View):
         else:
             return request.POST.get('client_id')
 
+    def _get_application_id(self, request):
+        """
+        Return application id from provided request
+        """
+        return dot_models.Application.objects.get(client_id=self._get_client_id(request)).id
+
+    def is_application_restricted(self, request):
+        """
+        Returns the appropriate adapter based on the OAuth client linked to the request.
+        """
+        dot_id = self._get_application_id(request)
+        if RestrictedApplication.objects.filter(application_id=dot_id).exists():
+            return True
+        else:
+            return False
+
+    def get_associated_org(self, request):
+        """
+        Returns the appropriate adapter based on the OAuth client linked to the request.
+        """
+        dot_id = self._get_application_id(request)
+        if RestrictedApplication.objects.filter(application_id=dot_id).exists():
+            return RestrictedApplication.objects.get(application_id=dot_id).org_associations
+        else:
+            return None
+
+    def get_application_grant_type(self, request):
+        """
+        Returns grant type of the application
+        """
+        return dot_models.Application.objects.get(client_id=self._get_client_id(request)).authorization_grant_type
 
 class AccessTokenView(RatelimitMixin, _DispatchingView):
     """
@@ -102,9 +133,14 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
 
         if response.status_code == 200 and request.POST.get('token_type', '').lower() == 'jwt':
             expires_in, scopes, user = self._decompose_access_token_response(request, response)
-
+            is_application_restricted = self.is_application_restricted(request)
+            if is_application_restricted:
+                org = self.get_associated_org(request)	
+            else:
+                org = None
+            application_grant_type = self.get_application_grant_type(request)
             content = {
-                'access_token': JwtBuilder(user).build_token(scopes, expires_in),
+                'access_token': JwtBuilder(user, is_application_restricted=is_application_restricted).build_token(scopes, expires_in, org=org, application_grant_type=application_grant_type),
                 'expires_in': expires_in,
                 'token_type': 'JWT',
                 'scope': ' '.join(scopes),

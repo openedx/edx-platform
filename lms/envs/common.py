@@ -505,6 +505,7 @@ OAUTH2_PROVIDER = {
         # conform profile scope message that is presented to end-user
         # to lms/templates/provider/authorize.html. This may be revised later.
         'profile': 'Know your name and username',
+        'grades:read': 'Retrieve your grades for your enrolled courses'
     },
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
 }
@@ -2402,6 +2403,8 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "reddit",
 ]
 
+DEFAULT_JWT_ISSUER = 'test-issuer-1',
+DEFAULT_RESTRICTED_JWT_ISSUER = 'test-issuer-2'
 # JWT Settings
 JWT_AUTH = {
     # TODO Set JWT_SECRET_KEY to a secure value. By default, SECRET_KEY will be used.
@@ -2416,6 +2419,18 @@ JWT_AUTH = {
     'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
     # Number of seconds before JWT tokens expire
     'JWT_EXPIRATION': 30,
+    'JWT_ISSUERS': [
+        {
+            'ISSUER':'test-issuer-1',
+            'SECRET_KEY':'test-secret-key-1',
+            'AUDIENCE':'test-audience-1',
+        },
+        {
+            'ISSUER':'test-issuer-2',
+            'SECRET_KEY':'test-secret-key-2',
+            'AUDIENCE':'test-audience-2',
+        }
+    ]
 }
 
 # The footer URLs dictionary maps social footer names
