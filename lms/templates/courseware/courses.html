@@ -57,11 +57,18 @@
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
           <ul class="courses-listing journal-list">
+            % for bundle in bundles:
+            <li class="courses-listing-item">
+              <%include file="../bundle.html" args="bundle=bundle" />
+            </li>
+            % endfor
+          </ul>
+          <ul class="courses-listing journal-list">
             %for journal in journals:
             <li class="courses-listing-item">
               <%include file="../journal.html" args="journal=journal, journals_root_url=journals_root_url" />
             </li>
-          %endfor
+            %endfor
           </ul>
 
           <ul class="courses-listing">
