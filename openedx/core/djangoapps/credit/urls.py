@@ -22,6 +22,7 @@ router.register(r'courses', views.CreditCourseViewSet)
 router.register(r'providers', views.CreditProviderViewSet)
 V1_URLS += router.urls
 
+app_name = 'credit'
 urlpatterns = [
     url(r'^v1/', include(V1_URLS)),
 ]

@@ -15,6 +15,7 @@ from openedx.core.djangoapps.api_admin.views import (
     CatalogSearchView
 )
 
+app_name = 'api_admin'
 urlpatterns = (
     url(
         r'^status/$',

@@ -13,6 +13,7 @@ from support.views.refund import RefundSupportView
 
 COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()
 
+app_name = 'support'
 urlpatterns = [
     url(r'^$', index, name="index"),
     url(r'^certificates/?$', CertificatesSupportView.as_view(), name="certificates"),
