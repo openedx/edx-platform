@@ -70,7 +70,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.journals.api import get_journals, get_journals_root_url
+from openedx.features.journals.api import get_journal_bundles, get_journals, get_journals_root_url
 from student.cookies import set_logged_in_cookies
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
@@ -198,6 +198,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     context['journals'] = get_journals(request.site)
     context['journals_root_url'] = get_journals_root_url()
+    context['journal_bundles'] = get_journal_bundles(request.site)
 
     return render_to_response('index.html', context)
 

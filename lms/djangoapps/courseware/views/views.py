@@ -93,7 +93,7 @@ from openedx.features.course_experience.views.course_dates import CourseDatesFra
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from openedx.features.journals.api import get_journals, get_journals_root_url
+from openedx.features.journals.api import get_journal_bundles, get_journals, get_journals_root_url
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from util.cache import cache, cache_if_anonymous
@@ -230,6 +230,8 @@ def courses(request):
     journals = get_journals(request.site)
     journals_root_url = get_journals_root_url()
 
+    journal_bundles = get_journal_bundles(request.site)
+
     return render_to_response(
         "courseware/courses.html",
         {
@@ -237,7 +239,8 @@ def courses(request):
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
             'journals': journals,
-            'journals_root_url': journals_root_url
+            'journals_root_url': journals_root_url,
+            'bundles': journal_bundles,
         }
     )
 

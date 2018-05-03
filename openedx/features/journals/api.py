@@ -28,15 +28,28 @@ class DiscoveryApiClient(object):
     """
     Class for interacting with the discovery service journals endpoint
     """
-    def __init__(self, user):
+    def __init__(self):
         """
         Initialize an authenticated Discovery service API client by using the
         provided user.
         """
-        self.user = user
+        catalog_integration = CatalogIntegration.current()
+
+        # Client can't be used if there is no catalog integration
+        if not (catalog_integration and catalog_integration.enabled):
+            LOGGER.info("Unable to create DiscoveryApiClient because catalog integration not set up or enabled")
+            return None
+
+        try:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
+            LOGGER.info("Unable to retrieve catalog integration service user")
+            return None
+
         jwt = JwtBuilder(user).build_token([])
         url = configuration_helpers.get_value('COURSE_CATALOG_API_URL', settings.COURSE_CATALOG_API_URL)
         self.client = EdxRestApiClient(self.create_journals_url(url), jwt=jwt)
+
 
     def create_journals_url(self, url):
         '''rewrite the discovery url to point to journals endpoint'''
@@ -66,6 +79,17 @@ class DiscoveryApiClient(object):
             )
             return []
 
+    def get_journal_bundles(self, uuid=''):
+        try:
+            response = self.client.journal_bundles(uuid).get()
+        except (HttpClientError, HttpServerError) as err:
+            LOGGER.exception(
+                'Failed to get journal bundles from discovery-service [%s]',
+                err.content
+            )
+            return []
+        return response if uuid else response.get('results')
+
 
 class JournalsApiClient(object):
     """
@@ -73,7 +97,7 @@ class JournalsApiClient(object):
     """
     def __init__(self):
         """
-        Initialize an authenticated Enterprise service API client by using the
+        Initialize an authenticated Journals service API client by using the
         provided user.
         """
         self.user = self.get_journals_worker()
@@ -186,20 +210,62 @@ def get_journals(site):
     journals = cache.get(cache_key)
 
     if not journals:
-        catalog_integration = CatalogIntegration.current()
-        if catalog_integration.enabled:
-            try:
-                user = catalog_integration.get_service_user()
-            except ObjectDoesNotExist:
-                return []
-
-            api_client = DiscoveryApiClient(user)
-            journals = api_client.get_journals(orgs)
-            cache.set(cache_key, journals, JOURNALS_CACHE_TIMEOUT)
-        else:
+        api_client = DiscoveryApiClient()
+        if not api_client:
             return []
+        journals = api_client.get_journals(orgs)
+        cache.set(cache_key, journals, JOURNALS_CACHE_TIMEOUT)
 
     return journals
+
+def fix_course_images(bundle):
+    """
+        Set the image for a course. If the course has an image, use that. Otherwise use the first
+        course run that has an image.
+    """
+    for course in bundle['courses']:
+        course_image = course['image'].get('src') if course.get('image') else None
+        if course_image:
+            # Course already had image and we don't need to check course runs
+            continue
+        for course_run in course['course_runs']:
+            if course_run['image']:
+                course['image'] = course_run['image']
+                break
+
+def get_journal_bundles(site, bundle_uuid=''):
+    """Retrieve journal bundles from the discovery service.
+
+    Returns:
+        list of dict, representing journal bundles
+    """
+    if not journals_enabled():
+        return []
+
+    api_resource = 'journal_bundles'
+
+    cache_key = get_cache_key(
+        site_domain=site.domain,
+        resource=api_resource,
+        bundle_uuid=bundle_uuid
+    )
+
+    journal_bundles = cache.get(cache_key)
+
+    if not journal_bundles:
+        api_client = DiscoveryApiClient()
+        if not api_client:
+            return []
+        journal_bundles = api_client.get_journal_bundles(uuid=bundle_uuid)
+        cache.set(cache_key, journal_bundles, JOURNALS_CACHE_TIMEOUT)
+
+    if isinstance(journal_bundles, dict):
+        fix_course_images(journal_bundles)
+    else:
+        for bundle in journal_bundles:
+            fix_course_images(bundle)
+
+    return journal_bundles
 
 
 def get_journals_root_url():
