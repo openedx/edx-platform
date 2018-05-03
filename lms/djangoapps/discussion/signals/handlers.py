@@ -3,19 +3,40 @@ Signal handlers related to discussions.
 """
 import logging
 
+from django.conf import settings
 from django.dispatch import receiver
-from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common import signals
 from lms.djangoapps.discussion import tasks
+from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
+from xmodule.modulestore.django import SignalHandler
 
 
 log = logging.getLogger(__name__)
 
 
 ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY = 'enable_forum_notifications'
+
+
+@receiver(SignalHandler.course_published)
+def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Catches the signal that a course has been published in the module
+    store and creates/updates the corresponding cache entry.
+    Ignores publish signals from content libraries.
+    """
+    if isinstance(course_key, LibraryLocator):
+        return
+
+    context = {
+        'course_id': unicode(course_key),
+    }
+    tasks.update_discussions_map.apply_async(
+        args=[context],
+        countdown=settings.DISCUSSION_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
+    )
 
 
 @receiver(signals.comment_created)
