@@ -614,6 +614,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
 
+        # We need to send ajax requests to show transcript status
+        # whenever edx_video_id changes on frontend. Thats why we
+        # are changing type to `VideoID` so that a specific
+        # Backbonjs view can handle it.
+        editable_fields['edx_video_id']['type'] = 'VideoID'
+
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()
         possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)

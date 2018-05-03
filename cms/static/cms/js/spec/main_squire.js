@@ -28,6 +28,7 @@
             'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',   // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/js/src/jquery.immediateDescendents',
+            'jquery.ajaxQueue': 'xmodule_js/common_static/js/vendor/jquery.ajaxQueue',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
@@ -107,6 +108,10 @@
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
                 exports: 'jQuery.fn.tinymce'
+            },
+            'jquery.ajaxQueue': {
+                deps: ['jquery'],
+                exports: 'jQuery.fn.ajaxQueue'
             },
             'datepair': {
                 deps: ['jquery.ui', 'jquery.timepicker']

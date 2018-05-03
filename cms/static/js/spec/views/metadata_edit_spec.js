@@ -3,8 +3,9 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(["js/models/metadata", "js/collections/metadata", "js/views/metadata", "cms/js/main"],
-function(MetadataModel, MetadataCollection, MetadataView, main) {
+define(["underscore", "js/models/metadata", "js/collections/metadata", "js/views/metadata", "cms/js/main",
+        "js/views/video/transcripts/utils", 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
+function(_, MetadataModel, MetadataCollection, MetadataView, main, TranscriptUtils, AjaxHelpers) {
   const verifyInputType = function(input, expectedType) {
       // Some browsers (e.g. FireFox) do not support the "number"
       // input type.  We can accept a "text" input instead
@@ -42,6 +43,8 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
           type: MetadataModel.GENERIC_TYPE,
           value: "Word cloud"
       };
+
+      const videoIDEntry = _.extend({}, genericEntry, {field_name: "edx_video_id", type: "VideoID"});
 
       const selectEntry = {
           default_value: "answered",
@@ -269,6 +272,51 @@ function(MetadataModel, MetadataCollection, MetadataView, main) {
           it("has an update model method", function() {
               assertUpdateModel(this.view, 'Word cloud', 'updated');
           });
+      });
+
+     describe("MetadataView.VideoID", function() {
+        var waitForMock;
+
+        waitForMock = function(mock) {
+            return jasmine.waitUntil(function() {
+                return mock.calls.count() === 1;
+            });
+        };
+
+        beforeEach(function() {
+            const model = new MetadataModel(videoIDEntry);
+            spyOn(TranscriptUtils.Storage, 'set');
+            this.view = new MetadataView.VideoID({model});
+            spyOn(Backbone, 'trigger');
+            expect(TranscriptUtils.Storage.set).toHaveBeenCalledWith('edx_video_id', this.view.getValueFromEditor());
+        });
+
+        it("triggers correct event on input change", function(done) {
+            // change value and trigger input event
+            this.view.$el.find('input').val("1234-5678-90").trigger('input');
+            waitForMock(Backbone.trigger)
+                .then(function() {
+                    expect(Backbone.trigger).toHaveBeenCalledWith('transcripts:basicTabFieldChanged');
+                })
+                .always(done);
+        });
+
+        it("triggers correct event on clear", function(done) {
+            this.view.clear();
+            waitForMock(Backbone.trigger)
+                .then(function() {
+                    expect(Backbone.trigger).toHaveBeenCalledWith('transcripts:basicTabFieldChanged');
+                })
+                .always(done);
+        });
+
+        it("constructs correct data", function() {
+            expect(
+                this.view.getData()
+            ).toEqual(
+                [{mode: 'edx_video_id', type: 'edx_video_id', video: this.view.getValueFromEditor()}]
+            );
+        });
       });
 
       describe("MetadataView.Option is an option input type with clear functionality", function() {

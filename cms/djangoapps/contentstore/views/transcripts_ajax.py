@@ -169,19 +169,22 @@ def validate_transcript_upload_data(request):
     error, validated_data = None, {}
     data, files = request.POST, request.FILES
     video_locator = data.get('locator')
+    edx_video_id = data.get('edx_video_id')
     if not video_locator:
         error = _(u'Video locator is required.')
     elif 'transcript-file' not in files:
         error = _(u'A transcript file is required.')
     elif os.path.splitext(files['transcript-file'].name)[1][1:] != Transcript.SRT:
         error = _(u'This transcript file type is not supported.')
+    elif 'edx_video_id' not in data:
+        error = _(u'Video ID is required.')
 
     if not error:
         error, video = validate_video_module(request, video_locator)
         if not error:
             validated_data.update({
                 'video': video,
-                'edx_video_id': clean_video_id(video.edx_video_id),
+                'edx_video_id': clean_video_id(edx_video_id) or clean_video_id(video.edx_video_id),
                 'transcript_file': files['transcript-file']
             })
 
@@ -212,6 +215,8 @@ def upload_transcripts(request):
             video.edx_video_id = edx_video_id
             video.save_with_metadata(request.user)
 
+        response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+
         try:
             # Convert 'srt' transcript into the 'sjson' and upload it to
             # configured transcript storage. For example, S3.
@@ -220,7 +225,7 @@ def upload_transcripts(request):
                 input_format=Transcript.SRT,
                 output_format=Transcript.SJSON
             )
-            create_or_update_video_transcript(
+            transcript_created = create_or_update_video_transcript(
                 video_id=edx_video_id,
                 language_code=u'en',
                 metadata={
@@ -230,7 +235,9 @@ def upload_transcripts(request):
                 },
                 file_data=ContentFile(sjson_subs),
             )
-            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+
+            if transcript_created is None:
+                response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
 
         except (TranscriptsGenerationException, UnicodeDecodeError):
 
@@ -310,7 +317,8 @@ def check_transcripts(request):
     transcripts_presence['status'] = 'Success'
 
     try:
-        get_transcript_from_val(edx_video_id=item.edx_video_id, lang=u'en')
+        edx_video_id = clean_video_id(videos.get('edx_video_id'))
+        get_transcript_from_val(edx_video_id=edx_video_id, lang=u'en')
         command = 'found'
     except NotFoundError:
         filename = 'subs_{0}.srt.sjson'.format(item.sub)
@@ -465,6 +473,9 @@ def _validate_transcripts_data(request):
     for video_data in data.get('videos'):
         if video_data['type'] == 'youtube':
             videos['youtube'] = video_data['video']
+        elif video_data['type'] == 'edx_video_id':
+            if clean_video_id(video_data['video']):
+                videos['edx_video_id'] = video_data['video']
         else:  # do not add same html5 videos
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']

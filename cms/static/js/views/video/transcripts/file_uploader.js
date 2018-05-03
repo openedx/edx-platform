@@ -3,7 +3,7 @@ define(
         'jquery', 'backbone', 'underscore',
         'js/views/video/transcripts/utils'
     ],
-function($, Backbone, _, Utils) {
+function($, Backbone, _, TranscriptUtils) {
     var FileUploader = Backbone.View.extend({
         invisibleClass: 'is-invisible',
 
@@ -57,6 +57,10 @@ function($, Backbone, _, Utils) {
         *
         */
         upload: function() {
+            var data = {
+                'edx_video_id': TranscriptUtils.Storage.get('edx_video_id') || ''
+            };
+
             if (!this.file) {
                 return;
             }
@@ -64,7 +68,8 @@ function($, Backbone, _, Utils) {
             this.$form.ajaxSubmit({
                 beforeSend: this.xhrResetProgressBar,
                 uploadProgress: this.xhrProgressHandler,
-                complete: this.xhrCompleteHandler
+                complete: this.xhrCompleteHandler,
+                data: data
             });
         },
 
