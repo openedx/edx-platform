@@ -93,6 +93,22 @@ def get_course_enrollment(username, course_id):
         return None
 
 
+def get_user_enrollments(course_key):
+    """Based on the course id, return all user enrollments in the course
+    Args:
+        course_key (CourseKey): Identifier of the course
+        from which to retrieve enrollments.
+    Returns:
+        A course's user enrollments as a queryset
+    Raises:
+        CourseEnrollment.DoesNotExist
+    """
+    return CourseEnrollment.objects.filter(
+        course_id=course_key,
+        is_active=True
+    ).order_by('created')
+
+
 def create_course_enrollment(username, course_id, mode, is_active):
     """Create a new course enrollment for the given user.
 
