@@ -795,6 +795,7 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
+GOOGLE_SITE_VERIFICATION_ID = None
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 
 ######################## BRANCH.IO ###########################
