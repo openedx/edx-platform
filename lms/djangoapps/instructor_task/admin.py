@@ -5,7 +5,10 @@ This will mostly involve searching by course_id or task_id and manually failing
 a task.
 
 """
+from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
+
+from .config.models import GradeReportSetting
 from .models import InstructorTask
 
 
@@ -34,3 +37,4 @@ class InstructorTaskAdmin(admin.ModelAdmin):
     email.admin_order_field = 'requester__username'
 
 admin.site.register(InstructorTask, InstructorTaskAdmin)
+admin.site.register(GradeReportSetting, ConfigurationModelAdmin)

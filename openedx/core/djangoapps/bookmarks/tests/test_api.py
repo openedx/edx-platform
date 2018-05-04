@@ -4,13 +4,13 @@ Tests for bookmarks api.
 import ddt
 from mock import patch
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 from opaque_keys.edx.keys import UsageKey
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .. import api
@@ -38,15 +38,11 @@ class BookmarkApiEventTestMixin(object):
 
 @attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
     """
     These tests cover the parts of the API methods.
     """
-
-    def setUp(self):
-        super(BookmarksAPITests, self).setUp()
-
     def test_get_bookmark(self):
         """
         Verifies that get_bookmark returns data as expected.
@@ -123,7 +119,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(
@@ -144,7 +140,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
 
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(

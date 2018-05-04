@@ -7,14 +7,14 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
+from opaque_keys.edx.keys import CourseKey
 
-from student.auth import has_course_author_access
 import contentstore.git_export_utils as git_export_utils
 from edxmako.shortcuts import render_to_response
+from student.auth import has_course_author_access
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 

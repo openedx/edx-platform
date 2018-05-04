@@ -3,6 +3,7 @@
 from datetime import datetime
 from pytz import UTC
 
+from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.partitions.partitions import UserPartition, Group

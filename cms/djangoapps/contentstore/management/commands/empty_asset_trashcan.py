@@ -1,10 +1,12 @@
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from xmodule.contentstore.utils import empty_asset_trashcan
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
+
 from .prompt import query_yes_no
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):

@@ -2,21 +2,22 @@
 Test the views served by third_party_auth.
 """
 
-import ddt
-from lxml import etree
-from onelogin.saml2.errors import OneLogin_Saml2_Error
 import unittest
 
+import ddt
 from django.conf import settings
-
-from .testutil import AUTH_FEATURE_ENABLED, SAMLTestCase
+from lxml import etree
+from onelogin.saml2.errors import OneLogin_Saml2_Error
 
 # Define some XML namespaces:
 from third_party_auth.tasks import SAML_XML_NS
+
+from .testutil import AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY, SAMLTestCase
+
 XMLDSIG_XML_NS = 'http://www.w3.org/2000/09/xmldsig#'
 
 
-@unittest.skipUnless(AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY + ' not enabled')
 @ddt.ddt
 class SAMLMetadataTest(SAMLTestCase):
     """
@@ -134,7 +135,7 @@ class SAMLMetadataTest(SAMLTestCase):
         self.assertEqual(support_email_node.text, support_email)
 
 
-@unittest.skipUnless(AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY + ' not enabled')
 class SAMLAuthTest(SAMLTestCase):
     """
     Test the SAML auth views

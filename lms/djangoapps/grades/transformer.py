@@ -1,19 +1,14 @@
 """
 Grades Transformer
 """
+import json
 from base64 import b64encode
-from django.test.client import RequestFactory
 from functools import reduce as functools_reduce
 from hashlib import sha1
 from logging import getLogger
-import json
 
-from courseware.model_data import FieldDataCache
-import courseware.module_render
 from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
-from openedx.core.djangoapps.util.user_utils import SystemUser
-
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 log = getLogger(__name__)
 
@@ -33,14 +28,25 @@ class GradesTransformer(BlockStructureTransformer):
         graded: (boolean)
         has_score: (boolean)
         weight: (numeric)
+        show_correctness: (string) when to show grades (one of 'always', 'past_due', 'never')
 
     Additionally, the following value is calculated and stored as a
     transformer_block_field for each block:
 
         max_score: (numeric)
     """
-    VERSION = 4
-    FIELDS_TO_COLLECT = [u'due', u'format', u'graded', u'has_score', u'weight', u'course_version', u'subtree_edited_on']
+    WRITE_VERSION = 4
+    READ_VERSION = 4
+    FIELDS_TO_COLLECT = [
+        u'due',
+        u'format',
+        u'graded',
+        u'has_score',
+        u'weight',
+        u'course_version',
+        u'subtree_edited_on',
+        u'show_correctness',
+    ]
 
     EXPLICIT_GRADED_FIELD_NAME = 'explicit_graded'
 
@@ -74,6 +80,18 @@ class GradesTransformer(BlockStructureTransformer):
         Perform no transformations.
         """
         pass
+
+    @classmethod
+    def grading_policy_hash(cls, course):
+        """
+        Returns the grading policy hash for the given course.
+        """
+        ordered_policy = json.dumps(
+            course.grading_policy,
+            separators=(',', ':'),  # Remove spaces from separators for more compact representation
+            sort_keys=True,
+        )
+        return b64encode(sha1(ordered_policy).digest())
 
     @classmethod
     def _collect_explicit_graded(cls, block_structure):
@@ -140,27 +158,13 @@ class GradesTransformer(BlockStructureTransformer):
         Collect a hash of the course's grading policy, storing it as a
         `transformer_block_field` associated with the `GradesTransformer`.
         """
-        def _hash_grading_policy(policy):
-            """
-            Creates a hash from the course grading policy.
-            The keys are sorted in order to make the hash
-            agnostic to the ordering of the policy coming in.
-            """
-            ordered_policy = json.dumps(
-                policy,
-                separators=(',', ':'),  # Remove spaces from separators for more compact representation
-                sort_keys=True,
-            )
-            return b64encode(sha1(ordered_policy).digest())
-
         course_location = block_structure.root_block_usage_key
         course_block = block_structure.get_xblock(course_location)
-        grading_policy = course_block.grading_policy
         block_structure.set_transformer_block_field(
             course_block.location,
             cls,
             "grading_policy_hash",
-            _hash_grading_policy(grading_policy)
+            cls.grading_policy_hash(course_block),
         )
 
     @staticmethod

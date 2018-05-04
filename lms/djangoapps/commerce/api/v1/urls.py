@@ -1,6 +1,6 @@
 """ API v1 URLs. """
 from django.conf import settings
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 
 from commerce.api.v1 import views
 

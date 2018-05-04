@@ -5,39 +5,37 @@ Tests for course access
 import itertools
 
 import ddt
+import mock
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-import mock
+from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from courseware.courses import (
     get_cms_block_link,
     get_cms_course_link,
-    get_courses,
     get_course_about_section,
     get_course_by_id,
     get_course_info_section,
     get_course_overview_with_access,
     get_course_with_access,
+    get_courses,
+    get_current_child
 )
-from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import (
-    CourseFactory, ItemFactory, check_mongo_calls
-)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
-
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -47,6 +45,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
+    ENABLED_SIGNALS = ['course_published']
 
     @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_block_link(self):
@@ -158,6 +157,23 @@ class CoursesTest(ModuleStoreTestCase):
                 expected_courses,
                 "testing get_courses with filter_={}".format(filter_),
             )
+
+    def test_get_current_child(self):
+        mock_xmodule = mock.MagicMock()
+        self.assertIsNone(get_current_child(mock_xmodule))
+
+        mock_xmodule.position = -1
+        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
+        self.assertEqual(get_current_child(mock_xmodule), 'one')
+
+        mock_xmodule.position = 2
+        self.assertEqual(get_current_child(mock_xmodule), 'two')
+        self.assertEqual(get_current_child(mock_xmodule, requested_child='first'), 'one')
+        self.assertEqual(get_current_child(mock_xmodule, requested_child='last'), 'three')
+
+        mock_xmodule.position = 3
+        mock_xmodule.get_display_items.return_value = []
+        self.assertIsNone(get_current_child(mock_xmodule))
 
 
 @attr(shard=1)

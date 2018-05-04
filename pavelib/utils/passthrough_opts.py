@@ -8,7 +8,8 @@ Provides:
         as the `passthrough_options` argument to the decorated function
 """
 
-from optparse import OptionParser, BadOptionError
+from optparse import BadOptionError, OptionParser
+
 import paver.tasks
 from mock import patch
 

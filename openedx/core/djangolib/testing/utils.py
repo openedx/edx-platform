@@ -9,17 +9,19 @@ Utility classes for testing django applications.
 """
 
 import copy
+import re
+from unittest import skipUnless
 
 import crum
 from django import db
-from django.contrib.auth.models import AnonymousUser
-from django.core.cache import caches
-from django.test import RequestFactory, TestCase, override_settings
 from django.conf import settings
 from django.contrib import sites
-
+from django.contrib.auth.models import AnonymousUser
+from django.core.cache import caches
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.test import RequestFactory, TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from nose.plugins import Plugin
-
 from request_cache.middleware import RequestCache
 
 
@@ -145,6 +147,82 @@ class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
         self.addCleanup(self.clear_caches)
 
 
+class _AssertNumQueriesContext(CaptureQueriesContext):
+    """
+    This is a copy of Django's internal class of the same name, with the
+    addition of being able to provide a table_blacklist used to filter queries
+    before comparing the count.
+    """
+    def __init__(self, test_case, num, connection, table_blacklist=None):
+        """
+        Same as Django's _AssertNumQueriesContext __init__, with the addition of
+        the following argument:
+            table_blacklist (List): A list of table names to filter out of the
+                set of queries that get counted.
+        """
+        self.test_case = test_case
+        self.num = num
+        self.table_blacklist = table_blacklist
+        super(_AssertNumQueriesContext, self).__init__(connection)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        def is_unfiltered_query(query):
+            """
+            Returns True if the query does not contain a blacklisted table, and
+            False otherwise.
+
+            Note: This is a simple naive implementation that makes no attempt
+            to parse the query.
+            """
+            if self.table_blacklist:
+                for table in self.table_blacklist:
+                    # SQL contains the following format for columns:
+                    # "table_name"."column_name".  The regex ensures there is no
+                    # "." before the name to avoid matching columns.
+                    if re.search(r'[^.]"{}"'.format(table), query['sql']):
+                        return False
+            return True
+
+        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
+        if exc_type is not None:
+            return
+        filtered_queries = [query for query in self.captured_queries if is_unfiltered_query(query)]
+        executed = len(filtered_queries)
+        self.test_case.assertEqual(
+            executed, self.num,
+            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+                executed, self.num,
+                '\n'.join(
+                    query['sql'] for query in filtered_queries
+                )
+            )
+        )
+
+
+class FilteredQueryCountMixin(object):
+    """
+    Mixin to add to any subclass of Django's TestCase that replaces
+    assertNumQueries with one that accepts a blacklist of tables to filter out
+    of the count.
+    """
+    def assertNumQueries(self, num, func=None, table_blacklist=None, *args, **kwargs):
+        """
+        Used to replace Django's assertNumQueries with the same capability, with
+        the addition of the following argument:
+            table_blacklist (List): A list of table names to filter out of the
+                set of queries that get counted.
+        """
+        using = kwargs.pop("using", DEFAULT_DB_ALIAS)
+        conn = connections[using]
+
+        context = _AssertNumQueriesContext(self, num, conn, table_blacklist=table_blacklist)
+        if func is None:
+            return context
+
+        with context:
+            func(*args, **kwargs)
+
+
 class NoseDatabaseIsolation(Plugin):
     """
     nosetest plugin that resets django databases before any tests begin.
@@ -175,3 +253,17 @@ def get_mock_request(user=None):
     request.get_host = lambda: "edx.org"
     crum.set_current_request(request)
     return request
+
+
+def skip_unless_cms(func):
+    """
+    Only run the decorated test in the CMS test suite
+    """
+    return skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in CMS')(func)
+
+
+def skip_unless_lms(func):
+    """
+    Only run the decorated test in the LMS test suite
+    """
+    return skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')(func)

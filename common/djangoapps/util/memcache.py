@@ -2,9 +2,10 @@
 This module provides a KEY_FUNCTION suitable for use with a memcache backend
 so that we can cache any keys, not just ones that memcache would ordinarily accept
 """
-from django.utils.encoding import smart_str
 import hashlib
 import urllib
+
+from django.utils.encoding import smart_str
 
 
 def fasthash(string):

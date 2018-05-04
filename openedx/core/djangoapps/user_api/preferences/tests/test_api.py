@@ -4,17 +4,15 @@ Unit tests for preference APIs.
 """
 import datetime
 import ddt
-import unittest
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import common_timezones, utc
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from dateutil.parser import parse as parse_datetime
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.tests.factories import UserFactory
 
@@ -42,7 +40,7 @@ from ...preferences.api import (
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestPreferenceAPI(CacheIsolationTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -55,9 +53,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         super(TestPreferenceAPI, self).setUp()
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
-        self.staff_user = UserFactory(is_staff=True, password=self.password)
-        self.no_such_user = UserFactory.create(password=self.password)
-        self.no_such_user.username = "no_such_user"
+        self.staff_user = UserFactory.create(is_staff=True, password=self.password)
+        self.no_such_user = UserFactory.build(password=self.password, username="no_such_user")
         self.test_preference_key = "test_key"
         self.test_preference_value = "test_value"
         set_user_preference(self.user, self.test_preference_key, self.test_preference_value)

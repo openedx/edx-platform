@@ -1,9 +1,10 @@
 from __future__ import division
+
 from fractions import Fraction
 
-from pyparsing import (Literal, StringEnd, OneOrMore, ParseException)
 import nltk
 from nltk.tree import Tree
+from pyparsing import Literal, OneOrMore, ParseException, StringEnd
 
 ARROWS = ('<->', '->')
 

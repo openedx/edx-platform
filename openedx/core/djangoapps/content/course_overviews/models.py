@@ -5,6 +5,7 @@ import json
 import logging
 from urlparse import urlparse, urlunparse
 
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField, \
     CharField
@@ -44,7 +45,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 5
+    VERSION = 6
 
     # Cache entry versioning.
     version = IntegerField()
@@ -98,12 +99,15 @@ class CourseOverview(TimeStampedModel):
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
+    marketing_url = TextField(null=True)
+    eligible_for_financial_aid = BooleanField(default=True)
+
     language = CharField(max_length=255, null=True)
 
     @classmethod
-    def _create_from_course(cls, course):
+    def _create_or_update(cls, course):
         """
-        Creates a CourseOverview object from a CourseDescriptor.
+        Creates or updates a CourseOverview object from a CourseDescriptor.
 
         Does not touch the database, simply constructs and returns an overview
         from the given course.
@@ -112,12 +116,10 @@ class CourseOverview(TimeStampedModel):
             course (CourseDescriptor): any course descriptor object
 
         Returns:
-            CourseOverview: overview extracted from the given course
+            CourseOverview: created or updated overview extracted from the given course
         """
         from lms.djangoapps.certificates.api import get_active_web_certificate
         from openedx.core.lib.courses import course_image_url
-
-        log.info('Creating course overview for %s.', unicode(course.id))
 
         # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
         # If the course has a malformed grading policy such that
@@ -141,55 +143,64 @@ class CourseOverview(TimeStampedModel):
             end = ccx.due
             max_student_enrollments_allowed = ccx.max_student_enrollments_allowed
 
-        return cls(
-            version=cls.VERSION,
-            id=course.id,
-            _location=course.location,
-            org=course.location.org,
-            display_name=display_name,
-            display_number_with_default=course.display_number_with_default,
-            display_org_with_default=course.display_org_with_default,
+        course_overview = cls.objects.filter(id=course.id)
+        if course_overview.exists():
+            log.info('Updating course overview for %s.', unicode(course.id))
+            course_overview = course_overview.first()
+        else:
+            log.info('Creating course overview for %s.', unicode(course.id))
+            course_overview = cls()
 
-            start=start,
-            end=end,
-            advertised_start=course.advertised_start,
-            announcement=course.announcement,
+        course_overview.version = cls.VERSION
+        course_overview.id = course.id
+        course_overview._location = course.location
+        course_overview.org = course.location.org
+        course_overview.display_name = display_name
+        course_overview.display_number_with_default = course.display_number_with_default
+        course_overview.display_org_with_default = course.display_org_with_default
 
-            course_image_url=course_image_url(course),
-            social_sharing_url=course.social_sharing_url,
+        course_overview.start = start
+        course_overview.end = end
+        course_overview.advertised_start = course.advertised_start
+        course_overview.announcement = course.announcement
 
-            certificates_display_behavior=course.certificates_display_behavior,
-            certificates_show_before_end=course.certificates_show_before_end,
-            cert_html_view_enabled=course.cert_html_view_enabled,
-            has_any_active_web_certificate=(get_active_web_certificate(course) is not None),
-            cert_name_short=course.cert_name_short,
-            cert_name_long=course.cert_name_long,
-            lowest_passing_grade=lowest_passing_grade,
-            end_of_course_survey_url=course.end_of_course_survey_url,
+        course_overview.course_image_url = course_image_url(course)
+        course_overview.social_sharing_url = course.social_sharing_url
 
-            days_early_for_beta=course.days_early_for_beta,
-            mobile_available=course.mobile_available,
-            visible_to_staff_only=course.visible_to_staff_only,
-            _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses),
+        course_overview.certificates_display_behavior = course.certificates_display_behavior
+        course_overview.certificates_show_before_end = course.certificates_show_before_end
+        course_overview.cert_html_view_enabled = course.cert_html_view_enabled
+        course_overview.has_any_active_web_certificate = (get_active_web_certificate(course) is not None)
+        course_overview.cert_name_short = course.cert_name_short
+        course_overview.cert_name_long = course.cert_name_long
+        course_overview.lowest_passing_grade = lowest_passing_grade
+        course_overview.end_of_course_survey_url = course.end_of_course_survey_url
 
-            enrollment_start=course.enrollment_start,
-            enrollment_end=course.enrollment_end,
-            enrollment_domain=course.enrollment_domain,
-            invitation_only=course.invitation_only,
-            max_student_enrollments_allowed=max_student_enrollments_allowed,
+        course_overview.days_early_for_beta = course.days_early_for_beta
+        course_overview.mobile_available = course.mobile_available
+        course_overview.visible_to_staff_only = course.visible_to_staff_only
+        course_overview._pre_requisite_courses_json = json.dumps(course.pre_requisite_courses)
 
-            catalog_visibility=course.catalog_visibility,
-            short_description=CourseDetails.fetch_about_attribute(course.id, 'short_description'),
-            effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
-            course_video_url=CourseDetails.fetch_video_url(course.id),
-            self_paced=course.self_paced,
-            language=course.language,
-        )
+        course_overview.enrollment_start = course.enrollment_start
+        course_overview.enrollment_end = course.enrollment_end
+        course_overview.enrollment_domain = course.enrollment_domain
+        course_overview.invitation_only = course.invitation_only
+        course_overview.max_student_enrollments_allowed = max_student_enrollments_allowed
+
+        course_overview.catalog_visibility = course.catalog_visibility
+        course_overview.short_description = CourseDetails.fetch_about_attribute(course.id, 'short_description')
+        course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
+        course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
+        course_overview.self_paced = course.self_paced
+
+        course_overview.language = course.language
+
+        return course_overview
 
     @classmethod
     def load_from_module_store(cls, course_id):
         """
-        Load a CourseDescriptor, create a new CourseOverview from it, cache the
+        Load a CourseDescriptor, create or update a CourseOverview from it, cache the
         overview, and return it.
 
         Arguments:
@@ -208,15 +219,19 @@ class CourseOverview(TimeStampedModel):
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
-                course_overview = cls._create_from_course(course)
+                course_overview = cls._create_or_update(course)
                 try:
                     with transaction.atomic():
                         course_overview.save()
+                        # Remove and recreate all the course tabs
+                        CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
                             CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
                             for tab in course.tabs
                         ])
-                        CourseOverviewImageSet.create_for_course(course_overview, course)
+                        # Remove and recreate course images
+                        CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
+                        CourseOverviewImageSet.create(course_overview, course)
 
                 except IntegrityError:
                     # There is a rare race condition that will occur if
@@ -228,6 +243,13 @@ class CourseOverview(TimeStampedModel):
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
                     pass
+                except Exception:  # pylint: disable=broad-except
+                    log.exception(
+                        "CourseOverview for course %s failed!",
+                        course_id,
+                    )
+                    raise
+
                 return course_overview
             elif course is not None:
                 raise IOError(
@@ -273,9 +295,30 @@ class CourseOverview(TimeStampedModel):
         # they were never generated, or because they were flushed out after
         # a change to CourseOverviewImageConfig.
         if course_overview and not hasattr(course_overview, 'image_set'):
-            CourseOverviewImageSet.create_for_course(course_overview)
+            CourseOverviewImageSet.create(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
+
+    @classmethod
+    def get_from_ids_if_exists(cls, course_ids):
+        """
+        Return a dict mapping course_ids to CourseOverviews, if they exist.
+
+        This method will *not* generate new CourseOverviews or delete outdated
+        ones. It exists only as a small optimization used when CourseOverviews
+        are known to exist, for common situations like the student dashboard.
+
+        Callers should assume that this list is incomplete and fall back to
+        get_from_id if they need to guarantee CourseOverview generation.
+        """
+        return {
+            overview.id: overview
+            for overview
+            in cls.objects.select_related('image_set').filter(
+                id__in=course_ids,
+                version__gte=cls.VERSION
+            )
+        }
 
     def clean_id(self, padding_char='='):
         """
@@ -341,6 +384,13 @@ class CourseOverview(TimeStampedModel):
         """
         return block_metadata_utils.display_name_with_default_escaped(self)
 
+    @property
+    def dashboard_start_display(self):
+        """
+         Return start date to diplay on learner's dashboard, preferably `Course Advertised Start`
+        """
+        return self.advertised_start or self.start
+
     def has_started(self):
         """
         Returns whether the the course has started.
@@ -352,6 +402,19 @@ class CourseOverview(TimeStampedModel):
         Returns whether the course has ended.
         """
         return course_metadata_utils.has_course_ended(self.end)
+
+    def has_marketing_url(self):
+        """
+        Returns whether the course has marketing url.
+        """
+        return settings.FEATURES.get('ENABLE_MKTG_SITE') and bool(self.marketing_url)
+
+    def has_social_sharing_url(self):
+        """
+        Returns whether the course has social sharing url.
+        """
+        is_social_sharing_enabled = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get('CUSTOM_COURSE_URLS')
+        return is_social_sharing_enabled and bool(self.social_sharing_url)
 
     def starts_within(self, days):
         """
@@ -449,12 +512,12 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
-    def get_all_courses(cls, org=None, filter_=None):
+    def get_all_courses(cls, orgs=None, filter_=None):
         """
         Returns all CourseOverview objects in the database.
 
         Arguments:
-            org (string): Optional parameter that allows case-insensitive
+            orgs (list[string]): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
         """
@@ -463,11 +526,11 @@ class CourseOverview(TimeStampedModel):
         # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
 
-        if org:
+        if orgs:
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
-            # Case-insensitive exact matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iexact=org)
+            # Case-insensitive matching allows us to deal with this kind of dirty data.
+            course_overviews = course_overviews.filter(org__iregex=r'(' + '|'.join(orgs) + ')')
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
@@ -669,11 +732,11 @@ class CourseOverviewImageSet(TimeStampedModel):
     large_url = models.TextField(blank=True, default="")
 
     @classmethod
-    def create_for_course(cls, course_overview, course=None):
+    def create(cls, course_overview, course=None):
         """
         Create thumbnail images for this CourseOverview.
 
-        This will save the CourseOverviewImageSet it creates before it returns.
+        This will save the CourseOverviewImageSet before it returns.
         """
         from openedx.core.lib.courses import create_course_image_thumbnail
 
@@ -689,7 +752,8 @@ class CourseOverviewImageSet(TimeStampedModel):
         if not course:
             course = modulestore().get_course(course_overview.id)
 
-        image_set = CourseOverviewImageSet(course_overview=course_overview)
+        image_set = cls(course_overview=course_overview)
+
         if course.course_image:
             # Try to create a thumbnails of the course image. If this fails for any
             # reason (weird format, non-standard URL, etc.), the URLs will default

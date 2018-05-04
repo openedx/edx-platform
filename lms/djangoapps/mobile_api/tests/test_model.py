@@ -2,9 +2,11 @@
 Tests for Mobile API Configuration Models
 """
 from datetime import datetime
+
 import ddt
 from django.test import TestCase
 from pytz import UTC
+
 from mobile_api.models import AppVersionConfig, MobileApiConfig
 
 
@@ -13,9 +15,6 @@ class TestAppVersionConfigModel(TestCase):
     """
     Tests for app version configuration model
     """
-    def setUp(self):
-        super(TestAppVersionConfigModel, self).setUp()
-
     def set_app_version_config(self):
         """ Creates configuration data for platform versions """
         AppVersionConfig(platform="ios", version="1.1.1", expire_at=None, enabled=True).save()

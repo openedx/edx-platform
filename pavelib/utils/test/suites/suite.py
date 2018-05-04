@@ -88,12 +88,10 @@ class TestSuite(object):
 
         try:
             process = subprocess.Popen(cmd, **kwargs)
-            process.communicate()
+            return (process.wait() == 0)
         except KeyboardInterrupt:
             kill_process(process)
             sys.exit(1)
-        else:
-            return process.returncode == 0
 
     def run_suite_tests(self):
         """

@@ -2,12 +2,11 @@
 Views for the rss_proxy djangoapp.
 """
 import requests
-
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseNotFound
-from rss_proxy.models import WhitelistedRssUrl
 
+from rss_proxy.models import WhitelistedRssUrl
 
 CACHE_KEY_RSS = "rss_proxy.{url}"
 

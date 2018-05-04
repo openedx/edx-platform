@@ -3,15 +3,15 @@ Unit tests for the course_mode signals
 """
 
 from datetime import datetime, timedelta
-from mock import patch
 
 import ddt
+from mock import patch
 from pytz import UTC
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.signals import _listen_for_course_publish
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt

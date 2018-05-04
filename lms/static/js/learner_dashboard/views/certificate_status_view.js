@@ -1,13 +1,13 @@
 (function(define) {
     'use strict';
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'text!../../../templates/learner_dashboard/certificate_status.underscore',
-            'text!../../../templates/learner_dashboard/certificate_icon.underscore'
-           ],
+        'jquery',
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!../../../templates/learner_dashboard/certificate_status.underscore',
+        'text!../../../templates/learner_dashboard/certificate_icon.underscore'
+    ],
          function(
              Backbone,
              $,

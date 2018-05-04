@@ -16,7 +16,7 @@ dealer==2.0.4
 defusedxml==0.4.1
 django-babel-underscore==0.5.1
 markey==0.8  # From django-babel-underscore
-django-celery==3.1.16
+django-celery==3.2.1
 django-config-models==0.1.3
 django-countries==4.0
 django-extensions==1.5.9
@@ -28,18 +28,22 @@ django-mptt==0.7.4
 django-oauth-plus==2.2.8
 django-oauth-toolkit==0.10.0
 django-pipeline-forgiving==1.0.0
+django-pyfs==1.0.6
 django-sekizai==0.8.2
 django-ses==0.7.1
 django-simple-history==1.6.3
-django-statici18n==1.1.5
+django-statici18n==1.4.0
 django-storages==1.4.1
 django-method-override==0.1.0
-django-user-tasks==0.1.2
+django-user-tasks==0.1.4
+# We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
 django==1.8.18
+django-waffle==0.12.0
 djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
 edx-ccx-keys==0.2.1
+edx-celeryutils==0.2.4
 edx-drf-extensions==1.2.2
 edx-i18n-tools==0.3.7
 edx-lint==0.4.3
@@ -48,18 +52,19 @@ edx-lint==0.4.3
 astroid==1.3.8
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
-edx-enterprise==0.9.0
+edx-enterprise==0.36.5
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
-edx-organizations==0.4.1
-edx-rest-api-client==1.6.0
-edx-search==0.1.2
+edx-organizations==0.4.4
+edx-rest-api-client==1.7.1
+edx-search==1.0.1
 facebook-sdk==0.4.0
 feedparser==5.1.3
 firebase-token-generator==1.3.2
 GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
+help-tokens==1.0.2
 httpretty==0.8.3
 lazy==1.1
 mako==1.0.2
@@ -80,20 +85,19 @@ polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
+pyjwkest==1.3.2
+# TODO Replace PyJWT usage with pyjwkest
 PyJWT==1.4.0
 pymongo==2.9.1
 python-memcached==1.48
+django-memcached-hashring==0.1.2
 python-openid==2.2.5
 python-dateutil==2.1
-
-# This module gets monkey-patched in third_party_auth.py to fix a Django 1.8 incompatibility.
-# When this dependency gets upgraded, the monkey patch should be removed, if possible.
-# We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
-python-social-auth==0.2.12
-
+social-auth-app-django==1.2.0
+social-auth-core==1.4.0
 pytz==2016.7
 pysrt==0.4.7
-PyYAML==3.10
+PyYAML==3.12
 requests==2.9.1
 requests-oauthlib==0.4.1
 rules==1.1.1
@@ -110,6 +114,7 @@ xmltodict==0.4.1
 django-ratelimit-backend==1.0
 unicodecsv==0.9.4
 django-require==1.0.11
+django-webpack-loader==0.4.1
 pyuca==1.1
 wrapt==1.10.5
 zendesk==1.1.1
@@ -128,7 +133,7 @@ watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.74.0.54
+newrelic==2.86.3.70
 
 # Used for documentation gathering
 sphinx==1.1.3
@@ -150,29 +155,30 @@ sqlparse>=0.2.0,<0.3.0
 
 # Used for testing
 before_after==0.1.3
-bok-choy==0.5.3
+bok-choy==0.7.1
 chrono==1.0.2
 ddt==0.8.0
 django-crum==0.5
 django_nose==1.4.1
-factory_boy==2.5.1
-flaky==2.4.0
-freezegun==0.1.17
+factory_boy==2.8.1
+flaky==3.3.0
+freezegun==0.3.8
 mock-django==0.6.9
 mock==1.0.1
 moto==0.3.1
+needle==0.5.0
 nose==1.3.7
 nose-exclude
 nose-ignore-docstring
 nose-randomly==1.2.0
 nosexcover==1.0.7
-pa11ycrawler==1.5.4
+pa11ycrawler==1.6.2
 pep8==1.5.7
 PyContracts==1.7.1
 python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.3.2
-selenium==2.53.1
+selenium==3.3.1
 splinter==0.5.4
 testtools==0.9.34
 testfixtures==4.5.0
@@ -193,7 +199,7 @@ pynliner==0.5.2
 sailthru-client==2.2.3
 
 # Release utils for the edx release pipeline
-edx-django-release-util==0.2.0
+edx-django-release-util==0.3.0
 
 # Used to communicate with Neo4j, which is used internally for
 # modulestore inspection
@@ -201,3 +207,10 @@ py2neo==3.1.2
 
 # for calculating coverage
 -r coverage.txt
+
+# Support for plugins
+web-fragments==0.2.2
+xblock==1.0.0
+
+# Third Party XBlocks
+edx-sga==0.6.2

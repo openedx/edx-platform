@@ -5,9 +5,7 @@ from contextlib import closing
 import datetime
 from nose.plugins.attrib import attr
 from pytz import UTC
-import unittest
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 
@@ -24,6 +22,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import (
     get_profile_image_names,
     get_profile_image_storage,
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..images import create_profile_images, ImageValidationError
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
@@ -153,7 +152,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
     """
@@ -174,7 +173,7 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
     """
@@ -384,7 +383,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
     """
@@ -515,7 +514,7 @@ class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APITestCase):
     """
@@ -528,7 +527,7 @@ class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APIT
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageRemoveTestCase(DeprecatedProfileImageTestMixin, APITestCase):
     """

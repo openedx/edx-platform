@@ -9,23 +9,24 @@ from urlparse import urljoin
 
 import requests
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from edx_rest_api_client.exceptions import HttpClientError
-from request_cache.middleware import RequestCache
-from student.models import UNENROLL_DONE
 
+from commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from request_cache.middleware import RequestCache
+from student.models import UNENROLL_DONE
 
 log = logging.getLogger(__name__)
 
 
+# pylint: disable=unused-argument
 @receiver(UNENROLL_DONE)
-def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
-                         **kwargs):  # pylint: disable=unused-argument
+def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False, **kwargs):
     """
     Signal receiver for unenrollments, used to automatically initiate refunds
     when applicable.
@@ -40,12 +41,12 @@ def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
             request_user = get_request_user() or course_enrollment.user
             if isinstance(request_user, AnonymousUser):
                 # Assume the request was initiated via server-to-server
-                # api call (presumably Otto).  In this case we cannot
+                # API call (presumably Otto).  In this case we cannot
                 # construct a client to call Otto back anyway, because
                 # the client does not work anonymously, and furthermore,
                 # there's certainly no need to inform Otto about this request.
                 return
-            refund_seat(course_enrollment, request_user)
+            refund_seat(course_enrollment)
         except:  # pylint: disable=bare-except
             # don't assume the signal was fired with `send_robust`.
             # avoid blowing up other signal handlers by gracefully
@@ -69,78 +70,76 @@ def get_request_user():
     return getattr(request, 'user', None)
 
 
-def refund_seat(course_enrollment, request_user):
+def refund_seat(course_enrollment):
     """
-    Attempt to initiate a refund for any orders associated with the seat being
-    unenrolled, using the commerce service.
+    Attempt to initiate a refund for any orders associated with the seat being unenrolled, using the commerce service.
 
     Arguments:
         course_enrollment (CourseEnrollment): a student enrollment
-        request_user: the user as whom to authenticate to the commerce service
-            when attempting to initiate the refund.
 
     Returns:
         A list of the external service's IDs for any refunds that were initiated
             (may be empty).
 
     Raises:
-        exceptions.SlumberBaseException: for any unhandled HTTP error during
-            communication with the commerce service.
-        exceptions.Timeout: if the attempt to reach the commerce service timed
-            out.
-
+        exceptions.SlumberBaseException: for any unhandled HTTP error during communication with the E-Commerce Service.
+        exceptions.Timeout: if the attempt to reach the commerce service timed out.
     """
+    User = get_user_model()  # pylint:disable=invalid-name
     course_key_str = unicode(course_enrollment.course_id)
-    unenrolled_user = course_enrollment.user
+    enrollee = course_enrollment.user
 
-    try:
-        refund_ids = ecommerce_api_client(request_user or unenrolled_user).refunds.post(
-            {'course_id': course_key_str, 'username': unenrolled_user.username}
-        )
-    except HttpClientError, exc:
-        if exc.response.status_code == 403 and request_user != unenrolled_user:
-            # this is a known limitation; commerce service does not presently
-            # support the case of a non-superusers initiating a refund on
-            # behalf of another user.
-            log.warning("User [%s] was not authorized to initiate a refund for user [%s] "
-                        "upon unenrollment from course [%s]", request_user.id, unenrolled_user.id, course_key_str)
-            return []
-        else:
-            # no other error is anticipated, so re-raise the Exception
-            raise exc
+    service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+    api_client = ecommerce_api_client(service_user)
+
+    log.info('Attempting to create a refund for user [%s], course [%s]...', enrollee.id, course_key_str)
+
+    refund_ids = api_client.refunds.post({'course_id': course_key_str, 'username': enrollee.username})
 
     if refund_ids:
-        # at least one refundable order was found.
-        log.info(
-            "Refund successfully opened for user [%s], course [%s]: %r",
-            unenrolled_user.id,
-            course_key_str,
-            refund_ids,
-        )
+        log.info('Refund successfully opened for user [%s], course [%s]: %r', enrollee.id, course_key_str, refund_ids)
 
-        # XCOM-371: this is a temporary measure to suppress refund-related email
-        # notifications to students and support@) for free enrollments.  This
-        # condition should be removed when the CourseEnrollment.refundable() logic
-        # is updated to be more correct, or when we implement better handling (and
-        # notifications) in Otto for handling reversal of $0 transactions.
-        if course_enrollment.mode != 'verified':
-            # 'verified' is the only enrollment mode that should presently
-            # result in opening a refund request.
-            log.info(
-                "Skipping refund email notification for non-verified mode for user [%s], course [%s], mode: [%s]",
-                course_enrollment.user.id,
-                course_enrollment.course_id,
-                course_enrollment.mode,
-            )
+        config = CommerceConfiguration.current()
+
+        if config.enable_automatic_refund_approval:
+            refunds_requiring_approval = []
+
+            for refund_id in refund_ids:
+                try:
+                    # NOTE: Approve payment only because the user has already been unenrolled. Additionally, this
+                    # ensures we don't tie up an additional web worker when the E-Commerce Service tries to unenroll
+                    # the learner
+                    api_client.refunds(refund_id).process.put({'action': 'approve_payment_only'})
+                    log.info('Refund [%d] successfully approved.', refund_id)
+                except:  # pylint: disable=bare-except
+                    log.exception('Failed to automatically approve refund [%d]!', refund_id)
+                    refunds_requiring_approval.append(refund_id)
         else:
-            try:
-                send_refund_notification(course_enrollment, refund_ids)
-            except:  # pylint: disable=bare-except
-                # don't break, just log a warning
-                log.warning("Could not send email notification for refund.", exc_info=True)
+            refunds_requiring_approval = refund_ids
+
+        if refunds_requiring_approval:
+            # XCOM-371: this is a temporary measure to suppress refund-related email
+            # notifications to students and support for free enrollments.  This
+            # condition should be removed when the CourseEnrollment.refundable() logic
+            # is updated to be more correct, or when we implement better handling (and
+            # notifications) in Otto for handling reversal of $0 transactions.
+            if course_enrollment.mode != 'verified':
+                # 'verified' is the only enrollment mode that should presently
+                # result in opening a refund request.
+                log.info(
+                    'Skipping refund email notification for non-verified mode for user [%s], course [%s], mode: [%s]',
+                    course_enrollment.user.id,
+                    course_enrollment.course_id,
+                    course_enrollment.mode,
+                )
+            else:
+                try:
+                    send_refund_notification(course_enrollment, refunds_requiring_approval)
+                except:  # pylint: disable=bare-except
+                    # don't break, just log a warning
+                    log.warning('Could not send email notification for refund.', exc_info=True)
     else:
-        # no refundable orders were found.
-        log.debug("No refund opened for user [%s], course [%s]", unenrolled_user.id, course_key_str)
+        log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
     return refund_ids
 

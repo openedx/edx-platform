@@ -3,8 +3,8 @@ Course Block API URLs
 """
 from django.conf import settings
 from django.conf.urls import patterns, url
-from .views import BlocksView, BlocksInCourseView
 
+from .views import BlocksInCourseView, BlocksView
 
 urlpatterns = patterns(
     '',

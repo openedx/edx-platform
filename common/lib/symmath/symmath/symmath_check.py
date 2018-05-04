@@ -8,9 +8,10 @@
 #
 # Takes in math expressions given as Presentation MathML (from ASCIIMathML), converts to Content MathML using SnuggleTeX
 
-import traceback
-from .formula import *
 import logging
+import traceback
+
+from .formula import *
 
 log = logging.getLogger(__name__)
 

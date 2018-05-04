@@ -1,17 +1,16 @@
 """
 Utilities for django models.
 """
-import unicodedata
 import re
-
-from eventtracking import tracker
+import unicodedata
 
 from django.conf import settings
+from django.dispatch import Signal
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
-from django.dispatch import Signal
-
 from django_countries.fields import Country
+
+from eventtracking import tracker
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 USER_SETTINGS_CHANGED_EVENT_NAME = u'edx.user.settings.changed'

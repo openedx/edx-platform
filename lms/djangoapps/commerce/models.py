@@ -1,10 +1,9 @@
 """
 Commerce-related models.
 """
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from config_models.models import ConfigurationModel
 
 
 class CommerceConfiguration(ConfigurationModel):
@@ -15,7 +14,8 @@ class CommerceConfiguration(ConfigurationModel):
 
     API_NAME = 'commerce'
     CACHE_KEY = 'commerce.api.data'
-    DEFAULT_RECEIPT_PAGE_URL = '/commerce/checkout/receipt/?orderNum='
+    DEFAULT_RECEIPT_PAGE_URL = '/checkout/receipt/?order_number='
+    MULTIPLE_ITEMS_BASKET_PAGE_URL = '/basket/add/'
 
     checkout_on_ecommerce_service = models.BooleanField(
         default=False,
@@ -34,10 +34,16 @@ class CommerceConfiguration(ConfigurationModel):
             'Specified in seconds. Enable caching by setting this to a value greater than 0.'
         )
     )
+    # receipt_page no longer used but remains in the model until we can purge old data.
+    # removing this will casue 500 errors when trying to access the Django admin.
     receipt_page = models.CharField(
         max_length=255,
         default=DEFAULT_RECEIPT_PAGE_URL,
         help_text=_('Path to order receipt page.')
+    )
+    enable_automatic_refund_approval = models.BooleanField(
+        default=True,
+        help_text=_('Automatically approve valid refund requests, without manual processing')
     )
 
     def __unicode__(self):

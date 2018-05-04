@@ -8,9 +8,10 @@ from celery.exceptions import MaxRetriesExceededError
 from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core import mail
-from edx_notifications.lib.publisher import bulk_publish_notification_to_users
 from mobileapps.models import MobileApp
 from student.models import CourseEnrollment
+from edx_notifications.lib.publisher import bulk_publish_notification_to_users
+
 
 log = logging.getLogger('edx.celery.task')
 
@@ -18,7 +19,7 @@ log = logging.getLogger('edx.celery.task')
 @task(bind=True)
 def send_activation_email(self, subject, message, from_address, dest_addr):
     """
-    Sending an activation email to the users.
+    Sending an activation email to the user.
     """
     max_retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
     retries = self.request.retries

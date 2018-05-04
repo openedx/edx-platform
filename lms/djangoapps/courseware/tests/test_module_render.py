@@ -2,79 +2,70 @@
 """
 Test for lms courseware app, module render unit
 """
-from datetime import datetime
-import ddt
 import itertools
 import json
-from nose.plugins.attrib import attr
+from datetime import datetime
 from functools import partial
 
+import ddt
+import pytz
 from bson import ObjectId
-from django.http import Http404, HttpResponse
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.test import APIRequestFactory
+from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
+from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.tests.test_services import MockCreditService
 from freezegun import freeze_time
-from mock import MagicMock, patch, Mock
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
-import pytz
-from xblock.field_data import FieldData
-from xblock.runtime import Runtime
-from xblock.fields import ScopeIds
 from xblock.core import XBlock, XBlockAside
+from xblock.field_data import FieldData
+from xblock.fields import ScopeIds
 from xblock.fragment import Fragment
+from xblock.runtime import Runtime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
 from courseware import module_render as render
-from courseware.courses import get_course_with_access, get_course_info_section
+from courseware.courses import get_course_info_section, get_course_with_access
 from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
 from courseware.module_render import hash_resource, get_module_for_descriptor, XblockCallbackView
 from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
-from courseware.tests.tests import LoginEnrollmentTestCase
+from courseware.module_render import get_module_for_descriptor, hash_resource
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
+from courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_MIXED_MODULESTORE
-)
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from xblock_django.models import XBlockConfiguration
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_asides import AsideTestType
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
-
-from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.api import (
-    set_credit_requirements,
-    set_credit_requirement_status
-)
-from xblock_django.models import XBlockConfiguration
-
-from edx_proctoring.api import (
-    create_exam,
-    create_exam_attempt,
-    update_attempt_status
-)
-from edx_proctoring.runtime import set_runtime_service
-from edx_proctoring.tests.test_services import MockCreditService
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-
-from milestones.tests.utils import MilestonesTestCaseMixin
-
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -406,7 +397,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 @attr(shard=1)
 class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Test the handle_xblock_callback function
+    Test the XblockCallbackView function
     """
     @classmethod
     def setUpClass(cls):
@@ -453,12 +444,12 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
         resp = view(
-            request,
-            self.course_key.to_deprecated_string(),
-            'invalid Location',
-            'dummy_handler'
-            'dummy_dispatch'
-        )
+                request,
+                self.course_key.to_deprecated_string(),
+                'invalid Location',
+                'dummy_handler'
+                'dummy_dispatch'
+            )
         self.assertEquals(resp.status_code, 404)
 
     def test_too_many_files(self):
@@ -541,17 +532,18 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         self.assertEquals(resp.status_code, 404)
 
+
     def test_bad_xmodule_dispatch(self):
         request = self.drf_request_factory.post('dummy_url')
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
         resp = view(
-            request,
-            self.course_key.to_deprecated_string(),
-            quote_slashes(self.location.to_deprecated_string()),
-            'xmodule_handler',
-            'bad_dispatch',
-        )
+                request,
+                self.course_key.to_deprecated_string(),
+                quote_slashes(self.location.to_deprecated_string()),
+                'xmodule_handler',
+                'bad_dispatch',
+            )
         self.assertEquals(resp.status_code, 404)
 
     def test_missing_handler(self):
@@ -559,35 +551,13 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
         resp = view(
-            request,
-            self.course_key.to_deprecated_string(),
-            quote_slashes(self.location.to_deprecated_string()),
-            'bad_handler',
-            'bad_dispatch',
-        )
+                request,
+                self.course_key.to_deprecated_string(),
+                quote_slashes(self.location.to_deprecated_string()),
+                'bad_handler',
+                'bad_dispatch',
+            )
         self.assertEquals(resp.status_code, 404)
-
-    def test_xblock_view_handler(self):
-        args = [
-            'edX/toy/2012_Fall',
-            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
-            'student_view'
-        ]
-        xblock_view_url = reverse(
-            'xblock_view',
-            args=args
-        )
-
-        request = self.request_factory.get(xblock_view_url)
-        request.user = self.mock_user
-        response = render.xblock_view(request, *args)
-        self.assertEquals(200, response.status_code)
-
-        expected = ['csrf_token', 'html', 'resources']
-        content = json.loads(response.content)
-        for section in expected:
-            self.assertIn(section, content)
-        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
@@ -1867,24 +1837,24 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @freeze_time(datetime.now().replace(tzinfo=pytz.UTC))
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
-    @patch.dict(settings.FEATURES, {'MARK_PROGRESS_ON_GRADING_EVENT': True})
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
-        self.set_module_grade_using_publish(self.grade_dict)
-        expected_signal_kwargs = {
-            'sender': None,
-            'raw_possible': self.grade_dict['max_value'],
-            'raw_earned': self.grade_dict['value'],
-            'weight': None,
-            'user_id': self.student_user.id,
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location),
-            'only_if_higher': None,
-            'modified': datetime.now().replace(tzinfo=pytz.UTC)
-        }
-        send_mock.assert_called_with(**expected_signal_kwargs)
+        with freeze_time(datetime.now().replace(tzinfo=pytz.UTC)):
+            self.set_module_grade_using_publish(self.grade_dict)
+            expected_signal_kwargs = {
+                'sender': None,
+                'raw_possible': self.grade_dict['max_value'],
+                'raw_earned': self.grade_dict['value'],
+                'weight': None,
+                'user_id': self.student_user.id,
+                'course_id': unicode(self.course.id),
+                'usage_id': unicode(self.problem.location),
+                'only_if_higher': None,
+                'modified': datetime.now().replace(tzinfo=pytz.UTC),
+                'score_db_table': 'csm',
+            }
+            send_mock.assert_called_with(**expected_signal_kwargs)
 
 
 @attr(shard=1)

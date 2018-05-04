@@ -16,12 +16,11 @@ we receive from the credit provider.
 
 """
 
-import logging
 import hashlib
 import hmac
+import logging
 
 from django.conf import settings
-
 
 log = logging.getLogger(__name__)
 

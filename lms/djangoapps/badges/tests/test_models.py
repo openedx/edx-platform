@@ -7,19 +7,21 @@ from django.core.files.storage import default_storage
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch, Mock
+from mock import Mock, patch
 from nose.plugins.attrib import attr
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from badges.models import (
-    CourseCompleteImageConfiguration, validate_badge_image, BadgeClass, BadgeAssertion,
-    CourseBadgesDisabledError
+    BadgeAssertion,
+    BadgeClass,
+    CourseBadgesDisabledError,
+    CourseCompleteImageConfiguration,
+    validate_badge_image
 )
-from badges.tests.factories import BadgeClassFactory, BadgeAssertionFactory, RandomBadgeClassFactory
+from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def get_image(name):

@@ -183,45 +183,43 @@
                         padding: 11px 14px;
                         line-height: normal;
                     }
-
-                    #u-field-value-username {
-                        padding-top: ($baseline/2);
-                    }
                 }
 
                 .u-field-order {
                     display: flex;
                     align-items: center;
                     font-size: em(16);
-                    color: $gray;
+                    font-weight: 600;
+                    color: $dark-gray;
                     width: 100%;
                     padding-top: $baseline;
                     padding-bottom: $baseline;
                     line-height: normal;
+                    flex-direction: row;
+                    flex-wrap: wrap;
 
                     span {
                         padding: $baseline;
                     }
 
-                    .u-field-order-title {
+                    .u-field-order-number {
                         @include float(left);
-                        width: 26%;
-                        font-size: em(20);
-                        padding-left: ($baseline*2);
-                    }
-
-                    .u-field-order-value {
-                        @include float(left);
-                        width: 12%;
+                        width: 30%;
                     }
 
                     .u-field-order-date {
                         @include float(left);
-                        width: 16%;
+                        padding-left: 30px;
+                        width: 20%;
+                    }
+
+                    .u-field-order-price {
+                        @include float(left);
+                        width: 15%;
                     }
 
                     .u-field-order-link {
-                        width: 15%;
+                        width: 10%;
                         padding: 0;
 
                         .u-field-link {
@@ -234,6 +232,16 @@
                             padding: 10px;
                             width: 110px;
                         }
+                    }
+                }
+
+                .u-field-order-lines {
+                    @extend .u-field-order;
+                    padding: 5px 0 0;
+                    font-weight: 100;
+
+                    .u-field-order-number {
+                        padding: 20px 10px 20px 30px;
                     }
                 }
 
@@ -290,7 +298,7 @@
                         font-weight: $font-semibold;
                     }
                 }
-                
+
                 .u-field-message {
                     position: relative;
                     padding: 24px 0 0 ($baseline*5);
@@ -309,6 +317,10 @@
                     border-bottom: none;
                     margin-bottom: ($baseline*2);
                 }
+            }
+
+            .u-field-readonly .u-field-value {
+                padding-top: ($baseline/2);
             }
 
             .u-field-orderHistory {

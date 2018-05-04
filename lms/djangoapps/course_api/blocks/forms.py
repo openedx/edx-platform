@@ -3,12 +3,12 @@ Course API Forms
 """
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms import Form, CharField, ChoiceField, IntegerField
+from django.forms import CharField, ChoiceField, Form, IntegerField
 from django.http import Http404
-from rest_framework.exceptions import PermissionDenied
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from rest_framework.exceptions import PermissionDenied
+
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 from xmodule.modulestore.django import modulestore
 

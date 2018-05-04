@@ -2,59 +2,61 @@
 Instructor Dashboard Views
 """
 
-import logging
 import datetime
+import logging
+import uuid
+
+import pytz
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseServerError
+from django.utils.html import escape
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-import uuid
-import pytz
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.utils.translation import ugettext as _, ugettext_noop
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.cache import cache_control
+from bulk_email.models import BulkEmailFlag
+from certificates import api as certs_api
+from certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateGenerationHistory,
+    CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
+)
+from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
+from course_modes.models import CourseMode, CourseModesArchive
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_studio_url
+from django_comment_client.utils import available_division_schemes, has_forum_access
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
-from django.core.urlresolvers import reverse
-from django.utils.html import escape
-from django.http import Http404, HttpResponseServerError
-from django.conf import settings
-from util.json_request import JsonResponse
-from mock import patch
-
-from openedx.core.lib.xblock_utils import wrap_xblock
+from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.core.lib.xblock_utils import wrap_xblock
+from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
+from student.models import CourseEnrollment
+from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
-from django_comment_client.utils import has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
-from openedx.core.djangoapps.course_groups.cohorts import get_course_cohorts, is_course_cohorted, DEFAULT_COHORT_NAME
-from student.models import CourseEnrollment
-from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
-from course_modes.models import CourseMode, CourseModesArchive
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import (
-    CertificateGenerationConfiguration,
-    CertificateWhitelist,
-    GeneratedCertificate,
-    CertificateStatuses,
-    CertificateGenerationHistory,
-    CertificateInvalidation,
-)
-from certificates import api as certs_api
-from bulk_email.models import BulkEmailFlag
 
-from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
-from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
@@ -123,6 +125,7 @@ def instructor_dashboard_2(request, course_id):
         _section_course_info(course, access),
         _section_membership(course, access, is_white_label),
         _section_cohort_management(course, access),
+        _section_discussions_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
     ]
@@ -189,6 +192,16 @@ def instructor_dashboard_2(request, course_id):
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
     if certs_enabled and access['admin']:
         sections.append(_section_certificates(course))
+
+    openassessment_blocks = modulestore().get_items(
+        course_key, qualifiers={'category': 'openassessment'}
+    )
+    # filter out orphaned openassessment blocks
+    openassessment_blocks = [
+        block for block in openassessment_blocks if block.parent is not None
+    ]
+    if len(openassessment_blocks) > 0:
+        sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not _is_small_course(course_key)
 
@@ -285,7 +298,8 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'coupons_enabled': coupons_enabled,
         'reports_enabled': reports_enabled,
         'course_price': course_price,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'is_ecommerce_course': is_ecommerce_course(course_key)
     }
     return section_data
 
@@ -500,9 +514,26 @@ def _section_cohort_management(course, access):
         ),
         'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
-        'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
         'verified_track_cohorting_url': reverse(
             'verified_track_cohorting', kwargs={'course_key_string': unicode(course_key)}
+        ),
+    }
+    return section_data
+
+
+def _section_discussions_management(course, access):
+    """ Provide data for the corresponding discussion management section """
+    course_key = course.id
+    enrollment_track_schemes = available_division_schemes(course_key)
+    section_data = {
+        'section_key': 'discussions_management',
+        'section_display_name': _('Discussions'),
+        'is_hidden': (not is_course_cohorted(course_key) and
+                      CourseDiscussionSettings.ENROLLMENT_TRACK not in enrollment_track_schemes),
+        'discussion_topics_url': reverse('discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
+        'course_discussion_settings': reverse(
+            'course_discussions_settings',
+            kwargs={'course_key_string': unicode(course_key)}
         ),
     }
     return section_data
@@ -633,6 +664,9 @@ def _section_send_email(course, access):
     cohorts = []
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
+    course_modes = []
+    if not VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key):
+        course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
@@ -641,6 +675,7 @@ def _section_send_email(course, access):
         'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
         'editor': email_editor,
         'cohorts': cohorts,
+        'course_modes': course_modes,
         'default_cohort_name': DEFAULT_COHORT_NAME,
         'list_instructor_tasks_url': reverse(
             'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}
@@ -690,3 +725,54 @@ def _section_metrics(course, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+def _section_open_response_assessment(request, course, openassessment_blocks, access):
+    """Provide data for the corresponding dashboard section """
+    course_key = course.id
+
+    ora_items = []
+    parents = {}
+
+    for block in openassessment_blocks:
+        block_parent_id = unicode(block.parent)
+        result_item_id = unicode(block.location)
+        if block_parent_id not in parents:
+            parents[block_parent_id] = modulestore().get_item(block.parent)
+
+        ora_items.append({
+            'id': result_item_id,
+            'name': block.display_name,
+            'parent_id': block_parent_id,
+            'parent_name': parents[block_parent_id].display_name,
+            'staff_assessment': 'staff-assessment' in block.assessment_steps,
+            'url_base': reverse('xblock_view', args=[course.id, block.location, 'student_view']),
+            'url_grade_available_responses': reverse('xblock_view', args=[course.id, block.location,
+                                                                          'grade_available_responses_view']),
+        })
+
+    openassessment_block = openassessment_blocks[0]
+    block, __ = get_module_by_usage_id(
+        request, unicode(course_key), unicode(openassessment_block.location),
+        disable_staff_debug_info=True, course=course
+    )
+    section_data = {
+        'fragment': block.render('ora_blocks_listing_view', context={
+            'ora_items': ora_items,
+            'ora_item_view_enabled': settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False)
+        }),
+        'section_key': 'open_response_assessment',
+        'section_display_name': _('Open Responses'),
+        'access': access,
+        'course_id': unicode(course_key),
+    }
+    return section_data
+
+
+def is_ecommerce_course(course_key):
+    """
+    Checks if the given course is an e-commerce course or not, by checking its SKU value from
+    CourseMode records for the course
+    """
+    sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
+    return sku_count > 0

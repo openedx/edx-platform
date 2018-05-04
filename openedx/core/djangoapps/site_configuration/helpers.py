@@ -2,8 +2,9 @@
 Helpers methods for site configuration.
 """
 from django.conf import settings
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
 from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 def get_current_site_configuration():
@@ -188,6 +189,21 @@ def get_value_for_org(org, val_name, default=None):
         return microsite.get_value_for_org(org, val_name, default)
 
 
+def get_current_site_orgs():
+    """
+    This returns the orgs configured in site configuration or microsite configuration for the current site.
+
+    Returns:
+        list: A list of organization names.
+    """
+    course_org_filter = get_value('course_org_filter')
+    # Make sure we have a list
+    if course_org_filter and not isinstance(course_org_filter, list):
+        course_org_filter = [course_org_filter]
+
+    return course_org_filter
+
+
 def get_all_orgs():
     """
     This returns all of the orgs that are considered in site configurations or microsite configuration,
@@ -211,6 +227,7 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
     """
     platform_name = get_value('platform_name', settings.PLATFORM_NAME)
     separator = kwargs.get("separator", " | ")
+    crumbs = [c for c in crumbs if c is not None]
     if crumbs:
         return u'{}{}{}'.format(separator.join(crumbs), separator, platform_name)
     else:

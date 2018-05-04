@@ -35,7 +35,7 @@
                         '[data-discussion-id="' + this.getCurrentTopicId() + '"]'
                     ));
                 } else if ($general.length > 0) {
-                    this.setTopic($general);
+                    this.setTopic($general.first());
                 } else {
                     this.setTopic(this.$('.post-topic option').first());
                 }
@@ -55,7 +55,7 @@
                             html = entryTemplate({
                                 text: name,
                                 id: entry.id,
-                                is_cohorted: entry.is_cohorted
+                                is_divided: entry.is_divided
                             });
                         } else { // subcategory
                             html = categoryTemplate({

@@ -2,22 +2,24 @@
 Tests for the recently enrolled messaging within the Dashboard.
 """
 import datetime
+import unittest
+
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
-from nose.plugins.attrib import attr
-import unittest
-import ddt
-from shoppingcart.models import DonationConfiguration
 
+from common.test.utils import XssTestMixin
+from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from shoppingcart.models import DonationConfiguration
+from student.models import CourseEnrollment, DashboardConfiguration
 from student.tests.factories import UserFactory
+from student.views import _get_recently_enrolled_courses, get_course_enrollments
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment, DashboardConfiguration
-from student.views import get_course_enrollments, _get_recently_enrolled_courses
-from common.test.utils import XssTestMixin
 
 
 @attr(shard=3)
@@ -211,3 +213,29 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
         self.assertNotContains(response, "donate-container")
+
+    @ddt.data(
+        (True, False,),
+        (True, True,),
+        (False, False,),
+        (False, True,),
+    )
+    @ddt.unpack
+    def test_donate_button_with_enabled_site_configuration(self, enable_donation_config, enable_donation_site_config):
+        # Enable the enrollment success message and donations
+        self._configure_message_timeout(10000)
+
+        # DonationConfiguration has low precedence if 'ENABLE_DONATIONS' is enable in SiteConfiguration
+        DonationConfiguration(enabled=enable_donation_config).save()
+
+        CourseModeFactory.create(mode_slug="audit", course_id=self.course.id, min_price=0)
+        self.enrollment.mode = "audit"
+        self.enrollment.save()
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        with with_site_configuration_context(configuration={'ENABLE_DONATIONS': enable_donation_site_config}):
+            response = self.client.get(reverse("dashboard"))
+            if enable_donation_site_config:
+                self.assertContains(response, "donate-container")
+            else:
+                self.assertNotContains(response, "donate-container")

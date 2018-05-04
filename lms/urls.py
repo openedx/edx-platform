@@ -2,23 +2,24 @@
 URLs for LMS
 """
 
+from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, patterns, url
+from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
-from django.conf.urls.static import static
 
-from courseware.views.views import EnrollStaffView
-from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
 from courseware.module_render import XblockCallbackView
+from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
+from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.enterprise_helpers import enterprise_enabled
+from openedx.features.enterprise_support.api import enterprise_enabled
+
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -80,6 +81,8 @@ urlpatterns = (
     url(r'^rss_proxy/', include('rss_proxy.urls', namespace='rss_proxy')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
+    url(r'^catalog/', include('openedx.core.djangoapps.catalog.urls', namespace='catalog')),
+
     # Update session view
     url(
         r'^lang_pref/session_language',
@@ -95,12 +98,14 @@ urlpatterns = (
     # URLs for managing dark launches of languages
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
+    # For redirecting to help pages.
+    url(r'^help_token/', include('help_tokens.urls')),
+
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
-)
 
-urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
+    url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
@@ -145,12 +150,6 @@ urlpatterns += (
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 )
 
-# if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
-urlpatterns += (
-    # TODO Namespace these!
-    url(r'^verify_student/', include('verify_student.urls')),
-    url(r'^course_modes/', include('course_modes.urls')),
-)
 if settings.FEATURES["ENABLE_OPENBADGES"]:
     urlpatterns += (
         url(r'^api/badges/v1/', include('badges.api.urls', app_name="badges", namespace="badges_api")),
@@ -161,6 +160,11 @@ js_info_dict = {
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
     'packages': ('openassessment',),
 }
+
+urlpatterns += (
+    url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
+)
+
 
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 if settings.FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
@@ -446,6 +450,14 @@ urlpatterns += (
         name='student_progress',
     ),
 
+    url(
+        r'^programs/{}/about'.format(
+            r'(?P<program_uuid>[0-9a-f-]+)',
+        ),
+        'courseware.views.views.program_marketing',
+        name='program_marketing_view',
+    ),
+
     # rest api for grades
     url(
         r'^api/grades/',
@@ -511,6 +523,15 @@ urlpatterns += (
         include(COURSE_URLS)
     ),
 
+    # Discussions Management
+    url(
+        r'^courses/{}/discussions/settings$'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        'lms.djangoapps.discussion.views.course_discussions_settings_handler',
+        name='course_discussions_settings',
+    ),
+
     # Cohorts management
     url(
         r'^courses/{}/cohorts/settings$'.format(
@@ -555,17 +576,17 @@ urlpatterns += (
         name='debug_cohort_mgmt',
     ),
     url(
-        r'^courses/{}/cohorts/topics$'.format(
+        r'^courses/{}/discussion/topics$'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'openedx.core.djangoapps.course_groups.views.cohort_discussion_topics',
-        name='cohort_discussion_topics',
+        'lms.djangoapps.discussion.views.discussion_topics',
+        name='discussion_topics',
     ),
     url(
         r'^courses/{}/verified_track_content/settings'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'verified_track_content.views.cohorting_settings',
+        'openedx.core.djangoapps.verified_track_content.views.cohorting_settings',
         name='verified_track_cohorting',
     ),
     url(
@@ -599,7 +620,9 @@ urlpatterns += (
 
     # Student profile
     url(
-        r'^u/(?P<username>[\w.@+-]+)$',
+        r'^u/{username_pattern}$'.format(
+            username_pattern=settings.USERNAME_PATTERN,
+        ),
         'student_profile.views.learner_profile',
         name='learner_profile',
     ),
@@ -613,9 +636,34 @@ urlpatterns += (
         name='edxnotes_endpoints',
     ),
 
+    # Branding API
     url(
         r'^api/branding/v1/',
         include('branding.api_urls')
+    ),
+
+    # Course experience
+    url(
+        r'^courses/{}/course/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_experience.urls'),
+    ),
+
+    # Course bookmarks
+    url(
+        r'^courses/{}/bookmarks/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_bookmarks.urls'),
+    ),
+
+    # Course search
+    url(
+        r'^courses/{}/search/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_search.urls'),
     ),
 )
 
@@ -705,13 +753,24 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             name='resubscribe_forum_update',
         ),
     )
+
+urlpatterns += (
+    url(
+        r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CourseTabView.as_view(),
+        name='course_tab_view',
+    ),
+)
+
 urlpatterns += (
     # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
     url(
         r'^courses/{}/(?P<tab_slug>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.static_tab',
+        StaticCourseTabView.as_view(),
         name='static_tab',
     ),
 )
@@ -776,7 +835,8 @@ urlpatterns += (
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (
-        url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls')),
+        url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='embargo')),
+        url(r'^api/embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='api_embargo')),
     )
 
 # Survey Djangoapp

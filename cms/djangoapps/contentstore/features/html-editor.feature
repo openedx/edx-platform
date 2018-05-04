@@ -110,7 +110,7 @@ Feature: CMS.HTML Editor
     When I edit the page
     And I click font selection dropdown
     Then I should see a list of available fonts
-    And "Default" option sets "'Open Sans', Verdana, Arial, Helvetica, sans-serif" font family
+    And "Default" option sets the expected font family
     And all standard tinyMCE fonts should be available
 
 # Skipping in master due to brittleness JZ 05/22/2014

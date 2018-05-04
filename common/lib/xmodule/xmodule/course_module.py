@@ -4,11 +4,12 @@ Django module container for classes and operations related to the "Course Module
 import json
 import logging
 from cStringIO import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from lazy import lazy
 from lxml import etree
+from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
@@ -16,7 +17,6 @@ from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
-from xmodule.mixin import LicenseMixin
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
@@ -190,6 +190,10 @@ class CourseFields(object):
         scope=Scope.settings
     )
     end = Date(help=_("Date that this class ends"), scope=Scope.settings)
+    certificate_available_date = Date(
+        help=_("Date that certificates become available to learners"),
+        scope=Scope.content
+    )
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(
@@ -533,7 +537,7 @@ class CourseFields(object):
         default=False,
     )
     cert_html_view_overrides = Dict(
-        # Translators: This field is the container for course-specific certifcate configuration values
+        # Translators: This field is the container for course-specific certificate configuration values
         display_name=_("Certificate Web/HTML View Overrides"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
@@ -542,7 +546,7 @@ class CourseFields(object):
 
     # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
     certificates = Dict(
-        # Translators: This field is the container for course-specific certifcate configuration values
+        # Translators: This field is the container for course-specific certificate configuration values
         display_name=_("Certificate Configuration"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific configuration information here (JSON format)"),
@@ -678,6 +682,9 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    # Note: Although users enter the entrance exam minimum score
+    # as a percentage value, it is internally converted and stored
+    # as a decimal value less than 1.
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
@@ -915,6 +922,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         except InvalidTabsException as err:
             raise type(err)('{msg} For course: {course_id}'.format(msg=err.message, course_id=unicode(self.id)))
 
+        self.set_default_certificate_available_date()
+
     def set_grading_policy(self, course_policy):
         """
         The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
@@ -939,6 +948,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         # Use setters so that side effecting to .definitions works
         self.raw_grader = grading_policy['GRADER']  # used for cms access
         self.grade_cutoffs = grading_policy['GRADE_CUTOFFS']
+
+    def set_default_certificate_available_date(self):
+        if (not self.certificate_available_date) and self.end:
+            self.certificate_available_date = self.end + timedelta(days=2)
 
     @classmethod
     def read_grading_policy(cls, paths, system):
@@ -1157,16 +1170,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def always_cohort_inline_discussions(self):
         """
         This allow to change the default behavior of inline discussions cohorting. By
-        setting this to False, all inline discussions are non-cohorted unless their
-        ids are specified in cohorted_discussions.
+        setting this to 'True', all inline discussions are cohorted. The default value is
+        now `False`, meaning that inline discussions are not cohorted unless their discussion IDs
+        are specifically listed as cohorted.
 
-        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
+        Note: No longer used except to get the initial value when cohorts are first enabled on a course
+        (and for migrating old courses). See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
-            return True
+            # This value sets the default for newly created courses.
+            return False
 
-        return bool(config.get("always_cohort_inline_discussions", True))
+        return bool(config.get("always_cohort_inline_discussions", False))
 
     @property
     def is_newish(self):
@@ -1340,23 +1356,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns the topics that have been configured for teams for this course, else None.
         """
         return self.teams_configuration.get('topics', None)
-
-    def get_user_partitions_for_scheme(self, scheme):
-        """
-        Retrieve all user partitions defined in the course for a particular
-        partition scheme.
-
-        Arguments:
-            scheme (object): The user partition scheme.
-
-        Returns:
-            list of `UserPartition`
-
-        """
-        return [
-            p for p in self.user_partitions
-            if p.scheme == scheme
-        ]
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """

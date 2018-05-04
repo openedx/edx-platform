@@ -1,38 +1,32 @@
 """
 Courseware Boomarks
 """
-from bok_choy.promise import EmptyPromise
-from common.test.acceptance.pages.lms.course_page import CoursePage
+
 from common.test.acceptance.pages.common.paging import PaginatedUIMixin
+from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
 class BookmarksPage(CoursePage, PaginatedUIMixin):
     """
     Courseware Bookmarks Page.
     """
-    url = None
-    url_path = "courseware/"
+    url_path = "bookmarks"
     BOOKMARKS_BUTTON_SELECTOR = '.bookmarks-list-button'
+    BOOKMARKS_ELEMENT_SELECTOR = '#my-bookmarks'
     BOOKMARKED_ITEMS_SELECTOR = '.bookmarks-results-list .bookmarks-results-list-item'
     BOOKMARKED_BREADCRUMBS = BOOKMARKED_ITEMS_SELECTOR + ' .list-item-breadcrumbtrail'
 
     def is_browser_on_page(self):
         """ Verify if we are on correct page """
-        return self.q(css=self.BOOKMARKS_BUTTON_SELECTOR).visible
+        return self.q(css=self.BOOKMARKS_ELEMENT_SELECTOR).present
 
     def bookmarks_button_visible(self):
         """ Check if bookmarks button is visible """
         return self.q(css=self.BOOKMARKS_BUTTON_SELECTOR).visible
 
-    def click_bookmarks_button(self, wait_for_results=True):
-        """ Click on Bookmarks button """
-        self.q(css=self.BOOKMARKS_BUTTON_SELECTOR).first.click()
-        if wait_for_results:
-            EmptyPromise(self.results_present, "Bookmarks results present").fulfill()
-
     def results_present(self):
         """ Check if bookmarks results are present """
-        return self.q(css='#my-bookmarks').present
+        return self.q(css=self.BOOKMARKS_ELEMENT_SELECTOR).present
 
     def results_header_text(self):
         """ Returns the bookmarks results header text """

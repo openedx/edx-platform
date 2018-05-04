@@ -1,13 +1,13 @@
 """Tests for disabling rate limiting. """
 import unittest
-from django.test import TestCase
-from django.core.cache import cache
-from django.conf import settings
-import mock
 
-from rest_framework.views import APIView
-from rest_framework.throttling import BaseThrottle
+import mock
+from django.conf import settings
+from django.core.cache import cache
+from django.test import TestCase
 from rest_framework.exceptions import Throttled
+from rest_framework.throttling import BaseThrottle
+from rest_framework.views import APIView
 
 from util.disable_rate_limit import can_disable_rate_limit
 from util.models import RateLimitConfiguration

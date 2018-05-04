@@ -3,30 +3,32 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-import json
 import datetime
-from shoppingcart.models import (
-    PaidCourseRegistration, CouponRedemption, CourseRegCodeItem,
-    RegistrationCodeRedemption, CourseRegistrationCodeInvoiceItem
-)
-from django.db.models import Q
+import json
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
-from opaque_keys.edx.keys import UsageKey
-import xmodule.graders as xmgraders
-from student.models import CourseEnrollmentAllowed, CourseEnrollment
+from django.db.models import Count, Q
 from edx_proctoring.api import get_all_exam_attempts
+from opaque_keys.edx.keys import UsageKey
+
+import xmodule.graders as xmgraders
+from certificates.models import CertificateStatuses, GeneratedCertificate
 from courseware.models import StudentModule
-from certificates.models import GeneratedCertificate
-from django.db.models import Count
-from certificates.models import CertificateStatuses
 from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+from shoppingcart.models import (
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCodeInvoiceItem,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
+)
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',

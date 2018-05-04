@@ -3,7 +3,6 @@ Image encoding helpers for the verification app.
 """
 import logging
 
-
 log = logging.getLogger(__name__)
 
 

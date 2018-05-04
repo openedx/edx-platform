@@ -5,13 +5,29 @@ from collections import namedtuple
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 
 # Named tuples can be referenced using object-like variable
 # deferencing, making the use of tuples more readable by
 # eliminating the need to see the context of the tuple packing.
 Language = namedtuple('Language', 'code name')
+
+
+def header_language_selector_is_enabled():
+    """Return true if the header language selector has been enabled via settings or site-specific configuration."""
+    setting = get_value('SHOW_HEADER_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_HEADER_LANGUAGE_SELECTOR', False))
+
+    # The SHOW_LANGUAGE_SELECTOR setting is deprecated, but might still be in use on some installations.
+    deprecated_setting = get_value('SHOW_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False))
+
+    return setting or deprecated_setting
+
+
+def footer_language_selector_is_enabled():
+    """Return true if the footer language selector has been enabled via settings or site-specific configuration."""
+    return get_value('SHOW_FOOTER_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_FOOTER_LANGUAGE_SELECTOR', False))
 
 
 def released_languages():

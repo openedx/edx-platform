@@ -2,8 +2,9 @@
 Fixture to configure XQueue response.
 """
 
-import requests
 import json
+
+import requests
 
 from common.test.acceptance.fixtures import XQUEUE_STUB_URL
 

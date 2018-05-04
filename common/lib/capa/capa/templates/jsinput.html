@@ -22,7 +22,7 @@
 
   <div class="script_placeholder" data-src="${jschannel_loader}"/>
   <div class="script_placeholder" data-src="${jsinput_loader}"/>
-  % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+  % if status in ['unsubmitted', 'submitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
   <div class="${status.classname}">
   % endif
 
@@ -49,7 +49,7 @@
 
     <div class="error_message" style="padding: 5px 5px 5px 5px; background-color:#FA6666; height:60px;width:400px; display: none"></div>
 
-  % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
+  % if status in ['unsubmitted', 'submitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
   </div>
   % endif
 

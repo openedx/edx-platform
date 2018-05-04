@@ -2,9 +2,8 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=unused-argument
 
-from lettuce import world, step
+from lettuce import step, world
 from nose.tools import assert_equal, assert_in
-
 
 CSS_FOR_TAB_ELEMENT = "li[data-tab-id='{0}'] input.toggle-checkbox"
 
@@ -38,7 +37,7 @@ def not_see_any_static_pages(step):
 
 @step(u'I "(edit|delete)" the static page$')
 def click_edit_or_delete(step, edit_or_delete):
-    button_css = 'ul.component-actions a.%s-button' % edit_or_delete
+    button_css = 'ul.component-actions .%s-button' % edit_or_delete
     world.css_click(button_css)
 
 

@@ -2,10 +2,9 @@
 Helpers for instructor app.
 """
 
-from xmodule.modulestore.django import modulestore
-
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
+from xmodule.modulestore.django import modulestore
 
 
 class DummyRequest(object):

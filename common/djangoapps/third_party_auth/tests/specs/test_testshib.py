@@ -1,20 +1,19 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
+import datetime
 import ddt
 import unittest
 import httpretty
+import json
 from mock import patch
-from social.apps.django_app.default.models import UserSocialAuth
-
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from freezegun import freeze_time
+from social_django.models import UserSocialAuth
+from unittest import skip
 
 from third_party_auth.saml import log as saml_log
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
-from third_party_auth import pipeline
-from student.tests.factories import UserFactory
 
 from .base import IntegrationTestMixin
 
@@ -25,22 +24,10 @@ TESTSHIB_METADATA_URL_WITH_CACHE_DURATION = 'https://mock.testshib.org/metadata/
 TESTSHIB_SSO_URL = 'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO'
 
 
-def _make_entrypoint_url(auth_entry):
+class SamlIntegrationTestUtilities(object):
     """
-    Builds TPA saml entrypoint with specified auth_entry value
-    """
-    return '/auth/login/tpa-saml/?auth_entry={auth_entry}&next=%2Fdashboard&idp=testshib'.format(auth_entry=auth_entry)
-
-TPA_TESTSHIB_LOGIN_URL = _make_entrypoint_url('login')
-TPA_TESTSHIB_REGISTER_URL = _make_entrypoint_url('register')
-TPA_TESTSHIB_COMPLETE_URL = '/auth/complete/tpa-saml/'
-
-
-@ddt.ddt
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
-class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
-    """
-    TestShib provider Integration Test, to test SAML functionality
+    Class contains methods particular to SAML integration testing so that they
+    can be separated out from the actual test methods.
     """
     PROVIDER_ID = "saml-testshib"
     PROVIDER_NAME = "TestShib"
@@ -52,8 +39,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
     USER_USERNAME = "myself"
 
     def setUp(self):
-        super(TestShibIntegrationTest, self).setUp()
-        self.dashboard_page_url = reverse('dashboard')
+        super(SamlIntegrationTestUtilities, self).setUp()
         self.enable_saml(
             private_key=self._get_private_key(),
             public_key=self._get_public_key(),
@@ -88,6 +74,56 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self.addCleanup(uid_patch.stop)
         self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
 
+    def _freeze_time(self, timestamp):
+        """ Mock the current time for SAML, so we can replay canned requests/responses """
+        now_patch = patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.now', return_value=timestamp)
+        now_patch.start()
+        self.addCleanup(now_patch.stop)
+
+    def _configure_testshib_provider(self, **kwargs):
+        """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
+        fetch_metadata = kwargs.pop('fetch_metadata', True)
+        assert_metadata_updates = kwargs.pop('assert_metadata_updates', True)
+        kwargs.setdefault('name', self.PROVIDER_NAME)
+        kwargs.setdefault('enabled', True)
+        kwargs.setdefault('visible', True)
+        kwargs.setdefault('idp_slug', self.PROVIDER_IDP_SLUG)
+        kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
+        kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
+        kwargs.setdefault('icon_class', 'fa-university')
+        kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        kwargs.setdefault('max_session_length', None)
+        self.configure_saml_provider(**kwargs)
+
+        if fetch_metadata:
+            self.assertTrue(httpretty.is_enabled())
+            num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()
+            if assert_metadata_updates:
+                self.assertEqual(num_total, 1)
+                self.assertEqual(num_skipped, 0)
+                self.assertEqual(num_attempted, 1)
+                self.assertEqual(num_updated, 1)
+                self.assertEqual(num_failed, 0)
+                self.assertEqual(len(failure_messages), 0)
+
+    def do_provider_login(self, provider_redirect_url):
+        """ Mocked: the user logs in to TestShib and then gets redirected back """
+        # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
+        self.assertTrue(provider_redirect_url.startswith(TESTSHIB_SSO_URL))
+        return self.client.post(
+            self.complete_url,
+            content_type='application/x-www-form-urlencoded',
+            data=self.read_data_file('testshib_response.txt'),
+        )
+
+
+@ddt.ddt
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
+    """
+    TestShib provider Integration Test, to test SAML functionality
+    """
+
     def test_login_before_metadata_fetched(self):
         self._configure_testshib_provider(fetch_metadata=False)
         # The user goes to the login page, and sees a button to login with TestShib:
@@ -101,52 +137,6 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         response = self.client.get(self.login_page_url)
         self.assertEqual(response.status_code, 200)
         self.assertIn('Authentication with TestShib is currently unavailable.', response.content)
-
-    def test_register(self):
-        self._configure_testshib_provider()
-        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
-        # The user goes to the register page, and sees a button to register with TestShib:
-        self._check_register_page()
-        # The user clicks on the TestShib button:
-        try_login_response = self.client.get(TPA_TESTSHIB_REGISTER_URL)
-        # The user should be redirected to TestShib:
-        self.assertEqual(try_login_response.status_code, 302)
-        self.assertTrue(try_login_response['Location'].startswith(TESTSHIB_SSO_URL))
-        # Now the user will authenticate with the SAML provider
-        testshib_response = self._fake_testshib_login_and_return()
-        # We should be redirected to the register screen since this account is not linked to an edX account:
-        self.assertEqual(testshib_response.status_code, 302)
-        self.assertEqual(testshib_response['Location'], self.url_prefix + self.register_page_url)
-        register_response = self.client.get(self.register_page_url)
-        # We'd now like to see if the "You've successfully signed into TestShib" message is
-        # shown, but it's managed by a JavaScript runtime template, and we can't run JS in this
-        # type of test, so we just check for the variable that triggers that message.
-        self.assertIn('&#34;currentProvider&#34;: &#34;TestShib&#34;', register_response.content)
-        self.assertIn('&#34;errorMessage&#34;: null', register_response.content)
-        # Now do a crude check that the data (e.g. email) from the provider is displayed in the form:
-        self.assertIn('&#34;defaultValue&#34;: &#34;myself@testshib.org&#34;', register_response.content)
-        self.assertIn('&#34;defaultValue&#34;: &#34;Me Myself And I&#34;', register_response.content)
-        # Now complete the form:
-        ajax_register_response = self.client.post(
-            reverse('user_api_registration'),
-            {
-                'email': 'myself@testshib.org',
-                'name': 'Myself',
-                'username': 'myself',
-                'honor_code': True,
-            }
-        )
-        self.assertEqual(ajax_register_response.status_code, 200)
-        # Then the AJAX will finish the third party auth:
-        continue_response = self.client.get(TPA_TESTSHIB_COMPLETE_URL)
-        # And we should be redirected to the dashboard:
-        self.assertEqual(continue_response.status_code, 302)
-        self.assertEqual(continue_response['Location'], self.url_prefix + self.dashboard_page_url)
-
-        # Now check that we can login again:
-        self.client.logout()
-        self._verify_user_email('myself@testshib.org')
-        self._test_return_login()
 
     def test_login(self):
         """ Configure TestShib before running the login test """
@@ -166,7 +156,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         record = UserSocialAuth.objects.get(
             user=self.user, provider=self.PROVIDER_BACKEND, uid__startswith=self.PROVIDER_IDP_SLUG
         )
-        attributes = record.extra_data["attributes"]
+        attributes = record.extra_data
         self.assertEqual(
             attributes.get("urn:oid:1.3.6.1.4.1.5923.1.1.1.9"), ["Member@testshib.org", "Staff@testshib.org"]
         )
@@ -212,137 +202,183 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
         self.configure_saml_provider(**kwargs)
         self.assertTrue(httpretty.is_enabled())
-        num_changed, num_failed, num_total, failure_messages = fetch_saml_metadata()
+        num_total, num_skipped, num_attempted, num_updated, num_failed, failure_messages = fetch_saml_metadata()
+        self.assertEqual(num_total, 1)
+        self.assertEqual(num_skipped, 0)
+        self.assertEqual(num_attempted, 1)
+        self.assertEqual(num_updated, 1)
         self.assertEqual(num_failed, 0)
         self.assertEqual(len(failure_messages), 0)
-        self.assertEqual(num_changed, 1)
-        self.assertEqual(num_total, 1)
 
-    def test_custom_form_does_not_link_by_email(self):
-        self._configure_testshib_provider()
-        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+    def test_login_with_testshib_provider_short_session_length(self):
+        """
+        Test that when we have a TPA provider which as an explicit maximum
+        session length set, waiting for longer than that between requests
+        results in us being logged out.
+        """
+        # Configure the provider with a 10-second timeout
+        self._configure_testshib_provider(max_session_length=10)
 
-        email = 'myself@testshib.org'
-        UserFactory(username='myself', email=email, password='irrelevant')
-        self._verify_user_email(email)
-        self._assert_user_exists('myself', have_social=False)
+        now = datetime.datetime.utcnow()
+        with freeze_time(now):
+            # Test the login flow, adding the user in the process
+            super(TestShibIntegrationTest, self).test_login()
 
-        custom_url = pipeline.get_login_url('saml-testshib', 'custom1')
-        self.client.get(custom_url)
+        # Wait 30 seconds; longer than the manually-set 10-second timeout
+        later = now + datetime.timedelta(seconds=30)
+        with freeze_time(later):
+            # Test returning as a logged in user; this method verifies that we're logged out first.
+            self._test_return_login(previous_session_timed_out=True)
 
-        testshib_response = self._fake_testshib_login_and_return()
 
-        # We should be redirected to the custom form since this account is not linked to an edX account, and
-        # automatic linking is not enabled for custom1 entrypoint:
-        self.assertEqual(testshib_response.status_code, 302)
-        self.assertEqual(testshib_response['Location'], self.url_prefix + '/auth/custom_auth_entry')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
+    """
+    Test basic SAML capability using the TestShib details, and then check that we're able
+    to make the proper calls using the SAP SuccessFactors API.
+    """
 
-    def test_custom_form_links_by_email(self):
-        self._configure_testshib_provider()
-        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+    # Note that these details are different than those that will be provided by the SAML
+    # assertion metadata. Rather, they will be fetched from the mocked SAPSuccessFactors API.
+    USER_EMAIL = "john@smith.com"
+    USER_NAME = "John Smith"
+    USER_USERNAME = "jsmith"
 
-        email = 'myself@testshib.org'
-        UserFactory(username='myself', email=email, password='irrelevant')
-        self._verify_user_email(email)
-        self._assert_user_exists('myself', have_social=False)
+    def setUp(self):
+        """
+        Mock out HTTP calls to various endpoints using httpretty.
+        """
+        super(SuccessFactorsIntegrationTest, self).setUp()
 
-        custom_url = pipeline.get_login_url('saml-testshib', 'custom2')
-        self.client.get(custom_url)
+        # Mock the call to the SAP SuccessFactors assertion endpoint
+        SAPSF_ASSERTION_URL = 'http://successfactors.com/oauth/idp'
 
-        testshib_response = self._fake_testshib_login_and_return()
-        # We should be redirected to TPA-complete endpoint
-        self.assertEqual(testshib_response.status_code, 302)
-        self.assertEqual(testshib_response['Location'], self.url_prefix + TPA_TESTSHIB_COMPLETE_URL)
+        def assertion_callback(_request, _uri, headers):
+            """
+            Return a fake assertion after checking that the input is what we expect.
+            """
+            self.assertIn('private_key=fake_private_key_here', _request.body)
+            self.assertIn('user_id=myself', _request.body)
+            self.assertIn('token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken', _request.body)
+            self.assertIn('client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            return (200, headers, 'fake_saml_assertion')
 
-        complete_response = self.client.get(testshib_response['Location'])
-        # And we should be redirected to the dashboard
-        self.assertEqual(complete_response.status_code, 302)
-        self.assertEqual(complete_response['Location'], self.url_prefix + self.dashboard_page_url)
+        httpretty.register_uri(httpretty.POST, SAPSF_ASSERTION_URL, content_type='text/plain', body=assertion_callback)
 
-        # And account should now be linked to social
-        self._assert_user_exists('myself', have_social=True)
+        SAPSF_BAD_ASSERTION_URL = 'http://successfactors.com/oauth-fake/idp'
 
-        # Now check that we can login again:
-        self.client.logout()
-        self._test_return_login()
+        def bad_callback(_request, _uri, headers):
+            """
+            Return a 404 error when someone tries to call the URL.
+            """
+            return (404, headers, 'NOT AN ASSERTION')
 
-    def _freeze_time(self, timestamp):
-        """ Mock the current time for SAML, so we can replay canned requests/responses """
-        now_patch = patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.now', return_value=timestamp)
-        now_patch.start()
-        self.addCleanup(now_patch.stop)
+        httpretty.register_uri(httpretty.POST, SAPSF_BAD_ASSERTION_URL, content_type='text/plain', body=bad_callback)
 
-    def _configure_testshib_provider(self, **kwargs):
-        """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
-        fetch_metadata = kwargs.pop('fetch_metadata', True)
-        assert_metadata_updates = kwargs.pop('assert_metadata_updates', True)
-        kwargs.setdefault('name', self.PROVIDER_NAME)
-        kwargs.setdefault('enabled', True)
-        kwargs.setdefault('visible', True)
-        kwargs.setdefault('idp_slug', self.PROVIDER_IDP_SLUG)
-        kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
-        kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
-        kwargs.setdefault('icon_class', 'fa-university')
-        kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
-        self.configure_saml_provider(**kwargs)
+        # Mock the call to the SAP SuccessFactors token endpoint
+        SAPSF_TOKEN_URL = 'http://successfactors.com/oauth/token'
 
-        if fetch_metadata:
-            self.assertTrue(httpretty.is_enabled())
-            num_changed, num_failed, num_total, failure_messages = fetch_saml_metadata()
-            if assert_metadata_updates:
-                self.assertEqual(num_failed, 0)
-                self.assertEqual(len(failure_messages), 0)
-                self.assertEqual(num_changed, 1)
-                self.assertEqual(num_total, 1)
+        def token_callback(_request, _uri, headers):
+            """
+            Return a fake assertion after checking that the input is what we expect.
+            """
+            self.assertIn('assertion=fake_saml_assertion', _request.body)
+            self.assertIn('company_id=NCC1701D', _request.body)
+            self.assertIn('grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer', _request.body)
+            self.assertIn('client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            return (200, headers, '{"access_token": "faketoken"}')
 
-    def _fake_testshib_login_and_return(self):
-        """ Mocked: the user logs in to TestShib and then gets redirected back """
-        # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
-        return self.client.post(
-            TPA_TESTSHIB_COMPLETE_URL,
-            content_type='application/x-www-form-urlencoded',
-            data=self.read_data_file('testshib_response.txt'),
+        httpretty.register_uri(httpretty.POST, SAPSF_TOKEN_URL, content_type='application/json', body=token_callback)
+
+        # Mock the call to the SAP SuccessFactors OData user endpoint
+        ODATA_USER_URL = (
+            'http://api.successfactors.com/odata/v2/User(userId=\'myself\')'
+            '?$select=username,firstName,lastName,defaultFullName,email'
         )
 
-    def _verify_user_email(self, email):
-        """ Mark the user with the given email as verified """
-        user = User.objects.get(email=email)
-        user.is_active = True
-        user.save()
+        def user_callback(request, _uri, headers):
+            auth_header = request.headers.get('Authorization')
+            self.assertEqual(auth_header, 'Bearer faketoken')
+            return (
+                200,
+                headers,
+                json.dumps({
+                    'd': {
+                        'username': 'jsmith',
+                        'firstName': 'John',
+                        'lastName': 'Smith',
+                        'defaultFullName': 'John Smith',
+                        'email': 'john@smith.com',
+                    }
+                })
+            )
 
-    def do_provider_login(self, provider_redirect_url):
-        """ Mocked: the user logs in to TestShib and then gets redirected back """
-        # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
-        self.assertTrue(provider_redirect_url.startswith(TESTSHIB_SSO_URL))
-        return self.client.post(
-            self.complete_url,
-            content_type='application/x-www-form-urlencoded',
-            data=self.read_data_file('testshib_response.txt'),
+        httpretty.register_uri(httpretty.GET, ODATA_USER_URL, content_type='application/json', body=user_callback)
+
+    def test_register_insufficient_sapsf_metadata(self):
+        """
+        Configure the provider such that it doesn't have enough details to contact the SAP
+        SuccessFactors API, and test that it falls back to the data it receives from the SAML assertion.
+        """
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings='{"key_i_dont_need":"value_i_also_dont_need"}',
         )
+        # Because we're getting details from the assertion, fall back to the initial set of details.
+        self.USER_EMAIL = "myself@testshib.org"
+        self.USER_NAME = "Me Myself And I"
+        self.USER_USERNAME = "myself"
+        super(SuccessFactorsIntegrationTest, self).test_register()
 
-    def _assert_user_exists(self, username, have_social=False, is_active=True):
+    def test_register_sapsf_metadata_present(self):
         """
-        Asserts user exists, checks activation status and social_auth links
+        Configure the provider such that it can talk to a mocked-out version of the SAP SuccessFactors
+        API, and ensure that the data it gets that way gets passed to the registration form.
         """
-        user = User.objects.get(username=username)
-        self.assertEqual(user.is_active, is_active)
-        social_auths = user.social_auth.all()
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps({
+                'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+                'sapsf_private_key': 'fake_private_key_here',
+                'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+                'odata_company_id': 'NCC1701D',
+                'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+            })
+        )
+        super(SuccessFactorsIntegrationTest, self).test_register()
 
-        if have_social:
-            self.assertEqual(1, len(social_auths))
-            self.assertEqual('tpa-saml', social_auths[0].provider)
-        else:
-            self.assertEqual(0, len(social_auths))
+    def test_register_http_failure(self):
+        """
+        Ensure that if there's an HTTP failure while fetching metadata, we continue, using the
+        metadata from the SAML assertion.
+        """
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps({
+                'sapsf_oauth_root_url': 'http://successfactors.com/oauth-fake/',
+                'sapsf_private_key': 'fake_private_key_here',
+                'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+                'odata_company_id': 'NCC1701D',
+                'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+            })
+        )
+        # Because we're getting details from the assertion, fall back to the initial set of details.
+        self.USER_EMAIL = "myself@testshib.org"
+        self.USER_NAME = "Me Myself And I"
+        self.USER_USERNAME = "myself"
+        super(SuccessFactorsIntegrationTest, self).test_register()
 
-    def _assert_user_does_not_exist(self, username):
-        """ Asserts that user with specified username does not exist """
-        with self.assertRaises(User.DoesNotExist):
-            User.objects.get(username=username)
+    @skip('Test not necessary for this subclass')
+    def test_get_saml_idp_class_with_fake_identifier(self):
+        pass
 
-    def _assert_account_created(self, username, email, full_name):
-        """ Asserts that user with specified username exists, activated and have specified full name and email """
-        user = User.objects.get(username=username)
-        self.assertIsNotNone(user.profile)
-        self.assertEqual(user.email, email)
-        self.assertEqual(user.profile.name, full_name)
-        self.assertTrue(user.is_active)
+    @skip('Test not necessary for this subclass')
+    def test_login(self):
+        pass
+
+    @skip('Test not necessary for this subclass')
+    def test_register(self):
+        pass

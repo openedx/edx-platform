@@ -2,27 +2,30 @@
 Tests for the Studio Tagging XBlockAside
 """
 
+import json
+from datetime import datetime
+from StringIO import StringIO
+
 import ddt
+from django.test.client import RequestFactory
+from lxml import etree
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
+from pytz import UTC
+from xblock.fields import ScopeIds
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
+
+from cms.lib.xblock.tagging import StructuredTagsAside
+from cms.lib.xblock.tagging.models import TagAvailableValues, TagCategories
+from contentstore.tests.utils import AjaxEnabledTestClient
+from contentstore.utils import reverse_usage_url
+from contentstore.views.preview import get_preview_fragment
+from student.tests.factories import UserFactory
+from xblock_config.models import StudioConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xblock_config.models import StudioConfig
-from xblock.fields import ScopeIds
-from xblock.runtime import DictKeyValueStore, KvsFieldData
-from xblock.test.tools import TestRuntime
-from cms.lib.xblock.tagging import StructuredTagsAside
-from cms.lib.xblock.tagging.models import TagCategories, TagAvailableValues
-from contentstore.views.preview import get_preview_fragment
-from contentstore.utils import reverse_usage_url
-from contentstore.tests.utils import AjaxEnabledTestClient
-from django.test.client import RequestFactory
-from student.tests.factories import UserFactory
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
-from datetime import datetime
-from pytz import UTC
-from lxml import etree
-from StringIO import StringIO
 
 
 @ddt.ddt
@@ -38,6 +41,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.aside_name = 'tagging_aside'
         self.aside_tag_dif = 'difficulty'
         self.aside_tag_dif_value = 'Hard'
+        self.aside_tag_dif_value2 = 'Easy'
         self.aside_tag_lo = 'learning_outcome'
 
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
@@ -152,27 +156,27 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.assertEquals(div_node.get('data-runtime-version'), '1')
         self.assertIn('xblock_asides-v1', div_node.get('class'))
 
-        select_nodes = div_node.xpath('div/select')
+        select_nodes = div_node.xpath("div//select[@multiple='multiple']")
         self.assertEquals(len(select_nodes), 2)
 
         select_node1 = select_nodes[0]
         self.assertEquals(select_node1.get('name'), self.aside_tag_dif)
 
         option_nodes1 = select_node1.xpath('option')
-        self.assertEquals(len(option_nodes1), 4)
+        self.assertEquals(len(option_nodes1), 3)
 
         option_values1 = [opt_elem.text for opt_elem in option_nodes1]
-        self.assertEquals(option_values1, ['Not selected', 'Easy', 'Medium', 'Hard'])
+        self.assertEquals(option_values1, ['Easy', 'Hard', 'Medium'])
 
         select_node2 = select_nodes[1]
         self.assertEquals(select_node2.get('name'), self.aside_tag_lo)
+        self.assertEquals(select_node2.get('multiple'), 'multiple')
 
         option_nodes2 = select_node2.xpath('option')
-        self.assertEquals(len(option_nodes2), 4)
+        self.assertEquals(len(option_nodes2), 3)
 
         option_values2 = [opt_elem.text for opt_elem in option_nodes2 if opt_elem.text]
-        self.assertEquals(option_values2, ['Not selected', 'Learned nothing',
-                                           'Learned a few things', 'Learned everything'])
+        self.assertEquals(option_values2, ['Learned a few things', 'Learned everything', 'Learned nothing'])
 
         # Now ensure the acid_aside is not in the result
         self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")
@@ -187,7 +191,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         Checks that handler to save tags in StructuredTagsAside works properly
         """
         handler_url = reverse_usage_url(
-            'preview_handler',
+            'component_handler',
             unicode(aside_key_class(self.problem.location, self.aside_name)),
             kwargs={'handler': 'save_tags'}
         )
@@ -195,27 +199,44 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         client = AjaxEnabledTestClient()
         client.login(username=self.user.username, password=self.user_password)
 
-        response = client.post(path=handler_url, data={})
+        response = client.post(handler_url, json.dumps({}), content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
-        response = client.post(path=handler_url, data={'tag': 'undefined_tag:undefined'})
+        response = client.post(handler_url, json.dumps({'undefined_tag': ['undefined1', 'undefined2']}),
+                               content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
-        val = '%s:undefined' % self.aside_tag_dif
-        response = client.post(path=handler_url, data={'tag': val})
+        response = client.post(handler_url, json.dumps({self.aside_tag_dif: ['undefined1', 'undefined2']}),
+                               content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
-        val = '%s:%s' % (self.aside_tag_dif, self.aside_tag_dif_value)
-        response = client.post(path=handler_url, data={'tag': val})
+        def _test_helper_func(problem_location):
+            """
+            Helper function
+            """
+            problem = modulestore().get_item(problem_location)
+            asides = problem.runtime.get_asides(problem)
+            tag_aside = None
+            for aside in asides:
+                if isinstance(aside, StructuredTagsAside):
+                    tag_aside = aside
+                    break
+            return tag_aside
+
+        response = client.post(handler_url, json.dumps({self.aside_tag_dif: [self.aside_tag_dif_value]}),
+                               content_type="application/json")
         self.assertEqual(response.status_code, 200)
 
-        problem = modulestore().get_item(self.problem.location)
-        asides = problem.runtime.get_asides(problem)
-        tag_aside = None
-        for aside in asides:
-            if isinstance(aside, StructuredTagsAside):
-                tag_aside = aside
-                break
-
+        tag_aside = _test_helper_func(self.problem.location)
         self.assertIsNotNone(tag_aside, "Necessary StructuredTagsAside object isn't found")
-        self.assertEqual(tag_aside.saved_tags[self.aside_tag_dif], self.aside_tag_dif_value)
+        self.assertEqual(tag_aside.saved_tags[self.aside_tag_dif], [self.aside_tag_dif_value])
+
+        response = client.post(handler_url, json.dumps({self.aside_tag_dif: [self.aside_tag_dif_value,
+                                                                             self.aside_tag_dif_value2]}),
+                               content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+
+        tag_aside = _test_helper_func(self.problem.location)
+        self.assertIsNotNone(tag_aside, "Necessary StructuredTagsAside object isn't found")
+        self.assertEqual(tag_aside.saved_tags[self.aside_tag_dif], [self.aside_tag_dif_value,
+                                                                    self.aside_tag_dif_value2])

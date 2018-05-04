@@ -17,6 +17,7 @@
                 formType: 'password-reset',
 
                 requiredStr: '',
+                optionalStr: '',
 
                 submitButton: '.js-reset',
 

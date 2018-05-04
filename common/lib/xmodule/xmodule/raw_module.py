@@ -1,9 +1,11 @@
+import logging
+from exceptions import SerializationError
+
 from lxml import etree
+from xblock.fields import Scope, String
+
 from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
-import logging
-from xblock.fields import String, Scope
-from exceptions import SerializationError
 
 log = logging.getLogger(__name__)
 

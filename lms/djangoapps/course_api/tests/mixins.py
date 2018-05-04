@@ -7,7 +7,6 @@ from datetime import datetime
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-
 TEST_PASSWORD = u'edx'
 
 

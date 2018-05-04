@@ -1,29 +1,24 @@
 """
 Tests for the certificates models.
 """
-from ddt import ddt, data, unpack
-from mock import patch
+from ddt import data, ddt, unpack
 from django.conf import settings
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import patch
 from nose.plugins.attrib import attr
 
 from badges.tests.factories import CourseCompleteImageConfigurationFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.models import (
     CertificateStatuses,
     GeneratedCertificate,
-    certificate_status_for_student,
-    certificate_info_for_user
+    certificate_info_for_user,
+    certificate_status_for_student
 )
 from certificates.tests.factories import GeneratedCertificateFactory
-
-from util.milestones_helpers import (
-    set_prerequisite_courses,
-    milestones_achieved_by_user,
-)
-from milestones.tests.utils import MilestonesTestCaseMixin
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
@@ -54,11 +49,11 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Verify that certificate_info_for_user works.
         """
         student = UserFactory()
-        course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
+        _ = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
         student.profile.allow_certificate = allow_certificate
         student.profile.save()
 
-        certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
+        certificate_info = certificate_info_for_user(student, grade, whitelisted, user_certificate=None)
         self.assertEqual(certificate_info, output)
 
     @unpack
@@ -81,15 +76,50 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         student.profile.allow_certificate = allow_certificate
         student.profile.save()
 
-        GeneratedCertificateFactory.create(
+        certificate = GeneratedCertificateFactory.create(
             user=student,
             course_id=course.id,
             status=CertificateStatuses.downloadable,
             mode='honor'
         )
-
-        certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
+        certificate_info = certificate_info_for_user(student, grade, whitelisted, certificate)
         self.assertEqual(certificate_info, output)
+
+    def test_course_ids_with_certs_for_user(self):
+        # Create one user with certs and one without
+        student_no_certs = UserFactory()
+        student_with_certs = UserFactory()
+        student_with_certs.profile.allow_certificate = True
+        student_with_certs.profile.save()
+
+        # Set up a couple of courses
+        course_1 = CourseFactory.create()
+        course_2 = CourseFactory.create()
+
+        # Generate certificates
+        GeneratedCertificateFactory.create(
+            user=student_with_certs,
+            course_id=course_1.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+        GeneratedCertificateFactory.create(
+            user=student_with_certs,
+            course_id=course_2.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # User with no certs should return an empty set.
+        self.assertSetEqual(
+            GeneratedCertificate.course_ids_with_certs_for_user(student_no_certs),
+            set()
+        )
+        # User with certs should return a set with the two course_ids
+        self.assertSetEqual(
+            GeneratedCertificate.course_ids_with_certs_for_user(student_with_certs),
+            {course_1.id, course_2.id}
+        )
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_milestone_collected(self):

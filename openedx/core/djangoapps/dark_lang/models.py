@@ -1,9 +1,8 @@
 """
 Models for the dark-launching languages
 """
-from django.db import models
-
 from config_models.models import ConfigurationModel
+from django.db import models
 
 
 class DarkLangConfig(ConfigurationModel):

@@ -10,10 +10,10 @@ of each of its fields (including those fields that are set as default values).
 from __future__ import print_function
 
 import json
-from path import Path as path
 
-from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
+from path import Path as path
 
 from xmodule.modulestore.xml import XMLModuleStore
 

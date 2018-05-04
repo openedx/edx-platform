@@ -47,9 +47,10 @@ Eligibility:
 """
 import json
 import logging
+import os
 import uuid
 
-import os
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -60,15 +61,13 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
-
 
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
-from config_models.models import ConfigurationModel
 from lms.djangoapps.instructor_task.models import InstructorTask
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
 LOGGER = logging.getLogger(__name__)
 
@@ -261,6 +260,23 @@ class GeneratedCertificate(models.Model):
         return None
 
     @classmethod
+    def course_ids_with_certs_for_user(cls, user):
+        """
+        Return a set of CourseKeys for which the user has certificates.
+
+        Sometimes we just want to check if a user has already been issued a
+        certificate for a given course (e.g. to test refund elibigility).
+        Instead of checking if `certificate_for_student` returns `None` on each
+        course_id individually, we instead just return a set of all CourseKeys
+        for which this student has certificates all at once.
+        """
+        return {
+            cert.course_id
+            for cert
+            in cls.objects.filter(user=user).only('course_id')  # pylint: disable=no-member
+        }
+
+    @classmethod
     def get_unique_statuses(cls, course_key=None, flat=False):
         """
         1 - Return unique statuses as a list of dictionaries containing the following key value pairs
@@ -284,6 +300,12 @@ class GeneratedCertificate(models.Model):
             return query.values_list('status', flat=True).distinct()
         else:
             return query.values('status').annotate(count=Count('status'))
+
+    def __repr__(self):
+        return "<GeneratedCertificate: {course_id}, user={user}>".format(
+            course_id=self.course_id,
+            user=self.user
+        )
 
     def invalidate(self):
         """
@@ -470,6 +492,18 @@ def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: d
 
 
 def certificate_status_for_student(student, course_id):
+    """
+    This returns a dictionary with a key for status, and other information.
+    See certificate_status for more information.
+    """
+    try:
+        generated_certificate = GeneratedCertificate.objects.get(user=student, course_id=course_id)
+    except GeneratedCertificate.DoesNotExist:
+        generated_certificate = None
+    return certificate_status(generated_certificate)
+
+
+def certificate_status(generated_certificate):
     '''
     This returns a dictionary with a key for status, and other information.
     The status is one of the following:
@@ -504,9 +538,7 @@ def certificate_status_for_student(student, course_id):
     # the course_modes app is loaded, resulting in a Django deprecation warning.
     from course_modes.models import CourseMode
 
-    try:
-        generated_certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
-            user=student, course_id=course_id)
+    if generated_certificate:
         cert_status = {
             'status': generated_certificate.status,
             'mode': generated_certificate.mode,
@@ -516,7 +548,7 @@ def certificate_status_for_student(student, course_id):
             cert_status['grade'] = generated_certificate.grade
 
         if generated_certificate.mode == 'audit':
-            course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(course_id)]
+            course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(generated_certificate.course_id)]
             # Short term fix to make sure old audit users with certs still see their certs
             # only do this if there if no honor mode
             if 'honor' not in course_mode_slugs:
@@ -527,31 +559,24 @@ def certificate_status_for_student(student, course_id):
             cert_status['download_url'] = generated_certificate.download_url
 
         return cert_status
-
-    except GeneratedCertificate.DoesNotExist:
-        pass
-    return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
+    else:
+        return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
 
 
-def certificate_info_for_user(user, course_id, grade, user_is_whitelisted=None):
+def certificate_info_for_user(user, grade, user_is_whitelisted, user_certificate):
     """
     Returns the certificate info for a user for grade report.
     """
-    if user_is_whitelisted is None:
-        user_is_whitelisted = CertificateWhitelist.objects.filter(
-            user=user, course_id=course_id, whitelist=True
-        ).exists()
-
     certificate_is_delivered = 'N'
     certificate_type = 'N/A'
     eligible_for_certificate = 'Y' if (user_is_whitelisted or grade is not None) and user.profile.allow_certificate \
         else 'N'
 
-    certificate_status = certificate_status_for_student(user, course_id)
-    certificate_generated = certificate_status['status'] == CertificateStatuses.downloadable
+    status = certificate_status(user_certificate)
+    certificate_generated = status['status'] == CertificateStatuses.downloadable
     if certificate_generated:
         certificate_is_delivered = 'Y'
-        certificate_type = certificate_status['mode']
+        certificate_type = status['mode']
 
     return [eligible_for_certificate, certificate_is_delivered, certificate_type]
 

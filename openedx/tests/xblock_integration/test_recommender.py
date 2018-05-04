@@ -3,24 +3,22 @@ This test file will run through some XBlock test scenarios regarding the
 recommender system
 """
 
-from copy import deepcopy
-import json
 import itertools
+import json
 import StringIO
 import unittest
+from copy import deepcopy
 
-from ddt import ddt, data
-from nose.plugins.attrib import attr
-
+from ddt import data, ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.lib.url_utils import quote_slashes
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -665,7 +663,6 @@ class TestRecommenderFileUploading(TestRecommender):
         url = self.get_handler_url(event_name)
         resp = self.client.post(url, {'file': f_handler})
         self.assertEqual(resp.status_code, test_case['status'])
-        self.assert_request_status_code(200, self.course_url)
 
     @data(
         {

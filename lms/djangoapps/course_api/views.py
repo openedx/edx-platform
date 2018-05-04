@@ -6,10 +6,11 @@ from django.core.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
-from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
-from .serializers import CourseSerializer, CourseDetailSerializer
+from .serializers import CourseDetailSerializer, CourseSerializer
 
 
 @view_auth_classes(is_authenticated=False)

@@ -103,7 +103,7 @@
         <option value="" selected> - </option>
         <option value="en">English</option>
       </select>
-      <span class="tip tip-stacked">Identify the course language here. This is used to assist users find courses that are taught in a specific language.</span>
+      <span class="tip tip-stacked">Identify the course language here. This is used to assist users find courses that are taught in a specific language. It is also used to localize the 'From:' field in bulk emails.</span>
     </li>
 
   </ol>

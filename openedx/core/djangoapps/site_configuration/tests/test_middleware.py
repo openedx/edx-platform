@@ -3,7 +3,6 @@
 Test site_configuration middleware.
 """
 import ddt
-import unittest
 from mock import patch
 
 from django.conf import settings
@@ -22,6 +21,7 @@ from microsite_configuration.tests.tests import (
     MICROSITE_BACKENDS,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
@@ -29,7 +29,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 # pylint: disable=no-member, protected-access
 @ddt.ddt
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class SessionCookieDomainMicrositeOverrideTests(DatabaseMicrositeTestCase):
     """
     Tests regarding the session cookie management in the middlware for Microsites

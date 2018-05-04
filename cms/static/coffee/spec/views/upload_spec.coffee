@@ -1,6 +1,6 @@
-define ["js/models/uploads", "js/views/uploads", "js/models/chapter",
+define ["sinon", "js/models/uploads", "js/views/uploads", "js/models/chapter",
         "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/modal_helpers"],
-    (FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) ->
+    (sinon, FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) ->
 
         describe "UploadDialog", ->
             tpl = readFixtures("upload-dialog.underscore")

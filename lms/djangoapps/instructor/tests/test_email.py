@@ -9,11 +9,9 @@ from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from bulk_email.models import CourseAuthorization, BulkEmailFlag
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
-)
+from bulk_email.models import BulkEmailFlag, CourseAuthorization
 from student.tests.factories import AdminFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -31,7 +29,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
         # URL for email view
-        cls.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
+        cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def setUp(self):
         super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()
@@ -126,7 +124,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course_key.to_deprecated_string()})
         # URL for email view
-        cls.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
+        cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def setUp(self):
         super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()
@@ -138,7 +136,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_key.to_deprecated_string()})
         # URL for email view
-        self.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
+        self.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def tearDown(self):
         super(TestNewInstructorDashboardEmailViewXMLBacked, self).tearDown()

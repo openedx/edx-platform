@@ -1,5 +1,5 @@
 from django.template import loader
-from django.template.base import Template, Context
+from django.template.base import Context, Template
 from django.template.loader import get_template, select_template
 
 

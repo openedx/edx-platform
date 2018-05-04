@@ -4,16 +4,16 @@ Bok choy acceptance tests for problems in the LMS
 
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
-from nose.plugins.attrib import attr
 from textwrap import dedent
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from nose.plugins.attrib import attr
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
 
 
 class ProblemsTest(UniqueCourseTest):

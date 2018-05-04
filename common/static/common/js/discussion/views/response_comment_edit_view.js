@@ -22,7 +22,8 @@
         this.ResponseCommentEditView = (function(_super) {
             __extends(ResponseCommentEditView, _super);
 
-            function ResponseCommentEditView() {
+            function ResponseCommentEditView(options) {
+                this.options = options;
                 return ResponseCommentEditView.__super__.constructor.apply(this, arguments);
             }
 
@@ -40,8 +41,10 @@
             };
 
             ResponseCommentEditView.prototype.render = function() {
+                var context = $.extend({mode: this.options.mode, startHeader: this.options.startHeader},
+                    this.model.attributes);
                 this.template = _.template($('#response-comment-edit-template').html());
-                this.$el.html(this.template(this.model.toJSON()));
+                this.$el.html(this.template(context));
                 this.delegateEvents();
                 DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-comment-body');
                 return this;

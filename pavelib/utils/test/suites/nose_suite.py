@@ -119,6 +119,7 @@ class SystemTestSuite(NoseTestSuite):
 
         self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
+        self.settings = kwargs.get('settings', Env.TEST_SETTINGS)
 
         if self.processes is None:
             # Don't use multiprocessing by default
@@ -148,7 +149,7 @@ class SystemTestSuite(NoseTestSuite):
             '--verbosity={}'.format(self.verbosity),
             self.test_id,
         ] + self.test_options_flags + [
-            '--settings=test',
+            '--settings', self.settings,
             self.extra_args,
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
             '--with-database-isolation',
@@ -189,10 +190,8 @@ class SystemTestSuite(NoseTestSuite):
 
         if self.root == 'lms':
             default_test_id += " {system}/tests.py"
-            default_test_id += " openedx/core/djangolib"
-
-        if self.root == 'cms':
-            default_test_id += " {system}/tests/*"
+            default_test_id += " openedx/core/djangolib/*"
+            default_test_id += " openedx/features"
 
         return default_test_id.format(system=self.root)
 

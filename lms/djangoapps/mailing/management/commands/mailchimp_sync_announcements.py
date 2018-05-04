@@ -4,15 +4,10 @@ Synchronizes the announcement list with all active students.
 import logging
 from optparse import make_option
 
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from django.contrib.auth.models import User
-
-from .mailchimp_sync_course import (
-    connect_mailchimp, get_cleaned,
-    get_subscribed, get_unsubscribed,
-    subscribe_with_data
-)
+from .mailchimp_sync_course import connect_mailchimp, get_cleaned, get_subscribed, get_unsubscribed, subscribe_with_data
 
 log = logging.getLogger('edx.mailchimp')
 

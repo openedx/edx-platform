@@ -1,0 +1,71 @@
+---
+# JavaScript test suite description
+#
+#
+# To run all the tests and print results to the console:
+#
+#   js-test-tool run TEST_SUITE --use-firefox
+#
+# where `TEST_SUITE` is this file.
+#
+#
+# To run the tests in your default browser ("dev mode"):
+#
+#   js-test-tool dev TEST_SUITE
+#
+
+test_suite_name: xmodule
+
+test_runner: jasmine
+
+# Path prepended to source files in the coverage report (optional)
+# For example, if the source path
+# is "src/source.js" (relative to this YAML file)
+# and the prepend path is "base/dir"
+# then the coverage report will show
+# "base/dir/src/source.js"
+prepend_path: common/lib/xmodule/xmodule/js
+
+# Paths to source JavaScript files
+src_paths:
+    - src/xmodule.js
+    - src
+
+# Paths to library JavaScript files (optional)
+lib_paths:
+    - common_static/js/test/i18n.js
+    - common_static/coffee/src/ajax_prefix.js
+    - common_static/js/src/logger.js
+    - common_static/js/vendor/jasmine-jquery.js
+    - common_static/js/vendor/jasmine-imagediff.js
+    - common_static/js/vendor/require.js
+    - RequireJS-namespace-undefine.js
+    - common_static/js/vendor/jquery.min.js
+    - common_static/js/vendor/jquery-ui.min.js
+    - common_static/js/vendor/jquery.ui.draggable.js
+    - common_static/js/vendor/jquery.cookie.js
+    - common_static/js/vendor/json2.js
+    - common_static/js/vendor/underscore-min.js
+    - common_static/js/vendor/backbone-min.js
+    - common_static/js/vendor/jquery.leanModal.min.js
+    - common_static/js/vendor/CodeMirror/codemirror.js
+    - common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js
+    - common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js
+    - common_static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js
+    - common_static/js/vendor/jquery.timeago.js
+    - common_static/js/vendor/sinon-1.7.1.js
+    - common_static/js/vendor/analytics.js
+    - common_static/js/test/add_ajax_prefix.js
+    - common_static/js/src/utility.js
+    - public/js/split_test_staff.js
+    - common_static/js/src/accessibility_tools.js
+    - common_static/js/vendor/moment.min.js
+
+# Paths to spec (test) JavaScript files
+spec_paths:
+    - spec/helper.js
+    - spec
+
+# Paths to fixture files (optional)
+fixture_paths:
+    - fixtures

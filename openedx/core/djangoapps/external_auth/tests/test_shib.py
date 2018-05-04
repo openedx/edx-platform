@@ -569,7 +569,8 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
                           'data': dict(params),
                           'follow': False,
                           'REMOTE_USER': 'testuser@stanford.edu',
-                          'Shib-Identity-Provider': 'https://idp.stanford.edu/'}
+                          'Shib-Identity-Provider': 'https://idp.stanford.edu/',
+                          'HTTP_ACCEPT': "text/html"}
         response = self.client.get(**request_kwargs)
         # successful login is a redirect to the URL that handles auto-enrollment
         self.assertEqual(response.status_code, 302)

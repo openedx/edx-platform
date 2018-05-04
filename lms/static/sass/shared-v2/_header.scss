@@ -9,13 +9,17 @@
     box-shadow: 0 1px 5px 0 $shadow-l1;
     background: $header-bg;
 
+    .logo-header {
+      display: inline;
+    }
+
     .wrapper-header {
         @include clearfix();
         box-sizing: border-box;
         margin: 0 auto;
         padding: 10px 10px 0;
         width: 100%;
-        max-width: 1180px;
+        max-width: $lms-max-width;
 
         .left {
             @include float(left);
@@ -27,7 +31,6 @@
 
         .logo {
             @include float(left);
-            @include margin-left(10px);
             @include margin-right(10px);
             margin-top: 4px;
             margin-bottom: 0;
@@ -38,6 +41,9 @@
             @include float(left);
             @include margin(12px, 10px, 0px, 10px);
             color: $lms-label-color;
+            .provider {
+              font-weight: bold;
+            }
         }
 
         .wrapper-user-menu {

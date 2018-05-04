@@ -26,7 +26,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%block name="header_extras">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'content-visibility-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'access-editor', 'settings-modal-tabs']:
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'content-visibility-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'access-editor', 'settings-modal-tabs', 'show-correctness-editor']:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -57,7 +57,7 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
   %endif
 
-    %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('block_types_enabled'):
+    %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('deprecated_enabled_block_types'):
       <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
         <div class="alert announcement">
           <span class="feedback-symbol fa fa-warning" aria-hidden="true"></span><span class="sr">${_("Warning")}</span>
@@ -84,7 +84,7 @@ from openedx.core.djangolib.markup import HTML, Text
               </div>
             %endif
 
-            % if deprecated_blocks_info.get('block_types_enabled'):
+            % if deprecated_blocks_info.get('deprecated_enabled_block_types'):
               <div class="advance-modules-list">
                 <p class="advance-modules-remove-text">
                   ${Text(_("To avoid errors, {platform_name} strongly recommends that you remove unsupported features from the course advanced settings. To do this, go to the {link_start}Advanced Settings page{link_end}, locate the \"Advanced Module List\" setting, and then delete the following modules from the list.")).format(
@@ -95,7 +95,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 </p>
                 <nav class="nav-related" aria-label="${_('Unsupported Advance Modules')}">
                   <ul>
-                    % for block_type in deprecated_blocks_info['block_types']:
+                    % for block_type in deprecated_blocks_info['deprecated_enabled_block_types']:
                       <li class="nav-item">${block_type}</li>
                     % endfor
                   </ul>
@@ -175,8 +175,11 @@ from openedx.core.djangolib.markup import HTML, Text
                     </div>
                % endif
             </div>
-
-            <div class="wrapper-dnd">
+            <div class="wrapper-dnd"
+              % if getattr(context_course, 'language'):
+                lang="${context_course.language}"
+              % endif
+            >
                 <%
                 course_locator = context_course.location
                 %>

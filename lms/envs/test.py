@@ -75,12 +75,16 @@ FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
+# Toggles API on for testing
+FEATURES['API'] = True
 FEATURES['ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE'] = False
 
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
+
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -113,6 +117,7 @@ NOSE_PLUGINS = [
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 
@@ -261,11 +266,11 @@ PASSWORD_COMPLEXITY = {}
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.google.GoogleOAuth2',
-    'social.backends.linkedin.LinkedinOAuth2',
-    'social.backends.facebook.FacebookOAuth2',
-    'social.backends.azuread.AzureADOAuth2',
-    'social.backends.twitter.TwitterOAuth',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.azuread.AzureADOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
@@ -276,6 +281,20 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
         'secret_key': 'opensesame',
         'url': '/misc/my-custom-registration-form',
         'error_url': '/misc/my-custom-sso-error-page'
+    },
+}
+
+THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
+    'custom1': {
+        'secret_key': 'opensesame',
+        'url': '/misc/my-custom-registration-form',
+        'error_url': '/misc/my-custom-sso-error-page'
+    },
+    'custom2': {
+        'secret_key': 'opensesame',
+        'url': '/misc/my-custom-registration-form',
+        'error_url': '/misc/my-custom-sso-error-page',
+        'link_by_email': True
     },
 }
 
@@ -351,6 +370,8 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
 ######################### MARKETING SITE ###############################
 
 MKTG_URL_LINK_MAP = {
@@ -374,6 +395,8 @@ MKTG_URL_LINK_MAP = {
 }
 
 SUPPORT_SITE_LINK = 'https://support.example.com'
+PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
+ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
@@ -456,6 +479,7 @@ MICROSITE_CONFIGURATION = {
         "platform_name": "Test Site",
         "logo_image_url": "test_site/images/header-logo.png",
         "email_from_address": "test_site@edx.org",
+        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
         "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
         "SITE_NAME": "test_site.localhost",
@@ -487,6 +511,7 @@ MICROSITE_CONFIGURATION = {
         "platform_name": "Test logistration",
         "logo_image_url": "test_site/images/header-logo.png",
         "email_from_address": "test_site@edx.org",
+        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
         "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
         "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
@@ -563,7 +588,7 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
-FACEBOOK_API_VERSION = "v2.2"
+FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
 INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
@@ -643,7 +668,15 @@ JWT_AUTH.update({
 
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
+CREDENTIALS_INTERNAL_SERVICE_URL = 'https://credentials-internal.example.com'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'https://credentials.example.com'
+
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
+
+ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
+ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
+
+ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'

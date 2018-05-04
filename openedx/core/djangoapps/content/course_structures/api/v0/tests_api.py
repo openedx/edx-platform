@@ -20,6 +20,8 @@ class CourseStructureApiTests(ModuleStoreTestCase):
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Test setup

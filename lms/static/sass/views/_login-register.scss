@@ -3,21 +3,86 @@
 @import '../base/grid-settings';
 @import "neat/neat"; // lib - Neat
 
-.login-register {
+@media (min-width: 768px) {
+    .enterprise-content {
+        width: 20%;
+        float: left;
+        height: 100%;
+        padding-left: $baseline;
+        padding-right: $baseline;
+    }
+
+    .login-register.border-left {
+        border-left: 1px solid #d9d9d9;
+        padding-left: ($baseline*1.5);
+        padding-right: $baseline;
+    }
+}
+
+@media (max-width: 767px) {
+    .enterprise-content {
+        margin: auto auto;
+        display: block;
+        padding-left: ($baseline/2);
+        padding-right: ($baseline/2);
+
+        img.enterprise-logo {
+            display: none;
+        }
+    }
+}
+
+.window-wrap {
+    background: $white;
+}
+
+.login-register-content {
     @include box-sizing(border-box);
     @include outer-container;
-    $grid-columns: 12;
-    background: $white;
-    min-height: 100%;
     width: 100%;
-    $third-party-button-height: ($baseline*1.75);
+    justify-content: center;
+    margin-top: $baseline;
+    background: $white;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
 
     h2 {
-        @extend %t-title5;
+        @extend %t-title4;
+        margin-top: $baseline;
+        letter-spacing: normal;
+        font-family: $sans-serif;
+        color: $uxpl-blue-hover-active;
+    }
+
+    h3 {
+        @extend %t-title6;
+        @extend %t-light;
         margin: 0;
         letter-spacing: normal;
         font-family: $sans-serif;
+        color: $uxpl-gray-dark;
     }
+
+    a, label {
+        @extend %expand-clickable-area;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+}
+
+.login-register {
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    padding-left: ($baseline/2);
+    padding-right: ($baseline/2);
+    $third-party-button-height: ($baseline*1.75);
+    display: inline-block;
+    max-width: 500px;
 
     .instructions {
         @extend %t-copy-base;
@@ -68,27 +133,22 @@
         }
     }
 
-    form,
-    .wrapper-other-login {
-        border: 1px solid $gray-l4;
-        border-radius: ($baseline/4);
-        padding: 0 ($baseline*1.25) $baseline ($baseline*1.25);
-    }
-
     .section-title {
         position: relative;
-        margin: 20px 0 10px;
+        margin: $baseline 0 ($baseline/2);
 
         &.lines {
-            margin-bottom: 20px;
+            margin-bottom: $baseline;
+            margin-top: $baseline;
+            text-align: center;
 
             &:after {
                 position: absolute;
                 left: 0;
-                top: 12px;
+                top: ($baseline/2);
                 width: 100%;
                 height: 1px;
-                background: $gray-l4;
+                background: $gray-l3;
                 content: '';
                 z-index: 5;
             }
@@ -125,18 +185,13 @@
     .form-type,
     .toggle-form {
         @include box-sizing(border-box);
-        max-width: 650px;
+        max-width: 600px;
         min-width: 250px;
         margin: 0 auto;
-        padding: {
-            left: $baseline; // Don't want to override any top or bottom (CR)
-            right: $baseline; // Don't want to override any top or bottom (CR)
-            bottom: ($baseline/2);
-        }
     }
 
     .toggle-form {
-        text-align: center // Centers the text and buttons
+        @extend %t-action1;
     }
 
     .note {
@@ -149,7 +204,8 @@
 
     /** The forms **/
     .form-wrapper {
-        padding-top: ($baseline + 5);
+        padding-top: $baseline;
+        padding-bottom: $baseline;
 
         form {
             @include clearfix();
@@ -161,22 +217,8 @@
         }
     }
 
-    .login-form {
-        margin-bottom: $baseline;
-
-        &:focus {
-            outline: none;
-        }
-    }
-
-    .password-reset-form {
-        padding-bottom: ($baseline + 5);
-
-        &:focus {
-            outline: none;
-        }
-    }
-
+    .login-form,
+    .password-reset-form,
     .register-form {
         &:focus {
             outline: none;
@@ -204,7 +246,7 @@
         clear: both;
         position: relative;
         width: 100%;
-        margin: ($baseline/2) 0 ($baseline/4) 0;
+        margin: ($baseline/2) 0 0 0;
 
         &.select-year_of_birth {
             @include margin-left(15px);
@@ -219,6 +261,7 @@
         /** FROM _accounts.scss - start **/
         label,
         input,
+        select,
         textarea {
             height: auto;
             line-height: 1.5em;
@@ -235,7 +278,8 @@
 
         label {
             display: block;
-            margin: 0 0 6px 0;
+            margin: 0;
+            color: $black;
 
             &.inline {
                 display: inline;
@@ -244,13 +288,12 @@
             &.error {
                 color: $red;
             }
-            
+
             &[for="register-data_sharing_consent"],
             &[for="register-honor_code"],
             &[for="register-terms_of_service"] {
                 display: inline-block;
                 margin: 5px 5px 0 0;
-                width: 90%;
                 vertical-align: top;
             }
 
@@ -275,7 +318,7 @@
             text-decoration: none;
             text-shadow: none;
             font-family: $sans-serif;
-            
+
             &:hover,
             &:focus {
                 text-decoration: underline;
@@ -286,6 +329,7 @@
         select,
         textarea {
             display: block;
+            height: 32px;
             width: 100%;
             margin: 0 0 ($baseline/4);
             padding: 0 ($baseline/2);
@@ -301,39 +345,46 @@
             &.checkbox {
                 display: inline;
                 width: auto;
+                height: auto;
                 margin-right: ($baseline/4);
+
+                & + label {
+                    display: inline;
+                }
             }
 
             &.error {
-                border-color: tint($red,50%);
+                border-color: $error-color;
             }
-        }
-
-        input {
-            height: 32px;
         }
 
         textarea {
             resize: none;
-
-            &.long {
-                height: ($baseline*5);
-            }
+            height: ($baseline*5);
         }
 
         select {
-            width: 100%;
+            background: transparent;
+            opacity: 0.85;
+            border: none;
+            outline: solid 1px $gray-l3;
+            cursor: pointer;
+
+            &:active, &:focus {
+                outline: auto;
+            }
 
             &.error {
-                border-color: tint($red,50%);
+                outline-color: $error-color;
             }
         }
 
+        .tip, .label-optional {
+            @extend %t-copy-sub1;
+            color: $uxpl-gray-base;
+        }
         .tip {
-            @extend %t-copy-sub2;
             display: block;
-            margin: 0 0 ($baseline/2) 0;
-            color: $base-font-color;
         }
         /** FROM _accounts.scss - end **/
     }
@@ -356,12 +407,11 @@
 
     .action-primary {
         @extend %btn-primary-blue;
-        width: 100%;
-        margin-top: 1em;
-        padding: ($baseline/2);
+        padding: 1ex 1em;
         text-transform: none;
         font-weight: 600;
         letter-spacing: normal;
+        margin-top: $baseline;
 
         .icon {
             @extend %sso-icon;
@@ -377,7 +427,7 @@
 
         position: relative;
         margin-right: ($baseline/4);
-        margin-bottom: $baseline;
+        margin-bottom: ($baseline/4);
         border-color: $lightGrey1;
         width: $baseline*6.5;
         height: $third-party-button-height;
@@ -426,10 +476,6 @@
                 border: 1px solid #A5382B;
                 color: $white;
             }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 #8D3024;
-            }
         }
 
         &.button-oa2-facebook {
@@ -444,10 +490,6 @@
                 background-color: $facebook-blue;
                 border: 1px solid #263A62;
                 color: $white;
-            }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 #30487C;
             }
         }
 
@@ -464,10 +506,6 @@
                 border: 1px solid #06527D;
                 color: $white;
             }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 #005D8E;
-            }
         }
 
         &.button-oa2-azuread-oauth2 {
@@ -482,10 +520,6 @@
                 background-color: $microsoft-blue;
                 border: 1px solid $microsoft-blue;
                 color: $white;
-            }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 darken($microsoft-blue, 10%);
             }
         }
 
@@ -528,6 +562,30 @@
 
             li {
                 margin: 0 0 ($baseline/4) $baseline;
+            }
+        }
+
+        &.account-activation {
+            .message-copy {
+                padding: 0 1em !important;
+            }
+
+            &.info {
+                background-color: $palette-info-back;
+                border: $palette-info-border 1px solid;
+                color: $palette-info-text;
+            }
+
+            &.success {
+                background-color: $palette-success-back;
+                border: $palette-success-border 1px solid;
+                color: $palette-success-text;
+           }
+
+            &.error {
+                background-color: $palette-error-back;
+                border: $palette-error-border 1px solid;
+                color: $palette-error-text 1px solid;
             }
         }
     }
@@ -606,3 +664,118 @@
 .supplemental-link {
     margin: 1rem 0;
 }
+
+.enterprise-content {
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    max-width: 500px;
+
+    .centered-div {
+        margin: 0 auto;
+        margin-right: 0px;
+        float: right;
+    }
+
+    img {
+        height: 100px;
+    }
+
+    p {
+        &:first-of-type {
+            margin-top: 20px;
+        }
+        
+        font-size: 16px;
+        line-height: 1.5;
+        color: $gray-d2;
+    }
+}
+
+.tos-modal {
+    background-color: $black-t1;
+    display: none;
+    height: 120%;
+    left: -10%;
+    overflow: auto;
+    position: fixed;
+    top: -10%;
+    width: 120%;
+    z-index: 1;
+
+    .modal-content {
+        background-color: $white;
+        bottom: auto;
+        left: 50%;
+        margin: auto;
+        max-width: 650px;
+        min-height: 540px;
+        min-width: 300px;
+        position: fixed;
+        right: auto;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+
+        .header {
+            height: 50px;
+            position: relative;
+
+            h1#modal-header-text {
+                float: left;
+                font-family: $sans-serif;
+                font-size: font-size(large);
+                font-weight: bold;
+                margin-bottom: 0;
+                padding-left: 20px;
+                position: absolute;
+                text-align: left;
+                top: 50%;
+                transform: translate(0, -50%);
+                width: 75%;
+            }
+
+            .modal-close-button {
+                background: $white;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                box-sizing: border-box;
+                color: $uxpl-blue-base;
+                float: right;
+                font-size: font-size(large);
+                height: 48px;
+                letter-spacing: normal;
+                padding: 0;
+                position: absolute;
+                right: 0;
+                text-shadow: none;
+                text-transform: lowercase;
+                top: 50%;
+                transform: translate(0, -50%);
+                width: 80px;
+            }
+
+            .modal-close-button:hover {
+                background: $white;
+                color: $uxpl-blue-hover-active;
+                text-decoration: underline;
+            }
+
+            .modal-close-button:focus {
+                color: $uxpl-blue-hover-active;
+                text-decoration: underline;
+            }
+        }
+
+        iframe {
+            border: 0;
+            width: 100%;
+        }
+    }
+}
+
+body.open-modal {
+    overflow: hidden;
+}
+

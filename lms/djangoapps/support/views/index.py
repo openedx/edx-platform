@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from edxmako.shortcuts import render_to_response
 from support.decorators import require_support_permission
 
-
 SUPPORT_INDEX_URLS = [
     {
         "url": reverse_lazy("support:certificates"),

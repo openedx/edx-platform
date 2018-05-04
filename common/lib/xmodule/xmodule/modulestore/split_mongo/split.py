@@ -57,6 +57,7 @@ import copy
 import datetime
 import hashlib
 import logging
+import six
 from contracts import contract, new_contract
 from importlib import import_module
 from mongodb_proxy import autoretry_read
@@ -82,6 +83,7 @@ from xmodule.modulestore import (
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
@@ -1202,9 +1204,17 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             block_name = qualifiers.pop('name')
             block_ids = []
             for block_id, block in course.structure['blocks'].iteritems():
-                # Do an in comparison on the name qualifier
-                # so that a list can be used to filter on block_id
-                if block_id.id in block_name and _block_matches_all(block):
+                # Don't do an in comparison blindly; first check to make sure
+                # that the name qualifier we're looking at isn't a plain string;
+                # if it is a string, then it should match exactly. If it's other
+                # than a string, we check whether it contains the block ID; this
+                # is so a list or other iterable can be passed with multiple
+                # valid qualifiers.
+                if isinstance(block_name, six.string_types):
+                    name_matches = block_id.id == block_name
+                else:
+                    name_matches = block_id.id in block_name
+                if name_matches and _block_matches_all(block):
                     block_ids.append(block_id)
 
             return self._load_items(course, block_ids, **kwargs)
@@ -3190,6 +3200,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 new_block.definition,
                 destination_version,
                 raw=True,
+                asides=new_block.asides,
                 block_defaults=new_block.defaults
             )
             # Extend the block's new edit_info with any extra edit_info fields from the source (e.g. original_usage):
@@ -3246,11 +3257,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param definition_id: the pointer to the content scoped fields
         :param new_id: the structure's version id
         :param raw: true if this block already has all references serialized
+        :param asides: dict information related to the connected xblock asides
         """
         if not raw:
             block_fields = self._serialize_fields(category, block_fields)
         if not asides:
-            asides = []
+            asides = {}
         document = {
             'block_type': category,
             'definition': definition_id,
@@ -3348,6 +3360,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Create the proper runtime for this course
         """
+        services = self.services
+        services["partitions"] = PartitionService(course_entry.course_key)
+
         return CachingDescriptorSystem(
             modulestore=self,
             course_entry=course_entry,
@@ -3359,7 +3374,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             mixins=self.xblock_mixins,
             select=self.xblock_select,
             disabled_xblock_types=self.disabled_xblock_types,
-            services=self.services,
+            services=services,
         )
 
     def ensure_indexes(self):

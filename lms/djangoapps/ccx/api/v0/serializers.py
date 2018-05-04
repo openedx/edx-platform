@@ -1,9 +1,9 @@
 """ CCX API v0 Serializers. """
 
+from ccx_keys.locator import CCXLocator
 from rest_framework import serializers
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from ccx_keys.locator import CCXLocator
 
 
 class CCXCourseSerializer(serializers.ModelSerializer):

@@ -1,20 +1,19 @@
 """ Management command to update courses' search index """
 import logging
-from django.core.management import BaseCommand, CommandError
 from optparse import make_option
 from textwrap import dedent
 
-from contentstore.courseware_index import CoursewareSearchIndexer
-from search.search_engine_base import SearchEngine
+from django.core.management import BaseCommand, CommandError
 from elasticsearch import exceptions
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from search.search_engine_base import SearchEngine
+
+from contentstore.courseware_index import CoursewareSearchIndexer
+from xmodule.modulestore.django import modulestore
 
 from .prompt import query_yes_no
-
-from xmodule.modulestore.django import modulestore
 
 
 class Command(BaseCommand):

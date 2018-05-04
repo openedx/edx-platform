@@ -2,13 +2,13 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-import os
-
+import HTMLParser
 import logging
-import pynliner
+import os
 import urlparse
 import uuid
-import HTMLParser
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -18,16 +18,13 @@ from django.core.mail import EmailMessage, SafeMIMEText
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from eventtracking import tracker
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
+from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
-from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -144,6 +141,13 @@ def with_inline_css(html_without_css):
     if css_filepath:
         with open(css_filepath, "r") as _file:
             css_content = _file.read()
+
+        # pynliner imports cssutils, which has an expensive initialization. All
+        # told, it can account for 15-20% of "fast" LMS startup (without asset
+        # compilation). So we're going to load it locally here so that we delay
+        # that one-time hit until we actually do the (rare) operation that is
+        # sending a credit notification email.
+        import pynliner
 
         # insert style tag in the html and run pyliner.
         html_with_inline_css = pynliner.fromString('<style>' + css_content + '</style>' + html_without_css)

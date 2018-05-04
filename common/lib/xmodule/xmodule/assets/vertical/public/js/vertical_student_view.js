@@ -1,8 +1,9 @@
 /* JavaScript for Vertical Student View. */
 window.VerticalStudentView = function(runtime, element) {
     'use strict';
-    if (typeof RequireJS === "undefined") {
-        console.log("Cannot initialize VerticalStudentView. RequireJS is not defined.");
+    if (typeof RequireJS === 'undefined') {
+        // eslint-disable-next-line no-console
+        console.log('Cannot initialize VerticalStudentView. RequireJS is not defined.');
         return;
     }
     RequireJS.require(['js/bookmarks/views/bookmark_button'], function(BookmarkButton) {
@@ -14,7 +15,7 @@ window.VerticalStudentView = function(runtime, element) {
             bookmarkId: $bookmarkButtonElement.data('bookmarkId'),
             usageId: $element.data('usageId'),
             bookmarked: $element.parent('#seq_content').data('bookmarked'),
-            apiUrl: $('.courseware-bookmarks-button').data('bookmarksApiUrl')
+            apiUrl: $bookmarkButtonElement.data('bookmarksApiUrl')
         });
     });
 };

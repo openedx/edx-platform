@@ -1,22 +1,21 @@
 """Tests for the resubmit_error_certificates management command. """
 import ddt
 from django.core.management.base import CommandError
-from nose.plugins.attrib import attr
 from django.test.utils import override_settings
 from mock import patch
-
-from course_modes.models import CourseMode
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion
 from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
+from certificates.management.commands import regenerate_user, resubmit_error_certificates, ungenerated_certs
+from certificates.models import CertificateStatuses, GeneratedCertificate
+from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
-from certificates.models import GeneratedCertificate, CertificateStatuses
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -69,6 +68,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
+    ENABLED_SIGNALS = ['course_published']
 
     @ddt.data(CourseMode.HONOR, CourseMode.VERIFIED)
     def test_resubmit_error_certificate(self, mode):

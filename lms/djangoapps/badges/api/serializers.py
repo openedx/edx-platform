@@ -3,7 +3,7 @@ Serializers for Badges
 """
 from rest_framework import serializers
 
-from badges.models import BadgeClass, BadgeAssertion
+from badges.models import BadgeAssertion, BadgeClass
 
 
 class BadgeClassSerializer(serializers.ModelSerializer):

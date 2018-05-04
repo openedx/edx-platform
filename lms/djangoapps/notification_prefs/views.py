@@ -1,9 +1,9 @@
-from base64 import urlsafe_b64encode, urlsafe_b64decode
-from hashlib import sha256
 import json
+from base64 import urlsafe_b64decode, urlsafe_b64encode
+from hashlib import sha256
 
-from Crypto.Cipher import AES
 from Crypto import Random
+from Crypto.Cipher import AES
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied

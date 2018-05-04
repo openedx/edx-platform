@@ -51,21 +51,9 @@ in. If you do not have an account, follow these steps.
 Documentation
 -------------
 
-Documentation is managed in the `edx-documentation`_ repository. Documentation
-is built using `Sphinx`_: you can `view the built documentation on
-ReadTheDocs`_.
+Documentation details can be found in the `docs index.rst`_.
 
-You can also check out `Confluence`_, our wiki system. Once you sign up for
-an account, you'll be able to create new pages and edit existing pages, just
-like in any other wiki system. You only need one account for both Confluence
-and `JIRA`_, our issue tracker.
-
-.. _Sphinx: http://sphinx-doc.org/
-.. _view the built documentation on ReadTheDocs: http://docs.edx.org/
-.. _edx-documentation: https://github.com/edx/edx-documentation
-.. _Confluence: http://openedx.atlassian.net/wiki/
-.. _JIRA: https://openedx.atlassian.net/
-
+.. _docs index.rst: docs/index.rst
 
 Getting Help
 ------------

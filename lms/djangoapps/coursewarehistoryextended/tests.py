@@ -6,15 +6,15 @@ backend tables.
 """
 
 import json
-from mock import patch
-from django.test import TestCase
-from django.conf import settings
 from unittest import skipUnless
+
+from django.conf import settings
+from django.test import TestCase
+from mock import patch
 from nose.plugins.attrib import attr
 
-from courseware.models import BaseStudentModuleHistory, StudentModuleHistory, StudentModule
-
-from courseware.tests.factories import StudentModuleFactory, location, course_id
+from courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
+from courseware.tests.factories import StudentModuleFactory, course_id, location
 
 
 @attr(shard=1)

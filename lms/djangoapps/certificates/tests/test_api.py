@@ -1,18 +1,30 @@
 """Tests for the certificates Python API. """
-from contextlib import contextmanager
-import ddt
-from functools import wraps
 import uuid
+from contextlib import contextmanager
+from functools import wraps
 
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+import ddt
+from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test import RequestFactory, TestCase
+from django.test.utils import override_settings
+from django.utils import timezone
+from freezegun import freeze_time
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from config_models.models import cache
+from certificates import api as certs_api
+from certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateStatuses,
+    ExampleCertificate,
+    GeneratedCertificate,
+    certificate_status_for_student
+)
+from certificates.queue import XQueueAddToQueueError, XQueueCertInterface
+from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
@@ -21,26 +33,8 @@ from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-)
-
-from certificates import api as certs_api
-from certificates.models import (
-    CertificateStatuses,
-    CertificateGenerationConfiguration,
-    ExampleCertificate,
-    GeneratedCertificate,
-    certificate_status_for_student,
-)
-from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
-from certificates.tests.factories import (
-    CertificateInvalidationFactory,
-    GeneratedCertificateFactory
-)
-
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -88,6 +82,7 @@ class WebCertificateTestMixin(object):
 @attr(shard=1)
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(CertificateDownloadableStatusTests, self).setUp()
@@ -320,8 +315,13 @@ class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
 @attr(shard=1)
 class CertificateGetTests(SharedModuleStoreTestCase):
     """Tests for the `test_get_certificate_for_user` helper function. """
+    now = timezone.now()
+
     @classmethod
     def setUpClass(cls):
+        cls.freezer = freeze_time(cls.now)
+        cls.freezer.start()
+
         super(CertificateGetTests, cls).setUpClass()
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
@@ -359,6 +359,11 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             verify_uuid=cls.uuid,
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        super(CertificateGetTests, cls).tearDownClass()
+        cls.freezer.stop()
+
     def test_get_certificate_for_user(self):
         """
         Test to get a certificate for a user for a specific course.
@@ -367,9 +372,11 @@ class CertificateGetTests(SharedModuleStoreTestCase):
 
         self.assertEqual(cert['username'], self.student.username)
         self.assertEqual(cert['course_key'], self.web_cert_course.id)
+        self.assertEqual(cert['created'], self.now)
         self.assertEqual(cert['type'], CourseMode.VERIFIED)
         self.assertEqual(cert['status'], CertificateStatuses.downloadable)
         self.assertEqual(cert['grade'], "0.88")
+        self.assertEqual(cert['is_passing'], True)
         self.assertEqual(cert['download_url'], 'www.google.com')
 
     def test_get_certificates_for_user(self):
@@ -382,10 +389,14 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(certs[1]['username'], self.student.username)
         self.assertEqual(certs[0]['course_key'], self.web_cert_course.id)
         self.assertEqual(certs[1]['course_key'], self.pdf_cert_course.id)
+        self.assertEqual(certs[0]['created'], self.now)
+        self.assertEqual(certs[1]['created'], self.now)
         self.assertEqual(certs[0]['type'], CourseMode.VERIFIED)
         self.assertEqual(certs[1]['type'], CourseMode.HONOR)
         self.assertEqual(certs[0]['status'], CertificateStatuses.downloadable)
         self.assertEqual(certs[1]['status'], CertificateStatuses.downloadable)
+        self.assertEqual(certs[0]['is_passing'], True)
+        self.assertEqual(certs[1]['is_passing'], True)
         self.assertEqual(certs[0]['grade'], '0.88')
         self.assertEqual(certs[1]['grade'], '0.99')
         self.assertEqual(certs[0]['download_url'], 'www.google.com')
@@ -457,6 +468,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
     """Tests for generating certificates for students. """
 
     ERROR_REASON = "Kaboom!"
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(GenerateUserCertificatesTest, self).setUp('certificates.api.tracker')
@@ -617,9 +629,6 @@ class GenerateExampleCertificatesTest(TestCase):
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
-    def setUp(self):
-        super(GenerateExampleCertificatesTest, self).setUp()
-
     def test_generate_example_certs(self):
         # Generate certificates for the course
         CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
@@ -704,9 +713,6 @@ class CertificatesBrandingTest(TestCase):
     """Test certificates branding. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
-
-    def setUp(self):
-        super(CertificatesBrandingTest, self).setUp()
 
     @set_microsite(settings.MICROSITE_CONFIGURATION['test_site']['domain_prefix'])
     def test_certificate_header_data(self):

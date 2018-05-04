@@ -13,7 +13,7 @@ from ..errors import UserNotFound
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are converted to JPEGs
+PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are converted to JPEGs\
 
 _PROFILE_IMAGE_SIZES = settings.PROFILE_IMAGE_SIZES_MAP.values()
 
@@ -56,6 +56,7 @@ def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXT
         return '{}?v={}'.format(url, version) if version is not None else url
 
     return {size_display_name: _make_url(size) for size_display_name, size in settings.PROFILE_IMAGE_SIZES_MAP.items()}
+
 
 
 def get_profile_image_names(username):

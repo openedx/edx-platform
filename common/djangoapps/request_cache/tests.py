@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the request cache.
 """
 from celery.task import task
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from mock import Mock
 
 from request_cache import get_request_or_stub
@@ -31,6 +33,7 @@ class TestRequestCache(TestCase):
         cache = {"course_cache": "blah blah blah"}
         modulestore().request_cache.data.update(cache)
 
+    @override_settings(CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION=True)
     def test_clear_cache_celery(self):
         """ Test that the request cache is cleared after a task is run. """
         self._dummy_task.apply(args=(self,)).get()
@@ -180,6 +183,28 @@ class TestRequestCache(TestCase):
         result = wrapped(2, foo=5)
         self.assertEqual(result, 4)
         self.assertEqual(to_be_wrapped.call_count, 4)
+
+    def test_request_cached_mixed_unicode_str_args(self):
+        """
+        Ensure that request_cached can work with mixed str and Unicode parameters.
+        """
+        RequestCache.clear_request_cache()
+
+        def dummy_function(arg1, arg2):
+            """
+            A dummy function that expects an str and unicode arguments.
+            """
+            assert isinstance(arg1, str), 'First parameter has to be of type `str`'
+            assert isinstance(arg2, unicode), 'Second parameter has to be of type `unicode`'
+            return True
+
+        self.assertTrue(dummy_function('Hello', u'World'), 'Should be callable with ASCII chars')
+        self.assertTrue(dummy_function('H∂llå', u'Wørld'), 'Should be callable with non-ASCII chars')
+
+        wrapped = request_cached(dummy_function)
+
+        self.assertTrue(wrapped('Hello', u'World'), 'Wrapper should handle ASCII only chars')
+        self.assertTrue(wrapped('H∂llå', u'Wørld'), 'Wrapper should handle non-ASCII chars')
 
     def test_request_cached_with_none_result(self):
         """

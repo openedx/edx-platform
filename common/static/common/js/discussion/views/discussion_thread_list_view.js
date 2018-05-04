@@ -32,8 +32,8 @@
                 this.retrieveFollowed = function() {
                     return DiscussionThreadListView.prototype.retrieveFollowed.apply(self, arguments);
                 };
-                this.chooseCohort = function() {
-                    return DiscussionThreadListView.prototype.chooseCohort.apply(self, arguments);
+                this.chooseGroup = function() {
+                    return DiscussionThreadListView.prototype.chooseGroup.apply(self, arguments);
                 };
                 this.chooseFilter = function() {
                     return DiscussionThreadListView.prototype.chooseFilter.apply(self, arguments);
@@ -85,19 +85,19 @@
                 'click .forum-nav-thread-link': 'threadSelected',
                 'click .forum-nav-load-more-link': 'loadMorePages',
                 'change .forum-nav-filter-main-control': 'chooseFilter',
-                'change .forum-nav-filter-cohort-control': 'chooseCohort'
+                'change .forum-nav-filter-cohort-control': 'chooseGroup'
             };
 
             DiscussionThreadListView.prototype.initialize = function(options) {
                 var self = this;
                 this.courseSettings = options.courseSettings;
-                this.hideRefineBar = options.hideRefineBar;
                 this.supportsActiveThread = options.supportsActiveThread;
+                this.hideReadState = options.hideReadState || false;
                 this.displayedCollection = new Discussion(this.collection.models, {
                     pages: this.collection.pages
                 });
                 this.collection.on('change', this.reloadDisplayedCollection);
-                this.discussionIds = '';
+                this.discussionIds = this.$el.data('discussion-id') || '';
                 this.collection.on('reset', function(discussion) {
                     self.displayedCollection.current_page = discussion.current_page;
                     self.displayedCollection.pages = discussion.pages;
@@ -108,7 +108,7 @@
                 this.sidebar_padding = 10;
                 this.boardName = null;
                 this.current_search = '';
-                this.mode = 'all';
+                this.mode = options.mode || 'commentables';
                 this.showThreadPreview = true;
                 this.searchAlertCollection = new Backbone.Collection([], {
                     model: Backbone.Model
@@ -196,10 +196,13 @@
                 edx.HtmlUtils.append(
                     this.$el,
                     this.template({
-                        isCohorted: this.courseSettings.get('is_cohorted'),
+                        isDiscussionDivisionEnabled: this.courseSettings.get('is_discussion_division_enabled'),
                         isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
                     })
                 );
+                if (this.hideReadState) {
+                    this.$('.forum-nav-filter-main').addClass('is-hidden');
+                }
                 this.$('.forum-nav-sort-control option').removeProp('selected');
                 this.$('.forum-nav-sort-control option[value=' + this.collection.sort_preference + ']')
                     .prop('selected', true);
@@ -291,6 +294,9 @@
                 case 'followed':
                     options.user_id = window.user.id;
                     break;
+                case 'user':
+                    options.user_id = this.$el.parent().data('user-id');
+                    break;
                 case 'commentables':
                     options.commentable_ids = this.discussionIds;
                     if (this.group_id) {
@@ -326,6 +332,11 @@
                         gettext('Additional posts could not be loaded. Refresh the page and try again.')
                     );
                 };
+                /*
+                The options object is being passed to the function below from discussion/discussion.js
+                which correspondingly forms the ajax url based on the mode via the DiscussionUtil.urlFor
+                from discussion/utils.js
+                */
                 return this.collection.retrieveAnotherPage(this.mode, options, {
                     sort_key: this.$('.forum-nav-sort-control').val()
                 }, error);
@@ -350,7 +361,8 @@
                             neverRead: neverRead,
                             threadUrl: thread.urlFor('retrieve'),
                             threadPreview: threadPreview,
-                            showThreadPreview: this.showThreadPreview
+                            showThreadPreview: this.showThreadPreview,
+                            hideReadState: this.hideReadState
                         },
                         thread.toJSON()
                     );
@@ -403,7 +415,7 @@
                         return $(elem).data('discussion-id');
                     }).get();
                     this.retrieveDiscussions(discussionIds);
-                    return this.$('.forum-nav-filter-cohort').toggle($item.data('cohorted') === true);
+                    return this.$('.forum-nav-filter-cohort').toggle($item.data('divided') === true);
                 }
             };
 
@@ -412,7 +424,7 @@
                 return this.retrieveFirstPage();
             };
 
-            DiscussionThreadListView.prototype.chooseCohort = function() {
+            DiscussionThreadListView.prototype.chooseGroup = function() {
                 this.group_id = this.$('.forum-nav-filter-cohort-control :selected').val();
                 return this.retrieveFirstPage();
             };

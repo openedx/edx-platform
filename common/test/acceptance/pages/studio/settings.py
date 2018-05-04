@@ -3,16 +3,15 @@
 Course Schedule and Details Settings page.
 """
 from __future__ import unicode_literals
+
 import os
-from bok_choy.promise import EmptyPromise
+
 from bok_choy.javascript import requirejs
+from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
-from common.test.acceptance.pages.studio.utils import (
-    press_the_notification_button,
-    type_in_codemirror
-)
+from common.test.acceptance.pages.studio.utils import press_the_notification_button, type_in_codemirror
 
 
 @requirejs('js/factories/settings')
@@ -285,6 +284,8 @@ class SettingsPage(CoursePage):
                 '#alert-confirmation-title',
                 'Save confirmation message is visible'
             )
+        # After visibility an ajax call is in process, waiting for that to complete
+        self.wait_for_ajax()
 
     def refresh_page(self, wait_for_confirmation=True):
         """

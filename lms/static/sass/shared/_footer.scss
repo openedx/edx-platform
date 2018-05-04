@@ -37,6 +37,11 @@
       }
     }
 
+    .icon {
+      font-family: 'FontAwesome';
+      font-style: normal;
+    }
+
     // colophon
     .colophon {
       @include span-columns(8);
@@ -127,11 +132,7 @@
         display: inline-block;
         font-size: em(11);
 
-      }
-
-      .nav-legal-02 a {
-
-        &:before {
+        &:not(:first-child) a:before {
           margin-right: ($baseline/4);
           content: "-";
         }
@@ -184,6 +185,13 @@
         &:hover {
           border-bottom: none;
         }
+      }
+    }
+
+    .footer-language-selector {
+      label[for=footer-language-select] {
+        display: inline-block;
+        cursor: initial;
       }
     }
   }

@@ -2,15 +2,10 @@
 Test the partitions and partitions service
 
 """
-
-import json
-from django.conf import settings
 import django.test
 from mock import patch
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
-from courseware.masquerade import handle_ajax, setup_masquerade
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
@@ -19,6 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DAT
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
@@ -344,30 +340,17 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
             scheme_id='cohort'
         )
         self.course.user_partitions.append(self.user_partition)
-        self.session = {}
         modulestore().update_item(self.course, self.test_user.id)
 
     def _verify_masquerade_for_group(self, group):
         """
         Verify that the masquerade works for the specified group id.
         """
-        # Send the request to set the masquerade
-        request_json = {
-            "role": "student",
-            "user_partition_id": self.user_partition.id,
-            "group_id": group.id if group is not None else None
-        }
-        request = self._create_mock_json_request(
-            self.test_user,
-            data=request_json,
-            session=self.session
+        self.ensure_masquerade_as_group_member(  # pylint: disable=no-member
+            self.user_partition.id,
+            group.id if group is not None else None
         )
-        response = handle_ajax(request, unicode(self.course.id))
-        # pylint has issues analyzing this class (maybe due to circular imports?)
-        self.assertEquals(response.status_code, 200)  # pylint: disable=no-member
 
-        # Now setup the masquerade for the test user
-        setup_masquerade(request, self.course.id, True)
         scheme = self.user_partition.scheme
         self.assertEqual(
             scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
@@ -383,7 +366,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         self._verify_masquerade_for_group(self.user_partition.groups[1])
         self._verify_masquerade_for_group(None)
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_group_masquerade(self):
         """
@@ -391,7 +374,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         """
         self._verify_masquerade_for_all_groups()
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_group_masquerade_with_cohort(self):
         """

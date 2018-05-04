@@ -14,6 +14,9 @@ import hashlib
 CODE_PROLOG = """\
 from __future__ import division
 
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
+
 import random as random_module
 import sys
 random = random_module.Random(%r)

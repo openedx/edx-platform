@@ -56,7 +56,6 @@
             'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
-            'backbone.validation': 'common/js/vendor/backbone-validation-min',
             'backbone-relational': 'xmodule_js/common_static/js/vendor/backbone-relational.min',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
@@ -72,11 +71,7 @@
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             'mock-ajax': 'xmodule_js/common_static/js/vendor/mock-ajax',
-
-            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
+            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'js/spec/test_utils': 'js/spec/test_utils'
@@ -287,17 +282,16 @@
         'js/spec/views/pages/library_users_spec',
         'js/spec/views/modals/base_modal_spec',
         'js/spec/views/modals/edit_xblock_spec',
+        'js/spec/views/modals/move_xblock_modal_spec',
         'js/spec/views/modals/validation_error_modal_spec',
+        'js/spec/views/move_xblock_spec',
         'js/spec/views/settings/main_spec',
         'js/spec/factories/xblock_validation_spec',
         'js/certificates/spec/models/certificate_spec',
         'js/certificates/spec/views/certificate_details_spec',
         'js/certificates/spec/views/certificate_editor_spec',
         'js/certificates/spec/views/certificates_list_spec',
-        'js/certificates/spec/views/certificate_preview_spec',
-        'js/spec/models/auto_auth_model_spec',
-        'js/spec/views/programs/program_creator_spec',
-        'js/spec/views/programs/program_details_spec'
+        'js/certificates/spec/views/certificate_preview_spec'
     ];
 
     i = 0;

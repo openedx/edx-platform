@@ -2,14 +2,16 @@
 Test helpers for testing course block transformers.
 """
 from mock import patch
+
 from course_modes.models import CourseMode
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from lms.djangoapps.courseware.access import has_access
+from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.djangoapps.courseware.access import has_access
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...api import get_course_blocks
 
@@ -22,7 +24,8 @@ class TransformerRegistryTestMixin(object):
     def setUp(self):
         super(TransformerRegistryTestMixin, self).setUp()
         self.patcher = patch(
-            'openedx.core.lib.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
+            'openedx.core.djangoapps.content.block_structure.transformer_registry.'
+            'TransformerRegistry.get_registered_transformers'
         )
         mock_registry = self.patcher.start()
         mock_registry.return_value = {self.TRANSFORMER_CLASS_TO_TEST}
@@ -30,6 +33,7 @@ class TransformerRegistryTestMixin(object):
 
     def tearDown(self):
         self.patcher.stop()
+        clear_registered_transformers_cache()
 
 
 class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):

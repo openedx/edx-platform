@@ -8,15 +8,13 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.views.decorators.cache import cache_control
-
 from opaque_keys.edx.keys import CourseKey
 
-from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.views.api import require_level
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from xmodule.modulestore.django import modulestore
-
 
 # Grade book: max students per page
 MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 20

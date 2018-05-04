@@ -1,10 +1,11 @@
 """ Calculation of Miller indices """
 
-import numpy as np
-import math
-import fractions as fr
 import decimal
+import fractions as fr
 import json
+import math
+
+import numpy as np
 
 
 def lcm(a, b):

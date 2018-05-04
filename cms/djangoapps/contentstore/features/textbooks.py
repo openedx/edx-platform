@@ -1,9 +1,10 @@
 # pylint: disable=missing-docstring
 
-from lettuce import world, step
 from django.conf import settings
-from common import upload_file
+from lettuce import step, world
 from nose.tools import assert_equal
+
+from common import upload_file
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

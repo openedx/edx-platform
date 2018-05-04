@@ -3,9 +3,9 @@
 Also, may be this module is the place for other chemistry-related grade functions. TODO: discuss it.
 """
 
+import itertools
 import json
 import unittest
-import itertools
 
 
 def vsepr_parse_user_answer(user_input):

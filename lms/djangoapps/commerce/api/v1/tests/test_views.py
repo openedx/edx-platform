@@ -1,9 +1,10 @@
 """ Commerce API v1 view tests. """
-from datetime import datetime, timedelta
 import itertools
 import json
+from datetime import datetime, timedelta
 
 import ddt
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
@@ -12,17 +13,15 @@ from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
 from flaky import flaky
 from nose.plugins.attrib import attr
-import pytz
 from rest_framework.utils.encoders import JSONEncoder
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
-from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
 from commerce.tests.mocks import mock_order_endpoint
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
-from student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 PASSWORD = 'test'
 JSON_CONTENT_TYPE = 'application/json'
@@ -391,7 +390,6 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
 
 @attr(shard=1)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class OrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v1:orders:detail'
@@ -419,7 +417,7 @@ class OrderViewTests(UserMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_login_required(self):
-        """ The view should return 403 if the user is not logged in. """
+        """ The view should return 401 if the user is not logged in. """
         self.client.logout()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)

@@ -4,78 +4,52 @@ test views
 import datetime
 import json
 import re
-import pytz
-import ddt
 import urlparse
+
+import ddt
+import pytz
+from ccx_keys.locator import CCXLocator
 from dateutil.tz import tzutc
-from mock import patch, MagicMock
+from django.conf import settings
+from django.core.urlresolvers import resolve, reverse
+from django.test import RequestFactory
+from django.test.utils import override_settings
+from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
+from mock import MagicMock, patch
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id
+from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tabs import get_course_tab_list
 from courseware.testutils import FieldOverrideTestMixin
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_common.utils import are_permissions_roles_seeded
-from lms.djangoapps.instructor.access import (
-    allow_access,
-    list_with_level,
-)
-
-from django.conf import settings
-from django.core.urlresolvers import reverse, resolve
-from django.utils.translation import ugettext as _
-from django.utils.timezone import UTC
-from django.test.utils import override_settings
-from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response
-from request_cache.middleware import RequestCache
-from opaque_keys.edx.keys import CourseKey
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole,
-)
-from student.models import (
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-)
-from student.tests.factories import (
-    AdminFactory,
-    CourseEnrollmentFactory,
-    UserFactory,
-)
-
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE)
-from xmodule.modulestore.tests.factories import (
-    CourseFactory,
-    ItemFactory,
-    SampleCourseFactory,
-)
-from ccx_keys.locator import CCXLocator
-
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from lms.djangoapps.ccx.tests.utils import (
-    CcxTestCase,
-    flatten,
-)
-from lms.djangoapps.ccx.utils import (
-    ccx_course,
-    is_email,
-)
+from lms.djangoapps.ccx.tests.utils import CcxTestCase, flatten
+from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
-
+from lms.djangoapps.instructor.access import allow_access, list_with_level
+from request_cache.middleware import RequestCache
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
+from xmodule.x_module import XModuleMixin
 
 
 def intercept_renderer(path, context):

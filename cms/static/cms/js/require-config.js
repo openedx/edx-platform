@@ -1,26 +1,82 @@
 /* globals _, requirejs */
-/* eslint-disable quote-props */
+/* eslint-disable quote-props, no-console, no-plusplus */
 
 (function(require, define) {
     'use strict';
 
+    var defineDependency, librarySetup;
+
+    // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
+    // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
+    // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
-        // MathJax Fast Preview was introduced in 2.5. However, it
-        // causes undesirable flashing/font size changes when
-        // MathJax is used for interactive preview (equation editor).
-        // Setting processSectionDelay to 0 (see below) fully eliminates
-        // fast preview, but to reduce confusion, we are also setting
-        // the option as displayed in the context menu to false.
-        // When upgrading to 2.6, check if this variable name changed.
-        window.MathJax = {
-            menuSettings: {CHTMLpreview: false}
+        defineDependency = function(globalName, name, noShim) {
+            var getGlobalValue = function() {
+                    var globalNamePath = globalName.split('.'),
+                        result = window,
+                        i;
+                    for (i = 0; i < globalNamePath.length; i++) {
+                        result = result[globalNamePath[i]];
+                    }
+                    return result;
+                },
+                globalValue = getGlobalValue();
+            if (globalValue) {
+                if (noShim) {
+                    define(name, {});
+                } else {
+                    define(name, [], function() { return globalValue; });
+                }
+            } else {
+                console.error('Expected library to be included on page, but not found on window object: ' + name);
+            }
         };
-        // Since we are serving the gettext catalog as static files,
-        // the URL for the gettext file will vary depending on which locale
-        // needs to be served. To handle this, we load the correct file in the
-        // rendered template and then use this to ensure that RequireJS knows
-        // how to find it.
-        define('gettext', function() { return window.gettext; });
+
+        librarySetup = function() {
+            // This is the function to setup all the vendor libraries
+
+            // Underscore.string no longer installs itself directly on '_'. For compatibility with existing
+            // code, add it to '_' with its previous name.
+            if (window._ && window.s) {
+                window._.str = window.s;
+            }
+
+            window.$.ajaxSetup({
+                contents: {
+                    script: false
+                }
+            });
+
+            // MathJax Fast Preview was introduced in 2.5. However, it
+            // causes undesirable flashing/font size changes when
+            // MathJax is used for interactive preview (equation editor).
+            // Setting processSectionDelay to 0 (see below) fully eliminates
+            // fast preview, but to reduce confusion, we are also setting
+            // the option as displayed in the context menu to false.
+            // When upgrading to 2.6, check if this variable name changed.
+            window.MathJax = {
+                menuSettings: {CHTMLpreview: false}
+            };
+        };
+
+        defineDependency('jQuery', 'jquery');
+        defineDependency('jQuery', 'jquery-migrate');
+        defineDependency('_', 'underscore');
+        defineDependency('s', 'underscore.string');
+        defineDependency('gettext', 'gettext');
+        defineDependency('Logger', 'logger');
+        defineDependency('URI', 'URI');
+        defineDependency('jQuery.url', 'jquery.url');
+        defineDependency('Backbone', 'backbone');
+
+        // Add the UI Toolkit helper classes that have been installed in the 'edx' namespace
+        defineDependency('edx.HtmlUtils', 'edx-ui-toolkit/js/utils/html-utils');
+        defineDependency('edx.StringUtils', 'edx-ui-toolkit/js/utils/string-utils');
+
+        // utility.js adds two functions to the window object, but does not return anything
+        defineDependency('isExternal', 'utility', true);
+
+        librarySetup();
     }
 
     require.config({
@@ -59,7 +115,6 @@
             'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'common/js/vendor/backbone',
             'backbone-relational': 'js/vendor/backbone-relational.min',
-            'backbone.validation': 'common/js/vendor/backbone-validation-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
@@ -73,6 +128,7 @@
             'ieshim': 'js/src/ie_shim',
             'tooltip_manager': 'js/src/tooltip_manager',
             'draggabilly': 'js/vendor/draggabilly',
+            'hls': 'common/js/vendor/hls',
 
             // Files needed for Annotations feature
             'annotator': 'js/vendor/ova/annotator-full',
@@ -97,7 +153,7 @@
             // end of Annotation tool files
 
             // externally hosted files
-            'mathjax': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
+            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': [
                 // youtube URL does not end in '.js'. We add '?noext' to the path so
                 // that require.js adds the '.js' to the query component of the URL,

@@ -1,16 +1,20 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
-import pytz
 
-from collections import namedtuple, defaultdict
+import pytz
 from config_models.models import ConfigurationModel
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import RequestCache, ns_request_cached
 
 Mode = namedtuple('Mode',
                   [
@@ -116,8 +120,21 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
-    DEFAULT_MODE_SLUG = AUDIT
+    DEFAULT_MODE = Mode(
+        settings.COURSE_MODE_DEFAULTS['slug'],
+        settings.COURSE_MODE_DEFAULTS['name'],
+        settings.COURSE_MODE_DEFAULTS['min_price'],
+        settings.COURSE_MODE_DEFAULTS['suggested_prices'],
+        settings.COURSE_MODE_DEFAULTS['currency'],
+        settings.COURSE_MODE_DEFAULTS['expiration_datetime'],
+        settings.COURSE_MODE_DEFAULTS['description'],
+        settings.COURSE_MODE_DEFAULTS['sku'],
+        settings.COURSE_MODE_DEFAULTS['bulk_sku'],
+    )
+    DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
+
+    # Modes utilized for audit/free enrollments
+    AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
@@ -140,6 +157,8 @@ class CourseMode(models.Model):
     # use "honor"
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
     DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
+
+    CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
@@ -265,6 +284,7 @@ class CourseMode(models.Model):
         return [mode.to_tuple() for mode in found_course_modes]
 
     @classmethod
+    @ns_request_cached(CACHE_NAMESPACE)
     def modes_for_course(cls, course_id, include_expired=False, only_selectable=True):
         """
         Returns a list of the non-expired modes for a given course id
@@ -340,7 +360,7 @@ class CourseMode(models.Model):
         return {mode.slug: mode for mode in modes}
 
     @classmethod
-    def mode_for_course(cls, course_id, mode_slug, modes=None):
+    def mode_for_course(cls, course_id, mode_slug, modes=None, include_expired=False):
         """Returns the mode for the course corresponding to mode_slug.
 
         Returns only non-expired modes.
@@ -356,12 +376,15 @@ class CourseMode(models.Model):
                 of course modes.  This can be used to avoid an additional
                 database query if you have already loaded the modes list.
 
+            include_expired (bool): If True, expired course modes will be included
+                in the returned values. If False, these modes will be omitted.
+
         Returns:
             Mode
 
         """
         if modes is None:
-            modes = cls.modes_for_course(course_id)
+            modes = cls.modes_for_course(course_id, include_expired=include_expired)
 
         matched = [m for m in modes if m.slug == mode_slug]
         if matched:
@@ -661,6 +684,13 @@ class CourseMode(models.Model):
         return u"{} : {}, min={}".format(
             self.course_id, self.mode_slug, self.min_price
         )
+
+
+@receiver(models.signals.post_save, sender=CourseMode)
+@receiver(models.signals.post_delete, sender=CourseMode)
+def invalidate_course_mode_cache(sender, **kwargs):   # pylint: disable=unused-argument
+    """Invalidate the cache of course modes. """
+    RequestCache.clear_request_cache(name=CourseMode.CACHE_NAMESPACE)
 
 
 class CourseModesArchive(models.Model):

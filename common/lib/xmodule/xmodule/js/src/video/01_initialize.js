@@ -1,4 +1,4 @@
-/* eslint no-console:0 */
+/* eslint-disable no-console, no-param-reassign */
 /**
  * @file Initialize module works with the JSON config, and sets up various
  * settings, parameters, variables. After all setup actions are performed, it
@@ -278,6 +278,18 @@ function(VideoPlayer, i18n, moment, _) {
         return false;
     }
 
+    /**
+     * Extract HLS video URLs from available video URLs.
+     *
+     * @param {object} state The object contaning the state (properties, methods, modules) of the Video player.
+     * @returns Array of available HLS video source urls.
+     */
+    function extractHLSVideoSources(state) {
+        return _.filter(state.config.sources, function(source) {
+            return /\.m3u8$/.test(source);
+        });
+    }
+
     // function _prepareHTML5Video(state)
     // The function prepare HTML5 video, parse HTML5
     // video sources etc.
@@ -325,6 +337,7 @@ function(VideoPlayer, i18n, moment, _) {
         state.controlHideTimeout = null;
         state.captionState = 'invisible';
         state.captionHideTimeout = null;
+        state.HLSVideoSources = extractHLSVideoSources(state);
     }
 
     function _initializeModules(state, i18n) {

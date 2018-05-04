@@ -3,45 +3,36 @@
 import datetime
 import json
 import logging
-import pytz
 
+import pytz
+from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
+from edx_rest_framework_extensions.authentication import JwtAuthentication
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ccx_keys.locator import CCXLocator
 from courseware import courses
-from xmodule.modulestore.django import SignalHandler
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from lms.djangoapps.instructor.enrollment import (
-    enroll_email,
-    get_email_params,
-)
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api import (
-    authentication,
-    permissions,
-)
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
-
-
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
-from lms.djangoapps.ccx.overrides import (
-    override_field_for_ccx,
-)
+from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     assign_staff_role_to_ccx,
-    is_email,
     get_course_chapters,
+    is_email
 )
+from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.api import authentication, permissions
+from student.models import CourseEnrollment
+from student.roles import CourseCcxCoachRole
+from xmodule.modulestore.django import SignalHandler
+
 from .paginators import CCXAPIPagination
 from .serializers import CCXCourseSerializer
 

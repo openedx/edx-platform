@@ -6,28 +6,34 @@ from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
 
+from opaque_keys.edx.locator import LibraryLocator
+
+from . import config
 from .api import clear_course_from_cache
-from .tasks import update_course_in_cache
+from .tasks import update_course_in_cache_v2
 
 
 @receiver(SignalHandler.course_published)
-def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+def _update_block_structure_on_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that a course has been published in the module
     store and creates/updates the corresponding cache entry.
+    Ignores publish signals from content libraries.
     """
-    clear_course_from_cache(course_key)
+    if isinstance(course_key, LibraryLocator):
+        return
 
-    # The countdown=0 kwarg ensures the call occurs after the signal emitter
-    # has finished all operations.
-    update_course_in_cache.apply_async(
-        [unicode(course_key)],
-        countdown=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY'],
+    if config.waffle().is_enabled(config.INVALIDATE_CACHE_ON_PUBLISH):
+        clear_course_from_cache(course_key)
+
+    update_course_in_cache_v2.apply_async(
+        kwargs=dict(course_id=unicode(course_key)),
+        countdown=settings.BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
     )
 
 
 @receiver(SignalHandler.course_deleted)
-def _listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+def _delete_block_structure_on_course_delete(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that a course has been deleted from the
     module store and invalidates the corresponding cache entry if one

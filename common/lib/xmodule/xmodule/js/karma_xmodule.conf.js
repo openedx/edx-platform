@@ -39,6 +39,7 @@ var options = {
         {pattern: 'common_static/js/src/utility.js', included: true},
         {pattern: 'common_static/js/test/add_ajax_prefix.js', included: true},
         {pattern: 'common_static/js/test/i18n.js', included: true},
+        {pattern: 'common_static/common/js/vendor/hls.js', included: true},
         {pattern: 'public/js/split_test_staff.js', included: true},
         {pattern: 'src/word_cloud/d3.min.js', included: true},
 
@@ -77,7 +78,8 @@ var options = {
     ],
 
     fixtureFiles: [
-        {pattern: 'fixtures/*.*'}
+        {pattern: 'fixtures/*.*'},
+        {pattern: 'fixtures/hls/**/*.*'}
     ],
 
     runFiles: [

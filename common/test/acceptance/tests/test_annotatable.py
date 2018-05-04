@@ -3,13 +3,13 @@
 E2E tests for the LMS.
 """
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.annotation_component import AnnotationComponentPage
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from textwrap import dedent
-from common.test.acceptance.tests.helpers import disable_animations
+
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.annotation_component import AnnotationComponentPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.tests.helpers import UniqueCourseTest, disable_animations
 
 
 def _correctness(choice, target):

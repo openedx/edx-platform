@@ -1,12 +1,11 @@
 """A openid store using django cache"""
 
-from openid.store.interface import OpenIDStore
-from openid.store import nonce
-
-from django.core.cache import cache
-
 import logging
 import time
+
+from django.core.cache import cache
+from openid.store import nonce
+from openid.store.interface import OpenIDStore
 
 DEFAULT_ASSOCIATIONS_TIMEOUT = 60
 DEFAULT_NONCE_TIMEOUT = 600

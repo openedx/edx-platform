@@ -5,8 +5,9 @@ from mock import patch
 from paver.easy import call_task
 
 import pavelib.js_test
-from .utils import PaverTestCase
 from pavelib.utils.envs import Env
+
+from .utils import PaverTestCase
 
 
 @ddt.ddt
@@ -26,7 +27,8 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
         u"--single-run={single_run} "
         u"--capture-timeout=60000 "
         u"--junitreportpath="
-        u"{platform_root}/reports/javascript/javascript_xunit-{suite}.xml"
+        u"{platform_root}/reports/javascript/javascript_xunit-{suite}.xml "
+        u"--browsers={browser}"
     )
     EXPECTED_COVERAGE_OPTIONS = (
         u' --coverage --coveragereportpath={platform_root}/reports/javascript/coverage-{suite}.xml'
@@ -129,6 +131,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
                     single_run='false' if dev_mode else 'true',
                     suite=suite,
                     platform_root=self.platform_root,
+                    browser=Env.KARMA_BROWSER,
                 ),
             )
             if is_coverage:

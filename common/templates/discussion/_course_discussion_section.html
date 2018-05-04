@@ -1,57 +1,6 @@
 ## mako
 
-<%!
-from json import dumps as json_dumps
-from django.utils.translation import ugettext as _
-from django_comment_client.permissions import has_permission
-%>
-<section class="discussion discussion-board container" id="discussion-container"
-       data-roles="${roles}"
-       data-course-id="${unicode(course.id)}"
-       data-course-name="${course.display_name_with_default}"
-       data-user-info="${user_info}"
-       data-threads="${threads}"
-       data-thread-pages="${thread_pages}"
-       data-content-info="${annotated_content_info}"
-       data-sort-preference="${sort_preference}"
-       data-flag-moderator="${flag_moderator}"
-       data-user-cohort-id="${user_cohort}"
-       data-course-settings="${course_settings}"
-       data-user-create-comment="${json_dumps(can_create_comment)}"
-       data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
-       data-read-only="false">
-    <header class="page-header has-secondary">
-        ## Breadcrumb navigation
-        <div class="page-header-main">
-            <nav aria-label="${_('Discussions')}" class="sr-is-focusable" tabindex="-1">
-                <div class="has-breadcrumbs"></div>
-            </nav>
-        </div>
-        <div class="page-header-secondary">
-            ## Add Post button
-            % if has_permission(user, 'create_thread', course.id):
-            <div class="form-actions">
-                <button class="btn btn-small new-post-btn">${_("Add a Post")}</button>
-            </div>
-            % endif
-            ## Search box
-            <div class="forum-search"></div>
-        </div>
-    </header>
-    <div class="page-content">
-        <div class="discussion-body layout layout-1t2t">
-            <aside class="forum-nav layout-col layout-col-a" role="complementary" aria-label="${_("Discussion thread list")}">
-                <%include file="_filter_dropdown.html" />
-                <div class="discussion-thread-list-container"></div>
-            </aside>
-
-            <main id="main" aria-label="Content" tabindex="-1" class="discussion-column layout-col layout-col-b">
-                <article class="new-post-article is-hidden" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
-                <div class="forum-content"></div>
-            </main>
-        </div>
-    </div>
-</section>
-
-<%include file="_underscore_templates.html" />
-<%include file="_thread_list_template.html" />
+<div>This xblock has been deprecated since ginkgo upgrade.
+    Course wide discussions are enabled by default.
+    However, discussion tab can be disabled via course feature flags in apros.
+</div>

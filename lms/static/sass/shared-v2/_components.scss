@@ -62,12 +62,8 @@
         vertical-align: middle;
     }
 
-    .search-field {
-        transition: all $tmg-f2 ease-in-out;
-        border: 1px solid $lms-border-color;
-        border-radius: 3px;
-        padding: $baseline/4 $baseline*1.5;
-        font-family: inherit;
+    .search-input {
+        width: 12rem;
     }
 
     .action-search {
@@ -91,4 +87,72 @@
             border-width: 0;
         }
     }
+}
+
+.wrapper-preview-menu {
+  @include clearfix();
+  @include box-sizing(border-box);
+  margin: 0 auto 0;
+  padding: ($baseline*0.75);
+  background-color: $lms-preview-menu-color;
+
+  @media print {
+    display: none;
+  }
+
+  .preview-menu {
+    max-width: $lms-max-width;
+    width: auto;
+    margin: 0 auto;
+  }
+
+  .preview-actions {
+    @include margin-left(0);
+    display: inline-block;
+    margin-bottom: 0;
+
+    .action-preview {
+      display: inline-block;
+
+      .action-preview-label {
+        @include margin-right($baseline/2);
+        display: inline-block;
+        margin-bottom: 0;
+        vertical-align: middle;
+      }
+
+      .action-preview-select {
+        @include margin-right($baseline);
+      }
+
+      .action-preview-username-container {
+        display: none;
+
+        .action-preview-username {
+          vertical-align: middle;
+          height: 25px;
+        }
+      }
+    }
+  }
+
+  .preview-specific-student-notice {
+    margin-top: ($baseline/2);
+    font-size: 90%;
+
+    > p {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.section {
+    .icon {
+        width: 20px;
+        text-align: center;
+    }
+}
+
+.section:not(:first-child) {
+    margin-top: $baseline;
 }

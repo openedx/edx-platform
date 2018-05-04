@@ -1,7 +1,8 @@
 """
 Blocks API Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
+
 from .block_counts import BlockCountsTransformer
 from .block_depth import BlockDepthTransformer
 from .navigation import BlockNavigationTransformer
@@ -22,7 +23,8 @@ class BlocksAPITransformer(BlockStructureTransformer):
     Note: BlockDepthTransformer must be executed before BlockNavigationTransformer.
     """
 
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
@@ -43,7 +45,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         transform method.
         """
         # collect basic xblock fields
-        block_structure.request_xblock_fields('graded', 'format', 'display_name', 'category', 'due')
+        block_structure.request_xblock_fields('graded', 'format', 'display_name', 'category', 'due', 'show_correctness')
 
         # collect data from containing transformers
         StudentViewTransformer.collect(block_structure)

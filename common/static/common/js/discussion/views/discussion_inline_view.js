@@ -24,7 +24,6 @@
 
         initialize: function(options) {
             var match;
-
             this.$el = options.el;
             this.readOnly = options.readOnly;
             this.showByDefault = options.showByDefault || false;
@@ -32,12 +31,21 @@
             this.listenTo(this.model, 'change', this.render);
             this.escKey = 27;
 
+            if (options.startHeader !== undefined) {
+                this.startHeader = options.startHeader;
+            } else {
+                this.startHeader = 4; // Start the header levels at H<startHeader>
+            }
+
             match = this.page_re.exec(window.location.href);
             if (match) {
                 this.page = parseInt(match[1], 10);
             } else {
                 this.page = 1;
             }
+
+            this.defaultSortKey = 'activity';
+            this.defaultSortOrder = 'desc';
 
             // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
             // pass showByDefault as an option. This code will open it on initialization.
@@ -48,7 +56,8 @@
 
         loadDiscussions: function($elem, error) {
             var discussionId = this.$el.data('discussion-id'),
-                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page),
+                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page)
+                    + ('&sort_key=' + this.defaultSortKey) + ('&sort_order=' + this.defaultSortOrder),
                 self = this;
 
             DiscussionUtil.safeAjax({
@@ -69,7 +78,6 @@
             var discussionHtml,
                 user = new DiscussionUser(response.user_info),
                 self = this;
-
             $elem.focus();
 
             window.user = user;
@@ -77,7 +85,8 @@
             Content.loadContentInfos(response.annotated_content_info);
             DiscussionUtil.loadRoles(response.roles);
 
-            this.course_settings = new DiscussionCourseSettings(response.course_settings);
+            this.courseSettings = new DiscussionCourseSettings(response.course_settings);
+            this.is_commentable_divided = response.is_commentable_divided;
 
             this.discussion = new Discussion(undefined, {pages: response.num_pages});
             this.discussion.reset(response.discussion_data, {
@@ -100,8 +109,7 @@
             this.threadListView = new DiscussionThreadListView({
                 el: this.$('.inline-threads'),
                 collection: self.discussion,
-                courseSettings: self.course_settings,
-                hideRefineBar: true  // TODO: re-enable the search/filter bar when it works correctly
+                courseSettings: self.courseSettings
             });
 
             this.threadListView.render();
@@ -115,9 +123,10 @@
             this.newPostView = new NewPostView({
                 el: this.newPostForm,
                 collection: this.discussion,
-                course_settings: this.course_settings,
+                course_settings: this.courseSettings,
                 topicId: discussionId,
-                is_commentable_cohorted: response.is_commentable_cohorted
+                startHeader: this.startHeader,
+                is_commentable_divided: response.is_commentable_divided
             });
 
             this.newPostView.render();
@@ -143,7 +152,9 @@
                 el: this.$('.forum-content'),
                 model: thread,
                 mode: 'inline',
-                course_settings: this.course_settings
+                startHeader: this.startHeader,
+                courseSettings: this.courseSettings,
+                is_commentable_divided: this.is_commentable_divided
             });
             this.threadView.render();
             this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
@@ -190,6 +201,7 @@
                     });
                 }
             }
+            this.toggleDiscussionBtn.focus();
         },
 
         hideDiscussion: function() {

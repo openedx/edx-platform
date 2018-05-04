@@ -1,14 +1,9 @@
 """ Certificates API v0 URLs. """
 
 from django.conf import settings
-from django.conf.urls import (
-    include,
-    patterns,
-    url,
-)
+from django.conf.urls import include, patterns, url
 
 from lms.djangoapps.certificates.apis.v0 import views
-
 
 CERTIFICATES_URLS = patterns(
     '',

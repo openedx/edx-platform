@@ -2,9 +2,11 @@
 Tests for pavelib/utils/test/utils
 """
 
-from pavelib.utils.test.utils import check_firefox_version, MINIMUM_FIREFOX_VERSION
 import unittest
+
 from mock import patch
+
+from pavelib.utils.test.utils import MINIMUM_FIREFOX_VERSION, check_firefox_version
 
 
 class TestUtils(unittest.TestCase):

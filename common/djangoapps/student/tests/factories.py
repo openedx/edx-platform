@@ -1,22 +1,32 @@
 """Provides factories for student models."""
 import random
-
-from student.models import (User, UserProfile, Registration,
-                            CourseEnrollmentAllowed, CourseEnrollment,
-                            PendingEmailChange, UserStanding,
-                            CourseAccessRole)
-from course_modes.models import CourseMode
-from django.contrib.auth.models import Group, AnonymousUser
 from datetime import datetime
+from uuid import uuid4
+
 import factory
+from django.contrib.auth.models import AnonymousUser, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from factory import lazy_attribute
 from factory.django import DjangoModelFactory
-from uuid import uuid4
-from pytz import UTC
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pytz import UTC
+
+from course_modes.models import CourseMode
+from student.models import (
+    CourseAccessRole,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    PendingEmailChange,
+    Registration,
+    User,
+    UserProfile,
+    UserStanding
+)
 
 # Factories are self documenting
 # pylint: disable=missing-docstring
+
+TEST_PASSWORD = 'test'
 
 
 class GroupFactory(DjangoModelFactory):
@@ -81,9 +91,11 @@ class UserFactory(DjangoModelFactory):
         model = User
         django_get_or_create = ('email', 'username')
 
+    _DEFAULT_PASSWORD = 'test'
+
     username = factory.Sequence(u'robot{0}'.format)
     email = factory.Sequence(u'robot+test+{0}@edx.org'.format)
-    password = factory.PostGenerationMethodCall('set_password', 'test')
+    password = factory.PostGenerationMethodCall('set_password', _DEFAULT_PASSWORD)
     first_name = factory.Sequence(u'Robot{0}'.format)
     last_name = 'Test'
     is_staff = False
@@ -121,6 +133,10 @@ class AnonymousUserFactory(factory.Factory):
 
 class AdminFactory(UserFactory):
     is_staff = True
+
+
+class SuperuserFactory(UserFactory):
+    is_superuser = True
 
 
 class CourseEnrollmentFactory(DjangoModelFactory):
@@ -161,3 +177,18 @@ class PendingEmailChangeFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     new_email = factory.Sequence(u'new+email+{0}@edx.org'.format)
     activation_key = factory.Sequence(u'{:0<30d}'.format)
+
+
+class ContentTypeFactory(DjangoModelFactory):
+    class Meta(object):
+        model = ContentType
+
+    app_label = factory.Faker('app_name')
+
+
+class PermissionFactory(DjangoModelFactory):
+    class Meta(object):
+        model = Permission
+
+    codename = factory.Faker('codename')
+    content_type = factory.SubFactory(ContentTypeFactory)

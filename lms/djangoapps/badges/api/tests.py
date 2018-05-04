@@ -1,7 +1,7 @@
 """
 Tests for the badges API views.
 """
-from ddt import ddt, data, unpack
+from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr

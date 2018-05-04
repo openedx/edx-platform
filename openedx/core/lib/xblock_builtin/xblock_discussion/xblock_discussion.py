@@ -39,7 +39,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this component"),
+        help=_("The display name for this component."),
         default="Discussion",
         scope=Scope.settings
     )
@@ -103,7 +103,15 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         works in conjunction with the Django pipeline to ensure that in development mode
         the files are loaded individually, but in production just the single bundle is loaded.
         """
-        return get_js_dependencies('discussion_vendor')
+        vendor_dependencies = get_js_dependencies('discussion_vendor')
+        base_vendor_dependencies = [
+            'edx-ui-toolkit/js/utils/global-loader.js',
+            'edx-ui-toolkit/js/utils/string-utils.js',
+            'edx-ui-toolkit/js/utils/html-utils.js',
+            'js/vendor/URI.min.js',
+            'js/vendor/jquery.leanModal.js'
+        ]
+        return base_vendor_dependencies + vendor_dependencies
 
     @staticmethod
     def js_dependencies():

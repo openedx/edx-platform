@@ -1,63 +1,54 @@
 # -*- coding: utf-8 -*-
 
 import copy
-import mock
 import shutil
-import lxml.html
-from lxml import etree
-import ddt
-
 from datetime import timedelta
-from fs.osfs import OSFS
-from json import loads
-from path import Path as path
-from textwrap import dedent
-from uuid import uuid4
 from functools import wraps
+from json import loads
+from textwrap import dedent
 from unittest import SkipTest
+from uuid import uuid4
 
+import ddt
+import lxml.html
+import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from openedx.core.lib.tempdir import mkdtemp_clean
-from common.test.utils import XssTestMixin
-from contentstore.tests.utils import parse_json, AjaxEnabledTestClient, CourseTestCase
-from contentstore.views.component import ADVANCED_COMPONENT_TYPES
-
 from edxval.api import create_video, get_videos_for_course
-
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
-from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from fs.osfs import OSFS
+from lxml import etree
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from path import Path as path
 
-from xmodule.capa_module import CapaDescriptor
-from xmodule.course_module import CourseDescriptor, Textbook
-from xmodule.seq_module import SequenceDescriptor
-
-from contentstore.utils import delete_course_and_groups, reverse_url, reverse_course_url
+from common.test.utils import XssTestMixin
+from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
+from contentstore.utils import delete_course, reverse_course_url, reverse_url
+from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+from course_action_state.managers import CourseActionStateItemNotFoundError
+from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from django_comment_common.utils import are_permissions_roles_seeded
-
+from openedx.core.lib.tempdir import mkdtemp_clean
 from student import auth
 from student.models import CourseEnrollment
 from student.roles import CourseCreatorRole, CourseInstructorRole
-from opaque_keys import InvalidKeyError
-from contentstore.tests.utils import get_url
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-
-from course_action_state.managers import CourseActionStateItemNotFoundError
+from xmodule.capa_module import CapaDescriptor
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
+from xmodule.course_module import CourseDescriptor, Textbook
+from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from xmodule.seq_module import SequenceDescriptor
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1232,7 +1223,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
         course_id = _get_course_id(self.store, test_course_data)
         self.assertTrue(are_permissions_roles_seeded(course_id))
-        delete_course_and_groups(course_id, self.user.id)
+        delete_course(course_id, self.user.id)
         # should raise an exception for checking permissions on deleted course
         with self.assertRaises(ItemNotFoundError):
             are_permissions_roles_seeded(course_id)
@@ -1244,7 +1235,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
 
         # unseed the forums for the first course
         course_id = _get_course_id(self.store, test_course_data)
-        delete_course_and_groups(course_id, self.user.id)
+        delete_course(course_id, self.user.id)
         # should raise an exception for checking permissions on deleted course
         with self.assertRaises(ItemNotFoundError):
             are_permissions_roles_seeded(course_id)
@@ -1264,7 +1255,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
         self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))
 
-        delete_course_and_groups(course_id, self.user.id)
+        delete_course(course_id, self.user.id)
         # check that user's enrollment for this course is not deleted
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
         # check that user has form role "Student" for this course even after deleting it
@@ -1286,13 +1277,33 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         self.assertGreater(len(instructor_role.users_with_role()), 0)
 
         # Now delete course and check that user not in instructor groups of this course
-        delete_course_and_groups(course_id, self.user.id)
+        delete_course(course_id, self.user.id)
 
         # Update our cached user since its roles have changed
         self.user = User.objects.get_by_natural_key(self.user.natural_key()[0])
 
         self.assertFalse(instructor_role.has_user(self.user))
         self.assertEqual(len(instructor_role.users_with_role()), 0)
+
+    def test_delete_course_with_keep_instructors(self):
+        """
+        Tests that when you delete a course with 'keep_instructors',
+        it does not remove any permissions of users/groups from the course
+        """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        course_id = _get_course_id(self.store, test_course_data)
+
+        # Add and verify instructor role for the course
+        instructor_role = CourseInstructorRole(course_id)
+        instructor_role.add_users(self.user)
+        self.assertTrue(instructor_role.has_user(self.user))
+
+        delete_course(course_id, self.user.id, keep_instructors=True)
+
+        # Update our cached user so if any change in roles can be captured
+        self.user = User.objects.get_by_natural_key(self.user.natural_key()[0])
+
+        self.assertTrue(instructor_role.has_user(self.user))
 
     def test_create_course_after_delete(self):
         """
@@ -1301,7 +1312,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         test_course_data = self.assert_created_course()
         course_id = _get_course_id(self.store, test_course_data)
 
-        delete_course_and_groups(course_id, self.user.id)
+        delete_course(course_id, self.user.id)
 
         self.assert_created_course()
 

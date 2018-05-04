@@ -1,7 +1,7 @@
 # disable missing docstring
 # pylint: disable=missing-docstring
 
-from lettuce import world, step
+from lettuce import step, world
 
 
 @step('I have created a Discussion Tag$')

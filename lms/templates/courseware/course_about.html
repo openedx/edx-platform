@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from courseware.courses import get_course_about_section
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
 %>
 
@@ -17,10 +18,6 @@ from openedx.core.lib.courses import course_image_url
 </%block>
 
 <%block name="js_extra">
-  ## CourseTalk widget js script
-  % if show_coursetalk_widget:
-      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
-  % endif
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
@@ -296,11 +293,9 @@ from openedx.core.lib.courses import course_image_url
         </ol>
     </div>
 
-      ## CourseTalk widget
-      % if show_coursetalk_widget:
-      <div class="coursetalk-read-reviews">
-          <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
-      </div>
+      ## Course reviews tool
+      % if reviews_fragment_view:
+       ${HTML(reviews_fragment_view.body_html())}
       % endif
 
       ## For now, ocw links are the only thing that goes in additional resources

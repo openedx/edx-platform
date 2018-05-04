@@ -1,5 +1,5 @@
-from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import XModule
 
 
 class HiddenModule(XModule):

@@ -28,21 +28,17 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
 
+COURSE_MODE_SLUG_CHOICES = [(mode_slug, mode_slug) for mode_slug in settings.COURSE_ENROLLMENT_MODES]
+
 
 class CourseModeForm(forms.ModelForm):
+    """
+    Admin form for adding a course mode.
+    """
 
     class Meta(object):
         model = CourseMode
         fields = '__all__'
-
-    COURSE_MODE_SLUG_CHOICES = (
-        [(CourseMode.DEFAULT_MODE_SLUG, CourseMode.DEFAULT_MODE_SLUG)] +
-        [(mode_slug, mode_slug) for mode_slug in CourseMode.VERIFIED_MODES] +
-        [(CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.NO_ID_PROFESSIONAL_MODE)] +
-        [(mode_slug, mode_slug) for mode_slug in CourseMode.CREDIT_MODES] +
-        # need to keep legacy modes around for awhile
-        [(CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)]
-    )
 
     mode_slug = forms.ChoiceField(choices=COURSE_MODE_SLUG_CHOICES, label=_("Mode"))
 

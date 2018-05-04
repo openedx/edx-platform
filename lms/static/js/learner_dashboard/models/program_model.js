@@ -11,17 +11,17 @@
                 initialize: function(data) {
                     if (data) {
                         this.set({
-                            name: data.name,
-                            category: data.category,
+                            title: data.title,
+                            type: data.type,
                             subtitle: data.subtitle,
-                            organizations: data.organizations,
+                            authoring_organizations: data.authoring_organizations,
                             detailUrl: data.detail_url,
-                            smallBannerUrl: data.banner_image_urls.w348h116,
-                            mediumBannerUrl: data.banner_image_urls.w435h145,
-                            largeBannerUrl: data.banner_image_urls.w726h242,
+                            xsmallBannerUrl: data.banner_image['x-small'].url,
+                            smallBannerUrl: data.banner_image.small.url,
+                            mediumBannerUrl: data.banner_image.medium.url,
                             breakpoints: {
                                 max: {
-                                    tiny: '320px',
+                                    xsmall: '320px',
                                     small: '540px',
                                     medium: '768px',
                                     large: '979px'

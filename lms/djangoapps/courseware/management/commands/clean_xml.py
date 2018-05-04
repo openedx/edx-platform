@@ -1,12 +1,11 @@
-import lxml.etree
 import os
 import sys
 import traceback
 
+import lxml.etree
+from django.core.management.base import BaseCommand
 from fs.osfs import OSFS
 from path import Path as path
-
-from django.core.management.base import BaseCommand
 
 from xmodule.modulestore.xml import XMLModuleStore
 

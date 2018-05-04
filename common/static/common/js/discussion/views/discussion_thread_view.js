@@ -82,6 +82,7 @@
                 this.mode = options.mode || 'inline';
                 this.context = options.context || 'course';
                 this.options = _.extend({}, options);
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -93,6 +94,7 @@
                         self.model = collection.get(id);
                     }
                 });
+                this.is_commentable_divided = options.is_commentable_divided;
                 this.createShowView();
                 this.responses = new Comments();
                 this.loadedResponses = false;
@@ -111,14 +113,15 @@
                     mode: this.mode,
                     model: this.model,
                     el: this.el,
-                    course_settings: this.options.course_settings,
+                    courseSettings: this.options.courseSettings,
                     topicId: this.topicId
                 });
                 return this.render();
             };
 
             DiscussionThreadView.prototype.renderTemplate = function() {
-                var container, templateData;
+                var container,
+                    templateData;
                 this.template = _.template($('#thread-template').html());
                 container = $('#discussion-container');
                 if (!container.length) {
@@ -126,6 +129,7 @@
                 }
                 templateData = _.extend(this.model.toJSON(), {
                     readOnly: this.readOnly,
+                    startHeader: this.startHeader + 1, // this is a child so headers should be increased
                     can_create_comment: container.data('user-create-comment')
                 });
                 return this.template(templateData);
@@ -340,13 +344,17 @@
                 var view;
                 response.set('thread', this.model);
                 view = new ThreadResponseView($.extend({
-                    model: response
+                    model: response,
+                    startHeader: this.startHeader + 1 // this is a child so headers should be increased
                 }, options));
                 view.on('comment:add', this.addComment);
                 view.on('comment:endorse', this.endorseThread);
                 view.render();
                 this.$el.find(listSelector).append(view.el);
-                return view.afterInsert();
+                view.afterInsert();
+                if (options.focusAddedResponse) {
+                    this.focusToTheAddedResponse(view.el);
+                }
             };
 
             DiscussionThreadView.prototype.renderAddResponseButton = function() {
@@ -394,7 +402,9 @@
                     user_id: window.user.get('id')
                 });
                 comment.set('thread', this.model.get('thread'));
-                this.renderResponseToList(comment, '.js-response-list');
+                this.renderResponseToList(comment, '.js-response-list', {
+                    focusAddedResponse: true
+                });
                 this.model.addComment();
                 this.renderAddResponseButton();
                 return DiscussionUtil.safeAjax({
@@ -410,6 +420,10 @@
                         return comment.set(data.content);
                     }
                 });
+            };
+
+            DiscussionThreadView.prototype.focusToTheAddedResponse = function(list) {
+                return $(list).attr('tabindex', '-1').focus();
             };
 
             DiscussionThreadView.prototype.edit = function() {
@@ -428,7 +442,8 @@
                     model: this.model,
                     mode: this.mode,
                     context: this.context,
-                    course_settings: this.options.course_settings
+                    startHeader: this.startHeader,
+                    course_settings: this.options.courseSettings
                 });
                 this.editView.bind('thread:updated thread:cancel_edit', this.closeEditView);
                 return this.editView.bind('comment:endorse', this.endorseThread);
@@ -447,7 +462,9 @@
             DiscussionThreadView.prototype.createShowView = function() {
                 this.showView = new DiscussionThreadShowView({
                     model: this.model,
-                    mode: this.mode
+                    mode: this.mode,
+                    startHeader: this.startHeader,
+                    is_commentable_divided: this.is_commentable_divided
                 });
                 this.showView.bind('thread:_delete', this._delete);
                 return this.showView.bind('thread:edit', this.edit);
