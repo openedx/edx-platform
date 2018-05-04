@@ -44,6 +44,13 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
             </a>
           </div>
         % endif
+        % if show_journal_listing:
+          <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+            <a class="${'active ' if reverse('journal_listing_view') in request.path else ''}tab-nav-link" href="${reverse('journal_listing_view')}">
+              ${_("Journals")}
+            </a>
+          </div>
+        % endif
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
             ${_("Profile")}
