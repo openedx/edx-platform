@@ -6,6 +6,7 @@ import re
 import string
 from urlparse import urlparse
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -192,3 +193,29 @@ def generate_password(length=12, chars=string.letters + string.digits):
     password += choice(string.letters)
     password += ''.join([choice(chars) for _i in xrange(length - 2)])
     return password
+
+
+def email_exists(email):
+    """
+    Check an email against the User and UserRetirementStatus models for
+    existence.
+    """
+    exists = False
+    # Normal case, check users in the auth_user table.
+    if User.objects.filter(email=email).exists():
+        exists = True
+    else:
+        # Handle case where another user with the same email address has
+        # initiated retirement (account deletion), but they are still in
+        # the retirement queue in any state which is not COMPLETE.
+        UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
+        try:
+            if (UserRetirementStatus.objects
+                                    .select_related('current_state')
+                                    .filter(original_email=email)
+                                    .exclude(current_state__state_name='COMPLETE')
+                                    .exists()):
+                exists = True
+        except UserRetirementStatus.DoesNotExist:
+            pass
+    return exists

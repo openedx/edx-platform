@@ -19,6 +19,7 @@ from django.core.validators import RegexValidator, slug_re
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
+from openedx.core.djangoapps.user_api.accounts.utils import email_exists
 from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import password_max_length, password_min_length, validate_password
 
@@ -294,7 +295,7 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_("Unauthorized email address."))
-        if User.objects.filter(email__iexact=email).exists():
+        if email_exists(email):
             raise ValidationError(
                 _(
                     "It looks like {email} belongs to an existing account. Try again with a different email address."
