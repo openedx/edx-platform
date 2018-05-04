@@ -17,9 +17,21 @@ from openedx.core.djangoapps.theming.models import SiteTheme
 def get_lms_link_from_course_key(base_lms_url, course_key):
     """
     Returns the microsite-aware LMS link based on the organization the course
-    belongs to.
+    belongs to. If there is a Custom Domain in use, will return the custom
+    domain URL instead.
     """
-    return "{}.{}".format(course_key.org, base_lms_url)
+    from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
+    site_domain = ""
+    try:
+        ad = AlternativeDomain.objects.get(site__name=course_key.org)
+        if ad.is_tahoe_domain():
+            site_domain = ad.site.domain
+        else:
+            site_domain = "{}.{}".format(course_key.org, base_lms_url)
+    except AlternativeDomain.DoesNotExist:
+        site_domain = "{}.{}".format(course_key.org, base_lms_url)
+
+    return site_domain
 
 
 def get_initial_sass_variables():
