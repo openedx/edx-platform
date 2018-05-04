@@ -17,7 +17,7 @@
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@v0.2#egg=xblock-chat==0.2
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@e1495e855a27514971ca08d87d1a7a2735cd3e31#egg=xblock-eoc-journal
--e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.10#egg=xblock-scorm==2.0.10
+-e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.11#egg=xblock-scorm==2.0.11
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.3#egg=xblock-diagnostic-feedback==0.2.3
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.6#egg=xblock-group-project-v2==0.4.6
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
