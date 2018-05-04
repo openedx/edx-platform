@@ -296,3 +296,15 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             self.assertIsNot(completion_return, None)
             self.assertTrue('complete' in completion_return)
             self.assertEqual(completion_return['complete'], True)
+
+    def test_handle_ajax_get_completion_return_none(self):
+        """
+        Test that the completion data is returned successfully None
+        when usage key is None through ajax call
+        """
+        usage_key = None
+        completion_return = self.sequence_3_1.handle_ajax(
+            'get_completion',
+            {'usage_key': usage_key}
+        )
+        self.assertIs(completion_return, None)

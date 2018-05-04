@@ -212,6 +212,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             completion_service = self.runtime.service(self, 'completion')
 
             usage_key = data.get('usage_key', None)
+            if not usage_key:
+                return None
             item = self.get_child(UsageKey.from_string(usage_key))
             if not item:
                 return None
