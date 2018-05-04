@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
+from rest_framework_swagger.views import get_swagger_view
 
 import contentstore.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
@@ -262,6 +263,11 @@ urlpatterns += [
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 ]
+
+if settings.FEATURES.get('ENABLE_API_DOCS'):
+    urlpatterns += [
+        url(r'^api-docs/$', get_swagger_view(title='Studio API')),
+    ]
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))

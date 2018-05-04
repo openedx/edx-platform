@@ -101,6 +101,11 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
         }
 
     """
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    exclude_from_schema = True
+
     def post(self, request, course_id):
         """
         Kicks off an asynchronous course import and returns an ID to be used to check

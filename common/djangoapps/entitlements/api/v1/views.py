@@ -308,6 +308,10 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         - Switch Enrollment
     """
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    exclude_from_schema = True
     permission_classes = (permissions.IsAuthenticated,)
     queryset = CourseEntitlement.objects.all()
 
