@@ -32,8 +32,7 @@ according to the organizational affiliation of the requesting application.
 Organizational Types in the edX System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the edX system, the 2 most prevalent organizational relationships
-are:
+Here are a few organizational relationships that exist in the edX system:
 
 * **Organization as a Content Provider**
 
@@ -55,8 +54,12 @@ are:
     edX system, typically via an SSO-enabled portal, but with the
     *organization (not edX) as the identity provider*. Such an
     organization will also want to access data for all its users.
-    However, it is not an immediate requirement to support data
-    access by this organization type at this time.
+
+* **Organization as a Credit Provider**
+
+  * This is an institution or employer that recognizes edX credentials for
+    a course, program, etc. A user would selectively grant organizations
+    permissions to access her edX records and information.
 
 Decisions
 ---------
@@ -65,9 +68,8 @@ In order to allow DOT Applications to access data for their own organization
 without inadvertently or maliciously gaining access to data for other
 organizations, (1) applications need to be linked to their own organizations,
 (2) organization information needs to be cryptographically bound with
-issued tokens, (3) the authorization approval form needs to present the
-organization information and (4) organization limitations need to be
-embedded in the scopes.
+issued tokens and the (3) the authorization approval form needs to present the
+organization information to the granting end-user.
 
 1. Associate Available Organizations with DOT Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,23 +86,36 @@ embedded in the scopes.
   and DOT Applications.
 
 * The new data model will also have a column for specifying organization
-  type: *content_provider* or *user_provider*. Initially, we will only
-  use *content_provider*.
+  type: *content_provider*, *user_provider*, *credit_provider*, etc.
+  Initially, we will only use *content_provider*.
 
-2. Organization Information in OAuth Tokens
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2. Organization and Users as Filters in OAuth Tokens
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The organization associated with the Application will be included
-  in the JWT tokens requested by the Application.
+* The organization associated with the Application will be specified
+  in a new *filters* field in the JSON Web Token (JWT).
+
+* The value of the *filters* field will include what *type* of organization
+  it is (per`Organizational Types in the edX System`_).  For example:
+
+    "content_org:Microsoft"
+
+* For a token created via a *Client Credentials grant type*, the token
+  is further restricted specifically for the granting user.  And so, a
+  "user" filter with the value "me" would be added for this grant type.
+  For example:
+
+    "user:me"
 
 * JwtBuilder_'s *build_token* functionality will be extended to include
-  the organization value in the token's payload. This payload is
+  the filters in the token's payload. This payload is
   cryptographically signed and so binds and limits the scopes in the
-  token to the organization.
+  token to the filters.
 
-* Since the organization value is inside the token, any relying party
-  that receives the token (including a microservice) will be able to
-  enforce scopes as limited to the organization.
+* Since filters are inside the token, any relying party
+  that receives the token (any microservice) will be able to
+  enforce scopes as limited by the filters. API endpoints will limit the
+  values returned in their payloads by the specified filters.
 
 .. _0006-enforce-scopes-in-LMS-APIs: 0006-enforce-scopes-in-LMS-APIs.rst
 .. _Organization: https://github.com/edx/edx-organizations/blob/fa137881be9b7d330062bc32655a00c68635cfed/organizations/models.py#L14
@@ -115,51 +130,42 @@ associated with an Organization, the Organization value(s) should be
 presented to the user. This makes it clear to the user that the
 granted access is limited to the Organization's affiliations.
 
-4. Embed Organization Limitation Types in Scopes
+Token Examples
+--------------
+
+Client Credentials (server-to-server) grant type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Since individual API endpoints need to enforce both scopes and their
-  corresponding organization limitations as included in the token, the
-  scopes themselves should indicate whether or not organization limitations
-  apply.
+When a trusted application makes server-to-server calls, the application's 
+service user info is included in the JWT and the *filters* field
+includes the organization identifier and type associated with the application.
 
-* In the event that we add additional types of organization limits in
-  the token, we would introduce new scopes that enforce the new
-  types of limits.
+::
 
-  * This allows us to introduce new types of limits while being assured
-    that pre-existing API endpoints will remain protected. Since the
-    pre-existing endpoint is unaware of the new scope, it will
-    prevent access until it is updated to support the new type of 
-    organization limit.
+  {
+    "scopes": ["grades:read", "enrollments:read"],
+    "filters":  ["content_org:Microsoft"],
+    "version": "1.0",
+    "preferred_username": "microsoft_service_user",
+    ...
+  }
 
-Scopes Examples
----------------
+Authorization Code and Password-based (on behalf of user) grant types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is an initial list of scopes that we may support. Notice how some
-enforce organization limits and others don't. When configuring a DOT
-Application, the edX operator decides how much access the application
-is permitted.
+When a user-approved application or a trusted mobile app makes calls on behalf
+of the approving user, the user's info is included in the token along with a
+filter “me” in the *filters* field.
 
-+-------------------------------+----------------------------------------------------------------+ 
-| Scope                         | Allowed access                                                 |
-+===============================+================================================================+
-| certificates:read             | Retrieve any certificate                                       |
-+-------------------------------+----------------------------------------------------------------+ 
-| certificates:read:content_org | Retrieve certificates for courses provided by the organization |
-+-------------------------------+----------------------------------------------------------------+ 
-| grades:read                   | Retrieve any grade                                             |
-+-------------------------------+----------------------------------------------------------------+ 
-| grades:read:content_org       | Retrieve grades for courses provided by the organization       |
-+-------------------------------+----------------------------------------------------------------+ 
-| enrollments:read              | Retrieve any enrollment information                            |
-+-------------------------------+----------------------------------------------------------------+ 
-| enrollments:read:content_org  | Retrieve enrollments for courses provided by the organization  |
-+-------------------------------+----------------------------------------------------------------+ 
+::
 
-**Note:** Each of these scopes can be used in a server-to-server
-API call (via Client Credentials) or an API call on behalf of a
-single user (via Authorization Code).
+  {
+    "scopes": ["grades:read", "enrollments:read"],
+    "filters":  ["content_org:Microsoft", "user:me"],
+    "version": "1.0",
+    "preferred_username": "ajay_mehta",
+    ...
+  } 
 
 Consequences
 ------------
@@ -168,14 +174,45 @@ Consequences
   Applications, we can eventually eliminate Restricted Applications
   altogether.
 
-* By including the organization value in the token, any relying party
+* By including the organization value and its type in the token, any relying party
   that receives the token (including a microservice) will be able to
   enforce the scopes as limited to the organization.
 
-* Including the organization limitation types in the scope allows for
-  a secure path forward to introduce new types of limitations in the
-  future. It also makes it clearer to API endpoints what needs to be
-  enforced.
+* Having a separate field for *filters* introduces a clear boundary for
+  separation of concerns of what is enforced at each layer:
+
+  * **API endpoint** declares the *required scopes*.
+  * The base **Django Permission** class enforces *required scopes*.
+  * **API gateway** (in the future) may additionally enforce *required scopes*.
+  * **API endpoint** enforces the *required filters*.
+
+* When a new filter type is introduced in the future, we will have to
+  make sure there are no security issues introduced where old endpoints
+  that are not aware of the new filter do not enforce it.  Possible
+  ways of doing so are:
+ 
+  * Endpoints that are highly security sensitive should reject any
+    token that includes an unrecognized filter.
+
+  * Multi-phase rollout with a major version update of tokens once all
+    microservices and relevant endpoints have updated to recognize the new
+    filter. Tokens with the new filter would be issued only after all relevant
+    endpoints have been updated.
+
+* Alternatively, we could have embedded the filter-type within the *scopes*
+  field of the token. This would support a more secure path forward since
+  old endpoints would automatically reject new filter-types in scopes that
+  they don't recognize. For example:
+
+    "grades:read:content_org"
+  
+  Additionally, this alternative would allow tokens to specify different filters
+  for different scopes.
+
+  However, this alternative was rejected since it added unnecessary confusion
+  in understanding and parsing scope values. Additionally keeping filters
+  independent allows them to evolve and grow (more complex) over time without
+  trying to coerce their values within scope expressions.
 
 References
 ----------
