@@ -25,6 +25,7 @@ from .transcripts_utils import (
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
     get_video_transcript_content,
+    get_transcript_from_contentstore,
     save_to_store,
     subs_filename,
     Transcript,
@@ -288,11 +289,14 @@ class VideoStudentViewHandlers(object):
                 self.transcript_language = language
 
             try:
-                transcript = self.translation(request.GET.get('videoId', None), transcripts)
-            except (TypeError, TranscriptException, NotFoundError) as ex:
-                # Catching `TranscriptException` because its also getting raised at places
-                # when transcript is not found in contentstore.
-                log.debug(six.text_type(ex))
+                transcript_content, __, mime_type = get_transcript_from_contentstore(
+                    video=self,
+                    language=language,
+                    output_format=Transcript.SJSON,
+                    transcripts_info=transcripts,
+                    youtube_id=request.GET.get('videoId', None)
+                )
+            except (TranscriptsGenerationException, UnicodeDecodeError, NotFoundError):
                 # Try to return static URL redirection as last resort
                 # if no translation is required
                 response = self.get_static_transcript(request, transcripts)
@@ -314,25 +318,28 @@ class VideoStudentViewHandlers(object):
                 log.info(six.text_type(ex))
                 response = Response(status=404)
             else:
-                response = Response(transcript, headerlist=[('Content-Language', language)])
-                response.content_type = Transcript.mime_types['sjson']
+                response = Response(transcript_content, headerlist=[('Content-Language', language)])
+                response.content_type = mime_type
 
         elif dispatch == 'download':
+
             lang = request.GET.get('lang', None)
+            # Make sure the language is set.
+            if not lang:
+                lang = self.get_default_transcript_language(transcripts)
+
             try:
-                transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(
-                    transcripts, transcript_format=self.transcript_download_format, lang=lang
+                output_format = self.transcript_download_format if self.transcript_download_format else Transcript.SRT
+                transcript_content, filename, mime_type = get_transcript_from_contentstore(
+                    video=self,
+                    language=lang,
+                    output_format=output_format,
+                    transcripts_info=transcripts
                 )
-            except (KeyError, UnicodeDecodeError):
-                return Response(status=404)
-            except (ValueError, NotFoundError):
+            except (TranscriptsGenerationException, UnicodeDecodeError, NotFoundError):
                 response = Response(status=404)
                 # Check for transcripts in edx-val as a last resort if corresponding feature is enabled.
                 if feature_enabled:
-                    # Make sure the language is set.
-                    if not lang:
-                        lang = self.get_default_transcript_language(transcripts)
-
                     transcript = get_video_transcript_content(edx_video_id=self.edx_video_id, language_code=lang)
                     if transcript:
                         transcript_conversion_props = dict(transcript, output_format=self.transcript_download_format)
@@ -354,12 +361,12 @@ class VideoStudentViewHandlers(object):
                 response = Response(
                     transcript_content,
                     headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename.encode('utf8'))),
-                        ('Content-Language', self.transcript_language),
+                        ('Content-Disposition', 'attachment; filename="{}"'.format(filename.encode('utf8'))),
+                        ('Content-Language', lang),
                     ],
                     charset='utf8'
                 )
-                response.content_type = transcript_mime_type
+                response.content_type = mime_type
 
         elif dispatch.startswith('available_translations'):
 
