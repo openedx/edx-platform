@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
+"POT-Creation-Date: 2018-05-06 20:36+0000\n"
+"PO-Revision-Date: 2018-05-06 20:36:20.125789\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -856,6 +856,7 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -902,7 +903,9 @@ msgstr ""
 "Töö mäný fäïléd lögïn ättémpts. Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Émäïl ör pässwörd ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -12534,6 +12537,43 @@ msgstr ""
 "        Ýöür ünïvérsïtý ïdéntïtý sérvér dïd nöt rétürn ýöür ÌD ïnförmätïön tö üs.\n"
 "        Pléäsé trý löggïng ïn ägäïn.  (Ýöü mäý nééd tö réstärt ýöür ßröwsér.)\n"
 "         Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr "Pässwörd Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+"{platform_name} nöw réqüïrés möré çömpléx pässwörds. Ýöür çürrént pässwörd "
+"döés nöt méét thé néw réqüïréménts. Çhängé ýöür pässwörd nöw tö çöntïnüé "
+"üsïng thé sïté. Thänk ýöü för hélpïng üs kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι#"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
+"{platform_name} nöw réqüïrés möré çömpléx pässwörds. Ýöür çürrént pässwörd "
+"döés nöt méét thé néw réqüïréménts. Ýöü müst çhängé ýöür pässwörd ßý "
+"{deadline} tö ßé äßlé tö çöntïnüé üsïng thé sïté. Thänk ýöü för hélpïng üs "
+"kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ρ#"
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format

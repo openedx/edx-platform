@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
+"POT-Creation-Date: 2018-05-06 20:36+0000\n"
+"PO-Revision-Date: 2018-05-06 20:36:20.125789\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -714,6 +714,7 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -739,7 +740,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr ""
 
@@ -9822,6 +9825,27 @@ msgid ""
 "        Your university identity server did not return your ID information to us.\n"
 "        Please try logging in again.  (You may need to restart your browser.)\n"
 "        "
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py

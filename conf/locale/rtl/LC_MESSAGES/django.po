@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
+"POT-Creation-Date: 2018-05-06 20:36+0000\n"
+"PO-Revision-Date: 2018-05-06 20:36:20.125789\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -757,6 +757,7 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr "فاثقث صشس شر ثققخق قثذثهدهرل غخعق مخلهر هربخقوشفهخر. حمثشسث ثوشهم عس."
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -791,7 +792,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلشهر مشفثق."
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "ثوشهم خق حشسسصخقي هس هرذخققثذف."
 
@@ -10890,6 +10893,34 @@ msgstr ""
 "        غخعق عرهدثقسهفغ هيثرفهفغ سثقدثق يهي رخف قثفعقر غخعق هي هربخقوشفهخر فخ عس.\n"
 "        حمثشسث فقغ مخللهرل هر شلشهر.  (غخع وشغ رثثي فخ قثسفشقف غخعق زقخصسثق.)\n"
 "        "
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr "حشسسصخقي حخمهذغ"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+"{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. ذاشرلث غخعق حشسسصخقي رخص فخ ذخرفهرعث "
+"عسهرل فاث سهفث. فاشرن غخع بخق اثمحهرل عس نثثح غخعق يشفش سشبث."
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
+"{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. غخع وعسف ذاشرلث غخعق حشسسصخقي زغ "
+"{deadline} فخ زث شزمث فخ ذخرفهرعث عسهرل فاث سهفث. فاشرن غخع بخق اثمحهرل عس "
+"نثثح غخعق يشفش سشبث."
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
