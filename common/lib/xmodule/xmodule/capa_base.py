@@ -1216,6 +1216,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 }
 
         try:
+            self.lcp.context['attempt'] = self.attempts + 1
             correct_map = self.lcp.grade_answers(answers)
             self.attempts = self.attempts + 1
             self.lcp.done = True
@@ -1678,6 +1679,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         Operates by creating a new correctness map based on the current
         state of the LCP, and updating the old correctness map of the LCP.
         """
+        self.lcp.context['attempt'] = self.attempts
         new_correct_map = self.lcp.get_grade_from_current_answers(None)
         self.lcp.correct_map.update(new_correct_map)
 

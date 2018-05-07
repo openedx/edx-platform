@@ -2057,6 +2057,46 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assertEqual(correctness, 'incorrect')
         self.assertEqual(msg, "Message text")
 
+    def test_function_code_with_attempt_number(self):
+        script = textwrap.dedent("""\
+                    def gradeit(expect, ans, **kwargs):
+                        attempt = kwargs["attempt"]
+                        message = "This is attempt number {}".format(str(attempt))
+                        return {
+                            'input_list': [
+                                { 'ok': True, 'msg': message},
+                            ]
+                        }
+                    """)
+
+        problem = self.build_problem(
+            script=script,
+            cfn="gradeit",
+            expect="42",
+            cfn_extra_args="attempt"
+        )
+
+        # first attempt
+        input_dict = {'1_2_1': '42'}
+        problem.context['attempt'] = 1
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'correct')
+        self.assertEqual(msg, "This is attempt number 1")
+
+        # second attempt
+        problem.context['attempt'] = 2
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'correct')
+        self.assertEqual(msg, "This is attempt number 2")
+
     def test_multiple_inputs_return_one_status(self):
         # When given multiple inputs, the 'answer_given' argument
         # to the check_func() is a list of inputs
