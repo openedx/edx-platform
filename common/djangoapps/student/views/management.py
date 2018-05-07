@@ -66,6 +66,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
@@ -1148,6 +1149,19 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         # password_reset_confirm function handle it.
         return password_reset_confirm(
             request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+    if UserRetirementRequest.has_user_requested_retirement(user):
+        # Refuse to reset the password of any user that has requested retirement.
+        context = {
+            'validlink': True,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': _('Error in resetting your password.'),
+        }
+        context.update(platform_name)
+        return TemplateResponse(
+            request, 'registration/password_reset_confirm.html', context
         )
 
     if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
