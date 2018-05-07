@@ -444,7 +444,7 @@ class DeactivateLogoutView(APIView):
         except AuthFailedError as err:
             return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except
-            return Response(u"Could not verify user password", status=status.HTTP_400_BAD_REQUEST)
+            return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
 
     def _check_excessive_login_attempts(self, user):
         """
@@ -480,7 +480,7 @@ class AccountRetirementStatusView(ViewSet):
     """
     authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
-    parser_classes = (MergePatchParser,)
+    parser_classes = (JSONParser,)
     serializer_class = UserRetirementStatusSerializer
 
     def retirement_queue(self, request):
@@ -554,13 +554,14 @@ class AccountRetirementStatusView(ViewSet):
         Updates the RetirementStatus row for the given user to the new
         status, and append any messages to the message log.
 
-        Note that this implementation is the "merge patch" implementation proposed in
-        https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
-        else an error response with status code 415 will be returned.
+        Note that this implementation DOES NOT use the "merge patch"
+        implementation seen in AccountViewSet. Slumber, the project
+        we use to power edx-rest-api-client, does not currently support
+        it. The content type for this request is 'application/json'.
         """
         try:
             username = request.data['username']
-            retirement = UserRetirementStatus.objects.get(user__username=username)
+            retirement = UserRetirementStatus.objects.get(original_username=username)
             retirement.update_state(request.data)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except UserRetirementStatus.DoesNotExist:
