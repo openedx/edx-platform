@@ -153,10 +153,9 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     # If not provided with a discussion id, filter threads by commentable ids
     # which are accessible to the current user.
     if discussion_id is None:
-        discussion_category_ids = set(utils.get_discussion_categories_ids(course, request.user))
         threads = [
             thread for thread in threads
-            if thread.get('commentable_id') in discussion_category_ids
+            if utils.discussion_category_id_access(course, request.user, thread.get('commentable_id'), thread)
         ]
 
     for thread in threads:
