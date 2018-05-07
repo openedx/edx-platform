@@ -2057,6 +2057,7 @@ CREATE TABLE `django_comment_common_coursediscussionsettings` (
   `always_divide_inline_discussions` tinyint(1) NOT NULL,
   `divided_discussions` longtext,
   `division_scheme` varchar(20) NOT NULL,
+  `discussions_id_map` longtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `course_id` (`course_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2095,7 +2096,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=440 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=443 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2423,6 +2424,8 @@ CREATE TABLE `email_marketing_emailmarketingconfiguration` (
   `welcome_email_send_delay` int(11) NOT NULL,
   `user_registration_cookie_timeout_delay` double NOT NULL,
   `sailthru_welcome_template` varchar(20) NOT NULL,
+  `sailthru_verification_failed_template` varchar(20) NOT NULL,
+  `sailthru_verification_passed_template` varchar(20) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `email_marketing_e_changed_by_id_1c6968b921f23b0b_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `email_marketing_emailmark_changed_by_id_15ce753b_fk` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
