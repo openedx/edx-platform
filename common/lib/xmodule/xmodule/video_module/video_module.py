@@ -49,10 +49,9 @@ from .transcripts_utils import (
     VideoTranscriptsMixin,
     clean_video_id,
     subs_filename,
+    get_transcript_for_video
 )
-from .transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
+
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
@@ -304,8 +303,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if download_video_link and download_video_link.endswith('.m3u8'):
                 download_video_link = None
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
-        transcripts = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        transcripts = self.get_transcripts_info()
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
@@ -363,7 +361,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'streams': self.youtube_streams,
-            'sub': self.sub,
             'sources': sources,
             'poster': poster,
             'duration': video_duration,
@@ -607,10 +604,39 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        # Default Timed Transcript a.k.a `sub` has been deprecated and end users shall
+        # not be able to modify it.
+        editable_fields.pop('sub')
+
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
+        editable_fields['transcripts']['custom'] = True
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
+
+        # We need to send ajax requests to show transcript status
+        # whenever edx_video_id changes on frontend. Thats why we
+        # are changing type to `VideoID` so that a specific
+        # Backbonjs view can handle it.
+        editable_fields['edx_video_id']['type'] = 'VideoID'
+
+        # construct transcripts info and also find if `en` subs exist
+        transcripts_info = self.get_transcripts_info()
+        possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
+        for sub_id in possible_sub_ids:
+            try:
+                get_transcript_for_video(
+                    self.location,
+                    subs_id=sub_id,
+                    file_name=sub_id,
+                    language=u'en'
+                )
+                transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
+                break
+            except NotFoundError:
+                continue
+
+        editable_fields['transcripts']['value'] = transcripts_info['transcripts']
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(
             self,
             'studio_transcript',
@@ -1098,9 +1124,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
-        transcripts_info = self.get_transcripts_info(include_val_transcripts=feature_enabled)
-        available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
+        available_translations = self.available_translations(self.get_transcripts_info())
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations

@@ -1,16 +1,21 @@
 define(
     [
+        'backbone',
         'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
         'js/models/uploads', 'js/views/uploads',
         'js/models/license', 'js/views/license',
+        'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist',
         'js/views/video/translations_editor'
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-         LicenseModel, LicenseView, VideoList, VideoTranslations) {
+function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
+         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations) {
+    'use strict';
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
+        // Store rendered view references
+        views: {},
 
         // Model is CMS.Models.MetadataCollection,
         initialize: function() {
@@ -42,10 +47,10 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
                     }
 
                     if (_.isFunction(Metadata[type])) {
-                        new Metadata[type](data);
+                        self.views[data.model.getFieldName()] = new Metadata[type](data);
                     } else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.
-                        new Metadata.String(data);
+                        self.views[data.model.getFieldName()] = new Metadata.String(data);
                     }
                 });
         },
@@ -117,6 +122,40 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
 
         setValueInEditor: function(value) {
             this.$el.find('input').val(value);
+        }
+    });
+
+    Metadata.VideoID = Metadata.String.extend({
+        // Delay between check_transcript requests
+        requestDelay: 300,
+
+        initialize: function() {
+            Metadata.String.prototype.initialize.apply(this, arguments);
+
+            this.$el.on(
+                'input',
+                'input',
+                _.debounce(_.bind(this.inputChange, this), this.requestDelay)
+            );
+        },
+
+        render: function() {
+            Metadata.String.prototype.render.apply(this, arguments);
+            TranscriptUtils.Storage.set('edx_video_id', this.getValueFromEditor());
+        },
+
+        clear: function() {
+            this.model.setValue('');
+            this.inputChange();
+        },
+
+        getData: function() {
+            return [{mode: 'edx_video_id', type: 'edx_video_id', video: this.getValueFromEditor()}];
+        },
+
+        inputChange: function() {
+            TranscriptUtils.Storage.set('edx_video_id', this.getValueFromEditor());
+            Backbone.trigger('transcripts:basicTabFieldChanged');
         }
     });
 

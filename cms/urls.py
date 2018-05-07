@@ -39,7 +39,6 @@ urlpatterns = [
     url(r'^transcripts/choose$', contentstore.views.choose_transcripts, name='choose_transcripts'),
     url(r'^transcripts/replace$', contentstore.views.replace_transcripts, name='replace_transcripts'),
     url(r'^transcripts/rename$', contentstore.views.rename_transcripts, name='rename_transcripts'),
-    url(r'^transcripts/save$', contentstore.views.save_transcripts, name='save_transcripts'),
     url(r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         contentstore.views.preview_handler, name='preview_handler'),
     url(r'^xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
@@ -146,10 +145,8 @@ urlpatterns = [
         contentstore.views.transcript_preferences_handler, name='transcript_preferences_handler'),
     url(r'^transcript_credentials/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.transcript_credentials_handler, name='transcript_credentials_handler'),
-    url(r'^transcript_download/{}$'.format(settings.COURSE_KEY_PATTERN),
-        contentstore.views.transcript_download_handler, name='transcript_download_handler'),
-    url(r'^transcript_upload/{}$'.format(settings.COURSE_KEY_PATTERN),
-        contentstore.views.transcript_upload_handler, name='transcript_upload_handler'),
+    url(r'^transcript_download/$', contentstore.views.transcript_download_handler, name='transcript_download_handler'),
+    url(r'^transcript_upload/$', contentstore.views.transcript_upload_handler, name='transcript_upload_handler'),
     url(r'^transcript_delete/{}(?:/(?P<edx_video_id>[-\w]+))?(?:/(?P<language_code>[^/]*))?$'.format(
         settings.COURSE_KEY_PATTERN
     ), contentstore.views.transcript_delete_handler, name='transcript_delete_handler'),

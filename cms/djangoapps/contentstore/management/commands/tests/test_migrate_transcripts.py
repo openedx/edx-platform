@@ -261,10 +261,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
              u'[Transcript migration] process for ge transcript started'),
             (LOGGER_NAME,
              'ERROR',
-             '[Transcript migration] Exception: u"SON(['
-             '(\'category\', \'asset\'), (\'name\', u\'not_found.srt\'),'
-             ' (\'course\', u\'{}\'), (\'tag\', \'c4x\'), (\'org\', u\'{}\'),'
-             ' (\'revision\', None)])"'.format(self.course_2.id.course, self.course_2.id.org)),
+             "[Transcript migration] Exception: u'No transcript for `ge` language'"),
             (LOGGER_NAME,
              'INFO',
              u'[Transcript migration] process for course {} ended. Processed 1 transcripts'.format(
@@ -272,11 +269,8 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
              )),
             (LOGGER_NAME,
              'INFO',
-             "[Transcript migration] Result: Failed: language ge of video test_edx_video_id_2 with exception SON(["
-             "('category', 'asset'), ('name', u'not_found.srt'), ('course', u'{}'),"
-             " ('tag', 'c4x'), ('org', u'{}'), ('revision', None)])".format(
-                 self.course_2.id.course, self.course_2.id.org)
-             )
+             "[Transcript migration] Result: Failed: language ge of video test_edx_video_id_2 with exception "
+             "No transcript for `ge` language")
         )
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:

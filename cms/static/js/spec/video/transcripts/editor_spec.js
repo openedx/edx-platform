@@ -38,7 +38,7 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                 field_name: 'edx_video_id',
                 help: 'Specifies the video ID.',
                 options: [],
-                type: MetadataModel.GENERIC_TYPE,
+                type: 'VideoID',
                 value: 'basic tab video id'
             },
             models = [DisplayNameEntry, VideoListEntry, VideoIDEntry],
@@ -51,7 +51,8 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                 object: testData,
                 string: JSON.stringify(testData)
             },
-            transcripts, $container;
+            component_locator = 'component_locator',
+            transcripts, $container, waitForEvent, editor;
 
         var waitsForDisplayName = function(collection) {
             return jasmine.waitUntil(function() {
@@ -76,13 +77,107 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
             Utils.Storage.remove('sub');
         });
 
+        describe('Events', function() {
+            beforeEach(function() {
+                Utils.command.and.callThrough();
+                spyOn(Backbone, 'trigger').and.callThrough();
+                spyOn(Editor.prototype, 'destroy').and.callThrough();
+                spyOn(Editor.prototype, 'handleFieldChanged').and.callThrough();
+                spyOn(Editor.prototype, 'getLocator').and.returnValue(component_locator);
+
+                appendSetFixtures(
+                    sandbox({  // eslint-disable-line no-undef
+                        class: 'wrapper-comp-settings basic_metadata_edit',
+                        'data-metadata': JSON.stringify({video_url: VideoListEntry, edx_video_id: VideoIDEntry})
+                    })
+                );
+
+                appendSetFixtures(
+                    $('<script>',
+                        {
+                            id: 'metadata-videolist-entry',
+                            type: 'text/template'
+                        }
+                    ).text(readFixtures('video/transcripts/metadata-videolist-entry.underscore'))
+                );
+
+                appendSetFixtures(
+                    $('<script>',
+                        {
+                            id: 'metadata-string-entry',
+                            type: 'text/template'
+                        }
+                    ).text(readFixtures('metadata-string-entry.underscore'))
+                );
+
+                editor = new Editor({
+                    el: $('.basic_metadata_edit')
+                });
+
+                // reset the already triggered events
+                Backbone.trigger.calls.reset();
+                // reset the manual call to `handleFieldChanged` we made in the `editor.js::initialize`
+                Editor.prototype.handleFieldChanged.calls.reset();
+            });
+
+            waitForEvent = function(eventName) {
+                var triggerCallArgs;
+                return jasmine.waitUntil(function() {
+                    triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
+                    return Backbone.trigger.calls.count() === 1 && triggerCallArgs[0] === eventName;
+                });
+            };
+
+            afterEach(function() {
+                Backbone.trigger.calls.reset();
+                Editor.prototype.destroy.calls.reset();
+                Editor.prototype.handleFieldChanged.calls.reset();
+            });
+
+            it('handles transcripts:basicTabFieldChanged', function(done) {
+                var event = 'transcripts:basicTabFieldChanged';
+
+                Backbone.trigger(event);
+                waitForEvent(event)
+                    .then(function() {
+                        expect(Editor.prototype.handleFieldChanged).toHaveBeenCalled();
+                        expect(Utils.command).toHaveBeenCalledWith(
+                            'check',
+                            component_locator,
+                            [
+                                { mode: 'youtube', video: '12345678901', type: 'youtube' },
+                                { mode: 'html5', video: 'video', type: 'mp4' },
+                                { mode: 'html5', video: 'video', type: 'webm' },
+                                { mode: 'edx_video_id', type: 'edx_video_id', video: 'basic tab video id' }
+                            ]
+                        );
+                    }).always(done);
+            });
+
+            it('handles xblock:editorModalHidden', function(done) {
+                var event = 'xblock:editorModalHidden';
+
+                Backbone.trigger(event);
+                waitForEvent(event)
+                    .then(function() {
+                        expect(Editor.prototype.destroy).toHaveBeenCalled();
+                    }).always(done);
+            });
+        });
+
         describe('Test initialization', function() {
             beforeEach(function() {
                 spyOn(MetadataView, 'Editor');
+                spyOn(Editor.prototype, 'handleFieldChanged');
 
                 transcripts = new Editor({
                     el: $container
                 });
+            });
+
+            afterEach(function() {
+                MetadataView.Editor.calls.reset();
+                Editor.prototype.handleFieldChanged.calls.reset();
             });
 
             $.each(metadataDict, function(index, val) {
@@ -159,6 +254,7 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
 
             beforeEach(function() {
                 spyOn(MetadataView, 'Editor');
+                spyOn(Editor.prototype, 'handleFieldChanged');
 
                 transcripts = new Editor({
                     el: $container
@@ -180,6 +276,11 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                         'getModifiedMetadataValues'
                     ]
                 );
+            });
+
+            afterEach(function() {
+                MetadataView.Editor.calls.reset();
+                Editor.prototype.handleFieldChanged.calls.reset();
             });
 
             describe('Test Advanced to Basic synchronization', function() {
@@ -361,31 +462,6 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                         field_name: 'youtube_id_1_0'
                     }).getValue();
                     expect(youtubeValue).toEqual('');
-                });
-
-                it('Timed Transcript field is updated', function() {
-                    Utils.Storage.set('sub', 'test_value');
-
-                    transcripts.syncAdvancedTab(metadataCollection);
-
-                    var collection = metadataCollection.models,
-                        subValue = collection[1].getValue();
-
-                    expect(subValue).toEqual('test_value');
-                });
-
-                it('Timed Transcript field is updated just once', function() {
-                    Utils.Storage.set('sub', 'test_value');
-
-                    var collection = metadataCollection.models,
-                        subModel = collection[1];
-
-                    spyOn(subModel, 'setValue');
-
-                    transcripts.syncAdvancedTab(metadataCollection);
-                    transcripts.syncAdvancedTab(metadataCollection);
-                    transcripts.syncAdvancedTab(metadataCollection);
-                    expect(subModel.setValue.calls.count()).toEqual(1);
                 });
             });
         });

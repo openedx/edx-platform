@@ -93,9 +93,8 @@ define(
                 return new File([new Blob([Array(size).join('i')], {type: type})], transcriptFileName);
             };
 
-            renderView = function(availableTranscripts, isVideoTranscriptEnabled) {
+            renderView = function(availableTranscripts) {
                 var videoViewIndex = 0,
-                    isVideoTranscriptEnabled = isVideoTranscriptEnabled || _.isUndefined(isVideoTranscriptEnabled), // eslint-disable-line max-len, no-redeclare
                     videoData = {
                         client_video_id: clientVideoID,
                         edx_video_id: edxVideoID,
@@ -109,8 +108,7 @@ define(
                     videoImageSettings: {},
                     videoTranscriptSettings: videoTranscriptSettings,
                     transcriptAvailableLanguages: transcriptAvailableLanguages,
-                    videoSupportedFileFormats: videoSupportedFileFormats,
-                    isVideoTranscriptEnabled: isVideoTranscriptEnabled
+                    videoSupportedFileFormats: videoSupportedFileFormats
                 });
                 videoListView.setElement($('.wrapper-assets'));
                 videoListView.render();
@@ -137,18 +135,6 @@ define(
                 expect(videoListView.$el.find('.js-table-body .transcripts-col')).toExist();
                 // Verify view has initiallized.
                 expect(_.isUndefined(videoTranscriptsView)).toEqual(false);
-            });
-
-            it('does not render transcripts view if feature is disabled', function() {
-                renderView(transcripts, false);
-                // Verify transcript container is not present.
-                expect(videoListView.$el.find('.video-transcripts-header')).not.toExist();
-                // Veirfy transcript column header is not present.
-                expect(videoListView.$el.find('.js-table-head .video-head-col.transcripts-col')).not.toExist();
-                // Verify transcript data column is not present.
-                expect(videoListView.$el.find('.js-table-body .transcripts-col')).not.toExist();
-                // Verify view has not initiallized.
-                expect(_.isUndefined(videoTranscriptsView)).toEqual(true);
             });
 
             it('does not show list of transcripts initially', function() {

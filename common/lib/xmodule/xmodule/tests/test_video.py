@@ -12,6 +12,7 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
+import json
 import os
 import unittest
 import datetime
@@ -36,7 +37,7 @@ from xblock.fields import ScopeIds
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
-from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
+from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store, save_subs_to_store
 from . import LogicTest
 from .test_import import DummySystem
 
@@ -912,22 +913,21 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course')
-    def test_student_view_data(self, field_data, expected_student_view_data, mock_transcript_feature):
+    def test_student_view_data(self, field_data, expected_student_view_data):
         """
         Ensure that student_view_data returns the expected results for video modules.
         """
-        mock_transcript_feature.return_value = False
         descriptor = instantiate_descriptor(**field_data)
         descriptor.runtime.course_id = MagicMock()
         student_view_data = descriptor.student_view_data()
         self.assertEquals(student_view_data, expected_student_view_data)
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.video_module.is_val_transcript_feature_enabled_for_course', Mock(return_value=False))
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     @patch('edxval.api.get_video_info')
-    def test_student_view_data_with_hls_flag(self, mock_get_video_info):
+    def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {
             'url': '/edxval/video/example',
             'edx_video_id': u'example_id',
@@ -943,8 +943,18 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
             ]
         }
 
+        mock_get_video_transcript_content.return_value = {
+            'content': json.dumps({
+                "start": [10],
+                "end": [100],
+                "text": ["Hi, welcome to Edx."],
+            }),
+            'file_name': 'edx.sjson'
+        }
+
         descriptor = instantiate_descriptor(edx_video_id='example_id', only_on_web=False)
         descriptor.runtime.course_id = MagicMock()
+        descriptor.runtime.handler_url = MagicMock()
         student_view_data = descriptor.student_view_data()
         expected_video_data = {u'hls': {'url': u'http://www.meowmix.com', 'file_size': 25556}}
         self.assertDictEqual(student_view_data.get('encoded_videos'), expected_video_data)
@@ -1032,9 +1042,10 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
               <handout src="http://www.example.com/handout"/>
             </video>
         '''
-
+        yt_subs_id = 'OEoXaMPEzfM'
         descriptor = instantiate_descriptor(data=xml_data_sub)
-        download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
+        subs = download_youtube_subs(yt_subs_id, descriptor, settings)
+        save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {
                 "display_name": "Test Video",
@@ -1063,9 +1074,10 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
               <transcript language="ge" src="subs_grmtran1.srt" />
             </video>
         '''
-
+        yt_subs_id = 'OEoXaMPEzfM'
         descriptor = instantiate_descriptor(data=xml_data_sub_transcript)
-        download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
+        subs = download_youtube_subs(yt_subs_id, descriptor, settings)
+        save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {

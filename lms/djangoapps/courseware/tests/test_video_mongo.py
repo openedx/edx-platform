@@ -92,7 +92,6 @@ class TestVideoYouTube(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'duration': None,
                 'poster': None,
@@ -174,7 +173,6 @@ class TestVideoNonYouTube(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'duration': None,
                 'poster': None,
@@ -232,7 +230,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saveStateUrl': '',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'streams': '1.00:3_yD_cEKoCk',
-            'sub': 'a_sub_file.srt.sjson',
             'sources': '[]',
             'duration': 111.0,
             'poster': None,
@@ -363,7 +360,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'sub': data['sub'],
             })
             expected_context.update({
                 'transcript_download_format': (
@@ -1249,7 +1245,6 @@ class TestEditorSavedMethod(BaseTestXmodule):
         # calling editor_saved will generate new file subs_video.srt.sjson for html5_sources
         item.editor_saved(self.user, old_metadata, None)
         self.assertIsInstance(Transcript.get_asset(item.location, 'subs_3_yD_cEKoCk.srt.sjson'), StaticContent)
-        self.assertIsInstance(Transcript.get_asset(item.location, 'subs_video.srt.sjson'), StaticContent)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_editor_saved_when_youtube_and_html5_subs_exist(self, default_store):
@@ -1494,7 +1489,6 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
@@ -1506,21 +1500,6 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.video.sub = english_sub
         student_view_response = self.get_result()
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
-
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    @patch(
-        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
-        Mock(return_value=['ro', 'es']),
-    )
-    def test_student_view_with_val_transcripts_disabled(self):
-        """
-        Test `student_view_data` with edx-val transcripts disabled.
-        """
-        student_view_response = self.get_result()
-        self.assertDictEqual(student_view_response['transcripts'], {self.TEST_LANGUAGE: self.transcript_url})
 
 
 @attr(shard=7)
@@ -2076,7 +2055,6 @@ class TestVideoWithBumper(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'poster': None,
                 'duration': None,
@@ -2148,7 +2126,6 @@ class TestAutoAdvanceVideo(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': [u'example.mp4', u'example.webm'],
                 'duration': None,
                 'poster': None,

@@ -11,7 +11,6 @@ from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
-from xmodule.video_module.transcripts_model_utils import is_val_transcript_feature_enabled_for_course
 
 
 class BlockOutline(object):
@@ -216,12 +215,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
     size = default_encoded_video.get('file_size', 0)
 
     # Transcripts...
-    feature_enabled = is_val_transcript_feature_enabled_for_course(course_id)
-    transcripts_info = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
-    transcript_langs = video_descriptor.available_translations(
-        transcripts=transcripts_info,
-        include_val_transcripts=feature_enabled
-    )
+    transcripts_info = video_descriptor.get_transcripts_info()
+    transcript_langs = video_descriptor.available_translations(transcripts=transcripts_info)
 
     transcripts = {
         lang: reverse(
