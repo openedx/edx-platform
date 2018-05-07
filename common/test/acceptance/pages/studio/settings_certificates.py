@@ -554,6 +554,9 @@ class SignatorySectionPage(CertificatesPage):
         self.wait_for_signature_image_upload_prompt()
 
         asset_file_path = self.file_path(image_filename)
+        # debug: if this fails then i don't know
+        assert os.path.isfile(asset_file_path)
+
         self.q(
             css='.assetupload-modal .upload-dialog input[type="file"]'
         )[0].send_keys(asset_file_path)
