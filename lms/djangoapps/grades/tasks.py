@@ -94,7 +94,7 @@ def compute_grades_for_course_v2(self, **kwargs):
 
     try:
         return compute_grades_for_course(kwargs['course_key'], kwargs['offset'], kwargs['batch_size'])
-    except Exception as exc:   # pylint: disable=broad-except
+    except Exception as exc:
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
@@ -113,6 +113,34 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     for result in CourseGradeFactory().iter(users=student_iter, course_key=course_key, force_update=True):
         if result.error is not None:
             raise result.error
+
+
+@task(
+    bind=True,
+    time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
+    max_retries=2,
+    default_retry_delay=RETRY_DELAY_SECONDS,
+    routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY
+)
+def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint: disable=unused-argument
+    """
+    Recalculates the course grade and all subsection grades
+    for the given ``user`` and ``course_key`` keyword arguments.
+    """
+    user = kwargs.get('user')
+    course_key = kwargs.get('course_key')
+
+    if not user or course_key:
+        message = 'recalculate_course_and_subsection_grades_for_user missing "user" or "course_key" kwargs from {}'
+        log.error(message.format(kwargs))
+
+    previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
+    if previous_course_grade and previous_course_grade.attempted:
+        CourseGradeFactory().update(
+            user=user,
+            course_key=course_key,
+            force_update_subsections=True
+        )
 
 
 @task(
@@ -185,7 +213,7 @@ def _recalculate_subsection_grade(self, **kwargs):
             kwargs['user_id'],
             kwargs['score_deleted'],
         )
-    except Exception as exc:   # pylint: disable=broad-except
+    except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             log.info("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
                 repr(exc),

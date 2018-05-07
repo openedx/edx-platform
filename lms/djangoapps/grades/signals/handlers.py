@@ -26,7 +26,11 @@ from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from .. import events
 from ..scores import weighted_score
-from ..tasks import RECALCULATE_GRADE_DELAY_SECONDS, recalculate_subsection_grade_v3
+from ..tasks import (
+    RECALCULATE_GRADE_DELAY_SECONDS,
+    recalculate_subsection_grade_v3,
+    recalculate_course_and_subsection_grades_for_user
+)
 
 log = getLogger(__name__)
 
@@ -241,10 +245,9 @@ def recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs)
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
     """
-    previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
-    if previous_course_grade and previous_course_grade.attempted:
-        CourseGradeFactory().update(
+    recalculate_course_and_subsection_grades_for_user.apply_async(
+        kwargs=dict(
             user=user,
-            course_key=course_key,
-            force_update_subsections=True
+            course_key=course_key
         )
+    )
