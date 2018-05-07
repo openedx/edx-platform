@@ -1,4 +1,6 @@
 """
+THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+
 Learning Tools Interoperability (LTI) module.
 
 
@@ -250,6 +252,8 @@ class LTIFields(object):
 
 class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     """
+    THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+
     Module provides LTI integration to course.
 
     Except usual Xmodule structure it proceeds with OAuth signing.

@@ -26,7 +26,7 @@ git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc8685
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 git+https://github.com/mitodl/edx-sga.git@6b2f7aa2a18206023c8407e2c46f86d4b4c3ac96#egg=edx-sga==0.8.0
 git+https://github.com/edx/lettuce.git@31b0dfd865766243e9b563ec65fae9122edf7975#egg=lettuce==0.2.23+edx.1
-git+https://github.com/edx/xblock-lti-consumer.git@v1.1.7#egg=lti_consumer-xblock==1.1.7
+git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 -e .
 git+https://github.com/edx/edx-ora2.git@2.1.16#egg=ora2==2.1.16
@@ -134,7 +134,7 @@ edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-drf-extensions==1.2.5
-edx-enterprise==0.67.7
+edx-enterprise==0.67.8
 edx-i18n-tools==0.4.5
 edx-lint==0.5.5
 edx-milestones==0.1.13
@@ -161,7 +161,7 @@ first==2.0.1
 fixtures==3.0.0
 flake8-polyfill==1.0.2
 flake8==3.5.0
-flask==1.0.1
+flask==1.0.2
 freezegun==0.3.10
 fs-s3fs==0.1.8
 fs==2.0.18
@@ -213,7 +213,7 @@ mysql-python==1.2.5
 needle==0.5.0
 networkx==1.7
 newrelic==3.2.0.91
-nltk==3.2.5
+nltk==3.3.0
 nodeenv==1.1.1
 nose==1.3.7
 numpy==1.6.2
@@ -306,12 +306,12 @@ sorl-thumbnail==12.3
 sortedcontainers==0.9.2
 sphinx==1.7.4
 sphinxcontrib-websupport==1.0.1  # via sphinx
-splinter==0.7.7
+splinter==0.8.0
 sqlparse==0.2.4           # via django-debug-toolbar
 stevedore==1.10.0
 sure==1.4.9
 sympy==0.7.1
-testfixtures==6.0.1
+testfixtures==6.0.2
 testtools==2.3.0
 text-unidecode==1.2
 tox-battery==0.5.1
