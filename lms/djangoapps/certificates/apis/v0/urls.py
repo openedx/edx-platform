@@ -16,7 +16,7 @@ CERTIFICATES_URLS = ([
     ),
 ], 'certificates')
 
-app_name = 'certificates'
+app_name = 'v0'
 urlpatterns = [
-    url(r'^certificates/', include(CERTIFICATES_URLS, namespace='certificates')),
+    url(r'^certificates/', include(CERTIFICATES_URLS)),
 ]

@@ -10,7 +10,7 @@ BASKET_URLS = ([
     url(r'^(?P<basket_id>[\w]+)/order/$', views.BasketOrderView.as_view(), name='retrieve_order'),
 ], 'baskets')
 
-app_name = 'commerce'
+app_name = 'v0'
 urlpatterns = [
     url(r'^baskets/', include(BASKET_URLS)),
 ]

@@ -112,8 +112,8 @@ urlpatterns = [
     url(r'^api/val/v0/', include('edxval.urls')),
 
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
-    url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', namespace='credit')),
-    url(r'^rss_proxy/', include('rss_proxy.urls', namespace='rss_proxy')),
+    url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
+    url(r'^rss_proxy/', include('rss_proxy.urls')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
     url(r'^catalog/', include('openedx.core.djangoapps.catalog.urls', namespace='catalog')),
@@ -177,7 +177,7 @@ if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
     ]
 
 urlpatterns += [
-    url(r'^support/', include('support.urls', namespace='support')),
+    url(r'^support/', include('support.urls')),
 ]
 
 # Favicon
@@ -971,7 +971,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
 
 # Certificates
 urlpatterns += [
-    url(r'^certificates/', include('certificates.urls', namespace='certificates')),
+    url(r'^certificates/', include('certificates.urls')),
 
     # Backwards compatibility with XQueue, which uses URLs that are not prefixed with /certificates/
     url(r'^update_certificate$', certificates_views.update_certificate, name='update_certificate'),

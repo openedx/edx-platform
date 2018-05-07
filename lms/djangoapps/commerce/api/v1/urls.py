@@ -12,7 +12,7 @@ ORDER_URLS = ([
     url(r'^(?P<number>[-\w]+)/$', views.OrderView.as_view(), name='detail'),
 ], 'orders')
 
-app_name = 'commerce'
+app_name = 'v1'
 urlpatterns = [
     url(r'^courses/', include(COURSE_URLS)),
     url(r'^orders/', include(ORDER_URLS)),
