@@ -1958,6 +1958,23 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEqual(0, len(videos))
         self.assertInCourseListing(destination_course_key)
 
+    def test_rerun_course_video_upload_token(self):
+        """
+        Test when rerunning a course with video upload token, video upload token is not copied to new course.
+        """
+        # Create a course with video upload token.
+        source_course = CourseFactory.create(video_upload_pipeline={"course_video_upload_token": 'test-token'})
+
+        destination_course_key = self.post_rerun_request(source_course.id)
+        self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
+        self.assertInCourseListing(destination_course_key)
+
+        # Verify video upload pipeline is empty.
+        source_course = self.store.get_course(source_course.id)
+        new_course = self.store.get_course(destination_course_key)
+        self.assertDictEqual(source_course.video_upload_pipeline, {"course_video_upload_token": 'test-token'})
+        self.assertEqual(new_course.video_upload_pipeline, {})
+
     def test_rerun_course_success(self):
         source_course = CourseFactory.create()
         create_video(
@@ -1977,6 +1994,10 @@ class RerunCourseTest(ContentStoreTestCase):
         target_videos = list(get_videos_for_course(text_type(destination_course_key)))
         self.assertEqual(1, len(source_videos))
         self.assertEqual(source_videos, target_videos)
+
+        # Verify that video upload token is empty for rerun.
+        new_course = self.store.get_course(destination_course_key)
+        self.assertEqual(new_course.video_upload_pipeline, {})
 
     def test_rerun_course_resets_advertised_date(self):
         source_course = CourseFactory.create(advertised_start="01-12-2015")
