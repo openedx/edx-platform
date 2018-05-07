@@ -625,6 +625,10 @@ def auto_auth(request):
     redirect_when_done = str2bool(request.GET.get('redirect', '')) or redirect_to
     login_when_done = 'no_login' not in request.GET
 
+    restricted = settings.FEATURES.get('RESTRICT_AUTOMATIC_AUTH', True)
+    if is_superuser and restricted:
+        return HttpResponseForbidden(_('Superuser creation not allowed'))
+
     form = AccountCreationForm(
         data={
             'username': username,
@@ -641,6 +645,8 @@ def auto_auth(request):
     try:
         user, profile, reg = do_create_account(form)
     except (AccountValidationError, ValidationError):
+        if restricted:
+            return HttpResponseForbidden(_('Account modification not allowed.'))
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email

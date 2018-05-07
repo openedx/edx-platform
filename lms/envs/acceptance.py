@@ -113,6 +113,7 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['RESTRICT_AUTOMATIC_AUTH'] = False
 
 # Enable third-party authentication
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
