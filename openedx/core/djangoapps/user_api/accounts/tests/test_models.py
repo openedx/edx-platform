@@ -99,7 +99,7 @@ def test_retirement_request_create_success():
     Ensure that retirement request record creation succeeds.
     """
     user = UserFactory()
-    retirement = UserRetirementRequest.create_retirement_request(user)
+    UserRetirementRequest.create_retirement_request(user)
     assert UserRetirementRequest.has_user_requested_retirement(user)
 
 
@@ -108,7 +108,7 @@ def test_retirement_request_created_upon_status(setup_retirement_states):  # pyl
     Ensure that retirement request record is created upon retirement status creation.
     """
     user = UserFactory()
-    retirement = UserRetirementStatus.create_retirement(user)
+    UserRetirementStatus.create_retirement(user)
     assert UserRetirementRequest.has_user_requested_retirement(user)
 
 

@@ -195,6 +195,9 @@ class UserRetirementRequest(TimeStampedModel):
         """
         return cls.objects.filter(user=user).exists()
 
+    def __unicode__(self):
+        return u'User: {} Requested: {}'.format(self.user.id, self.created)
+
 
 class UserRetirementStatus(TimeStampedModel):
     """
