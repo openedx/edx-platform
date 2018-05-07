@@ -1493,7 +1493,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         self.test_user = self.retirement.user
         self.test_superuser = SuperuserFactory()
         self.headers = self.build_jwt_headers(self.test_superuser)
-        self.headers['content_type'] = "application/merge-patch+json"
+        self.headers['content_type'] = "application/json"
         self.url = reverse('accounts_retirement_update')
 
     def update_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):

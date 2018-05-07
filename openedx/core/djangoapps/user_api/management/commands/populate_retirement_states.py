@@ -66,6 +66,11 @@ class Command(BaseCommand):
                 '{}'.format(REQ_STR)
             )
 
+    def _check_users_in_states_to_delete(self, states_to_delete):
+        if UserRetirementStatus.objects.filter(current_state__state_name__in=states_to_delete).exists():
+            raise CommandError('Users exist in a state that is marked for deletion! States to delete'
+                               'are: {}'.format(states_to_delete))
+
     def _delete_old_states_and_create_new(self, new_states):
         """
         Wipes the RetirementState table and creates new entries based on new_states
@@ -75,31 +80,43 @@ class Command(BaseCommand):
         """
 
         # Save off old states before
-        current_states = RetirementState.objects.all().values_list('state_name', flat=True)
-
-        # Delete all existing rows, easier than messing with the ordering
-        RetirementState.objects.all().delete()
-
-        # Add new rows, with space in between to manually insert stages via Django admin if necessary
-        curr_sort_order = 1
-        for state in new_states:
-            row = {
-                'state_name': state,
-                'state_execution_order': curr_sort_order,
-                'is_dead_end_state': state in END_STATES,
-                'required': state in REQUIRED_STATES
-            }
-
-            RetirementState.objects.create(**row)
-            curr_sort_order += 10
+        current_state_names = RetirementState.objects.all().values_list('state_name', flat=True)
 
         # Generate the diff
-        set_current_states = set(current_states)
+        set_current_states = set(current_state_names)
         set_new_states = set(new_states)
 
         states_to_create = set_new_states - set_current_states
         states_remaining = set_current_states.intersection(set_new_states)
         states_to_delete = set_current_states - set_new_states
+
+        # In theory this should not happen, this would have failed _check_current_users
+        # if the state was not required, and failed _validate_new_states if we're trying
+        # to remove a required state, but playing it extra safe here since a state delete
+        # will cascade and remove the UserRetirementState row as well if something slips
+        # through.
+        if states_to_delete:
+            self._check_users_in_states_to_delete(states_to_delete)
+
+        # Delete states slated for removal
+        RetirementState.objects.filter(state_name__in=states_to_delete).delete()
+
+        # Add new rows, with space in between to manually insert stages via Django admin if necessary
+        curr_sort_order = 1
+        for state in new_states:
+            if state not in current_state_names:
+                row = {
+                    'state_name': state,
+                    'state_execution_order': curr_sort_order,
+                    'is_dead_end_state': state in END_STATES,
+                    'required': state in REQUIRED_STATES
+                }
+
+                RetirementState.objects.create(**row)
+            else:
+                RetirementState.objects.filter(state_name=state).update(state_execution_order=curr_sort_order)
+
+            curr_sort_order += 10
 
         return states_to_create, states_remaining, states_to_delete
 

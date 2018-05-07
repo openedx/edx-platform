@@ -167,16 +167,6 @@ class RetirementState(models.Model):
         return cls.objects.all().values_list('state_name', flat=True)
 
 
-@receiver(pre_delete, sender=RetirementState)
-def retirementstate_pre_delete_callback(_, **kwargs):
-    """
-    Event changes to user preferences.
-    """
-    state = kwargs["instance"]
-    if state.required:
-        raise Exception('Required RetirementStates cannot be deleted.')
-
-
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
