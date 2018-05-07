@@ -78,6 +78,22 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    sailthru_verification_passed_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on passed ID verification."
+        )
+    )
+
+    sailthru_verification_failed_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on failed ID verification."
+        )
+    )
+
     sailthru_upgrade_template = models.fields.CharField(
         max_length=20,
         blank=True,
