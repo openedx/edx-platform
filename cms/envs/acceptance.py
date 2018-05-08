@@ -96,6 +96,7 @@ DATABASES = {
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['RESTRICT_AUTOMATIC_AUTH'] = False
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for lettuce acceptance tests.

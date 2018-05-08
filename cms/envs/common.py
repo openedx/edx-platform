@@ -304,6 +304,12 @@ FEATURES = {
     # Whether archived courses (courses with end dates in the past) should be
     # shown in Studio in a separate list.
     'ENABLE_SEPARATE_ARCHIVED_COURSES': True,
+
+    # For acceptance and load testing
+    'AUTOMATIC_AUTH_FOR_TESTING': False,
+
+    # Prevent auto auth from creating superusers or modifying existing users
+    'RESTRICT_AUTOMATIC_AUTH': True,
 }
 
 ENABLE_JASMINE = False
