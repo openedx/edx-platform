@@ -78,13 +78,9 @@ def get_user_demographic_data(profile):
                              data={'_uid': 1, 'username': profile.user.username},
                              headers=headers)
 
-    try:
-        user_community_data = json.loads(response._content)['payload']
-        reputation = user_community_data['reputation']
-        postcount = user_community_data['postcount']
-    except:
-        reputation = 0
-        postcount = 0
+    user_community_data = json.loads(response._content)['payload']
+    reputation = user_community_data.get('reputation', 0)
+    postcount = user_community_data.get('postcount', 0)
 
     return {
         'student_id': profile.user.id,
