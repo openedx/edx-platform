@@ -38,8 +38,9 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
     )
 
     report_store.store_rows(course_id, report_name, rows)
+    report_path = report_store.storage.url(report_store.path_to(course_id, report_name))
     tracker_emit(csv_name)
-    return report_name
+    return report_name, report_path
 
 
 def tracker_emit(report_name):

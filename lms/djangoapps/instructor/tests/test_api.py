@@ -2737,7 +2737,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         response = self.client.post(url, {'problem_location': problem_location})
         res_json = json.loads(response.content)
-        self.assertEqual(res_json, 'Could not find problem with this location.')
+        self.assertEqual(res_json, "Could not find problem with location: ''.")
 
     def valid_problem_location(test):  # pylint: disable=no-self-argument
         """
@@ -3160,16 +3160,17 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
         success_status = "The {report_type} report is being created.".format(report_type=report_type)
-        with patch(task_api_endpoint) as patched_task_api_endpoint:
-            patched_task_api_endpoint.return_value.task_id = "12345667-9abc-deff-ffed-cba987654321"
-
-            if report_type == 'problem responses':
+        if report_type == 'problem responses':
+            with patch(task_api_endpoint) as mock_task_api_endpoint:
+                mock_task_api_endpoint.return_value = Mock(task_id='task-id-1138')
                 response = self.client.post(url, {'problem_location': ''})
-                self.assertIn(success_status, response.content)
-            else:
-                CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+            self.assertIn(success_status, response.content)
+        else:
+            CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+            with patch(task_api_endpoint) as mock_task_api_endpoint:
+                mock_task_api_endpoint.return_value = Mock(task_id='task-id-1138')
                 response = self.client.post(url, {})
-                self.assertIn(success_status, response.content)
+            self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack

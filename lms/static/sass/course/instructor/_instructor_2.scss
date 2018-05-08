@@ -313,6 +313,25 @@
       }
     }
   }
+
+  .report-popup-modal-body {
+    text-align: center;
+    p {
+      text-align: center;
+    }
+    .msg {
+      display: inherit;
+      &.error {
+        color: $error-color;
+      }
+      &.error {
+        color: $warning-color;
+      }
+    }
+    .progress {
+      color: $darkest-base-font-color;
+    }
+  }
 }
 
 // elements - general
@@ -1503,6 +1522,10 @@
         text-overflow: ellipsis;
       }
     }
+  }
+
+  #react-problem-report {
+    margin: $baseline 0;
   }
 
   .block-browser {

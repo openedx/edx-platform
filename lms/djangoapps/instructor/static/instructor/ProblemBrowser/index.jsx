@@ -1,4 +1,4 @@
-import store from 'BlockBrowser/data/store';
+import store from './data/store';
 import React from 'react';
 
 import { Provider } from 'react-redux';

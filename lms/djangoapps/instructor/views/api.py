@@ -1015,7 +1015,7 @@ def get_problem_responses(request, course_id):
         if problem_key.course_key != course_key:
             raise InvalidKeyError(type(problem_key), problem_key)
     except InvalidKeyError:
-        return JsonResponseBadRequest(_("Could not find problem with this location."))
+        return JsonResponseBadRequest(_("Could not find problem with location: '{}'.".format(problem_location)))
 
     task = lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(
         request, course_key, problem_location

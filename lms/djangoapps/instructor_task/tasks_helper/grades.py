@@ -10,6 +10,7 @@ from time import time
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.urls import reverse
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
@@ -698,7 +699,12 @@ class ProblemResponses(object):
         # Perform the upload
         problem_location = re.sub(r'[:/]', '_', problem_location)
         csv_name = 'student_state_from_{}'.format(problem_location)
-        report_name = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
-        current_step = {'step': 'CSV uploaded', 'report_name': report_name}
+        report_name, report_path = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
+        current_step = {
+            'step': 'CSV uploaded',
+            'report_name': report_name,
+            'report_path': report_path,
+            'report_preview': '{}?csvUrl={}'.format(reverse('csv-viewer'), report_path),
+        }
 
         return task_progress.update_task_state(extra_meta=current_step)

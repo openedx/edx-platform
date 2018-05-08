@@ -18,7 +18,7 @@ export const buildBlockTree = (blocks, excludeBlockTypes) => {
   return blockTree(blocks.root, null);
 };
 
-const blocks = (state = {}, action) => {
+export const blocks = (state = {}, action) => {
   switch (action.type) {
     case courseBlocksActions.fetch.SUCCESS:
       return buildBlockTree(action.blocks, action.excludeBlockTypes);
@@ -27,7 +27,7 @@ const blocks = (state = {}, action) => {
   }
 };
 
-const selectedBlock = (state = null, action) => {
+export const selectedBlock = (state = null, action) => {
   switch (action.type) {
     case courseBlocksActions.SELECT_BLOCK:
       return action.blockId;
@@ -37,7 +37,7 @@ const selectedBlock = (state = null, action) => {
 };
 
 
-const rootBlock = (state = null, action) => {
+export const rootBlock = (state = null, action) => {
   switch (action.type) {
     case courseBlocksActions.fetch.SUCCESS:
       return action.blocks.root;

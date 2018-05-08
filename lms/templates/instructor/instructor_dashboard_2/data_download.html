@@ -58,22 +58,18 @@ from openedx.core.djangolib.markup import HTML, Text
       </p>
     %endif
 
-    <p>
-      <div class="problems">
+    <div class="problems">
         ${static.renderReact(
           component="ProblemBrowser",
-          id="react-block-listing",
+          id="react-problem-report",
           props={
             "courseId": course.id,
-            "excludeBlockTypes": ['html', 'video', 'discussion']
+            "excludeBlockTypes": ['html', 'video', 'discussion'],
+            "initialEndpoint": section_data['get_problem_responses_url'],
+            "taskStatusEndpoint": "/instructor_task_status"
           }
         )}
-      </div>
-    </p>
-
-    <p>
-      <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
-    </p>
+    </div>
 
     <div class="issued_certificates">
       <p>${_("Click to list certificates that are issued for this course:")}</p>
