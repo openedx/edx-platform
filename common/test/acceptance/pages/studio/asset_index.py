@@ -23,7 +23,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
 
     PAGINATION_PAGE_ELEMENT = ".pagination li"
     TABLE_SORT_BUTTONS = 'th.sortable button.btn-header'
-    TYPE_FILTER_ELEMENT = ".filter-set .form-group"
+    TYPE_FILTER_ELEMENT = 'div[data-identifier="asset-filters"] .form-group'
     URL_PATH = "assets"
 
     @property
@@ -93,14 +93,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
     @wait_for_js
     def are_no_results_headings_on_page(self):
         """Checks that no results page text is on page."""
-        return all([
-            self.q(css='.SFE-wrapper h3').filter(
-                lambda el: el.text == '0 files'
-            ).present,
-            self.q(css='.SFE-wrapper h4').filter(
-                lambda el: el.text == 'No files were found.'
-            ).present,
-        ])
+        return self.q(css='.SFE-wrapper h3').filter(lambda el: el.text == '0 files found').present
 
     @wait_for_js
     def is_no_results_clear_filter_button_on_page(self):
