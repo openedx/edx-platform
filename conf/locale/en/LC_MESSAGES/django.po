@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
+"POT-Creation-Date: 2018-05-08 07:18+0000\n"
+"PO-Revision-Date: 2018-05-08 07:18:58.430351\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -90,6 +90,32 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -714,6 +740,7 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -739,7 +766,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr ""
 
@@ -4170,7 +4199,7 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
+msgid "Language is required."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -6061,6 +6090,14 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
@@ -8536,13 +8573,6 @@ msgstr ""
 msgid "Your {platform_name} verification has expired."
 msgstr ""
 
-#: lms/djangoapps/verify_student/utils.py
-#, python-brace-format
-msgid ""
-"Could not send verification status email having subject: {subject} and email"
-" of user: {email}"
-msgstr ""
-
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr ""
@@ -9824,6 +9854,27 @@ msgid ""
 "        "
 msgstr ""
 
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
+
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
 msgid "The file must be smaller than {image_max_size} in size."
@@ -10994,24 +11045,24 @@ msgstr ""
 msgid "The information you entered is incorrect."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11023,7 +11074,25 @@ msgid "Can't find item by locator."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
+msgid "No such transcript."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
@@ -15828,34 +15897,6 @@ msgstr ""
 msgid "You have been enrolled in {course_name}"
 msgstr ""
 
-#: lms/templates/emails/failed_verification_email.txt
-msgid ""
-"Sorry! The photos you submitted for ID verification were not accepted, for "
-"the following reason(s):"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "The photo(s) of you: {reason}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Resubmit Verification: {reverify_url}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Thank you,"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "The {platform_name} team"
-msgstr ""
-
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -15863,11 +15904,15 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr ""
 
@@ -15881,6 +15926,11 @@ msgid ""
 "begun.Check for an email from us in the next few days to confirm whether "
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
+msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} team"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -16067,15 +16117,6 @@ msgstr ""
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
-msgstr ""
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
-msgstr ""
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid ""
-"Your verification is effective for one year. It will expire on {expiry_date}"
 msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt

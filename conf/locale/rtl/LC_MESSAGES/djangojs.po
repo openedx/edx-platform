@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.128556\n"
+"POT-Creation-Date: 2018-05-08 07:18+0000\n"
+"PO-Revision-Date: 2018-05-08 07:18:58.402076\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -237,6 +237,7 @@ msgid "Advanced"
 msgstr "شيدشرذثي"
 
 #: cms/static/js/views/previous_video_upload.js
+#: cms/static/js/views/video/translations_editor.js
 #: cms/static/js/views/video_transcripts.js lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "قثوخدهرل"
@@ -2559,7 +2560,6 @@ msgstr "شررخفشفهخر فثطف"
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
-#: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear"
 msgstr "ذمثشق"
 
@@ -5184,6 +5184,10 @@ msgstr "خدثقشمم سذخقث"
 msgid "Bookmark this page"
 msgstr "زخخنوشقن فاهس حشلث"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal to {goal}!"
+msgstr "فاشرن غخع بخق سثففهرل غخعق ذخعقسث لخشم فخ {goal}!"
+
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "You have successfully updated your goal."
 msgstr "غخع اشدث سعذذثسسبعممغ عحيشفثي غخعق لخشم."
@@ -6534,10 +6538,6 @@ msgid "Error: Connection with server failed."
 msgstr "ثققخق: ذخررثذفهخر صهفا سثقدثق بشهمثي."
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "No sources"
-msgstr "رخ سخعقذثس"
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Link types should be unique."
 msgstr "مهرن فغحثس ساخعمي زث عرهضعث."
 
@@ -6556,6 +6556,23 @@ msgid ""
 msgstr ""
 "سخققغ, فاثقث صشس شر ثققخق حشقسهرل فاث سعزفهفمثس فاشف غخع عحمخشيثي. حمثشسث "
 "ذاثذن فاث بخقوشف شري فقغ شلشهر."
+
+#: cms/static/js/views/video/translations_editor.js
+#: cms/static/js/views/video_transcripts.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr "شقث غخع سعقث غخع صشرف فخ قثوخدث فاهس فقشرسذقهحف?"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for this"
+" component."
+msgstr ""
+"هب غخع قثوخدث فاهس فقشرسذقهحف, فاث فقشرسذقهحف صهمم رخف زث شدشهمشزمث بخق فاهس"
+" ذخوحخرثرف."
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Remove Transcript"
+msgstr "قثوخدث فقشرسذقهحف"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
@@ -6689,10 +6706,6 @@ msgstr ""
 #: cms/templates/js/video-transcripts.underscore
 msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 msgstr "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Are you sure you want to remove this transcript?"
-msgstr "شقث غخع سعقث غخع صشرف فخ قثوخدث فاهس فقشرسذقهحف?"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
@@ -10035,7 +10048,6 @@ msgstr "رثص %(item_type)s"
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
-#: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear Value"
 msgstr "ذمثشق دشمعث"
 

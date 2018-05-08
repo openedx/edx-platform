@@ -218,7 +218,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-22 20:42+0000\n"
+"POT-Creation-Date: 2018-05-06 20:42+0000\n"
 "PO-Revision-Date: 2018-03-23 23:51+0000\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -950,6 +950,7 @@ msgstr ""
 "escríbanos al correo electrónico."
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -986,7 +987,9 @@ msgstr ""
 "Demasiados intentos fallidos de inicio de sesión. Inténtelo de nuevo más "
 "tarde."
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Correo electrónico o contraseña incorrectos."
 
@@ -1142,6 +1145,10 @@ msgstr "Eliminar configuración seleccionada(s)"
 #: common/djangoapps/third_party_auth/admin.py
 msgid "Delete the selected configuration"
 msgstr "Eliminar la configuración seleccionada"
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -10130,18 +10137,13 @@ msgstr "Bienvenido/a a {platform_name}."
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
-"{start_bold}{enterprise_name}{end_bold} ha colaborado con "
-"{start_bold}{platform_name}{end_bold} para ofrecerle programas de "
-"aprendizaje siempre disponibles y de alta calidad para ayudarlo a avanzar en"
-" conocimiento y carrera profesional. {line_break}Por favor continúe con el "
-"registro, o inicie sesión si ya es un usuario registrado, y seleccione "
-"continuar para comenzar a aprender."
 
 #: lms/templates/emails/password_reset_subject.txt
 #, python-format
@@ -11004,6 +11006,10 @@ msgstr ""
 msgid "A cohort with the same name already exists."
 msgstr "Ya existe una cohorte con ese nombre."
 
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr ""
+
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
 msgstr "URL del servicio interno"
@@ -11275,6 +11281,27 @@ msgstr ""
 "\n"
 "El servidor de identidad de su universidad no nos regresó su información de identificación.\n"
 "Por favor, intente acceder nuevamente. (Es posible que tenga que reiniciar su navegador.)"
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -24422,8 +24449,8 @@ msgstr "Dirección de correo electrónico del usuario"
 #: cms/templates/manage_users.html
 msgid "Provide the email address of the user you want to add as Staff"
 msgstr ""
-"Ingrese el correo electrónico del usuario al cual quiere agregar como "
-"Funcionario del curso"
+"Ingrese el correo electrónico del usuario al cual quiere agregar como parte "
+"del equipo de administración del curso."
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Add User"

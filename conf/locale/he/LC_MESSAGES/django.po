@@ -80,13 +80,14 @@
 # Nadav Stark <nadav@yeda.org.il>, 2015
 # Ned Batchelder <ned@edx.org>, 2016
 # qualityalltext <quality@alltext.co.il>, 2016
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-22 20:42+0000\n"
-"PO-Revision-Date: 2018-03-13 13:51+0000\n"
-"Last-Translator: Nadav Stark <nadav@yeda.org.il>\n"
+"POT-Creation-Date: 2018-05-06 20:42+0000\n"
+"PO-Revision-Date: 2018-05-02 07:51+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -795,6 +796,7 @@ msgstr ""
 "אירעה שגיאה בזמן קבלת מידע התחברות. אנא צרו איתנו קשר באמצעות דואר אלקטרוני."
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -827,7 +829,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "מספר נסיונות חיבור רב מדי. אנא נסה מאוחר יותר."
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "דואר אלקטרוני או סיסמה שגויים."
 
@@ -976,6 +980,10 @@ msgstr ""
 
 #: common/djangoapps/third_party_auth/admin.py
 msgid "Delete the selected configuration"
+msgstr ""
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -9435,11 +9443,12 @@ msgstr "ברוכ/ה הבא/ה ל {platform_name}."
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
 
 #: lms/templates/emails/password_reset_subject.txt
@@ -10269,6 +10278,10 @@ msgstr "חייבת להיות קבוצת לימוד אחת שאליה ניתן �
 msgid "A cohort with the same name already exists."
 msgstr "קבוצת לימוד בעלת אותו שם כבר קיימת."
 
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr ""
+
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
 msgstr "כתובת URL לשירות פנימי"
@@ -10526,6 +10539,27 @@ msgstr ""
 "\n"
 "שרת מזהה האוניברסיטה לא החזיר את פרטי המזהה שלך אלינו.\n"
 "נסה להתחבר שוב. (ייתכן שתצטרך להפעיל מחדש את הדפדפן שלך)."
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
