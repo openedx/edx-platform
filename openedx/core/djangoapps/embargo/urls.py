@@ -4,6 +4,7 @@ from django.conf.urls import url
 
 from .views import CheckCourseAccessView, CourseAccessMessageView
 
+app_name = 'embargo'
 urlpatterns = [
     url(
         r'^blocked-message/(?P<access_point>enrollment|courseware)/(?P<message_key>.+)/$',
