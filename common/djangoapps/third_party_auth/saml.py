@@ -14,6 +14,7 @@ from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
 
+from .utils import update_username_suggestion
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
@@ -176,6 +177,7 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
             field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
             for field in extra_field_definitions
         })
+        details = update_username_suggestion(details, self.conf)
         return details
 
     @property
