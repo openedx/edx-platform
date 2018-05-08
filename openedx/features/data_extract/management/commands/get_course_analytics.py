@@ -1,9 +1,11 @@
 import base64
 import json
 import tempfile
+import pyminizip
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
 from django.core.management.base import BaseCommand, CommandError
 
 from common.lib.mandrill_client.client import MandrillClient
@@ -49,17 +51,14 @@ class Command(BaseCommand):
                     'progress_data': progress_data,
                 })
 
-            with tempfile.TemporaryFile() as tmp:
+            with tempfile.NamedTemporaryFile() as tmp:
+                pyminizip.compress(tmp.name, '/tmp/data.zip', 'philu2miriam', 1)
                 for email in emails:
-                    MandrillClient().send_mail(
-                        template_name=MandrillClient.ACUMEN_DATA_TEMPLATE,
-                        user_email=email,
-                        context={},
-                        attachments=[
-                            {
-                                "type": "text/plain",
-                                "name": "data.json",
-                                "content": base64.encodestring(json.dumps(course_data))
-                            }
-                        ]
+                    email_message = EmailMessage(
+                        subject='Data from PhilU',
+                        body='hello there',
+                        from_email='no-reply@philanthropyu.org',
+                        to=[email]
                     )
+                    email_message.attach_file('/tmp/data.zip')
+                    email_message.send()
