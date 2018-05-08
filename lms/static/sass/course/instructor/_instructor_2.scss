@@ -313,6 +313,28 @@
       }
     }
   }
+
+  .report-generation-status {
+    .msg {
+      display: inherit;
+
+      &.error {
+        color: $error-color;
+      }
+
+      > div {
+        display: inline-block;
+      }
+
+      a {
+        margin: 0 1rem;
+
+        & > div {
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
 
 // elements - general
@@ -1507,6 +1529,10 @@
         overflow-x: hidden !important;
       }
     }
+  }
+
+  #react-problem-report {
+    margin: $baseline 0;
   }
 
   .block-browser {

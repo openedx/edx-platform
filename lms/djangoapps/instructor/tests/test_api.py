@@ -2564,7 +2564,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         response = self.client.post(url, {'problem_location': problem_location})
         res_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(res_json, 'Could not find problem with this location.')
+        self.assertEqual(res_json, "Could not find problem with this location.")
 
     def valid_problem_location(test):  # pylint: disable=no-self-argument
         """
@@ -2838,15 +2838,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     @ddt.data(*REPORTS_DATA)
     @ddt.unpack
     @valid_problem_location
-    def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+    def test_calculate_report_csv_success(
+        self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs
+    ):
         kwargs = {'course_id': text_type(self.course.id)}
         kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
         success_status = u"The {report_type} report is being created.".format(report_type=report_type)
-        with patch(task_api_endpoint) as patched_task_api_endpoint:
-            patched_task_api_endpoint.return_value.task_id = "12345667-9abc-deff-ffed-cba987654321"
-
+        with patch(task_api_endpoint) as mock_task_api_endpoint:
             if report_type == 'problem responses':
+                mock_task_api_endpoint.return_value = Mock(task_id='task-id-1138')
                 response = self.client.post(url, {'problem_location': ''})
                 self.assertContains(response, success_status)
             else:
