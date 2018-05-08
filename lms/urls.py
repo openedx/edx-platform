@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
+from rest_framework_swagger.views import get_swagger_view
 
 from branding import views as branding_views
 from config_models.views import ConfigurationModelCurrentAPIView
@@ -1071,6 +1072,11 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
 if settings.BRANCH_IO_KEY:
     urlpatterns += [
         url(r'^text-me-the-app', student_views.text_me_the_app, name='text_me_the_app'),
+    ]
+
+if settings.FEATURES.get('ENABLE_API_DOCS'):
+    urlpatterns += [
+        url(r'^api-docs/$', get_swagger_view(title='LMS API')),
     ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

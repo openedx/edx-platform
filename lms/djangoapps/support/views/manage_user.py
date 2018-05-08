@@ -37,6 +37,10 @@ class ManageUserDetailView(GenericAPIView):
     Allows viewing and disabling learner accounts by support
     staff.
     """
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    exclude_from_schema = True
 
     @method_decorator(require_support_permission)
     def get(self, request, username_or_email):

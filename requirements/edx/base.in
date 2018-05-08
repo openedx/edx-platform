@@ -52,6 +52,7 @@ django-pyfs
 django-ratelimit
 django-ratelimit-backend==1.1.1
 django-require
+django-rest-swagger                 # API documentation
 django-sekizai
 django-ses==0.8.4
 django-simple-history

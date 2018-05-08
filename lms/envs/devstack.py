@@ -87,6 +87,10 @@ def should_show_debug_toolbar(request):
         return False
     return True
 
+########################### API DOCS #################################
+
+FEATURES['ENABLE_API_DOCS'] = True
+
 ########################### PIPELINE #################################
 
 PIPELINE_ENABLED = False
