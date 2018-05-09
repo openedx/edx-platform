@@ -1,7 +1,5 @@
-import operator
 from datetime import date
-
-import collections
+from difflib import SequenceMatcher
 
 COUNTRIES = {
     'AD': 'Andorra',
@@ -7827,3 +7825,8 @@ def oef_eligible_first_learner(user_extended_profile):
     """
     return user_extended_profile.is_first_signup_in_org and not user_extended_profile.has_submitted_oef() \
            and not user_extended_profile.organization.admin
+
+
+def get_str_match_ratio(str1, str2):
+    """ Return matching percentage of two strings """
+    return SequenceMatcher(None, str1, str2).ratio()
