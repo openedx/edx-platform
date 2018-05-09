@@ -192,31 +192,38 @@ def inline_discussion(request, course_key, discussion_id):
     Renders JSON for DiscussionModules
     """
 
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-    cc_user = cc.User.from_django_user(request.user)
-    user_info = cc_user.to_dict()
+    with function_trace('get_course_and_user_info'):
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        cc_user = cc.User.from_django_user(request.user)
+        user_info = cc_user.to_dict()
 
     try:
-        threads, query_params = get_threads(request, course, user_info, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+        with function_trace('get_threads'):
+            threads, query_params = get_threads(
+                request, course, user_info, discussion_id, per_page=INLINE_THREADS_PER_PAGE
+            )
     except ValueError:
-        return HttpResponseServerError("Invalid group_id")
+        return HttpResponseServerError('Invalid group_id')
 
-    with function_trace("get_metadata_for_threads"):
+    with function_trace('get_metadata_for_threads'):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
-    is_staff = has_permission(request.user, 'openclose_thread', course.id)
-    course_discussion_settings = get_course_discussion_settings(course.id)
-    group_names_by_id = get_group_names_by_id(course_discussion_settings)
-    course_is_divided = course_discussion_settings.division_scheme is not CourseDiscussionSettings.NONE
-    threads = [
-        utils.prepare_content(
-            thread,
-            course_key,
-            is_staff,
-            course_is_divided,
-            group_names_by_id
-        ) for thread in threads
-    ]
+    with function_trace('determine_group_permissions'):
+        is_staff = has_permission(request.user, 'openclose_thread', course.id)
+        course_discussion_settings = get_course_discussion_settings(course.id)
+        group_names_by_id = get_group_names_by_id(course_discussion_settings)
+        course_is_divided = course_discussion_settings.division_scheme is not CourseDiscussionSettings.NONE
+
+    with function_trace('prepare_content'):
+        threads = [
+            utils.prepare_content(
+                thread,
+                course_key,
+                is_staff,
+                course_is_divided,
+                group_names_by_id
+            ) for thread in threads
+        ]
 
     return utils.JsonResponse({
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id),
