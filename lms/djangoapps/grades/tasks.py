@@ -127,13 +127,15 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     Recalculates the course grade and all subsection grades
     for the given ``user`` and ``course_key`` keyword arguments.
     """
-    user = kwargs.get('user')
-    course_key = kwargs.get('course_key')
+    user_id = kwargs.get('user_id')
+    course_key_str = kwargs.get('course_key')
 
-    if not user or course_key:
+    if not user_id or course_key_str:
         message = 'recalculate_course_and_subsection_grades_for_user missing "user" or "course_key" kwargs from {}'
         log.error(message.format(kwargs))
 
+    user = User.objects.get(id=user_id)
+    course_key = CourseKey.from_string(course_key_str)
     previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
     if previous_course_grade and previous_course_grade.attempted:
         CourseGradeFactory().update(
