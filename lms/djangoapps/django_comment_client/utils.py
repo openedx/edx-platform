@@ -110,7 +110,7 @@ def has_required_keys(xblock):
             log.debug(
                 "Required key '%s' not in discussion %s, leaving out of category map",
                 key,
-                getattr(xblock, 'location', None)
+                xblock.location
             )
             return False
     return True
