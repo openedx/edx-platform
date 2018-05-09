@@ -348,7 +348,7 @@ class VideoStudentViewHandlers(object):
             lang = request.GET.get('lang', None)
 
             try:
-                content, filename, mimetype = get_transcript(self, lang)
+                content, filename, mimetype = get_transcript(self, lang, output_format=self.transcript_download_format)
             except NotFoundError:
                 return Response(status=404)
 
