@@ -16,6 +16,7 @@ import logging
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import F
 
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 
@@ -100,6 +101,10 @@ class Command(BaseCommand):
 
         # Delete states slated for removal
         RetirementState.objects.filter(state_name__in=states_to_delete).delete()
+
+        # Get all of our remaining states out of the way so we don't have
+        # state_execution_order collisions
+        RetirementState.objects.all().update(state_execution_order=F('state_execution_order') + 500)
 
         # Add new rows, with space in between to manually insert stages via Django admin if necessary
         curr_sort_order = 1
