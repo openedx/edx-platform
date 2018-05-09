@@ -137,7 +137,7 @@ edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-drf-extensions==1.2.5
-edx-enterprise==0.67.8
+edx-enterprise==0.68.1
 edx-i18n-tools==0.4.5
 edx-lint==0.5.5
 edx-milestones==0.1.13
@@ -182,7 +182,7 @@ httpretty==0.9.4
 idna==2.6
 imagesize==1.0.0          # via sphinx
 incremental==17.5.0
-inflect==0.2.5
+inflect==0.3.1
 ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0
@@ -295,7 +295,7 @@ s3transfer==0.1.13
 sailthru-client==2.2.3
 scipy==0.14.0
 scrapy==1.1.2
-selenium==3.11.0
+selenium==3.12.0
 service-identity==17.0.0
 shapely==1.2.16
 shortuuid==0.5.0
