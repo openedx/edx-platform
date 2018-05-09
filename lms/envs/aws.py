@@ -195,8 +195,8 @@ if 'ENABLE_S3_GRADE_DOWNLOADS' in FEATURES:
 CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
+    # TODO: bbeggs remove this before prod, temp fix to get load testing running
+    "*",
     ENV_TOKENS.get('LMS_BASE'),
     FEATURES['PREVIEW_LMS_BASE'],
 ]
