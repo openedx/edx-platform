@@ -1,7 +1,7 @@
 """
 Common comment client utility functions.
 """
-
+import logging
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -12,8 +12,11 @@ from django_comment_common.models import (
 )
 from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
 from openedx.core.djangoapps.request_cache.middleware import request_cached
+from xmodule.modulestore.django import modulestore
 
 from .models import CourseDiscussionSettings
+
+log = logging.getLogger(__name__)
 
 
 class ThreadContext(object):
@@ -160,3 +163,29 @@ def set_course_discussion_settings(course_key, **kwargs):
 
     course_discussion_settings.save()
     return course_discussion_settings
+
+
+def get_discussion_xblocks_by_course_id(course_id):  # pylint: disable=invalid-name
+    """
+    Return a list of all valid discussion xblocks in this course.
+    """
+    all_xblocks = modulestore().get_items(
+        course_id, qualifiers={'category': 'discussion'}, include_orphans=False
+    )
+    return [xblock for xblock in all_xblocks if has_required_keys(xblock)]
+
+
+def has_required_keys(xblock):
+    """
+    Returns True iff xblock has the proper attributes for generating metadata
+    with get_discussion_id_map_entry()
+    """
+    for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+        if getattr(xblock, key, None) is None:
+            log.debug(
+                "Required key '%s' not in discussion %s, leaving out of category map",
+                key,
+                xblock.location
+            )
+            return False
+    return True

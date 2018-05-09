@@ -17,6 +17,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
 FORUM_ROLE_GROUP_MODERATOR = ugettext_noop('Group Moderator')
