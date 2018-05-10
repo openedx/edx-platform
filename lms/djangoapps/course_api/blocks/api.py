@@ -2,13 +2,13 @@
 API function for retrieving course blocks data
 """
 
-from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
+from lms.djangoapps.course_blocks.api import COURSE_BLOCK_ACCESS_TRANSFORMERS, get_course_blocks
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
+from .serializers import BlockDictSerializer, BlockSerializer
 from .transformers.blocks_api import BlocksAPITransformer
-from .transformers.milestones import MilestonesTransformer
-from .serializers import BlockSerializer, BlockDictSerializer
+from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 
 
 def get_blocks(
@@ -51,8 +51,12 @@ def get_blocks(
     """
     # create ordered list of transformers, adding BlocksAPITransformer at end.
     transformers = BlockStructureTransformers()
+    include_special_exams = False
+    if requested_fields is not None and 'special_exam_info' in requested_fields:
+        include_special_exams = True
     if user is not None:
-        transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS + [MilestonesTransformer(), HiddenContentTransformer()]
+        transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS
+        transformers += [MilestonesAndSpecialExamsTransformer(include_special_exams), HiddenContentTransformer()]
     transformers += [
         BlocksAPITransformer(
             block_counts,

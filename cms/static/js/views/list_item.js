@@ -22,6 +22,7 @@ define([
         canDelete: false,
 
         initialize: function() {
+            this.restrictEditing = this.options.restrictEditing || false;
             this.listenTo(this.model, 'change:editing', this.render);
             this.listenTo(this.model, 'remove', this.remove);
         },

@@ -8,9 +8,9 @@ from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from rest_framework.generics import GenericAPIView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.generics import GenericAPIView
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -20,7 +20,7 @@ from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from util.json_request import JsonResponse
 
 

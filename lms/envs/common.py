@@ -38,18 +38,15 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
-import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.mixin import LicenseMixin
+from openedx.core.lib.license import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
-# Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
-COPYRIGHT_YEAR = "2017"
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
@@ -255,10 +252,6 @@ FEATURES = {
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
-    # When set to True, a list of programs is displayed along with the list of courses
-    # when the user visits the homepage or the find courses page.
-    'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False,
-
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
@@ -295,6 +288,10 @@ FEATURES = {
 
     # For easily adding modes to courses during acceptance testing
     'MODE_CREATION_FOR_TESTING': False,
+
+    # For caching programs in contexts where the LMS can only
+    # be reached over HTTP.
+    'EXPOSE_CACHE_PROGRAMS_ENDPOINT': False,
 
     # Courseware search feature
     'ENABLE_COURSEWARE_SEARCH': False,
@@ -363,8 +360,11 @@ FEATURES = {
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
 
-    # Show Language selector.
-    'SHOW_LANGUAGE_SELECTOR': False,
+    # Show the language selector in the header
+    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
+
+    # Show the language selector in the footer
+    'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
     # Write new CSM history to the extended table.
     # This will eventually default to True and may be
@@ -389,9 +389,34 @@ FEATURES = {
     # Allow public account creation
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
+    # Enable footer banner for cookie consent.
+    # See https://cookieconsent.insites.com/ for more.
+    'ENABLE_COOKIE_CONSENT': False,
+
+    # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
+
+    # Enable one click program purchase
+    # See LEARNER-493
+    'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
+
+    # Whether to display account activation notification on dashboard.
+    'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
+
+    # Allow users to change their email address.
+    'ALLOW_EMAIL_ADDRESS_CHANGE': True,
+
+    # Whether to check the "Notify users by email" checkbox in the batch enrollment form
+    # in the instructor dashboard.
+    'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
+
     # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 }
+
+# Settings for the course reviews tool template and identification key, set either to None to disable course reviews
+COURSE_REVIEWS_TOOL_PROVIDER_FRAGMENT_NAME = 'coursetalk-reviews-fragment.html'
+COURSE_REVIEWS_TOOL_PROVIDER_PLATFORM_KEY = 'edx'
 
 # Ignore static asset files on import which match this pattern
 ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
@@ -416,6 +441,7 @@ COMMON_ROOT = REPO_ROOT / "common"
 OPENEDX_ROOT = REPO_ROOT / "openedx"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
+NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
@@ -426,7 +452,7 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
+system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
 
 node_paths = [
     COMMON_ROOT / "static/js/vendor",
@@ -506,6 +532,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
+    OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
 ]
 
 # Django templating
@@ -558,7 +585,7 @@ TEMPLATES = [
                 'edxmako.shortcuts.footer_context_processor',
 
                 # Online contextual help
-                'context_processors.doc_url',
+                'help_tokens.context_processor',
                 'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
             ],
             # Change 'debug' in your environment settings files - not here.
@@ -568,6 +595,9 @@ TEMPLATES = [
 ]
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
+# The template used to render a web fragment as a standalone page
+STANDALONE_FRAGMENT_VIEW_TEMPLATE = 'fragment-view-chromeless.html'
+
 ###############################################################################################
 
 # use the ratelimit backend to prevent brute force attacks
@@ -576,11 +606,6 @@ AUTHENTICATION_BACKENDS = (
 )
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
-
-# Dev machines shouldn't need the book
-# BOOK_URL = '/static/book/'
-BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
-RSS_TIMEOUT = 600
 
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
@@ -613,6 +638,18 @@ COURSE_SETTINGS = {
     }
 }
 
+COURSE_MODE_DEFAULTS = {
+    'bulk_sku': None,
+    'currency': 'usd',
+    'description': None,
+    'expiration_datetime': None,
+    'min_price': 0,
+    'name': _('Audit'),
+    'sku': None,
+    'slug': 'audit',
+    'suggested_prices': '',
+}
+
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
@@ -630,7 +667,13 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
-USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
+
+# The space is required for space-dependent languages like Arabic and Farsi.
+# However, backward compatibility with Ficus older releases is still maintained (space is still not valid)
+# in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
+USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
+USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
+
 
 # Verticals having children with any of these categories would be excluded from progress calculations
 PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project', 'eoc-journal']
@@ -850,18 +893,11 @@ FINANCE_EMAIL = ''
 # Platform mailing address
 CONTACT_MAILING_ADDRESS = ''
 
+# Account activation email sender address
+ACTIVATION_EMAIL_FROM_ADDRESS = ''
+
 ADMINS = ()
 MANAGERS = ADMINS
-
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/'
@@ -884,6 +920,8 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
+
+LANGUAGE_COOKIE = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
@@ -1030,6 +1068,7 @@ FEEDBACK_SUBMISSION_EMAIL = None
 ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
+ZENDESK_CUSTOM_FIELDS = {}
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -1136,7 +1175,7 @@ MIDDLEWARE_CLASSES = (
     'crum.CurrentRequestUserMiddleware',
 
     'request_cache.middleware.RequestCache',
-    'newrelic_custom_metrics.middleware.NewRelicCustomMetrics',
+    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringCustomMetrics',
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
@@ -1207,11 +1246,13 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.RedirectUnenrolledMiddleware',
+    'courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
+
+    'waffle.middleware.WaffleMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1242,9 +1283,6 @@ STATICFILES_FINDERS = [
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
-PIPELINE_COMPILE_INPLACE = True
 
 # Don't wrap JavaScript as there is code that depends upon updating the global namespace
 PIPELINE_DISABLE_WRAPPER = True
@@ -1327,7 +1365,7 @@ main_vendor_js = base_vendor_js + [
 base_application_js = [
     'js/src/utility.js',
     'js/src/logger.js',
-    'js/my_courses_dropdown.js',
+    'js/user_dropdown_v1.js',  # Custom dropdown keyboard handling for legacy pages
     'js/dialog_tab_controls.js',
     'js/src/string_utils.js',
     'js/form.ext.js',
@@ -1349,10 +1387,6 @@ discussion_js = (
 )
 
 discussion_vendor_js = [
-    'js/vendor/edx_ui_toolkit_shim.js',
-    'js/vendor/i18n_shim.js',
-    'js/vendor/URI_shim.js',
-    'js/vendor/leanModal_shim.js',
     'js/Markdown.Converter.js',
     'js/Markdown.Sanitizer.js',
     'js/Markdown.Editor.js',
@@ -1574,10 +1608,6 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
-    'discussion': {
-        'source_filenames': ['sass/discussion-forum.css'],
-        'output_filename': 'css/lms-style-discussion-forum.css'
-    },
     'style-learner-dashboard': {
         'source_filenames': [
             'css/lms-learner-dashboard.css',
@@ -1607,7 +1637,6 @@ PIPELINE_JS = {
         'source_filenames': base_application_js,
         'output_filename': 'js/lms-base-application.js',
     },
-
     'application': {
         'source_filenames': (
             common_js + xblock_runtime_js + base_application_js + lms_application_js +
@@ -1635,6 +1664,13 @@ PIPELINE_JS = {
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
+    },
+    'lms_bootstrap': {
+        'source_filenames': [
+            'common/js/vendor/tether.js',
+            'common/js/vendor/bootstrap.js',
+        ],
+        'output_filename': 'js/lms-bootstrap.js',
     },
     'module-descriptor-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
@@ -1735,20 +1771,8 @@ REQUIRE_BUILD_PROFILE = "lms/js/build.js"
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "common/js/vendor/require.js"
 
-# A dictionary of standalone modules to build with almond.js.
-REQUIRE_STANDALONE_MODULES = {}
-
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
-
-# A tuple of files to exclude from the compilation result of r.js.
-REQUIRE_EXCLUDE = ("build.txt",)
-
-# The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and rhino if not.
-# It can also be a path to a custom class that subclasses require.environments.Environment
-# and defines some "args" function that returns a list with the command arguments to execute.
-REQUIRE_ENVIRONMENT = "node"
 
 # In production, the Django pipeline appends a file hash to JavaScript file names.
 # This makes it difficult for RequireJS to load its requirements, since module names
@@ -1761,7 +1785,7 @@ REQUIRE_ENVIRONMENT = "node"
 # but you don't want to include those dependencies in the JS bundle for the page,
 # then you need to add the js urls in this list.
 REQUIRE_JS_PATH_OVERRIDES = {
-    'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
+    'course_bookmarks/js/views/bookmark_button': 'course_bookmarks/js/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
     'moment': 'common/js/vendor/moment-with-locales.js',
     'moment-timezone': 'common/js/vendor/moment-timezone-with-data.js',
@@ -1774,7 +1798,18 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
-    'draggabilly': 'js/vendor/draggabilly.js'
+    'js/groups/discussions_management/discussions_dashboard_factory': 'js/discussions_management/views/discussions_dashboard_factory.js',
+    'draggabilly': 'js/vendor/draggabilly.js',
+    'hls': 'common/js/vendor/hls.js'
+}
+
+########################## DJANGO WEBPACK LOADER ##############################
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    }
 }
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
@@ -1849,13 +1884,18 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # for a better chance at getting the latest changes when there
     # are secondary reads in sharded mongoDB clusters. See TNL-5041
     # for more info.
-    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=30,
+    COURSE_PUBLISH_TASK_DELAY=30,
 
     # Delay, in seconds, between retry attempts if a task fails.
-    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=30,
+    TASK_DEFAULT_RETRY_DELAY=30,
 
     # Maximum number of retries per task.
-    BLOCK_STRUCTURES_TASK_MAX_RETRIES=5,
+    TASK_MAX_RETRIES=5,
+
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='nim-beryl-test'),
+    # DIRECTORY_PREFIX='/modeltest/',
 )
 
 ################################ Bulk Email ###################################
@@ -1918,6 +1958,8 @@ YOUTUBE = {
     # YouTube JavaScript API
     'API': 'https://www.youtube.com/iframe_api',
 
+    'TEST_TIMEOUT': 1500,
+
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
 
@@ -1956,6 +1998,7 @@ INSTALLED_APPS = (
 
     # Database-backed configuration
     'config_models',
+    'waffle',
 
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
@@ -1967,6 +2010,11 @@ INSTALLED_APPS = (
     'edxmako',
     'pipeline',
     'static_replace',
+    'webpack_loader',
+
+    # For user interface plugins
+    'web_fragments',
+    'openedx.core.djangoapps.plugin_api',
 
     # For content serving
     'openedx.core.djangoapps.contentserver',
@@ -2039,6 +2087,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',  # only used in DEBUG mode
     'django_nose',
     'debug',
+    'django_extensions',
 
     # Discussion forums
     'django_comment_client',
@@ -2103,7 +2152,7 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
-    'social.apps.django_app.default',
+    'social_django',
 
     # Surveys
     'survey',
@@ -2165,14 +2214,14 @@ INSTALLED_APPS = (
     # Static i18n support
     'statici18n',
 
-    # Review widgets
-    'openedx.core.djangoapps.coursetalk',
-
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
-    # Verified Track Content Cohorting
-    'verified_track_content',
+    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
+    'openedx.core.djangoapps.verified_track_content',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
 
     # Learner's dashboard
     'learner_dashboard',
@@ -2188,12 +2237,28 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
-)
 
-# Migrations which are not in the standard module "migrations"
-MIGRATION_MODULES = {
-    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
-}
+    # Customized celery tasks, including persisting failed tasks so they can
+    # be retried
+    'celery_utils',
+
+    # Ability to detect and special-case crawler behavior
+    'openedx.core.djangoapps.crawlers',
+
+    # Unusual migrations
+    'database_fixups',
+
+    # Waffle related utilities
+    'openedx.core.djangoapps.waffle_utils',
+
+    # Features
+    'openedx.features.course_bookmarks',
+    'openedx.features.course_experience',
+    'openedx.features.course_search',
+    'openedx.features.enterprise_support',
+
+    'experiments',
+)
 
 ######################### CSRF #########################################
 
@@ -2207,8 +2272,15 @@ CSRF_COOKIE_SECURE = False
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'openedx.core.lib.api.paginators.DefaultPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '60/minute',
+        'service_user': '120/minute',
+    },
 }
 
 
@@ -2239,6 +2311,8 @@ MKTG_URL_LINK_MAP = {
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
 SUPPORT_SITE_LINK = ''
+PASSWORD_RESET_SUPPORT_LINK = ''
+ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
@@ -2371,6 +2445,7 @@ VERIFY_STUDENT = {
     # The variable represents the window within which a verification is considered to be "expiring soon."
     "EXPIRING_SOON_WINDOW": 28,
 }
+DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
 
 ### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = False
@@ -2398,11 +2473,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
-# Set this True to ignore CSRF referer check from s3 bucket. This is
-# required for SCORM xblock to work.
-# We should find a better alternative for this and change our approach
-# for how SCORM xblock is used.
-CORS_REPLACE_HTTPS_REFERER = True
 
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
@@ -2417,6 +2487,7 @@ XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 # - 'hidden': to not display the field
 
 REGISTRATION_EXTRA_FIELDS = {
+    'confirm_email': 'hidden',
     'level_of_education': 'optional',
     'gender': 'optional',
     'year_of_birth': 'optional',
@@ -2427,6 +2498,28 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+REGISTRATION_FIELD_ORDER = [
+    "name",
+    "first_name",
+    "last_name",
+    "username",
+    "email",
+    "confirm_email",
+    "password",
+    "city",
+    "state",
+    "country",
+    "gender",
+    "year_of_birth",
+    "level_of_education",
+    "company",
+    "title",
+    "mailing_address",
+    "goals",
+    "honor_code",
+    "terms_of_service",
+]
 
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
@@ -2710,8 +2803,10 @@ OPTIONAL_APPS = (
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
-    # Enterprise App (http://github.com/edx/edx-enterprise)
+    # Enterprise Apps (http://github.com/edx/edx-enterprise)
     'enterprise',
+    'integrated_channels.integrated_channel',
+    'integrated_channels.sap_success_factors',
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )
@@ -2856,11 +2951,13 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
 # E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = None
 ECOMMERCE_API_URL = None
-ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
 COURSE_CATALOG_API_URL = None
+
+CREDENTIALS_INTERNAL_SERVICE_URL = None
+CREDENTIALS_PUBLIC_SERVICE_URL = None
 
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
@@ -3008,8 +3105,8 @@ LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
 
 # For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
-PUBLIC_RSA_KEY = None
-PRIVATE_RSA_KEY = None
+JWT_PRIVATE_SIGNING_KEY = None
+JWT_EXPIRED_PRIVATE_SIGNING_KEYS = []
 
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
@@ -3205,8 +3302,66 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
 ############## Settings for LMS Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = None
+HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
+HELP_TOKENS_BOOKS = {
+    'learner': 'http://edx.readthedocs.io/projects/open-edx-learner-guide',
+    'course_author': 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
+}
 
-############## Settings for the Enterprise App ######################
+############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
+# The Open edX Enterprise service is currently hosted via the LMS container/process.
+# However, for all intents and purposes this service is treated as a standalone IDA.
+# These configuration settings are specific to the Enterprise service and you should
+# not find references to them within the edx-platform project.
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
+ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
+
+############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# These default settings are utilized by the LMS when interacting with the service,
+# and are overridden by the configuration parameter accessors defined in aws.py
+
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
+ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
+
+############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
+# The LMS has some features embedded that are related to the Enterprise service, but
+# which are not provided by the Enterprise service. These settings provide base values
+# for those features.
+
+ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
+ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
+    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}'
+    '{platform_name}{end_bold} to offer you high-quality learning opportunities '
+    'from the world\'s best universities.'
+)
+ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
+    'age',
+    'level_of_education',
+    'gender',
+    'goals',
+    'year_of_birth',
+    'mailing_address',
+}
+ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
+
+############## Settings for Course Enrollment Modes ######################
+COURSE_ENROLLMENT_MODES = {
+    "audit": 1,
+    "verified": 2,
+    "professional": 3,
+    "no-id-professional": 4,
+    "credit": 5,
+    "honor": 6,
+}
+
+############## Settings for the Discovery App ######################
+
+COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
+
+############## Settings for CourseGraph ############################
+COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE

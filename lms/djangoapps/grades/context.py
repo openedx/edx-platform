@@ -2,6 +2,7 @@
 Grading Context
 """
 from collections import OrderedDict
+
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 
 from .scores import possibly_scored
@@ -9,7 +10,7 @@ from .scores import possibly_scored
 
 def grading_context_for_course(course_key):
     """
-    Same as grading_context, but takes in a course object.
+    Same as grading_context, but takes in a course key.
     """
     course_structure = get_course_in_cache(course_key)
     return grading_context(course_structure)

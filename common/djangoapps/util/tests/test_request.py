@@ -5,6 +5,7 @@ import unittest
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test.client import RequestFactory
+
 from util.request import course_id_from_url, safe_get_host
 
 

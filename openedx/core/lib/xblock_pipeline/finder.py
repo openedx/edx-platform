@@ -1,16 +1,15 @@
 """
 Django pipeline finder for handling static assets required by XBlocks.
 """
-from datetime import datetime
 import os
-from pkg_resources import resource_exists, resource_listdir, resource_isdir, resource_filename
-
-from xblock.core import XBlock
+from datetime import datetime
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
+from pkg_resources import resource_exists, resource_filename, resource_isdir, resource_listdir
+from xblock.core import XBlock
 
 
 class XBlockPackageStorage(Storage):

@@ -67,8 +67,12 @@ class AccessTokenMixin(object):
             except UserProfile.DoesNotExist:
                 name = None
 
-            expected['name'] = name
-            expected['administrator'] = user.is_staff
+            expected.update({
+                'name': name,
+                'administrator': user.is_staff,
+                'family_name': user.last_name,
+                'given_name': user.first_name,
+            })
 
         self.assertDictContainsSubset(expected, payload)
 

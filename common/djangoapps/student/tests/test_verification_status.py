@@ -1,30 +1,29 @@
 """Tests for per-course verification status on the dashboard. """
+import unittest
 from datetime import datetime, timedelta
 
-import unittest
 import ddt
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.test import override_settings
 
+from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from student.helpers import (
-    VERIFY_STATUS_NEED_TO_VERIFY,
-    VERIFY_STATUS_SUBMITTED,
-    VERIFY_STATUS_RESUBMITTED,
     VERIFY_STATUS_APPROVED,
     VERIFY_STATUS_MISSED_DEADLINE,
-    VERIFY_STATUS_NEED_TO_REVERIFY
+    VERIFY_STATUS_NEED_TO_REVERIFY,
+    VERIFY_STATUS_NEED_TO_VERIFY,
+    VERIFY_STATUS_RESUBMITTED,
+    VERIFY_STATUS_SUBMITTED
 )
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=3)

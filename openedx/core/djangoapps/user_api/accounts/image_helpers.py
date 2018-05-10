@@ -4,16 +4,15 @@ Helper functions for the accounts API.
 import hashlib
 
 from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
-from django.contrib.staticfiles.storage import staticfiles_storage
-
 from student.models import UserProfile
-from ..errors import UserNotFound
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from ..errors import UserNotFound
 
-
-PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are converted to JPEGs
+PROFILE_IMAGE_FILE_EXTENSION = 'jpg'  # All processed profile images are converted to JPEGs\
 
 _PROFILE_IMAGE_SIZES = settings.PROFILE_IMAGE_SIZES_MAP.values()
 
@@ -49,6 +48,7 @@ def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXT
     Returns a dict containing the urls for a complete set of profile images,
     keyed by "friendly" name (e.g. "full", "large", "medium", "small").
     """
+
     def _make_url(size):  # pylint: disable=missing-docstring
         url = storage.url(
             _get_profile_image_filename(name, size, file_extension=file_extension)

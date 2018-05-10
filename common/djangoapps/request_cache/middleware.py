@@ -2,9 +2,10 @@
 An implementation of a RequestCache. This cache is reset at the beginning
 and end of every request.
 """
+import threading
 
 import crum
-import threading
+from django.utils.encoding import force_text
 
 
 class _RequestCache(threading.local):
@@ -38,11 +39,14 @@ class RequestCache(object):
         return crum.get_current_request()
 
     @classmethod
-    def clear_request_cache(cls):
+    def clear_request_cache(cls, name=None):
         """
         Empty the request cache.
         """
-        REQUEST_CACHE.data = {}
+        if name is None:
+            REQUEST_CACHE.data = {}
+        elif REQUEST_CACHE.data.get(name):
+            REQUEST_CACHE.data[name] = {}
 
     def process_request(self, request):
         self.clear_request_cache()
@@ -81,28 +85,52 @@ def request_cached(f):
               cache the value it returns, and return that cached value for subsequent calls with the
               same args/kwargs within a single request
     """
-    def wrapper(*args, **kwargs):
+    return ns_request_cached()(f)
+
+
+def ns_request_cached(namespace=None):
+    """
+    Same as request_cached above, except an optional namespace can be passed in to compartmentalize the cache.
+
+    Arguments:
+        namespace (string): An optional namespace to use for the cache.  Useful if the caller wants to manage
+            their own sub-cache by, for example, calling RequestCache.clear_request_cache for their own namespace.
+    """
+    def outer_wrapper(f):
         """
-        Wrapper function to decorate with.
+        Outer wrapper that decorates the given function
+
+        Arguments:
+            f (func): the function to wrap
         """
+        def inner_wrapper(*args, **kwargs):
+            """
+            Wrapper function to decorate with.
+            """
+            # Check to see if we have a result in cache.  If not, invoke our wrapped
+            # function.  Cache and return the result to the caller.
+            rcache = RequestCache.get_request_cache(namespace)
+            rcache = rcache.data if namespace is None else rcache
+            cache_key = func_call_cache_key(f, *args, **kwargs)
 
-        # Build our cache key based on the module the function belongs to, the functions name, and a stringified
-        # list of arguments and a query string-style stringified list of keyword arguments.
-        converted_args = map(str, args)
-        converted_kwargs = map(str, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
-        cache_keys = [f.__module__, f.func_name] + converted_args + converted_kwargs
-        cache_key = '.'.join(cache_keys)
+            if cache_key in rcache:
+                return rcache.get(cache_key)
+            else:
+                result = f(*args, **kwargs)
+                rcache[cache_key] = result
+                return result
 
-        # Check to see if we have a result in cache.  If not, invoke our wrapped
-        # function.  Cache and return the result to the caller.
-        rcache = RequestCache.get_request_cache()
+        return inner_wrapper
+    return outer_wrapper
 
-        if cache_key in rcache.data:
-            return rcache.data.get(cache_key)
-        else:
-            result = f(*args, **kwargs)
-            rcache.data[cache_key] = result
 
-            return result
-
-    return wrapper
+def func_call_cache_key(func, *args, **kwargs):
+    """
+    Returns a cache key based on the function's module
+    the function's name, and a stringified list of arguments
+    and a query string-style stringified list of keyword arguments.
+    """
+    converted_args = map(force_text, args)
+    converted_kwargs = map(force_text, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
+    cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
+    return u'.'.join(cache_keys)

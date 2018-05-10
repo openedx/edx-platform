@@ -40,3 +40,6 @@ $static-path: '../..' !default;
 @import 'views/inline';
 @import 'utilities/developer';
 @import 'utilities/shame';
+
+// Site status banner
+@import '../notifications';

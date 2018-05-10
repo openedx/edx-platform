@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
 """Tests for static_replace"""
 
-import ddt
 import re
-
-from django.test import override_settings
-from django.utils.http import urlquote, urlencode
-from urlparse import urlparse, urlunparse, parse_qsl
-from PIL import Image
 from cStringIO import StringIO
-from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=no-name-in-module
-from static_replace import (
-    replace_static_urls,
-    replace_course_urls,
-    _url_replace_regex,
-    process_static_urls,
-    make_static_urls_absolute
-)
-from mock import patch, Mock
+from urlparse import parse_qsl, urlparse, urlunparse
+
+import ddt
+from django.test import override_settings
+from django.utils.http import urlencode, urlquote
+from mock import Mock, patch
+from nose.tools import assert_equals, assert_false, assert_true  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from PIL import Image
+
+from static_replace import (
+    _url_replace_regex,
+    make_static_urls_absolute,
+    process_static_urls,
+    replace_course_urls,
+    replace_static_urls
+)
+from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-from xmodule.assetstore.assetmgr import AssetManager
 
 DATA_DIRECTORY = 'data_dir'
 COURSE_KEY = SlashSeparatedCourseKey('org', 'course', 'run')
@@ -235,9 +236,6 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
     of assets: c4x-style, opaque key style, locked, unlocked, CDN
     set, CDN not set, etc.
     """
-
-    def setUp(self):
-        super(CanonicalContentTest, self).setUp()
 
     @classmethod
     def setUpClass(cls):

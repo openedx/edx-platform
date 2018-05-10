@@ -1,11 +1,12 @@
 """Utilities for working with ID tokens."""
+import json
 from time import time
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.utils.functional import cached_property
-import jwt
+from jwkest.jwk import KEYS, RSAKey
+from jwkest.jws import JWS
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import UserProfile, anonymous_id_for_user
@@ -27,24 +28,31 @@ class JwtBuilder(object):
         asymmetric (Boolean): Whether the JWT should be signed with this app's private key.
         secret (string): Overrides configured JWT secret (signing) key. Unused if an asymmetric signature is requested.
     """
+
     def __init__(self, user, asymmetric=False, secret=None):
         self.user = user
         self.asymmetric = asymmetric
         self.secret = secret
         self.jwt_auth = configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)
 
-    def build_token(self, scopes, expires_in, aud=None):
+    def build_token(self, scopes, expires_in=None, aud=None, additional_claims=None):
         """Returns a JWT access token.
 
         Arguments:
             scopes (list): Scopes controlling which optional claims are included in the token.
-            expires_in (int): Time to token expiry, specified in seconds.
 
         Keyword Arguments:
+            expires_in (int): Time to token expiry, specified in seconds.
             aud (string): Overrides configured JWT audience claim.
+            additional_claims (dict): Additional claims to include in the token.
+
+        Returns:
+            str: Encoded JWT
         """
         now = int(time())
+        expires_in = expires_in or self.jwt_auth['JWT_EXPIRATION']
         payload = {
+            # TODO Consider getting rid of this claim since we don't use it.
             'aud': aud if aud else self.jwt_auth['JWT_AUDIENCE'],
             'exp': now + expires_in,
             'iat': now,
@@ -53,6 +61,9 @@ class JwtBuilder(object):
             'scopes': scopes,
             'sub': anonymous_id_for_user(self.user, None),
         }
+
+        if additional_claims:
+            payload.update(additional_claims)
 
         for scope in scopes:
             handler = self.claim_handlers.get(scope)
@@ -85,16 +96,23 @@ class JwtBuilder(object):
 
         payload.update({
             'name': name,
+            'family_name': self.user.last_name,
+            'given_name': self.user.first_name,
             'administrator': self.user.is_staff,
         })
 
     def encode(self, payload):
         """Encode the provided payload."""
+        keys = KEYS()
+
         if self.asymmetric:
-            secret = load_pem_private_key(settings.PRIVATE_RSA_KEY, None, default_backend())
+            keys.add(RSAKey(key=RSA.importKey(settings.JWT_PRIVATE_SIGNING_KEY)))
             algorithm = 'RS512'
         else:
-            secret = self.secret if self.secret else self.jwt_auth['JWT_SECRET_KEY']
+            key = self.secret if self.secret else self.jwt_auth['JWT_SECRET_KEY']
+            keys.add({'key': key, 'kty': 'oct'})
             algorithm = self.jwt_auth['JWT_ALGORITHM']
 
-        return jwt.encode(payload, secret, algorithm=algorithm)
+        data = json.dumps(payload)
+        jws = JWS(data, alg=algorithm)
+        return jws.sign_compact(keys=keys)

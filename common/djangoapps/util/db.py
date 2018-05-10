@@ -1,15 +1,15 @@
 """
 Utility functions related to databases.
 """
+import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception
 from contextlib import contextmanager
 from functools import wraps
-import random
 
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
-import request_cache
 
+import request_cache
 
 OUTER_ATOMIC_CACHE_NAME = 'db.outer_atomic'
 

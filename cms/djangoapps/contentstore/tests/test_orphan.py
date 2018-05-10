@@ -2,11 +2,12 @@
 Test finding orphans via the view and django config
 """
 import json
+
 import ddt
+from opaque_keys.edx.locator import BlockUsageLocator
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-from opaque_keys.edx.locator import BlockUsageLocator
 from student.models import CourseEnrollment
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.search import path_to_location
@@ -100,8 +101,8 @@ class TestOrphan(TestOrphanBase):
         self.assertIn(unicode(location), orphans)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 9, 6),
-        (ModuleStoreEnum.Type.mongo, 34, 13),
+        (ModuleStoreEnum.Type.split, 9, 5),
+        (ModuleStoreEnum.Type.mongo, 34, 12),
     )
     @ddt.unpack
     def test_delete_orphans(self, default_store, max_mongo_calls, min_mongo_calls):

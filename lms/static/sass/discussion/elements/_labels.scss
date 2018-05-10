@@ -42,13 +42,13 @@
     }
   }
 
-  .user-label-staff {
-    @include forum-user-label($forum-color-staff);
+  .user-label-staff,
+  .user-label-community-ta {
+    color: $forum-color-copy-light;
+    font-size: $forum-small-font-size;
+    white-space: nowrap;
   }
 
-  .user-label-community-ta {
-    @include forum-user-label($forum-color-community-ta);
-  }
 }
 
 // Make post labels tighter when shown inside the left nav

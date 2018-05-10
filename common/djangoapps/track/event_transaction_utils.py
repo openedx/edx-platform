@@ -2,7 +2,8 @@
 Helper functions to access and update the id and type
 used in event tracking.
 """
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
+
 from request_cache import get_cache
 
 

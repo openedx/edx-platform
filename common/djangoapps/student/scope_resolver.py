@@ -4,8 +4,8 @@ A User Scope Resolver that can be used by edx-notifications
 
 import logging
 
-from edx_notifications.scopes import NotificationUserScopeResolver
 from student.models import CourseEnrollment
+from edx_notifications.scopes import NotificationUserScopeResolver
 from django.contrib.auth.models import User
 
 from opaque_keys.edx.keys import CourseKey

@@ -6,11 +6,11 @@ in LTI v1.1.
 import logging
 import uuid
 
+import requests
+import requests_oauthlib
 from lxml import etree
 from lxml.builder import ElementMaker
-import requests
 from requests.exceptions import RequestException
-import requests_oauthlib
 
 from lti_provider.models import GradedAssignment, OutcomeService
 

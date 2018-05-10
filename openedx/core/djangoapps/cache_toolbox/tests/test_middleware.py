@@ -1,12 +1,10 @@
 """Tests for cached authentication middleware."""
-import unittest
-
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from mock import patch
 
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from student.tests.factories import UserFactory
 
 
@@ -33,13 +31,13 @@ class CachedAuthMiddlewareTestCase(TestCase):
             response = self.client.get(test_url)
             self.assertRedirects(response, redirect_url)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_session_change_lms(self):
         """Test session verification with LMS-specific URLs."""
         dashboard_url = reverse('dashboard')
         self._test_change_session_hash(dashboard_url, reverse('signin_user') + '?next=' + dashboard_url)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @skip_unless_cms
     def test_session_change_cms(self):
         """Test session verification with CMS-specific URLs."""
         home_url = reverse('home')

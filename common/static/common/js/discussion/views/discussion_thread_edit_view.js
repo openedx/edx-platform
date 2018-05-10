@@ -16,6 +16,7 @@
             initialize: function(options) {
                 this.container = options.container || $('.thread-content-wrapper');
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
                 this.course_settings = options.course_settings;
                 this.threadType = this.model.get('thread_type');
                 this.topicId = this.model.get('commentable_id');
@@ -28,8 +29,10 @@
                 var formId = _.uniqueId('form-'),
                     threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html()),
                     $threadTypeSelector = $(threadTypeTemplate({form_id: formId}).toString()),
+                    context,
                     mainTemplate = edx.HtmlUtils.template($('#thread-edit-template').html());
-                edx.HtmlUtils.setHtml(this.$el, mainTemplate(this.model.toJSON()));
+                context = $.extend({mode: this.mode, startHeader: this.startHeader}, this.model.attributes);
+                edx.HtmlUtils.setHtml(this.$el, mainTemplate(context));
                 this.container.append(this.$el);
                 this.$submitBtn = this.$('.post-update');
                 this.addField($threadTypeSelector);
@@ -58,7 +61,7 @@
 
             save: function() {
                 var title = this.$('.edit-post-title').val(),
-                    threadType = this.$('.post-type-input:checked').val(),
+                    threadType = this.$('.input-radio:checked').val(),
                     body = this.$('.edit-post-body textarea').val(),
                     postData = {
                         title: title,

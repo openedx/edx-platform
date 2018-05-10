@@ -4,9 +4,10 @@
 import hashlib
 import json
 import logging
-import requests
-import dogstats_wrapper as dog_stats_api
 
+import requests
+
+import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -15,6 +16,8 @@ XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
 # Wait time for response from Xqueue.
 XQUEUE_TIMEOUT = 35  # seconds
+CONNECT_TIMEOUT = 3.05  # seconds
+READ_TIMEOUT = 10  # seconds
 
 
 def make_hashkey(seed):
@@ -134,12 +137,18 @@ class XQueueInterface(object):
 
     def _http_post(self, url, data, files=None):
         try:
-            r = self.session.post(url, data=data, files=files)
+            response = self.session.post(
+                url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
+            )
         except requests.exceptions.ConnectionError, err:
             log.error(err)
             return (1, 'cannot connect to server')
 
-        if r.status_code not in [200]:
-            return (1, 'unexpected HTTP status code [%d]' % r.status_code)
+        except requests.exceptions.ReadTimeout, err:
+            log.error(err)
+            return (1, 'failed to read from the server')
 
-        return parse_xreply(r.text)
+        if response.status_code not in [200]:
+            return (1, 'unexpected HTTP status code [%d]' % response.status_code)
+
+        return parse_xreply(response.text)

@@ -9,16 +9,17 @@ not possible to have this LTI multiple times on a single page in LMS.
 
 """
 
-from uuid import uuid4
+import base64
+import hashlib
 import textwrap
 import urllib
-from oauthlib.oauth1.rfc5849 import signature, parameters
-import oauthlib.oauth1
-import hashlib
-import base64
+from uuid import uuid4
+
 import mock
+import oauthlib.oauth1
 import requests
 from http import StubHttpRequestHandler, StubHttpService
+from oauthlib.oauth1.rfc5849 import parameters, signature
 
 
 class StubLtiHandler(StubHttpRequestHandler):
@@ -191,13 +192,13 @@ class StubLtiHandler(StubHttpRequestHandler):
         if submit_url:
             submit_form = textwrap.dedent("""
                 <form action="{submit_url}/grade" method="post">
-                    <input type="submit" name="submit-button" value="Submit">
+                    <input type="submit" name="submit-button" value="Submit" id="submit-button">
                 </form>
                 <form action="{submit_url}/lti2_outcome" method="post">
-                    <input type="submit" name="submit-lti2-button" value="Submit">
+                    <input type="submit" name="submit-lti2-button" value="Submit" id="submit-lti2-button">
                 </form>
                 <form action="{submit_url}/lti2_delete" method="post">
-                    <input type="submit" name="submit-lti2-delete-button" value="Submit">
+                    <input type="submit" name="submit-lti2-delete-button" value="Submit" id="submit-lti-delete-button">
                 </form>
             """).format(submit_url=submit_url)
         else:

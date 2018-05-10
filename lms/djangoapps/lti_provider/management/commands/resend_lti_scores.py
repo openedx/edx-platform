@@ -5,11 +5,10 @@ Management command to resend all lti scores for the requested course.
 import textwrap
 
 from django.core.management import BaseCommand
-
 from opaque_keys.edx.keys import CourseKey
 
-from lti_provider.models import GradedAssignment
 from lti_provider import tasks
+from lti_provider.models import GradedAssignment
 
 
 class Command(BaseCommand):

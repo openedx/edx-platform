@@ -37,6 +37,7 @@
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
+                    this.hideAuthWarnings = data.hideAuthWarnings;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                 },
@@ -63,7 +64,7 @@
                     // Must be called after postRender, since postRender sets up $formFeedback.
                     if (this.errorMessage) {
                         this.renderErrors(formErrorsTitle, [this.errorMessage]);
-                    } else if (this.currentProvider) {
+                    } else if (this.currentProvider && !this.hideAuthWarnings) {
                         this.renderAuthWarning();
                     }
 
@@ -127,6 +128,37 @@
                         jsHook: this.authWarningJsHook,
                         message: fullMsg
                     });
+                },
+
+                getFormData: function() {
+                    var obj = FormView.prototype.getFormData.apply(this, arguments),
+                        $form = this.$form,
+                        $label,
+                        $emailElement,
+                        $confirmEmailElement,
+                        email = '',
+                        confirmEmail = '';
+
+                    $emailElement = $form.find('input[name=email]');
+                    $confirmEmailElement = $form.find('input[name=confirm_email]');
+
+                    if ($confirmEmailElement.length) {
+                        email = $emailElement.val();
+                        confirmEmail = $confirmEmailElement.val();
+                        $label = $form.find('label[for=' + $confirmEmailElement.attr('id') + ']');
+
+                        if (confirmEmail !== '' && email !== confirmEmail) {
+                            this.errors.push('<li>' + $confirmEmailElement.data('errormsg-required') + '</li>');
+                            $confirmEmailElement.addClass('error');
+                            $label.addClass('error');
+                        } else if (confirmEmail !== '') {
+                            obj.confirm_email = confirmEmail;
+                            $confirmEmailElement.removeClass('error');
+                            $label.removeClass('error');
+                        }
+                    }
+
+                    return obj;
                 }
             });
         });

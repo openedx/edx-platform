@@ -5,15 +5,14 @@ Tests for the LTI provider views
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from courseware.testutils import RenderXBlockTestMixin
-from lti_provider import views, models
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from lti_provider import models, views
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 
 LTI_DEFAULT_PARAMS = {
     'roles': u'Instructor,urn:lti:instrole:ims/lis/Administrator',
@@ -170,11 +169,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def setUp(self):
-        """
-        Set up tests
-        """
-        super(LtiLaunchTestRender, self).setUp()
+    SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
 
     def get_response(self, usage_key, url_encoded_params=None):
         """
@@ -212,3 +207,21 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()
+
+    def get_success_enrolled_staff_mongo_count(self):
+        """
+        Override because mongo queries are higher for this
+        particular test. This has not been investigated exhaustively
+        as mongo is no longer used much, and removing user_partitions
+        from inheritance fixes the problem.
+
+        # The 9 mongoDB calls include calls for
+        # Old Mongo:
+        #   (1) fill_in_run
+        #   (2) get_course in get_course_with_access
+        #   (3) get_item for HTML block in get_module_by_usage_id
+        #   (4) get_parent when loading HTML block
+        #   (5)-(8) calls related to the inherited user_partitions field.
+        #   (9) edx_notes descriptor call to get_course
+        """
+        return 9

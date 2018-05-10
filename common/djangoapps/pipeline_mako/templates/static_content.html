@@ -1,5 +1,6 @@
 <%page expression_filter="h"/>
 <%!
+import logging
 from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
@@ -17,7 +18,7 @@ from openedx.core.djangoapps.theming.helpers import (
   is_request_in_themed_site,
 )
 from certificates.api import get_asset_url_by_slug
-from openedx.core.djangoapps.lang_pref.api import released_languages
+logger = logging.getLogger(__name__)
 %>
 
 <%def name="marketing_link(name)"><%
@@ -85,6 +86,31 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
+<%def name="webpack(entry)">
+    <%doc>
+        Loads Javascript onto your page from a Webpack-generated bundle.
+        Uses the Django template engine because our webpack loader only provides template tags for Jinja and Django.
+    </%doc>
+    <%
+        from django.template import Template, Context
+        try:
+            return Template("""
+                {% load render_bundle from webpack_loader %}
+                {% render_bundle "commons" %}
+                {% render_bundle entry %}
+                <script type="text/javascript">
+                    {% autoescape off %}{{ body }}{% endautoescape %}
+                </script>
+            """).render(Context({
+                'entry': entry,
+                'body': capture(caller.body)
+            }))
+        except IOError as e:
+            # Don't break Mako template rendering if the bundle or webpack-stats can't be found, but log it
+            logger.error(e)
+    %>
+</%def>
+
 <%def name="require_module(module_name, class_name)">
     <%doc>
       Loads Javascript onto your page synchronously.
@@ -119,7 +145,7 @@ source, template_path = Loader(engine).load_template_source(path)
           }).call(this, require || RequireJS.require);
       % else:
         ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
-        ## static_replace calls (as woudl happen if require_module is used within courseware).
+        ## static_replace calls (as would happen if require_module is used within courseware).
         ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
         ## being appended more than once, causing the import to fail in production environments.
         require(['${staticfiles_storage.url(module_name + ".js") + "?raw" | n, js_escaped_string}'], function () {
@@ -169,10 +195,6 @@ else:
     return get_value('email_from_address', settings.TECH_SUPPORT_EMAIL)
 %></%def>
 
-<%def name="show_language_selector()"><%
-    return get_value('SHOW_LANGUAGE_SELECTOR', settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False))
-%></%def>
-
-<%def name="get_released_languages()"><%
-    return released_languages()
+<%def name="get_contact_email_address()"><%
+    return get_value('email_from_address', settings.CONTACT_EMAIL)
 %></%def>

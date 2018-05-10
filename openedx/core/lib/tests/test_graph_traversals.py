@@ -3,12 +3,11 @@ Tests for graph traversal generator functions.
 """
 
 from collections import defaultdict
-from nose.plugins.attrib import attr
 from unittest import TestCase
 
-from ..graph_traversals import (
-    traverse_pre_order, traverse_post_order, traverse_topologically
-)
+from nose.plugins.attrib import attr
+
+from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
 
 
 @attr(shard=2)

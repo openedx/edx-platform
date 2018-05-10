@@ -8,9 +8,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import patch, MagicMock
-from lti_provider.models import LtiConsumer, LtiUser
+from mock import MagicMock, patch
+
 import lti_provider.users as users
+from lti_provider.models import LtiConsumer, LtiUser
 from student.tests.factories import UserFactory
 
 

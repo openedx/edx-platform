@@ -4,6 +4,7 @@ import re
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
+
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
@@ -170,9 +171,6 @@ class FakeSoftwareSecureVerificationPage(PageObject):
     """
 
     url = BASE_URL + '/verify_student/software-secure-fake-response'
-
-    def __init__(self, browser):
-        super(FakeSoftwareSecureVerificationPage, self).__init__(browser)
 
     def is_browser_on_page(self):
         """ Determine if browser is on the page. """

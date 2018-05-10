@@ -3,11 +3,10 @@ Acceptance tests for course in studio
 """
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-
-from common.test.acceptance.pages.studio.users import CourseTeamPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.users import CourseTeamPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
 @attr(shard=2)

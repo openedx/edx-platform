@@ -3,32 +3,30 @@
 Test the course_info xblock
 """
 import mock
-from nose.plugins.attrib import attr
-from pyquery import PyQuery as pq
-
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.test.utils import override_settings
-
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE,
-    TEST_DATA_MIXED_MODULESTORE
-)
-from xmodule.modulestore.tests.utils import TEST_DATA_DIR
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory
-
-from .helpers import LoginEnrollmentTestCase
+from nose.plugins.attrib import attr
+from pyquery import PyQuery as pq
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory
+from util.date_utils import strftime_localized
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
+
+from .helpers import LoginEnrollmentTestCase
 
 
 @attr(shard=1)
@@ -59,6 +57,29 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
+    def test_redirection_missing_enterprise_consent(self, mock_get_url):
+        """
+        Verify that users viewing the course info who are enrolled, but have not provided
+        data sharing consent, are first redirected to a consent page, and then, once they've
+        provided consent, are able to view the course info.
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        mock_get_url.return_value = reverse('dashboard')
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+
+        response = self.client.get(url)
+
+        self.assertRedirects(
+            response,
+            reverse('dashboard')
+        )
+        mock_get_url.assert_called_once()
+        mock_get_url.return_value = None
+        response = self.client.get(url)
+        self.assertNotIn("You are not currently enrolled in this course", response.content)
 
     def test_anonymous_user(self):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
@@ -151,7 +172,16 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         content = pq(response.content)
         self.assertEqual(content('.page-header-secondary a').length, 0)
 
-    def test_last_accessed_shown(self):
+    def get_resume_course_url(self, course_info_url):
+        """
+        Retrieves course info page and returns the resume course url
+        or None if the button doesn't exist.
+        """
+        info_page_response = self.client.get(course_info_url)
+        content = pq(info_page_response.content)
+        return content('.page-header-secondary .last-accessed-link').attr('href')
+
+    def test_resume_course_visibility(self):
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
         chapter = ItemFactory.create(
             category="chapter", parent_location=self.course.location
@@ -169,9 +199,20 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         )
         self.client.get(section_url)
         info_url = reverse('info', args=(unicode(self.course.id),))
-        info_page_response = self.client.get(info_url)
-        content = pq(info_page_response.content)
-        self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
+
+        # Assuring a non-authenticated user cannot see the resume course button.
+        resume_course_url = self.get_resume_course_url(info_url)
+        self.assertEqual(resume_course_url, None)
+
+        # Assuring an unenrolled user cannot see the resume course button.
+        self.setup_user()
+        resume_course_url = self.get_resume_course_url(info_url)
+        self.assertEqual(resume_course_url, None)
+
+        # Assuring an enrolled user can see the resume course button.
+        self.enroll(self.course)
+        resume_course_url = self.get_resume_course_url(info_url)
+        self.assertEqual(resume_course_url, section_url)
 
 
 @attr(shard=1)
@@ -313,7 +354,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False), ENABLE_ENTERPRISE_INTEGRATION=False)
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.
@@ -344,7 +385,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 21, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 26, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 21, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 26, 4)

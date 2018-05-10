@@ -2,12 +2,12 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'text!../../../templates/learner_dashboard/course_enroll.underscore'
-           ],
+        'jquery',
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!../../../templates/learner_dashboard/course_enroll.underscore'
+    ],
          function(
              Backbone,
              $,
@@ -17,11 +17,12 @@
              pageTpl
          ) {
              return Backbone.View.extend({
+                 className: 'course-enroll-view',
+
                  tpl: HtmlUtils.template(pageTpl),
 
                  events: {
-                     'click .enroll-button': 'handleEnroll',
-                     'change .run-select': 'handleRunSelect'
+                     'click .enroll-button': 'handleEnroll'
                  },
 
                  initialize: function(options) {
@@ -29,9 +30,6 @@
                      this.enrollModel = options.enrollModel;
                      this.urlModel = options.urlModel;
                      this.render();
-                     if (this.urlModel) {
-                         this.trackSelectionUrl = this.urlModel.get('track_selection_url');
-                     }
                  },
 
                  render: function() {
@@ -41,16 +39,23 @@
                          HtmlUtils.setHtml(this.$el, filledTemplate);
                          HtmlUtils.setHtml(this.$parentEl, HtmlUtils.HTML(this.$el));
                      }
+                     this.postRender();
+                 },
+
+                 postRender: function() {
+                     if (this.urlModel) {
+                         this.trackSelectionUrl = this.urlModel.get('track_selection_url');
+                     }
                  },
 
                  handleEnroll: function() {
-                    // Enrollment click event handled here
-                     if (!this.model.get('course_key')) {
-                         this.$('.select-error').css('visibility', 'visible');
-                     } else if (!this.model.get('is_enrolled')) {
-                        // actually enroll
+                     // Enrollment click event handled here
+                     var courseRunKey = $('.run-select').val() || this.model.get('course_run_key');
+                     this.model.updateCourseRun(courseRunKey);
+                     if (!this.model.get('is_enrolled')) {
+                         // Create the enrollment.
                          this.enrollModel.save({
-                             course_id: this.model.get('course_key')
+                             course_id: courseRunKey
                          }, {
                              success: _.bind(this.enrollSuccess, this),
                              error: _.bind(this.enrollError, this)
@@ -58,24 +63,12 @@
                      }
                  },
 
-                 handleRunSelect: function(event) {
-                     var runKey;
-                     if (event.target) {
-                         runKey = $(event.target).val();
-                         if (runKey) {
-                             this.model.updateRun(runKey);
-                         } else {
-                            // Set back the unselected states
-                             this.model.setUnselected();
-                         }
-                     }
-                 },
-
                  enrollSuccess: function() {
-                     var courseKey = this.model.get('course_key');
+                     var courseRunKey = this.model.get('course_run_key');
+                     window.analytics.track('edx.bi.user.program-details.enrollment');
                      if (this.trackSelectionUrl) {
-                        // Go to track selection page
-                         this.redirect(this.trackSelectionUrl + courseKey);
+                         // Go to track selection page
+                         this.redirect(this.trackSelectionUrl + courseRunKey);
                      } else {
                          this.model.set({
                              is_enrolled: true
@@ -98,7 +91,7 @@
                          * This can occur, for example, when a course does not
                          * have a free enrollment mode, so we can't auto-enroll.
                          */
-                         this.redirect(this.trackSelectionUrl + this.model.get('course_key'));
+                         this.redirect(this.trackSelectionUrl + this.model.get('course_run_key'));
                      }
                  },
 

@@ -21,14 +21,14 @@
       display: inline-block;
 
       .action-preview-label {
+        @include margin-right($baseline/2);
         display: inline-block;
-        margin-right: ($baseline/2);
         margin-bottom: 0;
         vertical-align: middle;
       }
 
       .action-preview-select {
-        margin-right: $baseline;
+        @include margin-right($baseline);
       }
 
       .action-preview-username-container {

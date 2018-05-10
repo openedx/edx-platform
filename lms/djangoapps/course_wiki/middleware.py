@@ -1,13 +1,15 @@
 """Middleware for course_wiki"""
 from urlparse import urlparse
+
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import redirect
-from django.core.exceptions import PermissionDenied
 from wiki.models import reverse
 
-from courseware.courses import get_course_with_access, get_course_overview_with_access
 from courseware.access import has_access
+from courseware.courses import get_course_overview_with_access, get_course_with_access
+from openedx.features.enterprise_support.api import get_enterprise_consent_url
 from student.models import CourseEnrollment
 from util.request import course_id_from_url
 
@@ -75,6 +77,12 @@ class WikiAccessMiddleware(object):
                     # if a user is logged in, but not authorized to see a page,
                     # we'll redirect them to the course about page
                     return redirect('about_course', course_id.to_deprecated_string())
+
+                # If we need enterprise data sharing consent for this course, then redirect to the form.
+                consent_url = get_enterprise_consent_url(request, course_id)
+                if consent_url:
+                    return redirect(consent_url)
+
             # set the course onto here so that the wiki template can show the course navigation
             request.course = course
         else:

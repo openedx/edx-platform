@@ -1,14 +1,14 @@
 """
 Management command which fixes ungraded certificates for students
 """
-from django.core.management.base import BaseCommand
 import logging
 from optparse import make_option
 
+from django.core.management.base import BaseCommand
+
 from certificates.models import GeneratedCertificate
 from courseware import courses
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 
 log = logging.getLogger(__name__)
 

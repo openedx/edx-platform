@@ -4,7 +4,7 @@
   from django.conf import settings
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
-  from contentstore.context_processors import doc_url
+  from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -180,17 +180,12 @@
           </li>
         </ol>
       </nav>
-      % elif show_programs_header:
-      <h2 class="info-course">
-        <span class="course-org">${settings.PLATFORM_NAME}</span><span class="course-number">${_("Programs")}</span>
-        <span class="course-title">${_("Program Administration")}</span>
-      </h2>
       % endif
     </div>
 
     <div class="wrapper wrapper-r">
-      % if static.show_language_selector():
-        <% languages = static.get_released_languages() %>
+      % if header_language_selector_is_enabled():
+        <% languages = released_languages() %>
         % if len(languages) > 1:
         <nav class="user-language-selector" aria-label="${_('Language preference')}">
           <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">

@@ -50,7 +50,7 @@
                 function masquerade(selectedOption) {
                     var data = {
                         role: selectedOption.val() === 'staff' ? 'staff' : 'student',
-                        user_partition_id: options.cohortedUserPartitionId,
+                        user_partition_id: selectedOption.data('partition-id'),
                         group_id: selectedOption.data('group-id'),
                         user_name: selectedOption.val() === 'specific student' ? $userNameElement.val() : null
                     };

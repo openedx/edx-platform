@@ -6,12 +6,11 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from course_modes.models import CourseMode
-from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from xmodule.course_module import CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
@@ -21,6 +20,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):
@@ -57,9 +57,6 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
             emit_signals=True,
         )
-
-    def setUp(self):
-        super(TestSites, self).setUp()
 
     def setup_users(self):
         # Create student accounts and activate them.

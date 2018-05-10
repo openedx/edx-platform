@@ -5,19 +5,18 @@ Test grading events across apps.
 
 import os
 from unittest import skipIf
+from mock import patch
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
-from mock import patch
 from openedx.core.djangolib.testing.utils import get_mock_request
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 STATE_DELETED_TYPE = 'edx.grades.problem.state_deleted'
 RESCORE_TYPE = 'edx.grades.problem.rescored'
@@ -29,10 +28,13 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
     Tests integration between the eventing in various layers
     of the grading infrastructure.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
-    def setUpClass(cls):
-        super(GradesEventIntegrationTest, cls).setUpClass()
-        cls.store = modulestore()
+    def reset_course(cls):
+        """
+        Sets up the course anew.
+        """
         with cls.store.default_store(ModuleStoreEnum.Type.split):
             cls.course = CourseFactory.create()
             cls.chapter = ItemFactory.create(
@@ -66,6 +68,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             )
 
     def setUp(self):
+        self.reset_course()
         super(GradesEventIntegrationTest, self).setUp()
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
@@ -144,7 +147,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             }
         )
 
-        course = modulestore().get_course(self.course.id, depth=0)
+        course = self.store.get_course(self.course.id, depth=0)
         models_tracker.emit.assert_called_with(
             u'edx.grades.course.grade_calculated',
             {
@@ -159,14 +162,10 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'course_version': unicode(course.course_version),
             }
         )
-        enrollment_tracker.reset_mock()
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
     @patch('lms.djangoapps.grades.models.tracker')
-    def test_rescoring_events(self, models_tracker, handlers_tracker, instructor_task_tracker):
+    def test_rescoring_events(self, models_tracker, handlers_tracker):
         # submit answer
         self.submit_question_answer('p1', {'2_1': 'choice_choice_3'})
         models_tracker.reset_mock()
@@ -177,11 +176,10 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             choices=[False, False, False, True],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        module_store = modulestore()
-        with module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             self.problem.data = new_problem_xml
-            module_store.update_item(self.problem, self.instructor.id)
-            module_store.publish(self.problem.location, self.instructor.id)
+            self.store.update_item(self.problem, self.instructor.id)
+        self.store.publish(self.problem.location, self.instructor.id)
 
         submit_rescore_problem_for_student(
             request=get_mock_request(self.instructor),
@@ -191,11 +189,8 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         )
         # check logging to make sure id's are tracked correctly across
         # events
-        event_transaction_id = instructor_task_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
-        self.assertEqual(
-            instructor_task_tracker.get_tracker().context.call_args[0],
-            ('edx.grades.problem.rescored', {'course_id': unicode(self.course.id), 'org_id': unicode(self.course.org)})
-        )
+        event_transaction_id = handlers_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
+
         # make sure the id is propagated throughout the event flow
         for call in models_tracker.emit.mock_calls:
             self.assertEqual(event_transaction_id, call[1][1]['event_transaction_id'])
@@ -210,7 +205,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
 
         handlers_tracker.assert_not_called()
 
-        instructor_task_tracker.emit.assert_called_with(
+        handlers_tracker.emit.assert_called_with(
             unicode(RESCORE_TYPE),
             {
                 'course_id': unicode(self.course.id),
@@ -224,7 +219,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'event_transaction_type': unicode(RESCORE_TYPE),
             }
         )
-        course = modulestore().get_course(self.course.id, depth=0)
+        course = self.store.get_course(self.course.id, depth=0)
         models_tracker.emit.assert_called_with(
             u'edx.grades.course.grade_calculated',
             {
@@ -239,6 +234,3 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'course_edited_timestamp': unicode(course.subtree_edited_on),
             }
         )
-        instructor_task_tracker.reset_mock()
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()

@@ -1,8 +1,8 @@
 """Tests for CMS's requests to logs"""
 import mock
-
-from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+
 from contentstore.views.helpers import event as cms_user_track
 
 

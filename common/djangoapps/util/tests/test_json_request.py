@@ -2,11 +2,13 @@
 Test for JsonResponse and JsonResponseBadRequest util classes.
 """
 
-from django.http import HttpResponse, HttpResponseBadRequest
-from util.json_request import JsonResponse, JsonResponseBadRequest
 import json
 import unittest
+
 import mock
+from django.http import HttpResponse, HttpResponseBadRequest
+
+from util.json_request import JsonResponse, JsonResponseBadRequest
 
 
 class JsonResponseTestCase(unittest.TestCase):

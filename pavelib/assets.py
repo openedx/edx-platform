@@ -3,24 +3,26 @@ Asset compilation and collection.
 """
 
 from __future__ import print_function
-from datetime import datetime
-from functools import wraps
-from threading import Timer
+
 import argparse
 import glob
 import os
 import traceback
+from datetime import datetime
+from functools import wraps
+from threading import Timer
 
 from paver import tasks
-from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
-from watchdog.observers.polling import PollingObserver
+from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
-
-from .utils.envs import Env
-from .utils.cmd import cmd, django_cmd
-from .utils.timer import timed
+from watchdog.observers.polling import PollingObserver
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
+
+from .utils.cmd import cmd, django_cmd
+from .utils.envs import Env
+from .utils.process import run_background_process
+from .utils.timer import timed
 
 # setup baseline paths
 
@@ -47,16 +49,18 @@ COMMON_LOOKUP_PATHS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
-    'backbone-validation/dist/backbone-validation-min.js',
-    'backbone/backbone.js',
     'backbone.paginator/lib/backbone.paginator.js',
-    'moment-timezone/builds/moment-timezone-with-data.js',
-    'moment/min/moment-with-locales.js',
+    'backbone/backbone.js',
+    'bootstrap/dist/js/bootstrap.js',
+    'hls.js/dist/hls.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
     'jquery/dist/jquery.js',
+    'moment-timezone/builds/moment-timezone-with-data.js',
+    'moment/min/moment-with-locales.js',
     'picturefill/dist/picturefill.js',
     'requirejs/require.js',
+    'tether/dist/js/tether.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
 ]
@@ -703,6 +707,29 @@ def execute_compile_sass(args):
         )
 
 
+def execute_webpack(prod, settings=None):
+    sh(
+        cmd(
+            "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack"
+            .format(
+                node_env="production" if prod else "development",
+                static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
+                static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+            )
+        )
+    )
+
+
+def execute_webpack_watch(settings=None):
+    run_background_process(
+        "STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack --watch --watch-poll=200"
+        .format(
+            static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
+            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+        )
+    )
+
+
 def get_parsed_option(command_opts, opt_key, default=None):
     """
     Extract user command option and parse it.
@@ -769,6 +796,11 @@ def watch_assets(options):
 
     print("Starting asset watcher...")
     observer.start()
+
+    # We only want Webpack to re-run on changes to its own entry points, not all JS files, so we use its own watcher
+    # instead of subclassing from Watchdog like the other watchers do
+    execute_webpack_watch(settings=Env.DEVSTACK_SETTINGS)
+
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
         # in order to allow for shutdown by contrl-c
@@ -796,7 +828,7 @@ def update_assets(args):
         help="lms or studio",
     )
     parser.add_argument(
-        '--settings', type=str, default="devstack",
+        '--settings', type=str, default=Env.DEVSTACK_SETTINGS,
         help="Django settings module",
     )
     parser.add_argument(
@@ -829,6 +861,7 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
+    execute_webpack(prod=(args.settings != Env.DEVSTACK_SETTINGS), settings=args.settings)
 
     # Compile sass for themes and system
     execute_compile_sass(args)

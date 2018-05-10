@@ -4,32 +4,39 @@ Test cases for tabs.
 
 from django.core.urlresolvers import reverse
 from django.http import Http404
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
+from waffle.testutils import override_flag
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
-    get_course_tab_list, CoursewareTab, CourseInfoTab, ProgressTab,
-    ExternalDiscussionCourseTab, ExternalLinkCourseTab
+    CourseInfoTab,
+    CoursewareTab,
+    ExternalDiscussionCourseTab,
+    ExternalLinkCourseTab,
+    ProgressTab,
+    get_course_tab_list
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.views.views import get_static_tab_contents, static_tab
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.views.views import StaticCourseTabView, get_static_tab_fragment
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
-    get_milestone_relationship_types,
-    add_milestone,
+    add_course_content_milestone,
     add_course_milestone,
-    add_course_content_milestone
+    add_milestone,
+    get_milestone_relationship_types
 )
-from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_MIXED_MODULESTORE
+    SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
@@ -258,16 +265,16 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.setup_user()
         request = get_mock_request(self.user)
         with self.assertRaises(Http404):
-            static_tab(request, course_id='edX/toy', tab_slug='new_tab')
+            StaticCourseTabView().get(request, course_id='edX/toy', tab_slug='new_tab')
 
-    def test_get_static_tab_contents(self):
+    def test_get_static_tab_fragment(self):
         self.setup_user()
         course = get_course_by_id(self.course.id)
         request = get_mock_request(self.user)
         tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'new_tab')
 
         # Test render works okay
-        tab_content = get_static_tab_contents(request, course, tab)
+        tab_content = get_static_tab_fragment(request, course, tab).content
         self.assertIn(self.course.id.to_deprecated_string(), tab_content)
         self.assertIn('static_tab', tab_content)
 
@@ -276,8 +283,8 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
-            static_tab = get_static_tab_contents(request, course, tab)
-            self.assertIn("this module is temporarily unavailable", static_tab)
+            static_tab_content = get_static_tab_fragment(request, course, tab).content
+            self.assertIn("this module is temporarily unavailable", static_tab_content)
 
 
 @attr(shard=1)
@@ -764,6 +771,26 @@ class StaticTabTestCase(TabTestCase):
         )
         self.check_can_display_results(tab)
         self.check_get_and_set_method_for_key(tab, 'url_slug')
+
+
+@attr(shard=1)
+class CourseInfoTabTestCase(TabTestCase):
+    """Test cases for the course info tab."""
+    def setUp(self):
+        self.user = self.create_mock_user()
+        self.request = get_mock_request(self.user)
+
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    def test_default_tab(self):
+        # Verify that the course info tab is the first tab
+        tabs = get_course_tab_list(self.request, self.course)
+        self.assertEqual(tabs[0].type, 'course_info')
+
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    def test_default_tab_for_new_course_experience(self):
+        # Verify that the unified course experience hides the course info tab
+        tabs = get_course_tab_list(self.request, self.course)
+        self.assertEqual(tabs[0].type, 'courseware')
 
 
 @attr(shard=1)

@@ -3,6 +3,7 @@ Signal handler for setting default course mode expiration dates
 """
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch.dispatcher import receiver
+
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from .models import CourseMode, CourseModeExpirationConfig

@@ -1,6 +1,8 @@
 // forums - inline discussion styling
 // ====================
 
+@import '../../edx-pattern-library-shims/form';
+
 .discussion.inline-discussion {
     .inline-threads {
         border: 1px solid $forum-color-border;

@@ -100,6 +100,19 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default="finished",
     )
+
+    show_correctness = String(
+        display_name=_("Show Results"),
+        help=_(
+            # Translators: DO NOT translate the words in quotes here, they are
+            # specific words for the acceptable values.
+            'Specify when to show answer correctness and score to learners. '
+            'Valid values are "always", "never", and "past_due".'
+        ),
+        scope=Scope.settings,
+        default="always",
+    )
+
     rerandomize = String(
         display_name=_("Randomization"),
         help=_(

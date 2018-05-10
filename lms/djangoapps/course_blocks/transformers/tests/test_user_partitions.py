@@ -2,18 +2,19 @@
 """
 Tests for UserPartitionTransformer.
 """
+import string
 from collections import namedtuple
+
 import ddt
 from nose.plugins.attrib import attr
-import string
 
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
 from student.tests.factories import CourseEnrollmentFactory
-from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 from ...api import get_course_blocks
 from ..user_partitions import UserPartitionTransformer, _MergedGroupAccess

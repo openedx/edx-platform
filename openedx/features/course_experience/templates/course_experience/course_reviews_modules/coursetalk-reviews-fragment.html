@@ -1,0 +1,18 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from openedx.features.course_experience import SHOW_REVIEWS_TOOL_FLAG
+%>
+
+% if SHOW_REVIEWS_TOOL_FLAG.is_enabled(course.id):
+    <div class="coursetalk-read-reviews">
+        ## Coursetalk Widget
+        <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course.id}"></div>
+    </div>
+
+    <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
+% endif

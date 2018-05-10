@@ -4,21 +4,16 @@ Test courseware search
 
 import json
 
-from common.test.acceptance.tests.helpers import remove_file
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import create_user_partition_json
-
-from xmodule.partitions.partitions import Group
-
 from nose.plugins.attrib import attr
 
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.tests.helpers import create_user_partition_json, remove_file
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
-
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from xmodule.partitions.partitions import Group
 
 
 @attr(shard=1)
@@ -43,9 +38,8 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         super(SplitTestCoursewareSearchTest, self).setUp(is_staff=is_staff)
         self.staff_user = self.user
 
-        self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
-        self.course_navigation_page = CourseNavPage(self.browser)
-        self.course_outline = CourseOutlinePage(
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -60,17 +54,16 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        StudioAutoAuthPage(self.browser, username=username, email=email,
-                           course_id=self.course_id, staff=staff).visit()
+        AutoAuthPage(self.browser, username=username, email=email, course_id=self.course_id, staff=staff).visit()
 
     def _studio_reindex(self):
         """
         Reindex course content on studio course page
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], True)
-        self.course_outline.visit()
-        self.course_outline.start_reindex()
-        self.course_outline.wait_for_ajax()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.start_reindex()
+        self.studio_course_outline.wait_for_ajax()
 
     def _create_group_configuration(self):
         """
@@ -119,19 +112,12 @@ class SplitTestCoursewareSearchTest(ContainerBase):
             )
         )
 
-    def test_page_existence(self):
-        """
-        Make sure that the page is accessible.
-        """
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-
     def test_search_for_experiment_content_user_assigned_to_one_group(self):
         """
         Test user can search for experiment content restricted to his group
         when assigned to just one experiment group
         """
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term("VISIBLE TO")
-        assert "1 result" in self.courseware_search_page.search_results.html[0]
+        self.course_home_page.visit()
+        course_search_results_page = self.course_home_page.search_for_term("VISIBLE TO")
+        assert "result-excerpt" in course_search_results_page.search_results.html[0]

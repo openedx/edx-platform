@@ -1,13 +1,16 @@
 <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
 
-<form id="login" class="login-form" tabindex="-1" method="POST">
+<% if ( context.createAccountOption !== false ) { %>
+<div class="toggle-form">
+    <span class="text"><%- gettext("First time here?") %></span>
+    <a href="#login" class="form-toggle" data-type="register"><%- gettext("Create an Account.") %></a>
+</div>
+<% } %>
 
-    <div class="section-title lines">
-        <h2>
-            <span class="text"><%- gettext("Sign in") %></span>
-        </h2>
-    </div>
+<h2><%- gettext("Sign In") %></h2>
+
+<form id="login" class="login-form" tabindex="-1" method="POST">
 
     <p class="sr">
         <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
@@ -25,9 +28,9 @@
     <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
     <div class="login-providers">
         <div class="section-title lines">
-            <h2>
+            <h3>
                 <span class="text"><%- gettext("or sign in with") %></span>
-            </h2>
+            </h3>
         </div>
 
         <% _.each( context.providers, function( provider ) {
@@ -53,13 +56,3 @@
     <% } %>
 </form>
 
-<% if ( context.createAccountOption !== false ) { %>
-    <div class="toggle-form">
-        <div class="section-title">
-            <h2>
-                <span class="text"><%- _.sprintf( gettext("New to %(platformName)s?"), context ) %></span>
-            </h2>
-        </div>
-        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an account") %></button>
-    </div>
-<% } %>

@@ -66,6 +66,7 @@ TEST_ROOT = path('test_root')
 
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 DATA_DIR = TEST_ROOT / "data"
@@ -196,6 +197,8 @@ simplefilter('ignore')
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
 ########################### Server Ports ###################################
 
 # These ports are carefully chosen so that if the browser needs to
@@ -318,6 +321,10 @@ FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
+########################## AUTHOR PERMISSION #######################
+FEATURES['ENABLE_CREATOR_GROUP'] = False
 
 # teams feature
 FEATURES['ENABLE_TEAMS'] = True
@@ -345,5 +352,20 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'edx_solutions_projects',
         'edx_solutions_organizations',
         'mobileapps',
+    )
+FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
+
+##### edx solutions apps for McKA #####
+EDX_API_KEY = 'test_api_key'
+TEST_MODE = True
+if FEATURES.get('EDX_SOLUTIONS_API'):
+    INSTALLED_APPS += (
+        'course_metadata',
+        'edx_solutions_api_integration',
+        'social_engagement',
+        'gradebook',
+        'progress',
+        'edx_solutions_projects',
+        'edx_solutions_organizations',
     )
 FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True

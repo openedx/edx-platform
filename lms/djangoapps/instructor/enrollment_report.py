@@ -2,11 +2,13 @@
 Defines abstract class for the Enrollment Reports.
 """
 
-from django.contrib.auth.models import User
-from student.models import UserProfile
+import abc
 import collections
 import json
-import abc
+
+from django.contrib.auth.models import User
+
+from student.models import UserProfile
 
 
 class AbstractEnrollmentReportProvider(object):

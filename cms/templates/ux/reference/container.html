@@ -1,0 +1,706 @@
+<%inherit file="../../base.html" />
+
+<%block name="view_notes">
+    <%include file="_note-usage.html" />
+</%block>
+
+<%!
+  import logging
+  from util.date_utils import get_default_time_display
+  from django.utils.translation import ugettext as _
+  from contentstore.utils import reverse_usage_url
+%>
+
+<%block name="title">Container</%block>
+<%block name="bodyclass">is-signedin course uploads view-container</%block>
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="content">
+<div id="content">
+
+
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-navigation has-subtitle">
+        <div class="page-header">
+            <small class="navigation navigation-parents subtitle">
+                        <a href="" class="navigation-item navigation-link navigation-parent">
+                            Section parent
+                        </a>
+                        <span class="navigation-item navigation-parent">Subsection parent</span>
+            </small>
+            <div class="wrapper-xblock-field" data-field="display_name">
+                <h1 class="page-header-title is-editable xblock-field-value">Unit Example</h1>
+            </div>
+        </div>
+
+        <nav class="nav-actions" aria-label="${_('Page Actions')}">
+            <h3 class="sr">Page Actions</h3>
+            <ul>
+
+<!-- begin publishing changes -->
+                <li class="action-item action-view nav-item">
+                    <a href="#" class="button view-button action-button">
+                        <span class="action-button-text">View Published Version</span>
+                    </a>
+                </li>
+                <li class="action-item action-preview nav-item">
+                    <a href="#" class="button preview-button action-button">
+                        <span class="action-button-text">Preview</span>
+                    </a>
+                </li>
+<!-- end publishing changes -->
+
+            </ul>
+        </nav>
+    </header>
+</div>
+<div class="wrapper-content wrapper">
+    <div class="inner-wrapper">
+        <section class="content-area">
+            <article class="content-primary">
+
+                <div class="ui-loading">
+                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+                </div>
+                <div class="no-container-content">
+                    <p>This page has no content yet.</p>
+                </div>
+                <section class="wrapper-xblock level-page">
+                    <header class="xblock-header">
+                        <div class="header-details">
+                            Container Name
+                        </div>
+                        <div class="header-actions">
+                            <ul class="actions-list">
+                                <li class="action-item action-edit">
+                                    <a href="#" class="edit-button action-button">
+                                        <i class="icon fa fa-edit"></i>
+                                        <span class="action-button-text">Edit</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </header>
+                    <article class="xblock-render">
+                        <ol class="xblock-list">
+                            <li class="xblock-list-item">
+                                <section class="wrapper-xblock level-nesting is-collapsible">
+                                    <header class="xblock-header">
+                                        <div class="header-details">
+                                            <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
+                                                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
+                                                <span class="sr">Expand or Collapse</span>
+                                            </a>
+                                            <span>Condition 1</span>
+                                        </div>
+                                        <div class="header-actions">
+                                            <ul class="actions-list">
+                                                <li class="sr action-item">No Actions</li>
+                                            </ul>
+                                        </div>
+                                    </header>
+                                    <article class="xblock-render">
+                                        <ol class="xblock-list">
+                                            <li class="xblock-list-item">
+                                                <section class="wrapper-xblock level-element">
+                                                    <header class="xblock-header">
+                                                        <div class="header-details">
+                                                            Video
+                                                        </div>
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit">
+                                                                    <a href="#" class="edit-button action-button">
+                                                                        <i class="icon fa fa-edit"></i>
+                                                                        <span class="action-button-text">Edit</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate">
+                                                                    <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                                                                        <i class="icon fa fa-copy"></i>
+                                                                        <span class="sr">Duplicate this component</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="action-item action-delete">
+                                                                    <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                                                                        <i class="icon fa fa-trash-o"></i>
+                                                                        <span class="sr">Delete this component</span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </header>
+                                                    <article class="xblock-render">
+                                                        <section class="xblock xblock-student_view xmodule_display xmodule_VideoModule" data-runtime-version="1" data-init="XBlockToXModuleShim" data-handler-prefix="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_72b5a0d74e8c4ed4a4d4e6bf67837c09/handler" data-type="Video">
+
+
+                                                            <h2>Video</h2>
+
+                                                            <div id="video_i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09" class="video closed is-initialized" data-streams="1.00:OEoXaMPEzfM" data-save-state-url="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_72b5a0d74e8c4ed4a4d4e6bf67837c09/handler/xmodule_handler/save_user_state" data-caption-data-dir="None" data-show-captions="true" data-general-speed="1.0" data-speed="null" data-start="0.0" data-end="0.0" data-caption-asset-path="/c4x/AndyA/ABT101/asset/subs_" data-autoplay="False" data-yt-test-timeout="1500" data-yt-test-url="https://www.googleapis.com/youtube/v3/videos/" data-autohide-html5="False" tabindex="-1">
+                                                                <div class="focus_grabber first" tabindex="-1"></div>
+
+                                                                <div class="tc-wrapper">
+                                                                    <a href="#before-transcript_i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09" class="nav-skip sr">Skip to a navigable version of this video transcript.</a>
+
+                                                                    <article class="video-wrapper">
+                                                                        <span tabindex="-1" class="spinner" aria-hidden="true" aria-label="Loading video player"></span>
+                                                                        <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="Play video"></span>
+                                                                        <div class="video-player-pre"></div>
+                                                                        <section class="video-player">
+                                                                            <iframe id="i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09" frameborder="0" allowfullscreen="1" title="YouTube video player" width="640" height="360" src="https://www.youtube.com/embed/OEoXaMPEzfM?controls=0&amp;wmode=transparent&amp;rel=0&amp;showinfo=0&amp;enablejsapi=1&amp;modestbranding=1&amp;html5=1&amp;origin=http%3A%2F%2Flocalhost%3A8001" style="height: 411.75px; width: 732px; top: -22.875px; left: 0px;"></iframe>
+                                                                            <h3 class="hidden">ERROR: No playable video sources found!</h3>
+                                                                        </section>
+                                                                        <div class="video-player-post"></div>
+                                                                        <section class="video-controls" style="">
+                                                                            <div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" title="Video position" aria-disabled="false" tabindex="-1" style=""><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="width: 0%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" role="slider" title="Video position" aria-disabled="false" aria-valuetext="0 seconds" style="left: 0%;"></a></div>
+                                                                            <div>
+                                                                                <ul class="vcr">
+                                                                                    <li><a class="video_control play" href="#" title="Play" role="button" aria-disabled="false"></a></li>
+                                                                                    <li><div class="vidtime">0:00 / 1:56</div></li>
+                                                                                </ul>
+                                                                                <div class="secondary-controls"><div class="speeds">
+                                                                                    <a href="#" title="Speeds" role="button" aria-disabled="false">
+                                                                                        <h3>Speed</h3>
+                                                                                        <p class="active">1.0x</p>
+                                                                                    </a>
+                                                                                    <ol class="video_speeds"><li data-speed="2.0"><a class="speed_link" href="#">2.0x</a></li><li data-speed="1.50"><a class="speed_link" href="#">1.50x</a></li><li data-speed="1.0" class="active"><a class="speed_link" href="#">1.0x</a></li><li data-speed="0.50"><a class="speed_link" href="#">0.50x</a></li></ol>
+                                                                                </div><div class="volume">
+                                                                                    <a href="#" title="Volume" role="button" aria-disabled="false" aria-label="Volume"></a>
+                                                                                    <div class="volume-slider-container">
+                                                                                        <div class="volume-slider ui-slider ui-slider-vertical ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="height: 100%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" role="slider" title="Volume" aria-disabled="false" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="Maximum" style="bottom: 100%;"></a></div>
+                                                                                    </div>
+                                                                                </div>
+
+
+                                                                                    <a href="#" class="add-fullscreen" title="Fill browser" role="button" aria-disabled="false">Fill browser</a>
+                                                                                    <a href="#" class="quality_control" title="HD off" role="button" aria-disabled="false" style="display: inline;">HD off</a>
+
+                                                                                    <a href="#" class="hide-subtitles" title="Turn on captions" role="button" aria-disabled="false" style="display: none;">Turn on captions</a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </section>
+                                                                        <a class="nav-skip sr" id="before-transcript_i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09" href="#after-transcript_i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09">Skip to end of transcript.</a>
+                                                                    </article>
+
+                                                                    <ol id="transcript-captions" class="subtitles" tabindex="0" title="Captions" role="group" aria-label="Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item." style="max-height: 411px;">
+                                                                        <li style=""></li>
+                                                                    </ol>
+                                                                </div>
+
+                                                                <a class="nav-skip sr" id="after-transcript_i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09" href="#before-transcript_i4x-AndyA-ABT101-video-72b5a0d74e8c4ed4a4d4e6bf67837c09">Go back to start of transcript.</a>
+
+                                                                <div class="focus_grabber last" tabindex="-1"></div>
+                                                                <ul class="wrapper-downloads">
+                                                                </ul>
+                                                            </div>
+
+                                                        </section>
+                                                    </article>
+                                                </section>
+                                            </li><li class="xblock-list-item">
+                                            <section class="wrapper-xblock xblock-type-container level-element">
+                                                <header class="xblock-header">
+                                                    <div class="header-details">
+                                                        Randomize Block
+                                                    </div>
+                                                    <div class="header-actions">
+                                                        <ul class="actions-list">
+                                                            <li class="action-item action-view">
+                                                                <a href="#" class="action-button">
+                                                                    <span class="action-button-text">View</span>
+                                                                    <i class="icon fa fa-arrow-right"></i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </header>
+                                                <article class="xblock-render">Shows Element - Example Randomize Block could be here.</article>
+                                            </section>
+                                        </li><li class="xblock-list-item">
+                                            <section class="wrapper-xblock level-element">
+                                                <header class="xblock-header">
+                                                    <div class="header-details">
+                                                        Element Level Header
+                                                    </div>
+                                                    <div class="header-actions">
+                                                        <ul class="actions-list">
+                                                            <li class="action-item action-edit">
+                                                                <a href="#" class="edit-button action-button">
+                                                                    <i class="icon fa fa-edit"></i>
+                                                                    <span class="action-button-text">Edit</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="action-item action-duplicate">
+                                                                <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                                                                    <i class="icon fa fa-copy"></i>
+                                                                    <span class="sr">Duplicate this component</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="action-item action-delete">
+                                                                <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                                                                    <i class="icon fa fa-trash-o"></i>
+                                                                    <span class="sr">Delete this component</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </header>
+                                                <article class="xblock-render" style="height:200px;">Shows Element - Example HTML could be here.</article>
+                                            </section>
+                                        </li>
+                                        </ol>
+                                    </article>
+                                </section>
+                            </li>
+                            <li class="xblock-list-item xblock-list-item">
+                                <section class="wrapper-xblock level-nesting is-collapsible">
+                                    <header class="xblock-header">
+                                        <div class="header-details">
+                                            <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
+                                                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
+                                                <span class="sr">Expand or Collapse</span>
+                                            </a>
+                                            <span>Condition 2</span>
+                                        </div>
+                                        <div class="header-actions">
+                                            <ul class="actions-list">
+                                                <li class="sr action-item">No Actions</li>
+                                            </ul>
+                                        </div>
+                                    </header>
+                                    <article class="xblock-render">
+                                        <ol class="xblock-list">
+                                            <li class="xblock-list-item">
+                                                <section class="wrapper-xblock level-element">
+                                                    <header class="xblock-header">
+                                                        <div class="header-details">
+                                                            Video
+                                                        </div>
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit">
+                                                                    <a href="#" class="edit-button action-button">
+                                                                        <i class="icon fa fa-edit"></i>
+                                                                        <span class="action-button-text">Edit</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="action-item action-duplicate">
+                                                                    <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                                                                        <i class="icon fa fa-copy"></i>
+                                                                        <span class="sr">Duplicate this component</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="action-item action-delete">
+                                                                    <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                                                                        <i class="icon fa fa-trash-o"></i>
+                                                                        <span class="sr">Delete this component</span>
+                                                                    </a>
+                                                                </li>
+                                                                <ul>
+                                                                </ul></ul></div>
+                                                    </header>
+                                                    <article class="xblock-render" >Shows Element - Example Video could be here. </article>
+                                                </section>
+                                            </li><li class="xblock-list-item">
+                                            <section class="wrapper-xblock level-element">
+                                                <header class="xblock-header">
+                                                    <div class="header-details">
+                                                        Common Problem
+                                                    </div>
+                                                    <div class="header-actions">
+                                                        <ul class="actions-list">
+                                                            <li class="action-item action-edit">
+                                                                <a href="#" class="edit-button action-button">
+                                                                    <i class="icon fa fa-edit"></i>
+                                                                    <span class="action-button-text">Edit</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="action-item action-duplicate">
+                                                                <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                                                                    <i class="icon fa fa-copy"></i>
+                                                                    <span class="sr">Duplicate this component</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="action-item action-delete">
+                                                                <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                                                                    <i class="icon fa fa-trash-o"></i>
+                                                                    <span class="sr">Delete this component</span>
+                                                                </a>
+                                                            </li>
+                                                            <ul>
+                                                            </ul></ul></div>
+                                                </header>
+                                                <article class="xblock-render">
+                                                    <section class="xblock xblock-student_view xmodule_display xmodule_CapaModule" data-runtime-version="1" data-init="XBlockToXModuleShim" data-handler-prefix="/preview/xblock/i4x:;_;_AndyA;_ABT101;_problem;_46d2b65d793549e2876729d55df9a2cb/handler" data-type="Problem" data-block-type="problem">
+                                                        <section id="problem_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb" class="problems-wrapper" data-problem-id="i4x://AndyA/ABT101/problem/46d2b65d793549e2876729d55df9a2cb" data-url="/preview/xblock/i4x:;_;_AndyA;_ABT101;_problem;_46d2b65d793549e2876729d55df9a2cb/handler/xmodule_handler" data-progress_status="none" data-progress_detail="0/1">
+
+
+                                                            <h2 class="problem-header">
+                                                                Multiple Choice
+                                                            </h2>
+
+                                                            <section class="problem-progress">(1 point possible)</section>
+
+                                                            <section class="problem">
+                                                                <div>
+                                                                    <p>
+                                                                        A multiple choice problem presents radio buttons for student
+                                                                        input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+                                                                    <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
+                                                                    </p>
+                                                                    <p>What Apple device competed with the portable CD player?</p>
+                              <span><form class="choicegroup capa_inputtype" id="inputtype_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1">
+                                  <div class="indicator-container">
+                                      <span class="unanswered" style="display:inline-block;" id="status_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1"></span>
+                                  </div>
+
+                                  <fieldset>
+
+                                      <label for="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_ipad">
+                                          <input type="radio" name="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" id="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_ipad" aria-describedby="answer_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" value="choice_ipad"> The iPad
+
+                                      </label>
+                                      <label for="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_beatles">
+                                          <input type="radio" name="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" id="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_beatles" aria-describedby="answer_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" value="choice_beatles"> Napster
+
+                                      </label>
+                                      <label for="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_ipod">
+                                          <input type="radio" name="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" id="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_ipod" aria-describedby="answer_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" value="choice_ipod"> The iPod
+
+                                      </label>
+                                      <label for="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_peeler">
+                                          <input type="radio" name="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" id="input_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1_choice_peeler" aria-describedby="answer_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1" value="choice_peeler"> The vegetable peeler
+
+                                      </label>
+                                      <span id="answer_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_2_1"></span>
+                                  </fieldset>
+
+                              </form></span>
+                                                                    <section class="solution-span">
+                                                                        <span id="solution_i4x-AndyA-ABT101-problem-46d2b65d793549e2876729d55df9a2cb_solution_1"></span>
+                                                                    </section></div>
+
+                                                                <section class="action">
+                                                                    <input type="hidden" name="problem_id" value="Multiple Choice">
+
+                                                                    <input class="check Check" type="button" value="Check">
+                                                                </section>
+                                                            </section>
+                                                        </section>
+
+                                                    </section>
+                                                </article>
+                                            </section>
+                                        </li><li class="xblock-list-item">
+                                            <section class="wrapper-xblock level-element">
+                                                <header class="xblock-header">
+                                                    <div class="header-details">
+                                                        HTML
+                                                    </div>
+                                                    <div class="header-actions">
+                                                        <ul class="actions-list">
+                                                            <li class="action-item action-edit">
+                                                                <a href="#" class="edit-button action-button">
+                                                                    <i class="icon fa fa-edit"></i>
+                                                                    <span class="action-button-text">Edit</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="action-item action-duplicate">
+                                                                <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+                                                                    <i class="icon fa fa-copy"></i>
+                                                                    <span class="sr">Duplicate this component</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="action-item action-delete">
+                                                                <a href="#" data-tooltip="Delete" class="delete-button action-button">
+                                                                    <i class="icon fa fa-trash-o"></i>
+                                                                    <span class="sr">Delete this component</span>
+                                                                </a>
+                                                            </li>
+                                                            <ul>
+                                                            </ul></ul></div>
+                                                </header>
+                                                <article class="xblock-render">
+                                                    <section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule" data-runtime-version="1" data-init="XBlockToXModuleShim" data-handler-prefix="/preview/xblock/i4x:;_;_andya;_AA101;_html;_c8fb4780eb554aec95c6231680eb82cf/handler" data-type="HTMLModule" data-block-type="html">
+                                                        <ol>
+                                                            <li>
+                                                                <h2> September 21 </h2>
+                                                                <section class="update-description">
+                                                                    <section class="primary">
+                                                                        <p> Words of encouragement! This is a short note that most students will read. </p>
+                                                                        <p class="author">Anant  Agarwal (6.002x Principal Instructor)</p>
+                                                                    </section>
+                                                                    <p></p><h3>Primary versus Secondary Updates:</h3> Unfortunately, the internet throws a lot of text at students, and they
+                                                                    do not read everything that they are given. However, many students <em>do</em> read all that they are
+                                                                    given, and so detailed explanations in this section will benefit the most conscientious.
+                                                                    Any essential information should be extremely quickly summarized in the primary section for skimmers.<p></p>
+                                                                    <p></p><h3>Star Forum Poster</h3>
+                                                                    Students appreciate knowing that the course staff is reading what they post, and one of several ways
+                                                                    that you can do this is by acknowledging the star posters in your announcements.
+                                                                    <p></p>
+                                                                </section>
+                                                            </li>
+                                                        </ol>
+
+                                                    </section>
+                                                </article>
+                                            </section>
+                                        </li>
+                                        </ol>
+                                    </article>
+                                </section>
+                            </li>
+                        </ol>
+                </article>
+                </section>
+            </article>
+            <aside class="content-supplementary" role="complementary">
+
+<!-- begin publishing changes 1 -->
+
+                <!-- case never published, future release no staff lock -->
+
+                <div class="bit-publishing ">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">Publishing Status </span>Draft (Never published)</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Draft saved on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon fa fa-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary is-disabled" href="" aria-disabled="true" >Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 1 -->
+
+<!-- begin publishing changes 2 -->
+
+                <!-- case published no changes, future release no staff lock -->
+
+                <div class="bit-publishing is-published">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">Publishing Status </span>Published</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Last published on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon fa fa-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary is-disabled" href="" aria-disabled="true" >Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary is-disabled" href="" aria-disabled="true" >Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 2 -->
+
+
+<!-- begin publishing changes 3 -->
+
+                <!-- case unpubbed changes, future release no staff lock -->
+
+                <div class="bit-publishing is-draft">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">Publishing Status </span>Draft (Unpublished changes)</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Draft saved on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon fa fa-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 3 -->
+
+
+<!-- begin publishing changes 4 -->
+
+                <!-- case unpubbed changes, future release with staff lock -->
+
+                <div class="bit-publishing is-draft is-staff-only">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">Publishing Status </span>Draft (Unpublished changes)</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Draft saved on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff only</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon fa fa-lock"></i> Hidden from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 4 -->
+
+
+<!-- begin publishing changes 5 -->
+
+                <!-- case published no changes, release in past no staff lock -->
+
+                <div class="bit-publishing is-published">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">Publishing Status </span>Published</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Last published on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Released:</h5>
+                      <p class="copy">
+                          <span class="release-date">May 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Currently Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon fa fa-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary is-disabled" href="" aria-disabled="true" >Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary is-disabled" href="" aria-disabled="true" >Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 2 -->
+
+
+                <div class="bit-publishing">
+                    <h3 class="title-3">Publishing Status</h3>
+                    <p class="copy">This content is published with unit <a href="">Unit 1</a>. To make changes to the content of this container, place <a href="">Unit 1</a> in draft mode.</p>
+                </div>
+                <div class="bit">
+                    <h3 class="title-3">Container Reference Page</h3>
+                    <ul class="list-details">
+                        <li class="item-detail">This is a reference  for the container page, meant to show visual states and general FED hierarchy for the both the HTML template and the SASS styling.</li>
+                    </ul>
+                </div>
+            </aside>
+        </section>
+    </div>
+</div>
+
+
+</div>
+</%block>

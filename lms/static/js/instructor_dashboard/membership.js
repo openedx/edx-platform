@@ -461,16 +461,27 @@ such that the value can be defined later than this assignment (file load order).
                 return displayResponse.$task_response.append($taskResSection);
             };
             if (successes.length && dataFromServer.action === 'add') {
-                // Translators: A list of users appears after this sentence;
-                renderList(gettext('These users were successfully added as beta testers:'), (function() {
-                    var j, len1, results;
-                    results = [];
-                    for (j = 0, len1 = successes.length; j < len1; j++) {
-                        sr = successes[j];
-                        results.push(sr.identifier);
+                var j, len1, inActiveUsers, activeUsers; // eslint-disable-line vars-on-top
+                activeUsers = [];
+                inActiveUsers = [];
+                for (j = 0, len1 = successes.length; j < len1; j++) {
+                    sr = successes[j];
+                    if (sr.is_active) {
+                        activeUsers.push(sr.identifier);
+                    } else {
+                        inActiveUsers.push(sr.identifier);
                     }
-                    return results;
-                }()));
+                }
+                if (activeUsers.length) {
+                    // Translators: A list of users appears after this sentence;
+                    renderList(gettext('These users were successfully added as beta testers:'), activeUsers);
+                }
+                if (inActiveUsers.length) {
+                    // Translators: A list of users appears after this sentence;
+                    renderList(gettext(
+                        'These users could not be added as beta testers because their accounts are not yet activated:'),
+                        inActiveUsers);
+                }
             }
             if (successes.length && dataFromServer.action === 'remove') {
                 // Translators: A list of users appears after this sentence;
@@ -524,7 +535,6 @@ such that the value can be defined later than this assignment (file load order).
             }
             return renderList();
         };
-
         return betaTesterBulkAddition;
     }());
 
@@ -538,6 +548,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$reason_field = this.$container.find("textarea[name='reason-field']");
             this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
             this.$checkbox_emailstudents = this.$container.find("input[name='email-students']");
+            this.checkbox_emailstudents_initialstate = this.$checkbox_emailstudents.is(':checked');
             this.$task_response = this.$container.find('.request-response');
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$enrollment_button.click(function(event) {
@@ -574,7 +585,7 @@ such that the value can be defined later than this assignment (file load order).
         batchEnrollment.prototype.clear_input = function() {
             this.$identifier_input.val('');
             this.$reason_field.val('');
-            this.$checkbox_emailstudents.attr('checked', true);
+            this.$checkbox_emailstudents.attr('checked', this.checkbox_emailstudents_initialstate);
             return this.$checkbox_autoenroll.attr('checked', true);
         };
 

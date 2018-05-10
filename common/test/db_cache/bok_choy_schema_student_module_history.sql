@@ -24,7 +24,7 @@ CREATE TABLE `coursewarehistoryextended_studentmodulehistoryextended` (
   KEY `coursewarehistoryextended_studentmodulehistoryextended_2af72f10` (`version`),
   KEY `coursewarehistoryextended_studentmodulehistoryextended_e2fa5388` (`created`),
   KEY `coursewarehistoryextended_student_module_id_61b23a7a1dd27fe4_idx` (`student_module_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -35,7 +35,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=176 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=275 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

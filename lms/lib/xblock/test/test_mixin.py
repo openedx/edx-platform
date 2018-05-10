@@ -4,6 +4,7 @@ Tests of the LMS XBlock Mixin
 import ddt
 from nose.plugins.attrib import attr
 
+from lms_xblock.mixin import INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
@@ -90,7 +91,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content group configurations.",
+            INVALID_USER_PARTITION_VALIDATION,
             ValidationMessage.ERROR,
         )
 
@@ -102,7 +103,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content group configurations.",
+            INVALID_USER_PARTITION_VALIDATION,
             ValidationMessage.ERROR,
         )
 
@@ -115,7 +116,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content groups.",
+            INVALID_USER_PARTITION_GROUP_VALIDATION,
             ValidationMessage.ERROR,
         )
 
@@ -125,7 +126,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content groups.",
+            INVALID_USER_PARTITION_GROUP_VALIDATION,
             ValidationMessage.ERROR,
         )
 

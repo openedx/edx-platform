@@ -18,16 +18,24 @@
                 initialize: function(options) {
                     Backbone.Router.prototype.initialize.call(this);
                     _.bindAll(this, 'allThreads', 'showThread');
-                    this.courseId = options.courseId;
+                    this.rootUrl = options.rootUrl;
                     this.discussion = options.discussion;
-                    this.course_settings = options.courseSettings;
+                    this.courseSettings = options.courseSettings;
                     this.discussionBoardView = options.discussionBoardView;
                     this.newPostView = options.newPostView;
+                    if (options.startHeader !== undefined) {
+                        this.startHeader = options.startHeader;
+                    } else {
+                        this.startHeader = 2; // Start the header levels at H<startHeader>
+                    }
+
                 },
 
                 start: function() {
                     var self = this,
-                        $newPostButton = $('.new-post-btn');
+                        $newPostButton = $('.new-post-btn'),
+                        rootUrl = '/courses/' + this.courseId + '/discussion/',
+                        result = window.location.pathname.match('.*/discussion');
                     this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
                     $newPostButton.bind('click', _.bind(this.showNewPost, this));
                     $newPostButton.bind('keydown', function(event) {
@@ -47,12 +55,14 @@
                     this.discussionBoardView.discussionThreadListView.on(
                         'thread:created', _.bind(this.navigateToThread, this)
                     );
-                    var root_url = '/courses/' + this.courseId + '/discussion/';
-                    var result = window.location.pathname.match('.*/discussion');
-                    root_url = (result !== null) ? result[0] + '/' : root_url;
+                    rootUrl = (result !== null) ? result[0] + '/' : rootUrl;
+                    // stop history if it is already started.
+                    if (Backbone.History.started) {
+                        Backbone.history.stop();
+                    }
                     Backbone.history.start({
                         pushState: true,
-                        root: root_url
+                        root: rootUrl
                     });
                 },
 
@@ -104,7 +114,9 @@
                         el: $('.forum-content'),
                         model: this.thread,
                         mode: 'tab',
-                        course_settings: this.course_settings
+                        startHeader: this.startHeader,
+                        courseSettings: this.courseSettings,
+                        is_commentable_divided: this.discussion.is_commentable_divided
                     });
                     this.main.render();
                     this.main.on('thread:responses:rendered', function() {

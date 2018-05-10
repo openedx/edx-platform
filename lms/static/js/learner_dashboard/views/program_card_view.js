@@ -22,7 +22,7 @@
 
                  attributes: function() {
                      return {
-                         'aria-labelledby': 'program-' + this.model.get('id'),
+                         'aria-labelledby': 'program-' + this.model.get('uuid'),
                          'role': 'group'
                      };
                  },
@@ -33,14 +33,14 @@
                      this.progressCollection = data.context.progressCollection;
                      if (this.progressCollection) {
                          this.progressModel = this.progressCollection.findWhere({
-                             id: this.model.get('id')
+                             uuid: this.model.get('uuid')
                          });
                      }
                      this.render();
                  },
 
                  render: function() {
-                     var orgList = _.map(this.model.get('organizations'), function(org) {
+                     var orgList = _.map(this.model.get('authoring_organizations'), function(org) {
                              return gettext(org.key);
                          }),
                          data = $.extend(
@@ -54,11 +54,6 @@
                  },
 
                  postRender: function() {
-                    // Add describedby to parent only if progess is present
-                     if (this.progressModel) {
-                         this.$el.attr('aria-describedby', 'status-' + this.model.get('id'));
-                     }
-
                      if (navigator.userAgent.indexOf('MSIE') !== -1 ||
                         navigator.appVersion.indexOf('Trident/') > 0) {
                         /* Microsoft Internet Explorer detected in. */
@@ -73,19 +68,14 @@
                      var progress = this.progressModel ? this.progressModel.toJSON() : false;
 
                      if (progress) {
-                         progress.total = {
-                             completed: progress.completed.length,
-                             in_progress: progress.in_progress.length,
-                             not_started: progress.not_started.length
-                         };
 
-                         progress.total.courses = progress.total.completed +
-                                                 progress.total.in_progress +
-                                                 progress.total.not_started;
+                         progress.total = progress.completed +
+                                          progress.in_progress +
+                                          progress.not_started;
 
                          progress.percentage = {
-                             completed: this.getWidth(progress.total.completed, progress.total.courses),
-                             in_progress: this.getWidth(progress.total.in_progress, progress.total.courses)
+                             completed: this.getWidth(progress.completed, progress.total),
+                             in_progress: this.getWidth(progress.in_progress, progress.total)
                          };
                      }
 

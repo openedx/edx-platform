@@ -3,10 +3,11 @@ Factories are defined in other modules and absorbed here into the
 lettuce world so that they can be used by both unit tests
 and integration / BDD tests.
 '''
+from lettuce import world
+
+import course_modes.tests.factories as cmf
 import student.tests.factories as sf
 import xmodule.modulestore.tests.factories as xf
-import course_modes.tests.factories as cmf
-from lettuce import world
 
 # Unlock XBlock factories, because we're randomizing the collection
 # name above to prevent collisions

@@ -1,41 +1,51 @@
 """
 CourseGrade Class
 """
-
-from collections import defaultdict, namedtuple, OrderedDict
-from logging import getLogger
+from abc import abstractmethod
+from collections import OrderedDict, defaultdict
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
-import dogstats_wrapper as dog_stats_api
 from lazy import lazy
 
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 from xmodule import block_metadata_utils
 
-from ..models import PersistentCourseGrade
-from .subsection_grade import SubsectionGradeFactory
-from ..transformer import GradesTransformer
+from .subsection_grade import ZeroSubsectionGrade
+from .subsection_grade_factory import SubsectionGradeFactory
 
 
-log = getLogger(__name__)
+def uniqueify(iterable):
+    return OrderedDict([(item, None) for item in iterable]).keys()
 
 
-class CourseGrade(object):
+class CourseGradeBase(object):
     """
-    Course Grade class
+    Base class for Course Grades.
     """
-    def __init__(self, student, course, course_structure):
-        self.student = student
-        self.course = course
-        self.course_version = getattr(course, 'course_version', None)
-        self.course_edited_timestamp = getattr(course, 'subtree_edited_on', None)
-        self.course_structure = course_structure
-        self._percent = None
-        self._letter_grade = None
-        self._subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
+    def __init__(self, user, course_data, percent=0, letter_grade=None, passed=False, force_update_subsections=False):
+        self.user = user
+        self.course_data = course_data
+
+        self.percent = percent
+        self.passed = passed
+
+        # Convert empty strings to None when reading from the table
+        self.letter_grade = letter_grade or None
+        self.force_update_subsections = force_update_subsections
+
+    def __unicode__(self):
+        return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
+            unicode(self.percent),
+            self.letter_grade,
+            self.passed,
+        )
+
+    @property
+    def attempted(self):
+        """
+        Returns whether at least one problem was attempted
+        by the user in the course.
+        """
+        return False
 
     @lazy
     def graded_subsections_by_format(self):
@@ -44,7 +54,7 @@ class CourseGrade(object):
         a dict keyed by subsection format types.
         """
         subsections_by_format = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades:
+        for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
@@ -53,372 +63,207 @@ class CourseGrade(object):
         return subsections_by_format
 
     @lazy
-    def locations_to_scores(self):
+    def chapter_grades(self):
+        """
+        Returns a dictionary of dictionaries.
+        The primary dictionary is keyed by the chapter's usage_key.
+        The secondary dictionary contains the chapter's
+        subsection grades, display name, and url name.
+        """
+        course_structure = self.course_data.structure
+        grades = OrderedDict()
+        for chapter_key in course_structure.get_children(self.course_data.location):
+            grades[chapter_key] = self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
+        return grades
+
+    @lazy
+    def subsection_grades(self):
+        """
+        Returns an ordered dictionary of subsection grades,
+        keyed by subsection location.
+        """
+        subsection_grades = defaultdict(OrderedDict)
+        for chapter in self.chapter_grades.itervalues():
+            for subsection_grade in chapter['sections']:
+                subsection_grades[subsection_grade.location] = subsection_grade
+        return subsection_grades
+
+    @lazy
+    def problem_scores(self):
         """
         Returns a dict of problem scores keyed by their locations.
         """
-        locations_to_scores = {}
-        for chapter in self.chapter_grades:
-            self._log_event(log.info, u"chapter grades has a chapter: {0}".format(chapter))
+        problem_scores = {}
+        for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
-                self._log_event(log.info, u"subsection_grade: {0}, {1}".format(
-                    subsection_grade, subsection_grade.locations_to_scores
-                ))
-                locations_to_scores.update(subsection_grade.locations_to_scores)
-        return locations_to_scores
+                problem_scores.update(subsection_grade.problem_scores)
+        return problem_scores
 
-    @lazy
-    def grade_value(self):
+    def score_for_chapter(self, chapter_key):
         """
-        Helper function to extract the grade value as calculated by the course's grader.
+        Returns the aggregate weighted score for the given chapter.
+        Raises:
+            KeyError if the chapter is not found.
         """
-        # Grading policy might be overriden by a CCX, need to reset it
-        self.course.set_grading_policy(self.course.grading_policy)
-        grade_value = self.course.grader.grade(
-            self.graded_subsections_by_format,
-            generate_random_scores=settings.GENERATE_PROFILE_SCORES
-        )
-        # can't use the existing properties due to recursion issues caused by referencing self.grade_value
-        percent = self._calc_percent(grade_value)
-        letter_grade = self._compute_letter_grade(percent)
-        self._log_event(log.warning, u"grade_value, percent: {0}, grade: {1}".format(percent, letter_grade))
-        return grade_value
-
-    @lazy
-    def chapter_grades(self):
-        """
-        Returns a list of chapters, each containing its subsection grades,
-        display name, and url name.
-        """
-        chapter_grades = []
-        for chapter_key in self.course_structure.get_children(self.course.location):
-            self._log_event(log.info, u"chapter key in course struct: {0}".format(chapter_key))
-            chapter = self.course_structure[chapter_key]
-            chapter_subsection_grades = []
-            children = self.course_structure.get_children(chapter_key)
-            for subsection_key in children:
-                self._log_event(log.info, u"subsection_key key in course struct: {0}".format(subsection_key))
-                chapter_subsection_grades.append(
-                    self._subsection_grade_factory.create(self.course_structure[subsection_key], read_only=True)
-                )
-
-            chapter_grades.append({
-                'display_name': block_metadata_utils.display_name_with_default_escaped(chapter),
-                'url_name': block_metadata_utils.url_name_for_block(chapter),
-                'sections': chapter_subsection_grades
-            })
-        return chapter_grades
-
-    @property
-    def percent(self):
-        """
-        Returns a rounded percent from the overall grade.
-        """
-        if self._percent is None:
-            self._percent = self._calc_percent(self.grade_value)
-        return self._percent
-
-    @property
-    def letter_grade(self):
-        """
-        Returns a letter representing the grade.
-        """
-        if self._letter_grade is None:
-            self._letter_grade = self._compute_letter_grade(self.percent)
-        return self._letter_grade
-
-    @property
-    def passed(self):
-        """
-        Check user's course passing status. Return True if passed.
-        """
-        nonzero_cutoffs = [cutoff for cutoff in self.course.grade_cutoffs.values() if cutoff > 0]
-        success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
-        return success_cutoff and self.percent >= success_cutoff
-
-    @property
-    def summary(self):
-        """
-        Returns the grade summary as calculated by the course's grader.
-        """
-        grade_summary = self.grade_value
-        grade_summary['percent'] = self.percent
-        grade_summary['grade'] = self.letter_grade
-
-        return grade_summary
-
-    def compute_and_update(self, read_only=False):
-        """
-        Computes the grade for the given student and course.
-
-        If read_only is True, doesn't save any updates to the grades.
-        """
-        subsections_total = sum(len(chapter['sections']) for chapter in self.chapter_grades)
-
-        total_graded_subsections = sum(len(x) for x in self.graded_subsections_by_format.itervalues())
-        subsections_created = len(self._subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
-        subsections_read = subsections_total - subsections_created
-        blocks_total = len(self.locations_to_scores)
-        if not read_only:
-            self._subsection_grade_factory.bulk_create_unsaved()
-            grading_policy_hash = self.get_grading_policy_hash(self.course.location, self.course_structure)
-            PersistentCourseGrade.update_or_create_course_grade(
-                user_id=self.student.id,
-                course_id=self.course.id,
-                course_version=self.course_version,
-                course_edited_timestamp=self.course_edited_timestamp,
-                grading_policy_hash=grading_policy_hash,
-                percent_grade=self.percent,
-                letter_grade=self.letter_grade or "",
-                passed=self.passed,
-            )
-
-        self._signal_listeners_when_grade_computed()
-        self._log_event(
-            log.warning,
-            u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
-            u"graded subsections: {4}".format(
-                read_only,
-                subsections_read,
-                subsections_created,
-                blocks_total,
-                total_graded_subsections,
-            )
-        )
+        earned, possible = 0.0, 0.0
+        chapter_grade = self.chapter_grades[chapter_key]
+        for section in chapter_grade['sections']:
+            earned += section.graded_total.earned
+            possible += section.graded_total.possible
+        return earned, possible
 
     def score_for_module(self, location):
         """
         Calculate the aggregate weighted score for any location in the course.
         This method returns a tuple containing (earned_score, possible_score).
-
         If the location is of 'problem' type, this method will return the
         possible and earned scores for that problem. If the location refers to a
         composite module (a vertical or section ) the scores will be the sums of
         all scored problems that are children of the chosen location.
         """
-        if location in self.locations_to_scores:
-            score = self.locations_to_scores[location]
+        if location in self.problem_scores:
+            score = self.problem_scores[location]
             return score.earned, score.possible
-        children = self.course_structure.get_children(location)
-        earned = 0.0
-        possible = 0.0
+        children = self.course_data.structure.get_children(location)
+        earned, possible = 0.0, 0.0
         for child in children:
             child_earned, child_possible = self.score_for_module(child)
             earned += child_earned
             possible += child_possible
         return earned, possible
 
-    @staticmethod
-    def get_grading_policy_hash(course_location, course_structure):
+    @lazy
+    def grader_result(self):
         """
-        Gets the grading policy of the course at the given location
-        in the given course structure.
+        Returns the result from the course grader.
         """
-        return course_structure.get_transformer_block_field(
-            course_location,
-            GradesTransformer,
-            'grading_policy_hash'
+        course = self.course_data.course
+        course.set_grading_policy(course.grading_policy)
+        return course.grader.grade(
+            self.graded_subsections_by_format,
+            generate_random_scores=settings.GENERATE_PROFILE_SCORES,
         )
 
-    @classmethod
-    def load_persisted_grade(cls, user, course, course_structure):
+    @property
+    def summary(self):
         """
-        Initializes a CourseGrade object, filling its members with persisted values from the database.
-
-        If the grading policy is out of date, recomputes the grade.
-
-        If no persisted values are found, returns None.
+        Returns the grade summary as calculated by the course's grader.
+        DEPRECATED: To be removed as part of TNL-5291.
         """
-        try:
-            persistent_grade = PersistentCourseGrade.read_course_grade(user.id, course.id)
-        except PersistentCourseGrade.DoesNotExist:
-            return None
-        course_grade = CourseGrade(user, course, course_structure)
+        # TODO(TNL-5291) Remove usages of this deprecated property.
+        grade_summary = self.grader_result
+        grade_summary['percent'] = self.percent
+        grade_summary['grade'] = self.letter_grade
+        return grade_summary
 
-        current_grading_policy_hash = course_grade.get_grading_policy_hash(course.location, course_structure)
-        if current_grading_policy_hash != persistent_grade.grading_policy_hash:
-            return None
+    def _get_chapter_grade_info(self, chapter, course_structure):
+        """
+        Helper that returns a dictionary of chapter grade information.
+        """
+        chapter_subsection_grades = self._get_subsection_grades(course_structure, chapter.location)
+        return {
+            'display_name': block_metadata_utils.display_name_with_default_escaped(chapter),
+            'url_name': block_metadata_utils.url_name_for_block(chapter),
+            'sections': chapter_subsection_grades,
+        }
+
+    def _get_subsection_grades(self, course_structure, chapter_key):
+        """
+        Returns a list of subsection grades for the given chapter.
+        """
+        return [
+            self._get_subsection_grade(course_structure[subsection_key])
+            for subsection_key in uniqueify(course_structure.get_children(chapter_key))
+        ]
+
+    @abstractmethod
+    def _get_subsection_grade(self, subsection):
+        """
+        Abstract method to be implemented by subclasses for returning
+        the grade of the given subsection.
+        """
+        raise NotImplementedError
+
+
+class ZeroCourseGrade(CourseGradeBase):
+    """
+    Course Grade class for Zero-value grades when no problems were
+    attempted in the course.
+    """
+    def _get_subsection_grade(self, subsection):
+        return ZeroSubsectionGrade(subsection, self.course_data)
+
+
+class CourseGrade(CourseGradeBase):
+    """
+    Course Grade class when grades are updated or read from storage.
+    """
+    def __init__(self, user, course_data, *args, **kwargs):
+        super(CourseGrade, self).__init__(user, course_data, *args, **kwargs)
+        self._subsection_grade_factory = SubsectionGradeFactory(user, course_data=course_data)
+
+    def update(self):
+        """
+        Updates the grade for the course. Also updates subsection grades
+        if self.force_update_subsections is true, via the lazy call
+        to self.grader_result.
+        """
+        grade_cutoffs = self.course_data.course.grade_cutoffs
+        self.percent = self._compute_percent(self.grader_result)
+        self.letter_grade = self._compute_letter_grade(grade_cutoffs, self.percent)
+        self.passed = self._compute_passed(grade_cutoffs, self.percent)
+
+    @lazy
+    def attempted(self):
+        """
+        Returns whether any of the subsections in this course
+        have been attempted by the student.
+        """
+        for chapter in self.chapter_grades.itervalues():
+            for subsection_grade in chapter['sections']:
+                if subsection_grade.all_total.first_attempted:
+                    return True
+        return False
+
+    def _get_subsection_grade(self, subsection):
+        # Pass read_only here so the subsection grades can be persisted in bulk at the end.
+        if self.force_update_subsections:
+            return self._subsection_grade_factory.update(subsection)
         else:
-            course_grade._percent = persistent_grade.percent_grade  # pylint: disable=protected-access
-            course_grade._letter_grade = persistent_grade.letter_grade  # pylint: disable=protected-access
-            course_grade.course_version = persistent_grade.course_version
-            course_grade.course_edited_timestamp = persistent_grade.course_edited_timestamp
-
-        course_grade._log_event(log.info, u"load_persisted_grade")  # pylint: disable=protected-access
-
-        return course_grade
-
-    @classmethod
-    def get_persisted_grade(cls, user, course):
-        """
-        Gets the persisted grade in the database, without checking
-        whether it is up-to-date with the course's grading policy.
-        For read use only.
-        """
-        try:
-            persistent_grade = PersistentCourseGrade.read_course_grade(user.id, course.id)
-        except PersistentCourseGrade.DoesNotExist:
-            return None
-        else:
-            course_grade = CourseGrade(user, course, None)  # no course structure needed
-            course_grade._percent = persistent_grade.percent_grade  # pylint: disable=protected-access
-            course_grade._letter_grade = persistent_grade.letter_grade  # pylint: disable=protected-access
-            course_grade.course_version = persistent_grade.course_version
-            course_grade.course_edited_timestamp = persistent_grade.course_edited_timestamp
-            return course_grade
+            return self._subsection_grade_factory.create(subsection, read_only=True)
 
     @staticmethod
-    def _calc_percent(grade_value):
+    def _compute_percent(grader_result):
         """
-        Helper for percent calculation.
+        Computes and returns the grade percentage from the given
+        result from the grader.
         """
-        return round(grade_value['percent'] * 100 + 0.05) / 100
+        return round(grader_result['percent'] * 100 + 0.05) / 100
 
-    def _compute_letter_grade(self, percentage):
+    @staticmethod
+    def _compute_letter_grade(grade_cutoffs, percent):
         """
-        Returns a letter grade as defined in grading_policy (e.g. 'A' 'B' 'C' for 6.002x) or None.
-
-        Arguments
-        - grade_cutoffs is a dictionary mapping a grade to the lowest
-            possible percentage to earn that grade.
-        - percentage is the final percent across all problems in a course
+        Computes and returns the course letter grade given the
+        inputs, as defined in the grading_policy (e.g. 'A' 'B' 'C')
+        or None if not passed.
         """
-
         letter_grade = None
-        grade_cutoffs = self.course.grade_cutoffs
 
         # Possible grades, sorted in descending order of score
         descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
         for possible_grade in descending_grades:
-            if percentage >= grade_cutoffs[possible_grade]:
+            if percent >= grade_cutoffs[possible_grade]:
                 letter_grade = possible_grade
                 break
 
         return letter_grade
 
-    def _signal_listeners_when_grade_computed(self):
+    @staticmethod
+    def _compute_passed(grade_cutoffs, percent):
         """
-        Signal all listeners when grades are computed.
+        Computes and returns whether the given percent value
+        is a passing grade according to the given grade cutoffs.
         """
-        responses = COURSE_GRADE_CHANGED.send_robust(
-            sender=None,
-            user=self.student,
-            course_grade=self,
-            course_key=self.course.id,
-            deadline=self.course.end
-        )
-
-        for receiver, response in responses:
-            log.debug(
-                'Signal fired when student grade is calculated. Receiver: %s. Response: %s',
-                receiver, response
-            )
-
-    def _log_event(self, log_func, log_statement):
-        """
-        Logs the given statement, for this instance.
-        """
-        log_func(u"Persistent Grades: CourseGrade.{0}, course: {1}, user: {2}".format(
-            log_statement,
-            self.course.id,
-            self.student.id
-        ))
-
-
-class CourseGradeFactory(object):
-    """
-    Factory class to create Course Grade objects
-    """
-    def create(self, student, course, read_only=True):
-        """
-        Returns the CourseGrade object for the given student and course.
-
-        If read_only is True, doesn't save any updates to the grades.
-        Raises a PermissionDenied if the user does not have course access.
-        """
-        course_structure = get_course_blocks(student, course.location)
-        # if user does not have access to this course, throw an exception
-        if not self._user_has_access_to_course(course_structure):
-            raise PermissionDenied("User does not have access to this course")
-        return (
-            self._get_saved_grade(student, course, course_structure) or
-            self._compute_and_update_grade(student, course, course_structure, read_only)
-        )
-
-    GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
-
-    def iter(self, course, students):
-        """
-        Given a course and an iterable of students (User), yield a GradeResult
-        for every student enrolled in the course.  GradeResult is a named tuple of:
-
-            (student, course_grade, err_msg)
-
-        If an error occurred, course_grade will be None and err_msg will be an
-        exception message. If there was no error, err_msg is an empty string.
-        """
-        for student in students:
-            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=[u'action:{}'.format(course.id)]):
-
-                try:
-                    course_grade = CourseGradeFactory().create(student, course)
-                    yield self.GradeResult(student, course_grade, "")
-
-                except Exception as exc:  # pylint: disable=broad-except
-                    # Keep marching on even if this student couldn't be graded for
-                    # some reason, but log it for future reference.
-                    log.exception(
-                        'Cannot grade student %s (%s) in course %s because of exception: %s',
-                        student.username,
-                        student.id,
-                        course.id,
-                        exc.message
-                    )
-                    yield self.GradeResult(student, None, exc.message)
-
-    def update(self, student, course, course_structure):
-        """
-        Updates the CourseGrade for this Factory's student.
-        """
-        self._compute_and_update_grade(student, course, course_structure)
-
-    def get_persisted(self, student, course):
-        """
-        Returns the saved grade for the given course and student,
-        irrespective of whether the saved grade is up-to-date.
-        """
-        if not PersistentGradesEnabledFlag.feature_enabled(course.id):
-            return None
-
-        return CourseGrade.get_persisted_grade(student, course)
-
-    def _get_saved_grade(self, student, course, course_structure):
-        """
-        Returns the saved grade for the given course and student.
-        """
-        if not PersistentGradesEnabledFlag.feature_enabled(course.id):
-            return None
-
-        return CourseGrade.load_persisted_grade(
-            student,
-            course,
-            course_structure
-        )
-
-    def _compute_and_update_grade(self, student, course, course_structure, read_only=False):
-        """
-        Freshly computes and updates the grade for the student and course.
-
-        If read_only is True, doesn't save any updates to the grades.
-        """
-        course_grade = CourseGrade(student, course, course_structure)
-        course_grade.compute_and_update(read_only)
-        return course_grade
-
-    def _user_has_access_to_course(self, course_structure):
-        """
-        Given a course structure, returns whether the user
-        for whom that course structure was retrieved
-        has access to the course.
-        """
-        return len(course_structure) > 0
+        nonzero_cutoffs = [cutoff for cutoff in grade_cutoffs.values() if cutoff > 0]
+        success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+        return success_cutoff and percent >= success_cutoff

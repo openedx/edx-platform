@@ -1,8 +1,9 @@
 # pylint: disable=missing-docstring
 
-from lettuce import world, step
-from lettuce.django import django_url
 import time
+
+from lettuce import step, world
+from lettuce.django import django_url
 
 
 @step('I register for the course "([^"]*)"$')

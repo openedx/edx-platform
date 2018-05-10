@@ -1,12 +1,15 @@
 (function(define) {
     'use strict';
-    define(['jquery',
-            'underscore',
-            'underscore.string',
-            'backbone',
-            'text!common/templates/components/system-feedback.underscore'],
-        function($, _, str, Backbone, systemFeedbackTemplate) {
-            var tabbable_elements = [
+    define([
+        'jquery',
+        'underscore',
+        'underscore.string',
+        'backbone',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!../../../../common/templates/components/system-feedback.underscore'
+    ],
+        function($, _, str, Backbone, HtmlUtils, systemFeedbackTemplate) {
+            var tabbableElements = [
                 "a[href]:not([tabindex='-1'])",
                 "area[href]:not([tabindex='-1'])",
                 "input:not([disabled]):not([tabindex='-1'])",
@@ -26,15 +29,15 @@
                     shown: true,  // is this view currently being shown?
                     icon: true,  // should we render an icon related to the message intent?
                     closeIcon: true,  // should we render a close button in the top right corner?
-                    minShown: 0,  // length of time after this view has been shown before it can be hidden (milliseconds)
-                    maxShown: Infinity,  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
+                    minShown: 0,  // ms after this view has been shown before it can be hidden
+                    maxShown: Infinity,  // ms after this view has been shown before it will be automatically hidden
                     outFocusElement: null  // element to send focus to on hide
 
                 /* Could also have an "actions" hash: here is an example demonstrating
-                   the expected structure. For each action, by default the framework
-                   will call preventDefault on the click event before the function is
-                   run; to make it not do that, just pass `preventDefault: false` in
-                   the action object.
+                    the expected structure. For each action, by default the framework
+                    will call preventDefault on the click event before the function is
+                    run; to make it not do that, just pass `preventDefault: false` in
+                    the action object.
 
                 actions: {
                     primary: {
@@ -62,11 +65,11 @@
                 initialize: function(options) {
                     this.options = _.extend({}, this.options, options);
                     if (!this.options.type) {
-                        throw 'SystemFeedback: type required (given ' +
+                        throw 'SystemFeedback: type required (given ' +  // eslint-disable-line no-throw-literal
                             JSON.stringify(this.options) + ')';
                     }
                     if (!this.options.intent) {
-                        throw 'SystemFeedback: intent required (given ' +
+                        throw 'SystemFeedback: intent required (given ' +  // eslint-disable-line no-throw-literal
                             JSON.stringify(this.options) + ')';
                     }
                     this.setElement($('#page-' + this.options.type));
@@ -78,24 +81,24 @@
                     return this;
                 },
 
-                inFocus: function() {
+                inFocus: function(wrapperElementSelector) {
+                    var wrapper = wrapperElementSelector || '.wrapper',
+                        tabbables;
                     this.options.outFocusElement = this.options.outFocusElement || document.activeElement;
 
                     // Set focus to the container.
-                    this.$('.wrapper').first().focus();
-
+                    this.$(wrapper).first().focus();
 
                     // Make tabs within the prompt loop rather than setting focus
                     // back to the main content of the page.
-                    var tabbables = this.$(tabbable_elements.join());
+                    tabbables = this.$(tabbableElements.join());
                     tabbables.on('keydown', function(event) {
                         // On tab backward from the first tabbable item in the prompt
                         if (event.which === 9 && event.shiftKey && event.target === tabbables.first()[0]) {
                             event.preventDefault();
                             tabbables.last().focus();
-                        }
-                        // On tab forward from the last tabbable item in the prompt
-                        else if (event.which === 9 && !event.shiftKey && event.target === tabbables.last()[0]) {
+                        } else if (event.which === 9 && !event.shiftKey && event.target === tabbables.last()[0]) {
+                            // On tab forward from the last tabbable item in the prompt
                             event.preventDefault();
                             tabbables.first().focus();
                         }
@@ -105,7 +108,7 @@
                 },
 
                 outFocus: function() {
-                    var tabbables = this.$(tabbable_elements.join()).off('keydown');
+                    this.$(tabbableElements.join()).off('keydown');
                     if (this.options.outFocusElement) {
                         this.options.outFocusElement.focus();
                     }
@@ -155,7 +158,7 @@
                         singleton.stopListening();
                         singleton.undelegateEvents();
                     }
-                    this.$el.html(_.template(systemFeedbackTemplate)(this.options));
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(systemFeedbackTemplate)(this.options));
                     SystemFeedback['active_' + this.options.type] = this;
                     return this;
                 },

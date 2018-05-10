@@ -12,18 +12,18 @@
 # pylint: disable=unused-argument
 
 # django_url is assigned late in the process of loading lettuce,
+from logging import getLogger
+
 # so we import this as a module, and then read django_url from
 # it to get the correct value
 import lettuce.django
-
-from lettuce import world, step
-from .course_helpers import *
-from .ui_helpers import *
+from lettuce import step, world
 from nose.tools import assert_equals  # pylint: disable=no-name-in-module
-
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from logging import getLogger
+from .course_helpers import *
+from .ui_helpers import *
+
 logger = getLogger(__name__)
 
 

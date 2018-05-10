@@ -12,9 +12,8 @@ from lazy import lazy
 from requests.packages.urllib3.exceptions import HTTPError
 
 from badges.backends.base import BadgeBackend
-from eventtracking import tracker
-
 from badges.models import BadgeAssertion
+from eventtracking import tracker
 
 MAX_SLUG_LENGTH = 255
 LOGGER = logging.getLogger(__name__)

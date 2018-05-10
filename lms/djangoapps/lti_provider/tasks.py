@@ -2,18 +2,19 @@
 Asynchronous tasks for the LTI provider app.
 """
 
+import logging
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
-import logging
-
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
-from lms import CELERY_APP
-from lti_provider.models import GradedAssignment
-import lti_provider.outcomes as outcomes
-from lti_provider.views import parse_course_and_usage_keys
 from opaque_keys.edx.keys import CourseKey
+
+import lti_provider.outcomes as outcomes
+from lms import CELERY_APP
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
+from lti_provider.models import GradedAssignment
+from lti_provider.views import parse_course_and_usage_keys
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.lti_provider")

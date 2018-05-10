@@ -8,17 +8,13 @@ import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-
-from certificates.models import (
-    CertificateInvalidation,
-    CertificateStatuses,
-    GeneratedCertificate
-)
-from certificates.tests.factories import CertificateInvalidationFactory
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import UserFactory
+
+from certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
+from certificates.tests.factories import CertificateInvalidationFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

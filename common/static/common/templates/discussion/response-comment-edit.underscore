@@ -1,5 +1,5 @@
 <div class="edit-post-form" id="comment_<%- id %>">
-    <h1><%- gettext("Editing comment") %></h1>
+    <h<%- startHeader %> ><%- gettext("Editing comment") %></h<%- startHeader%>>
     <ul class="edit-comment-form-errors"></ul>
     <div class="form-row">
         <div class="edit-comment-body" name="body" data-id="<%- id %>"><%- body %></div>

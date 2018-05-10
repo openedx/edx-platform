@@ -2,23 +2,23 @@
 """
 Admin site configuration for third party authentication
 """
+from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django import forms
-
 from django.contrib import admin
 
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from third_party_auth.provider import Registry
+
 from .models import (
-    OAuth2ProviderConfig,
-    SAMLProviderConfig,
-    SAMLConfiguration,
-    SAMLProviderData,
-    LTIProviderConfig,
-    ProviderApiPermissions,
     _PSA_OAUTH2_BACKENDS,
-    _PSA_SAML_BACKENDS
+    _PSA_SAML_BACKENDS,
+    LTIProviderConfig,
+    OAuth2ProviderConfig,
+    ProviderApiPermissions,
+    SAMLConfiguration,
+    SAMLProviderConfig,
+    SAMLProviderData
 )
 from .tasks import fetch_saml_metadata
-from third_party_auth.provider import Registry
 
 
 class OAuth2ProviderConfigForm(forms.ModelForm):
@@ -33,7 +33,7 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'site', 'backend_name', 'secondary', 'skip_registration_form',
+            'name', 'enabled', 'provider_slug', 'site', 'backend_name', 'secondary', 'skip_registration_form',
             'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
         )
 

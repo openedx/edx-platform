@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
+import django.db.models.deletion
 import django.utils.timezone
 import django_countries.fields
-import django.db.models.deletion
 from django.conf import settings
+from django.db import migrations, models
+
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
@@ -189,7 +190,7 @@ class Migration(migrations.Migration):
                 ('gender', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'm', b'Male'), (b'f', b'Female'), (b'o', b'Other/Prefer Not to Say')])),
                 ('level_of_education', models.CharField(blank=True, max_length=6, null=True, db_index=True, choices=[(b'p', b'Doctorate'), (b'm', b"Master's or professional degree"), (b'b', b"Bachelor's degree"), (b'a', b'Associate degree'), (b'hs', b'Secondary/high school'), (b'jhs', b'Junior secondary/junior high/middle school'), (b'el', b'Elementary/primary school'), (b'none', b'No Formal Education'), (b'other', b'Other Education')])),
                 ('mailing_address', models.TextField(null=True, blank=True)),
-                ('city', models.TextField(null=True, blank=True)),
+                ('city', models.CharField(db_index=True, max_length=255, null=True, blank=True)),
                 ('country', django_countries.fields.CountryField(blank=True, max_length=2, null=True)),
                 ('goals', models.TextField(null=True, blank=True)),
                 ('allow_certificate', models.BooleanField(default=1)),

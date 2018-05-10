@@ -3,9 +3,9 @@ Tests for the milestones helpers library, which is the integration point for the
 """
 
 import ddt
+from milestones.exceptions import InvalidCourseKeyException, InvalidUserException
 from mock import patch
 
-from milestones.exceptions import InvalidCourseKeyException, InvalidUserException
 from util import milestones_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

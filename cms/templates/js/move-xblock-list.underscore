@@ -1,0 +1,53 @@
+<div class="xblock-items-category">
+    <span class="sr">
+        <%
+        // Translators: message will be like `Units in Homework - Question Styles`, `Subsections in Example 1 - Getting started` etc.
+        %>
+        <%- StringUtils.interpolate(
+                gettext("{categoryText} in {parentDisplayname}"),
+                {categoryText: categoryText, parentDisplayname: parentDisplayname}
+            )
+        %>
+    </span>
+    <span class="category-text" aria-hidden="true">
+        <%- categoryText %>:
+    </span>
+</div>
+<ul class="xblock-items-container" data-items-category="<%- XBlocksCategory %>">
+    <% for (var i = 0; i < xblocks.length; i++) {
+        var xblock = xblocks[i];
+    %>
+        <li class="xblock-item" data-item-index="<%- i %>">
+            <% if (sourceXBlockId !== xblock.id && (xblock.get('child_info') || XBlocksCategory !== 'component')) { %>
+                <button class="button-forward" >
+                    <span class="xblock-displayname truncate">
+                        <%- xblock.get('display_name') %>
+                    </span>
+                    <% if(currentLocationIndex === i) { %>
+                        <span class="current-location">
+                            (<%- gettext('Current location') %>)
+                        </span>
+                    <% } %>
+                    <span class="icon fa fa-arrow-right forward-sr-icon" aria-hidden="true"></span>
+                    <span class="sr forward-sr-text"><%- gettext("View child items") %></span>
+                </button>
+            <% } else { %>
+                <span class="component">
+                    <span class="xblock-displayname truncate">
+                        <%- xblock.get('display_name') %>
+                    </span>
+                    <% if(currentLocationIndex === i) { %>
+                        <span class="current-location">
+                            (<%- gettext('Currently selected') %>)
+                        </span>
+                    <% } %>
+                </span>
+            <% } %>
+        </li>
+    <% } %>
+    <% if(xblocks.length === 0) { %>
+        <span class="xblock-no-child-message">
+            <%- noChildText %>
+        </span>
+    <% } %>
+</ul>

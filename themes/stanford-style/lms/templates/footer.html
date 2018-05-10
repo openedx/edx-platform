@@ -1,11 +1,11 @@
 ## mako
 <%!
+  from datetime import date
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
+  from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
-<%!
-  from datetime import date
-%>
+<%namespace name='static' file='static_content.html'/>
 <!-- footer overrides for stanford theme go here -->
 <div class="wrapper-footer">
   <footer>
@@ -21,6 +21,11 @@
           <li><a href="${reverse('tos')}#copyright">${_("Copyright")}</a></li>
         </ol>
       </nav>
+
+      % if context.get('include_language_selector', footer_language_selector_is_enabled()):
+          <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
+      % endif
+
     </div>
     <div class="references">
       <span>Built on <a href="http://open.edx.org">OpenEdX</a>.</span>

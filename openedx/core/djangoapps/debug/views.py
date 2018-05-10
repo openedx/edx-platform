@@ -3,9 +3,10 @@ Views that are only activated when the project is running in development mode.
 These views will NOT be shown on production: trying to access them will result
 in a 404 error.
 """
-from edxmako.shortcuts import render_to_response
-from mako.exceptions import TopLevelLookupException
 from django.http import HttpResponseNotFound
+from mako.exceptions import TopLevelLookupException
+
+from edxmako.shortcuts import render_to_response
 
 
 def show_reference_template(request, template):
@@ -21,9 +22,12 @@ def show_reference_template(request, template):
     e.g. /template/ux/reference/index.html?name=Foo
     """
     try:
+        uses_bootstrap = u'/bootstrap/' in request.path
+        uses_pattern_library = not uses_bootstrap
         context = {
             "disable_courseware_js": True,
-            "uses_pattern_library": True
+            "uses_pattern_library": uses_pattern_library,
+            "uses_bootstrap": uses_bootstrap,
         }
         context.update(request.GET.dict())
         return render_to_response(template, context)

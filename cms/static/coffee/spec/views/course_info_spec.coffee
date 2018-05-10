@@ -232,6 +232,20 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
                 @handoutsEdit.render()
 
+            it "saves <ol></ol> when content left empty", ->
+                requests = AjaxHelpers["requests"](this)
+
+                # Enter empty string in the handouts section, verifying that the model
+                # is saved with '<ol></ol>' instead of the empty string
+                @handoutsEdit.$el.find('.edit-button').click()
+                spyOn(@handoutsEdit.$codeMirror, 'getValue').and.returnValue('')
+                spyOn(@model, "save").and.callThrough()
+                @handoutsEdit.$el.find('.save-button').click()
+                expect(@model.save).toHaveBeenCalled()
+
+                contentSaved = JSON.parse(requests[requests.length - 1].requestBody).data
+                expect(contentSaved).toEqual('<ol></ol>')
+
             it "does not rewrite links on save", ->
                 requests = AjaxHelpers["requests"](this)
 

@@ -1,9 +1,7 @@
 """ Utils for RSA keys"""
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.serialization import(
-    Encoding, PublicFormat, PrivateFormat, NoEncryption
-)
+from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
 
 
 def generate_rsa_key_pair(key_size=2048):

@@ -1,15 +1,16 @@
 """Tests for the lms module itself."""
 
 import mimetypes
+
+from django.core.urlresolvers import reverse
+from django.test import TestCase
 from mock import patch
 
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-
-from edxmako import add_lookup, LOOKUP
+from edxmako import LOOKUP, add_lookup
 from lms import startup
-from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.features.course_experience import course_home_url_name
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class LmsModuleTests(TestCase):
@@ -54,6 +55,6 @@ class HelpModalTests(ModuleStoreTestCase):
         Simple test to make sure that you don't get a 500 error when the modal
         is enabled.
         """
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse(course_home_url_name(self.course.id), args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)

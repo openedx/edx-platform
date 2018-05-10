@@ -1,14 +1,14 @@
 """LTI integration tests"""
 
-from collections import OrderedDict
 import json
-import mock
-from nose.plugins.attrib import attr
-import oauthlib
 import urllib
+from collections import OrderedDict
 
+import mock
+import oauthlib
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
 from courseware.tests import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints
@@ -78,7 +78,7 @@ class TestLTI(BaseTestXmodule):
             'input_fields': self.correct_headers,
             'element_class': self.item_descriptor.category,
             'element_id': self.item_descriptor.location.html_id(),
-            'launch_url': 'http://www.example.com',  # default value
+            'launch_url': u'http://www.example.com',  # default value
             'open_in_a_new_page': True,
             'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor,
                                                                          'preview_handler').rstrip('/?'),
@@ -168,10 +168,6 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             location=cls.course.id.make_usage_key('lti', 'lti_draft'),
             publish_item=False,
         )
-
-    def setUp(self):
-        """Create course, 2 chapters, 2 sections"""
-        super(TestLTIModuleListing, self).setUp()
 
     def expected_handler_url(self, handler):
         """convenience method to get the reversed handler urls"""

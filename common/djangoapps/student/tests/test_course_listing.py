@@ -4,31 +4,30 @@ by reversing group name formats.
 """
 import unittest
 
+import mock
 from django.conf import settings
 from django.test.client import Client
-import mock
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff
 from student.tests.factories import UserFactory
 from student.views import get_course_enrollments
+from util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from util.milestones_helpers import (
-    get_pre_requisite_courses_not_completed,
-    set_prerequisite_courses,
-)
-from milestones.tests.utils import MilestonesTestCaseMixin
 
 
 class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
+    ENABLED_SIGNALS = ['course_deleted']
+
     def setUp(self):
         """
         Add a student & teacher

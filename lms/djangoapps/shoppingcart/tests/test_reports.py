@@ -4,18 +4,24 @@
 Tests for the Shopping Cart Models
 """
 import datetime
-import pytz
 import StringIO
 from textwrap import dedent
 
+import pytz
 from django.conf import settings
+from mock import patch
 
 from course_modes.models import CourseMode
-from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
-                                 CourseRegCodeItemAnnotation)
+from shoppingcart.models import (
+    CertificateItem,
+    CourseRegCodeItemAnnotation,
+    Order,
+    PaidCourseRegistration,
+    PaidCourseRegistrationAnnotation
+)
 from shoppingcart.views import initialize_report
-from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -26,9 +32,10 @@ class ReportTypeTests(ModuleStoreTestCase):
     """
     FIVE_MINS = datetime.timedelta(minutes=5)
 
-    def setUp(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def setUp(self, cutoff_date):
         super(ReportTypeTests, self).setUp()
-
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         # Need to make a *lot* of users for this one
         self.first_verified_user = UserFactory.create(profile__name="John Doe")
         self.second_verified_user = UserFactory.create(profile__name="Jane Deer")

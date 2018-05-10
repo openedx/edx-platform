@@ -4,13 +4,12 @@ Test scenarios for the crowdsource hinter xblock.
 import json
 import unittest
 
-from nose.plugins.attrib import attr
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

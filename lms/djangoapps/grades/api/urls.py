@@ -1,9 +1,6 @@
 """ Grades API URLs. """
 from django.conf import settings
-from django.conf.urls import (
-    patterns,
-    url,
-)
+from django.conf.urls import patterns, url
 
 from lms.djangoapps.grades.api import views
 

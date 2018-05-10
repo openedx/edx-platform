@@ -2,11 +2,17 @@
 Third-party auth provider configuration API.
 """
 from django.contrib.sites.models import Site
+
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .models import (
-    OAuth2ProviderConfig, SAMLConfiguration, SAMLProviderConfig, LTIProviderConfig,
-    _PSA_OAUTH2_BACKENDS, _PSA_SAML_BACKENDS, _LTI_BACKENDS,
+    _LTI_BACKENDS,
+    _PSA_OAUTH2_BACKENDS,
+    _PSA_SAML_BACKENDS,
+    LTIProviderConfig,
+    OAuth2ProviderConfig,
+    SAMLConfiguration,
+    SAMLProviderConfig
 )
 
 
@@ -22,9 +28,10 @@ class Registry(object):
         Helper method that returns a generator used to iterate over all providers
         of the current site.
         """
-        for backend_name in _PSA_OAUTH2_BACKENDS:
-            provider = OAuth2ProviderConfig.current(backend_name)
-            if provider.enabled_for_current_site:
+        oauth2_slugs = OAuth2ProviderConfig.key_values('provider_slug', flat=True)
+        for oauth2_slug in oauth2_slugs:
+            provider = OAuth2ProviderConfig.current(oauth2_slug)
+            if provider.enabled_for_current_site and provider.backend_name in _PSA_OAUTH2_BACKENDS:
                 yield provider
         if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request())):
             idp_slugs = SAMLProviderConfig.key_values('idp_slug', flat=True)
@@ -43,9 +50,23 @@ class Registry(object):
         return sorted(cls._enabled_providers(), key=lambda provider: provider.name)
 
     @classmethod
-    def displayed_for_login(cls):
-        """Returns list of providers that can be used to initiate logins in the UI"""
-        return [provider for provider in cls.enabled() if provider.display_for_login]
+    def displayed_for_login(cls, tpa_hint=None):
+        """
+        Args:
+            tpa_hint (string): An override used in certain third-party authentication
+                scenarios that will cause the specified provider to be included in the
+                set along with any providers matching the 'display_for_login' criteria.
+                Note that 'provider_id' cannot have a value of None according to the
+                current implementation.
+
+        Returns:
+            List of ProviderConfig entities
+        """
+        return [
+            provider
+            for provider in cls.enabled()
+            if provider.display_for_login or provider.provider_id == tpa_hint
+        ]
 
     @classmethod
     def get(cls, provider_id):
@@ -89,9 +110,11 @@ class Registry(object):
             Instances of ProviderConfig.
         """
         if backend_name in _PSA_OAUTH2_BACKENDS:
-            provider = OAuth2ProviderConfig.current(backend_name)
-            if provider.enabled_for_current_site:
-                yield provider
+            oauth2_slugs = OAuth2ProviderConfig.key_values('provider_slug', flat=True)
+            for oauth2_slug in oauth2_slugs:
+                provider = OAuth2ProviderConfig.current(oauth2_slug)
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
+                    yield provider
         elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
                 Site.objects.get_current(get_current_request())):
             idp_names = SAMLProviderConfig.key_values('idp_slug', flat=True)

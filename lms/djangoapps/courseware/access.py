@@ -10,32 +10,32 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
-from datetime import datetime
 import logging
-import pytz
+from datetime import datetime
 
+import pytz
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.utils.timezone import UTC
-
 from opaque_keys.edx.keys import CourseKey, UsageKey
-
-from util import milestones_helpers as milestones_helpers
 from xblock.core import XBlock
 
-from xmodule.course_module import (
-    CourseDescriptor,
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
-    CATALOG_VISIBILITY_ABOUT,
+from courseware.access_response import MilestoneError, MobileAvailabilityError, VisibilityError
+from courseware.access_utils import (
+    ACCESS_DENIED,
+    ACCESS_GRANTED,
+    adjust_start_date,
+    check_start_date,
+    debug,
+    in_preview_mode
 )
-from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule
-from xmodule.split_test_module import get_split_user_partitions
-from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -44,29 +44,20 @@ from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
-    SupportStaffRole,
     OrgInstructorRole,
     OrgStaffRole,
+    SupportStaffRole
 )
+from util import milestones_helpers as milestones_helpers
 from util.milestones_helpers import (
-    get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
-    is_prerequisite_courses_enabled,
+    get_pre_requisite_courses_not_completed,
+    is_prerequisite_courses_enabled
 )
-from ccx_keys.locator import CCXLocator
-
-from courseware.access_response import (
-    MilestoneError,
-    MobileAvailabilityError,
-    VisibilityError,
-)
-from courseware.access_utils import (
-    adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
-    in_preview_mode
-)
-
-from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.ccx.models import CustomCourseForEdX
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.x_module import XModule
 
 log = logging.getLogger(__name__)
 
@@ -134,8 +125,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    if in_preview_mode():
-        if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
+    # Preview mode is only accessible by staff.
+    if in_preview_mode() and course_key:
+        if not has_staff_access_to_preview_mode(user, course_key):
             return ACCESS_DENIED
 
     # delegate the work to type-specific functions.
@@ -171,51 +163,14 @@ def has_access(user, action, obj, course_key=None):
                     .format(type(obj)))
 
 
-# ================ Implementation helpers ================================
-
-def has_staff_access_to_preview_mode(user, obj, course_key=None):
+def has_staff_access_to_preview_mode(user, course_key):
     """
-    Returns whether user has staff access to specified modules or not.
-
-    Arguments:
-
-        user: a Django user object.
-
-        obj: The object to check access for.
-
-        course_key: A course_key specifying which course this access is for.
-
-    Returns an AccessResponse object.
+    Checks if given user can access course in preview mode.
+    A user can access a course in preview mode only if User has staff access to course.
     """
-    if course_key is None:
-        if isinstance(obj, CourseDescriptor) or isinstance(obj, CourseOverview):
-            course_key = obj.id
+    has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
 
-        elif isinstance(obj, ErrorDescriptor):
-            course_key = obj.location.course_key
-
-        elif isinstance(obj, XModule):
-            course_key = obj.descriptor.course_key
-
-        elif isinstance(obj, XBlock):
-            course_key = obj.location.course_key
-
-        elif isinstance(obj, CCXLocator):
-            course_key = obj.to_course_locator()
-
-        elif isinstance(obj, CourseKey):
-            course_key = obj
-
-        elif isinstance(obj, UsageKey):
-            course_key = obj.course_key
-
-    if course_key is None:
-        if GlobalStaff().has_user(user):
-            return ACCESS_GRANTED
-        else:
-            return ACCESS_DENIED
-
-    return _has_access_to_course(user, 'staff', course_key=course_key)
+    return has_admin_access_to_course or is_masquerading_as_student(user, course_key)
 
 
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
@@ -463,10 +418,8 @@ def _has_group_access(descriptor, user, course_key):
     This function returns a boolean indicating whether or not `user` has
     sufficient group memberships to "load" a block (the `descriptor`)
     """
-    if len(descriptor.user_partitions) == len(get_split_user_partitions(descriptor.user_partitions)):
-        # Short-circuit the process, since there are no defined user partitions that are not
-        # user_partitions used by the split_test module. The split_test module handles its own access
-        # via updating the children of the split_test module.
+    # Allow staff and instructors roles group access, as they are not masquerading as a student.
+    if get_user_role(user, course_key) in ['staff', 'instructor']:
         return ACCESS_GRANTED
 
     # use merged_group_access which takes group access on the block's
@@ -550,14 +503,20 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        # If the user (or the role the user is currently masquerading as) does not have
+        # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
+        # before this method is that _has_staff_access_to_descriptor short-circuits and returns True
+        # for staff users in preview mode.
+        if not _has_group_access(descriptor, user, course_key):
+            return ACCESS_DENIED
+
+        # If the user has staff access, they can load the module and checks below are not needed.
         if _has_staff_access_to_descriptor(user, descriptor, course_key):
             return ACCESS_GRANTED
 
-        # if the user has staff access, they can load the module so this code doesn't need to run
         return (
             _visible_to_nonstaff_users(descriptor) and
             _can_access_descriptor_with_milestones(user, descriptor, course_key) and
-            _has_group_access(descriptor, user, course_key) and
             (
                 _has_detached_class_tag(descriptor) or
                 _can_access_descriptor_with_start_date(user, descriptor, course_key)
@@ -727,10 +686,12 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return ACCESS_DENIED
 
-    if not in_preview_mode() and is_masquerading_as_student(user, course_key):
+    if is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
-    if GlobalStaff().has_user(user):
+    global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
+
+    if global_staff:
         debug("Allow: user.is_staff")
         return ACCESS_GRANTED
 
@@ -739,18 +700,9 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: unknown access level")
         return ACCESS_DENIED
 
-    staff_access = (
-        CourseStaffRole(course_key).has_user(user) or
-        OrgStaffRole(course_key.org).has_user(user)
-    )
     if staff_access and access_level == 'staff':
         debug("Allow: user has course staff access")
         return ACCESS_GRANTED
-
-    instructor_access = (
-        CourseInstructorRole(course_key).has_user(user) or
-        OrgInstructorRole(course_key.org).has_user(user)
-    )
 
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
@@ -758,6 +710,25 @@ def _has_access_to_course(user, access_level, course_key):
 
     debug("Deny: user did not have correct access")
     return ACCESS_DENIED
+
+
+def administrative_accesses_to_course_for_user(user, course_key):
+    """
+    Returns types of access a user have for given course.
+    """
+    global_staff = GlobalStaff().has_user(user)
+
+    staff_access = (
+        CourseStaffRole(course_key).has_user(user) or
+        OrgStaffRole(course_key.org).has_user(user)
+    )
+
+    instructor_access = (
+        CourseInstructorRole(course_key).has_user(user) or
+        OrgInstructorRole(course_key.org).has_user(user)
+    )
+
+    return global_staff, staff_access, instructor_access
 
 
 def _has_instructor_access_to_descriptor(user, descriptor, course_key):  # pylint: disable=invalid-name
@@ -849,7 +820,10 @@ def _is_descriptor_mobile_available(descriptor):
     """
     Returns if descriptor is available on mobile.
     """
-    return ACCESS_GRANTED if descriptor.mobile_available else MobileAvailabilityError()
+    if IgnoreMobileAvailableFlagConfig.is_enabled() or descriptor.mobile_available:
+        return ACCESS_GRANTED
+    else:
+        return MobileAvailabilityError()
 
 
 def is_mobile_available_for_user(user, descriptor):

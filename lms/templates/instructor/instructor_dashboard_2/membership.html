@@ -2,8 +2,6 @@
 <%page args="section_data"/>
 <%!
 from django.utils.translation import ugettext as _
-from courseware.courses import get_studio_url
-from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 %>
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
@@ -66,7 +64,8 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
     </div>
     <div class="enroll-option">
         <label class="has-hint">
-            <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="heading-batch-enrollment">
+          <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" aria-describedby="heading-batch-enrollment"
+                 ${'checked="yes"' if settings.FEATURES.get('BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT') else ''}>
             <span class="label-text">${_("Notify users by email")}</span>
             <div class="hint email-students-hint">
                 <span class="hint-caret"></span>
@@ -224,10 +223,10 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       data-display-name="${_("Discussion Admins")}"
       data-info-text="
         ${_("Discussion Admins can edit or delete any post, clear misuse flags, close "
-         "and re-open threads, endorse responses, and see posts from all cohorts. "
+         "and re-open threads, endorse responses, and see posts from all groups. "
          "Their posts are marked as 'staff'. They can also add and remove the "
-         "discussion moderation roles to manage course team membership. You can "
-         "only give course team roles to enrolled users.")}"
+         "discussion moderation roles to manage course team membership. Only "
+         "enrolled users can be added as Discussion Admins.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Discussion Admin")}"
@@ -240,10 +239,10 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       data-display-name="${_("Discussion Moderators")}"
       data-info-text="
         ${_("Discussion Moderators can edit or delete any post, clear misuse flags, close "
-         "and re-open threads, endorse responses, and see posts from all cohorts. "
+         "and re-open threads, endorse responses, and see posts from all groups. "
          "Their posts are marked as 'staff'. They cannot manage course team membership by "
-         "adding or removing discussion moderation roles. You can only give course team "
-         "roles to enrolled users.")}"
+         "adding or removing discussion moderation roles. Only enrolled users can be "
+         "added as Discussion Moderators.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Moderator")}"
@@ -253,11 +252,11 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       data-rolename="Community TA"
       data-display-name="${_("Discussion Community TAs")}"
       data-info-text="
-        ${_("Community TA's are members of the community whom you deem particularly "
+        ${_("Community TAs are members of the community whom you deem particularly "
         "helpful on the discussion boards. They can edit or delete any post, clear "
         "misuse flags, close and re-open threads, endorse responses, and see posts from "
-        "all cohorts. Their posts are marked as 'Community TA'. You can only give course "
-        "team roles to enrolled users.")}"
+        "all groups. Their posts are marked as 'Community TA'. Only enrolled users can "
+        "be added as Community TAs.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Community TA")}"

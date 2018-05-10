@@ -4,6 +4,7 @@
 Acceptance tests for CMS Video Editor.
 """
 from nose.plugins.attrib import attr
+
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
@@ -12,9 +13,6 @@ class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class
     """
-
-    def setUp(self):
-        super(VideoEditorTest, self).setUp()
 
     def _create_video_component(self, subtitles=False):
         """

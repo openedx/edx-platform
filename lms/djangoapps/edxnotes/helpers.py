@@ -3,33 +3,31 @@ Helper methods related to EdxNotes.
 """
 import json
 import logging
-from json import JSONEncoder
-from uuid import uuid4
 import urlparse
+from datetime import datetime
+from json import JSONEncoder
 from urllib import urlencode
+from uuid import uuid4
 
 import requests
-from datetime import datetime
 from dateutil.parser import parse as dateutil_parse
-from opaque_keys.edx.keys import UsageKey
-from requests.exceptions import RequestException
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import UsageKey
 from provider.oauth2.models import Client
+from requests.exceptions import RequestException
 
+from courseware.access import has_access
+from courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from courseware.views.views import get_current_child
-from courseware.access import has_access
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
 
 log = logging.getLogger(__name__)
 # OAuth2 Client name for edxnotes

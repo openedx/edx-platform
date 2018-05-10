@@ -3,10 +3,10 @@ Specialized models for oauth_dispatch djangoapp
 """
 
 from datetime import datetime
-from django.db import models
-from pytz import utc
 
+from django.db import models
 from oauth2_provider.settings import oauth2_settings
+from pytz import utc
 
 
 class RestrictedApplication(models.Model):

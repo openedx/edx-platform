@@ -4,12 +4,12 @@ Script for importing courseware from XML format
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django_comment_common.utils import (seed_permissions_roles,
-                                         are_permissions_roles_seeded)
-from xmodule.modulestore.xml_importer import import_course_from_xml
+
+from django_comment_common.utils import are_permissions_roles_seeded, seed_permissions_roles
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 
 class Command(BaseCommand):

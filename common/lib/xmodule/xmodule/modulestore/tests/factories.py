@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from uuid import uuid4
 
 from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
-from factory.containers import CyclicDefinitionError
+from factory.errors import CyclicDefinitionError
 from mock import patch
 from nose.tools import assert_less_equal, assert_greater_equal
 import dogstats_wrapper as dog_stats_api

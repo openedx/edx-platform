@@ -2,25 +2,24 @@
 """
 Unit tests for video-related REST APIs.
 """
-from datetime import datetime
 import csv
-import ddt
 import json
-import dateutil.parser
 import re
+from datetime import datetime
 from StringIO import StringIO
-import pytz
 
+import dateutil.parser
+import ddt
+import pytz
 from django.conf import settings
 from django.test.utils import override_settings
+from edxval.api import create_profile, create_video, get_video_info
 from mock import Mock, patch
 
-from edxval.api import create_profile, create_video, get_video_info
-
 from contentstore.models import VideoUploadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -488,13 +487,13 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # Test should fail if video not found
         self.assertEqual(True, False, 'Invalid edx_video_id')
 
-    def test_video_status_update_request(self):
+    @patch('contentstore.views.videos.LOGGER')
+    def test_video_status_update_request(self, mock_logger):
         """
         Verifies that video status update request works as expected.
         """
         url = self.get_url_for_course_key(self.course.id)
         edx_video_id = 'test1'
-
         self.assert_video_status(url, edx_video_id, 'Uploading')
 
         response = self.client.post(
@@ -506,6 +505,14 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             }]),
             content_type="application/json"
         )
+
+        mock_logger.info.assert_called_with(
+            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            edx_video_id,
+            'upload_failed',
+            'server down'
+        )
+
         self.assertEqual(response.status_code, 204)
 
         self.assert_video_status(url, edx_video_id, 'Failed')

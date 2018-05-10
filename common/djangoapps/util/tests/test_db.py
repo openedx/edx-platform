@@ -1,20 +1,18 @@
 """Tests for util.db module."""
 
-import ddt
 import threading
 import time
 import unittest
 
+import ddt
 from django.contrib.auth.models import User
 from django.core.management import call_command
-from django.db import connection, IntegrityError
-from django.db.transaction import atomic, TransactionManagementError
+from django.db import IntegrityError, connection
+from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
-from util.db import (
-    commit_on_success, enable_named_outer_atomic, outer_atomic, generate_int_id, NoOpMigrationModules
-)
+from util.db import NoOpMigrationModules, commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
 
 
 def do_nothing():

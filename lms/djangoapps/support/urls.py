@@ -16,5 +16,4 @@ urlpatterns = patterns(
         views.EnrollmentSupportListView.as_view(),
         name="enrollment_list"
     ),
-    url(r'^programs/certify/$', views.IssueProgramCertificatesView.as_view(), name='programs-certify'),
 )

@@ -1,12 +1,13 @@
 """
 Serve HTML5 video sources for acceptance tests
 """
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from .http import StubHttpService
-from contextlib import contextmanager
 import os
-
+from contextlib import contextmanager
 from logging import getLogger
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+
+from .http import StubHttpService
+
 LOGGER = getLogger(__name__)
 
 
@@ -23,6 +24,13 @@ class VideoSourceRequestHandler(SimpleHTTPRequestHandler):
         root_dir = self.server.config.get('root_dir')
         path = '{}{}'.format(root_dir, path)
         return path.split('?')[0]
+
+    def end_headers(self):
+        """
+        This is required by hls.js to play hls videos.
+        """
+        self.send_header('Access-Control-Allow-Origin', '*')
+        SimpleHTTPRequestHandler.end_headers(self)
 
 
 class VideoSourceHttpService(StubHttpService):

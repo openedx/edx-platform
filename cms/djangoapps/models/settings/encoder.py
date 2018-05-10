@@ -6,6 +6,7 @@ import json
 from json.encoder import JSONEncoder
 
 from opaque_keys.edx.locations import Location
+
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.fields import Date
 

@@ -1,15 +1,16 @@
 """
 Tests for Course Blocks forms
 """
+from urllib import urlencode
+
 import ddt
 from django.http import Http404, QueryDict
-from urllib import urlencode
+from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
 
-from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

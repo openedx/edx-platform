@@ -3,8 +3,7 @@ URLs for the maintenance app.
 """
 from django.conf.urls import patterns, url
 
-from .views import MaintenanceIndexView, ForcePublishCourseView
-
+from .views import ForcePublishCourseView, MaintenanceIndexView
 
 urlpatterns = patterns(
     '',

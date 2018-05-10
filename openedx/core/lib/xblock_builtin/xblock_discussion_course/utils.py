@@ -2,20 +2,7 @@
 Utils for DiscussionCourseXBlock
 """
 
-import os
-
 from django.conf import settings
-
-from mako.template import Template as MakoTemplate
-
-from path import Path as path
-
-
-def _(text):
-    """
-    A noop underscore function that marks strings for extraction.
-    """
-    return text
 
 
 def get_js_dependencies(group):

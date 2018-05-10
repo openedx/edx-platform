@@ -2,16 +2,16 @@
 """
 This test file will verify proper password history enforcement
 """
-from django.test import TestCase
-from django.utils import timezone
-from mock import patch
-from student.tests.factories import UserFactory, AdminFactory
-
-from student.models import PasswordHistory
-from freezegun import freeze_time
 from datetime import timedelta
 
+from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
+from freezegun import freeze_time
+from mock import patch
+
+from student.models import PasswordHistory
+from student.tests.factories import AdminFactory, UserFactory
 
 
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})

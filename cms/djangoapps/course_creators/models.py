@@ -1,11 +1,10 @@
 """
 Table for storing information about whether or not Studio users have course creation privileges.
 """
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_init, post_save
-from django.dispatch import receiver, Signal
-from django.contrib.auth.models import User
-
+from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 

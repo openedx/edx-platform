@@ -4,22 +4,25 @@ data in a Django ORM model.
 """
 
 import itertools
+import logging
 from operator import attrgetter
 from time import time
-import logging
+
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.utils import IntegrityError
+from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
+from xblock.fields import Scope
+
+import dogstats_wrapper as dog_stats_api
+from courseware.models import BaseStudentModuleHistory, StudentModule
+from openedx.core.djangoapps import monitoring_utils
+
 try:
     import simplejson as json
 except ImportError:
     import json
 
-import newrelic_custom_metrics
-import dogstats_wrapper as dog_stats_api
-from django.contrib.auth.models import User
-from django.db import transaction
-from django.db.utils import IntegrityError
-from xblock.fields import Scope
-from courseware.models import StudentModule, BaseStudentModuleHistory
-from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +139,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate arbitrary NR stats (not specific to block types).
         """
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value
         )
@@ -151,11 +154,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate NR stats related to block types.
         """
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value,
         )
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name, block_type=block_type),
             value,
         )

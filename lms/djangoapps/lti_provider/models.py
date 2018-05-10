@@ -8,14 +8,14 @@ changes. To do that,
 1. Go to the edx-platform dir
 2. ./manage.py lms schemamigration lti_provider --auto "description" --settings=devstack
 """
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
-import logging
+from provider.utils import short_token
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 from openedx.core.djangolib.fields import CharNullField
-
-from provider.utils import short_token
 
 log = logging.getLogger("edx.lti_provider")
 

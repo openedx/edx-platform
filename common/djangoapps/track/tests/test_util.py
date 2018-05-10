@@ -1,9 +1,8 @@
-from datetime import datetime
 import json
-
-from pytz import UTC
+from datetime import datetime
 
 from django.test import TestCase
+from pytz import UTC
 
 from track.utils import DateTimeJSONEncoder
 

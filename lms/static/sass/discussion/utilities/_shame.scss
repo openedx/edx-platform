@@ -128,9 +128,27 @@ li[class*=forum-nav-thread-label-] {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
   }
+}
 
-  p {
-    margin-bottom: 0 !important;
+// -------
+// Inline Discussion and Discussion Course Overrides
+// -------
+.vert-mod > div {
+  .discussion-course ul.post-errors,
+  .xblock-student_view-discussion ul.post-errors {
+    padding: 0;
+    list-style: none;
+  }
+}
+
+// -------
+// Inline Discussion and Discussion Course Overrides
+// -------
+.vert-mod > div {
+  .discussion-course ul.post-errors,
+  .xblock-student_view-discussion ul.post-errors {
+    padding: 0;
+    list-style: none;
   }
 }
 

@@ -2,12 +2,17 @@
 Helper functions for loading environment settings.
 """
 from __future__ import print_function
+
+import json
 import os
 import sys
-import json
+
+import memcache
 from lazy import lazy
 from path import Path as path
-import memcache
+from paver.easy import sh
+
+from pavelib.utils.cmd import django_cmd
 
 
 class Env(object):
@@ -60,13 +65,22 @@ class Env(object):
     # Directory that videos are served from
     VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
 
+    # Detect if in a Docker container, and if so which one
+    SERVER_HOST = os.environ.get('BOK_CHOY_HOSTNAME', '0.0.0.0')
+    USING_DOCKER = SERVER_HOST != '0.0.0.0'
+    SETTINGS = 'bok_choy_docker' if USING_DOCKER else 'bok_choy'
+    DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
+    TEST_SETTINGS = 'test_docker' if USING_DOCKER else 'test'
+
     BOK_CHOY_SERVERS = {
         'lms': {
-            'port': 8003,
+            'host': SERVER_HOST,
+            'port': os.environ.get('BOK_CHOY_LMS_PORT', '8003'),
             'log': BOK_CHOY_LOG_DIR / "bok_choy_lms.log"
         },
         'cms': {
-            'port': 8031,
+            'host': SERVER_HOST,
+            'port': os.environ.get('BOK_CHOY_CMS_PORT', '8031'),
             'log': BOK_CHOY_LOG_DIR / "bok_choy_studio.log"
         }
     }
@@ -111,11 +125,6 @@ class Env(object):
             'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
         },
 
-        'programs': {
-            'port': 8090,
-            'log': BOK_CHOY_LOG_DIR / "bok_choy_programs.log",
-        },
-
         'catalog': {
             'port': 8091,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
@@ -123,11 +132,16 @@ class Env(object):
     }
 
     # Mongo databases that will be dropped before/after the tests run
+    MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
     BOK_CHOY_MONGO_DATABASE = "test"
-    BOK_CHOY_CACHE = memcache.Client(['0.0.0.0:11211'], debug=0)
+    BOK_CHOY_CACHE_HOST = 'edx.devstack.memcached' if USING_DOCKER else '0.0.0.0'
+    BOK_CHOY_CACHE = memcache.Client(['{}:11211'.format(BOK_CHOY_CACHE_HOST)], debug=0)
 
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
+
+    # Configured browser to use for the js test suites
+    KARMA_BROWSER = 'FirefoxDocker' if USING_DOCKER else 'FirefoxNoUpdates'
 
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
@@ -175,6 +189,29 @@ class Env(object):
             SERVICE_VARIANT = 'cms'
         else:
             SERVICE_VARIANT = 'lms'
+
+    @classmethod
+    def get_django_setting(self, django_setting, system, settings=None):
+        """
+        Interrogate Django environment for specific settings values
+        :param django_setting: the django setting to get
+        :param system: the django app to use when asking for the setting (lms | cms)
+        :param settings: the settings file to use when asking for the value
+        :return: unicode value of the django setting
+        """
+        if not settings:
+            settings = os.environ.get("EDX_PLATFORM_SETTINGS", "aws")
+        value = sh(
+            django_cmd(
+                system,
+                settings,
+                "print_settings {django_setting} --format=value 2>/dev/null".format(
+                    django_setting=django_setting
+                )
+            ),
+            capture=True
+        )
+        return unicode(value).strip()
 
     @lazy
     def env_tokens(self):

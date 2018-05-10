@@ -2,13 +2,14 @@
 Tools for timing paver tasks
 """
 
-from datetime import datetime
 import json
 import logging
 import os
-from os.path import dirname, exists
 import sys
 import traceback
+from datetime import datetime
+from os.path import dirname, exists
+
 import wrapt
 
 LOGGER = logging.getLogger(__file__)

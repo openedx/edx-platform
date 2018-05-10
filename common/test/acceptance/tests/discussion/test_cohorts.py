@@ -3,19 +3,14 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
-from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.fixtures.course import (CourseFixture, XBlockFixtureDesc)
-
-from common.test.acceptance.pages.lms.discussion import (
-    DiscussionTabSingleThreadPage,
-    InlineDiscussionThreadPage,
-    InlineDiscussionPage)
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-
 from nose.plugins.attrib import attr
+
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage, InlineDiscussionPage
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase, CohortTestMixin
+from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
 class NonCohortedDiscussionTestMixin(BaseDiscussionMixin):
@@ -49,6 +44,11 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         # Must be moderator to view content in a cohort other than your own
         AutoAuthPage(self.browser, course_id=self.course_id, roles="Moderator").visit()
         self.thread_id = self.setup_thread(1, group_id=self.cohort_1_id)
+
+        # Enable cohorts and verify that the post shows to cohort only.
+        self.enable_cohorting(self.course_fixture)
+        self.enable_always_divide_inline_discussions(self.course_fixture)
+        self.refresh_thread_page(self.thread_id)
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
             "This post is visible only to {}.".format(self.cohort_1_name)

@@ -1,0 +1,446 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html"/>
+<%!
+from datetime import datetime
+
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from mako import exceptions
+
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%
+faq = program['faq']
+program_type = program['type']
+program_type_slug = program['type_slug']
+title = program['title']
+status = program['status']
+courses = program['courses']
+subtitle = program['subtitle']
+overview = program['overview']
+instructors = program['instructors']
+job_outlook_items = program['job_outlook_items']
+weeks_to_complete = program['weeks_to_complete']
+full_program_price_format = '{0:.0f}' if program['full_program_price'].is_integer() else '{0:.2f}'
+full_program_price = full_program_price_format.format(program['full_program_price'])
+endorsement = program['individual_endorsements'][0] if program['individual_endorsements'] else {}
+endorsement_quote = endorsement.get('quote', '')
+endorser = endorsement.get('endorser', {})
+endorsement_image = endorser.get('profile_image', {}).get('medium', {}).get('url', '')
+endorsement_name = endorser.get('given_name', '')
+endorsement_position = (endorser.get('position') or {}).get('title', '')
+endorsement_organization = (endorser.get('position') or {}).get('organization_name', '')
+expected_learning_items = program['expected_learning_items']
+authoring_organizations = program['authoring_organizations']
+min_hours_effort_per_week = program['min_hours_effort_per_week']
+max_hours_effort_per_week = program['max_hours_effort_per_week']
+video_url = (program.get('video', {}) or {}).get('src', '')
+banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
+description_max_length = 250
+%>
+
+<%static:css group='style-main-v2'/>
+<%static:css group='style-learner-dashboard'/>
+
+<%block name="js_extra">
+  <script src="${static.url('js/slick.min.js')}"></script>
+  <script src="${static.url('js/leanModal.js')}"></script>
+  <script src="${static.url('js/program_marketing.js')}"></script>
+</%block>
+
+<%block name="pagetitle">${program['title']}</%block>
+
+<div id="program-details-page">
+  <div class="main-banner" style="background: #000 url(${banner_image}) no-repeat center center / cover;">
+    <div class="grid-manual">
+      <div class="row">
+        <div class="col col-12 md-col-8 lg-col-9">
+          <div class="org-logo">
+            % if authoring_organizations and authoring_organizations[0]['logo_image_url']:
+              <img src="${authoring_organizations[0]['logo_image_url']}" alt="${authoring_organizations[0]['name']}">
+            % endif
+          </div>
+          <h1 class="banner-title">${title}</h1>
+          <p class="banner-description">${subtitle}</p>
+          % if program.get('is_learner_eligible_for_one_click_purchase'):
+            <a href="${buy_button_href}" class="btn-brand btn-large btn-start">
+              ${_('Purchase the Program')}
+            </a>
+          % else:
+            <a href="#courses" class="btn-brand btn-large btn-start">
+              ${_('Start Learning')}
+            </a>
+          % endif
+        </div>
+        <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
+          <a href="#video-modal" class="media trailer-link visible-sm" rel="leanModal">
+            <i class="fa fa-play-circle-o" aria-hidden="true"></i>
+            <span>${_('View Program Trailer')}</span>
+          </a>
+          <div class="hidden-sm">
+            <button href="#video-modal" class="media btn-play" rel="leanModal">
+              <span class="sr">Play the ${title} program video</span>
+              <i class="icon fa fa-2x fa-play" alt="${_('Play')}"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-manual data-table">
+    <div class="row">
+      <div class="col col-12 md-col-7 lg-col-8 left-col">
+        <ul class="list-divided program-desc-tbl">
+          <li class="item">
+            <span class="description">
+              <span class="fa fa-book fa-lg" aria-hidden="true"></span>
+              ${_('Number of Courses')}
+            </span>
+            <a href="#courses">
+              ${Text(_('{number_of_courses} courses in program')).format(
+                number_of_courses=len(courses)
+              )}
+            </a>
+          </li>
+          <li class="item">
+            <span class="description">
+              <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
+              ${_('Average Length')}
+            </span>
+            <span>
+              ${Text(_('{weeks_to_complete} weeks per course')).format(
+                weeks_to_complete=weeks_to_complete
+              )}
+            </span>
+          </li>
+          <li class="item">
+            <span class="description">
+              <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
+              ${_('Effort')}
+            </span>
+            <span>
+              ${Text(_('{min_hours_effort_per_week}-{max_hours_effort_per_week} hours per week, per course')).format(
+                max_hours_effort_per_week=max_hours_effort_per_week,
+                min_hours_effort_per_week=min_hours_effort_per_week
+              )}
+            </span>
+          </li>
+          <li class="item">
+            <span class="description">
+              <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
+              ${_('Price (USD)')}
+            </span>
+            % if program.get('discount_data') and program['discount_data']['is_discounted']:
+              <span class="price">
+                <span role="group" aria-label="${_('Original Price')}" class="original-price">
+                  ${Text(_('${oldPrice}')).format(
+                    oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
+                  )}
+                </span>
+                <span role="group" aria-label="${_('Discounted Price')}" class="discount green-highlight">
+                  ${Text(_('${newPrice}{htmlEnd} for entire program')).format(
+                    newPrice=full_program_price,
+                    htmlEnd=HTML('</span>')
+                  )}
+                <span class="savings green-highlight">
+                  ${Text(_('You save ${discount_value} {currency}')).format(
+                    discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
+                    currency=program['discount_data']['currency']
+                  )}
+                </span>
+              </span>
+            % else:
+              <span>
+                ${Text(_('${full_program_price} for entire program')).format(
+                  full_program_price=full_program_price
+                )}
+              </span>
+            % endif
+          </li>
+        </ul>
+        <div id="accordion-group">
+          <div class="accordion-item">
+            <div class="accordion-head">${_('Overview')}</div>
+            <div class="accordion-content">
+              <p>${HTML(overview)}</p>
+            </div>
+          </div>
+          % if job_outlook_items:
+              <div class="accordion-item">
+                <div class="accordion-head">${_('Job Outlook')}</div>
+                <div class="accordion-content">
+                  <ul class="list-bulleted list-disc no-indent">
+                    % for item in job_outlook_items:
+                      <li>${item}</li>
+                    % endfor
+                  </ul>
+                </div>
+              </div>
+          % endif
+          <div class="accordion-item">
+            <div class="accordion-head">${_("What You'll Learn")}</div>
+            <div class="accordion-content">
+              <ul class="list-bulleted list-disc no-indent">
+                % for item in expected_learning_items:
+                  <li>${item}</li>
+                % endfor
+              </ul>
+            </div>
+          </div>
+          <div class="accordion-item instructors-mobile-list">
+            <div class="accordion-head">${_("Instructors")}</div>
+            <div class="accordion-content">
+              <div class="instructor-profiles">
+                <% index = 0 %>
+                % for instructor in instructors:
+                  <% index += 1 %>
+                  <div class="profile-item">
+                    <div class="avatar">
+                      <div class="img-holder">
+                        <a href="#instructor-details-mobile-${index}" class="instructor-image">
+                          <img src="${static.url(instructor.get('image'))}" alt="${instructor.get('name')}"/>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="details">
+                      <div class="name">
+                        <a href="#instructor-details-mobile-${index}" class="instructor-label">${instructor.get('name')}</a>
+                      </div>
+                      % if instructor.get('position'):
+                        <div class="dept">${instructor['position'].get('organization_name')}</div>
+                      % endif
+                    </div>
+                    <div class="modal modal-custom" id="instructor-details-mobile-${index}">
+                      <a href="#" class="focusKeeper"></a>
+                      <div class="btn-close modal_close"><a href="#"><i class="fa fa-close"></i></a></div>
+                      <div class="modal-body">
+                        <div class="modal-header">
+                          <div class="instructor-data">
+                            <div class="thumbnail">
+                              <img src="${instructor['image']}" alt="${instructor.get('name')}">
+                            </div>
+                            <h3>
+                              <span class="instructor-name">${instructor.get('name')}</span>
+                              % if instructor.get('position'):
+                                <span>
+                                  ${Text(_('{position} at {organization}')).format(
+                                    position=instructor['position'].get('title'),
+                                    organization=instructor['position'].get('organization_name')
+                                  )}
+                                </span>
+                              % endif
+                            </h3>
+                          </div>
+                        </div>
+                        <div class="instructor-bio">${HTML(instructor['bio'])}</div>
+                      </div>
+                      <a href="#" class="focusKeeper"></a>
+                    </div>
+                  </div>
+                %endfor
+              </div>
+            </div>
+          </div>
+
+          % try:
+            <%include file="_${program_type_slug}_faq.html" args="program_type=program_type" />
+          % except exceptions.TemplateLookupException:
+            ## pass
+          % endtry
+
+          <div class="accordion-item">
+            <div class="accordion-head">${_("FAQ")}</div>
+            <div class="accordion-content">
+              <ul class="list-unstyled faq-links-list">
+                % for item in faq:
+                  <li class="item">
+                    <a href="#!">${item['question']}</a>
+                    <div class="answer hidden">${item['answer']}</div>
+                  </li>
+                % endfor
+              </ul>
+            </div>
+          </div>
+        </div>
+        <blockquote class="program-quote visible-sm">
+          <div class="quote">
+            % if endorsement:
+              <span>"${endorsement_quote}"</span>
+                % if endorser:
+                  % if endorsement_image:
+                    <img class="visible-sm pull-left" src="${endorsement_image}" width="40" height="40" alt="${_('Endorser Image')}"/>
+                  % endif
+                  <span class="writer">
+                    ${endorsement_name},
+                    ${endorsement_position},
+                    ${endorsement_organization}
+                  </span>
+                % endif
+            % endif
+          </div>
+        </blockquote>
+      </div>
+
+      <div class="col col-12 md-col-5 lg-col-4 right-col hidden-sm">
+        <h2 class="instructors-title">
+          ${_('Meet the Instructors')}
+          <span>(${len(instructors)})</span>
+        </h2>
+        <div class="instructor-profiles">
+          <% index = 0 %>
+          % for instructor in instructors:
+            <% index += 1 %>
+            <div class="profile-item profile-item-desktop">
+              <div class="avatar">
+                <div class="img-holder">
+                  <a href="#instructor-details-${index}" class="instructor-image">
+                    <img src="${static.url(instructor.get('image'))}"
+                         alt="${instructor.get('name')}"/>
+                  </a>
+                </div>
+              </div>
+              <div class="details">
+                <div class="name">
+                  <a href="#instructor-details-${index}" class="instructor-label">${instructor.get('name')}</a>
+                </div>
+                <div class="dept">${instructor.get('organization')}</div>
+              </div>
+
+              <div class="modal modal-custom" id="instructor-details-${index}">
+                <a href="#" class="focusKeeper"></a>
+                <div class="btn-close modal_close"><a href="#"><i class="fa fa-close"></i></a></div>
+                <div class="modal-body">
+                  <div class="modal-header">
+                    <div class="instructor-data">
+                      <div class="thumbnail">
+                        <img src="${instructor['image']}" alt="${instructor.get('name')}"/>
+                      </div>
+                      <h3>
+                        <span class="instructor-name">${instructor.get('name')}</span>
+                        <span>
+                          ${Text(_('{position} at {organization}')).format(
+                            position=instructor.get('title'),
+                            organization=instructor.get('organization')
+                          )}
+                        </span>
+                      </h3>
+                    </div>
+                  </div>
+                  <div class="instructor-bio">${HTML(instructor['bio'])}</div>
+                </div>
+                <a href="#" class="focusKeeper"></a>
+              </div>
+            </div>
+          % endfor
+
+          <div class="pagination hidden-xs">
+            <div class="pages">
+              ## Translators: Pagination range contains ordinal numbers of the first and the last instructor
+              ## whose information is shown on the current page.
+              ${Text(_("{pagination_range} of {number_of_instructors}")).format(
+                pagination_range=HTML('<span class="pagination-start"></span>-<span class="pagination-end"></span>'),
+                number_of_instructors=HTML('<span class="instructor-size">{number_of_instructors}</span>').format(
+                  number_of_instructors=len(instructors)
+                )
+              )}
+            </div>
+            <div class="controls">
+              <a href="#" id="pagination-previous">
+                <span class="fa fa-chevron-up" aria-hidden="true"></span>
+                <span class="sr" aria-hidden="true">${_("Previous page")}</span>
+              </a>
+              <a href="#" id="pagination-next">
+                <span class="fa fa-chevron-down" aria-hidden="true"></span>
+                <span class="sr" aria-hidden="true">${_("Next page")}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <blockquote class="program-quote">
+          <div class="quote">
+            % if endorsement:
+              <span class="pull-right hidden-sm">
+                % if endorser and endorsement_image:
+                  <img src="${endorsement_image}" width="90" height="90" alt="${_('Endorser Image')}"/>
+                % endif
+              </span>
+              <span>
+                "${endorsement_quote}"
+              </span>
+              <span class="writer">
+                % if endorser:
+                  ${endorsement_name},
+                  ${endorsement_position},
+                  ${endorsement_organization}
+                % endif
+              </span>
+            % endif
+          </div>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+
+  <div class="container courses-in-program" id="courses">
+    <h3 class="hd">
+      ${Text(_('Courses in the {program_type}')).format(
+        program_type=program_type
+      )}
+    </h3>
+    <div class="course-cards">
+      % for course in courses:
+        % if course.get('course_runs'):
+          <div class="course-card">
+            <div class="course-content">
+              <div class="col-full-sm">
+                <h4 class="hd title">
+                  <a href="/courses/${course['course_runs'][0]['key']}/about"> ${course['title']}</a>
+                  <small>
+                    <span>
+                      <i class="fa fa-clock-o" aria-hidden="true"></i>
+                      ${Text(_('Starts {course_start_datetime}')).format(
+                        course_start_datetime=datetime.strptime(course['course_runs'][0]['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%B %-d, %Y')
+                      )}
+                    </span>
+
+                    % if course['course_runs'][0]['pacing_type'] == "instructor_paced":
+                      <span>${_('Instructor - Paced')}</span>
+                    % else:
+                      <span>${_('Self - Paced')}</span>
+                    % endif
+                  </small>
+                </h4>
+                <p class="copy-meta">
+                  % if course['course_runs'][0]['short_description']:
+                    ${course['course_runs'][0]['short_description']}
+                  % endif
+                </p>
+                <p class="copy-meta-mobile">
+                  % if course['course_runs'][0]['short_description']:
+                    ${course['course_runs'][0]['short_description'][:description_max_length]}
+                    % if len(course['course_runs'][0]['short_description']) > description_max_length:
+                      ...
+                    % endif
+                  % endif
+                </p>
+              </div>
+            </div>
+          </div>
+        % endif
+      % endfor
+    </div>
+    <span class="pagingInfo"></span>
+  </div>
+
+  <section id="video-modal" class="modal modal-custom custom-video-modal">
+    <div class="inner-wrapper">
+      <iframe title="${_('YouTube Video')}" width="640" height="360"
+              src="${video_url}"
+              frameborder="0" allowfullscreen></iframe>
+    </div>
+  </section>
+</div>

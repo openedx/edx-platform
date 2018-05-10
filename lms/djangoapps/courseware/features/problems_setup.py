@@ -9,10 +9,11 @@
 # -A way to answer the problem correctly and incorrectly
 # -A way to check the problem was answered correctly, incorrectly and blank
 
-from lettuce import world
 import random
 import textwrap
-from common import section_location
+
+from lettuce import world
+
 from capa.tests.response_xml_factory import (
     ChoiceResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
@@ -23,9 +24,9 @@ from capa.tests.response_xml_factory import (
     MultipleChoiceResponseXMLFactory,
     NumericalResponseXMLFactory,
     OptionResponseXMLFactory,
-    StringResponseXMLFactory,
+    StringResponseXMLFactory
 )
-
+from common import section_location
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure

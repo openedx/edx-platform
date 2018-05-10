@@ -2,15 +2,17 @@
 Stub implementation of an HTTP service.
 """
 
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+import json
+import threading
 import urllib
 import urlparse
-import threading
-import json
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from functools import wraps
+from logging import getLogger
+from SocketServer import ThreadingMixIn
+
 from lazy import lazy
 
-from logging import getLogger
 LOGGER = getLogger(__name__)
 
 
@@ -233,7 +235,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         self.send_response(200)
 
 
-class StubHttpService(HTTPServer, object):
+class StubHttpService(ThreadingMixIn, HTTPServer, object):
     """
     Stub HTTP service implementation.
     """

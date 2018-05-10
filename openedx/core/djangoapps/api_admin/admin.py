@@ -1,10 +1,10 @@
 """Admin views for API managment."""
+from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from config_models.admin import ConfigurationModelAdmin
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
+from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 
 
 @admin.register(ApiAccessRequest)

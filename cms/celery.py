@@ -5,9 +5,12 @@ and auto discover tasks in all installed django apps.
 Taken from: http://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
 """
 from __future__ import absolute_import
+
 import os
+
 from celery import Celery
 from django.conf import settings
+
 from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
 
 # set the default Django settings module for the 'celery' program.
@@ -33,4 +36,6 @@ class Router(AlternateEnvironmentRouter):
         """
         return {
             'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
+            'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
+            'lms.djangoapps.grades.tasks.compute_all_grades_for_course': 'lms',
         }

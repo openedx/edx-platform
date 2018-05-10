@@ -8,7 +8,7 @@ import time
 
 import six
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.dispatch import Signal
 from django.utils.http import cookie_date
 
@@ -17,7 +17,7 @@ from student.models import CourseEnrollment
 CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
 
 
-def _get_cookie_settings(request):
+def standard_cookie_settings(request):
     """ Returns the common cookie settings (e.g. expiration time). """
 
     if request.session.get_expire_at_browser_close():
@@ -73,7 +73,7 @@ def set_logged_in_cookies(request, response, user):
         HttpResponse
 
     """
-    cookie_settings = _get_cookie_settings(request)
+    cookie_settings = standard_cookie_settings(request)
 
     # Backwards compatibility: set the cookie indicating that the user
     # is logged in.  This is just a boolean value, so it's not very useful.
@@ -96,7 +96,7 @@ def set_logged_in_cookies(request, response, user):
 
 def set_user_info_cookie(response, request):
     """ Sets the user info cookie on the response. """
-    cookie_settings = _get_cookie_settings(request)
+    cookie_settings = standard_cookie_settings(request)
 
     # In production, TLS should be enabled so that this cookie is encrypted
     # when we send it.  We also need to set "secure" to True so that the browser

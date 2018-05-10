@@ -1,7 +1,6 @@
 """
 Test helpers for Comprehensive Theming.
 """
-import unittest
 from mock import patch, Mock
 
 from django.test import TestCase, override_settings
@@ -12,6 +11,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
     get_themes, Theme, get_theme_base_dir
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 
 
 class TestHelpers(TestCase):
@@ -201,7 +201,7 @@ class TestHelpers(TestCase):
                     self.assertEqual(theming_helpers.get_template_path("about.html"), "/microsite/about.html")
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestHelpersLMS(TestCase):
     """Test comprehensive theming helper functions."""
 
@@ -244,7 +244,7 @@ class TestHelpersLMS(TestCase):
         self.assertEqual(template_path, '/red-theme/lms/templates/header.html')
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+@skip_unless_cms
 class TestHelpersCMS(TestCase):
     """Test comprehensive theming helper functions."""
 

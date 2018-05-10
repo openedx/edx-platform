@@ -36,21 +36,25 @@
             NewPostView.prototype.initialize = function(options) {
                 var _ref;
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
                 this.course_settings = options.course_settings;
-                this.is_commentable_cohorted = options.is_commentable_cohorted;
+                this.is_commentable_divided = options.is_commentable_divided;
                 this.topicId = options.topicId;
+                this.discussionBoardView = options.discussionBoardView;
             };
 
             NewPostView.prototype.render = function() {
-                var context, threadTypeTemplate;
+                var context,
+                    threadTypeTemplate;
                 context = _.clone(this.course_settings.attributes);
                 _.extend(context, {
-                    cohort_options: this.getCohortOptions(),
-                    is_commentable_cohorted: this.is_commentable_cohorted,
+                    group_options: this.getGroupOptions(),
+                    is_commentable_divided: this.is_commentable_divided,
                     mode: this.mode,
+                    startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
                 });
                 this.$el.html(_.template($('#new-post-template').html())(context));
@@ -80,15 +84,15 @@
                 return this.mode === 'tab';
             };
 
-            NewPostView.prototype.getCohortOptions = function() {
-                var userCohortId;
-                if (this.course_settings.get('is_cohorted') && DiscussionUtil.isPrivilegedUser()) {
-                    userCohortId = $('#discussion-container').data('user-cohort-id');
-                    return _.map(this.course_settings.get('cohorts'), function(cohort) {
+            NewPostView.prototype.getGroupOptions = function() {
+                var userGroupId;
+                if (this.course_settings.get('is_discussion_division_enabled') && DiscussionUtil.isPrivilegedUser()) {
+                    userGroupId = $('#discussion-container').data('user-group-id');
+                    return _.map(this.course_settings.get('groups'), function(group) {
                         return {
-                            value: cohort.id,
-                            text: cohort.name,
-                            selected: cohort.id === userCohortId
+                            value: group.id,
+                            text: group.name,
+                            selected: group.id === userGroupId
                         };
                     });
                 } else {
@@ -108,7 +112,7 @@
             };
 
             NewPostView.prototype.toggleGroupDropdown = function($target) {
-                if ($target.data('cohorted')) {
+                if ($target.data('divided')) {
                     $('.js-group-select').prop('disabled', false);
                     return $('.group-selector-wrapper').removeClass('disabled');
                 } else {
@@ -132,13 +136,13 @@
                 var anonymous, anonymousToPeers, body, follow, group, threadType, title, topicId, url,
                     self = this;
                 event.preventDefault();
-                threadType = this.$('.post-type-input:checked').val();
+                threadType = this.$('.input-radio:checked').val();
                 title = this.$('.js-post-title').val();
                 body = this.$('.js-post-body').find('.wmd-input').val();
                 group = this.$('.js-group-select option:selected').attr('value');
-                anonymous = false || this.$('.js-anon').is(':checked');
-                anonymousToPeers = false || this.$('.js-anon-peers').is(':checked');
-                follow = false || this.$('.js-follow').is(':checked');
+                anonymous = false || this.$('input[name=anonymous]').is(':checked');
+                anonymousToPeers = false || this.$('input[name=anonymous_to_peers]').is(':checked');
+                follow = false || this.$('input[name=follow]').is(':checked');
                 topicId = this.isTabMode() ? this.topicView.getCurrentTopicId() : this.topicId;
                 url = DiscussionUtil.urlFor('create_thread', topicId);
                 return DiscussionUtil.safeAjax({
@@ -158,8 +162,17 @@
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
-                        var thread;
+                        var thread, discussionBreadcrumbsModel;
                         thread = new Thread(response.content);
+                        // Update the breadcrumbs and discussion Id(s) related to current topic
+                        if (self.discussionBoardView) {
+                            discussionBreadcrumbsModel = self.discussionBoardView.breadcrumbs.model;
+                            if (discussionBreadcrumbsModel.get('contents').length) {
+                                discussionBreadcrumbsModel.set('contents', self.topicView.topicText.split('/'));
+                            }
+                            self.discussionBoardView.discussionThreadListView.discussionIds =
+                                self.topicView.currentTopicId;
+                        }
                         self.$el.addClass('is-hidden');
                         self.resetForm();
                         self.trigger('newPost:createPost');
@@ -186,11 +199,13 @@
             };
 
             NewPostView.prototype.resetForm = function() {
+                var $general;
                 this.$('.forum-new-post-form')[0].reset();
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
-                this.$('.wmd-preview p').html('');
+                this.$('.wmd-preview').html('');
                 if (this.isTabMode()) {
-                    this.topicView.setTopic(this.$('button.topic-title').first());
+                    $general = this.$('.post-topic option:contains(General)');
+                    this.topicView.setTopic($general || this.$('button.topic-title').first());
                 }
             };
 

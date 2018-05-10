@@ -1,25 +1,24 @@
 """
 Views related to the video upload feature
 """
-from datetime import datetime, timedelta
-import logging
-
-from boto import s3
 import csv
+import logging
+from datetime import datetime, timedelta
 from uuid import uuid4
 
+import rfc6266
+from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound
-from django.utils.translation import ugettext as _, ugettext_noop
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
-import rfc6266
-
 from edxval.api import (
-    create_video,
-    get_videos_for_course,
     SortDirection,
     VideoSortField,
+    create_video,
+    get_videos_for_course,
     remove_video_for_course,
     update_video_status
 )
@@ -28,10 +27,9 @@ from opaque_keys.edx.keys import CourseKey
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
-from util.json_request import expect_json, JsonResponse
+from util.json_request import JsonResponse, expect_json
 
 from .course import get_course_and_check_access
-
 
 __all__ = ["videos_handler", "video_encodings_download"]
 
@@ -433,7 +431,11 @@ def storage_service_bucket():
         settings.AWS_ACCESS_KEY_ID,
         settings.AWS_SECRET_ACCESS_KEY
     )
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"])
+    # We don't need to validate our bucket, it requires a very permissive IAM permission
+    # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
+    # meaning it would need ListObjects on the whole bucket, not just the path used in each
+    # environment (since we share a single bucket for multiple deployments in some configurations)
+    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
 
 
 def storage_service_key(bucket, file_name):
@@ -453,7 +455,12 @@ def send_video_status_update(updates):
     """
     for update in updates:
         update_video_status(update.get('edxVideoId'), update.get('status'))
-        LOGGER.info(update.get('message'))
+        LOGGER.info(
+            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            update.get('edxVideoId'),
+            update.get('status'),
+            update.get('message')
+        )
 
     return JsonResponse()
 

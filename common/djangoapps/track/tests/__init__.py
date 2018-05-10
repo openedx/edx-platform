@@ -31,7 +31,6 @@ class InMemoryBackend(object):
         self.events.append(event)
 
 
-@freeze_time(FROZEN_TIME)
 @override_settings(
     EVENT_TRACKING_BACKENDS=IN_MEMORY_BACKEND_CONFIG
 )
@@ -46,6 +45,10 @@ class EventTrackingTestCase(TestCase):
     # Make this more robust to the addition of new events that the test doesn't care about.
 
     def setUp(self):
+        freezer = freeze_time(FROZEN_TIME)
+        freezer.start()
+        self.addCleanup(freezer.stop)
+
         super(EventTrackingTestCase, self).setUp()
 
         self.recreate_tracker()

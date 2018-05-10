@@ -34,12 +34,28 @@
 //
 
 /* eslint-env node */
+/* globals process */
 
 'use strict';
 
 var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
+var webpackConfig = require(path.join(appRoot, 'webpack.config.js'));
+
+delete webpackConfig.entry;
+
+// The following crazy bit is to work around the webpack.optimize.CommonsChunkPlugin
+// plugin. The problem is that it it factors out the code that defines webpackJsonp
+// and puts in in the commons JS, which Karma doesn't know to load first. This is a
+// workaround recommended in the karma-webpack bug report that basically just removes
+// the plugin for the purposes of Karma testing (the plugin is meant to be an
+// optimization only).
+//     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
+//
+// This should be fixed in v3 of karma-webpack
+const commonsChunkPluginIndex = webpackConfig.plugins.findIndex(plugin => plugin.chunkNames);
+webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
 
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
@@ -167,7 +183,8 @@ function junitSettings(config) {
  * @param {String} pattern
  * @return {String}
  */
-var defaultNormalizeFunc = function(appRoot, pattern) {
+// I'd like to fix the no-shadow violation on the next line, but it would break this shared conf's API.
+function defaultNormalizeFunc(appRoot, pattern) {  // eslint-disable-line no-shadow
     if (pattern.match(/^common\/js/)) {
         pattern = path.join(appRoot, '/common/static/' + pattern);
     } else if (pattern.match(/^xmodule_js\/common_static/)) {
@@ -175,52 +192,45 @@ var defaultNormalizeFunc = function(appRoot, pattern) {
             pattern.replace(/^xmodule_js\/common_static\//, ''));
     }
     return pattern;
-};
+}
 
-var normalizePathsForCoverage = function(files, normalizeFunc) {
+function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
     var normalizeFn = normalizeFunc || defaultNormalizeFunc,
+        normalizedFile,
         filesForCoverage = {};
 
     files.forEach(function(file) {
         if (!file.ignoreCoverage) {
-            filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
+            normalizedFile = normalizeFn(appRoot, file.pattern);
+            if (preprocessors && preprocessors.hasOwnProperty(normalizedFile)) {
+                filesForCoverage[normalizedFile] = ['coverage'].concat(preprocessors[normalizedFile]);
+            } else {
+                filesForCoverage[normalizedFile] = ['coverage'];
+            }
         }
     });
 
     return filesForCoverage;
-};
-
-/**
- * Sets nocache on each file in the list.
- * @param {Object} files
- * @param {Bool} enable
- * @return {Object}
- */
-var setNocache = function(files, enable) {
-    files.forEach(function(f) {
-        if (_.isObject(f)) {
-            f.nocache = enable;
-        }
-    });
-    return files;
-};
+}
 
 /**
  * Sets defaults for each file pattern.
+ * RequireJS files are excluded by default.
+ * Webpack files are included by default.
  * @param {Object} files
  * @return {Object}
  */
-var setDefaults = function(files) {
+function setDefaults(files) {
     return files.map(function(f) {
         var file = _.isObject(f) ? f : {pattern: f};
-        if (!file.included) {
+        if (!file.included && !file.webpack) {
             f.included = false;
         }
         return file;
     });
-};
+}
 
-var getBaseConfig = function(config, useRequireJs) {
+function getBaseConfig(config, useRequireJs) {
     var getFrameworkFiles = function() {
         var files = [
             'node_modules/jquery/dist/jquery.js',
@@ -258,6 +268,11 @@ var getBaseConfig = function(config, useRequireJs) {
         });
     };
 
+    var hostname = 'localhost';
+    if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
+        hostname = process.env.BOK_CHOY_HOSTNAME;
+    }
+
     initFrameworks.$inject = ['config.files'];
 
     var customPlugin = {
@@ -281,6 +296,9 @@ var getBaseConfig = function(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
+            'karma-webdriver-launcher',
+            'karma-webpack',
+            'karma-sourcemap-loader',
             customPlugin
         ],
 
@@ -304,7 +322,8 @@ var getBaseConfig = function(config, useRequireJs) {
         junitReporter: junitSettings(config),
 
 
-        // web server port
+        // web server hostname and port
+        hostname: hostname,
         port: 9876,
 
 
@@ -334,6 +353,14 @@ var getBaseConfig = function(config, useRequireJs) {
                     'app.update.auto': false,
                     'app.update.enabled': false
                 }
+            },
+            FirefoxDocker: {
+                base: 'WebDriver',
+                browserName: 'firefox',
+                config: {
+                    hostname: 'edx.devstack.firefox',
+                    port: 4444
+                }
             }
         },
 
@@ -349,11 +376,19 @@ var getBaseConfig = function(config, useRequireJs) {
 
         client: {
             captureConsole: false
+        },
+
+        webpack: webpackConfig,
+
+        webpackMiddleware: {
+            watchOptions: {
+                poll: true
+            }
         }
     };
-};
+}
 
-var configure = function(config, options) {
+function configure(config, options) {
     var useRequireJs = options.useRequireJs === undefined ? true : useRequireJs,
         baseConfig = getBaseConfig(config, useRequireJs);
 
@@ -382,11 +417,6 @@ var configure = function(config, options) {
     // We set it to false by default because RequireJS should be used instead.
     files = setDefaults(files);
 
-    // With nocache=true, Karma always serves the latest files from disk.
-    // However, that prevents coverage tracking from working.
-    // So we only set it if coverage tracking is off.
-    setNocache(files, !config.coverage);
-
     var filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
@@ -399,14 +429,14 @@ var configure = function(config, options) {
     var preprocessors = _.extend(
         {},
         options.preprocessors,
-        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
+        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc, options.preprocessors)
     );
 
     config.set(_.extend(baseConfig, {
         files: files,
         preprocessors: preprocessors
     }));
-};
+}
 
 module.exports = {
     configure: configure,

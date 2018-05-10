@@ -14,42 +14,41 @@ import hashlib
 import json
 import logging
 import uuid
-from collections import defaultdict, OrderedDict, namedtuple
+from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
 import analytics
-import dogstats_wrapper as dog_stats_api
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import models, IntegrityError
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import IntegrityError, models
 from django.db.models import Count
-from django.db.models.signals import pre_save, post_save
-from django.dispatch import receiver, Signal
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
-from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
 
+import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
+from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
@@ -234,6 +233,7 @@ class UserProfile(models.Model):
 
     class Meta(object):
         db_table = "auth_userprofile"
+        permissions = (("can_deactivate_users", "Can deactivate, but NOT delete users"),)
 
     # CRITICAL TODO/SECURITY
     # Sanitize all fields.
@@ -931,12 +931,18 @@ class CourseEnrollmentManager(models.Manager):
 
         return is_course_full
 
-    def users_enrolled_in(self, course_id):
-        """Return a queryset of User for every user enrolled in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id,
-            courseenrollment__is_active=True
-        )
+    def users_enrolled_in(self, course_id, include_inactive=False):
+        """
+        Return a queryset of User for every user enrolled in the course.  If
+        `include_inactive` is True, returns both active and inactive enrollees
+        for the course. Otherwise returns actively enrolled users only.
+        """
+        filter_kwargs = {
+            'courseenrollment__course_id': course_id,
+        }
+        if not include_inactive:
+            filter_kwargs['courseenrollment__is_active'] = True
+        return User.objects.filter(**filter_kwargs)
 
     def enrollment_counts(self, course_id):
         """
@@ -1000,7 +1006,9 @@ class CourseEnrollment(models.Model):
     history = HistoricalRecords()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
-    COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"
+    COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.
+
+    MODE_CACHE_NAMESPACE = u'CourseEnrollment.mode_and_active'
 
     class Meta(object):
         unique_together = (('user', 'course_id'),)
@@ -1441,7 +1449,32 @@ class CourseEnrollment(models.Model):
 
     @classmethod
     def enrollments_for_user(cls, user):
-        return cls.objects.filter(user=user, is_active=1)
+        return cls.objects.filter(user=user, is_active=1).select_related('user')
+
+    @classmethod
+    def enrollments_for_user_with_overviews_preload(cls, user):  # pylint: disable=invalid-name
+        """
+        List of user's CourseEnrollments, CourseOverviews preloaded if possible.
+
+        We try to preload all CourseOverviews, which are usually lazily loaded
+        as the .course_overview property. This is to avoid making an extra
+        query for every enrollment when displaying something like the student
+        dashboard. If some of the CourseOverviews are not found, we make no
+        attempt to initialize them -- we just fall back to existing lazy-load
+        behavior. The goal is to optimize the most common case as simply as
+        possible, without changing any of the existing contracts.
+
+        The name of this method is long, but was the end result of hashing out a
+        number of alternatives, so pylint can stuff it (disable=invalid-name)
+        """
+        enrollments = list(cls.enrollments_for_user(user))
+        overviews = CourseOverview.get_from_ids_if_exists(
+            enrollment.course_id for enrollment in enrollments
+        )
+        for enrollment in enrollments:
+            enrollment._course_overview = overviews.get(enrollment.course_id)  # pylint: disable=protected-access
+
+        return enrollments
 
     @classmethod
     def enrollment_status_hash_cache_key(cls, user):
@@ -1508,29 +1541,53 @@ class CourseEnrollment(models.Model):
         """Changes this `CourseEnrollment` record's mode to `mode`.  Saves immediately."""
         self.update_enrollment(mode=mode)
 
-    def refundable(self):
+    def refundable(self, user_already_has_certs_for=None):
         """
-        For paid/verified certificates, students may receive a refund if they have
-        a verified certificate and the deadline for refunds has not yet passed.
+        For paid/verified certificates, students may always receive a refund if
+        this CourseEnrollment's `can_refund` attribute is not `None` (that
+        overrides all other rules).
+
+        If the `.can_refund` attribute is `None` or doesn't exist, then ALL of
+        the following must be true for this enrollment to be refundable:
+
+            * The user does not have a certificate issued for this course.
+            * We are not past the refund cutoff date
+            * There exists a 'verified' CourseMode for this course.
+
+        Arguments:
+            `user_already_has_certs_for` (set of `CourseKey`):
+                 An optional param that is a set of `CourseKeys` that the user
+                 has already been issued certificates in.
+
+        Returns:
+            bool: Whether is CourseEnrollment can be refunded.
         """
         # In order to support manual refunds past the deadline, set can_refund on this object.
         # On unenrolling, the "UNENROLL_DONE" signal calls CertificateItem.refund_cert_callback(),
         # which calls this method to determine whether to refund the order.
         # This can't be set directly because refunds currently happen as a side-effect of unenrolling.
         # (side-effects are bad)
+
         if getattr(self, 'can_refund', None) is not None:
             return True
 
         # If the student has already been given a certificate they should not be refunded
-        if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
-            return False
+        if user_already_has_certs_for is not None:
+            if self.course_id in user_already_has_certs_for:
+                return False
+        else:
+            if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
+                return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
-        if refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date:
+        # `refund_cuttoff_date` will be `None` if there is no order. If there is no order return `False`.
+        if refund_cutoff_date is None:
+            return False
+        if datetime.now(UTC) > refund_cutoff_date:
             return False
 
-        course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
+        course_mode = CourseMode.mode_for_course(self.course_id, 'verified', include_expired=True)
         if course_mode is None:
             return False
         else:
@@ -1538,6 +1595,9 @@ class CourseEnrollment(models.Model):
 
     def refund_cutoff_date(self):
         """ Calculate and return the refund window end date. """
+        # NOTE: This is here to avoid circular references
+        from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
+
         try:
             attribute = self.attributes.get(namespace='order', name='order_number')
         except ObjectDoesNotExist:
@@ -1648,11 +1708,27 @@ class CourseEnrollment(models.Model):
         return enrollment_state
 
     @classmethod
+    def bulk_fetch_enrollment_states(cls, users, course_key):
+        """
+        Bulk pre-fetches the enrollment states for the given users
+        for the given course.
+        """
+        # before populating the cache with another bulk set of data,
+        # remove previously cached entries to keep memory usage low.
+        request_cache.clear_cache(cls.MODE_CACHE_NAMESPACE)
+
+        records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user__id')
+        cache = cls._get_mode_active_request_cache()
+        for record in records:
+            enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
+            cls._update_enrollment(cache, record.user.id, course_key, enrollment_state)
+
+    @classmethod
     def _get_mode_active_request_cache(cls):
         """
         Returns the request-specific cache for CourseEnrollment
         """
-        return request_cache.get_cache('CourseEnrollment.mode_and_active')
+        return request_cache.get_cache(cls.MODE_CACHE_NAMESPACE)
 
     @classmethod
     def _get_enrollment_in_request_cache(cls, user, course_key):
@@ -1668,7 +1744,15 @@ class CourseEnrollment(models.Model):
         Updates the cached value for the user's enrollment in the
         request cache.
         """
-        cls._get_mode_active_request_cache()[(user.id, course_key)] = enrollment_state
+        cls._update_enrollment(cls._get_mode_active_request_cache(), user.id, course_key, enrollment_state)
+
+    @classmethod
+    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):
+        """
+        Updates the cached value for the user's enrollment in the
+        given cache.
+        """
+        cache[(user_id, course_key)] = enrollment_state
 
 
 @receiver(models.signals.post_save, sender=CourseEnrollment)

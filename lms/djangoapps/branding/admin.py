@@ -1,8 +1,8 @@
 """Django admin pages for branding configuration. """
-from django.contrib import admin
 from config_models.admin import ConfigurationModelAdmin
+from django.contrib import admin
 
-from .models import BrandingInfoConfig, BrandingApiConfig
+from .models import BrandingApiConfig, BrandingInfoConfig
 
 admin.site.register(BrandingInfoConfig, ConfigurationModelAdmin)
 admin.site.register(BrandingApiConfig, ConfigurationModelAdmin)

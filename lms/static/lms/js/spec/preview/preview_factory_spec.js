@@ -70,7 +70,6 @@ define(
                 var requests = AjaxHelpers.requests(this),
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
-                    cohortedUserPartitionId: 'test_partition_id',
                     courseId: 'test_course'
                 });
                 previewActionSelect().find('option[value="group-b"]').prop('selected', 'selected').change();
@@ -79,7 +78,7 @@ define(
                     {
                         role: 'student',
                         user_name: null,
-                        user_partition_id: 'test_partition_id',
+                        user_partition_id: 'test_partition_b_id',
                         group_id: 'group-b'
                     }
                 );

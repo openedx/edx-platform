@@ -1,12 +1,11 @@
-import time
+import datetime
 import logging
 import re
+import time
 
-from xblock.fields import JSONField
-import datetime
 import dateutil.parser
-
 from pytz import UTC
+from xblock.fields import JSONField
 
 log = logging.getLogger(__name__)
 

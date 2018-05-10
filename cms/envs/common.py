@@ -49,22 +49,26 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
+    update_module_store_settings, ASSET_IGNORE_REGEX,
     PARENTAL_CONSENT_AGE_LIMIT, COMPREHENSIVE_THEME_DIRS, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
-    PROGRESS_DETACHED_VERTICAL_CATEGORIES, PROGRESS_DETACHED_CATEGORIES,
-    IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_SIZES_MAP,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     ORGANIZATION_LOGO_IMAGE_BACKEND, ORGANIZATION_LOGO_IMAGE_SIZES_MAP, ORGANIZATION_THEME_IMAGE_SECRET_KEY,
     ORGANIZATION_LOGO_IMAGE_DEFAULT_FILENAME, ORGANIZATION_HEADER_BG_IMAGE_SIZES_MAP,
     ORGANIZATION_HEADER_BG_IMAGE_KEY_PREFIX, ORGANIZATION_LOGO_IMAGE_KEY_PREFIX,
+    IMAGE_DEFAULT_FILE_EXTENSION,
+    PROGRESS_DETACHED_VERTICAL_CATEGORIES, PROGRESS_DETACHED_CATEGORIES,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
-    DEFAULT_COURSE_ABOUT_IMAGE_URL,
+    COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
+
+    # User-uploaded content
+    MEDIA_ROOT,
+    MEDIA_URL,
 
     # Django REST framework configuration
     REST_FRAMEWORK,
@@ -86,6 +90,9 @@ from lms.envs.common import (
 
     JWT_AUTH,
 
+    USERNAME_REGEX_PARTIAL,
+    USERNAME_PATTERN,
+
     # django-debug-toolbar
     DEBUG_TOOLBAR_PATCH_SETTINGS,
     BLOCK_STRUCTURES_SETTINGS,
@@ -93,6 +100,18 @@ from lms.envs.common import (
     # File upload defaults
     FILE_UPLOAD_STORAGE_BUCKET_NAME,
     FILE_UPLOAD_STORAGE_PREFIX,
+
+    COURSE_ENROLLMENT_MODES,
+
+    HELP_TOKENS_BOOKS,
+
+    SUPPORT_SITE_LINK,
+    PASSWORD_RESET_SUPPORT_LINK,
+    ACTIVATION_EMAIL_SUPPORT_LINK,
+
+    CONTACT_EMAIL,
+
+    DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -101,7 +120,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.mixin import LicenseMixin
+from openedx.core.lib.license import LicenseMixin
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -135,8 +154,8 @@ FEATURES = {
     'AUTOPLAY_VIDEOS': False,
 
     # If set to True, new Studio users won't be able to author courses unless
-    # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False,
+    # an Open edX admin has added them to the course creator group.
+    'ENABLE_CREATOR_GROUP': True,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
@@ -179,7 +198,7 @@ FEATURES = {
     'ENABLE_CONTENT_LIBRARIES': True,
 
     # Solutions apps flag
-    'EDX_SOLUTIONS_API': True,
+    'EDX_SOLUTIONS_API': False,
 
     # Milestones application flag
     'MILESTONES_APP': False,
@@ -231,14 +250,17 @@ FEATURES = {
 
     'ORGANIZATIONS_APP': False,
 
-    # Show Language selector
-    'SHOW_LANGUAGE_SELECTOR': False,
+    # Show the language selector in the header
+    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
 
     # Allow public account creation
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+
+    # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
 }
 
 ENABLE_JASMINE = False
@@ -281,6 +303,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
+    OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
@@ -309,7 +332,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
                 'dealer.contrib.django.staff.context_processor',  # access git revision
-                'contentstore.context_processors.doc_url',
+                'help_tokens.context_processor',
             ),
             # Change 'debug' in your environment settings files - not here.
             'debug': False
@@ -333,6 +356,7 @@ AUTHENTICATION_BACKENDS = (
 
 LMS_BASE = None
 LMS_ROOT_URL = "http://localhost:8000"
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
@@ -366,6 +390,9 @@ simplefilter('ignore')
 MIDDLEWARE_CLASSES = (
     'crum.CurrentRequestUserMiddleware',
     'request_cache.middleware.RequestCache',
+
+    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
+
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -413,6 +440,8 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'waffle.middleware.WaffleMiddleware',
 
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -553,6 +582,8 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
 
+LANGUAGE_COOKIE = lms.envs.common.LANGUAGE_COOKIE
+
 LANGUAGES = lms.envs.common.LANGUAGES
 LANGUAGE_DICT = dict(LANGUAGES)
 
@@ -566,6 +597,8 @@ LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -588,7 +621,13 @@ STATICFILES_FINDERS = [
 
 # Don't use compression by default
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
+
+# Don't wrap JavaScript as there is code that depends upon updating the global namespace
+PIPELINE_DISABLE_WRAPPER = True
+
+# Specify the UglifyJS binary to use
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -661,15 +700,36 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
-    'discussion': {
-        'source_filenames': ['sass/discussion-forum.css'],
-        'output_filename': 'css/cms-style-discussion-forum.css'
-    }
 }
+
+base_vendor_js = [
+    'js/src/utility.js',
+    'js/src/logger.js',
+    'common/js/vendor/jquery.js',
+    'common/js/vendor/jquery-migrate.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/url.min.js',
+    'common/js/vendor/underscore.js',
+    'common/js/vendor/underscore.string.js',
+    'common/js/vendor/backbone.js',
+    'js/vendor/URI.min.js',
+
+    # Make some edX UI Toolkit utilities available in the global "edx" namespace
+    'edx-ui-toolkit/js/utils/global-loader.js',
+    'edx-ui-toolkit/js/utils/string-utils.js',
+    'edx-ui-toolkit/js/utils/html-utils.js',
+
+    # Finally load RequireJS
+    'common/js/vendor/require.js'
+]
 
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
+    'base_vendor': {
+        'source_filenames': base_vendor_js,
+        'output_filename': 'js/cms-base-vendor.js',
+    },
     'module-js': {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
@@ -730,22 +790,17 @@ REQUIRE_BUILD_PROFILE = "cms/js/build.js"
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
-# A dictionary of standalone modules to build with almond.js.
-REQUIRE_STANDALONE_MODULES = {}
-
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
 
-# A tuple of files to exclude from the compilation result of r.js.
-REQUIRE_EXCLUDE = ("build.txt",)
+########################## DJANGO WEBPACK LOADER ##############################
 
-# The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and
-# rhino if not.
-# It can also be a path to a custom class that subclasses
-# require.environments.Environment and defines some "args" function that
-# returns a list with the command arguments to execute.
-REQUIRE_ENVIRONMENT = "node"
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    }
+}
 
 ################################# CELERY ######################################
 
@@ -799,6 +854,8 @@ YOUTUBE = {
     # YouTube JavaScript API
     'API': 'https://www.youtube.com/iframe_api',
 
+    'TEST_TIMEOUT': 1500,
+
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
@@ -845,6 +902,7 @@ INSTALLED_APPS = (
 
     # Database-backed configuration
     'config_models',
+    'waffle',
 
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
@@ -853,17 +911,18 @@ INSTALLED_APPS = (
     'django_nose',
 
     # For CMS
-    'contentstore',
+    'contentstore.apps.ContentstoreConfig',
+
     'openedx.core.djangoapps.contentserver',
     'course_creators',
     'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
-    'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
     'xblock_config',
 
     # Maintenance tools
     'maintenance',
+    'django_extensions',
 
     # Tracking
     'track',
@@ -877,6 +936,7 @@ INSTALLED_APPS = (
     'pipeline',
     'static_replace',
     'require',
+    'webpack_loader',
 
     # Theming
     'openedx.core.djangoapps.theming',
@@ -892,6 +952,9 @@ INSTALLED_APPS = (
 
     # for managing course modes
     'course_modes',
+
+    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
+    'openedx.core.djangoapps.verified_track_content',
 
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
@@ -930,14 +993,14 @@ INSTALLED_APPS = (
     # Bookmarks
     'openedx.core.djangoapps.bookmarks',
 
-    # programs support
-    'openedx.core.djangoapps.programs',
-
     # Catalog integration
     'openedx.core.djangoapps.catalog',
 
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
 
     # django-oauth2-provider (deprecated)
     'provider',
@@ -975,6 +1038,19 @@ INSTALLED_APPS = (
 
     # management of user-triggered async tasks (course import/export, etc.)
     'user_tasks',
+
+    # CMS specific user task handling
+    'cms_user_tasks.apps.CmsUserTasksConfig',
+
+    # Unusual migrations
+    'database_fixups',
+
+    # Customized celery tasks, including persisting failed tasks so they can
+    # be retried
+    'celery_utils',
+
+    # Waffle related utilities
+    'openedx.core.djangoapps.waffle_utils',
 )
 
 
@@ -1084,6 +1160,9 @@ OPTIONAL_APPS = (
 
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Enterprise App (http://github.com/edx/edx-enterprise)
+    'enterprise',
 )
 
 
@@ -1308,7 +1387,7 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = None
+HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
@@ -1328,3 +1407,21 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
+
+############## Settings for the Enterprise App ######################
+
+ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
+ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
+
+############## Settings for the Discovery App ######################
+
+COURSE_CATALOG_API_URL = None
+
+############################# Persistent Grades ####################################
+
+# Queue to use for updating persistent grades
+RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+
+############## Settings for CourseGraph ############################
+COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE

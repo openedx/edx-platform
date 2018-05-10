@@ -36,9 +36,6 @@
                 }
                 return Problem.prototype.enableSubmitButton.apply(that, arguments);
             };
-            this.enableAllButtons = function(enable, isFromCheckOperation) { // eslint-disable-line no-unused-vars
-                return Problem.prototype.enableAllButtons.apply(that, arguments);
-            };
             this.disableAllButtonsWhileRunning = function(
                 operationCallback, isFromCheckOperation // eslint-disable-line no-unused-vars
             ) {
@@ -177,6 +174,7 @@
             this.showButton.click(this.show);
             this.saveButton = this.$('.action .save');
             this.saveNotification = this.$('.notification-save');
+            this.showAnswerNotification = this.$('.notification-show-answer');
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
@@ -216,11 +214,36 @@
             attemptsUsed = this.el.data('attempts-used');
             graded = this.el.data('graded');
 
+            // The problem is ungraded if it's explicitly marked as such, or if the total possible score is 0
+            if (graded === 'True' && totalScore !== 0) {
+                graded = true;
+            } else {
+                graded = false;
+            }
+
             if (curScore === undefined || totalScore === undefined) {
-                progress = '';
+                // Render an empty string.
+                progressTemplate = '';
+            } else if (curScore === null || curScore === 'None') {
+                // Render 'x point(s) possible (un/graded, results hidden)' if no current score provided.
+                if (graded) {
+                    progressTemplate = ngettext(
+                        // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
+                        '%(num_points)s point possible (graded, results hidden)',
+                        '%(num_points)s points possible (graded, results hidden)',
+                        totalScore
+                    );
+                } else {
+                    progressTemplate = ngettext(
+                        // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
+                        '%(num_points)s point possible (ungraded, results hidden)',
+                        '%(num_points)s points possible (ungraded, results hidden)',
+                        totalScore
+                    );
+                }
             } else if (attemptsUsed === 0 || totalScore === 0) {
                 // Render 'x point(s) possible' if student has not yet attempted question
-                if (graded === 'True' && totalScore !== 0) {
+                if (graded) {
                     progressTemplate = ngettext(
                         // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
                         '%(num_points)s point possible (graded)', '%(num_points)s points possible (graded)',
@@ -233,10 +256,9 @@
                         totalScore
                     );
                 }
-                progress = interpolate(progressTemplate, {num_points: totalScore}, true);
             } else {
                 // Render 'x/y point(s)' if student has attempted question
-                if (graded === 'True' && totalScore !== 0) {
+                if (graded) {
                     progressTemplate = ngettext(
                         // This comment needs to be on one line to be properly scraped for the translators.
                         // Translators: %(earned)s is the number of points earned. %(possible)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points);
@@ -251,13 +273,14 @@
                         totalScore
                     );
                 }
-                progress = interpolate(
-                    progressTemplate, {
-                        earned: curScore,
-                        possible: totalScore
-                    }, true
-                );
             }
+            progress = interpolate(
+                progressTemplate, {
+                    earned: curScore,
+                    num_points: totalScore,
+                    possible: totalScore
+                }, true
+            );
             return this.$('.problem-progress').text(progress);
         };
 
@@ -512,7 +535,7 @@
                     ref = element.files;
                     for (loopI = 0, loopLen = ref.length; loopI < loopLen; loopI++) {
                         file = ref[loopI];
-                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name < 0)) {
+                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name) < 0) {
                             unallowedFileSubmitted = true;
                             errors.push(edx.StringUtils.interpolate(
                                 gettext('You submitted {filename}; only {allowedFiles} are allowed.'), {
@@ -575,6 +598,7 @@
                     complete: this.enableSubmitButtonAfterResponse,
                     success: function(response) {
                         switch (response.success) {
+                        case 'submitted':
                         case 'incorrect':
                         case 'correct':
                             that.render(response.contents);
@@ -601,6 +625,7 @@
             Logger.log('problem_check', this.answers);
             return $.postWithPrefix('' + this.url + '/problem_check', this.answers, function(response) {
                 switch (response.success) {
+                case 'submitted':
                 case 'incorrect':
                 case 'correct':
                     window.SR.readTexts(that.get_sr_status(response.contents));
@@ -684,17 +709,8 @@
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {
-                    var answer, choice, i, len, results;
-                    if ($.isArray(value)) {
-                        results = [];
-                        for (i = 0, len = value.length; i < len; i++) {
-                            choice = value[i];
-                            results.push(that.$('label[for="input_' + key + '_' + choice + '"]').attr({
-                                correct_answer: 'true'
-                            }));
-                        }
-                        return results;
-                    } else {
+                    var answer;
+                    if (!$.isArray(value)) {
                         answer = that.$('#answer_' + key + ', #solution_' + key);
                         edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value));
                         Collapsible.setCollapsibles(answer);
@@ -725,7 +741,7 @@
                         display = that.inputtypeDisplays[$(inputtype).attr('id')];
                         showMethod = that.inputtypeShowAnswerMethods[cls];
                         if (showMethod != null) {
-                            results.push(showMethod(inputtype, display, answers));
+                            results.push(showMethod(inputtype, display, answers, response.correct_status_html));
                         } else {
                             results.push(void 0);
                         }
@@ -739,8 +755,9 @@
                 }
                 that.el.find('.show').attr('disabled', 'disabled');
                 that.updateProgress(response);
-                window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.')); // eslint-disable-line max-len
-                that.scroll_to_problem_meta();
+                that.clear_all_notifications();
+                that.showAnswerNotification.show();
+                that.focus_on_notification('show-answer');
             });
         };
 
@@ -748,6 +765,8 @@
             this.submitNotification.remove();
             this.gentleAlertNotification.hide();
             this.saveNotification.hide();
+            this.showAnswerNotification.hide();
+
         };
 
         Problem.prototype.gentle_alert = function(msg) {
@@ -860,6 +879,7 @@
                     if (bind) {
                         $(textField).on('input', function() {
                             that.saveNotification.hide();
+                            that.showAnswerNotification.hide();
                             that.submitAnswersAndSubmitButton();
                         });
                     }
@@ -879,6 +899,8 @@
                         if (bind) {
                             $(checkboxOrRadio).on('click', function() {
                                 that.saveNotification.hide();
+                                that.el.find('.show').removeAttr('disabled');
+                                that.showAnswerNotification.hide();
                                 that.submitAnswersAndSubmitButton();
                             });
                         }
@@ -896,6 +918,7 @@
                 if (bind) {
                     $(selectField).on('change', function() {
                         that.saveNotification.hide();
+                        that.showAnswerNotification.hide();
                         that.submitAnswersAndSubmitButton();
                     });
                 }
@@ -950,14 +973,15 @@
                     var $status;
                     $status = $('#status_' + id);
                     if ($status[0]) {
-                        $status.removeAttr('class').addClass('unanswered');
+                        $status.removeAttr('class').addClass('status unanswered');
                     } else {
                         $('<span>', {
-                            class: 'unanswered',
+                            class: 'status unanswered',
                             style: 'display: inline-block;',
                             id: 'status_' + id
                         });
                     }
+                    $element.find('label').find('span.status.correct').remove();
                     return $element.find('label').removeAttr('class');
                 });
             },
@@ -1033,16 +1057,31 @@
         };
 
         Problem.prototype.inputtypeShowAnswerMethods = {
-            choicegroup: function(element, display, answers) {
-                var answer, choice, inputId, i, len, results, $element;
+            choicegroup: function(element, display, answers, correctStatusHtml) {
+                var answer, choice, inputId, i, len, results, $element, $inputLabel, $inputStatus;
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
                 answer = answers[inputId];
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    results.push($element.find('#input_' + inputId + '_' + choice).parent('label').
-                        addClass('choicegroup_correct'));
+                    $inputLabel = $element.find('#input_' + inputId + '_' + choice).parent('label');
+                    $inputStatus = $inputLabel.find('#status_' + inputId);
+                    // If the correct answer was already Submitted before "Show Answer" was selected,
+                    // the status HTML will already be present. Otherwise, inject the status HTML.
+
+                    // If the learner clicked a different answer after Submit, their submitted answers
+                    // will be marked as "unanswered". In that case, for correct answers update the
+                    // classes accordingly.
+                    if ($inputStatus.hasClass('unanswered')) {
+                        $inputStatus.removeAttr('class').addClass('status correct');
+                        $inputLabel.addClass('choicegroup_correct');
+                    } else if (!$inputLabel.hasClass('choicegroup_correct')) {
+                        // If the status HTML is not already present (due to clicking Submit), append
+                        // the status HTML for correct answers.
+                        edx.HtmlUtils.append($inputLabel, edx.HtmlUtils.HTML(correctStatusHtml));
+                        results.push($inputLabel.addClass('choicegroup_correct'));
+                    }
                 }
                 return results;
             },
@@ -1157,32 +1196,38 @@
          */
         Problem.prototype.disableAllButtonsWhileRunning = function(operationCallback, isFromCheckOperation) {
             var that = this;
-            this.enableAllButtons(false, isFromCheckOperation);
+            var allButtons = [this.resetButton, this.saveButton, this.showButton, this.hintButton, this.submitButton];
+            var initiallyEnabledButtons = allButtons.filter(function(button) {
+                return !button.attr('disabled');
+            });
+            this.enableButtons(initiallyEnabledButtons, false, isFromCheckOperation);
             return operationCallback().always(function() {
-                return that.enableAllButtons(true, isFromCheckOperation);
+                return that.enableButtons(initiallyEnabledButtons, true, isFromCheckOperation);
             });
         };
 
         /**
-         * Used to enable/disable all buttons in problem.
+         * Enables/disables buttons by removing/adding the disabled attribute. The submit button is checked
+         *     separately due to the changing text it contains.
          *
          * params:
-         *     'enable' is a boolean to determine enabling/disabling of buttons.
-         *     'isFromCheckOperation' is a boolean to keep track if operation was initiated
+         *     'buttons' is an array of buttons that will have their 'disabled' attribute modified
+         *     'enable' a boolean to either enable or disable the buttons passed in the first parameter
+         *     'changeSubmitButtonText' is a boolean to keep track if operation was initiated
          *         from submit so that text of submit button will also be changed while disabling/enabling
          *         the submit button.
          */
-        Problem.prototype.enableAllButtons = function(enable, isFromCheckOperation) {
-            // Called by disableAllButtonsWhileRunning to automatically disable all buttons while check,reset, or
-            // save internal are running. Then enable all the buttons again after it is done.
-            if (enable) {
-                this.resetButton.add(this.saveButton).add(this.hintButton).add(this.showButton).
-                    removeAttr('disabled');
-            } else {
-                this.resetButton.add(this.saveButton).add(this.hintButton).add(this.showButton).
-                    attr({disabled: 'disabled'});
-            }
-            return this.enableSubmitButton(enable, isFromCheckOperation);
+        Problem.prototype.enableButtons = function(buttons, enable, changeSubmitButtonText) {
+            var that = this;
+            buttons.forEach(function(button) {
+                if (button.hasClass('submit')) {
+                    that.enableSubmitButton(enable, changeSubmitButtonText);
+                } else if (enable) {
+                    button.removeAttr('disabled');
+                } else {
+                    button.attr({disabled: 'disabled'});
+                }
+            });
         };
 
         /**

@@ -3,18 +3,19 @@ Unit tests for contentstore.views.library
 
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+import ddt
+import mock
+from django.conf import settings
+from mock import patch
+from opaque_keys.edx.locator import CourseKey, LibraryLocator
+
+from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
-from contentstore.tests.utils import CourseTestCase
 from contentstore.views.component import get_component_templates
 from contentstore.views.library import get_library_creator_status
 from course_creators.views import add_user_with_status_granted as grant_course_creator_status
-from xmodule.modulestore.tests.factories import LibraryFactory
-from mock import patch
-from opaque_keys.edx.locator import CourseKey, LibraryLocator
-import ddt
-import mock
 from student.roles import LibraryUserRole
+from xmodule.modulestore.tests.factories import LibraryFactory
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 
@@ -211,7 +212,7 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(make_url_for_lib(lib.location.library_key))
         self.assertEqual(response.status_code, 200)
         self.assertIn("<html", response.content)
-        self.assertIn(lib.display_name, response.content)
+        self.assertIn(lib.display_name.encode('utf-8'), response.content)
 
     @ddt.data('library-v1:Nonexistent+library', 'course-v1:Org+Course', 'course-v1:Org+Course+Run', 'invalid')
     def test_invalid_keys(self, key_str):
@@ -250,6 +251,24 @@ class UnitTestLibraries(CourseTestCase):
         self.assertIn('problem', templates)
         self.assertNotIn('discussion', templates)
         self.assertNotIn('advanced', templates)
+
+    def test_advanced_problem_types(self):
+        """
+        Verify that advanced problem types are not provided in problem component for libraries.
+        """
+        lib = LibraryFactory.create()
+        lib.save()
+
+        problem_type_templates = next(
+            (component['templates'] for component in get_component_templates(lib, library=True) if component['type'] == 'problem'),
+            []
+        )
+        # Each problem template has a category which shows whether problem is a 'problem'
+        # or which of the advanced problem type (e.g drag-and-drop-v2).
+        problem_type_categories = [problem_template['category'] for problem_template in problem_type_templates]
+
+        for advance_problem_type in settings.ADVANCED_PROBLEM_TYPES:
+            self.assertNotIn(advance_problem_type['component'], problem_type_categories)
 
     def test_manage_library_users(self):
         """

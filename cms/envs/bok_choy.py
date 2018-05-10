@@ -13,6 +13,7 @@ from the same directory.
 import os
 from path import Path as path
 
+from openedx.core.release import RELEASE_LINE
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -20,7 +21,7 @@ from path import Path as path
 # Unlike in prod, we use the JSON files stored in this repo.
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
-os.environ['SERVICE_VARIANT'] = 'bok_choy'
+os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
 
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
@@ -48,6 +49,9 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
+# Needed to enable licensing on video modules
+XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
+
 ############################ STATIC FILES #############################
 
 # Enable debug so that static assets are served by Django
@@ -62,6 +66,11 @@ STATICFILES_FINDERS = (
 STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "cms").abspath(),
 ]
+
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = TEST_ROOT / "uploads"
+
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "cms" / "webpack-stats.json"
 
 # Silence noisy logs
 import logging
@@ -93,6 +102,8 @@ FEATURES['LICENSING'] = True
 FEATURES['ENABLE_MOBILE_REST_API'] = True  # Enable video bumper in Studio
 FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 
@@ -103,6 +114,7 @@ FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
+YOUTUBE['TEST_TIMEOUT'] = 5000
 YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
@@ -121,6 +133,12 @@ MOCK_SEARCH_BACKING_FILE = (
 SECRET_KEY = "very_secret_bok_choy_key"
 
 LMS_ROOT_URL = "http://localhost:8000"
+if RELEASE_LINE == "master":
+    # On master, acceptance tests use edX books, not the default Open edX books.
+    HELP_TOKENS_BOOKS = {
+        'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
+        'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
+    }
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

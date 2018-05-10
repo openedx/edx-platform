@@ -3,7 +3,6 @@ The utility methods and functions to help the djangoapp logic
 """
 from opaque_keys.edx.keys import CourseKey
 
-
 FAKE_COURSE_KEY = CourseKey.from_string('course-v1:fake+course+run')
 
 

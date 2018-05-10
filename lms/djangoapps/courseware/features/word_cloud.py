@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 
-from lettuce import world, step
+from lettuce import step, world
+
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 
 

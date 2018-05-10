@@ -1,8 +1,8 @@
 from django.test import TestCase
 from nose.plugins.attrib import attr
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @attr(shard=1)

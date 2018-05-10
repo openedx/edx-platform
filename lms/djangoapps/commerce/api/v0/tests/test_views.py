@@ -1,35 +1,35 @@
 """ Commerce API v0 view tests. """
-from datetime import datetime, timedelta
-import json
 import itertools
+import json
+from datetime import datetime, timedelta
 from uuid import uuid4
-import httpretty
 
 import ddt
+import httpretty
+import mock
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-import mock
+from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
-import pytz
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
+from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
 from commerce.constants import Messages
-from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
+from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA
 from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
-from edx_rest_api_client import exceptions
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from enrollment.api import get_enrollment
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
-from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 UTM_COOKIE_NAME = 'edx.test.utm'
 UTM_COOKIE_CONTENTS = {
@@ -39,7 +39,6 @@ UTM_COOKIE_CONTENTS = {
 
 @attr(shard=1)
 @ddt.ddt
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce orders view.
@@ -276,7 +275,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # We should be enrolled in honor mode
         self._test_course_without_sku(enrollment_mode=CourseMode.HONOR)
 
-    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    @override_settings(ECOMMERCE_API_URL=None)
     def test_ecommerce_service_not_configured(self):
         """
         If the E-Commerce Service is not configured, the view should enroll the user.
@@ -313,7 +312,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """ Verifies that the view behaves appropriately when the course only has a professional mode. """
         self.assertProfessionalModeBypassed()
 
-    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    @override_settings(ECOMMERCE_API_URL=None)
     def test_professional_mode_only_and_ecommerce_service_not_configured(self):
         """
         Verifies that the view behaves appropriately when the course only has a professional mode and
@@ -390,7 +389,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
 
 @attr(shard=1)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v0:baskets:retrieve_order'

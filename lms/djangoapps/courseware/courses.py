@@ -2,40 +2,39 @@
 Functions for accessing and displaying courses within the
 courseware.
 """
-from datetime import datetime
-from collections import defaultdict
-from fs.errors import ResourceNotFoundError
 import logging
+from collections import defaultdict
+from datetime import datetime
 
-from path import Path as path
 import pytz
-from django.http import Http404
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import Http404
+from fs.errors import ResourceNotFoundError
+from opaque_keys.edx.keys import UsageKey
+from path import Path as path
 
-from edxmako.shortcuts import render_to_string
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from static_replace import replace_static_urls
-from xmodule.x_module import STUDENT_VIEW
-
+import branding
 from courseware.access import has_access
 from courseware.date_summary import (
     CourseEndDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate,
+    VerifiedUpgradeDeadlineDate
 )
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
+from courseware.module_render import get_module, get_module_for_descriptor
+from edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
-from student.models import CourseEnrollment
-import branding
-
-from opaque_keys.edx.keys import UsageKey
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+from static_replace import replace_static_urls
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.x_module import STUDENT_VIEW
 
 log = logging.getLogger(__name__)
 
@@ -70,12 +69,6 @@ def get_course_by_id(course_key, depth=0):
         return course
     else:
         raise Http404("Course not found: {}.".format(unicode(course_key)))
-
-
-class UserNotEnrolled(Http404):
-    def __init__(self, course_key):
-        super(UserNotEnrolled, self).__init__()
-        self.course_key = course_key
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False):
@@ -132,10 +125,10 @@ def check_course_access(course, user, action, check_if_enrolled=False):
 
     if check_if_enrolled:
         # Verify that the user is either enrolled in the course or a staff
-        # member.  If user is not enrolled, raise UserNotEnrolled exception
-        # that will be caught by middleware.
+        # member.  If the user is not enrolled, raise a Redirect exception
+        # that will be handled by middleware.
         if not ((user.id and CourseEnrollment.is_enrolled(user, course.id)) or has_access(user, 'staff', course)):
-            raise UserNotEnrolled(course.id)
+            raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
 
 
 def find_file(filesystem, dirs, filename):
@@ -240,6 +233,13 @@ def get_course_about_section(request, course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
+def get_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info module.
+    """
+    return course.id.make_usage_key('course_info', section_key)
+
+
 def get_course_info_section_module(request, user, course, section_key):
     """
     This returns the course info module for a given section_key.
@@ -250,7 +250,7 @@ def get_course_info_section_module(request, user, course, section_key):
     - updates
     - guest_updates
     """
-    usage_key = course.id.make_usage_key('course_info', section_key)
+    usage_key = get_course_info_usage_key(course, section_key)
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, user)
@@ -283,7 +283,7 @@ def get_course_info_section(request, user, course, section_key):
     html = ''
     if info_module is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content
+            html = info_module.render(STUDENT_VIEW).content.strip()
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
@@ -470,3 +470,56 @@ def get_problems_in_section(section):
                     problem_descriptors[unicode(component.location)] = component
 
     return problem_descriptors
+
+
+def get_current_child(xmodule, min_depth=None, requested_child=None):
+    """
+    Get the xmodule.position's display item of an xmodule that has a position and
+    children.  If xmodule has no position or is out of bounds, return the first
+    child with children of min_depth.
+
+    For example, if chapter_one has no position set, with two child sections,
+    section-A having no children and section-B having a discussion unit,
+    `get_current_child(chapter, min_depth=1)`  will return section-B.
+
+    Returns None only if there are no children at all.
+    """
+    # TODO: convert this method to use the Course Blocks API
+    def _get_child(children):
+        """
+        Returns either the first or last child based on the value of
+        the requested_child parameter.  If requested_child is None,
+        returns the first child.
+        """
+        if requested_child == 'first':
+            return children[0]
+        elif requested_child == 'last':
+            return children[-1]
+        else:
+            return children[0]
+
+    def _get_default_child_module(child_modules):
+        """Returns the first child of xmodule, subject to min_depth."""
+        if min_depth <= 0:
+            return _get_child(child_modules)
+        else:
+            content_children = [
+                child for child in child_modules
+                if child.has_children_at_depth(min_depth - 1) and child.get_display_items()
+            ]
+            return _get_child(content_children) if content_children else None
+
+    child = None
+    if hasattr(xmodule, 'position'):
+        children = xmodule.get_display_items()
+        if len(children) > 0:
+            if xmodule.position is not None and not requested_child:
+                pos = xmodule.position - 1  # position is 1-indexed
+                if 0 <= pos < len(children):
+                    child = children[pos]
+                    if min_depth > 0 and not child.has_children_at_depth(min_depth - 1):
+                        child = None
+            if child is None:
+                child = _get_default_child_module(children)
+
+    return child

@@ -18,12 +18,12 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import contentstore.git_export_utils as git_export_utils
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys import InvalidKeyError
 from contentstore.git_export_utils import GitExportError
-from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 

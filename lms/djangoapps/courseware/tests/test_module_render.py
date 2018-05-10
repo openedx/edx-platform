@@ -2,79 +2,69 @@
 """
 Test for lms courseware app, module render unit
 """
-from datetime import datetime
-import ddt
 import itertools
 import json
-from nose.plugins.attrib import attr
+from datetime import datetime
 from functools import partial
 
-from bson import ObjectId
-from django.http import Http404, HttpResponse
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
-from django.contrib.auth.models import AnonymousUser
-from rest_framework.test import APIRequestFactory
-from freezegun import freeze_time
-from mock import MagicMock, patch, Mock
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from pyquery import PyQuery
+import ddt
 import pytz
-from xblock.field_data import FieldData
-from xblock.runtime import Runtime
-from xblock.fields import ScopeIds
-from xblock.core import XBlock, XBlockAside
-from xblock.fragment import Fragment
-
+from bson import ObjectId
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
 from courseware import module_render as render
-from courseware.courses import get_course_with_access, get_course_info_section
+from courseware.courses import get_course_info_section, get_course_with_access
 from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
-from courseware.module_render import hash_resource, get_module_for_descriptor, XblockCallbackView
 from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
-from courseware.tests.tests import LoginEnrollmentTestCase
+from courseware.module_render import XblockCallbackView
+from courseware.module_render import get_module_for_descriptor, hash_resource
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.url_utils import quote_slashes
+from courseware.tests.tests import LoginEnrollmentTestCase
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponse
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
+from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.tests.test_services import MockCreditService
+from freezegun import freeze_time
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pyquery import PyQuery
+from rest_framework.test import APIRequestFactory
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_MIXED_MODULESTORE
-)
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from xblock.core import XBlock, XBlockAside
+from xblock.field_data import FieldData
+from xblock.fields import ScopeIds
+from xblock.fragment import Fragment
+from xblock.runtime import Runtime
+from xblock_django.models import XBlockConfiguration
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_asides import AsideTestType
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
 
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.api import (
-    set_credit_requirements,
-    set_credit_requirement_status
-)
-from xblock_django.models import XBlockConfiguration
-
-from edx_proctoring.api import (
-    create_exam,
-    create_exam_attempt,
-    update_attempt_status
-)
-from edx_proctoring.runtime import set_runtime_service
-from edx_proctoring.tests.test_services import MockCreditService
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-
-from milestones.tests.utils import MilestonesTestCaseMixin
-
+from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.url_utils import quote_slashes
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -406,8 +396,9 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 @attr(shard=1)
 class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Test the handle_xblock_callback function
+    Test the XblockCallbackView function
     """
+
     @classmethod
     def setUpClass(cls):
         super(TestHandleXBlockCallback, cls).setUpClass()
@@ -464,7 +455,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_too_many_files(self):
         request = self.drf_request_factory.post(
             'dummy_url',
-            data={'file_id': (self._mock_file(), ) * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)}
+            data={'file_id': (self._mock_file(),) * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)}
         )
         request.user = self.mock_user
         view = XblockCallbackView.as_view()
@@ -567,28 +558,6 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         self.assertEquals(resp.status_code, 404)
 
-    def test_xblock_view_handler(self):
-        args = [
-            'edX/toy/2012_Fall',
-            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
-            'student_view'
-        ]
-        xblock_view_url = reverse(
-            'xblock_view',
-            args=args
-        )
-
-        request = self.request_factory.get(xblock_view_url)
-        request.user = self.mock_user
-        response = render.xblock_view(request, *args)
-        self.assertEquals(200, response.status_code)
-
-        expected = ['csrf_token', 'html', 'resources']
-        content = json.loads(response.content)
-        for section in expected:
-            self.assertIn(section, content)
-        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
-
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
         course = CourseFactory.create()
@@ -645,6 +614,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
+
     def setup_request_and_course(self, num_finds, num_sends):
         """
         Sets up the toy course in the modulestore and the request object.
@@ -655,10 +625,12 @@ class TestTOC(ModuleStoreTestCase):
         factory = RequestFactory()
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
-        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
+        self.modulestore = self.store._get_modulestore_for_courselike(
+            self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
             with check_mongo_calls(num_finds, num_sends):
-                self.toy_course = self.store.get_course(self.course_key, depth=2)  # pylint: disable=attribute-defined-outside-init
+                self.toy_course = self.store.get_course(self.course_key,
+                                                        depth=2)  # pylint: disable=attribute-defined-outside-init
                 self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                     self.course_key, self.request.user, self.toy_course, depth=2
                 )
@@ -757,6 +729,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         cls.course_key = ToyCourseFactory.create().id
 
     """Check the Table of Contents for a course"""
+
     def setUp(self):
         """
         Set up the initial mongo datastores
@@ -769,7 +742,8 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         self.request.user = UserFactory.create()
         self.user = UserFactory.create()
         SoftwareSecurePhotoVerificationFactory.create(user=self.request.user)
-        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access
+        self.modulestore = self.store._get_modulestore_for_courselike(
+            self.course_key)  # pylint: disable=protected-access
         with self.modulestore.bulk_operations(self.course_key):
             self.toy_course = self.store.get_course(self.course_key, depth=2)
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1088,6 +1062,7 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
     """
     Test the toc for a course is rendered correctly when there is gated content
     """
+
     def setUp(self):
         """
         Set up the initial test data
@@ -1165,6 +1140,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
     Tests to verify that standard modifications to the output of XModule/XBlock
     student_view are taking place
     """
+
     def setUp(self):
         super(TestHtmlModifiers, self).setUp()
         self.course = CourseFactory.create()
@@ -1208,7 +1184,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"',
+                         result_fragment.content)
 
     def test_static_link_rewrite(self):
         module = render.get_module(
@@ -1312,7 +1289,7 @@ class XBlockWithJsonInitData(XBlock):
     """
     the_json_data = None
 
-    def student_view(self, context=None):       # pylint: disable=unused-argument
+    def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         A simple view that returns just enough to test.
         """
@@ -1340,13 +1317,13 @@ class JsonInitDataTest(ModuleStoreTestCase):
         mock_request.user = mock_user
         course = CourseFactory()
         descriptor = ItemFactory(category='withjson', parent=course)
-        field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)   # pylint: disable=no-member
+        field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)  # pylint: disable=no-member
         module = render.get_module_for_descriptor(
             mock_user,
             mock_request,
             descriptor,
             field_data_cache,
-            course.id,                          # pylint: disable=no-member
+            course.id,  # pylint: disable=no-member
             course=course
         )
         html = module.render(STUDENT_VIEW).content
@@ -1460,6 +1437,7 @@ class DetachedXBlock(XBlock):
     """
     XBlock marked with the 'detached' flag.
     """
+
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         A simple view that returns just enough to test.
@@ -1606,7 +1584,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             self.assertTrue(mock_grade_histogram.called)
 
 
-PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
+PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor,)
 
 # The "set" here is to work around the bug that load_classes returns duplicates for multiply-delcared classes.
 PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
@@ -1867,24 +1845,24 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @freeze_time(datetime.now().replace(tzinfo=pytz.UTC))
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
-    @patch.dict(settings.FEATURES, {'MARK_PROGRESS_ON_GRADING_EVENT': True})
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
-        self.set_module_grade_using_publish(self.grade_dict)
-        expected_signal_kwargs = {
-            'sender': None,
-            'raw_possible': self.grade_dict['max_value'],
-            'raw_earned': self.grade_dict['value'],
-            'weight': None,
-            'user_id': self.student_user.id,
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location),
-            'only_if_higher': None,
-            'modified': datetime.now().replace(tzinfo=pytz.UTC)
-        }
-        send_mock.assert_called_with(**expected_signal_kwargs)
+        with freeze_time(datetime.now().replace(tzinfo=pytz.UTC)):
+            self.set_module_grade_using_publish(self.grade_dict)
+            expected_signal_kwargs = {
+                'sender': None,
+                'raw_possible': self.grade_dict['max_value'],
+                'raw_earned': self.grade_dict['value'],
+                'weight': None,
+                'user_id': self.student_user.id,
+                'course_id': unicode(self.course.id),
+                'usage_id': unicode(self.problem.location),
+                'only_if_higher': None,
+                'modified': datetime.now().replace(tzinfo=pytz.UTC),
+                'score_db_table': 'csm',
+            }
+            send_mock.assert_called_with(**expected_signal_kwargs)
 
 
 @attr(shard=1)
@@ -1893,6 +1871,7 @@ class TestRebindModule(TestSubmittingProblems):
     Tests to verify the functionality of rebinding a module.
     Inherit from TestSubmittingProblems to get functionality that set up a course structure
     """
+
     def setUp(self):
         super(TestRebindModule, self).setUp()
         self.homework = self.add_graded_section_to_course('homework')
@@ -1944,8 +1923,8 @@ class TestRebindModule(TestSubmittingProblems):
         user2 = UserFactory()
         user2.id = 2
         with self.assertRaisesRegexp(
-            render.LmsModuleRenderError,
-            "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
+                render.LmsModuleRenderError,
+                "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
         ):
             self.assertTrue(module.system.rebind_noauth_module_to_user(module, user2))
 
@@ -2256,6 +2235,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """
     Tests that verify disabled XBlock types are not loaded.
     """
+
     # pylint: disable=no-member
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()

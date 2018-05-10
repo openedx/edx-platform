@@ -4,24 +4,22 @@ Run these tests @ Devstack:
 """
 # pylint: disable=missing-docstring,invalid-name,maybe-no-member,attribute-defined-outside-init
 from datetime import datetime
-from mock import patch, Mock
 
 from django.core.urlresolvers import reverse
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from mock import Mock, patch
+from opaque_keys.edx.locator import CourseLocator
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
-from opaque_keys.edx.locator import CourseLocator
+from courseware.tests.factories import GlobalStaffFactory, StaffFactory
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests import get_test_system
-
-from courseware.tests.factories import GlobalStaffFactory, StaffFactory
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
-
 
 TEST_SERVER_HOST = 'http://testserver'
 

@@ -33,7 +33,7 @@ _std_parameters_list = (
 
 
 @ddt.ddt
-@mock.patch(_target_module + ".get_course_cohort_settings")
+@mock.patch(_target_module + ".get_legacy_discussion_settings")
 @mock.patch(_target_module + ".get_course")
 class CommandTest(TestCase):
     """

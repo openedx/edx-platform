@@ -1,33 +1,30 @@
 """Interface for adding certificate generation tasks to the XQueue. """
 import json
-import random
 import logging
-import lxml.html
-from lxml.etree import XMLSyntaxError, ParserError
+import random
 from uuid import uuid4
 
-from django.test.client import RequestFactory
+import lxml.html
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
+from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-from xmodule.modulestore.django import modulestore
-from capa.xqueue_interface import XQueueInterface
-from capa.xqueue_interface import make_xheader, make_hashkey
-from course_modes.models import CourseMode
-from student.models import UserProfile, CourseEnrollment
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-
+from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
+from certificates.models import CertificateStatuses as status
 from certificates.models import (
     CertificateStatuses,
-    GeneratedCertificate,
-    certificate_status_for_student,
-    CertificateStatuses as status,
     CertificateWhitelist,
-    ExampleCertificate
+    ExampleCertificate,
+    GeneratedCertificate,
+    certificate_status_for_student
 )
-
+from course_modes.models import CourseMode
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from student.models import CourseEnrollment, UserProfile
+from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 
@@ -271,7 +268,7 @@ class XQueueCertInterface(object):
         self.request.session = {}
 
         is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        grade = CourseGradeFactory().create(student, course).summary
+        course_grade = CourseGradeFactory().create(student, course)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
@@ -295,8 +292,6 @@ class XQueueCertInterface(object):
         else:
             # honor code and audit students
             template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
-        if forced_grade:
-            grade['grade'] = forced_grade
 
         LOGGER.info(
             (
@@ -317,13 +312,13 @@ class XQueueCertInterface(object):
 
         cert.mode = cert_mode
         cert.user = student
-        cert.grade = grade['percent']
+        cert.grade = course_grade.percent
         cert.course_id = course_id
         cert.name = profile_name
         cert.download_url = ''
 
         # Strip HTML from grade range label
-        grade_contents = grade.get('grade', None)
+        grade_contents = forced_grade or course_grade.letter_grade
         try:
             grade_contents = lxml.html.fromstring(grade_contents).text_content()
             passing = True

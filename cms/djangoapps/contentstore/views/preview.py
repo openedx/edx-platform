@@ -7,20 +7,26 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string
 
+from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.xblock_utils import (
-    replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
+    replace_static_urls,
+    request_token,
+    wrap_fragment,
+    wrap_xblock,
+    wrap_xblock_aside,
+    xblock_local_resource_url
 )
-from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
+from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW, ModuleSystem
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.studio_editable import has_author_view
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -37,7 +43,7 @@ from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
-
+from contentstore.utils import get_visibility_partition_info
 from contentstore.views.access import get_user_role
 from xblock_config.models import StudioConfig
 
@@ -57,17 +63,8 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    if isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2)):
-        descriptor = modulestore().get_item(usage_key.usage_key)
-        for aside in descriptor.runtime.get_asides(descriptor):
-            if aside.scope_ids.block_type == usage_key.aside_type:
-                asides = [aside]
-                instance = aside
-                break
-    else:
-        descriptor = modulestore().get_item(usage_key)
-        instance = _load_preview_module(request, descriptor)
-        asides = []
+    descriptor = modulestore().get_item(usage_key)
+    instance = _load_preview_module(request, descriptor)
 
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
@@ -91,9 +88,6 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         log.exception("error processing ajax call")
         raise
 
-    # Update block only if it has asides
-    if asides:
-        modulestore().update_item(descriptor, request.user.id, asides=asides)
     return webob_to_django_response(resp)
 
 
@@ -104,9 +98,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
     is_author_mode = True
-
-    def __init__(self, **kwargs):
-        super(PreviewModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
@@ -157,7 +148,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return result
 
 
-def get_available_xblock_services(request=None, field_data=None):
+def get_available_xblock_services(request=None, field_data=None, course_id=None):
     """
     Returns a dict of available services for xBlocks
     """
@@ -167,6 +158,8 @@ def get_available_xblock_services(request=None, field_data=None):
         "settings": SettingsService(),
         "courseware_parent_info": CoursewareParentInfoService(),
     }
+    if course_id:
+        services['partitions'] = StudioPartitionService(course_id=course_id)
     if request:
         services['user'] = DjangoXBlockUserService(request.user)
     if field_data:
@@ -221,7 +214,7 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
 
-    services = get_available_xblock_services(request, field_data)
+    services = get_available_xblock_services(request, field_data, course_id)
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -248,6 +241,19 @@ def _preview_module_system(request, descriptor, field_data):
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services=services,
     )
+
+
+class StudioPartitionService(PartitionService):
+    """
+    A runtime mixin to allow the display and editing of component visibility based on user partitions.
+    """
+    def get_user_group_id_for_partition(self, user, user_partition_id):
+        """
+        Override this method to return None, as the split_test_module calls this
+        to determine which group a user should see, but is robust to getting a return
+        value of None meaning that all groups should be shown.
+        """
+        return None
 
 
 def _load_preview_module(request, descriptor):
@@ -297,6 +303,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
+        selected_groups_label = get_visibility_partition_info(xblock)['selected_groups_label']
+        if selected_groups_label:
+            selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
+        course = modulestore().get_course(xblock.location.course_key)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
@@ -306,8 +316,12 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_reorderable': is_reorderable,
             'can_edit': context.get('can_edit', True),
             'can_edit_visibility': context.get('can_edit_visibility', True),
+            'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),
+            'can_move': context.get('can_move', True),
+            'language': getattr(course, 'language', None)
         }
+
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
     return frag

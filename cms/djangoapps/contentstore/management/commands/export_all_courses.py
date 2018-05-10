@@ -2,9 +2,10 @@
 Script for exporting all courseware from Mongo to a directory and listing the courses which failed to export
 """
 from django.core.management.base import BaseCommand, CommandError
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.django import modulestore
+
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 
 
 class Command(BaseCommand):

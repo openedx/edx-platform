@@ -2,26 +2,28 @@
 # pylint: disable=missing-docstring
 import json
 from functools import partial
+
 import factory
 from factory.django import DjangoModelFactory
-
-# Imported to re-export
-from student.tests.factories import UserFactory  # Imported to re-export
-
-from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
-from courseware.models import StudentModule, XModuleUserStateSummaryField
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from student.roles import (
-    CourseInstructorRole,
-    CourseStaffRole,
-    CourseBetaTesterRole,
-    GlobalStaff,
-    OrgStaffRole,
-    OrgInstructorRole,
-)
-
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from courseware.models import (
+    StudentModule,
+    XModuleStudentInfoField,
+    XModuleStudentPrefsField,
+    XModuleUserStateSummaryField
+)
+from student.roles import (
+    CourseBetaTesterRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    OrgInstructorRole,
+    OrgStaffRole
+)
+from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
+# Imported to re-export
+from student.tests.factories import UserFactory  # Imported to re-export
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name

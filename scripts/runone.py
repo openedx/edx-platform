@@ -4,6 +4,7 @@ import argparse
 import os
 import sys
 
+
 # I want this:
 #   ERROR: test_update_and_fetch (edx-platform.cms.djangoapps.contentstore.tests.test_course_settings.CourseDetailsViewTest)
 # to become:
