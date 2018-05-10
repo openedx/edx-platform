@@ -658,7 +658,7 @@ class RegModelForm(BaseOnboardingModelForm):
         extended_profile = UserExtendedProfile.objects.create(user=user)
 
         if not is_currently_unemployed and organization_name:
-            organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            organization_to_assign, is_created = Organization.objects.get_or_create(label__iexact=organization_name)
             extended_profile.organization = organization_to_assign
 
             if organization_to_assign.users_count() == 0:
@@ -711,7 +711,7 @@ class UpdateRegModelForm(RegModelForm):
         extended_profile = UserExtendedProfile.objects.get(user=user)
 
         if not is_currently_unemployed and organization_name:
-            organization_to_assign, is_created = Organization.objects.get_or_create(label=organization_name)
+            organization_to_assign, is_created = Organization.objects.get_or_create(label__iexact=organization_name)
             prev_org = extended_profile.organization
             extended_profile.organization = organization_to_assign
 
