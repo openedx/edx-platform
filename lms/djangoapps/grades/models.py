@@ -153,31 +153,39 @@ class VisibleBlocks(models.Model):
         return BlockRecordList.from_json(self.blocks_json)
 
     @classmethod
-    def bulk_read(cls, course_key):
+    def bulk_read(cls, user_id, course_key):
         """
-        Reads and returns all visible block records for the given course from
-        the cache.  The cache is initialize with the visible blocks for this
-        course if no entry currently exists.has no entry for this course,
-        the cache is updated.
+        Reads and returns all visible block records for the given user and course from
+        the cache.  The cache is initialized with the visible blocks for this user and
+        course if no entry currently exists.
 
         Arguments:
             course_key: The course identifier for the desired records
         """
-        prefetched = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(course_key), None)
+        prefetched = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(user_id, course_key), None)
         if prefetched is None:
-            prefetched = cls._initialize_cache(course_key)
+            prefetched = cls._initialize_cache(user_id, course_key)
         return prefetched
 
     @classmethod
-    def cached_get_or_create(cls, blocks):
-        prefetched = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(blocks.course_key))
+    def cached_get_or_create(cls, user_id, blocks):
+        """
+        Given a ``user_id`` and a ``BlockRecordList`` object, attempts to
+        fetch the related VisibleBlocks model from the request cache.  This
+        will create and save a new ``VisibleBlocks`` record if no record
+        exists corresponding to the hash_value of ``blocks``.
+        """
+        prefetched = get_cache(cls._CACHE_NAMESPACE).get(cls._cache_key(user_id, blocks.course_key))
         if prefetched is not None:
             model = prefetched.get(blocks.hash_value)
             if not model:
-                model = cls.objects.create(
+                # We still have to do a get_or_create, because
+                # another user may have had this block hash created,
+                # even if the user we checked the cache for hasn't yet.
+                model, _ = cls.objects.get_or_create(
                     hashed=blocks.hash_value, blocks_json=blocks.json_value, course_id=blocks.course_key,
                 )
-                cls._update_cache(blocks.course_key, [model])
+                cls._update_cache(user_id, blocks.course_key, [model])
         else:
             model, _ = cls.objects.get_or_create(
                 hashed=blocks.hash_value,
@@ -186,7 +194,7 @@ class VisibleBlocks(models.Model):
         return model
 
     @classmethod
-    def bulk_create(cls, course_key, block_record_lists):
+    def bulk_create(cls, user_id, course_key, block_record_lists):
         """
         Bulk creates VisibleBlocks for the given iterator of
         BlockRecordList objects and updates the VisibleBlocks cache
@@ -201,44 +209,48 @@ class VisibleBlocks(models.Model):
             )
             for brl in block_record_lists
         ])
-        cls._update_cache(course_key, created)
+        cls._update_cache(user_id, course_key, created)
         return created
 
     @classmethod
-    def bulk_get_or_create(cls, block_record_lists, course_key):
+    def bulk_get_or_create(cls, user_id, course_key, block_record_lists):
         """
         Bulk creates VisibleBlocks for the given iterator of
-        BlockRecordList objects for the given course_key, but
+        BlockRecordList objects for the given user and course_key, but
         only for those that aren't already created.
         """
-        existent_records = cls.bulk_read(course_key)
-        non_existent_brls = {brl for brl in block_record_lists if brl.hash_value not in existent_records}
-        cls.bulk_create(course_key, non_existent_brls)
+        cached_records = cls.bulk_read(user_id, course_key)
+        non_existent_brls = {brl.hash_value for brl in block_record_lists if brl.hash_value not in cached_records}
+        cls.bulk_create(user_id, course_key, non_existent_brls)
 
     @classmethod
-    def _initialize_cache(cls, course_key):
+    def _initialize_cache(cls, user_id, course_key):
         """
-        Prefetches visible blocks for the given course and stores in the cache.
+        Prefetches visible blocks for the given user and course and stores in the cache.
         Returns a dictionary mapping hashes of these block records to the
         block record objects.
         """
-        prefetched = {record.hashed: record for record in cls.objects.filter(course_id=course_key)}
-        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_key)] = prefetched
+        grades_with_blocks = PersistentSubsectionGrade.objects.select_related('visible_blocks').filter(
+            user_id=user_id,
+            course_id=course_key,
+        )
+        prefetched = {grade.visible_blocks.hashed: grade.visible_blocks for grade in grades_with_blocks}
+        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(user_id, course_key)] = prefetched
         return prefetched
 
     @classmethod
-    def _update_cache(cls, course_key, visible_blocks):
+    def _update_cache(cls, user_id, course_key, visible_blocks):
         """
         Adds a specific set of visible blocks to the request cache.
         This assumes that prefetch has already been called.
         """
-        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_key)].update(
+        get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(user_id, course_key)].update(
             {visible_block.hashed: visible_block for visible_block in visible_blocks}
         )
 
     @classmethod
-    def _cache_key(cls, course_key):
-        return u"visible_blocks_cache.{}".format(course_key)
+    def _cache_key(cls, user_id, course_key):
+        return u"visible_blocks_cache.{}.{}".format(course_key, user_id)
 
 
 class PersistentSubsectionGrade(TimeStampedModel):
@@ -362,10 +374,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Wrapper for objects.update_or_create.
         """
         cls._prepare_params(params)
-        VisibleBlocks.cached_get_or_create(params['visible_blocks'])
+        VisibleBlocks.cached_get_or_create(params['user_id'], params['visible_blocks'])
         cls._prepare_params_visible_blocks_id(params)
         cls._prepare_params_override(params)
 
+        # TODO: do we NEED to pop these?
         first_attempted = params.pop('first_attempted')
         user_id = params.pop('user_id')
         usage_key = params.pop('usage_key')
@@ -394,7 +407,9 @@ class PersistentSubsectionGrade(TimeStampedModel):
         PersistentSubsectionGradeOverride.prefetch(user_id, course_key)
 
         map(cls._prepare_params, grade_params_iter)
-        VisibleBlocks.bulk_get_or_create([params['visible_blocks'] for params in grade_params_iter], course_key)
+        VisibleBlocks.bulk_get_or_create(
+            user_id, course_key, [params['visible_blocks'] for params in grade_params_iter]
+        )
         map(cls._prepare_params_visible_blocks_id, grade_params_iter)
         map(cls._prepare_params_override, grade_params_iter)
 
@@ -619,4 +634,4 @@ class PersistentSubsectionGradeOverride(models.Model):
 
 def prefetch(user, course_key):
     PersistentSubsectionGradeOverride.prefetch(user.id, course_key)
-    VisibleBlocks.bulk_read(course_key)
+    VisibleBlocks.bulk_read(user.id, course_key)

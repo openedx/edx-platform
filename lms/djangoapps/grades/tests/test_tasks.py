@@ -485,22 +485,39 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
         self.user = UserFactory.create()
         self.set_up_course()
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.original_max_visible_blocks_allowed = tasks.MAX_VISIBLE_BLOCKS_ALLOWED
-        tasks.MAX_VISIBLE_BLOCKS_ALLOWED = 1
 
-    def tearDown(self):
-        super(RecalculateGradesForUserTest, self).tearDown()
-        tasks.MAX_VISIBLE_BLOCKS_ALLOWED = self.original_max_visible_blocks_allowed
-
-    def test_do_not_recalculate_complex_courses(self):
+    def test_recalculation_happy_path(self):
         with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+            factory = mock_factory.return_value
+            factory.read.return_value = MagicMock(attempted=True)
+
             kwargs = {
                 'user_id': self.user.id,
                 'course_key': six.text_type(self.course.id),
             }
-            with self.assertRaisesRegexp(Exception, 'too many VisibleBlocks'):
-                task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
-                task_result.get()
 
-            update = mock_factory.return_value.update
-            self.assertFalse(update.called)
+            task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
+            task_result.get()
+
+            factory.read.assert_called_once_with(self.user, course_key=self.course.id)
+            factory.update.assert_called_once_with(
+                user=self.user,
+                course_key=self.course.id,
+                force_update_subsections=True,
+            )
+
+    def test_recalculation_doesnt_happen_if_not_previously_attempted(self):
+        with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+            factory = mock_factory.return_value
+            factory.read.return_value = MagicMock(attempted=False)
+
+            kwargs = {
+                'user_id': self.user.id,
+                'course_key': six.text_type(self.course.id),
+            }
+
+            task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
+            task_result.get()
+
+            factory.read.assert_called_once_with(self.user, course_key=self.course.id)
+            self.assertFalse(factory.update.called)
