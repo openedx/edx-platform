@@ -2,7 +2,7 @@
 
 # When updating a hash of an XBlock that uses xblock-utils, please update its version hash in github.txt.
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@8837eb5d91fed05ec4758dfd9b9e7adc5c906210#egg=xblock-mentoring
--e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.0.0#egg=xblock-image-explorer==1.0.0
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.0.1#egg=xblock-image-explorer==1.0.1
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@9e017517060ad1c8e6935c24962de1d233a9d3a4#egg=xblock-drag-and-drop-v2
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
@@ -19,7 +19,7 @@
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@e1495e855a27514971ca08d87d1a7a2735cd3e31#egg=xblock-eoc-journal
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.11#egg=xblock-scorm==2.0.11
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.3#egg=xblock-diagnostic-feedback==0.2.3
--e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.6#egg=xblock-group-project-v2==0.4.6
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.7#egg=xblock-group-project-v2==0.4.7
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
 git+https://github.com/edx-solutions/api-integration.git@ziafazal/ginkgo-fixes
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@ziafazal/ginkgo-fixes
