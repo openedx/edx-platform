@@ -44,19 +44,16 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '-u', '--username',
-            nargs=1,
             required=False,
             help='Username'
         )
         parser.add_argument(
             '-e', '--email',
-            nargs=1,
             required=False,
             help='Email'
         )
         parser.add_argument(
             '-c', '--course',
-            nargs=1,
             required=False,
             help='Course UUID'
         )
@@ -72,6 +69,7 @@ class Command(BaseCommand):
 
         user, __ = User.objects.get_or_create(
             username=username,
+            email=email
         )
         user_info = {
             'email': email,
