@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from mock import MagicMock, patch
 
+from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
@@ -40,6 +41,9 @@ from .utils import mock_get_score
 
 
 class MockGradesService(GradesService):
+    """
+    A mock grades service.
+    """
     def __init__(self, mocked_return_value=None):
         super(MockGradesService, self).__init__()
         self.mocked_return_value = mocked_return_value
@@ -56,7 +60,6 @@ class HasCourseWithProblemsMixin(object):
         """
         Configures the course for this test.
         """
-        # pylint: disable=attribute-defined-outside-init,no-member
         self.course = CourseFactory.create(
             org='edx',
             name='course',
@@ -234,7 +237,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         # So in total, 3 sequential parents, with one inaccessible.
         for sequential in (accessible_seq, inaccessible_seq):
             sequential.children = [self.problem.location]
-            modulestore().update_item(sequential, self.user.id)  # pylint: disable=no-member
+            modulestore().update_item(sequential, self.user.id)
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
@@ -471,3 +474,33 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
             self.assertEqual(batch_size, test_batch_size)
             self.assertEqual(offset, offset_expected)
             offset_expected += test_batch_size
+
+
+class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
+    """
+    Test recalculate_course_and_subsection_grades_for_user task.
+    """
+    def setUp(self):
+        super(RecalculateGradesForUserTest, self).setUp()
+        self.user = UserFactory.create()
+        self.set_up_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.original_max_visible_blocks_allowed = tasks.MAX_VISIBLE_BLOCKS_ALLOWED
+        tasks.MAX_VISIBLE_BLOCKS_ALLOWED = 1
+
+    def tearDown(self):
+        super(RecalculateGradesForUserTest, self).tearDown()
+        tasks.MAX_VISIBLE_BLOCKS_ALLOWED = self.original_max_visible_blocks_allowed
+
+    def test_do_not_recalculate_complex_courses(self):
+        with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+            kwargs = {
+                'user_id': self.user.id,
+                'course_key': six.text_type(self.course.id),
+            }
+            with self.assertRaisesRegexp(Exception, 'too many VisibleBlocks'):
+                task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
+                task_result.get()
+
+            update = mock_factory.return_value.update
+            self.assertFalse(update.called)
