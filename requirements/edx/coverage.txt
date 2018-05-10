@@ -7,7 +7,7 @@
 
 coverage==4.2
 diff-cover==0.9.8
-inflect==0.2.5            # via jinja2-pluralize
+inflect==0.3.1            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10              # via diff-cover, jinja2-pluralize
 markupsafe==1.0           # via jinja2
