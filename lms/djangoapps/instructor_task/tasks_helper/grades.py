@@ -578,6 +578,7 @@ class ProblemResponses(object):
         # Perform the upload
         problem_location = re.sub(r'[:/]', '_', problem_location)
         csv_name = 'student_state_from_{}'.format(problem_location)
-        upload_csv_to_report_store(rows, csv_name, course_id, start_date)
+        report_name = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
+        current_step = {'step': 'CSV uploaded', 'report_name': report_name}
 
         return task_progress.update_task_state(extra_meta=current_step)

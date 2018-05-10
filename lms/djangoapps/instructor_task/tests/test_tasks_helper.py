@@ -486,6 +486,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         self.assertEquals(len(links), 1)
         self.assertDictContainsSubset({'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
+        self.assertIn("report_name", result)
 
 
 @ddt.ddt
