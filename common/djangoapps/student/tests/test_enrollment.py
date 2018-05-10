@@ -12,7 +12,13 @@ from nose.plugins.attrib import attr
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, CourseFullError, EnrollmentClosedError
+from student.models import (
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    CourseFullError,
+    EnrollmentClosedError,
+    SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
+)
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -340,3 +346,34 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # Still same
         cea.refresh_from_db()
         self.assertEqual(cea.user, user1)
+
+    def test_score_recalculation_on_enrollment_update(self):
+        """
+        Test that an update in enrollment cause score recalculation.
+        Note:
+        Score recalculation task must be called with a delay of SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE
+        """
+        course_modes = ['verified', 'audit']
+
+        for mode_slug in course_modes:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+            )
+        CourseEnrollment.enroll(self.user, self.course.id, mode="audit")
+
+        local_task_args = dict(
+            user_id=self.user.id,
+            course_key=str(self.course.id)
+        )
+
+        with patch(
+            'lms.djangoapps.grades.tasks.recalculate_course_and_subsection_grades_for_user.apply_async',
+            return_value=None
+        ) as mock_task_apply:
+            CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
+            mock_task_apply.assert_called_once_with(
+                countdown=SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
+                kwargs=local_task_args
+            )
