@@ -215,6 +215,19 @@ def is_username_retired(username):
     return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
 
 
+def is_email_retired(email):
+    """
+    Checks to see if the given email has been previously retired
+    """
+    locally_hashed_emails = user_util.get_all_retired_emails(
+        email,
+        settings.RETIRED_USER_SALTS,
+        settings.RETIRED_EMAIL_FMT
+    )
+
+    return User.objects.filter(email__in=list(locally_hashed_emails)).exists()
+
+
 def get_retired_username_by_username(username):
     """
     If a UserRetirementStatus object with an original_username matching the given username exists,

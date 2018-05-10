@@ -11,7 +11,10 @@ from student.helpers import (
     AccountValidationError,
     USERNAME_EXISTS_MSG_FMT
 )
-from student.models import is_username_retired
+from student.models import (
+    is_email_retired,
+    is_username_retired,
+)
 
 
 def update_last_login(sender, user, **kwargs):  # pylint: disable=unused-argument
@@ -45,4 +48,11 @@ def on_user_updated(sender, instance, **kwargs):  # pylint: disable=unused-argum
             raise AccountValidationError(
                 USERNAME_EXISTS_MSG_FMT.format(username=instance.username),
                 field="username"
+            )
+
+        # Check for a retired email.
+        if is_email_retired(instance.email):
+            raise AccountValidationError(
+                EMAIL_EXISTS_MSG_FMT.format(username=instance.email),
+                field="email"
             )

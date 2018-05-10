@@ -16,7 +16,6 @@ import StringIO
 import time
 
 import unicodecsv
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
@@ -106,7 +105,8 @@ from student.models import (
     UserProfile,
     anonymous_id_for_user,
     get_user_by_username_or_email,
-    unique_id_for_user
+    unique_id_for_user,
+    is_email_retired
 )
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -377,7 +377,6 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                 row_errors.append({
                     'username': username, 'email': email, 'response': _('Invalid email {email_address}.').format(email_address=email)})
             else:
-                UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
                 if User.objects.filter(email=email).exists():
                     # Email address already exists. assume it is the correct user
                     # and just register the user in the course and send an enrollment email.
@@ -414,20 +413,16 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                             state_transition=UNENROLLED_TO_ENROLLED,
                         )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
-                elif (UserRetirementStatus.objects
-                                          .select_related('current_state')
-                                          .filter(original_email=email)
-                                          .exclude(current_state__state_name='COMPLETE')
-                                          .exists()):
-                        # Somebody is attempting to enroll a user who has initiated retirement but still exists in
-                        # general.  Simply block these attempts.
-                        general_errors.append({
-                            'username': '',
-                            'email': '',
-                            'response': _('Invalid email {email_address}.').format(email_address=email),
-                        })
-                        log.warning(u'Email address %s is associated with a user which has initiated account retirement, ' +
-                                    u'so course enrollment was blocked.', email)
+                elif is_email_retired(email):
+                    # We are either attempting to enroll a retired user or create a new user with an email which is
+                    # already associated with a retired account.  Simply block these attempts.
+                    row_errors.append({
+                        'username': username,
+                        'email': email,
+                        'response': _('Invalid email {email_address}.').format(email_address=email),
+                    })
+                    log.warning(u'Email address %s is associated with a retired user, so course enrollment was ' +
+                                u'blocked.', email)
                 else:
                     # This email does not yet exist, so we need to create a new account
                     # If username already exists in the database, then create_and_enroll_user

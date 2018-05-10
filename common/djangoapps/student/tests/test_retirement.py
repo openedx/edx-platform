@@ -17,7 +17,8 @@ from student.models import (
     get_potentially_retired_user_by_username_and_hash,
     get_retired_email_by_email,
     get_retired_username_by_username,
-    is_username_retired
+    is_username_retired,
+    is_email_retired
 )
 from student.tests.factories import UserFactory
 
@@ -130,6 +131,29 @@ def test_is_username_retired_not_retired():
     """
     user = UserFactory()
     assert not is_username_retired(user.username)
+
+
+def test_is_email_retired_is_retired():
+    """
+    Check functionality of is_email_retired when email is retired
+    """
+    user = UserFactory()
+    original_email = user.email
+    retired_email = get_retired_email_by_email(user.email)
+
+    # Fake email retirement.
+    user.email = retired_email
+    user.save()
+
+    assert is_email_retired(original_email)
+
+
+def test_is_email_retired_not_retired():
+    """
+    Check functionality of is_email_retired when email is not retired
+    """
+    user = UserFactory()
+    assert not is_email_retired(user.email)
 
 
 def test_get_retired_email():

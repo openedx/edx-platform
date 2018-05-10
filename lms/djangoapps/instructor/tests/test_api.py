@@ -86,7 +86,9 @@ from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
-    NonExistentCourseError
+    NonExistentCourseError,
+    get_retired_email_by_email,
+    get_retired_username_by_username
 )
 from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
 from student.tests.factories import AdminFactory, UserFactory
@@ -842,6 +844,28 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertTrue(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
 
+    def test_user_with_retired_email_in_csv(self):
+
+        # prep a retired user
+        user = UserFactory.create(username='old_test_student', email='test_student@example.com')
+        user.email = get_retired_email_by_email(user.email)
+        user.username = get_retired_username_by_username(user.username)
+        user.is_active = False
+        user.save()
+
+        csv_content = "test_student@example.com,test_student,tester,USA" \
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['row_errors']), 0)
+        self.assertEquals(
+            data['row_errors'][0]['response'],
+            'Invalid email {email}.'.format(email='test_student@example.com')
+        )
+        self.assertFalse(User.objects.filter(email='test_student@example.com').exists())
+
     def test_user_with_already_existing_username_in_csv(self):
         """
         If the username already exists (but not the email),
@@ -907,8 +931,16 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
     def test_users_created_and_enrolled_successfully_if_others_fail(self):
 
+        # prep a retired user
+        user = UserFactory.create(username='old_test_student_4', email='test_student4@example.com')
+        user.email = get_retired_email_by_email(user.email)
+        user.username = get_retired_username_by_username(user.username)
+        user.is_active = False
+        user.save()
+
         csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
                       "test_student3@example.com,test_student_1,tester3,CA\n" \
+                      "test_student4@example.com,test_student_4,tester4,USA\n" \
                       "test_student2@example.com,test_student_2,tester2,USA"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
@@ -916,10 +948,18 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(data['row_errors'][0]['response'], 'Username {user} already exists.'.format(user='test_student_1'))
+        self.assertEquals(
+            data['row_errors'][0]['response'],
+            'Username {user} already exists.'.format(user='test_student_1')
+        )
+        self.assertEquals(
+            data['row_errors'][1]['response'],
+            'Invalid email {email}.'.format(email='test_student4@example.com')
+        )
         self.assertTrue(User.objects.filter(username='test_student_1', email='test_student1@example.com').exists())
         self.assertTrue(User.objects.filter(username='test_student_2', email='test_student2@example.com').exists())
         self.assertFalse(User.objects.filter(email='test_student3@example.com').exists())
+        self.assertFalse(User.objects.filter(email='test_student4@example.com').exists())
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 2)

@@ -6,7 +6,6 @@ import re
 import string
 from urlparse import urlparse
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -16,6 +15,7 @@ from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
+from student.models import is_email_retired
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -197,25 +197,6 @@ def generate_password(length=12, chars=string.letters + string.digits):
 
 def email_exists(email):
     """
-    Check an email against the User and UserRetirementStatus models for
-    existence.
+    Check an email against the User model for existence.
     """
-    exists = False
-    # Normal case, check users in the auth_user table.
-    if User.objects.filter(email=email).exists():
-        exists = True
-    else:
-        # Handle case where another user with the same email address has
-        # initiated retirement (account deletion), but they are still in
-        # the retirement queue in any state which is not COMPLETE.
-        UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
-        try:
-            if (UserRetirementStatus.objects
-                                    .select_related('current_state')
-                                    .filter(original_email=email)
-                                    .exclude(current_state__state_name='COMPLETE')
-                                    .exists()):
-                exists = True
-        except UserRetirementStatus.DoesNotExist:
-            pass
-    return exists
+    return User.objects.filter(email=email).exists() or is_email_retired(email)
