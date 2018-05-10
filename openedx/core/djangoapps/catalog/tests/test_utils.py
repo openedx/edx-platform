@@ -1,6 +1,7 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 import copy
+from datetime import timedelta
 
 import ddt
 import mock
@@ -8,8 +9,13 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
-from student.tests.factories import UserFactory
+from django.utils.timezone import now
+from opaque_keys.edx.keys import CourseKey
 
+from course_modes.helpers import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from entitlements.tests.factories import CourseEntitlementFactory
+from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -27,10 +33,12 @@ from openedx.core.djangoapps.catalog.utils import (
     get_localized_price_text,
     get_program_types,
     get_programs,
-    get_programs_with_type
+    get_visible_sessions_for_entitlement
 )
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
@@ -314,6 +322,60 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         data = get_course_runs_for_course(course_uuid=str(catalog_course['uuid']))
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, catalog_course_runs)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
+    """
+    Test Covering data related Entitlements.
+    """
+    def setUp(self):
+        super(TestSessionEntitlement, self).setUp()
+
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+        self.tomorrow = now() + timedelta(days=1)
+
+    def test_get_visible_sessions_for_entitlement(self, mock_get_edx_api_data):
+        """
+        Test retrieval of visible session entitlements.
+        """
+        catalog_course_runs = CourseRunFactory.create()
+        catalog_course = CourseFactory(course_runs=[catalog_course_runs])
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_runs.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        course_enrollment = CourseEnrollmentFactory(
+            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+        )
+        entitlement = CourseEntitlementFactory(
+            user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [catalog_course_runs])
+
+    def test_unpublished_sessions_for_entitlement(self, mock_get_edx_api_data):
+        """
+        Test unpublished course runs are not part of visible session entitlements.
+        """
+        catalog_course_runs = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
+        catalog_course = CourseFactory(course_runs=[catalog_course_runs])
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_runs.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        course_enrollment = CourseEnrollmentFactory(
+            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+        )
+        entitlement = CourseEntitlementFactory(
+            user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [])
 
 
 @skip_unless_lms
