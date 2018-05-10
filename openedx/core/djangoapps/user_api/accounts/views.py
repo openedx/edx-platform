@@ -342,7 +342,12 @@ class AccountRetireMailingsView(APIView):
 
                 # This signal allows lms' email_marketing and other 3rd party email
                 # providers to unsubscribe the user as well
-                USER_RETIRE_MAILINGS.send(sender=self.__class__, user=retirement.user)
+                USER_RETIRE_MAILINGS.send(
+                    sender=self.__class__,
+                    email=retirement.original_email,
+                    new_email=retirement.retired_email,
+                    user=retirement.user
+                )
 
             return Response(status=status.HTTP_204_NO_CONTENT)
         except UserRetirementStatus.DoesNotExist:

@@ -273,31 +273,46 @@ def force_unsubscribe_all(sender, **kwargs):  # pylint: disable=unused-argument
     of success or failure.
 
     Args:
-        user(User): Django model of type returned from get_user_model()
+        email: Email address to unsubscribe
+        new_email (optional): Email address to change 3rd party services to for this user (used in retirement to clear
+                              personal information from the service)
     Returns:
         None
     """
-    user = kwargs.get('user', None)
+    email = kwargs.get('email', None)
+    new_email = kwargs.get('new_email', None)
 
-    if not user:
-        raise TypeError('Expected a User type, but received None.')
+    if not email:
+        raise TypeError('Expected an email address to unsubscribe, but received None.')
 
     email_config = EmailMarketingConfiguration.current()
     if not email_config.enabled:
         return
 
-    sailthru_parms = {"id": user.email, "keys": {"optout_email": "all"}}
+    sailthru_parms = {
+        "id": email,
+        "optout_email": "all",
+        "fields": {"optout_email": 1}
+    }
+
+    # If we have a new email address to change to, do that as well
+    if new_email:
+        sailthru_parms["keys"] = {
+            "email": new_email
+        }
+        sailthru_parms["fields"]["keys"] = 1
+        sailthru_parms["keysconflict"] = "merge"
 
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
         sailthru_response = sailthru_client.api_post("user", sailthru_parms)
     except SailthruClientError as exc:
-        error_msg = "Exception attempting to opt-out user %s from Sailthru - %s" % (user.email, text_type(exc))
+        error_msg = "Exception attempting to opt-out user {} from Sailthru - {}".format(email, text_type(exc))
         log.error(error_msg)
         raise Exception(error_msg)
 
     if not sailthru_response.is_ok():
         error = sailthru_response.get_error()
-        error_msg = "Error attempting to opt-out user %s from Sailthru - %s" % (user.email, error.get_message())
+        error_msg = "Error attempting to opt-out user {} from Sailthru - {}".format(email, error.get_message())
         log.error(error_msg)
         raise Exception(error_msg)
