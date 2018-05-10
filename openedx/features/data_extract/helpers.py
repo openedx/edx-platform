@@ -126,7 +126,7 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
             'done': module.done,
             'created': module.created.__str__(),
             'modified': module.modified.__str__(),
-        } for module in StudentModule.objects.filter(student_id=profile.user.id)],
+        } for module in StudentModule.objects.filter(student_id=profile.user.id, course_id=course_key)],
 
         'persistent_course_grades': [{
             'created': course_grade.created.__str__(),
@@ -138,7 +138,7 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
             'percent_grade': course_grade.percent_grade,
             'letter_grade': course_grade.letter_grade,
             'passed_timestamp': course_grade.passed_timestamp.__str__(),
-        } for course_grade in PersistentCourseGrade.objects.filter(user_id=profile.user.id)],
+        } for course_grade in PersistentCourseGrade.objects.filter(user_id=profile.user.id, course_id=course_key)],
 
         'persistent_subsection_grades': [{
             'created': subsection_grade.created.__str__(),
@@ -153,7 +153,10 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
             'possible_graded': subsection_grade.possible_graded,
             'visible_blocks': subsection_grade.visible_blocks.blocks_json,
             'first_attempted': subsection_grade.first_attempted.__str__(),
-        } for subsection_grade in PersistentSubsectionGrade.objects.filter(user_id=profile.user.id)],
+        } for subsection_grade in PersistentSubsectionGrade.objects.filter(
+            user_id=profile.user.id,
+            course_id=course_key
+        )],
 
         'generated_certificates': [{
             'course_id': certificate.course_id.to_deprecated_string(),
@@ -169,14 +172,17 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
             'created_date': certificate.created_date.__str__(),
             'modified_date': certificate.modified_date.__str__(),
             'error_reason': certificate.error_reason,
-        } for certificate in GeneratedCertificate.objects.filter(user_id=profile.user.id)],
+        } for certificate in GeneratedCertificate.objects.filter(user_id=profile.user.id, course_id=course_key)],
 
         'course_submission_data': {
             'student_items': [{
                 'course_id': item.course_id,
                 'item_id': item.item_id,
                 'item_type': item.item_type,
-            } for item in StudentItem.objects.filter(student_id=anonymous_user_id)],
+            } for item in StudentItem.objects.filter(
+                student_id=anonymous_user_id,
+                course_id=course_key.to_deprecated_string()
+            )],
 
             'submissions': [{
                 'uuid': submission.uuid,
@@ -188,7 +194,8 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
                 'student_item_id': submission.student_item_id,
                 'status': submission.status,
             } for submission in Submission.objects.filter(
-                student_item__student_id=anonymous_user_id
+                student_item__student_id=anonymous_user_id,
+                student_item__course_id=course_key.to_deprecated_string()
             )],
 
             'student_scores': [{
@@ -198,6 +205,9 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
                 'reset': score.reset,
                 'student_item_id': score.student_item_id,
                 'submission_id': score.submission_id,
-            } for score in Score.objects.filter(student_item__student_id=anonymous_user_id)],
+            } for score in Score.objects.filter(
+                student_item__student_id=anonymous_user_id,
+                student_item__course_id=course_key.to_deprecated_string()
+            )],
         }
     }
