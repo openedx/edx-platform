@@ -42,6 +42,7 @@ var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
 var webpackConfig = require(path.join(appRoot, 'webpack.config.js'));
+var commonsChunkPluginIndex;
 
 delete webpackConfig.entry;
 
@@ -54,7 +55,9 @@ delete webpackConfig.entry;
 //     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
 //
 // This should be fixed in v3 of karma-webpack
-const commonsChunkPluginIndex = webpackConfig.plugins.findIndex(plugin => plugin.chunkNames);
+commonsChunkPluginIndex = webpackConfig.plugins.findIndex(function(plugin) {
+    return plugin.chunkNames;
+});
 webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
 
 // Files which are needed by all lms/cms suites.
