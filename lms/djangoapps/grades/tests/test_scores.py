@@ -61,10 +61,7 @@ class TestScoredBlockTypes(TestCase):
     }
 
     def test_block_types_possibly_scored(self):
-        self.assertSetEqual(
-            self.possibly_scored_block_types,
-            scores._block_types_possibly_scored()
-        )
+        self.assertTrue(self.possibly_scored_block_types.issubset(scores._block_types_possibly_scored()))
 
     def test_possibly_scored(self):
         course_key = CourseLocator(u'org', u'course', u'run')

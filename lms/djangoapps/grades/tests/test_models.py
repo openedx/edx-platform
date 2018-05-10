@@ -132,11 +132,16 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     shard = 4
 
-    def _create_block_record_list(self, blocks):
+    def setUp(self):
+        super(VisibleBlocksTest, self).setUp()
+        self.user_id = 12345
+
+    def _create_block_record_list(self, blocks, user_id=None):
         """
         Creates and returns a BlockRecordList for the given blocks.
         """
-        return VisibleBlocks.cached_get_or_create(BlockRecordList.from_list(blocks, self.course_key))
+        block_record_list = BlockRecordList.from_list(blocks, self.course_key)
+        return VisibleBlocks.cached_get_or_create(user_id or self.user_id, block_record_list)
 
     def test_creation(self):
         """
