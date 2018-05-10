@@ -120,7 +120,7 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
     default_retry_delay=RETRY_DELAY_SECONDS,
-    routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY
+    routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
 )
 def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint: disable=unused-argument
     """
@@ -130,9 +130,9 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     user_id = kwargs.get('user_id')
     course_key_str = kwargs.get('course_key')
 
-    if not user_id or course_key_str:
+    if not (user_id or course_key_str):
         message = 'recalculate_course_and_subsection_grades_for_user missing "user" or "course_key" kwargs from {}'
-        log.error(message.format(kwargs))
+        raise Exception(message.format(kwargs))
 
     user = User.objects.get(id=user_id)
     course_key = CourseKey.from_string(course_key_str)
