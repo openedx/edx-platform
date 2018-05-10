@@ -27,6 +27,7 @@ from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
+from .models import VisibleBlocks
 from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
@@ -40,6 +41,7 @@ KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on r
     ValidationError,
     DatabaseNotReadyError,
 )
+MAX_VISIBLE_BLOCKS_ALLOWED = 50000
 RECALCULATE_GRADE_DELAY_SECONDS = 2  # to prevent excessive _has_db_updated failures. See TNL-6424.
 RETRY_DELAY_SECONDS = 30
 SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
@@ -136,6 +138,13 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
 
     user = User.objects.get(id=user_id)
     course_key = CourseKey.from_string(course_key_str)
+
+    # Hotfix to address LEARNER-5123, to be removed later
+    visible_blocks_count = VisibleBlocks.objects.filter(course_id=course_key)
+    if visible_blocks_count > MAX_VISIBLE_BLOCKS_ALLOWED:
+        message = '{} has too many VisibleBlocks to recalculate grades for {}'
+        raise Exception(message.format(course_key_str, user_id))
+
     previous_course_grade = CourseGradeFactory().read(user, course_key=course_key)
     if previous_course_grade and previous_course_grade.attempted:
         CourseGradeFactory().update(
