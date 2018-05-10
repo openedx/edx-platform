@@ -99,9 +99,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
 
     # Original rate Limit before rate limit increases.
     if USE_UNIVERSAL_RATE_LIMIT_FOR_ENROLLMENT_API.is_enabled():
-        THROTTLE_RATES = {
-            'user': '40/minute',
-        }
+        rate = '40/minute'
 
     def allow_request(self, request, view):
         # Use a special scope for staff to allow for a separate throttle rate
