@@ -7,15 +7,12 @@
 {% trans "If you did not request this change, you can ignore this email." %}
 {% else %}
 {% trans "Please go to the following page and choose a new password:" %}
-{% block reset_link %}
-{{ protocol }}://{{ site_name }}{% url 'password_reset_confirm' uidb36=uid token=token %}
-{% endblock %}
+
+{{ reset_link }}
 
 {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." %}
 
 {% trans "Thanks for using our site!" %}
 {% endif %}
-
 {% blocktrans %}The {{ platform_name }} Team{% endblocktrans %}
-
 {% endautoescape %}

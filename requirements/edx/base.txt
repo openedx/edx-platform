@@ -109,7 +109,7 @@ dm.xmlsec.binding==1.3.3  # via python-saml
 docopt==0.6.2
 docutils==0.14            # via botocore
 dogapi==1.2.1
-edx-ace==0.1.6
+edx-ace==0.1.7
 edx-analytics-data-api-client==0.14.4
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7

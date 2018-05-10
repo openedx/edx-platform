@@ -19,7 +19,7 @@ class AceCommonConfig(AppConfig):
             ProjectType.LMS: {
                 SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
             }
         }
     }

@@ -64,7 +64,7 @@ django-waffle==0.12.0
 django-webpack-loader==0.4.1
 djangorestframework-jwt
 dogapi==1.2.1                       # Python bindings to Datadog's API, for metrics gathering
-edx-ace==0.1.6
+edx-ace==0.1.7
 edx-analytics-data-api-client
 edx-ccx-keys
 edx-celeryutils
