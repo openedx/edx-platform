@@ -164,6 +164,19 @@ class AuthEntryError(AuthException):
     """
 
 
+class NotActivatedException(AuthException):
+    """ Raised when a user tries to login to an unverified account """
+    def __init__(self, backend, email):
+        self.email = email
+        super(NotActivatedException, self).__init__(backend, email)
+
+    def __str__(self):
+        return (
+            _('This account has not yet been activated. An activation email has been re-sent to {email_address}.')
+            .format(email_address=self.email)
+        )
+
+
 class ProviderUserState(object):
     """Object representing the provider state (attached or not) for a user.
 
@@ -697,7 +710,9 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
 
     This association is done ONLY if the user entered the pipeline through a LOGIN API.
     """
-    if auth_entry == AUTH_ENTRY_LOGIN_API:
+    custom_auth_entry = AUTH_ENTRY_CUSTOM.get(auth_entry)
+
+    if auth_entry == AUTH_ENTRY_LOGIN_API or (custom_auth_entry and custom_auth_entry.get('link_by_email')):
         association_response = associate_by_email(backend, details, user, *args, **kwargs)
         if (
             association_response and

@@ -33,6 +33,17 @@ from edx_notifications import startup
 
 log = logging.getLogger(__name__)
 
+# edx notifications related imports
+from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
+from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
+from edx_solutions_projects.scope_resolver import GroupProjectParticipantsScopeResolver
+from edx_notifications.scopes import register_user_scope_resolver
+from edx_notifications.namespaces import register_namespace_resolver
+from util.namespace_resolver import CourseNamespaceResolver
+from edx_notifications import startup
+
+log = logging.getLogger(__name__)
+
 
 def run():
     """

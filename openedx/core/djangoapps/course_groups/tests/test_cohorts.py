@@ -651,7 +651,7 @@ class TestCohorts(ModuleStoreTestCase):
             }
         )
         # Error cases
-        # Should get ValueError if user already in cohort
+        # Should get AlreadyAddedToCohortException if user already in cohort
         self.assertRaises(
             ValueError,
             lambda: cohorts.add_user_to_cohort(second_cohort, "Username")

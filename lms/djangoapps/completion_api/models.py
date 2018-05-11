@@ -103,7 +103,7 @@ class CourseCompletionFacade(CompletionDataMixin, object):
         """
         The block key for the course.
         """
-        return CourseOverview.load_from_module_store(self.course_key).location
+        return CourseOverview.get_from_id(self.course_key).location
 
     @lazy
     def blocks(self):

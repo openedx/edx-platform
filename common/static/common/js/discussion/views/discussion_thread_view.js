@@ -120,8 +120,7 @@
             };
 
             DiscussionThreadView.prototype.renderTemplate = function() {
-                var container,
-                    templateData;
+                var container, templateData;
                 this.template = _.template($('#thread-template').html());
                 container = $('#discussion-container');
                 if (!container.length) {
