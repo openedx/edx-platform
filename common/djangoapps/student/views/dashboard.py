@@ -845,3 +845,15 @@ def student_dashboard(request):
     response = render_to_response('dashboard.html', context)
     set_user_info_cookie(response, request)
     return response
+
+
+@login_required
+@ensure_csrf_cookie
+@add_maintenance_banner
+def dashboard_v2(request):
+    context = {
+        'api_uri': settings.GRAPHQL_API_URI
+    }
+    response = render_to_response('dashboard-v2.html', context)
+    set_user_info_cookie(response, request)
+    return response

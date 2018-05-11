@@ -1,0 +1,59 @@
+## coding=utf-8
+
+## Extremely stripped-down version of main.html.
+
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language_bidi
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.release import RELEASE_LINE
+%>
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
+<head dir="${static.dir_rtl()}">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+## Define a couple of helper functions to make life easier when
+## embedding theme conditionals into templates. All inheriting
+## templates have access to these functions, and we can import these
+## into non-inheriting templates via the %namespace tag.
+
+## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
+<%def name="pagetitle()" />
+  <%block name="title">
+      <title>
+       ${static.get_page_title_breadcrumbs(self.pagetitle())}
+      </title>
+  </%block>
+
+  <%
+    ie11_fix_path = "js/ie11_find_array.js"
+  %>
+
+  <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
+
+  <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
+
+  <%static:webpack entry="commons"/>
+
+  <meta name="path_prefix" content="${EDX_ROOT_URL}">
+  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+  <meta name="openedx-release-line" content="${RELEASE_LINE}" />
+
+</head>
+
+<body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+  ${self.body()}
+</body>
+</html>
+
+<%def name="login_query()">${
+  u"?next={next}".format(
+    next=urlquote_plus(login_redirect_url if login_redirect_url else request.path)
+  ) if (login_redirect_url or request) else ""
+}</%def>
