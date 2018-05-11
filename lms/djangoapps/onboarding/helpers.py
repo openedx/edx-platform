@@ -1,5 +1,7 @@
+import re
 from datetime import date
 from difflib import SequenceMatcher
+from lms.djangoapps.onboarding.models import Organization
 
 COUNTRIES = {
     'AD': 'Andorra',
@@ -7830,3 +7832,27 @@ def oef_eligible_first_learner(user_extended_profile):
 def get_str_match_ratio(str1, str2):
     """ Return matching percentage of two strings """
     return SequenceMatcher(None, str1, str2).ratio()
+
+
+def get_close_matching_orgs_with_suggestions(request, query):
+    """find list of organizations which are very close to a searched string"""
+    data = {}
+
+    all_organizations = Organization.objects.all()
+    for organization in all_organizations:
+        match_ratio = get_str_match_ratio(query.lower(), organization.label.lower())
+        is_suggestion = True if re.match(query, organization.label, re.I) else False
+        is_matched = True if match_ratio >= 0.8 else False
+
+        if is_suggestion or is_matched:
+            data[organization.label.lower()] = {
+                'label': organization.label,
+                'is_admin_assigned': True if organization.admin else False,
+                'is_current_user_admin': True if organization.admin == request.user else False,
+                'admin_email': organization.admin.email if organization.admin else 'Administrator not assigned yet.',
+                'country': COUNTRIES.get(organization.country) if organization.country else '',
+                'is_matched': is_matched,
+                'is_suggestion': is_suggestion,
+            }
+
+    return data
