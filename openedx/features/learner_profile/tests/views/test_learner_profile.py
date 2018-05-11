@@ -4,7 +4,6 @@
 import datetime
 import ddt
 import mock
-from waffle.testutils import override_switch
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
@@ -14,6 +13,8 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from lms.djangoapps.certificates.api import is_passing_status
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.credentials import STUDENT_RECORDS_FLAG
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -22,7 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@override_switch('student_records', True)
+@override_waffle_flag(STUDENT_RECORDS_FLAG, active=True)
 class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student profile view. """
 
