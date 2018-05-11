@@ -1,7 +1,6 @@
 /* globals gettext */
 /* eslint-disable react/no-danger */
 import React from 'react';
-import 'whatwg-fetch';
 import PropTypes from 'prop-types';
 import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
@@ -46,8 +45,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
             validationErrorDetails: '',
           }))
           .catch(error => this.failedSubmission(error))
-        ),
-      );
+      ),
+    );
   }
 
   failedSubmission(error) {
