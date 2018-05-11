@@ -32,6 +32,7 @@ from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCoho
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dop_oauth2_models, retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
@@ -417,6 +418,9 @@ class DeactivateLogoutView(APIView):
                 # Remove the activation keys sent by email to the user for account activation.
                 Registration.objects.filter(user=request.user).delete()
                 # Add user to retirement queue.
+                # Delete OAuth tokens associated with the user.
+                retire_dop_oauth2_models(request.user)
+                retire_dot_oauth2_models(request.user)
                 # Log the user out.
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
