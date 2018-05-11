@@ -78,3 +78,8 @@
   width: 100%;
   background: $black;
 }
+
+// Mimic Bootstrap functionality which makes the background body unscrollable while the modal is open.
+body.modal-open {
+  overflow: hidden;
+}

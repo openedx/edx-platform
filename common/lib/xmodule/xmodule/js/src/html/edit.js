@@ -1215,7 +1215,7 @@
         onclick: this.openImageModal
       });
       this.visualEditor = ed;
-      this.imageModal = $('#edit-image-modal .modal');
+      this.imageModal = $('#edit-image-modal #modalWrapper');
 
       /*
       These events were added to the plugin code as the TinyMCE PluginManager
@@ -1227,6 +1227,8 @@
       ed.on('EditLink', this.editLink);
       ed.on('ShowCodeEditor', this.showCodeEditor);
       ed.on('SaveCodeEditor', this.saveCodeEditor);
+
+      this.imageModal.on('closeModal', this.closeImageModal);
       return this.imageModal.on('submitForm', this.editImageSubmit);
     };
 
@@ -1263,6 +1265,7 @@
         imgAttrs['height'] = parseInt(img.attr('height'), 10) || img[0].naturalHeight;
         imgAttrs['style'] = img.attr('style');
       }
+      $('body').addClass('modal-open'); // prevents background from scrolling while modal is open
       return this.imageModal[0].dispatchEvent(new CustomEvent('openModal', {
         bubbles: true,
         detail: imgAttrs
@@ -1270,9 +1273,7 @@
     };
 
     HTMLEditingDescriptor.prototype.closeImageModal = function() {
-      return this.imageModal[0].dispatchEvent(new CustomEvent('closeModal', {
-        bubbles: true
-      }));
+      $('body').removeClass('modal-open');
     };
 
     HTMLEditingDescriptor.prototype.saveImageFromModal = function(data) {
