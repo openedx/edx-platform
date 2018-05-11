@@ -140,7 +140,7 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     course_key = CourseKey.from_string(course_key_str)
 
     # Hotfix to address LEARNER-5123, to be removed later
-    visible_blocks_count = VisibleBlocks.objects.filter(course_id=course_key)
+    visible_blocks_count = VisibleBlocks.objects.filter(course_id=course_key).count()
     if visible_blocks_count > MAX_VISIBLE_BLOCKS_ALLOWED:
         message = '{} has too many VisibleBlocks to recalculate grades for {}'
         raise Exception(message.format(course_key_str, user_id))
