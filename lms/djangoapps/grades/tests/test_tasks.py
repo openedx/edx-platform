@@ -486,7 +486,7 @@ class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCa
         self.set_up_course()
         CourseEnrollment.enroll(self.user, self.course.id)
         self.original_max_visible_blocks_allowed = tasks.MAX_VISIBLE_BLOCKS_ALLOWED
-        tasks.MAX_VISIBLE_BLOCKS_ALLOWED = 1
+        tasks.MAX_VISIBLE_BLOCKS_ALLOWED = -1
 
     def tearDown(self):
         super(RecalculateGradesForUserTest, self).tearDown()
