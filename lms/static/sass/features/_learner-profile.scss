@@ -269,6 +269,28 @@
       border-bottom: 1px solid $gray-l3;
       background-color: $gray-l4;
       padding: ($baseline*0.75) 5%;
+      display: table;
+
+      .wrapper-profile-records {
+        display: table-row;
+
+        button {
+          @extend %btn-secondary-blue-outline;
+          margin-top: 1em;
+        }
+      }
+
+      @include media-breakpoint-up(sm) {
+        .wrapper-profile-records {
+          display: table-cell;
+          vertical-align: middle;
+          white-space: nowrap;
+
+          button {
+            margin-top: 0;
+          }
+        }
+      }
 
       .u-field-account_privacy {
         @extend .container;
@@ -277,6 +299,7 @@
         box-shadow: none;
         padding: 0;
         margin: 0;
+        display: table-cell;
 
         @media (max-width: $learner-profile-container-flex) { // Switch to map-get($grid-breakpoints,md) for bootstrap
           max-width: calc(100% - 40px);

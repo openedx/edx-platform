@@ -10,7 +10,7 @@
 <% if (programRecordUrl) { %>
     <aside class="aside js-program-record program-record">
         <a href="<%- programRecordUrl %>" class="program-record-link">
-            <button class="program-record-button"><%- gettext('View Program Record') %></button>
+            <button class="btn program-record-button"><%- gettext('View Program Record') %></button>
         </a>
     </aside>
 <% } %>
