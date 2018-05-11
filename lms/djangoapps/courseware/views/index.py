@@ -437,23 +437,24 @@ class CoursewareIndex(View):
             )
             courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
             if self.section.position and self.section.has_children:
-                display_items = self.section.get_display_items()
-                if display_items:
-                    try:
-                        courseware_context['sequence_title'] = display_items[self.section.position - 1] \
-                            .display_name_with_default
-                    except IndexError:
-                        log.exception(
-                            "IndexError loading courseware for user %s, course %s, section %s, position %d. Total items: %d. URL: %s",
-                            self.real_user.username,
-                            self.course.id,
-                            self.section.display_name_with_default,
-                            self.section.position,
-                            len(display_items),
-                            self.url,
-                        )
-                        raise
+                self._add_sequence_title_to_context(courseware_context)
+
         return courseware_context
+
+    def _add_sequence_title_to_context(self, courseware_context):
+        """
+        Adds sequence title to the given context.
+
+        If we're rendering a section with some display items, but position
+        exceeds the length of the displayable items, default the position
+        to the first element.
+        """
+        display_items = self.section.get_display_items()
+        if not display_items:
+            return
+        if self.section.position > len(display_items):
+            self.section.position = 1
+        courseware_context['sequence_title'] = display_items[self.section.position - 1].display_name_with_default
 
     def _add_entrance_exam_to_context(self, courseware_context):
         """
