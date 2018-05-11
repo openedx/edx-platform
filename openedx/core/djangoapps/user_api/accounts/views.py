@@ -406,6 +406,7 @@ class DeactivateLogoutView(APIView):
             if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
                 return verify_user_password_response
             with transaction.atomic():
+                UserRetirementStatus.create_retirement(request.user)
                 # Unlink LMS social auth accounts
                 UserSocialAuth.objects.filter(user_id=request.user.id).delete()
                 # Change LMS password & email
@@ -416,7 +417,6 @@ class DeactivateLogoutView(APIView):
                 # Remove the activation keys sent by email to the user for account activation.
                 Registration.objects.filter(user=request.user).delete()
                 # Add user to retirement queue.
-                UserRetirementStatus.create_retirement(request.user)
                 # Log the user out.
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
