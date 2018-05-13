@@ -21,7 +21,7 @@ from student.models import User, UserProfile, Registration
 from student import views as student_views
 from third_party_auth.models import UserSocialAuthMapping
 from util.model_utils import emit_setting_changed_event
-
+import lms.lib.comment_client as cc
 from openedx.core.lib.api.view_utils import add_serializer_errors
 
 from ..errors import (
@@ -682,7 +682,8 @@ def anonymize_user_discussions(user, old_username):
     # Updating each discussion entity for each course
     query_params = {
         'paged_results': False,
-        'author_username': old_username
+        'author_username': old_username,
+        'retired_username': user.username
     }
     for course in courses:
         query_params['course_id'] = str(course.id)
@@ -698,3 +699,6 @@ def anonymize_user_discussions(user, old_username):
             entity['anonymous_to_peers'] = True
             entity['author_username'] = user.username
             th.save(entity)
+    # Anonymize all the replys to threads by user
+    profiled_user = cc.User(id=user.id)
+    profiled_user.retire_threads(query_params)

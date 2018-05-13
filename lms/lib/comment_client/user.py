@@ -134,6 +134,22 @@ class User(models.Model):
             thread_count=response.get('thread_count', 0)
         )
 
+    def retire_threads(self, query_params={}):
+        if 'retired_username' not in query_params:
+            raise CommentClientRequestError("Must provide retired_username to retire the threads for the user")
+        url = _url_for_user_retire_threads(self.id)
+        try:
+            response = perform_request(
+                'post',
+                url,
+                query_params,
+                metric_action='user.retire_all_comments',
+                metric_tags=self._metric_tags,
+                paged_results=True
+            )
+        except CommentClientRequestError as e:
+            raise
+
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params.copy()
@@ -185,6 +201,10 @@ def _url_for_user_active_threads(user_id):
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_user_retire_threads(user_id):
+    return "{prefix}/users/{user_id}/retire".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_read(user_id):
