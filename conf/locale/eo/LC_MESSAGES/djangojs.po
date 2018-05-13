@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.128556\n"
+"POT-Creation-Date: 2018-05-13 20:36+0000\n"
+"PO-Revision-Date: 2018-05-13 20:37:05.556935\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -237,6 +237,7 @@ msgid "Advanced"
 msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/static/js/views/previous_video_upload.js
+#: cms/static/js/views/video/translations_editor.js
 #: cms/static/js/views/video_transcripts.js lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "Rémövïng Ⱡ'σяєм ιρѕυм ∂#"
@@ -2681,7 +2682,6 @@ msgstr "Ànnötätïön Téxt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
-#: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear"
 msgstr "Çléär Ⱡ'σяєм ιρѕ#"
 
@@ -5800,6 +5800,12 @@ msgstr "Övéräll Sçöré Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Bookmark this page"
 msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal to {goal}!"
+msgstr ""
+"Thänk ýöü för séttïng ýöür çöürsé göäl tö {goal}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "You have successfully updated your goal."
 msgstr ""
@@ -7376,10 +7382,6 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "No sources"
-msgstr "Nö söürçés Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Link types should be unique."
 msgstr "Lïnk týpés shöüld ßé ünïqüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
@@ -7398,6 +7400,25 @@ msgid ""
 msgstr ""
 "Sörrý, théré wäs än érrör pärsïng thé süßtïtlés thät ýöü üplöädéd. Pléäsé "
 "çhéçk thé förmät änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/static/js/views/video/translations_editor.js
+#: cms/static/js/views/video_transcripts.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö rémövé thïs tränsçrïpt? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for this"
+" component."
+msgstr ""
+"Ìf ýöü rémövé thïs tränsçrïpt, thé tränsçrïpt wïll nöt ßé äväïläßlé för thïs"
+" çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Remove Transcript"
+msgstr "Rémövé Tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
@@ -7540,12 +7561,6 @@ msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 msgstr ""
 "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension} Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Are you sure you want to remove this transcript?"
-msgstr ""
-"Àré ýöü süré ýöü wänt tö rémövé thïs tränsçrïpt? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
@@ -11239,7 +11254,6 @@ msgstr "Néw %(item_type)s Ⱡ'σяєм ιρѕυм #"
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
-#: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear Value"
 msgstr "Çléär Välüé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
