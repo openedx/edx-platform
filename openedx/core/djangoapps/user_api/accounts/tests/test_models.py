@@ -3,7 +3,12 @@ Model specific tests for user_api
 """
 import pytest
 
-from openedx.core.djangoapps.user_api.models import RetirementState, RetirementStateError, UserRetirementStatus
+from openedx.core.djangoapps.user_api.models import (
+    RetirementState,
+    RetirementStateError,
+    UserRetirementRequest,
+    UserRetirementStatus
+)
 from student.models import get_retired_email_by_email, get_retired_username_by_username
 from student.tests.factories import UserFactory
 
@@ -87,3 +92,47 @@ def test_retirement_create_already_retired(setup_retirement_states):  # pylint: 
 
     with pytest.raises(RetirementStateError):
         UserRetirementStatus.create_retirement(user)
+
+
+def test_retirement_request_create_success():
+    """
+    Ensure that retirement request record creation succeeds.
+    """
+    user = UserFactory()
+    UserRetirementRequest.create_retirement_request(user)
+    assert UserRetirementRequest.has_user_requested_retirement(user)
+
+
+def test_retirement_request_created_upon_status(setup_retirement_states):  # pylint: disable=unused-argument, redefined-outer-name
+    """
+    Ensure that retirement request record is created upon retirement status creation.
+    """
+    user = UserFactory()
+    UserRetirementStatus.create_retirement(user)
+    assert UserRetirementRequest.has_user_requested_retirement(user)
+
+
+def test_retirement_request_deleted_upon_pending_status_delete(setup_retirement_states):  # pylint: disable=unused-argument, redefined-outer-name
+    """
+    Ensure that retirement request record is deleted upon deletion of a PENDING retirement status.
+    """
+    user = UserFactory()
+    retirement_status = UserRetirementStatus.create_retirement(user)
+    assert UserRetirementRequest.has_user_requested_retirement(user)
+    pending = RetirementState.objects.all().order_by('state_execution_order')[0]
+    assert retirement_status.current_state == pending
+    retirement_status.delete()
+    assert not UserRetirementRequest.has_user_requested_retirement(user)
+
+
+def test_retirement_request_preserved_upon_non_pending_status_delete(setup_retirement_states):  # pylint: disable=unused-argument, redefined-outer-name
+    """
+    Ensure that retirement request record is not deleted upon deletion of a non-PENDING retirement status.
+    """
+    user = UserFactory()
+    retirement_status = UserRetirementStatus.create_retirement(user)
+    assert UserRetirementRequest.has_user_requested_retirement(user)
+    non_pending = RetirementState.objects.all().order_by('state_execution_order')[1]
+    retirement_status.current_state = non_pending
+    retirement_status.delete()
+    assert UserRetirementRequest.has_user_requested_retirement(user)

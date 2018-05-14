@@ -645,6 +645,7 @@ class OrderItem(TimeStampedModel):
     """
     class Meta(object):
         app_label = "shoppingcart"
+        base_manager_name = 'objects'
 
     objects = InheritanceManager()
     order = models.ForeignKey(Order, db_index=True)
@@ -1091,6 +1092,7 @@ class InvoiceItem(TimeStampedModel):
     """
     class Meta(object):
         app_label = "shoppingcart"
+        base_manager_name = 'objects'
 
     objects = InheritanceManager()
     invoice = models.ForeignKey(Invoice, db_index=True)
