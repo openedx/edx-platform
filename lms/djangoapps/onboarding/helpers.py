@@ -57,7 +57,7 @@ COUNTRIES = {
     'CV': 'Cape Verde',
     'CX': 'Christmas Island',
     'CY': 'Cyprus',
-    'CZ': 'Czechia',
+    'CZ': 'Czech Republic',
     'DE': 'Germany',
     'DJ': 'Djibouti',
     'DK': 'Denmark',
