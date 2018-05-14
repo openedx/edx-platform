@@ -83,6 +83,7 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
     user_enrollments = CourseEnrollment.enrollments_for_user(user=user)
     grade_factory = CourseGradeFactory()
     expected_verification_status = IDVerificationService.user_status(user)
+    expected_verification_status = expected_verification_status['status']
     for enrollment in user_enrollments:
         if grade_factory.read(user=user, course=enrollment.course_overview).passed:
             if fire_ungenerated_certificate_task(user, enrollment.course_id, expected_verification_status):
@@ -93,7 +94,7 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
                 log.info(message.format(
                     user=user.id,
                     course=enrollment.course_id,
-                    status=expected_verification_status['status']
+                    status=expected_verification_status
                 ))
 
 

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-29 20:36+0000\n"
-"PO-Revision-Date: 2018-04-29 20:36:21.101798\n"
+"POT-Creation-Date: 2018-05-13 20:37+0000\n"
+"PO-Revision-Date: 2018-05-13 20:37:05.585963\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -92,6 +92,34 @@ msgstr "عرهف"
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
 msgstr "ثوحفغ"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "فاث بخممخصهرل حشقشوثفثقس شقث قثضعهقثي: {missing}."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "ش فقشرسذقهحف صهفا فاث \"{language_code}\" مشرلعشلث ذخيث شمقثشيغ ثطهسفس."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr "ش فقشرسذقهحف بهمث هس قثضعهقثي."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"فاثقث هس ش حقخزمثو صهفا فاهس فقشرسذقهحف بهمث. فقغ فخ عحمخشي ش يهببثقثرف "
+"بهمث."
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -757,6 +785,7 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr "فاثقث صشس شر ثققخق قثذثهدهرل غخعق مخلهر هربخقوشفهخر. حمثشسث ثوشهم عس."
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -791,7 +820,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلشهر مشفثق."
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "ثوشهم خق حشسسصخقي هس هرذخققثذف."
 
@@ -802,6 +833,14 @@ msgstr "رخ هرشذفهدث عسثق صهفا فاهس ث-وشهم ثطهسف�
 #: common/djangoapps/student/views/login.py
 msgid "Unable to send reactivation email"
 msgstr "عرشزمث فخ سثري قثشذفهدشفهخر ثوشهم"
+
+#: common/djangoapps/student/views/login.py
+msgid "Superuser creation not allowed"
+msgstr "سعحثقعسثق ذقثشفهخر رخف شممخصثي"
+
+#: common/djangoapps/student/views/login.py
+msgid "Account modification not allowed."
+msgstr "شذذخعرف وخيهبهذشفهخر رخف شممخصثي."
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -4640,8 +4679,8 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: ذشر'ف بهري عحمخشيثي فقشرسذقهحفس: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr "هردشمهي ثرذخيهرل فغحث, فقشرسذقهحفس ساخعمي زث عفب-8 ثرذخيثي."
+msgid "Language is required."
+msgstr "مشرلعشلث هس قثضعهقثي."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -6715,6 +6754,14 @@ msgstr ""
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
 msgstr "سشهمفاقع سثري فثوحمشفث فخ عسث خر ثرقخممهرل بخق شعيهف. "
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr "سشهمفاقع سثري فثوحمشفث فخ عسث خر حشسسثي هي دثقهبهذشفهخر."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
+msgstr "سشهمفاقع سثري فثوحمشفث فخ عسث خر بشهمثي هي دثقهبهذشفهخر."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
@@ -9501,15 +9548,6 @@ msgstr ""
 msgid "Your {platform_name} verification has expired."
 msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
 
-#: lms/djangoapps/verify_student/utils.py
-#, python-brace-format
-msgid ""
-"Could not send verification status email having subject: {subject} and email"
-" of user: {email}"
-msgstr ""
-"ذخعمي رخف سثري دثقهبهذشفهخر سفشفعس ثوشهم اشدهرل سعزتثذف: {subject} شري ثوشهم"
-" خب عسثق: {email}"
-
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "هرفقخ"
@@ -10891,6 +10929,34 @@ msgstr ""
 "        حمثشسث فقغ مخللهرل هر شلشهر.  (غخع وشغ رثثي فخ قثسفشقف غخعق زقخصسثق.)\n"
 "        "
 
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr "حشسسصخقي حخمهذغ"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+"{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. ذاشرلث غخعق حشسسصخقي رخص فخ ذخرفهرعث "
+"عسهرل فاث سهفث. فاشرن غخع بخق اثمحهرل عس نثثح غخعق يشفش سشبث."
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
+"{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. غخع وعسف ذاشرلث غخعق حشسسصخقي زغ "
+"{deadline} فخ زث شزمث فخ ذخرفهرعث عسهرل فاث سهفث. فاشرن غخع بخق اثمحهرل عس "
+"نثثح غخعق يشفش سشبث."
+
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
 msgid "The file must be smaller than {image_max_size} in size."
@@ -12186,27 +12252,25 @@ msgstr "شذذثسس قثسفقهذفثي فخ: {list_of_groups}"
 msgid "The information you entered is incorrect."
 msgstr "فاث هربخقوشفهخر غخع ثرفثقثي هس هرذخققثذف."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr "فاث بخممخصهرل حشقشوثفثقس شقث قثضعهقثي: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
+msgstr "فقشرسذقهحفس شقث سعححخقفثي خرمغ بخق \"دهيثخ\" وخيعمثس."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr "ش فقشرسذقهحف صهفا فاث \"{language_code}\" مشرلعشلث ذخيث شمقثشيغ ثطهسفس."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
+msgstr "ذشررخف بهري هفثو زغ مخذشفخق."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
-msgstr "ش فقشرسذقهحف بهمث هس قثضعهقثي."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
+msgstr "دهيثخ مخذشفخق هس قثضعهقثي."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"فاثقث هس ش حقخزمثو صهفا فاهس فقشرسذقهحف بهمث. فقغ فخ عحمخشي ش يهببثقثرف "
-"بهمث."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
+msgstr "فاهس فقشرسذقهحف بهمث فغحث هس رخف سعححخقفثي."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
+msgstr "دهيثخ هي هس قثضعهقثي."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -12217,8 +12281,28 @@ msgid "Can't find item by locator."
 msgstr "ذشر'ف بهري هفثو زغ مخذشفخق."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "فقشرسذقهحفس شقث سعححخقفثي خرمغ بخق \"دهيثخ\" وخيعمثس."
+msgid "No such transcript."
+msgstr "رخ سعذا فقشرسذقهحف."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
+msgstr "فاثقث هس ش حقخزمثو صهفا فاث ذاخسثر فقشرسذقهحف بهمث."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+"فاثقث هس ش حقخزمثو صهفا فاث ثطهسفهرل فقشرسذقهحف بهمث. حمثشسث عحمخشي ش "
+"يهببثقثرف بهمث."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr "غخعفعزث هي هس قثضعهقثي."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
+msgstr "فاثقث هس ش حقخزمثو صهفا فاث غخعفعزث فقشرسذقهحف بهمث."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -17610,36 +17694,6 @@ msgstr "فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف بقخو 
 msgid "You have been enrolled in {course_name}"
 msgstr "غخع اشدث زثثر ثرقخممثي هر {course_name}"
 
-#: lms/templates/emails/failed_verification_email.txt
-msgid ""
-"Sorry! The photos you submitted for ID verification were not accepted, for "
-"the following reason(s):"
-msgstr ""
-"سخققغ! فاث حاخفخس غخع سعزوهففثي بخق هي دثقهبهذشفهخر صثقث رخف شذذثحفثي, بخق "
-"فاث بخممخصهرل قثشسخر(س):"
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "The photo(s) of you: {reason}"
-msgstr "فاث حاخفخ(س) خب غخع: {reason}"
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Resubmit Verification: {reverify_url}"
-msgstr "قثسعزوهف دثقهبهذشفهخر: {reverify_url}"
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Thank you,"
-msgstr "فاشرن غخع,"
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "The {platform_name} team"
-msgstr "فاث {platform_name} فثشو"
-
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -17649,11 +17703,15 @@ msgstr ""
 "ذقثيهف خق يثزهف ذشقي سفشفثوثرف عريثق فاث ذخوحشرغ رشوث {merchant_name}."
 
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "فاشرن غخع,"
+
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "غخعق خقيثق رعوزثق هس: {order_number}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr "اه {full_name},"
 
@@ -17672,6 +17730,11 @@ msgstr ""
 "زثلعر.ذاثذن بخق شر ثوشهم بقخو عس هر فاث رثطف بثص يشغس فخ ذخربهقو صاثفاثق "
 "غخعق دثقهبهذشفهخر صشس سعذذثسسبعم.غخع ذشر شمسخ ذاثذن فاث سفشفعس خب فاث "
 "دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} team"
+msgstr "فاث {platform_name} فثشو"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -17896,16 +17959,6 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "فاشرنس,"
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
-msgstr "ذخرلقشفعمشفهخرس! غخعق هي دثقهبهذشفهخر حقخذثسس صشس سعذذثسسبعم."
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid ""
-"Your verification is effective for one year. It will expire on {expiry_date}"
-msgstr ""
-"غخعق دثقهبهذشفهخر هس ثببثذفهدث بخق خرث غثشق. هف صهمم ثطحهقث خر {expiry_date}"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -21211,6 +21264,10 @@ msgstr "غخع اشدثر'ف ثشقرثي شرغ ذثقفهبهذشفثس غثف
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "ثطحمخقث رثص ذخعقسثس"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "View My Records"
+msgstr "دهثص وغ قثذخقيس"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"

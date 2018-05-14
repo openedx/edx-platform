@@ -167,6 +167,38 @@ class RetirementState(models.Model):
         return cls.objects.all().values_list('state_name', flat=True)
 
 
+class UserRetirementRequest(TimeStampedModel):
+    """
+    Records and perists every user retirement request.
+    Users that have requested to cancel their retirement before retirement begins can be removed.
+    All other retired users persist in this table forever.
+    """
+    user = models.OneToOneField(User)
+
+    class Meta(object):
+        verbose_name = 'User Retirement Request'
+        verbose_name_plural = 'User Retirement Requests'
+
+    @classmethod
+    def create_retirement_request(cls, user):
+        """
+        Creates a UserRetirementRequest for the specified user.
+        """
+        if cls.has_user_requested_retirement(user):
+            raise RetirementStateError('User {} already has a retirement request row!'.format(user))
+        return cls.objects.create(user=user)
+
+    @classmethod
+    def has_user_requested_retirement(cls, user):
+        """
+        Checks to see if a UserRetirementRequest has been created for the specified user.
+        """
+        return cls.objects.filter(user=user).exists()
+
+    def __unicode__(self):
+        return u'User: {} Requested: {}'.format(self.user.id, self.created)
+
+
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
@@ -228,10 +260,12 @@ class UserRetirementStatus(TimeStampedModel):
             raise RetirementStateError('Default state does not exist! Populate retirement states to retire users.')
 
         if cls.objects.filter(user=user).exists():
-            raise RetirementStateError('User {} already has a retirement row!'.format(user))
+            raise RetirementStateError('User {} already has a retirement status row!'.format(user))
 
         retired_username = get_retired_username_by_username(user.username)
         retired_email = get_retired_email_by_email(user.email)
+
+        UserRetirementRequest.create_retirement_request(user)
 
         return cls.objects.create(
             user=user,
@@ -282,3 +316,14 @@ class UserRetirementStatus(TimeStampedModel):
 
     def __unicode__(self):
         return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
+
+
+@receiver(models.signals.post_delete, sender=UserRetirementStatus)
+def remove_pending_retirement_request(sender, instance, **kwargs):   # pylint: disable=unused-argument
+    """
+    Whenever a UserRetirementStatus record is deleted, remove the user's UserRetirementRequest record
+    IFF the UserRetirementStatus record was still PENDING.
+    """
+    pending_state = RetirementState.objects.filter(state_name='PENDING')[0]
+    if pending_state and instance.current_state == pending_state:
+        UserRetirementRequest.objects.filter(user=instance.user).delete()

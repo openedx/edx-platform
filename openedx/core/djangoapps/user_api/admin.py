@@ -3,7 +3,7 @@ Django admin configuration pages for the user_api app
 """
 from django.contrib import admin
 
-from .models import RetirementState, UserRetirementStatus
+from .models import RetirementState, UserRetirementStatus, UserRetirementRequest
 
 
 @admin.register(RetirementState)
@@ -31,3 +31,15 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
 
     class Meta(object):
         model = UserRetirementStatus
+
+
+@admin.register(UserRetirementRequest)
+class UserRetirementRequestAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the UserRetirementRequestAdmin model.
+    """
+    list_display = ('user', 'created')
+    raw_id_fields = ('user',)
+
+    class Meta(object):
+        model = UserRetirementRequest

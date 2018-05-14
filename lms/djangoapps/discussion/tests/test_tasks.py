@@ -298,6 +298,8 @@ class TaskTestCase(ModuleStoreTestCase):
             for key, entry in test_props.items():
                 setattr(message, key, entry)
 
+            test_props['nonInteraction'] = True
+
             with mock.patch('analytics.track') as mock_analytics_track:
                 _track_notification_sent(message, context)
                 mock_analytics_track.assert_called_once_with(

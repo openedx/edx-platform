@@ -45,6 +45,7 @@
             data-element="${idx+1}"
             data-page-title="${item['page_title']}"
             data-path="${item['path']}"
+            data-graded="${item['graded']}"
             id="tab_${idx}"
             ${"disabled=disabled" if disable_navigation else ""}>
             <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
