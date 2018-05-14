@@ -763,6 +763,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     # when SSO is enabled via SCORM shell we need allow frames from SCORM cloud
     THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL = ENV_TOKENS.get('THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL')
 
+    # Whether to allow unprivileged users to discover SSO providers for arbitrary usernames.
+    ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY = ENV_TOKENS.get('ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY', False)
+
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
