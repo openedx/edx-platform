@@ -6,12 +6,17 @@
 .global-header {
   box-sizing: border-box;
   width: 100%;
+  position: relative;
   overflow: hidden;
   padding-bottom: $baseline/2;
   border-bottom: 1px solid theme-color("primary");
   box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
   background: theme-color("inverse");
   line-height: 1.5;
+
+  @include media-breakpoint-up(lg) {
+    position: inherit;
+  }
 
   /*
     Logo and course identification block
@@ -63,6 +68,12 @@
       @include media-breakpoint-up(lg) {
         display: block;
       }
+    }
+  }
+
+  .edx-cookie-banner-wrapper {
+    .edx-cookie-banner {
+      min-width: 0;
     }
   }
 
@@ -241,6 +252,7 @@
   @include media-breakpoint-down(md) {
     .main-header {
       height: $header-logo-height;
+      position: inherit;
     }
 
     // Display the menu icon and allow for transition to an X on click
