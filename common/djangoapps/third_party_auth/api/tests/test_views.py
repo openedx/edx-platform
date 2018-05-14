@@ -86,58 +86,6 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
         UserFactory.create(username=CARL_USERNAME, password=PASSWORD)
 
 
-@ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ProviderViewAPITests(TpaAPITestCase):
-    """
-    Test that the provider endpoint returns the appropriate data
-    """
-    @ddt.data(*LINKED_USERS)
-    def test_linked_users(self, username):
-        for identifier_type in (u'username', u'email'):
-            identifier = getattr(User.objects.get(username=username), identifier_type)
-            url = reverse(
-                u'third_party_auth_providers_api',
-                kwargs={u'identifier': identifier},
-            )
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content)
-            self.assertEqual(
-                data,
-                {
-                    u"identifier": identifier,
-                    u"identifier_type": identifier_type,
-                    u"providers": [
-                        {
-                            u'backend_name': u'google-oauth2',
-                            u'name': u'Google',
-                            u'provider_id': u'oa2-google-oauth2'
-                        }, {
-                            u'backend_name': u'tpa-saml',
-                            u'name': u'TestShib',
-                            u'provider_id': u'saml-testshib'
-                        },
-                    ],
-                },
-            )
-
-    @ddt.data(CARL_USERNAME, NONEXISTENT_USERNAME)
-    def test_unlinked_users(self, username):
-        url = reverse(u'third_party_auth_providers_api', kwargs={u'identifier': username})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(
-            data,
-            {
-                u'identifier': username,
-                u'identifier_type': u'username',
-                u'providers': [],
-            },
-        )
-
-
 @override_settings(EDX_API_KEY=VALID_API_KEY)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -205,6 +153,24 @@ class UserViewAPITests(TpaAPITestCase):
         if expect_result == 200:
             self.assertIn("active", response.data)
             self.assertItemsEqual(response.data["active"], self.expected_active(target_user))
+
+    @ddt.data(
+        (True, ALICE_USERNAME, 200, True),
+        (True, CARL_USERNAME, 200, False),
+        (False, ALICE_USERNAME, 200, True),
+        (False, CARL_USERNAME, 403, None),
+    )
+    @ddt.unpack
+    def test_allow_unprivileged_response(self, allow_unprivileged, requesting_user, expect, include_remote_id):
+        self.client.login(username=requesting_user, password=PASSWORD)
+        with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=allow_unprivileged):
+            url = reverse('third_party_auth_users_api', kwargs={'username': ALICE_USERNAME})
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, expect)
+        if response.status_code == 200:
+            self.assertNotEqual(len(response.data['active']), 0)
+            for provider_data in response.data['active']:
+                self.assertEqual(include_remote_id, 'remote_id' in provider_data)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -313,20 +279,6 @@ class UserMappingViewAPITests(TpaAPITestCase):
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
         self.assertEqual(response.status_code, 200)
         self._verify_response(response, 200, get_mapping_data_by_usernames(LINKED_USERS))
-
-    @ddt.data(
-        (True, True, 200),
-        (False, True, 200),
-        (True, False, 200),
-        (False, False, 403)
-    )
-    @ddt.unpack
-    def test_user_mapping_permission_logic(self, api_key_permission, token_permission, expect):
-        url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
-        with patch.object(ApiKeyHeaderPermission, 'has_permission', return_value=api_key_permission):
-            with patch.object(ThirdPartyAuthProviderApiPermission, 'has_permission', return_value=token_permission):
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, expect)
 
     def _verify_response(self, response, expect_code, expect_result):
         """ verify the items in data_list exists in response and data_results matches results in response """
