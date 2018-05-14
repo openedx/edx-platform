@@ -15,7 +15,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task, CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -263,17 +263,12 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
-                expected_verification_status = {
-                    'status': 'approved',
-                    'error': '',
-                    'should_display': True,
-                }
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
                         'student': unicode(self.user_one.id),
                         'course_key': unicode(self.course_one.id),
-                        'expected_verification_status': unicode(expected_verification_status),
+                        'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
 
@@ -289,17 +284,12 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     status='submitted'
                 )
                 attempt.approve()
-                expected_verification_status = {
-                    'status': 'approved',
-                    'error': '',
-                    'should_display': True,
-                }
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
                         'student': unicode(self.user_two.id),
                         'course_key': unicode(self.course_two.id),
-                        'expected_verification_status': unicode(expected_verification_status),
+                        'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
 

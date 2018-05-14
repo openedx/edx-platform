@@ -4,6 +4,7 @@ from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.tasks import generate_certificate
+from lms.djangoapps.verify_student.models import IDVerificationAttempt
 from student.tests.factories import UserFactory
 
 
@@ -47,16 +48,10 @@ class GenerateUserCertificateTest(TestCase):
         course_key = 'course-v1:edX+CS101+2017_T2'
         student = UserFactory()
 
-        expected_verification_status = {
-            'status': 'approved',
-            'error': '',
-            'should_display': True,
-        }
-
         kwargs = {
             'student': student.id,
             'course_key': course_key,
-            'expected_verification_status': expected_verification_status,
+            'expected_verification_status': IDVerificationAttempt.STATUS.approved
         }
 
         user_status_mock.side_effect = [
