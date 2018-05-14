@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 'Bulgaria',
                 'Croatia',
                 'Cyprus',
-                'Czech Republic',
+                'Czechia',
                 'Denmark',
                 'Estonia',
                 'Finland',
@@ -90,7 +90,6 @@ class Command(BaseCommand):
                     'demographic_data': demographic_data,
                     'progress_data': progress_data,
                 })
-
             with tempfile.NamedTemporaryFile() as tmp:
                 tmp.write(json.dumps(course_data))
                 pyminizip.compress(tmp.name, '/tmp/data.zip', options['password'], 1)
