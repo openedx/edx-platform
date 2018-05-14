@@ -85,7 +85,8 @@ def _track_notification_sent(message, context):
         'uuid': unicode(message.uuid),
         'send_uuid': unicode(message.send_uuid),
         'thread_id': context['thread_id'],
-        'thread_created_at': date.deserialize(context['thread_created_at'])
+        'thread_created_at': date.deserialize(context['thread_created_at']),
+        'nonInteraction': 1,
     }
     analytics.track(
         user_id=context['thread_author_id'],
