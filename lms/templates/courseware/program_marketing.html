@@ -67,7 +67,7 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
     full_program_price = full_program_price_format.format(program['full_program_price'])
   %>
   <div id="program-details-hero">
-    <div class="main-banner" 
+    <div class="main-banner"
       style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image});">
       <div class="container" >
         <div class="row">
@@ -294,8 +294,9 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
       </div>
     </div>
     % for course in courses:
-      <% 
-        course_run = course['course_runs'][0] 
+      <%
+        ## Sort course runs by start date, reverse so newest is first, then take newest run
+        course_run = sorted(course['course_runs'], key=lambda run: run['start'], reverse=True)[0]
         course_img = course_run.get('image')
         course_about_url = reverse('about_course', args=[course_run['key']])
         course_purchase_url = course_run['upgrade_url'] if course_run['upgrade_url'] else course_about_url
