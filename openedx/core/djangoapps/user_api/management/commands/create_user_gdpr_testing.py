@@ -75,11 +75,11 @@ class Command(BaseCommand):
             'email': email,
             'first_name': "GDPR",
             'last_name': "Test",
-            'is_active': True,
-            'password': 'gdpr test password'
+            'is_active': True
         }
         for field, value in user_info.items():
             setattr(user, field, value)
+        user.set_password('gdpr test password')
         user.save()
 
         # UserProfile
@@ -89,7 +89,7 @@ class Command(BaseCommand):
         )
         user_profile_info = {
             'name': 'gdpr test name',
-            'meta': 'gdpr test meta',
+            'meta': '{}',
             'location': 'gdpr test location',
             'year_of_birth': 1950,
             'gender': 'gdpr test gender',
