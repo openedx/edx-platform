@@ -533,7 +533,7 @@ class RetireUserView(APIView):
     **Example Requests**:
         POST /api/discussion/v1/retire_user/
         {
-            "retired_username": "old_user_name"
+            "username": "an_original_user_name"
         }
 
     **Example Response**:
@@ -553,11 +553,9 @@ class RetireUserView(APIView):
             retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
             cc_user = comment_client.User.from_django_user(retirement.user)
 
-            # We can't count on the LMS username being un-retired at this point,
-            # so we pass the old username as a parameter to describe which
-            # user to retire. This will either succeed or throw an error which
-            # should be good to raise from here.
-            cc_user.retire(username)
+            # Send the retired username to the forums service, as the service cannot generate
+            # the retired username itself. Forums users are referenced by Django auth_user id.
+            cc_user.retire(retirement.retired_username)
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
