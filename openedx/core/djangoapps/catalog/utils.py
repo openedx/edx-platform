@@ -13,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
+from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -379,13 +380,21 @@ def get_visible_sessions_for_entitlement(entitlement):
 
 def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
     """
-    Takes a list of course runs and returns only the course runs, sorted by start date, that:
+    Looks through the list of course runs and returns the course runs that can
+    be applied to the entitlement.
 
-    These are the only sessions that can be selected for an entitlement.
+    Args:
+        entitlement (CourseEntitlement): The CourseEntitlement to which a
+        course run is to be applied.
+        course_runs (list): List of course run that we would like to apply
+        to the entitlement.
+
+    Return:
+        list: A list of sessions that a user can apply to the provided entitlement.
     """
     enrollable_sessions = []
 
-    # Only show published course runs that can still be enrolled and upgraded
+    # Only retrieve list of published course runs that can still be enrolled and upgraded
     search_time = datetime.datetime.now(UTC)
     for course_run in course_runs:
         course_id = CourseKey.from_string(course_run.get('key'))
@@ -394,7 +403,8 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             course_id=course_id
         )
         is_enrolled_in_mode = is_active and (user_enrollment_mode == entitlement.mode)
-        if is_course_run_entitlement_fulfillable(course_id, entitlement, search_time):
+        if (course_run.get('status') == COURSE_PUBLISHED and
+                is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
             if (is_enrolled_in_mode and
                     entitlement.enrollment_course_run and
                     course_id == entitlement.enrollment_course_run.course_id):
