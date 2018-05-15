@@ -100,13 +100,15 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
         htmlEnd: '</a>',
       },
     );
+    const confirmationWrapperClass = 'delete-confirmation-wrapper';
 
     return (
-      <div className="delete-confirmation-wrapper">
+      <div className={confirmationWrapperClass}>
         <Modal
           title={gettext('Are you sure?')}
           renderHeaderCloseButton={false}
           onClose={onClose}
+          parentSelector={`.${confirmationWrapperClass}`}
           aria-live="polite"
           open
           body={(
@@ -175,13 +177,15 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
   }
 
   renderSuccessModal() {
+    const successWrapperClass = 'delete-success-wrapper';
     return (
-      <div className="delete-success-wrapper">
+      <div className={successWrapperClass}>
         <Modal
           title={gettext('We\'re sorry to see you go! Your account will be deleted shortly.')}
           renderHeaderCloseButton={false}
           body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.')}
           onClose={this.handleConfirmationModalClose}
+          parentSelector={`.${successWrapperClass}`}
           aria-live="polite"
           open
         />

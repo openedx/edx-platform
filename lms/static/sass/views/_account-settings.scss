@@ -551,9 +551,9 @@
         margin: 20px 0;
       }
 
-      .paragon__modal-open {
-        overflow-y: scroll;
+      .paragon__modal {
         color: $dark-gray;
+        margin-top: 0.5rem;
 
         .paragon__modal-title {
           font-weight: $font-semibold;
@@ -580,7 +580,7 @@
           width: 50%;
         }
 
-        .paragon__btn:not(.cancel-btn) {
+        .paragon__btn {
           @extend %btn-primary-blue;
         }
       }
@@ -610,7 +610,7 @@
 
       .delete-confirmation-wrapper {
         .paragon__modal-footer {
-          .paragon__btn-outline-primary {
+          .paragon__btn-secondary {
             @extend %ui-clear-button;
 
             // set styles

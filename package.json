@@ -4,7 +4,7 @@
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.8",
     "@edx/edx-bootstrap": "0.4.3",
-    "@edx/paragon": "2.6.4",
+    "@edx/paragon": "3.0.5",
     "@edx/studio-frontend": "1.9.12",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",
