@@ -117,6 +117,7 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
 
 @task(
     bind=True,
+    base=LoggedPersistOnFailureTask,
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
     default_retry_delay=RETRY_DELAY_SECONDS,
