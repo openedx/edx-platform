@@ -12,7 +12,8 @@ export class StudentAccountDeletion extends React.Component {
     this.loadDeletionModal = this.loadDeletionModal.bind(this);
     this.state = {
       deletionModalOpen: false,
-      socialAuthConnected: props.socialAccountLinks.providers.reduce((acc, value) => acc || value.connected, false)
+      socialAuthConnected: props.socialAccountLinks.providers.reduce((acc, value) => acc || value.connected, false),
+      isActive: props.isActive,
     };
   }
 
@@ -26,7 +27,7 @@ export class StudentAccountDeletion extends React.Component {
   }
 
   render() {
-    const { deletionModalOpen, socialAuthConnected } = this.state
+    const { deletionModalOpen, socialAuthConnected, isActive } = this.state
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
@@ -35,10 +36,20 @@ export class StudentAccountDeletion extends React.Component {
       },
     );
 
+    const showError = socialAuthConnected || !isActive;
+
     const socialAuthError = StringUtils.interpolate(
       gettext('Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.'),
       {
         htmlStart: '<a href="https://support.edx.org/hc/en-us/articles/207206067" target="_blank">',
+        htmlEnd: '</a>',
+      }
+    );
+
+    const activationError = StringUtils.interpolate(
+      gettext('Before proceeding, please {htmlStart}activate your account{htmlEnd}.'),
+      {
+        htmlStart: '<a href="https://support.edx.org/hc/en-us/articles/115000940568-How-do-I-activate-my-account-" target="_blank">',
         htmlEnd: '</a>',
       }
     );
@@ -56,19 +67,20 @@ export class StudentAccountDeletion extends React.Component {
         <Button
           id="delete-account-btn"
           className={['btn-outline-primary']}
-          disabled={socialAuthConnected}
+          disabled={showError}
           label={gettext('Delete My Account')}
           inputRef={(input) => { this.modalTrigger = input; }}
           onClick={this.loadDeletionModal}
         />
-        {socialAuthConnected && <StatusAlert
+        {showError && <StatusAlert
                   dialog={(
                     <div className="modal-alert">
                       <div className="icon-wrapper">
                         <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
                       </div>
                       <div className="alert-content">
-                        <p dangerouslySetInnerHTML={{ __html: socialAuthError }}/>
+                        {socialAuthConnected && isActive && <p dangerouslySetInnerHTML={{ __html: socialAuthError }}/> }
+                        {!isActive && <p dangerouslySetInnerHTML={{ __html:activationError }}/> }
                       </div>
                     </div>
                   )}

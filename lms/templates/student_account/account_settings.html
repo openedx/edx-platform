@@ -73,7 +73,8 @@ from openedx.features.course_experience import ENABLE_GDPR_COMPAT_FLAG
 </%static:require_module>
 % if ENABLE_GDPR_COMPAT_FLAG.is_enabled_without_course_context():
     <script type="text/javascript">
-        window.auth = ${ auth | n, dump_js_escaped_json }
+        window.auth = ${ auth | n, dump_js_escaped_json };
+        window.isActive = ${ user.is_active | n, dump_js_escaped_json };
     </script>
 <%static:webpack entry="StudentAccountDeletionInitializer">
 </%static:webpack>
