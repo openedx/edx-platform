@@ -558,6 +558,12 @@ class RetireUserView(APIView):
             cc_user.retire(retirement.retired_username)
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        except comment_client.CommentClientRequestError as exc:
+            # 404s from client service for users that don't exist there are expected
+            # we can just pass those up.
+            if exc.status_code == 404:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            raise
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
