@@ -15,7 +15,6 @@ from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
-from student.models import is_email_retired
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -193,10 +192,3 @@ def generate_password(length=12, chars=string.letters + string.digits):
     password += choice(string.letters)
     password += ''.join([choice(chars) for _i in xrange(length - 2)])
     return password
-
-
-def email_exists(email):
-    """
-    Check an email against the User model for existence.
-    """
-    return User.objects.filter(email=email).exists() or is_email_retired(email)

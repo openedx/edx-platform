@@ -48,7 +48,8 @@ from student.models import (
     Registration,
     UserAttribute,
     UserProfile,
-    unique_id_for_user
+    unique_id_for_user,
+    email_exists_or_retired
 )
 
 
@@ -652,7 +653,7 @@ def do_create_account(form, custom_form=None):
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
                 field="username"
             )
-        elif User.objects.filter(email=user.email):
+        elif email_exists_or_retired(user.email):
             raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"

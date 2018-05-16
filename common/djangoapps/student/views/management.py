@@ -95,7 +95,7 @@ from student.models import (
     UserSignupSource,
     UserStanding,
     create_comments_service_user,
-    username_or_email_exists_or_retired,
+    email_exists_or_retired,
 )
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
@@ -1252,7 +1252,7 @@ def validate_new_email(user, new_email):
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
 
-    if username_or_email_exists_or_retired(new_email):
+    if email_exists_or_retired(new_email):
         raise ValueError(_('An account with this e-mail already exists.'))
 
 

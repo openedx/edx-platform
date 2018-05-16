@@ -13,7 +13,7 @@ from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
 from six import text_type
 
-from student.models import User, UserProfile, Registration
+from student.models import User, UserProfile, Registration, email_exists_or_retired
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
@@ -21,7 +21,6 @@ from util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
-from openedx.core.djangoapps.user_api.accounts.utils import email_exists
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
@@ -693,7 +692,7 @@ def _validate_email_doesnt_exist(email):
     :return: None
     :raises: errors.AccountEmailAlreadyExists
     """
-    if email is not None and email_exists(email):
+    if email is not None and email_exists_or_retired(email):
         raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
 
 

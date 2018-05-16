@@ -845,15 +845,23 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertTrue(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
 
     def test_user_with_retired_email_in_csv(self):
+        """
+        If the CSV contains email addresses which correspond with users which
+        have already been retired, confirm that the attempt returns invalid
+        email errors.
+        """
+
+        # This email address is re-used to create a retired account and another account.
+        conflicting_email = 'test_student@example.com'
 
         # prep a retired user
-        user = UserFactory.create(username='old_test_student', email='test_student@example.com')
+        user = UserFactory.create(username='old_test_student', email=conflicting_email)
         user.email = get_retired_email_by_email(user.email)
         user.username = get_retired_username_by_username(user.username)
         user.is_active = False
         user.save()
 
-        csv_content = "test_student@example.com,test_student,tester,USA" \
+        csv_content = "{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
@@ -862,9 +870,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertNotEquals(len(data['row_errors']), 0)
         self.assertEquals(
             data['row_errors'][0]['response'],
-            'Invalid email {email}.'.format(email='test_student@example.com')
+            'Invalid email {email}.'.format(email=conflicting_email)
         )
-        self.assertFalse(User.objects.filter(email='test_student@example.com').exists())
+        self.assertFalse(User.objects.filter(email=conflicting_email).exists())
 
     def test_user_with_already_existing_username_in_csv(self):
         """

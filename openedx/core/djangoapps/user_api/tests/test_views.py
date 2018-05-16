@@ -20,12 +20,15 @@ from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
+from openedx.core.djangoapps.user_api.accounts.tests.test_views import RetirementTestCase
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
+from student.models import get_retired_email_by_email
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
@@ -777,7 +780,7 @@ class PasswordResetViewTest(UserAPITestCase):
 
 @ddt.ddt
 @skip_unless_lms
-class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCase):
+class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCase, RetirementTestCase):
     """
     Tests for catching duplicate email and username validation errors within
     the registration end-points of the User API.
@@ -799,6 +802,99 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
     def setUp(self):
         super(RegistrationViewValidationErrorTest, self).setUp()
         self.url = reverse("user_api_registration")
+
+    def _retireRequestUser(self):
+        """
+        Very basic user retirement initiation, logic copied form DeactivateLogoutView.  This only lands the user in
+        PENDING, simulating a retirement request only.
+        """
+        user = User.objects.get(username=self.USERNAME)
+        UserRetirementStatus.create_retirement(user)
+        user.email = get_retired_email_by_email(user.email)
+        user.set_unusable_password()
+        user.save()
+
+    @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
+    def test_register_retired_email_validation_error(self, dummy_check_account_exists):
+        dummy_check_account_exists.return_value = []
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Initiate retirement for the above user:
+        self._retireRequestUser()
+
+        # Try to create a second user with the same email address as the retired user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
+        )
+
+    def test_register_retired_email_validation_error_no_bypass_check_account_exists(self):
+        """
+        This test is the same as above, except it doesn't bypass check_account_exists.  Not bypassing this function
+        results in the same error message, but a 409 status code rather than 400.
+        """
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Initiate retirement for the above user:
+        self._retireRequestUser()
+
+        # Try to create a second user with the same email address as the retired user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
+        )
 
     @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
     def test_register_duplicate_email_validation_error(self, dummy_check_account_exists):
