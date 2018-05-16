@@ -33,7 +33,7 @@ from lms.djangoapps.onboarding.models import (
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
 from lms.djangoapps.onboarding.models import UserExtendedProfile
 from lms.djangoapps.onboarding.signals import save_interests
-from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_recommended_communities
+from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_joined_communities
 from nodebb.helpers import update_nodebb_for_user_status
 from onboarding import forms
 
@@ -542,12 +542,12 @@ def recommendations(request):
 
     """
     recommended_courses = get_recommended_xmodule_courses(request.user)
-    recommended_communities = get_recommended_communities(request.user)
+    joined_communities = get_joined_communities(request.user)
     user_extended_profile = request.user.extended_profile
 
     context = {
         'recommended_courses': recommended_courses,
-        'recommended_communities': recommended_communities,
+        'joined_communities': joined_communities,
         'user_has_organization': bool(user_extended_profile.organization),
         'is_nonprofit_org': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
