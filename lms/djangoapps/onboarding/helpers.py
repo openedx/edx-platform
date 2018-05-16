@@ -7775,9 +7775,10 @@ def calculate_age_years(born):
 
 def get_country_iso(c_name):
     _iso = ""
-    for iso, name in COUNTRIES.items():
-        if name.lower() == c_name.lower():
-            _iso = iso
+    if c_name:
+        for iso, name in COUNTRIES.items():
+            if name.lower() == c_name.lower():
+                _iso = iso
 
     return _iso
 
