@@ -6,6 +6,7 @@ import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import { deactivate } from '../AccountsClient';
+import removeLoggedInCookies from './removeLoggedInCookies';
 
 class StudentAccountDeletionConfirmationModal extends React.Component {
   constructor(props) {
@@ -29,6 +30,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
   handleConfirmationModalClose() {
     this.props.onClose();
 
+    removeLoggedInCookies();
     window.location.href = 'https://www.edx.org';
   }
 
