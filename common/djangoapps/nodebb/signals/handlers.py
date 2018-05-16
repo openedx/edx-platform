@@ -44,7 +44,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
         }
     elif sender == UserExtendedProfile:
         data_to_sync = {
-            "country_of_employment": COUNTRIES.get(instance.country_of_employment, ''),
+            "country_of_employment": COUNTRIES.get(instance.country_of_employment, '') if len(instance.country_of_employment) == 2 else instance.country_of_employment,
             "city_of_employment": instance.city_of_employment,
             "interests": instance.get_user_selected_interests(),
             "self_prioritize_areas": instance.get_user_selected_functions()
