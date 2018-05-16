@@ -1,7 +1,3 @@
-import WordCloudMain from './word_cloud_main';
+const WordCloudMain = require('xmodule/assets/word_cloud/src/js/word_cloud_main.js');
 
-function WordCloud(el) {
-  return new WordCloudMain(el);
-}
-
-window.WordCloud = WordCloud;
+window.WordCloud = WordCloudMain.default;

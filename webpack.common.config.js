@@ -6,6 +6,7 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var StringReplace = require('string-replace-webpack-plugin');
+var Merge = require('webpack-merge');
 
 var files = require('./webpack-config/file-lists.js');
 var xmoduleJS = require('./common/static/xmodule/webpack.xmodule.config.js');
@@ -25,7 +26,7 @@ var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
                              + defineDirectFooter.source + ')|('
                              + defineFancyFooter.source + ')', 'm');
 
-module.exports = {
+module.exports = Merge.smart({
     context: __dirname,
 
     entry: {
@@ -211,24 +212,30 @@ module.exports = {
                         replacements: [
                             {
                                 pattern: /\(function\(AjaxPrefix\) {/,
-                                replacement: function () { return ''; }
+                                replacement: function() { return ''; }
                             },
                             {
                                 pattern: /], function\(domReady, \$, str, Backbone, gettext, NotificationView\) {/,
-                                replacement: function () {
+                                replacement: function() {
                                     // eslint-disable-next-line
                                     return '], function(domReady, $, str, Backbone, gettext, NotificationView, AjaxPrefix) {';
                                 }
                             },
                             {
                                 pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
-                                replacement: function () {
+                                replacement: function() {
                                     return "'../../common/js/components/views/feedback_notification', 'AjaxPrefix',";
                                 }
                             },
                             {
                                 pattern: /}\).call\(this, AjaxPrefix\);/,
-                                replacement: function () { return ''; }
+                                replacement: function() { return ''; }
+                            },
+                            {
+                                pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
+                                replacement: function() {
+                                    return "'../../common/js/components/views/feedback_notification', 'AjaxPrefix',";
+                                }
                             }
                         ]
                     }
@@ -318,7 +325,6 @@ module.exports = {
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
             sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
-            WordCloudMain: 'xmodule/assets/word_cloud/public/js/word_cloud_main',
             hls: 'hls.js/dist/hls.js'
         },
         modules: [
@@ -329,6 +335,7 @@ module.exports = {
             'lms/static',
             'common/lib/xmodule',
             'common/lib/xmodule/xmodule/js/src',
+            'common/lib/xmodule/xmodule/assets/word_cloud/src/js',
             'common/static',
             'common/static/coffee/src',
             'common/static/common/js',
@@ -349,15 +356,17 @@ module.exports = {
     },
 
     externals: {
+        $: 'jQuery',
         backbone: 'Backbone',
+        canvas: 'canvas',
         coursetalk: 'CourseTalk',
         gettext: 'gettext',
         jquery: 'jQuery',
         logger: 'Logger',
         underscore: '_',
         URI: 'URI',
-        XModule: 'XModule',
-        XBlockToXModuleShim: 'XBlockToXModuleShim'
+        XBlockToXModuleShim: 'XBlockToXModuleShim',
+        XModule: 'XModule'
     },
 
     watchOptions: {
@@ -367,4 +376,5 @@ module.exports = {
     node: {
         fs: 'empty'
     }
-};
+
+}, xmoduleJS);
