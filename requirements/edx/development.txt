@@ -18,7 +18,7 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
 git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
 git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6dea236422852#egg=django-pipeline==1.5.3
--e git+https://github.com/edx/django-wiki.git@v0.0.17#egg=django-wiki
+-e git+https://github.com/edx/django-wiki.git@v0.0.18#egg=django-wiki
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 -e common/lib/dogstats
