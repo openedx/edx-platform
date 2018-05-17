@@ -122,11 +122,10 @@ from student.models import CourseEnrollment
 
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="dashboard" id="dashboard-main">
+
       <div class="main-container">
         <div class="my-courses" id="my-courses">
-          % if display_dashboard_courses:
           <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
-          % endif
 
           % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">
@@ -196,20 +195,14 @@ from student.models import CourseEnrollment
             </ul>
           % else:
             <div class="empty-dashboard-message">
-              % if display_dashboard_courses:
-                <p>${_("You are not enrolled in any courses yet.")}</p>
-                % if empty_dashboard_message:
-                  <p class="custom-message">${empty_dashboard_message | n, decode.utf8}</p>
-                %endif
-                % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-                  <a class="btn btn-primary" href="${marketing_link('COURSES')}">
-                    ${_("Explore courses")}
-                  </a>
-                %endif
-              % else:
-              <p>${_("Activate your account!")}</p>
-              <p class="custom-message">${ activate_account_message | n, decode.utf8 }</p>
-              % endif
+              <p>${_("You are not enrolled in any courses yet.")}</p>
+
+              % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+                <a class="btn btn-primary" href="${marketing_link('COURSES')}">
+                  ${_("Explore courses")}
+                </a>
+
+              %endif
           </div>
           % endif
 
@@ -232,9 +225,9 @@ from student.models import CourseEnrollment
         </div>
       </div>
       <div class="side-container">
-        %if display_sidebar_account_activation_message:
+        %if sidebar_account_activation_message:
           <div class="sidebar-notification">
-            <%include file="${static.get_template_path('registration/account_activation_sidebar_notice.html')}" />
+            ${sidebar_account_activation_message | n, decode.utf8}
           </div>
         %endif
 
