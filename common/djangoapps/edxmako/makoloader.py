@@ -21,7 +21,7 @@ class MakoLoader(object):
     """
 
     is_usable = False
-    supports_recursion = False
+    supports_recursion = True
 
     def __init__(self, base_loader):
         # base_loader is an instance of a BaseLoader subclass
@@ -75,6 +75,9 @@ class MakoLoader(object):
     def load_template_source(self, template_name, template_dirs=None):
         # Just having this makes the template load as an instance, instead of a class.
         return self.base_loader.load_template_source(template_name, template_dirs)
+
+    def get_template(self, template_name, template_dirs=None, skip=None):
+        return self.base_loader.get_template(template_name, template_dirs, skip)
 
     def reset(self):
         self.base_loader.reset()
