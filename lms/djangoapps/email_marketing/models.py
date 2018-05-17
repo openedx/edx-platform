@@ -94,6 +94,14 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    sailthru_verification_expired_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru email template for expired ID verification."
+        )
+    )
+
     sailthru_upgrade_template = models.fields.CharField(
         max_length=20,
         blank=True,

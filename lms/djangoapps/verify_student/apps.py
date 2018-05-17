@@ -17,3 +17,4 @@ class VerifyStudentConfig(AppConfig):
         Connect signal handlers.
         """
         from . import signals  # pylint: disable=unused-variable
+        from . import tasks    # pylint: disable=unused-variable
