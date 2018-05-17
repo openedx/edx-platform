@@ -228,7 +228,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         }
 
     def save(self, request, commit=True):
-        user_info_survey = super(UserInfoModelForm, self).save()
+        user_info_survey = super(UserInfoModelForm, self).save(commit=False)
 
         userprofile = user_info_survey.user.profile
         userprofile.year_of_birth = self.cleaned_data['year_of_birth']
