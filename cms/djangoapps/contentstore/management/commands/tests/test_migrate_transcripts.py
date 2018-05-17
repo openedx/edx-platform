@@ -228,13 +228,18 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
              '[Transcript migration] Migrating 2 transcripts'),
             (LOGGER_NAME,
              'INFO',
-             u'[Transcript migration] process for course {} ended. Processed 2 transcripts'.format(
+             '[Transcript migration] Result: Language hr transcript of video test_edx_video_id will be migrated'),
+            (LOGGER_NAME,
+             'INFO',
+             '[Transcript migration] Result: Language ge transcript of video test_edx_video_id will be migrated'),
+            (LOGGER_NAME,
+             'INFO',
+             u'[Transcript migration] task submission for course {} ended.'.format(
                  unicode(self.course.id)
              )),
             (LOGGER_NAME,
              'INFO',
-             '[Transcript migration] Result: Language hr transcript of video test_edx_video_id will be migrated'
-             '\nLanguage ge transcript of video test_edx_video_id will be migrated')
+             "[Transcript migration] Result: None")
         )
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
@@ -264,13 +269,16 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
              "[Transcript migration] Exception: u'No transcript for `ge` language'"),
             (LOGGER_NAME,
              'INFO',
-             u'[Transcript migration] process for course {} ended. Processed 1 transcripts'.format(
+             "[Transcript migration] Result: Failed: language ge of video test_edx_video_id_2 with exception "
+             "No transcript for `ge` language"),
+            (LOGGER_NAME,
+             'INFO',
+             u'[Transcript migration] task submission for course {} ended.'.format(
                  unicode(self.course_2.id)
              )),
             (LOGGER_NAME,
              'INFO',
-             "[Transcript migration] Result: Failed: language ge of video test_edx_video_id_2 with exception "
-             "No transcript for `ge` language")
+             "[Transcript migration] Result: None")
         )
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
