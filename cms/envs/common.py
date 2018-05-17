@@ -881,6 +881,9 @@ WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ################################# CELERY ######################################
 
+# Auto discover tasks fails to detect contentstore tasks
+CELERY_IMPORTS = ('cms.djangoapps.contentstore.tasks')
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'

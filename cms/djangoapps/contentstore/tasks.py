@@ -26,7 +26,7 @@ from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
 from djcelery.common import respect_language
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, BlockUsageLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
@@ -106,9 +106,7 @@ def enqueue_async_migrate_transcripts_tasks(
         ) for course_key in course_keys
     ]
     callback = task_status_callback.s()
-    status = chord(tasks)(callback)
-    for res in status.get():
-        LOGGER.info("[Transcript migration] Result: %s", '\n'.join(res))
+    chord(tasks)(callback)
 
 
 @chord_task
@@ -116,7 +114,11 @@ def task_status_callback(results):
     """
     Callback for collating the results of chord.
     """
-    return results
+    try:
+        for res in results:
+            LOGGER.info("[Transcript migration] Result: %s", res)
+    except TypeError:
+        pass
 
 
 @chord_task(
@@ -161,21 +163,19 @@ def async_migrate_transcript(self, course_key, **kwargs):
             )
             if transcript_already_present and force_update:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
-                    video, lang, True, **kwargs
+                    unicode(video.location), lang, True, **kwargs
                 ))
             elif not transcript_already_present:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
-                    video, lang, False, **kwargs
+                    unicode(video.location), lang, False, **kwargs
                 ))
     LOGGER.info("[Transcript migration] Migrating %s transcripts", len(sub_tasks))
     callback = task_status_callback.s()
-    status = chord(sub_tasks)(callback)
+    chord(sub_tasks)(callback)
     LOGGER.info(
-        "[Transcript migration] process for course %s ended. Processed %s transcripts",
-        course_key,
-        len(status.get())
+        "[Transcript migration] task submission for course %s ended.",
+        course_key
     )
-    return status.get()
 
 
 def get_videos_from_store(course_key):
@@ -210,7 +210,9 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):
     """
     Migrates a transcript of a given video in a course as a new celery task.
     """
-    video, language_code, force_update = args
+    video_location, language_code, force_update = args
+    store = modulestore()
+    video = store.get_item(usage_key=BlockUsageLocator.from_string(video_location))
     commit = kwargs['commit']
     result = None
     if commit is not True:
