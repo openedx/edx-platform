@@ -40,6 +40,7 @@ from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramP
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
@@ -562,6 +563,13 @@ def student_dashboard(request):
     activation_email_support_link = configuration_helpers.get_value(
         'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
     ) or settings.SUPPORT_SITE_LINK
+    hide_dashboard_courses_until_activated = configuration_helpers.get_value(
+        'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED',
+        settings.FEATURES.get('HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED', False)
+    )
+    empty_dashboard_message = configuration_helpers.get_value(
+        'EMPTY_DASHBOARD_MESSAGE', None
+    )
 
     # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
@@ -602,28 +610,21 @@ def student_dashboard(request):
     )
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
-    sidebar_account_activation_message = ''
-    banner_account_activation_message = ''
-    display_account_activation_message_on_sidebar = configuration_helpers.get_value(
-        'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR',
-        settings.FEATURES.get('DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR', False)
-    )
-
-    # Display activation message in sidebar if DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR
-    # flag is active. Otherwise display existing message at the top.
-    if display_account_activation_message_on_sidebar and not user.is_active:
-        sidebar_account_activation_message = render_to_string(
-            'registration/account_activation_sidebar_notice.html',
-            {
-                'email': user.email,
-                'platform_name': platform_name,
-                'activation_email_support_link': activation_email_support_link
-            }
-        )
-    elif not user.is_active:
-        banner_account_activation_message = render_to_string(
-            'registration/activate_account_notice.html',
-            {'email': user.email}
+    # Display activation message
+    activate_account_message = ''
+    if not user.is_active:
+        activate_account_message = Text(_(
+            "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
+            "If you need help, contact {link_start}{platform_name} Support{link_end}."
+        )).format(
+            platform_name=platform_name,
+            email_start=HTML("<strong>"),
+            email_end=HTML("</strong>"),
+            email=user.email,
+            link_start=HTML("<a target='_blank' href='{activation_email_support_link}'>").format(
+                activation_email_support_link=activation_email_support_link,
+            ),
+            link_end=HTML("</a>"),
         )
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
@@ -789,13 +790,12 @@ def student_dashboard(request):
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'account_activation_messages': account_activation_messages,
+        'activate_account_message': activate_account_message,
         'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
         'course_optouts': course_optouts,
-        'banner_account_activation_message': banner_account_activation_message,
-        'sidebar_account_activation_message': sidebar_account_activation_message,
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
@@ -825,6 +825,9 @@ def student_dashboard(request):
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
+        'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
+        'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
+        'empty_dashboard_message': empty_dashboard_message,
     }
 
     if ecommerce_service.is_enabled(request.user):
