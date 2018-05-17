@@ -297,6 +297,31 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         ).install()
 
+    def test_register_failure(self):
+        # Navigate to the registration page
+        self.register_page.visit()
+
+        # Enter a blank for the username field, which is required
+        # Don't agree to the terms of service / honor code.
+        # Don't specify a country code, which is required.
+        # Don't specify a favorite movie.
+        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = "{user}@example.com".format(user=username)
+        self.register_page.register(
+            email=email,
+            password="password",
+            username="",
+            full_name="Test User",
+            terms_of_service=False
+        )
+        # Verify that the expected errors are displayed.
+        errors = self.register_page.wait_for_errors()
+        self.assertIn(u'Please enter your Public Username.', errors)
+        self.assertIn(u'You must agree to the édX Terms of Service and Honor Code',
+                      errors)
+        self.assertIn(u'Select your country or region of residence.', errors)
+        self.assertIn(u'Please tell us your favorite movie.', errors)
+
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()
         self.assertEqual(self.register_page.current_form, "login")
