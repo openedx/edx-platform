@@ -405,7 +405,7 @@ FEATURES = {
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
     # Set to enable Journal integration
-    'ENABLE_JOURNAL_INTEGRATION': False,
+    'ENABLE_JOURNAL_INTEGRATION': True,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -3469,8 +3469,8 @@ FERNET_KEYS = [
 USER_STATE_BATCH_SIZE = 5000
 
 ############## Settings for Journals ######################
-JOURNALS_API_URL = 'http://journals.app:18606/api/v1/'
-JOURNALS_ROOT_URL = 'http://localhost:18606'
+JOURNALS_URL_ROOT = None
+JOURNALS_API_URL = None
 
 ############## Plugin Django Apps #########################
 
