@@ -12,6 +12,11 @@ from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
+from enrollment import (
+    USE_RATE_LIMIT_100_FOR_STAFF_FOR_ENROLLMENT_API,
+    USE_RATE_LIMIT_40_FOR_ENROLLMENT_API,
+    USE_RATE_LIMIT_400_FOR_STAFF_FOR_ENROLLMENT_API,
+)
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -76,7 +81,32 @@ class ApiKeyPermissionMixIn(object):
 
 class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     """Limit the number of requests users can make to the enrollment API."""
-    rate = '40/minute'
+    # TODO: After confirming that reducing the throttle is successful, remove
+    # and clean up waffles. The rate limit has been increased over the course
+    # of a few months to account for unnecessary calls from the ecommerce
+    # service. These calls are no longer made and the plan is to set the
+    # rate limit back to its original state. LEARNER-5148
+
+    if USE_RATE_LIMIT_400_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
+        THROTTLE_RATES = {
+            'user': '40/minute',
+            'staff': '400/minute',
+        }
+    elif USE_RATE_LIMIT_100_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
+        THROTTLE_RATES = {
+            'user': '40/minute',
+            'staff': '100/minute',
+        }
+    elif USE_RATE_LIMIT_40_FOR_ENROLLMENT_API.is_enabled():
+        THROTTLE_RATES = {
+            'user': '40/minute',
+            'staff': '40/minute',
+        }
+    else:
+        THROTTLE_RATES = {
+            'user': '40/minute',
+            'staff': '2000/minute',
+        }
 
     def allow_request(self, request, view):
         # Use a special scope for staff to allow for a separate throttle rate
