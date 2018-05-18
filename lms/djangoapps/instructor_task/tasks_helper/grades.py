@@ -620,12 +620,15 @@ class ProblemResponses(object):
                 # Blocks can implement the generate_report_data method to provide their own
                 # human-readable formatting for user state.
                 if hasattr(block, 'generate_report_data'):
-                    user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                    responses = [
-                        {'username': username, 'state': state}
-                        for username, state in
-                        block.generate_report_data(user_state_iterator, max_count)
-                    ]
+                    try:
+                        user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                        responses = [
+                            {'username': username, 'state': state}
+                            for username, state in
+                            block.generate_report_data(user_state_iterator, max_count)
+                        ]
+                    except NotImplementedError:
+                        responses = list_problem_responses(course_key, block_key, max_count)
                 else:
                     responses = list_problem_responses(course_key, block_key, max_count)
 
