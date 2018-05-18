@@ -7842,8 +7842,8 @@ def get_close_matching_orgs_with_suggestions(request, query):
     """find list of organizations which are very close to a searched string"""
     data = {}
 
-    all_organizations = Organization.objects.all()
-    for organization in all_organizations:
+    organizations = Organization.objects.filter(label__istartswith=query)
+    for organization in organizations:
         match_ratio = get_str_match_ratio(query.lower(), organization.label.lower())
         is_suggestion = True if re.match(query, organization.label, re.I) else False
         is_matched = True if match_ratio >= configuration_helpers.get_value('org_search_ratio', 0) else False

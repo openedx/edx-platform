@@ -5,12 +5,10 @@ from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from rest_framework import status
-import logging
 
 from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
 from lms.djangoapps.onboarding.models import Organization
-log = logging.getLogger("edx.oef")
 
 @login_required
 def oef_dashboard(request):
@@ -126,7 +124,6 @@ def save_answer(request):
 
     if data['is_complete']:
         uos.finish_date = datetime.date.today()
-        log.info(datetime.datetime.now())
     uos.save()
 
     return JsonResponse({
