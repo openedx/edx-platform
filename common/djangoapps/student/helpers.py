@@ -492,7 +492,7 @@ def _cert_info(user, course_overview, cert_status):
     }
 
     certificate_earned_but_not_available_status = 'certificate_earned_but_not_available'
-    default_status = 'processing'
+    default_status = 'unavailable' if course_overview.self_paced else 'processing'
 
     default_info = {
         'status': default_status,
