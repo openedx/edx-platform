@@ -16,7 +16,7 @@ const wrapperRendered = setInterval(() => {
       component: StudentAccountDeletion,
       selector: `#${accountDeletionWrapperId}`,
       componentName: 'StudentAccountDeletion',
-      props: { socialAccountLinks: window.auth },
+      props: { socialAccountLinks: window.auth, isActive: window.isActive },
     });
   }
 
