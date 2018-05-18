@@ -7,7 +7,7 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 
-cryptography==2.1.4                 # Implementations of assorted cryptography algorithms
+cryptography                        # Implementations of assorted cryptography algorithms
 lxml==3.8.0                         # XML parser
 networkx==1.7                       # Utilities for creating, manipulating, and studying network graphs
 nltk                                # Natural language processing; used by the chem package

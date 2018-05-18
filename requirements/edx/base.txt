@@ -4,6 +4,7 @@
 #
 #    make upgrade
 #
+
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/calc
 -e common/lib/capa
@@ -62,7 +63,7 @@ charade==1.0.3            # via pysrt
 click==6.7                # via user-util
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
-cryptography==2.1.4
+cryptography==2.2.2
 cssutils==1.0.2           # via pynliner
 ddt==0.8.0
 decorator==4.3.0          # via dogapi, pycontracts
@@ -168,7 +169,7 @@ mock==1.0.1
 mongoengine==0.10.0
 mysql-python==1.2.5
 networkx==1.7
-newrelic==3.2.0.91
+newrelic==3.2.1.93
 nltk==3.3.0
 nodeenv==1.1.1
 numpy==1.6.2
