@@ -15,7 +15,7 @@ from lms.djangoapps.grades.tasks import recalculate_course_and_subsection_grades
 class Command(BaseCommand):
     """
     Example usage:
-        $ ./manage.py lms recalculate_learner_course_grades learner_courses_to_recalculate.csv
+        $ ./manage.py lms recalculate_learner_grades learner_courses_to_recalculate.csv
     """
     help = 'Recalculates a user\'s grades for a course, for every user in a csv of (user, course) pairs'
 
