@@ -215,6 +215,26 @@ def is_username_retired(username):
     return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
 
 
+def is_email_retired(email):
+    """
+    Checks to see if the given email has been previously retired
+    """
+    locally_hashed_emails = user_util.get_all_retired_emails(
+        email,
+        settings.RETIRED_USER_SALTS,
+        settings.RETIRED_EMAIL_FMT
+    )
+
+    return User.objects.filter(email__in=list(locally_hashed_emails)).exists()
+
+
+def email_exists_or_retired(email):
+    """
+    Check an email against the User model for existence.
+    """
+    return User.objects.filter(email=email).exists() or is_email_retired(email)
+
+
 def get_retired_username_by_username(username):
     """
     If a UserRetirementStatus object with an original_username matching the given username exists,
@@ -2233,18 +2253,30 @@ class CourseAccessRole(models.Model):
 #### Helper methods for use from python manage.py shell and other classes.
 
 
+def strip_if_string(value):
+    if isinstance(value, six.string_types):
+        return value.strip()
+    return value
+
+
 def get_user_by_username_or_email(username_or_email):
     """
     Return a User object, looking up by email if username_or_email contains a
     '@', otherwise by username.
 
     Raises:
-        User.DoesNotExist is lookup fails.
+        User.DoesNotExist if no user object can be found, the user was
+        retired, or the user is in the process of being retired.
     """
+    username_or_email = strip_if_string(username_or_email)
     if '@' in username_or_email:
-        return User.objects.get(email=username_or_email)
+        user = User.objects.get(email=username_or_email)
     else:
-        return User.objects.get(username=username_or_email)
+        user = User.objects.get(username=username_or_email)
+        UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
+        if UserRetirementRequest.has_user_requested_retirement(user):
+            raise User.DoesNotExist
+    return user
 
 
 def get_user(email):

@@ -430,6 +430,12 @@ class CCXListView(GenericAPIView):
             )
 
         try:
+            # Retired users should effectively appear to not exist when
+            # attempts are made to modify them, so a direct User model email
+            # lookup is sufficient here.  This corner case relies on the fact
+            # that we scramble emails immediately during user lock-out.  Of
+            # course, the normal cases are that the email just never existed,
+            # or it is currently associated with an active account.
             coach = User.objects.get(email=valid_input['coach_email'])
         except User.DoesNotExist:
             return Response(
