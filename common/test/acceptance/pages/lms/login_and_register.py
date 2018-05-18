@@ -218,7 +218,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         if password:
             self.q(css="#register-password").fill(password)
         if country:
-            self.q(css="#register-country option[value='{country}']".format(country=country)).click()
+            self.q(css="#register-country").results[0].send_keys(country)
         if favorite_movie:
             self.q(css="#register-favorite_movie").fill(favorite_movie)
         if terms_of_service:
@@ -335,6 +335,8 @@ class CombinedLoginAndRegisterPage(PageObject):
         def _check_func():
             """Return success status and any errors that occurred."""
             errors = self.errors
+            if not errors:
+                self.q(css=".register-button").click()
             return (bool(errors), errors)
         return Promise(_check_func, "Errors are visible").fulfill()
 
