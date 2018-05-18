@@ -572,6 +572,27 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'state': state,
         }, student_data[0])
 
+    @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
+    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    def test_build_student_data_for_block_with_generate_report_data_not_implemented(
+            self,
+            mock_generate_report_data,
+            mock_list_problem_responses,
+    ):
+        """
+        Ensure that if ``generate_report_data`` raises a NotImplementedError,
+        the report falls back to the alternative method.
+        """
+        problem = self.define_option_problem(u'Problem1')
+        mock_generate_report_data.side_effect = NotImplementedError
+        ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(problem.location),
+        )
+        mock_generate_report_data.assert_called_with(ANY, ANY)
+        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
+
     def test_success(self):
         task_input = {
             'problem_location': str(self.course.location),
