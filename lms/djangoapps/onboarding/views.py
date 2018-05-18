@@ -6,7 +6,6 @@ import json
 import logging
 from datetime import datetime
 
-import os
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -21,13 +20,14 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _, ugettext_noop
 from django.views.decorators.csrf import csrf_exempt
-from path import Path as path
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
     can_save_org_details
-from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, send_admin_update_email
-from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner
+from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
+    send_admin_update_email
+from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
+    get_close_matching_orgs_with_suggestions
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
@@ -486,29 +486,21 @@ def get_organizations(request):
     Get organizations
     """
     final_result = {}
-    org_label = ''
-    admin_email = ''
 
     if request.is_ajax():
         query = request.GET.get('term', '')
-        all_organizations = Organization.objects.filter(label__istartswith=query)
 
-        for organization in all_organizations:
-            final_result[organization.label] = {
-                'is_admin_assigned': True if organization.admin else False,
-                'is_current_user_admin': True if organization.admin == request.user else False,
-                'admin_email': organization.admin.email if organization.admin else 'Administrator not assigned yet.'
-            }
+        final_result = get_close_matching_orgs_with_suggestions(request, query)
 
         if request.user.is_authenticated():
             user_extended_profile = request.user.extended_profile
-            organization = user_extended_profile.organization
+            org = user_extended_profile.organization
 
-            if organization:
+            if org:
                 _result = {
-                    'org': organization.label,
-                    'is_poc': True if organization.admin == request.user else False,
-                    'admin_email': organization.admin.email if organization.admin else ''
+                    'org': org.label,
+                    'is_poc': True if org.admin == request.user else False,
+                    'admin_email': org.admin.email if org.admin else ''
                 }
             else:
                 _result = {
