@@ -1098,7 +1098,7 @@
 .empty-dashboard-message {
   border: 3px solid $gray-l4;
   background: $gray-l6;
-  padding: ($baseline*2) 0;
+  padding: ($baseline*2) ($baseline/10);
   text-align: center;
 
   p {
@@ -1109,7 +1109,13 @@
     text-shadow: 0 1px rgba(255,255,255, 0.6);
   }
 
-  a {
+  p.custom-message {
+    @include font-size(14);
+
+    text-shadow: none;
+  }
+
+  a.btn {
     background-color: theme-color('primary');
     border: 1px solid theme-color('primary');
     box-shadow: 0 1px 8px 0 $shadow-l1;
