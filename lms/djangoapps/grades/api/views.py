@@ -9,7 +9,6 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from edx_rest_framework_extensions.permissions import JWTRestrictedApplicationPermission
 from edx_rest_framework_extensions.authentication import JwtAuthentication
@@ -166,7 +165,6 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        SessionAuthentication,
         OAuth2AuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, JWTRestrictedApplicationPermission,)
@@ -192,9 +190,9 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
         # See if the request has an explicit sattr(request, 'allowed_organizations'))
         # which limits which OAuth2 clients can see the courses
         # based on the association with a RestrictedApplication
-        if hasattr(request, 'auth') and hasattr(request, 'allowed_organization'):
+        if hasattr(request, 'auth') and hasattr(request, 'filters'):
             course_key = CourseKey.from_string(course_id)
-            if course_key.org not in request.allowed_organization:
+            if course_key.org not in request.filters['content_org']:
                 return self.make_error_response(
                     status_code=status.HTTP_403_FORBIDDEN,
                     developer_message='The OAuth2 RestrictedApplication is not associated with org.',

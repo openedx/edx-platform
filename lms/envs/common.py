@@ -498,6 +498,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxOAuth2Validator',
     'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
+    'SCOPES_BACKEND_CLASS':'openedx.core.djangoapps.oauth_dispatch.scopes.DynamicScopes',
     'SCOPES': {
         'read': 'Read access',
         'write': 'Write access',
@@ -511,8 +512,8 @@ OAUTH2_PROVIDER = {
 }
 # This is required for the migrations in oauth_dispatch.models
 # otherwise it fails saying this attribute is not present in Settings
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
-
+##OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth_dispatch.OauthRestrictedApplication'
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile

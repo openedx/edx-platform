@@ -29,14 +29,15 @@ class JwtBuilder(object):
         secret (string): Overrides configured JWT secret (signing) key. Unused if an asymmetric signature is requested.
     """
 
-    def __init__(self, user, asymmetric=False, secret=None,is_application_restricted=None):
+    def __init__(self, user, asymmetric=False, secret=None,is_application_scopes_restricted=None):
+
         self.user = user
         self.asymmetric = asymmetric
         self.secret = secret
         self.jwt_auth = configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)
         self.default_jwt_issuer = configuration_helpers.get_value('DEFAULT_JWT_ISSUER', settings.DEFAULT_JWT_ISSUER)
         self.default_restricted_jwt_issuer = configuration_helpers.get_value('DEFAULT_RESTRICTED_JWT_ISSUER', settings.DEFAULT_RESTRICTED_JWT_ISSUER)
-        if is_application_restricted:
+        if is_application_scopes_restricted:
             for issuer in self.jwt_auth['JWT_ISSUERS']:
                 if self.default_restricted_jwt_issuer == issuer['ISSUER']:
                     self.issuer = issuer
@@ -45,7 +46,7 @@ class JwtBuilder(object):
                 if self.default_jwt_issuer == issuer['ISSUER']:
                     self.issuer = issuer
 
-    def build_token(self, scopes, expires_in=None, aud=None, additional_claims=None, org=None, application_grant_type=None):
+    def build_token(self, scopes, expires_in=None, aud=None, additional_claims=None, orgs=None, application_grant_type=None):
         """Returns a JWT access token.
 
         Arguments:
@@ -61,11 +62,13 @@ class JwtBuilder(object):
         """
         now = int(time())
         expires_in = expires_in or self.jwt_auth['JWT_EXPIRATION']
-        filters = {}
-        if org:
-            filters['content_org'] = org
+        filters = []
+        if orgs:
+            for org in orgs:
+                filters.append('content_org:'+org)
         if application_grant_type != u'client-credentials':
-             filters['user'] = 'me' 
+             filters.append('user:me')
+        
         payload = {
             # TODO Consider getting rid of this claim since we don't use it.
             'aud': aud if aud else self.issuer['AUDIENCE'],
